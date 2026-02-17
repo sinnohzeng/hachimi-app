@@ -1,0 +1,42 @@
+# Firestore Security Rules
+
+> Users can only read/write their own data.
+
+```javascript
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only access their own document and subcollections
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Habits subcollection
+      match /habits/{habitId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Check-ins subcollection (date-partitioned)
+      match /checkIns/{date} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        // Entries within a check-in date
+        match /entries/{entryId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+## Deploy
+```bash
+firebase deploy --only firestore:rules
+```
