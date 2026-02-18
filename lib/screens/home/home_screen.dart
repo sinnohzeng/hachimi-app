@@ -6,6 +6,7 @@ import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/habit_card.dart';
 import 'package:hachimi_app/screens/stats/stats_screen.dart';
+import 'package:hachimi_app/screens/profile/profile_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +18,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
+  static const _screens = <Widget>[
+    _HabitListView(),
+    StatsScreen(),
+    ProfileScreen(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _selectedIndex == 0 ? const _HabitListView() : const StatsScreen(),
+      body: _screens[_selectedIndex],
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () =>
@@ -44,6 +51,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             selectedIcon: Icon(Icons.bar_chart),
             label: 'Stats',
           ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Me',
+          ),
         ],
       ),
     );
@@ -64,23 +76,10 @@ class _HabitListView extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // App bar
-        SliverAppBar(
+        // App bar — no logout button; logout is in the Me tab
+        const SliverAppBar(
           floating: true,
-          title: const Text('Hachimi'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await ref.read(authServiceProvider).signOut();
-                if (context.mounted) {
-                  Navigator.of(context)
-                      .pushReplacementNamed(AppRouter.login);
-                }
-              },
-              tooltip: 'Logout',
-            ),
-          ],
+          title: Text('Hachimi'),
         ),
 
         // Today summary
@@ -163,7 +162,8 @@ class _HabitListView extends ConsumerWidget {
                     todayMinutes: todayMinutes[habit.id] ?? 0,
                     onTap: () => Navigator.of(context)
                         .pushNamed(AppRouter.timer, arguments: habit.id),
-                    onDelete: () => _confirmDelete(context, ref, habit.id, habit.name),
+                    onDelete: () =>
+                        _confirmDelete(context, ref, habit.id, habit.name),
                   );
                 },
                 childCount: habits.length,

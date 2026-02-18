@@ -4,6 +4,7 @@ import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/habits/add_habit_screen.dart';
 import 'package:hachimi_app/screens/timer/timer_screen.dart';
 import 'package:hachimi_app/screens/habits/habit_detail_screen.dart';
+import 'package:hachimi_app/screens/profile/profile_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -13,6 +14,7 @@ class AppRouter {
   static const String addHabit = '/add-habit';
   static const String timer = '/timer';
   static const String habitDetail = '/habit-detail';
+  static const String profile = '/profile';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -32,6 +34,8 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => HabitDetailScreen(habitId: habitId),
         );
+      case profile:
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
