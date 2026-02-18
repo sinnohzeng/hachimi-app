@@ -20,6 +20,7 @@
 | Background Timer | flutter_foreground_task | 8.x | Android foreground service for focus timer |
 | A/B Testing | Firebase Remote Config | 5.x | Dynamic config, feature flags |
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
+| Connectivity | connectivity_plus | 6.x | Device network status monitoring |
 
 ---
 
@@ -43,7 +44,8 @@
 │  ├── habitsProvider            ├── todayMinutesPerHabitProvider │
 │  ├── todayCheckInsProvider     ├── catsProvider                 │
 │  ├── catByIdProvider (family)  └── ownedBreedsProvider          │
-│  └── catByHabitProvider (family)                                │
+│  ├── catByHabitProvider (family)                                │
+│  ├── connectivityProvider     └── isOfflineProvider             │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services  (Data Layer — Firebase SDK isolation)               │
 │  ├── AuthService               ├── XpService (pure Dart)        │
@@ -83,6 +85,7 @@ Every concern in the system has exactly one authoritative source:
 | Cat game metadata | `lib/core/constants/cat_constants.dart` |
 | Named routes | `lib/core/router/app_router.dart` |
 | Dynamic configuration | Firebase Remote Config (keys in `remote_config_service.dart`) |
+| Device connectivity | `connectivityProvider` in `providers/connectivity_provider.dart` |
 
 ### 3. Strict Dependency Flow
 

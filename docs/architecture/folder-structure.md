@@ -70,6 +70,7 @@ hachimi-app/
 │   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── focus_timer_provider.dart       # focusTimerProvider (FSM state machine)
+│   │   ├── connectivity_provider.dart      # connectivityProvider, isOfflineProvider
 │   │   ├── habits_provider.dart            # habitsProvider, todayCheckInsProvider
 │   │   └── stats_provider.dart             # statsProvider (computed HabitStats)
 │   │
@@ -99,6 +100,7 @@ hachimi-app/
 │       ├── cat_preview_card.dart           # Cat candidate card in adoption Step 2
 │       ├── cat_sprite.dart                 # Cat display: breed tinting + stage/mood selection
 │       ├── emoji_picker.dart               # Curated ~30-emoji grid for habit icon selection
+│       ├── offline_banner.dart            # Offline indicator: cloud_off + sync message
 │       ├── progress_ring.dart              # Circular progress indicator (timer ring)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
 │       └── streak_indicator.dart           # Fire badge showing current streak count

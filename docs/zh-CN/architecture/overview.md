@@ -20,6 +20,7 @@
 | 后台计时 | flutter_foreground_task | 8.x | Android 前台服务保持计时器运行 |
 | A/B 测试 | Firebase Remote Config | 5.x | 动态配置、功能开关 |
 | 崩溃报告 | Firebase Crashlytics | 4.x | 生产环境错误监控 |
+| 网络连接 | connectivity_plus | 6.x | 设备网络状态监测 |
 
 ---
 
@@ -43,7 +44,8 @@
 │  ├── habitsProvider            ├── todayMinutesPerHabitProvider │
 │  ├── todayCheckInsProvider     ├── catsProvider                 │
 │  ├── catByIdProvider（family） └── ownedBreedsProvider          │
-│  └── catByHabitProvider（family）                               │
+│  ├── catByHabitProvider（family）                               │
+│  ├── connectivityProvider    └── isOfflineProvider             │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services（数据层——Firebase SDK 封装）                           │
 │  ├── AuthService               ├── XpService（纯 Dart）         │
@@ -83,6 +85,7 @@
 | 猫咪游戏元数据 | `lib/core/constants/cat_constants.dart` |
 | 命名路由 | `lib/core/router/app_router.dart` |
 | 动态配置 | Firebase Remote Config |
+| 设备网络连接 | `connectivityProvider`（`providers/connectivity_provider.dart`） |
 
 ### 3. 严格依赖方向
 

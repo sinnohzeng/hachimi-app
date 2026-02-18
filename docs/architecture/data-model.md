@@ -182,6 +182,7 @@ Batch includes:
 
 | Collection | Fields | Order | Purpose |
 |-----------|--------|-------|---------|
+| `users/{uid}/cats` | `state ASC`, `createdAt ASC` | Compound | `watchCats()` — active cats ordered by adoption date |
 | `users/{uid}/habits/{habitId}/sessions` | `habitId ASC`, `endedAt DESC` | Compound | Session history per habit |
 | `users/{uid}/checkIns/{date}/entries` | `habitId ASC`, `completedAt DESC` | Compound | Heatmap queries per habit |
 

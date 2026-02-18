@@ -7,6 +7,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/stats/stats_screen.dart';
@@ -92,6 +93,9 @@ class _TodayTab extends ConsumerWidget {
           floating: true,
           title: Text('Hachimi'),
         ),
+
+        // Offline banner
+        const SliverToBoxAdapter(child: OfflineBanner()),
 
         // Today summary
         SliverToBoxAdapter(

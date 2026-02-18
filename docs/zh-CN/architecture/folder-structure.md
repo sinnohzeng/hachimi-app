@@ -51,6 +51,7 @@ hachimi-app/
 │   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── focus_timer_provider.dart       # focusTimerProvider（有限状态机）
+│   │   ├── connectivity_provider.dart      # connectivityProvider、isOfflineProvider
 │   │   ├── habits_provider.dart            # habitsProvider、todayCheckInsProvider
 │   │   └── stats_provider.dart             # statsProvider（计算型 HabitStats）
 │   │
@@ -80,6 +81,7 @@ hachimi-app/
 │       ├── cat_preview_card.dart           # 领养第 2 步中的猫咪候选卡片
 │       ├── cat_sprite.dart                 # 猫咪显示：品种着色 + 阶段/心情选择
 │       ├── emoji_picker.dart               # 约 30 个 Emoji 的精选网格（用于习惯图标）
+│       ├── offline_banner.dart            # 离线指示器：cloud_off 图标 + 同步提示
 │       ├── progress_ring.dart              # 圆形进度指示器（计时器圆环）
 │       ├── streak_heatmap.dart             # 91 天 GitHub 风格活动热力图
 │       └── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章

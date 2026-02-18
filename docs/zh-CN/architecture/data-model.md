@@ -180,6 +180,7 @@ dormant ──[习惯重新激活]─► active（未来功能）
 
 | 集合 | 字段 | 顺序 | 用途 |
 |------|------|------|------|
+| `users/{uid}/cats` | `state ASC`, `createdAt ASC` | 复合 | `watchCats()` —— 按领养日期排序的活跃猫咪 |
 | `users/{uid}/habits/{habitId}/sessions` | `habitId ASC`, `endedAt DESC` | 复合 | 按习惯查询会话历史 |
 | `users/{uid}/checkIns/{date}/entries` | `habitId ASC`, `completedAt DESC` | 复合 | 按习惯查询热力图数据 |
 

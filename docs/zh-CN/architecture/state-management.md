@@ -30,6 +30,14 @@ Firebase Auth 流 ──────────────► authStateProvide
 计时器状态（本地状态，非 Firestore）：
 
   focusTimerProvider (StateNotifierProvider<FocusTimerNotifier, FocusTimerState>)
+
+
+设备网络连接（独立于认证状态）：
+
+  connectivity_plus 流 ──► connectivityProvider (StreamProvider<bool>)
+                                     │
+                                     ▼
+                            isOfflineProvider (Provider<bool>)
 ```
 
 ---
@@ -165,6 +173,24 @@ Firebase Auth 流 ──────────────► authStateProvide
 | `reset()` | 返回 `idle` 状态 |
 
 **计时器心跳**：`Timer.periodic(const Duration(seconds: 1), _onTick)` —— 通过 `ref.onDispose()` 进行清理。
+
+---
+
+### `connectivityProvider`
+
+- **类型**：`StreamProvider<bool>`
+- **文件**：`lib/providers/connectivity_provider.dart`
+- **数据源**：`connectivity_plus` 的 `Connectivity().onConnectivityChanged` —— 将 `ConnectivityResult.none` 映射为 `false`，其余为 `true`
+- **消费者**：`isOfflineProvider`
+- **SSOT**：设备当前是否有活跃的网络接口
+
+### `isOfflineProvider`
+
+- **类型**：`Provider<bool>`
+- **文件**：`lib/providers/connectivity_provider.dart`
+- **数据源**：派生自 `connectivityProvider` —— 断网时返回 `true`，加载期间默认 `false`
+- **消费者**：`OfflineBanner` 组件
+- **SSOT**：供 UI 显示/隐藏离线横幅的简单布尔标志
 
 ---
 

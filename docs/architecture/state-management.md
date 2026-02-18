@@ -30,6 +30,14 @@ Firebase Auth stream ───────────────────�
 Timer state (local, not Firestore):
 
          focusTimerProvider (StateNotifierProvider<FocusTimerNotifier, FocusTimerState>)
+
+
+Device connectivity (independent of auth):
+
+  connectivity_plus stream ──► connectivityProvider (StreamProvider<bool>)
+                                        │
+                                        ▼
+                               isOfflineProvider (Provider<bool>)
 ```
 
 ---
@@ -165,6 +173,24 @@ Timer state (local, not Firestore):
 | `reset()` | Return to `idle` state |
 
 **Timer tick:** `Timer.periodic(const Duration(seconds: 1), _onTick)` — disposed via `ref.onDispose()`.
+
+---
+
+### `connectivityProvider`
+
+- **Type**: `StreamProvider<bool>`
+- **File**: `lib/providers/connectivity_provider.dart`
+- **Source**: `Connectivity().onConnectivityChanged` from `connectivity_plus` — maps `ConnectivityResult.none` to `false`, all others to `true`
+- **Consumers**: `isOfflineProvider`
+- **SSOT for**: Whether the device currently has a network interface active
+
+### `isOfflineProvider`
+
+- **Type**: `Provider<bool>`
+- **File**: `lib/providers/connectivity_provider.dart`
+- **Source**: Derived from `connectivityProvider` — returns `true` when disconnected, defaults `false` during loading
+- **Consumers**: `OfflineBanner` widget
+- **SSOT for**: Simple boolean flag for UI to show/hide the offline banner
 
 ---
 
