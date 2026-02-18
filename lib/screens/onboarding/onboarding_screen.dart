@@ -17,30 +17,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _pages = [
     _OnboardingPageData(
-      icon: Icons.local_fire_department,
+      emoji: '🐱',
       title: 'Welcome to Hachimi',
-      subtitle: 'Track your habits',
-      body: 'Build better habits and reach your goals.\n'
-          'Join thousands of others improving their lives,\n'
-          'one check-in at a time.',
+      subtitle: 'Raise cats, build habits',
+      body: 'Every habit you create comes with a kitten.\n'
+          'Focus on your goals and watch them grow\n'
+          'from tiny kittens into shiny cats!',
       gradientColors: [Color(0xFF6C63FF), Color(0xFF3F3D9E)],
     ),
     _OnboardingPageData(
-      icon: Icons.timer_outlined,
-      title: 'Track Your Progress',
-      subtitle: 'Time & streaks',
-      body: 'Log your time, build streaks, and see\n'
-          'your progress over days, weeks, and months.\n'
-          'Every minute counts toward your goals.',
+      emoji: '⏱️',
+      title: 'Focus & Earn XP',
+      subtitle: 'Time fuels growth',
+      body: 'Start a focus session and your cat earns XP.\n'
+          'Build streaks for bonus rewards.\n'
+          'Every minute counts toward evolution!',
       gradientColors: [Color(0xFF42A5F5), Color(0xFF1565C0)],
     ),
     _OnboardingPageData(
-      icon: Icons.emoji_events_outlined,
-      title: 'Achieve Your Goals',
-      subtitle: 'Stay motivated',
-      body: 'Set target hours for each habit and\n'
-          'watch your progress ring fill up.\n'
-          "Let's get started!",
+      emoji: '✨',
+      title: 'Watch Them Evolve',
+      subtitle: 'Kitten → Shiny',
+      body: 'Cats evolve through 4 stages as they grow.\n'
+          'Collect different breeds, unlock rare cats,\n'
+          'and fill your cozy cat room!',
       gradientColors: [Color(0xFFEF5350), Color(0xFFC62828)],
     ),
   ];
@@ -172,14 +172,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _OnboardingPageData {
-  final IconData icon;
+  final String emoji;
   final String title;
   final String subtitle;
   final String body;
   final List<Color> gradientColors;
 
   const _OnboardingPageData({
-    required this.icon,
+    required this.emoji,
     required this.title,
     required this.subtitle,
     required this.body,
@@ -232,8 +232,11 @@ class _OnboardingPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Icon
-              Icon(data.icon, size: 120, color: Colors.white24),
+              // Emoji
+              Text(
+                data.emoji,
+                style: const TextStyle(fontSize: 96),
+              ),
               const SizedBox(height: 40),
 
               // Body

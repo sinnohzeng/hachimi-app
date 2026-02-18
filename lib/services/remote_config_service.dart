@@ -6,9 +6,17 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 class RemoteConfigService {
   final FirebaseRemoteConfig _remoteConfig = FirebaseRemoteConfig.instance;
 
+  // Legacy keys
   static const String keyCheckInSuccessMessage = 'checkin_success_message';
   static const String defaultSuccessMessage =
       'Great job! Keep the momentum going.';
+
+  // Cat system keys
+  static const String keyXpMultiplier = 'xp_multiplier';
+  static const String keyNotificationCopyVariant = 'notification_copy_variant';
+  static const String keyMoodThresholdLonelyDays =
+      'mood_threshold_lonely_days';
+  static const String keyDefaultFocusDuration = 'default_focus_duration';
 
   Future<void> initialize() async {
     await _remoteConfig.setConfigSettings(RemoteConfigSettings(
@@ -18,6 +26,10 @@ class RemoteConfigService {
 
     await _remoteConfig.setDefaults({
       keyCheckInSuccessMessage: defaultSuccessMessage,
+      keyXpMultiplier: 1.0,
+      keyNotificationCopyVariant: 'A',
+      keyMoodThresholdLonelyDays: 3,
+      keyDefaultFocusDuration: 25,
     });
 
     // Fetch and activate on init
@@ -30,4 +42,19 @@ class RemoteConfigService {
 
   String get checkInSuccessMessage =>
       _remoteConfig.getString(keyCheckInSuccessMessage);
+
+  /// XP multiplier for events/promotions (default: 1.0).
+  double get xpMultiplier => _remoteConfig.getDouble(keyXpMultiplier);
+
+  /// Notification copy variant for A/B testing (default: 'A').
+  String get notificationCopyVariant =>
+      _remoteConfig.getString(keyNotificationCopyVariant);
+
+  /// Days without a session before mood becomes 'lonely' (default: 3).
+  int get moodThresholdLonelyDays =>
+      _remoteConfig.getInt(keyMoodThresholdLonelyDays);
+
+  /// Default focus duration in minutes for new habits (default: 25).
+  int get defaultFocusDuration =>
+      _remoteConfig.getInt(keyDefaultFocusDuration);
 }

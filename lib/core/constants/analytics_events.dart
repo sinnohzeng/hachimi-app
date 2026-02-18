@@ -2,40 +2,93 @@
 /// See docs/firebase/analytics-events.md for the full specification.
 ///
 /// Conversion funnel:
-/// app_open → sign_up → first_habit_created → first_timer_started → daily_check_in → streak_7_days
+/// app_open → sign_up → cat_adopted → focus_session_completed → cat_level_up → streak_achieved_7
 class AnalyticsEvents {
   AnalyticsEvents._();
 
-  // Event names
+  // ─── Event Names ───
+
+  // Auth
   static const String signUp = 'sign_up';
+
+  // Habit lifecycle
   static const String habitCreated = 'habit_created';
   static const String habitDeleted = 'habit_deleted';
+  static const String habitArchived = 'habit_archived';
+
+  // Cat lifecycle
+  static const String catAdopted = 'cat_adopted';
+  static const String catLevelUp = 'cat_level_up';
+  static const String catStageEvolved = 'cat_stage_evolved';
+
+  // Focus sessions
+  static const String focusSessionStarted = 'focus_session_started';
+  static const String focusSessionCompleted = 'focus_session_completed';
+  static const String focusSessionAbandoned = 'focus_session_abandoned';
+
+  // Progress
+  static const String allHabitsDone = 'all_habits_done';
+  static const String streakAchieved = 'streak_achieved';
+
+  // Navigation
+  static const String catRoomViewed = 'cat_room_viewed';
+  static const String catTapped = 'cat_tapped';
+
+  // Notifications
+  static const String notificationOpened = 'notification_opened';
+
+  // Legacy (kept for backward compat with existing screens)
   static const String timerStarted = 'timer_started';
   static const String timerCompleted = 'timer_completed';
   static const String dailyCheckIn = 'daily_check_in';
-  static const String streakAchieved = 'streak_achieved';
   static const String goalProgress = 'goal_progress';
-  static const String notificationOpened = 'notification_opened';
 
-  // Parameter keys
+  // ─── Parameter Keys ───
+
   static const String paramMethod = 'method';
   static const String paramHabitName = 'habit_name';
+  static const String paramHabitId = 'habit_id';
+  static const String paramGoalMinutes = 'goal_minutes';
   static const String paramTargetHours = 'target_hours';
+  static const String paramTimerMode = 'timer_mode';
+  static const String paramTargetMinutes = 'target_minutes';
+  static const String paramActualMinutes = 'actual_minutes';
+  static const String paramXpEarned = 'xp_earned';
+  static const String paramStreakDays = 'streak_days';
+  static const String paramMinutesCompleted = 'minutes_completed';
+  static const String paramReason = 'reason';
+  static const String paramHabitCount = 'habit_count';
+  static const String paramTotalBonusXp = 'total_bonus_xp';
+  static const String paramCatId = 'cat_id';
+  static const String paramBreed = 'breed';
+  static const String paramPattern = 'pattern';
+  static const String paramPersonality = 'personality';
+  static const String paramRarity = 'rarity';
+  static const String paramNewLevel = 'new_level';
+  static const String paramNewStage = 'new_stage';
+  static const String paramTotalXp = 'total_xp';
+  static const String paramCatCount = 'cat_count';
+  static const String paramAction = 'action';
+  static const String paramNotificationType = 'notification_type';
   static const String paramDurationMinutes = 'duration_minutes';
   static const String paramStreakCount = 'streak_count';
   static const String paramMinutesToday = 'minutes_today';
   static const String paramMilestone = 'milestone';
   static const String paramPercentComplete = 'percent_complete';
 
-  // User property keys
+  // ─── User Property Keys ───
+
   static const String propTotalHabits = 'total_habits';
+  static const String propCatCount = 'cat_count';
+  static const String propMaxCatLevel = 'max_cat_level';
   static const String propLongestStreak = 'longest_streak';
+  static const String propTotalFocusMinutes = 'total_focus_minutes';
   static const String propTotalHoursLogged = 'total_hours_logged';
+  static const String propDaysActive = 'days_active';
   static const String propDaysSinceSignup = 'days_since_signup';
 
-  // Streak milestones
-  static const List<int> streakMilestones = [7, 14, 30, 60, 100];
+  // ─── Milestones ───
 
-  // Progress milestones (percent)
+  static const List<int> streakMilestones = [3, 7, 14, 30, 60, 100];
   static const List<int> progressMilestones = [25, 50, 75, 100];
 }

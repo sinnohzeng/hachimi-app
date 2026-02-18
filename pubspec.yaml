@@ -1,5 +1,5 @@
 name: hachimi_app
-description: "Habit check-in and time tracking app for interview preparation. Built with Flutter + Firebase + Material Design 3."
+description: "Cat-parenting habit app. Adopt cats, build habits, earn XP. Built with Flutter + Firebase + Material Design 3."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -34,6 +34,15 @@ dependencies:
   google_sign_in: ^7.2.0
   shared_preferences: ^2.5.4
 
+  # Notifications
+  flutter_local_notifications: ^18.0.1
+
+  # Background timer
+  flutter_foreground_task: ^8.12.0
+
+  # Timezone (for local notification scheduling)
+  timezone: ^0.10.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -41,3 +50,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/sprites/
+    - assets/room/

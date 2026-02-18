@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/providers/stats_provider.dart';
+import 'package:hachimi_app/widgets/cat_sprite.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -11,9 +16,22 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final stats = ref.watch(statsProvider);
+    final allCats = ref.watch(allCatsProvider).value ?? [];
+
+    // Count cats by rarity
+    final commonCount = allCats.where((c) => c.rarity == 'common').length;
+    final uncommonCount = allCats.where((c) => c.rarity == 'uncommon').length;
+    final rareCount = allCats.where((c) => c.rarity == 'rare').length;
+
+    // Max cat level
+    int maxLevel = 0;
+    for (final cat in allCats) {
+      if (cat.computedStage > maxLevel) maxLevel = cat.computedStage;
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Me')),
+      appBar: AppBar(title: const Text('Profile')),
       body: ListView(
         children: [
           const SizedBox(height: 24),
@@ -56,7 +74,131 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+
+          // Stats overview
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your Journey',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _StatBadge(
+                          icon: Icons.timer_outlined,
+                          value: '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
+                          label: 'Total Focus',
+                          color: colorScheme.primary,
+                        ),
+                        _StatBadge(
+                          icon: Icons.pets,
+                          value: '${allCats.length}',
+                          label: 'Total Cats',
+                          color: colorScheme.tertiary,
+                        ),
+                        _StatBadge(
+                          icon: Icons.local_fire_department,
+                          value: '${stats.longestStreak}',
+                          label: 'Best Streak',
+                          color: colorScheme.error,
+                        ),
+                      ],
+                    ),
+                    if (allCats.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      // Rarity breakdown
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _RarityChip(
+                            label: 'Common',
+                            count: commonCount,
+                            color: const Color(0xFF66BB6A),
+                          ),
+                          _RarityChip(
+                            label: 'Uncommon',
+                            count: uncommonCount,
+                            color: const Color(0xFF448AFF),
+                          ),
+                          _RarityChip(
+                            label: 'Rare',
+                            count: rareCount,
+                            color: const Color(0xFFE040FB),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Cat Album section
+          if (allCats.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Cat Album',
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${allCats.length} cats',
+                            style: textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Cat grid preview (max 6)
+                      _CatAlbumGrid(cats: allCats.take(6).toList()),
+                      if (allCats.length > 6) ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _showFullAlbum(context, allCats);
+                            },
+                            icon: const Icon(Icons.grid_view),
+                            label: Text('See all ${allCats.length} cats'),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 16),
           const Divider(),
 
           // Settings section
@@ -75,10 +217,10 @@ class ProfileScreen extends ConsumerWidget {
 
           // About section
           _SectionHeader(title: 'About', colorScheme: colorScheme),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Version'),
-            subtitle: const Text('1.0.0'),
+          const ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Version'),
+            subtitle: Text('1.0.0'),
           ),
 
           // Extra spacing to push danger zone to the bottom
@@ -122,6 +264,58 @@ class ProfileScreen extends ConsumerWidget {
       return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
     }
     return parts.first[0].toUpperCase();
+  }
+
+  void _showFullAlbum(BuildContext context, List<Cat> allCats) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.75,
+        maxChildSize: 0.95,
+        builder: (ctx, scrollController) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Text(
+                    'Cat Album',
+                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: GridView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: allCats.length,
+                itemBuilder: (ctx, index) {
+                  final cat = allCats[index];
+                  return _CatAlbumTile(cat: cat);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _confirmLogout(BuildContext context, WidgetRef ref) {
@@ -180,6 +374,165 @@ class ProfileScreen extends ConsumerWidget {
             child: const Text('Delete Account'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatBadge extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  const _StatBadge({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RarityChip extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+
+  const _RarityChip({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '$count $label',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CatAlbumGrid extends StatelessWidget {
+  final List<Cat> cats;
+
+  const _CatAlbumGrid({required this.cats});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      childAspectRatio: 0.85,
+      children: cats.map((cat) => _CatAlbumTile(cat: cat)).toList(),
+    );
+  }
+}
+
+class _CatAlbumTile extends StatelessWidget {
+  final Cat cat;
+
+  const _CatAlbumTile({required this.cat});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isActive = cat.state == 'active';
+    final isGraduated = cat.state == 'graduated';
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRouter.catDetail,
+          arguments: cat.id,
+        );
+      },
+      child: Opacity(
+        opacity: isGraduated ? 0.5 : (isActive ? 1.0 : 0.7),
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: CatSprite.fromCat(
+                    breed: cat.breed,
+                    stage: cat.computedStage,
+                    mood: cat.computedMood,
+                    size: 48,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              cat.name,
+              style: theme.textTheme.labelSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (isGraduated)
+              Text(
+                'Graduated',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 9,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

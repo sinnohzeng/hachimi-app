@@ -1,58 +1,311 @@
-# Product Requirements Document (PRD)
+# Product Requirements Document — PRD v3.0
 
-## Product Vision
+> **Version**: 3.0 | **Status**: Implemented | **Last Updated**: 2026-02-17
 
-**Hachimi** is a habit check-in and time tracking app designed for goal-oriented individuals who want to systematically track their daily investment toward long-term goals (e.g., interview preparation, skill building).
+---
 
-## Problem Statement
+## 1. Product Vision
 
-When preparing for important milestones (like job interviews), people need to:
-1. Set clear time investment goals for each preparation area
-2. Track daily progress consistently
-3. Maintain motivation through streaks and visible progress
-4. Get reminded to stay on track
+**Hachimi** is a cat-parenting habit app where every habit you create gives you a unique virtual kitten to raise. Focusing on your habit earns XP; XP makes your cat grow. The cozy Cat Room fills up as you build more habits — creating a living, visual record of your growth.
 
-## Target User
+**Core loop:**
+```
+Create habit → Adopt kitten → Start focus timer → Earn XP → Cat evolves
+```
 
-Professionals preparing for career milestones who want to track their daily study/practice investment across multiple preparation areas.
+**Design philosophy:** Abstract habit tracking is emotionally neutral. A cat that misses you when you skip a session is not. Hachimi uses attachment and nurturing psychology to transform consistency from obligation into care.
 
-## Core Features (MVP)
+---
 
-### F1: User Authentication
-- Email/password registration and login
-- Persistent session (stay logged in)
+## 2. Target Audience
 
-### F2: Habit Management
-- Create a habit with: name, icon, target hours
-- View all habits on home screen
-- Delete a habit
+**Primary:** Goal-oriented individuals aged 18–35 who:
+- Are learning or building a skill over the long term (language learning, coding, fitness, creative practice)
+- Already understand the value of streaks but struggle with maintaining them
+- Respond to visual feedback and progress visualization
+- Are comfortable with mobile apps and light gamification
 
-### F3: Daily Check-in + Time Logging
-- Start a timer for a specific habit (count-up, not Pomodoro-fixed)
-- Pause and resume timer
-- Complete timer → log minutes to Firestore
-- Alternative: manually enter minutes invested
-- Each check-in updates the habit's total accumulated time
+**Non-target:** Users seeking strict time-boxing (Pomodoro apps), social accountability, or enterprise team tracking.
 
-### F4: Progress Tracking
-- Per-habit: accumulated hours vs target (progress bar/ring)
-- Per-habit: current streak (consecutive days checked in)
-- Overall: today's total investment time
-- Calendar heatmap: which days had check-ins
+---
 
-### F5: Push Notifications
-- Daily reminder to check in (configurable time)
-- Streak-at-risk notification (if no check-in by evening)
+## 3. Feature Specifications
 
-### F6: A/B Testing
-- Test motivational copy on check-in completion screen
-- Variant A: "Great job! Keep the momentum going."
-- Variant B: "Day {streak} complete. You're {percent}% closer to your goal."
+### 3.1 Onboarding
 
-## Out of Scope (MVP)
-- Social features / sharing
-- Multiple languages
-- Dark mode toggle
-- App Store submission
-- Offline-first / local caching
+**Flow:**
+1. **3-page carousel** introducing the cat loop:
+   - Page 1: "Welcome to Hachimi" — emoji 🐱, app concept
+   - Page 2: "Focus & Earn XP" — emoji ⏱️, timer + XP explanation
+   - Page 3: "Watch Them Evolve" — emoji ✨, stage evolution preview
+2. **Login/Register** — email+password or Google OAuth
+3. **First Habit Adoption** — auto-detected: if `habits.length == 0`, redirect to adoption flow with first-time messaging
+
+**Acceptance criteria:**
+- Onboarding completion status stored in `SharedPreferences` (`onboarding_complete: bool`)
+- After completion, `AuthGate` never shows onboarding again
+- First-time users see the adoption flow automatically; returning users go directly to Home
+
+---
+
+### 3.2 User Authentication
+
+| Method | Status |
+|--------|--------|
+| Email + Password | Supported |
+| Google OAuth | Supported |
+
+**Behavior:**
+- Session persists across app restarts (Firebase Auth local persistence)
+- On sign-out, navigate to `LoginScreen` and clear all provider state
+- User document `users/{uid}` is created on first sign-in
+
+---
+
+### 3.3 Habit Management
+
+**Create a Habit** (Adoption Flow — 3 steps):
+
+**Step 1 — Define Habit:**
+- Habit name (required, text field)
+- Emoji icon (emoji picker with ~30 curated options)
+- Daily focus goal: chip selector `[15 min] [25 min] [40 min] [60 min] [Custom]` — default 25 min
+- Reminder time: optional, quick-pick chips ("7 AM", "8 AM", "9 PM", "None")
+
+**Step 2 — Adopt Your Cat:**
+- Display 3 generated cat candidates side by side
+- Each card shows: breed name, personality badge, flavor text, cat sprite preview
+- Tap to select; unselected cards fade out
+- Cats generated by `CatGenerationService.generateDraft()`
+
+**Step 3 — Name Your Cat:**
+- Text field with randomly generated default name from `catNames` pool
+- "Adopt" button → batch-creates habit + cat in Firestore → navigate to Home
+
+**Delete a Habit:**
+- Habit is permanently deleted
+- Bound cat transitions to `graduated` state in the same Firestore batch
+- Graduated cats remain visible in the Cat Album (greyed out)
+
+**Deactivate a Habit (future):**
+- Marks habit `isActive: false`
+- Cat state → `dormant` (slightly faded in Cat Room)
+- No new sessions can be logged; cat mood freezes
+
+---
+
+### 3.4 Focus Timer
+
+**Timer Modes:**
+- **Countdown**: User sets a target duration; timer counts down. A circular progress ring empties.
+- **Stopwatch**: Open-ended; timer counts up. Progress ring fills relative to the habit's `goalMinutes`.
+
+**Focus Setup Screen:**
+- Cat displayed prominently (center)
+- Duration chips: `[15] [25] [40] [60] [Custom]` — default = habit's `goalMinutes`
+- Mode toggle: `[Countdown] [Stopwatch]`
+- "Start Focus" button
+
+**Timer Screen (in progress):**
+- Full-screen with soft gradient background (cat breed color)
+- Cat sprite in center
+- Circular progress ring around cat
+- Timer display (remaining or elapsed)
+- Habit name + streak badge at top
+- "Give Up" button: **long-press** only to prevent accidental abandonment
+
+**Background Behavior:**
+- Android foreground service keeps timer alive when app is minimized
+- Persistent notification shows: cat emoji + habit name + remaining/elapsed time
+- `onPause` (app backgrounded): record timestamp
+- `onResume` (app foregrounded):
+  - Away < 15 seconds: continue normally
+  - Away 15 s – 5 min: auto-pause timer
+  - Away > 5 min: auto-end session (mark as completed with time up to backgrounding)
+
+**Session Completion:**
+- XP calculated by `XpService.calculateXp()`
+- Session written to Firestore via `FirestoreService.logFocusSession()` (atomic batch)
+- Navigate to Focus Complete screen
+
+**Abandoned Sessions (Give Up):**
+- If focused >= 5 minutes: session saved with `completed: false`, base XP only
+- If focused < 5 minutes: no session saved, no XP awarded
+
+---
+
+### 3.5 XP & Cat Evolution
+
+See [Cat System](../architecture/cat-system.md) for full XP formula and stage thresholds.
+
+**XP Formula:**
+```
+totalXp = (minutes × 1) + streakBonus + milestoneBonus + fullHouseBonus
+```
+
+| Component | Value | Condition |
+|-----------|-------|-----------|
+| Base | 1 XP/minute | Always |
+| Streak bonus | +5/session | currentStreak >= 3 |
+| Milestone bonus | +30 (one-time) | Streak hits 7, 14, or 30 days |
+| Full house bonus | +10/session | All habits completed today |
+
+**XP multiplier** from Remote Config (`xp_multiplier`, default `1.0`) scales total XP for promotional events.
+
+**Growth Stages:**
+
+| Stage | XP Threshold | Visual |
+|-------|-------------|--------|
+| Kitten | 0 | Small, round sprite |
+| Young | 100 | Growing, more expressive |
+| Adult | 300 | Fully formed |
+| Shiny | 600 | Golden glow effect |
+
+**Focus Complete Screen:**
+- Cat bounce animation + "+{xp} XP" floating text
+- Level-up animation if stage changed (sprite morphs)
+- Stats: duration, XP earned, current streak, total XP
+- "Full House" special animation if all habits done today
+
+---
+
+### 3.6 Cat Room
+
+The Cat Room is the emotional centerpiece of the app. It shows all active cats in a cozy illustrated room scene.
+
+**Layout:**
+- Room background image (day/night variant based on system time: day if 6:00–19:59, night otherwise)
+- Up to 10 cats placed at predefined slot positions (see [Cat System](../architecture/cat-system.md))
+- Each cat sprite tinted by its breed color
+
+**Interactions:**
+- Tap cat → speech bubble (personality × mood message) + bottom sheet
+- Bottom sheet actions: "Start Focus" → FocusSetupScreen; "View Details" → CatDetailScreen
+- Speech bubble disappears after 3 seconds or on background tap
+
+**Overflow:** If user has >10 active cats, a "See all cats" link opens the full Cat Album.
+
+**Cat mood affects:**
+- Sprite pose variant (happy/neutral/sad)
+- Speech bubble text
+- Dormant cats appear slightly faded (70% opacity)
+
+---
+
+### 3.7 Cat Detail Screen
+
+- Large cat sprite with stage indicator
+- Cat name, breed, personality badge
+- XP progress bar (current XP / next stage threshold)
+- Bound habit name + current streak
+- 91-day GitHub-style streak heatmap (focus minutes per day)
+- Milestones list (stages reached, streak achievements)
+
+---
+
+### 3.8 Stats & Profile
+
+**Stats Screen:**
+- Today's total focus minutes
+- Cat count
+- Active streak count
+- Per-habit progress: accumulated hours vs `targetHours`, today's progress
+
+**Profile Screen:**
+- "Your Journey" stats card: total focus time, total cats, best streak
+- Rarity breakdown: count by Common / Uncommon / Rare
+- Cat Album button → full grid of all cats (active, dormant, graduated)
+- Settings: account info, notification preferences, sign out
+
+---
+
+### 3.9 Push Notifications
+
+| Type | Trigger | Channel | Copy |
+|------|---------|---------|------|
+| Daily reminder | Scheduled at `habit.reminderTime` | `hachimi_reminders` | "{cat name} is waiting for you! Time to focus on {habit name}." |
+| Streak-at-risk | 20:00 local, no session today, streak >= 3 | `hachimi_reminders` | "Don't break your {n}-day streak! {cat name} is getting worried." |
+| Level-up celebration | Immediately after stage evolution | `hachimi_focus` | "{cat name} evolved to {stage}! Come see!" |
+| Win-back | > 48 hours with no session (FCM) | `hachimi_reminders` | "{cat name} misses you. It's been {n} days..." |
+
+**Implementation:**
+- Daily reminder and streak-at-risk: `flutter_local_notifications` with `zonedSchedule`
+- Level-up: immediate local notification
+- Win-back: Firebase Cloud Messaging (requires Cloud Functions — future backend work)
+
+---
+
+## 4. Navigation
+
+**4-tab NavigationBar:**
+
+| Tab | Icon | Screen |
+|-----|------|--------|
+| Today | home | HomeScreen — featured cat + habit list |
+| Cat Room | pets | CatRoomScreen — illustrated room with all cats |
+| Stats | bar_chart | StatsScreen — activity heatmap + per-habit stats |
+| Profile | person | ProfileScreen — settings + cat album |
+
+**Named Routes:**
+
+| Route | Screen | Args |
+|-------|--------|------|
+| `/login` | LoginScreen | — |
+| `/home` | HomeScreen | — |
+| `/adoption` | AdoptionFlowScreen | `isFirstHabit: bool` |
+| `/focus-setup` | FocusSetupScreen | `habitId: String` |
+| `/timer` | TimerScreen | `habitId: String` |
+| `/focus-complete` | FocusCompleteScreen | `Map<String, dynamic>` |
+| `/cat-detail` | CatDetailScreen | `catId: String` |
+| `/profile` | ProfileScreen | — |
+
+---
+
+## 5. Analytics Strategy
+
+**Conversion funnel:**
+```
+app_open → sign_up → cat_adopted → focus_session_started → focus_session_completed → cat_level_up
+```
+
+**Key events:**
+
+| Event | Trigger | Key Parameters |
+|-------|---------|----------------|
+| `sign_up` | Registration complete | `method` |
+| `cat_adopted` | Adoption flow completed | `breed`, `rarity`, `personality` |
+| `focus_session_started` | Timer started | `habit_id`, `timer_mode`, `target_minutes` |
+| `focus_session_completed` | Session saved | `habit_id`, `actual_minutes`, `xp_earned`, `streak_days` |
+| `focus_session_abandoned` | Give Up pressed | `habit_id`, `minutes_completed` |
+| `cat_level_up` | Stage evolved | `cat_id`, `new_stage`, `total_xp` |
+| `streak_achieved` | Streak milestone | `streak_days`, `habit_id` |
+| `all_habits_done` | Full house bonus | `habit_count`, `total_bonus_xp` |
+| `cat_room_viewed` | Cat Room tab opened | `cat_count` |
+| `cat_tapped` | Cat tapped in room | `cat_id`, `action` |
+
+See [Analytics Events](../firebase/analytics-events.md) for full specification.
+
+---
+
+## 6. A/B Testing
+
+| Key | Default | Variants | Goal Metric |
+|-----|---------|---------|------------|
+| `xp_multiplier` | `1.0` | 1.0 vs 1.5 | `focus_session_completed` rate |
+| `notification_copy_variant` | `"A"` | A, B | Notification open rate |
+| `mood_threshold_lonely_days` | `3` | 3 vs 5 | Session return rate after gap |
+| `default_focus_duration` | `25` | 25 vs 15 | Session start rate |
+
+---
+
+## 7. Out of Scope (v3.0)
+
+- Social features (sharing, leaderboards, friends)
+- Dark mode toggle (system-controlled via `ThemeMode.system`)
+- App Store / Play Store submission
+- Offline-first / local caching (Firestore offline persistence is implicit)
 - Data export
+- Multi-device sync (FCM token supports one device per account)
+- Cat accessories / cosmetics shop
+- Multiplayer / co-op habit tracking
+- Web or desktop support

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
@@ -77,7 +78,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     return authState.when(
       data: (user) {
         debugPrint('[APP] authState: data, user=${user?.uid}');
-        return user != null ? const HomeScreen() : const LoginScreen();
+        if (user == null) return const LoginScreen();
+        return const _FirstHabitGate();
       },
       loading: () {
         debugPrint('[APP] authState: loading');
@@ -90,6 +92,46 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         return const LoginScreen();
       },
     );
+  }
+}
+
+/// _FirstHabitGate — shows HomeScreen immediately, but if the user has
+/// zero habits, auto-navigates to the adoption flow with first-time messaging.
+class _FirstHabitGate extends ConsumerStatefulWidget {
+  const _FirstHabitGate();
+
+  @override
+  ConsumerState<_FirstHabitGate> createState() => _FirstHabitGateState();
+}
+
+class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
+  bool _checkedFirstHabit = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final habitsAsync = ref.watch(habitsProvider);
+
+    // Once habits load, check if this is a first-time user
+    if (!_checkedFirstHabit) {
+      habitsAsync.whenData((habits) {
+        if (habits.isEmpty) {
+          _checkedFirstHabit = true;
+          // Navigate to adoption flow after build completes
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              Navigator.of(context).pushNamed(
+                AppRouter.adoption,
+                arguments: true, // isFirstHabit = true
+              );
+            }
+          });
+        } else {
+          _checkedFirstHabit = true;
+        }
+      });
+    }
+
+    return const HomeScreen();
   }
 }
 

@@ -1,67 +1,180 @@
 # Architecture Overview
 
+> **SSOT**: This document is the authoritative reference for system architecture. All implementation decisions must align with the principles described here.
+
+---
+
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| Frontend | Flutter 3.x | Cross-platform mobile UI |
-| Design System | Material Design 3 | Google-aligned UI components |
-| State Management | Riverpod 2.x | Reactive state with SSOT providers |
-| Backend | Firebase (cloud) | Auth, database, analytics, messaging |
-| Language | Dart 3.x | Type-safe, null-safe development |
+| Layer | Technology | Version | Purpose |
+|-------|------------|---------|---------|
+| UI Framework | Flutter | 3.41.x stable | Cross-platform mobile (iOS + Android) |
+| Language | Dart | 3.11.x | Type-safe, null-safe development |
+| Design System | Material Design 3 | — | Google-aligned UI components and theming |
+| State Management | Riverpod | 2.6.x | Reactive, compile-safe dependency injection |
+| Auth | Firebase Auth | 5.x | Google OAuth + email/password |
+| Database | Cloud Firestore | 5.x | Real-time NoSQL, offline-capable |
+| Analytics | Firebase Analytics (GA4) | 11.x | Event-based behavioral analytics |
+| Push | Firebase Cloud Messaging | 15.x | Server-triggered push notifications |
+| Local Notifications | flutter_local_notifications | 18.x | Scheduled daily habit reminders |
+| Background Timer | flutter_foreground_task | 8.x | Android foreground service for focus timer |
+| A/B Testing | Firebase Remote Config | 5.x | Dynamic config, feature flags |
+| Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
 
-## System Architecture
+---
+
+## Layer Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│                  Flutter App                 │
-├─────────────────────────────────────────────┤
-│  Screens (UI Layer)                         │
-│  ├── LoginScreen                            │
-│  ├── HomeScreen                             │
-│  ├── AddHabitScreen                         │
-│  ├── TimerScreen                            │
-│  └── StatsScreen                            │
-├─────────────────────────────────────────────┤
-│  Providers (State Layer - Riverpod)         │
-│  ├── authProvider          (SSOT: auth)     │
-│  ├── habitsProvider        (SSOT: habits)   │
-│  └── statsProvider         (SSOT: stats)    │
-├─────────────────────────────────────────────┤
-│  Services (Data Layer)                      │
-│  ├── AuthService           → Firebase Auth  │
-│  ├── FirestoreService      → Firestore      │
-│  ├── AnalyticsService      → Analytics      │
-│  ├── NotificationService   → FCM            │
-│  └── RemoteConfigService   → Remote Config  │
-├─────────────────────────────────────────────┤
-│  Firebase SDK                               │
-│  ├── firebase_auth                          │
-│  ├── cloud_firestore                        │
-│  ├── firebase_analytics                     │
-│  ├── firebase_messaging                     │
-│  ├── firebase_remote_config                 │
-│  └── firebase_crashlytics                   │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                          Flutter App                             │
+├─────────────────────────────────────────────────────────────────┤
+│  Screens  (UI Layer — no business logic)                        │
+│  ├── OnboardingScreen          ├── CatRoomScreen                │
+│  ├── LoginScreen               ├── CatDetailScreen              │
+│  ├── HomeScreen (4-tab shell)  ├── FocusSetupScreen             │
+│  ├── AdoptionFlowScreen        ├── TimerScreen                  │
+│  ├── StatsScreen               ├── FocusCompleteScreen          │
+│  └── ProfileScreen                                              │
+├─────────────────────────────────────────────────────────────────┤
+│  Providers  (State Layer — Riverpod, reactive SSOT)            │
+│  ├── authStateProvider         ├── focusTimerProvider           │
+│  ├── currentUidProvider        ├── statsProvider                │
+│  ├── habitsProvider            ├── todayMinutesPerHabitProvider │
+│  ├── todayCheckInsProvider     ├── catsProvider                 │
+│  ├── catByIdProvider (family)  └── ownedBreedsProvider          │
+│  └── catByHabitProvider (family)                                │
+├─────────────────────────────────────────────────────────────────┤
+│  Services  (Data Layer — Firebase SDK isolation)               │
+│  ├── AuthService               ├── XpService (pure Dart)        │
+│  ├── FirestoreService          ├── NotificationService          │
+│  ├── AnalyticsService          ├── RemoteConfigService          │
+│  ├── CatGenerationService      └── FocusTimerService            │
+├─────────────────────────────────────────────────────────────────┤
+│  Firebase SDK                                                   │
+│  ├── firebase_auth             ├── firebase_remote_config        │
+│  ├── cloud_firestore           ├── firebase_crashlytics         │
+│  ├── firebase_analytics        ├── flutter_local_notifications   │
+│  ├── firebase_messaging        └── flutter_foreground_task      │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Design Principles
 
-### Document-Driven Development (DDD)
-- All interfaces and behaviors are defined in `docs/` before implementation
-- Documents serve as the contract; code is the implementation
+### 1. Document-Driven Development (DDD)
 
-### Single Source of Truth (SSOT)
-- **Data**: Firestore is the sole source of truth for business data
-- **State**: Each Riverpod Provider is the sole source for its state domain
-- **Style**: M3 Theme is the sole source for all UI styling — no hardcoded colors or fonts
-- **Events**: `analytics_events.dart` is the sole source for all analytics event definitions
-- **Config**: Firebase Remote Config is the sole source for dynamic configuration
+All interfaces and behaviors are specified in `docs/` **before** implementation. Documents are the contract; code is the implementation. When a document and code conflict, the document takes precedence (fix the code, update the document only with deliberate intent).
 
-### Dependency Flow
+### 2. Single Source of Truth (SSOT)
+
+Every concern in the system has exactly one authoritative source:
+
+| Concern | SSOT Location |
+|---------|--------------|
+| Business data | Firestore |
+| Authentication state | `authStateProvider` in `providers/auth_provider.dart` |
+| Cats list | `catsProvider` in `providers/cat_provider.dart` |
+| Timer state | `focusTimerProvider` in `providers/focus_timer_provider.dart` |
+| Computed stats | `statsProvider` in `providers/stats_provider.dart` |
+| UI theme | `lib/core/theme/app_theme.dart` |
+| Analytics event names | `lib/core/constants/analytics_events.dart` |
+| Cat game metadata | `lib/core/constants/cat_constants.dart` |
+| Named routes | `lib/core/router/app_router.dart` |
+| Dynamic configuration | Firebase Remote Config (keys in `remote_config_service.dart`) |
+
+### 3. Strict Dependency Flow
+
 ```
-Screens → Providers → Services → Firebase SDK
+Screens  →  Providers  →  Services  →  Firebase SDK
 ```
-- Screens only read from Providers (never call Services directly)
-- Providers orchestrate Services and expose reactive state
-- Services encapsulate all Firebase SDK interactions
+
+**Rules:**
+- Screens only read from Providers (via `ref.watch` / `ref.read`) — never import Services directly
+- Providers orchestrate Services and expose reactive state — never access Firebase SDK directly
+- Services encapsulate all Firebase SDK interactions — no UI code, no BuildContext
+- Pure computation (XP, breed generation) lives in Services with no Firebase dependency
+
+### 4. Reactive over Imperative
+
+Prefer `StreamProvider` and `ref.watch()` over one-shot `Future` fetches. State flows down automatically — screens rebuild when upstream data changes without manual `setState` calls.
+
+### 5. Atomic Firestore Operations
+
+Operations that span multiple documents (e.g., creating a habit + cat, logging a focus session) use Firestore **batch writes** to guarantee consistency. If any write fails, all writes roll back.
+
+---
+
+## Navigation
+
+The app uses Flutter's `Navigator 1.0` with named routes managed by `AppRouter`:
+
+```
+/login              → LoginScreen
+/home               → HomeScreen (4-tab NavigationBar shell)
+/adoption           → AdoptionFlowScreen  (args: isFirstHabit: bool)
+/focus-setup        → FocusSetupScreen    (args: habitId: String)
+/timer              → TimerScreen         (args: habitId: String)
+/focus-complete     → FocusCompleteScreen (args: Map<String, dynamic>)
+/habit-detail       → HabitDetailScreen   (args: habitId: String)
+/cat-detail         → CatDetailScreen     (args: catId: String)
+/profile            → ProfileScreen
+```
+
+**Root routing** is managed by `AuthGate` → `_FirstHabitGate`:
+1. `AuthGate` checks onboarding completion (SharedPreferences) and Firebase Auth state
+2. `_FirstHabitGate` detects first-time users (zero habits) and auto-navigates to adoption flow
+
+---
+
+## Authentication Flow
+
+```
+App Launch
+    │
+    ▼
+AuthGate
+    ├── onboarding not complete → OnboardingScreen
+    │       └── complete → AuthGate (loop)
+    │
+    └── onboarding complete
+            │
+            ▼
+        Firebase Auth stream
+            ├── user == null → LoginScreen
+            └── user != null → _FirstHabitGate
+                    ├── habits.isEmpty → AdoptionFlow (isFirstHabit: true)
+                    └── habits.any → HomeScreen
+```
+
+---
+
+## State Management in Detail
+
+See [state-management.md](state-management.md) for full provider graph.
+
+**Key patterns used:**
+
+| Pattern | Use Case | Example |
+|---------|----------|---------|
+| `StreamProvider` | Firestore real-time streams | `habitsProvider`, `catsProvider` |
+| `StateNotifierProvider` | Mutable local state with methods | `focusTimerProvider` |
+| `Provider` | Computed/derived values | `statsProvider`, `todayMinutesPerHabitProvider` |
+| `Provider.family` | Parameterized lookups | `catByIdProvider(catId)`, `catByHabitProvider(habitId)` |
+| `ref.watch()` | Reactive subscription in `build()` | All screen `build` methods |
+| `ref.read()` | One-shot read in event handlers | Button `onPressed` callbacks |
+
+---
+
+## Background Timer Architecture
+
+The focus timer is a **two-isolate system**:
+
+1. **Main isolate** — `FocusTimerNotifier` (Riverpod) owns the authoritative timer state. It uses `Timer.periodic(1s)` and exposes the full `FocusTimerState` to the UI.
+
+2. **Background isolate** — `flutter_foreground_task` runs a minimal `_TimerTaskHandler` in a separate isolate. Its sole job is to keep the Android foreground service alive and display the persistent notification. The main isolate updates the notification text via `FocusTimerService.updateNotification()` each tick.
+
+`AppLifecycleState` changes are observed via `WidgetsBindingObserver`:
+- `paused` / `hidden` → record timestamp (`onAppBackgrounded`)
+- `resumed` → calculate away duration; auto-pause if >15 s, auto-end if >5 min (`onAppResumed`)

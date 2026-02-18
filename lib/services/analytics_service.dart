@@ -10,21 +10,26 @@ class AnalyticsService {
   FirebaseAnalyticsObserver get observer =>
       FirebaseAnalyticsObserver(analytics: _analytics);
 
-  // ─── Conversion Events ───
+  // ─── Auth Events ───
 
   Future<void> logSignUp({String method = 'email'}) async {
     await _analytics.logSignUp(signUpMethod: method);
   }
 
+  // ─── Habit Lifecycle Events ───
+
   Future<void> logHabitCreated({
     required String habitName,
     required int targetHours,
+    int? goalMinutes,
   }) async {
     await _analytics.logEvent(
       name: AnalyticsEvents.habitCreated,
       parameters: {
         AnalyticsEvents.paramHabitName: habitName,
         AnalyticsEvents.paramTargetHours: targetHours,
+        if (goalMinutes != null)
+          AnalyticsEvents.paramGoalMinutes: goalMinutes,
       },
     );
   }
@@ -38,7 +43,171 @@ class AnalyticsService {
     );
   }
 
-  // ─── Timer Events ───
+  // ─── Cat Lifecycle Events ───
+
+  Future<void> logCatAdopted({
+    required String breed,
+    required String pattern,
+    required String personality,
+    required String rarity,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.catAdopted,
+      parameters: {
+        AnalyticsEvents.paramBreed: breed,
+        AnalyticsEvents.paramPattern: pattern,
+        AnalyticsEvents.paramPersonality: personality,
+        AnalyticsEvents.paramRarity: rarity,
+      },
+    );
+  }
+
+  Future<void> logCatLevelUp({
+    required String catId,
+    required int newLevel,
+    required int newStage,
+    required int totalXp,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.catLevelUp,
+      parameters: {
+        AnalyticsEvents.paramCatId: catId,
+        AnalyticsEvents.paramNewLevel: newLevel,
+        AnalyticsEvents.paramNewStage: newStage,
+        AnalyticsEvents.paramTotalXp: totalXp,
+      },
+    );
+  }
+
+  Future<void> logCatStageEvolved({
+    required String catId,
+    required int newStage,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.catStageEvolved,
+      parameters: {
+        AnalyticsEvents.paramCatId: catId,
+        AnalyticsEvents.paramNewStage: newStage,
+      },
+    );
+  }
+
+  // ─── Focus Session Events ───
+
+  Future<void> logFocusSessionStarted({
+    required String habitId,
+    required String timerMode,
+    required int targetMinutes,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.focusSessionStarted,
+      parameters: {
+        AnalyticsEvents.paramHabitId: habitId,
+        AnalyticsEvents.paramTimerMode: timerMode,
+        AnalyticsEvents.paramTargetMinutes: targetMinutes,
+      },
+    );
+  }
+
+  Future<void> logFocusSessionCompleted({
+    required String habitId,
+    required int actualMinutes,
+    required int xpEarned,
+    required int streakDays,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.focusSessionCompleted,
+      parameters: {
+        AnalyticsEvents.paramHabitId: habitId,
+        AnalyticsEvents.paramActualMinutes: actualMinutes,
+        AnalyticsEvents.paramXpEarned: xpEarned,
+        AnalyticsEvents.paramStreakDays: streakDays,
+      },
+    );
+  }
+
+  Future<void> logFocusSessionAbandoned({
+    required String habitId,
+    required int minutesCompleted,
+    required String reason,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.focusSessionAbandoned,
+      parameters: {
+        AnalyticsEvents.paramHabitId: habitId,
+        AnalyticsEvents.paramMinutesCompleted: minutesCompleted,
+        AnalyticsEvents.paramReason: reason,
+      },
+    );
+  }
+
+  // ─── Progress Events ───
+
+  Future<void> logAllHabitsDone({
+    required int habitCount,
+    required int totalBonusXp,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.allHabitsDone,
+      parameters: {
+        AnalyticsEvents.paramHabitCount: habitCount,
+        AnalyticsEvents.paramTotalBonusXp: totalBonusXp,
+      },
+    );
+  }
+
+  Future<void> logStreakAchieved({
+    required String habitName,
+    required int milestone,
+    String? habitId,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.streakAchieved,
+      parameters: {
+        AnalyticsEvents.paramHabitName: habitName,
+        AnalyticsEvents.paramStreakDays: milestone,
+        if (habitId != null) AnalyticsEvents.paramHabitId: habitId,
+      },
+    );
+  }
+
+  // ─── Navigation Events ───
+
+  Future<void> logCatRoomViewed({required int catCount}) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.catRoomViewed,
+      parameters: {
+        AnalyticsEvents.paramCatCount: catCount,
+      },
+    );
+  }
+
+  Future<void> logCatTapped({
+    required String catId,
+    required String action,
+  }) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.catTapped,
+      parameters: {
+        AnalyticsEvents.paramCatId: catId,
+        AnalyticsEvents.paramAction: action,
+      },
+    );
+  }
+
+  // ─── Notification Events ───
+
+  Future<void> logNotificationOpened({String? notificationType}) async {
+    await _analytics.logEvent(
+      name: AnalyticsEvents.notificationOpened,
+      parameters: {
+        if (notificationType != null)
+          AnalyticsEvents.paramNotificationType: notificationType,
+      },
+    );
+  }
+
+  // ─── Legacy Events (backward compat) ───
 
   Future<void> logTimerStarted({required String habitName}) async {
     await _analytics.logEvent(
@@ -62,8 +231,6 @@ class AnalyticsService {
     );
   }
 
-  // ─── Check-in Events ───
-
   Future<void> logDailyCheckIn({
     required String habitName,
     required int streakCount,
@@ -75,19 +242,6 @@ class AnalyticsService {
         AnalyticsEvents.paramHabitName: habitName,
         AnalyticsEvents.paramStreakCount: streakCount,
         AnalyticsEvents.paramMinutesToday: minutesToday,
-      },
-    );
-  }
-
-  Future<void> logStreakAchieved({
-    required String habitName,
-    required int milestone,
-  }) async {
-    await _analytics.logEvent(
-      name: AnalyticsEvents.streakAchieved,
-      parameters: {
-        AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramMilestone: milestone,
       },
     );
   }
@@ -105,16 +259,16 @@ class AnalyticsService {
     );
   }
 
-  Future<void> logNotificationOpened() async {
-    await _analytics.logEvent(name: AnalyticsEvents.notificationOpened);
-  }
-
   // ─── User Properties ───
 
   Future<void> setUserProperties({
     int? totalHabits,
+    int? catCount,
+    int? maxCatLevel,
     int? longestStreak,
+    int? totalFocusMinutes,
     int? totalHoursLogged,
+    int? daysActive,
     int? daysSinceSignup,
   }) async {
     if (totalHabits != null) {
@@ -123,16 +277,40 @@ class AnalyticsService {
         value: totalHabits.toString(),
       );
     }
+    if (catCount != null) {
+      await _analytics.setUserProperty(
+        name: AnalyticsEvents.propCatCount,
+        value: catCount.toString(),
+      );
+    }
+    if (maxCatLevel != null) {
+      await _analytics.setUserProperty(
+        name: AnalyticsEvents.propMaxCatLevel,
+        value: maxCatLevel.toString(),
+      );
+    }
     if (longestStreak != null) {
       await _analytics.setUserProperty(
         name: AnalyticsEvents.propLongestStreak,
         value: longestStreak.toString(),
       );
     }
+    if (totalFocusMinutes != null) {
+      await _analytics.setUserProperty(
+        name: AnalyticsEvents.propTotalFocusMinutes,
+        value: totalFocusMinutes.toString(),
+      );
+    }
     if (totalHoursLogged != null) {
       await _analytics.setUserProperty(
         name: AnalyticsEvents.propTotalHoursLogged,
         value: totalHoursLogged.toString(),
+      );
+    }
+    if (daysActive != null) {
+      await _analytics.setUserProperty(
+        name: AnalyticsEvents.propDaysActive,
+        value: daysActive.toString(),
       );
     }
     if (daysSinceSignup != null) {

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/widgets/habit_card.dart';
+import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/streak_indicator.dart';
+import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/stats/stats_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 
@@ -19,7 +23,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
   static const _screens = <Widget>[
-    _HabitListView(),
+    _TodayTab(),
+    CatRoomScreen(),
     StatsScreen(),
     ProfileScreen(),
   ];
@@ -31,7 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.addHabit),
+                  Navigator.of(context).pushNamed(AppRouter.adoption),
               tooltip: 'Add habit',
               child: const Icon(Icons.add),
             )
@@ -42,9 +47,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             setState(() => _selectedIndex = index),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.today_outlined),
+            selectedIcon: Icon(Icons.today),
             label: 'Today',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.pets_outlined),
+            selectedIcon: Icon(Icons.pets),
+            label: 'Cat Room',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
@@ -54,7 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
-            label: 'Me',
+            label: 'Profile',
           ),
         ],
       ),
@@ -62,13 +72,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class _HabitListView extends ConsumerWidget {
-  const _HabitListView();
+/// Today tab — shows featured cat card and habit list with cat avatars.
+class _TodayTab extends ConsumerWidget {
+  const _TodayTab();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitsProvider);
     final todayMinutes = ref.watch(todayMinutesPerHabitProvider);
+    final catsAsync = ref.watch(catsProvider);
     final stats = ref.watch(statsProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -76,7 +88,6 @@ class _HabitListView extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // App bar — no logout button; logout is in the Me tab
         const SliverAppBar(
           floating: true,
           title: Text('Hachimi'),
@@ -105,12 +116,43 @@ class _HabitListView extends ConsumerWidget {
                       icon: Icons.hourglass_bottom,
                     ),
                     _SummaryItem(
-                      label: 'Habits',
-                      value: '${stats.totalHabits}',
-                      icon: Icons.checklist,
+                      label: 'Cats',
+                      value: '${catsAsync.value?.length ?? 0}',
+                      icon: Icons.pets,
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ),
+
+        // Featured cat card (closest to level-up)
+        catsAsync.when(
+          loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          data: (cats) {
+            if (cats.isEmpty) {
+              return const SliverToBoxAdapter(child: SizedBox.shrink());
+            }
+            final featured = _findFeaturedCat(cats);
+            if (featured == null) {
+              return const SliverToBoxAdapter(child: SizedBox.shrink());
+            }
+            return SliverToBoxAdapter(
+              child: _FeaturedCatCard(cat: featured),
+            );
+          },
+        ),
+
+        // Section header
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Your Habits',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -131,8 +173,7 @@ class _HabitListView extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_task,
-                          size: 64, color: colorScheme.onSurfaceVariant),
+                      const Text('🐱', style: TextStyle(fontSize: 64)),
                       const SizedBox(height: 16),
                       Text(
                         'No habits yet',
@@ -142,7 +183,7 @@ class _HabitListView extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tap + to create your first habit',
+                        'Tap + to create a habit and adopt a cat!',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -157,11 +198,19 @@ class _HabitListView extends ConsumerWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final habit = habits[index];
-                  return HabitCard(
+                  final cat = habit.catId != null
+                      ? ref.watch(catByIdProvider(habit.catId!))
+                      : null;
+                  final minutes = todayMinutes[habit.id] ?? 0;
+
+                  return _HabitRow(
                     habit: habit,
-                    todayMinutes: todayMinutes[habit.id] ?? 0,
-                    onTap: () => Navigator.of(context)
-                        .pushNamed(AppRouter.timer, arguments: habit.id),
+                    cat: cat,
+                    todayMinutes: minutes,
+                    onTap: () => Navigator.of(context).pushNamed(
+                      AppRouter.focusSetup,
+                      arguments: habit.id,
+                    ),
                     onDelete: () =>
                         _confirmDelete(context, ref, habit.id, habit.name),
                   );
@@ -175,13 +224,36 @@ class _HabitListView extends ConsumerWidget {
     );
   }
 
+  /// Find the cat closest to leveling up.
+  Cat? _findFeaturedCat(List<Cat> cats) {
+    if (cats.isEmpty) return null;
+    Cat? best;
+    double bestProgress = -1;
+
+    for (final cat in cats) {
+      // Prefer cats that are close to leveling up but not max
+      if (cat.computedStage < 4) {
+        final progress = cat.stageProgress;
+        if (progress > bestProgress) {
+          bestProgress = progress;
+          best = cat;
+        }
+      }
+    }
+    // If all cats are max level, return the most recently active
+    return best ?? cats.first;
+  }
+
   void _confirmDelete(
       BuildContext context, WidgetRef ref, String habitId, String habitName) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete habit?'),
-        content: Text('Are you sure you want to delete "$habitName"?'),
+        content: Text(
+          'Are you sure you want to delete "$habitName"? '
+          'The cat will be graduated to your album.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -203,6 +275,228 @@ class _HabitListView extends ConsumerWidget {
             child: const Text('Delete'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Featured cat card — shows the cat closest to leveling up.
+class _FeaturedCatCard extends ConsumerWidget {
+  final Cat cat;
+
+  const _FeaturedCatCard({required this.cat});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    final habits = ref.watch(habitsProvider).value ?? [];
+    final habit =
+        habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
+    final breedData = cat.breedData;
+    final bgColor = breedData?.colors.base ?? colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Card(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: habit != null
+              ? () => Navigator.of(context)
+                  .pushNamed(AppRouter.focusSetup, arguments: habit.id)
+              : null,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [
+                  bgColor.withValues(alpha: 0.08),
+                  bgColor.withValues(alpha: 0.03),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                CatSprite.fromCat(
+                  breed: cat.breed,
+                  stage: cat.computedStage,
+                  mood: cat.computedMood,
+                  size: 72,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cat.name,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (habit != null)
+                        Text(
+                          '${habit.icon} ${habit.name}',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      // XP progress
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: cat.stageProgress,
+                          minHeight: 6,
+                          backgroundColor:
+                              colorScheme.surfaceContainerHighest,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${cat.xp} XP  •  ${cat.stageName}',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: habit != null
+                      ? () => Navigator.of(context).pushNamed(
+                          AppRouter.focusSetup,
+                          arguments: habit.id)
+                      : null,
+                  child: const Text('Focus'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Habit row with cat avatar — replaces the old HabitCard.
+class _HabitRow extends StatelessWidget {
+  final dynamic habit; // Habit type
+  final Cat? cat;
+  final int todayMinutes;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  const _HabitRow({
+    required this.habit,
+    required this.cat,
+    required this.todayMinutes,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Cat avatar or habit emoji
+              if (cat != null)
+                CatSprite.fromCat(
+                  breed: cat!.breed,
+                  stage: cat!.computedStage,
+                  mood: cat!.computedMood,
+                  size: 48,
+                )
+              else
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      habit.icon,
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 12),
+
+              // Habit info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      habit.name,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        if (todayMinutes > 0) ...[
+                          Text(
+                            '${todayMinutes}min today',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            ' / ${habit.goalMinutes}min',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ] else
+                          Text(
+                            'Goal: ${habit.goalMinutes}min/day',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Streak badge
+              if (habit.currentStreak > 0) ...[
+                StreakIndicator(streak: habit.currentStreak),
+                const SizedBox(width: 8),
+              ],
+
+              // Start button
+              IconButton(
+                icon: Icon(Icons.play_circle_filled,
+                    color: colorScheme.primary, size: 32),
+                onPressed: onTap,
+                tooltip: 'Start focus',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
