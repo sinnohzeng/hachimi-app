@@ -53,3 +53,5 @@ ios/Runner/GoogleService-Info.plist
 # Environment
 .env
 .env.*
+# Wrangler CLI cache (from Cloudflare Pages deployment)
+.wrangler/
