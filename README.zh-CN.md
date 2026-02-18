@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/Dart-3.11.0-blue?logo=dart" alt="Dart" />
   <img src="https://img.shields.io/badge/Firebase-backend-orange?logo=firebase" alt="Firebase" />
   <img src="https://img.shields.io/badge/Material_Design-3-purple?logo=materialdesign" alt="MD3" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+  <img src="https://img.shields.io/badge/license-All%20Rights%20Reserved-red" alt="License" />
 </p>
 
 ---
@@ -211,4 +211,7 @@ adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
 
 ## 许可证
 
-MIT © 2024 Hachimi
+Copyright (c) 2025 Zixuan Zeng. All Rights Reserved.
+
+本源代码以作品集与参考目的公开，仅允许查阅与参考，未经书面授权不得复制、修改、分发或使用。
+完整条款详见 [LICENSE](LICENSE)。

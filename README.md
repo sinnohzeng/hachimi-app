@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/Dart-3.11.0-blue?logo=dart" alt="Dart" />
   <img src="https://img.shields.io/badge/Firebase-backend-orange?logo=firebase" alt="Firebase" />
   <img src="https://img.shields.io/badge/Material_Design-3-purple?logo=materialdesign" alt="MD3" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+  <img src="https://img.shields.io/badge/license-All%20Rights%20Reserved-red" alt="License" />
 </p>
 
 ---
@@ -264,4 +264,8 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## License
 
-MIT © 2024 Hachimi
+Copyright (c) 2025 Zixuan Zeng. All Rights Reserved.
+
+This source code is publicly available for portfolio and reference purposes only.
+You may view and reference the code, but may not copy, modify, distribute, or use
+it without explicit written permission. See [LICENSE](LICENSE) for full terms.

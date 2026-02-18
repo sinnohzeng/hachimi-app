@@ -31,6 +31,7 @@ Every concern in the system has exactly one authoritative source. Never duplicat
 | Firestore security rules | `firestore.rules` |
 | Website deployment & maintenance | `docs/website/deployment.md` |
 | App release process | `docs/release/process.md` |
+| License | `LICENSE` |
 
 **When adding a new provider, service, model, route, or widget:**
 1. Add it to the relevant `docs/architecture/` spec (EN + zh-CN)
