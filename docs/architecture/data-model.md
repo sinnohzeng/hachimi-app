@@ -11,6 +11,7 @@ users/{uid}                          <- User profile document
 ├── habits/{habitId}                 <- Habit metadata + streak tracking
 │   └── sessions/{sessionId}        <- Focus session history
 ├── cats/{catId}                     <- Cat state (appearance, growth, accessories)
+├── monthlyCheckIns/{YYYY-MM}        <- Monthly check-in tracking (resets each month)
 └── checkIns/{date}                  <- Date-partitioned check-in buckets (backward compat)
     └── entries/{entryId}            <- Per-session minute log entries
 ```
@@ -135,6 +136,26 @@ dormant --[habit reactivated]-> active  (future feature)
 
 ---
 
+## Collection: `users/{uid}/monthlyCheckIns/{YYYY-MM}`
+
+One document per calendar month, tracking daily check-in progress and milestone claims. Document ID is the month string, e.g. "2026-02".
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `checkedDays` | list\<int\> | yes | Day-of-month numbers that have been checked in, e.g. `[1, 2, 5, 8]` |
+| `totalCoins` | int | yes | Cumulative coins earned from check-ins this month (daily + milestone bonuses) |
+| `milestonesClaimed` | list\<int\> | yes | Milestone day thresholds already claimed, e.g. `[7, 14]` |
+
+**Notes:**
+- The document is created on the first check-in of a new month.
+- `checkedDays` uses `FieldValue.arrayUnion` to append; day numbers are 1-based.
+- Milestones (7, 14, 21, full month) are claimed automatically when the `checkedDays` length crosses the threshold.
+- The full-month bonus is awarded when `checkedDays.length` equals the total days in that month.
+
+**Dart Model:** `lib/models/monthly_check_in.dart` -> `class MonthlyCheckIn`
+
+---
+
 ## Collection: `users/{uid}/checkIns/{date}/entries/{entryId}`
 
 Legacy check-in storage, preserved for backward compatibility and used by the heatmap queries.
@@ -174,8 +195,8 @@ Batch includes:
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — set to now
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)` (focus reward: `durationMinutes × 10`)
 6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — legacy check-in entry (for heatmap)
-7. (Conditional) `UPDATE users/{uid}.coins` — `FieldValue.increment(50)` if `lastCheckInDate != today` (daily check-in bonus)
-8. (Conditional) `UPDATE users/{uid}.lastCheckInDate` — set to today's date string if bonus was awarded
+
+> **Note:** Daily check-in bonus is no longer awarded in this batch. It is managed independently by `CoinService.checkIn()` via the monthly check-in system.
 
 ### 3. Habit Deletion (Graduation)
 **Method:** `FirestoreService.deleteHabit(uid, habitId)`
@@ -208,6 +229,20 @@ Transaction includes:
 1. `READ users/{uid}/cats/{catId}` — get current `equippedAccessory`
 2. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([equippedAccessory])` (return to box)
 3. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — set to `null`
+
+### 7. Daily Check-In (Monthly)
+**Method:** `CoinService.checkIn(uid)`
+
+Transaction includes:
+1. `READ users/{uid}` — check `lastCheckInDate`; if already today, return early (already checked in)
+2. `READ users/{uid}/monthlyCheckIns/{YYYY-MM}` — get or prepare monthly document
+3. Compute daily reward: weekday = 10 coins, weekend (Sat/Sun) = 15 coins
+4. Check if new `checkedDays.length` crosses milestone thresholds (7, 14, 21, or full month)
+5. `SET/UPDATE users/{uid}/monthlyCheckIns/{YYYY-MM}` — append day to `checkedDays`, increment `totalCoins`, append new milestones to `milestonesClaimed`
+6. `UPDATE users/{uid}.coins` — `FieldValue.increment(totalReward)` (daily + any milestone bonus)
+7. `UPDATE users/{uid}.lastCheckInDate` — set to today's date string
+
+Returns `CheckInResult` with `dailyCoins`, `milestoneBonus`, and `newMilestones`.
 
 ---
 

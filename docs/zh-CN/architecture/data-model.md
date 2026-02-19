@@ -11,6 +11,7 @@ users/{uid}                          <- 用户基本信息文档
 ├── habits/{habitId}                 <- 习惯元数据 + 连续记录追踪
 │   └── sessions/{sessionId}        <- 专注会话历史
 ├── cats/{catId}                     <- 猫咪状态（外观、成长、配饰）
+├── monthlyCheckIns/{YYYY-MM}        <- 月度签到追踪（每月重置）
 └── checkIns/{date}                  <- 按日期分区的打卡桶（向后兼容）
     └── entries/{entryId}            <- 每次会话的分钟数记录
 ```
@@ -133,6 +134,26 @@ dormant --[习惯重新激活]--> active（未来功能）
 
 ---
 
+## 集合：`users/{uid}/monthlyCheckIns/{YYYY-MM}`
+
+每个日历月一个文档，追踪每日签到进度和里程碑领取情况。文档 ID 为月份字符串，如 "2026-02"。
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `checkedDays` | list\<int\> | 是 | 本月已签到的日期号，如 `[1, 2, 5, 8]` |
+| `totalCoins` | int | 是 | 本月签到累计获得的金币（每日奖励 + 里程碑奖励） |
+| `milestonesClaimed` | list\<int\> | 是 | 已领取的里程碑天数阈值，如 `[7, 14]` |
+
+**说明：**
+- 文档在新月份首次签到时创建。
+- `checkedDays` 使用 `FieldValue.arrayUnion` 追加，日期号从 1 开始。
+- 里程碑（7、14、21、全月）在 `checkedDays` 长度跨过阈值时自动领取。
+- 全月奖励在 `checkedDays.length` 等于该月总天数时发放。
+
+**Dart 模型：** `lib/models/monthly_check_in.dart` -> `class MonthlyCheckIn`
+
+---
+
 ## 集合：`users/{uid}/checkIns/{date}/entries/{entryId}`
 
 遗留打卡存储，保留以向后兼容，并用于热力图查询。
@@ -172,8 +193,8 @@ dormant --[习惯重新激活]--> active（未来功能）
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — 设置为当前时间
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)`（专注奖励：`durationMinutes × 10`）
 6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — 遗留打卡条目（用于热力图）
-7. （有条件）`UPDATE users/{uid}.coins` — 若 `lastCheckInDate != today` 则 `FieldValue.increment(50)`（每日签到奖励）
-8. （有条件）`UPDATE users/{uid}.lastCheckInDate` — 若发放了奖励则设置为今日日期字符串
+
+> **注意：** 每日签到奖励不再在此批量操作中发放，由 `CoinService.checkIn()` 通过月度签到系统独立管理。
 
 ### 3. 习惯删除（毕业）
 **方法：** `FirestoreService.deleteHabit(uid, habitId)`
@@ -206,6 +227,20 @@ dormant --[习惯重新激活]--> active（未来功能）
 1. `READ users/{uid}/cats/{catId}` — 获取当前 `equippedAccessory`
 2. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([equippedAccessory])`（返回道具箱）
 3. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — 设为 `null`
+
+### 7. 每日签到（月度系统）
+**方法：** `CoinService.checkIn(uid)`
+
+事务操作包括：
+1. `READ users/{uid}` — 检查 `lastCheckInDate`；若为今日则提前返回（已签到）
+2. `READ users/{uid}/monthlyCheckIns/{YYYY-MM}` — 获取或准备月度文档
+3. 计算每日奖励：工作日 = 10 金币，周末（周六/日） = 15 金币
+4. 检查新的 `checkedDays.length` 是否跨过里程碑阈值（7、14、21、或全月）
+5. `SET/UPDATE users/{uid}/monthlyCheckIns/{YYYY-MM}` — 追加日期到 `checkedDays`，累加 `totalCoins`，追加新里程碑到 `milestonesClaimed`
+6. `UPDATE users/{uid}.coins` — `FieldValue.increment(totalReward)`（每日 + 里程碑奖励）
+7. `UPDATE users/{uid}.lastCheckInDate` — 设置为今日日期字符串
+
+返回 `CheckInResult`，包含 `dailyCoins`、`milestoneBonus` 和 `newMilestones`。
 
 ---
 

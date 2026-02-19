@@ -1,19 +1,26 @@
 // ---
 // 📘 文件说明：
-// 每日签到横幅组件 — 自动检测签到状态，未签到时弹出「+50 金币」浮层。
+// 每日签到横幅组件 — 可视化卡片，展示月度签到进度。
+// 未签到时自动触发签到 + 显示奖励反馈；已签到时展示进度摘要。
 //
-// 📋 程序整体伪代码（中文）：
-// 1. 检查今日是否已签到；
-// 2. 若未签到 → 自动执行签到 → 显示 SnackBar 提示；
-// 3. 组件本身不渲染可视内容（仅触发副作用）；
+// 📋 程序整体伪代码：
+// 1. 监听 hasCheckedInTodayProvider + monthlyCheckInProvider；
+// 2. 未签到 → 显示"签到领金币"卡片 + 自动执行签到；
+// 3. 已签到 → 显示"X/N 天 · +Y 金币"摘要，点击进入月度详情；
+//
+// 🕒 创建时间：2026-02-18
+// 🔄 更新：2026-02-19 — 从 SizedBox.shrink() 重构为可视卡片
 // ---
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/coin_provider.dart';
 
-/// CheckInBanner — placed in widget tree to auto-trigger daily check-in.
-/// Renders nothing visually; shows a SnackBar when check-in succeeds.
+/// CheckInBanner — 可视化签到卡片，放置于 HomeScreen 顶部。
 class CheckInBanner extends ConsumerStatefulWidget {
   const CheckInBanner({super.key});
 
@@ -22,37 +29,45 @@ class CheckInBanner extends ConsumerStatefulWidget {
 }
 
 class _CheckInBannerState extends ConsumerState<CheckInBanner> {
-  bool _checked = false;
+  bool _checkInAttempted = false;
 
   @override
   void initState() {
     super.initState();
-    // Run check-in after first frame to ensure context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _tryCheckIn();
     });
   }
 
   Future<void> _tryCheckIn() async {
-    if (_checked) return;
-    _checked = true;
+    if (_checkInAttempted) return;
+    _checkInAttempted = true;
 
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
     final coinService = ref.read(coinServiceProvider);
-    final alreadyDone = await coinService.hasCheckedInToday(uid);
-    if (alreadyDone) return;
+    final result = await coinService.checkIn(uid);
 
-    final success = await coinService.checkIn(uid);
-    if (success && mounted) {
+    if (result != null && mounted) {
+      // 刷新签到状态
+      ref.invalidate(hasCheckedInTodayProvider);
+      ref.invalidate(monthlyCheckInProvider);
+
+      // 构建反馈文案
+      String message = '+${result.dailyCoins} coins! Daily check-in complete';
+      if (result.milestoneBonus > 0) {
+        message += ' + ${result.milestoneBonus} milestone bonus!';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.monetization_on, color: Color(0xFFFFD700), size: 20),
-              SizedBox(width: 8),
-              Text('+50 coins! Daily check-in complete'),
+              const Icon(Icons.monetization_on,
+                  color: Color(0xFFFFD700), size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text(message)),
             ],
           ),
           behavior: SnackBarBehavior.floating,
@@ -64,7 +79,129 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
 
   @override
   Widget build(BuildContext context) {
-    // Invisible widget — side-effect only
-    return const SizedBox.shrink();
+    final checkedInAsync = ref.watch(hasCheckedInTodayProvider);
+    final monthlyAsync = ref.watch(monthlyCheckInProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return checkedInAsync.when(
+      loading: () => _buildLoadingCard(colorScheme),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (hasCheckedIn) {
+        final monthly = monthlyAsync.value;
+        if (hasCheckedIn) {
+          return _buildCheckedInCard(context, colorScheme, theme, monthly);
+        } else {
+          return _buildNotCheckedInCard(colorScheme, theme);
+        }
+      },
+    );
+  }
+
+  Widget _buildLoadingCard(ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        color: colorScheme.secondaryContainer,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              SizedBox(width: 12),
+              Text('Loading check-in status...'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotCheckedInCard(ColorScheme colorScheme, ThemeData theme) {
+    final now = DateTime.now();
+    final isWeekend =
+        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+    final coins = isWeekend ? checkInCoinsWeekend : checkInCoinsWeekday;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        color: colorScheme.tertiaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(Icons.calendar_today,
+                  color: colorScheme.onTertiaryContainer, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Check in for +$coins coins',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onTertiaryContainer,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colorScheme.onTertiaryContainer,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckedInCard(BuildContext context, ColorScheme colorScheme,
+      ThemeData theme, MonthlyCheckIn? monthly) {
+    final now = DateTime.now();
+    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    final checkedCount = monthly?.checkedCount ?? 0;
+    final isWeekend =
+        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+    final todayCoins = isWeekend ? checkInCoinsWeekend : checkInCoinsWeekday;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        color: colorScheme.secondaryContainer,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () =>
+              Navigator.of(context).pushNamed(AppRouter.checkIn),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_month,
+                    color: colorScheme.onSecondaryContainer, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '$checkedCount/$daysInMonth days  ·  +$todayCoins today',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSecondaryContainer,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(Icons.chevron_right,
+                    color: colorScheme.onSecondaryContainer, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -42,6 +42,7 @@ class TimerScreen extends ConsumerStatefulWidget {
 class _TimerScreenState extends ConsumerState<TimerScreen>
     with WidgetsBindingObserver {
   bool _hasStarted = false;
+  bool _sessionSaved = false;
 
   @override
   void initState() {
@@ -218,10 +219,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     // Notification updates are now driven by FocusTimerNotifier._onTick()
     // so they work even when the app is in the background.
 
-    // Handle completed/abandoned state
-    if (timerState.status == TimerStatus.completed ||
-        timerState.status == TimerStatus.abandoned) {
-      // Save session on next frame to avoid build-phase side effects
+    // Handle completed/abandoned state — guard with _sessionSaved to prevent
+    // multiple postFrameCallbacks being registered across successive builds.
+    if (!_sessionSaved &&
+        (timerState.status == TimerStatus.completed ||
+            timerState.status == TimerStatus.abandoned)) {
+      _sessionSaved = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _saveSession(timerState);
       });

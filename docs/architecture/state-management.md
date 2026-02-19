@@ -38,7 +38,8 @@ Pixel cat rendering (singleton + per-cat cache):
 Coin economy:
 
   coinServiceProvider ──► coinBalanceProvider (StreamProvider<int>)
-                          hasCheckedInTodayProvider (Provider<bool>)
+                          hasCheckedInTodayProvider (FutureProvider<bool>)
+                          monthlyCheckInProvider (StreamProvider<MonthlyCheckIn?>)
 
 
 Timer state (local, not Firestore — persisted to SharedPreferences for crash recovery):
@@ -203,11 +204,19 @@ Device connectivity (independent of auth):
 
 ### `hasCheckedInTodayProvider`
 
-- **Type**: `Provider<bool>`
+- **Type**: `FutureProvider<bool>`
 - **File**: `lib/providers/coin_provider.dart`
-- **Source**: Derived from the user document's `lastCheckInDate` — compares with today's date string
-- **Consumers**: `CheckInBanner` widget (to show/hide the daily bonus prompt)
+- **Source**: `CoinService.hasCheckedInToday(uid)` — compares `lastCheckInDate` with today's date string
+- **Consumers**: `CheckInBanner` widget (to determine checked-in vs. not-checked-in state)
 - **SSOT for**: Whether the user has already claimed today's daily check-in coin bonus
+
+### `monthlyCheckInProvider`
+
+- **Type**: `StreamProvider<MonthlyCheckIn?>`
+- **File**: `lib/providers/coin_provider.dart`
+- **Source**: `CoinService.watchMonthlyCheckIn(uid)` — real-time stream of the current month's check-in document
+- **Consumers**: `CheckInBanner` (progress summary), `CheckInScreen` (full monthly details)
+- **SSOT for**: The current month's check-in progress, including checked days, earned coins, and claimed milestones
 
 ---
 

@@ -235,14 +235,31 @@ List<String> get allAccessories => [
       '$color$style',
 ];
 
-/// 每日签到金币奖励
+/// 每日签到金币奖励（旧，保留向后兼容引用）
+@Deprecated('Use checkInCoinsWeekday / checkInCoinsWeekend instead')
 const int dailyCheckInCoins = 50;
+
+/// 签到金币：工作日（周一至周五）
+const int checkInCoinsWeekday = 10;
+
+/// 签到金币：周末（周六、周日）
+const int checkInCoinsWeekend = 15;
+
+/// 月度签到里程碑 — 累计天数 → 一次性奖励金币。
+const Map<int, int> checkInMilestones = {
+  7: 30,
+  14: 50,
+  21: 80,
+};
+
+/// 全月签到奖励（签满该月所有天数）。
+const int checkInFullMonthBonus = 150;
 
 /// 专注奖励：每分钟 +10 金币
 const int focusRewardCoinsPerMinute = 10;
 
 // ─── Accessory Pricing（饰品梯度定价）───
-// 每日签到 50 金币。Budget = 1 天，Legendary = 7 天。
+// 每日签到约 10-15 金币 + 里程碑奖励。Budget ≈ 几天，Legendary ≈ 数周。
 
 /// Budget 级植物（50 金币）
 const List<String> _budgetPlants = [

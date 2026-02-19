@@ -38,7 +38,8 @@ Firebase Auth 流 ──────────────► authStateProvide
 金币经济：
 
   coinServiceProvider ──► coinBalanceProvider (StreamProvider<int>)
-                          hasCheckedInTodayProvider (Provider<bool>)
+                          hasCheckedInTodayProvider (FutureProvider<bool>)
+                          monthlyCheckInProvider (StreamProvider<MonthlyCheckIn?>)
 
 
 计时器状态（本地状态，非 Firestore —— 通过 SharedPreferences 持久化以支持崩溃恢复）：
@@ -203,11 +204,19 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 ### `hasCheckedInTodayProvider`
 
-- **类型**：`Provider<bool>`
+- **类型**：`FutureProvider<bool>`
 - **文件**：`lib/providers/coin_provider.dart`
-- **数据源**：派生自用户文档的 `lastCheckInDate` —— 与今日日期字符串比较
-- **消费者**：`CheckInBanner` 组件（用于显示/隐藏每日奖励提示）
+- **数据源**：`CoinService.hasCheckedInToday(uid)` —— 将 `lastCheckInDate` 与今日日期字符串比较
+- **消费者**：`CheckInBanner` 组件（判断已签到/未签到状态）
 - **SSOT**：用户是否已领取今日每日签到金币奖励
+
+### `monthlyCheckInProvider`
+
+- **类型**：`StreamProvider<MonthlyCheckIn?>`
+- **文件**：`lib/providers/coin_provider.dart`
+- **数据源**：`CoinService.watchMonthlyCheckIn(uid)` —— 当月签到文档的实时流
+- **消费者**：`CheckInBanner`（进度摘要）、`CheckInScreen`（完整月度详情）
+- **SSOT**：当月签到进度，包括已签到天数、已获金币和已领取的里程碑
 
 ---
 

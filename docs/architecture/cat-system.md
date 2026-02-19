@@ -219,9 +219,29 @@ Dormant cats appear at 70% opacity. Graduated cats appear at 50% opacity with a 
 Coins are earned through two channels:
 
 1. **Focus Reward**: Every completed focus session awards **+10 coins per minute** of actual focus time. Abandoned sessions with ≥ 5 minutes still earn the per-minute reward; sessions < 5 minutes earn 0 coins.
-2. **Daily Check-in**: First session of the day awards an additional **+50 coins** bonus (once per calendar day, tracked via `lastCheckInDate` on the user document).
+2. **Daily Check-in (Monthly System)**: Auto-triggered on HomeScreen load. Resets each calendar month. Rewards vary by day type and accumulate toward monthly milestones.
 
-The coin balance is stored as `coins` on the `users/{uid}` document and exposed via `coinBalanceProvider`. The per-minute rate is defined as `focusRewardCoinsPerMinute` in `pixel_cat_constants.dart`.
+#### Check-In Daily Rewards
+
+| Day Type | Coins |
+|----------|-------|
+| Weekday (Mon–Fri) | 10 |
+| Weekend (Sat–Sun) | 15 |
+
+#### Monthly Milestones
+
+Milestones award a one-time bonus when the cumulative checked days in a month reaches the threshold:
+
+| Milestone | Bonus Coins |
+|-----------|-------------|
+| 7 days | +30 |
+| 14 days | +50 |
+| 21 days | +80 |
+| Full month (all days) | +150 |
+
+**Maximum monthly check-in income: ~640–660 coins** (daily rewards + all milestones). Focus rewards (10 coins/min) remain the primary coin source.
+
+The coin balance is stored as `coins` on the `users/{uid}` document and exposed via `coinBalanceProvider`. Check-in progress is tracked in `users/{uid}/monthlyCheckIns/{YYYY-MM}` and exposed via `monthlyCheckInProvider`. The per-minute focus rate is defined as `focusRewardCoinsPerMinute` in `pixel_cat_constants.dart`.
 
 ### Accessories
 
@@ -275,7 +295,21 @@ Accessories use a **user-level inventory** model instead of per-cat storage:
 
 ### Check-In Banner
 
-The `CheckInBanner` widget appears on the HomeScreen when the user has not yet earned today's coin bonus. After the user completes their first focus session of the day, the banner updates to show "+50 coins earned!" and the `hasCheckedInTodayProvider` flips to `true`.
+The `CheckInBanner` is a visible card widget on the HomeScreen that displays monthly check-in progress:
+
+- **Not checked in**: Shows "Check in for +10 coins" and auto-triggers check-in on load. Displays success feedback via SnackBar (including milestone bonuses if applicable).
+- **Already checked in**: Shows "X/N days · +Y coins today" summary. Tapping navigates to `CheckInScreen` (`/check-in` route) for full monthly details.
+
+Data sources: `monthlyCheckInProvider` + `hasCheckedInTodayProvider`.
+
+### Check-In Screen
+
+The `CheckInScreen` (`/check-in` route) displays full monthly check-in details:
+
+1. **Stats Card** — X/N days checked in, Y coins earned this month, next milestone info
+2. **Calendar Grid** — 7-column grid showing checked/unchecked/future days with weekend column highlighting
+3. **Milestones Card** — Progress toward 7/14/21/full-month milestones with check/pending indicators
+4. **Reward Schedule** — Weekday 10 coins, Weekend 15 coins reference card
 
 ---
 

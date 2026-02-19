@@ -11,6 +11,7 @@ import 'package:hachimi_app/screens/profile/profile_screen.dart';
 import 'package:hachimi_app/screens/settings/settings_screen.dart';
 import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
 import 'package:hachimi_app/screens/cat_room/inventory_screen.dart';
+import 'package:hachimi_app/screens/check_in/check_in_screen.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 class AppRouter {
@@ -29,6 +30,7 @@ class AppRouter {
   static const String settingsPage = '/settings';
   static const String accessoryShop = '/accessory-shop';
   static const String inventory = '/inventory';
+  static const String checkIn = '/check-in';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -87,6 +89,9 @@ class AppRouter {
       case inventory:
         return MaterialPageRoute(
             builder: (_) => const InventoryScreen());
+      case checkIn:
+        return MaterialPageRoute(
+            builder: (_) => const CheckInScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
