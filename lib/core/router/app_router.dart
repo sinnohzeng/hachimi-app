@@ -8,6 +8,7 @@ import 'package:hachimi_app/screens/timer/focus_complete_screen.dart';
 import 'package:hachimi_app/screens/habits/habit_detail_screen.dart';
 import 'package:hachimi_app/screens/cat_detail/cat_detail_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
+import 'package:hachimi_app/screens/settings/settings_screen.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 class AppRouter {
@@ -23,6 +24,7 @@ class AppRouter {
   static const String habitDetail = '/habit-detail';
   static const String catDetail = '/cat-detail';
   static const String profile = '/profile';
+  static const String settingsPage = '/settings';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -72,6 +74,8 @@ class AppRouter {
         );
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case settingsPage:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }

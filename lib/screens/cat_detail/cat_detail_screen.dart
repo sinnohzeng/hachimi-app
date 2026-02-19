@@ -439,6 +439,7 @@ class _HabitHeatmapCard extends ConsumerStatefulWidget {
 class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
   Map<String, int>? _dailyMinutes;
   bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -447,27 +448,42 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
   }
 
   Future<void> _loadData() async {
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
-    final data =
-        await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
-              uid: uid,
-              habitId: widget.habitId,
-              lastNDays: 91,
-            );
+    try {
+      final uid = ref.read(currentUidProvider);
+      if (uid == null) return;
 
-    if (mounted) {
-      setState(() {
-        _dailyMinutes = data;
-        _isLoading = false;
-      });
+      final data =
+          await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
+                uid: uid,
+                habitId: widget.habitId,
+                lastNDays: 91,
+              );
+
+      if (mounted) {
+        setState(() {
+          _dailyMinutes = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _error = e.toString();
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       child: Padding(
@@ -487,6 +503,31 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else if (_error != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Icon(Icons.cloud_off,
+                          color: colorScheme.onSurfaceVariant, size: 32),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Failed to load activity data',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton.icon(
+                        onPressed: _loadData,
+                        icon: const Icon(Icons.refresh, size: 18),
+                        label: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               )
             else

@@ -7,8 +7,7 @@
 // 2. 展示用户头像和基本信息；
 // 3. 统计卡片（总专注时长、猫猫数量、最长连续）；
 // 4. 猫猫图鉴网格预览；
-// 5. 设置（通知、语言）+ 关于（版本、归属声明）；
-// 6. 危险区（登出、删除账号）；
+// 5. Settings 入口跳转到独立设置页面；
 //
 // 🧩 文件结构：
 // - ProfileScreen：主页面；
@@ -221,65 +220,12 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           const Divider(),
 
-          // Settings section
-          _SectionHeader(title: 'Settings', colorScheme: colorScheme),
+          // Settings entry
           ListTile(
-            leading: const Icon(Icons.notifications_outlined),
-            title: const Text('Notifications'),
+            leading: const Icon(Icons.settings_outlined),
+            title: const Text('Settings'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Navigate to notification settings
-            },
-          ),
-
-          const SizedBox(height: 16),
-          const Divider(),
-
-          // About section
-          _SectionHeader(title: 'About', colorScheme: colorScheme),
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('Version'),
-            subtitle: Text('1.1.0'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.palette_outlined),
-            title: const Text('Pixel Cat Sprites'),
-            subtitle: Text(
-              'by pixel-cat-maker (CC BY-NC 4.0)',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-
-          // Extra spacing to push danger zone to the bottom
-          const SizedBox(height: 48),
-          const Divider(),
-
-          // Danger zone — intentionally at the very bottom
-          _SectionHeader(title: 'Account', colorScheme: colorScheme),
-          ListTile(
-            leading: Icon(Icons.logout, color: colorScheme.error),
-            title: Text(
-              'Log Out',
-              style: TextStyle(color: colorScheme.error),
-            ),
-            onTap: () => _confirmLogout(context, ref),
-          ),
-          ListTile(
-            leading: Icon(Icons.delete_forever, color: colorScheme.error),
-            title: Text(
-              'Delete Account',
-              style: TextStyle(color: colorScheme.error),
-            ),
-            subtitle: Text(
-              'This action cannot be undone',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            onTap: () => _confirmDeleteAccount(context, ref),
+            onTap: () => Navigator.of(context).pushNamed(AppRouter.settingsPage),
           ),
           const SizedBox(height: 32),
         ],
@@ -348,65 +294,6 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmLogout(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(authServiceProvider).signOut();
-            },
-            child: const Text('Log Out'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _confirmDeleteAccount(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete account?'),
-        content: const Text(
-          'This will permanently delete your account and all your data. '
-          'This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                await ref.read(authServiceProvider).deleteAccount();
-              } on Exception catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
-                }
-              }
-            },
-            child: const Text('Delete Account'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _StatBadge extends StatelessWidget {
@@ -563,22 +450,3 @@ class _CatAlbumTile extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final ColorScheme colorScheme;
-
-  const _SectionHeader({required this.title, required this.colorScheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-      ),
-    );
-  }
-}

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
@@ -54,12 +56,147 @@ class CatRoomScreen extends ConsumerWidget {
     );
   }
 
+  void _showCatActions(BuildContext context, WidgetRef ref, Cat cat, dynamic habit) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                cat.name,
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            if (habit != null)
+              ListTile(
+                leading: const Icon(Icons.edit_outlined),
+                title: const Text('Edit Habit'),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).pushNamed(
+                    AppRouter.habitDetail,
+                    arguments: habit.id as String,
+                  );
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.drive_file_rename_outline),
+              title: const Text('Rename Cat'),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showRenameDialog(context, ref, cat);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.archive_outlined,
+                  color: Theme.of(ctx).colorScheme.error),
+              title: Text(
+                'Archive Cat',
+                style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+              ),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _confirmArchive(context, ref, cat);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, WidgetRef ref, Cat cat) {
+    final controller = TextEditingController(text: cat.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename Cat'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'New name',
+            prefixIcon: Icon(Icons.pets),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isEmpty) return;
+              final uid = ref.read(currentUidProvider);
+              if (uid == null) return;
+              await ref.read(catFirestoreServiceProvider).renameCat(
+                    uid: uid,
+                    catId: cat.id,
+                    newName: newName,
+                  );
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            child: const Text('Rename'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmArchive(BuildContext context, WidgetRef ref, Cat cat) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Archive cat?'),
+        content: Text(
+          'This will archive "${cat.name}" and delete its bound habit. '
+          'The cat will still appear in your album.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final uid = ref.read(currentUidProvider);
+              if (uid == null) return;
+              await ref.read(catFirestoreServiceProvider).archiveCat(
+                    uid: uid,
+                    catId: cat.id,
+                  );
+              if (cat.boundHabitId.isNotEmpty) {
+                await ref.read(firestoreServiceProvider).deleteHabit(
+                      uid: uid,
+                      habitId: cat.boundHabitId,
+                    );
+              }
+            },
+            child: const Text('Archive'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGrid(BuildContext context, WidgetRef ref, List<Cat> cats) {
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.85,
+        childAspectRatio: 0.78,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -74,10 +211,12 @@ class CatRoomScreen extends ConsumerWidget {
           cat: cat,
           habitName: habit?.name,
           habitIcon: habit?.icon,
+          habitId: habit?.id,
           onTap: () => Navigator.of(context).pushNamed(
             AppRouter.catDetail,
             arguments: cat.id,
           ),
+          onLongPress: () => _showCatActions(context, ref, cat, habit),
         );
       },
     );
@@ -89,13 +228,17 @@ class _CatHouseCard extends StatelessWidget {
   final Cat cat;
   final String? habitName;
   final String? habitIcon;
+  final String? habitId;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _CatHouseCard({
     required this.cat,
     this.habitName,
     this.habitIcon,
+    this.habitId,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -109,37 +252,44 @@ class _CatHouseCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Pixel cat sprite
               PixelCatSprite.fromCat(cat: cat, size: 80),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
-              // Name
-              Text(
-                cat.name,
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+              // Name + habit (flexible to prevent overflow)
+              Flexible(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      cat.name,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    if (habitName != null)
+                      Flexible(
+                        child: Text(
+                          '${habitIcon ?? ""} $habitName',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 2),
-
-              // Habit name
-              if (habitName != null)
-                Text(
-                  '${habitIcon ?? ""} $habitName',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
               // Growth progress bar
               ClipRRect(

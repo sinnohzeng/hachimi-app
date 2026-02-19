@@ -300,15 +300,19 @@ class FirestoreService {
   }
 
   /// Get daily focus minutes for a specific habit over the last N days.
+  /// Queries run in parallel with a 10-second timeout for performance.
   Future<Map<String, int>> getDailyMinutesForHabit({
     required String uid,
     required String habitId,
     required int lastNDays,
   }) async {
-    final result = <String, int>{};
-    for (int i = 0; i < lastNDays; i++) {
-      final date = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(Duration(days: i)));
+    final dates = List.generate(
+      lastNDays,
+      (i) => DateFormat('yyyy-MM-dd')
+          .format(DateTime.now().subtract(Duration(days: i))),
+    );
+
+    final futures = dates.map((date) async {
       final snapshot = await _entriesRef(uid, date)
           .where('habitId', isEqualTo: habitId)
           .get();
@@ -317,8 +321,16 @@ class FirestoreService {
         final data = doc.data() as Map<String, dynamic>;
         dayTotal += (data['minutes'] as int? ?? 0);
       }
-      if (dayTotal > 0) {
-        result[date] = dayTotal;
+      return MapEntry(date, dayTotal);
+    });
+
+    final entries = await Future.wait(futures)
+        .timeout(const Duration(seconds: 10));
+
+    final result = <String, int>{};
+    for (final entry in entries) {
+      if (entry.value > 0) {
+        result[entry.key] = entry.value;
       }
     }
     return result;

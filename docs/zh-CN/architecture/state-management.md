@@ -145,7 +145,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 ### `catFirestoreServiceProvider`
 
 - **类型**：`Provider<CatFirestoreService>`
-- **文件**：`lib/providers/cat_provider.dart`
+- **文件**：`lib/providers/auth_provider.dart`
 - **数据源**：使用 Firestore 实例初始化 `CatFirestoreService`
 - **消费者**：`catsProvider`、`allCatsProvider` 及任何需要读写猫咪文档的 Provider
 - **SSOT**：所有猫咪相关 Firestore 操作的单例服务实例

@@ -29,10 +29,13 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   String _selectedEmoji = '📚';
   int _goalMinutes = 25;
   int _targetHours = 100;
+  bool _isCustomGoal = false;
+  bool _isCustomTarget = false;
   String? _reminderTime;
 
-  // Step 2: Cat preview (single cat + refresh)
-  Cat? _previewCat;
+  // Step 2: 3 cats to choose from
+  List<Cat> _previewCats = [];
+  int _selectedCatIndex = 0;
 
   // Step 3: Name cat
   final _catNameController = TextEditingController();
@@ -56,10 +59,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         );
         return;
       }
-      _generateCat();
+      _generateCats();
     } else if (_currentStep == 1) {
-      if (_previewCat == null) return;
-      _catNameController.text = _previewCat!.name;
+      if (_previewCats.isEmpty) return;
+      _catNameController.text = _previewCats[_selectedCatIndex].name;
     }
 
     setState(() => _currentStep++);
@@ -81,15 +84,35 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     }
   }
 
-  void _generateCat() {
+  void _generateCats() {
     final catGenService = ref.read(pixelCatGenerationServiceProvider);
     setState(() {
-      _previewCat = catGenService.generateCat(
+      _previewCats = List.generate(
+        3,
+        (_) => catGenService.generateCat(
+          boundHabitId: '',
+          targetMinutes: _targetHours * 60,
+        ),
+      );
+      _selectedCatIndex = 0;
+    });
+  }
+
+  void _regenerateSingleCat(int index) {
+    final catGenService = ref.read(pixelCatGenerationServiceProvider);
+    setState(() {
+      _previewCats[index] = catGenService.generateCat(
         boundHabitId: '',
         targetMinutes: _targetHours * 60,
       );
+      if (_selectedCatIndex == index) {
+        // Keep selection, but update preview
+      }
     });
   }
+
+  Cat? get _selectedCat =>
+      _previewCats.isEmpty ? null : _previewCats[_selectedCatIndex];
 
   Future<void> _adopt() async {
     if (_catNameController.text.trim().isEmpty) {
@@ -105,7 +128,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       final uid = ref.read(currentUidProvider);
       if (uid == null) return;
 
-      final selectedCat = _previewCat!.copyWith(
+      final selectedCat = _selectedCat!.copyWith(
         name: _catNameController.text.trim(),
       );
 
@@ -253,7 +276,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Target hours
+          // Target hours with custom option
           Text('Total target hours', style: textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
@@ -265,30 +288,64 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
-            children: targetHourOptions.map((hours) {
-              final isSelected = _targetHours == hours;
-              return ChoiceChip(
-                label: Text('${hours}h'),
-                selected: isSelected,
-                onSelected: (_) => setState(() => _targetHours = hours),
-              );
-            }).toList(),
+            children: [
+              ...targetHourOptions.map((hours) {
+                final isSelected = !_isCustomTarget && _targetHours == hours;
+                return ChoiceChip(
+                  label: Text('${hours}h'),
+                  selected: isSelected,
+                  onSelected: (_) => setState(() {
+                    _targetHours = hours;
+                    _isCustomTarget = false;
+                  }),
+                );
+              }),
+              if (_isCustomTarget)
+                ChoiceChip(
+                  label: Text('${_targetHours}h'),
+                  selected: true,
+                  onSelected: (_) => _showCustomTargetDialog(),
+                )
+              else
+                ActionChip(
+                  label: const Text('Custom'),
+                  avatar: const Icon(Icons.tune, size: 18),
+                  onPressed: _showCustomTargetDialog,
+                ),
+            ],
           ),
           const SizedBox(height: 24),
 
-          // Daily goal time
+          // Daily goal time with custom option
           Text('Daily focus goal', style: textTheme.titleMedium),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
-            children: goalOptions.map((minutes) {
-              final isSelected = _goalMinutes == minutes;
-              return ChoiceChip(
-                label: Text('${minutes}min'),
-                selected: isSelected,
-                onSelected: (_) => setState(() => _goalMinutes = minutes),
-              );
-            }).toList(),
+            children: [
+              ...goalOptions.map((minutes) {
+                final isSelected = !_isCustomGoal && _goalMinutes == minutes;
+                return ChoiceChip(
+                  label: Text('${minutes}min'),
+                  selected: isSelected,
+                  onSelected: (_) => setState(() {
+                    _goalMinutes = minutes;
+                    _isCustomGoal = false;
+                  }),
+                );
+              }),
+              if (_isCustomGoal)
+                ChoiceChip(
+                  label: Text('${_goalMinutes}min'),
+                  selected: true,
+                  onSelected: (_) => _showCustomGoalDialog(),
+                )
+              else
+                ActionChip(
+                  label: const Text('Custom'),
+                  avatar: const Icon(Icons.tune, size: 18),
+                  onPressed: _showCustomGoalDialog,
+                ),
+            ],
           ),
           const SizedBox(height: 24),
 
@@ -330,6 +387,97 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     );
   }
 
+  void _showCustomGoalDialog() {
+    final controller = TextEditingController(
+      text: _isCustomGoal ? '$_goalMinutes' : '',
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Custom daily goal'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Minutes per day',
+            hintText: '5 - 180',
+            suffixText: 'min',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              if (value == null || value < 5 || value > 180) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Enter a value between 5 and 180')),
+                );
+                return;
+              }
+              setState(() {
+                _goalMinutes = value;
+                _isCustomGoal = true;
+              });
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCustomTargetDialog() {
+    final controller = TextEditingController(
+      text: _isCustomTarget ? '$_targetHours' : '',
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Custom target hours'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Total hours',
+            hintText: '10 - 2000',
+            suffixText: 'h',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              if (value == null || value < 10 || value > 2000) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Enter a value between 10 and 2000')),
+                );
+                return;
+              }
+              setState(() {
+                _targetHours = value;
+                _isCustomTarget = true;
+              });
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickCustomTime(BuildContext context) async {
     final time = await showTimePicker(
       context: context,
@@ -343,19 +491,19 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     }
   }
 
-  // ─── Step 2: Cat Preview (single + refresh) ───
+  // ─── Step 2: Choose from 3 cats ───
 
   Widget _buildStep2CatPreview(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final cat = _selectedCat;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          const SizedBox(height: 16),
           Text(
-            'A kitten is waiting for you!',
+            'Choose your kitten!',
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -369,21 +517,20 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // Cat sprite (large preview)
-          if (_previewCat != null) ...[
-            PixelCatSprite.fromCat(cat: _previewCat!, size: 160),
-            const SizedBox(height: 16),
+          // Large preview of selected cat
+          if (cat != null) ...[
+            PixelCatSprite.fromCat(cat: cat, size: 120),
+            const SizedBox(height: 12),
             Text(
-              _previewCat!.name,
+              cat.name,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 4),
-            // Personality tag
-            if (_previewCat!.personalityData != null)
+            if (cat.personalityData != null)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -392,16 +539,16 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  '${_previewCat!.personalityData!.emoji} ${_previewCat!.personalityData!.name}',
+                  '${cat.personalityData!.emoji} ${cat.personalityData!.name}',
                   style: textTheme.labelLarge?.copyWith(
                     color: colorScheme.onTertiaryContainer,
                   ),
                 ),
               ),
-            if (_previewCat!.personalityData != null) ...[
+            if (cat.personalityData != null) ...[
               const SizedBox(height: 8),
               Text(
-                _previewCat!.personalityData!.flavorText,
+                cat.personalityData!.flavorText,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -412,11 +559,88 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ],
           const SizedBox(height: 24),
 
-          // Refresh button
+          // 3-cat selection row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(3, (index) {
+              if (index >= _previewCats.length) return const SizedBox.shrink();
+              final isSelected = _selectedCatIndex == index;
+              final previewCat = _previewCats[index];
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedCatIndex = index),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 80,
+                        height: 96,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? colorScheme.primaryContainer
+                              : colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: isSelected
+                              ? Border.all(
+                                  color: colorScheme.primary, width: 2)
+                              : null,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            PixelCatSprite.fromCat(
+                                cat: previewCat, size: 56),
+                            const SizedBox(height: 4),
+                            Text(
+                              previewCat.name,
+                              style: textTheme.labelSmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Refresh single cat icon
+                      Positioned(
+                        top: -6,
+                        right: -6,
+                        child: GestureDetector(
+                          onTap: () => _regenerateSingleCat(index),
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colorScheme.surfaceContainerHighest,
+                              border: Border.all(
+                                color: colorScheme.outlineVariant,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.refresh,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 16),
+
+          // Reroll all button
           TextButton.icon(
-            onPressed: _generateCat,
+            onPressed: _generateCats,
             icon: const Icon(Icons.refresh),
-            label: const Text('Try another kitten'),
+            label: const Text('Reroll All'),
           ),
         ],
       ),
@@ -428,7 +652,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   Widget _buildStep3NameCat(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final personality = _previewCat?.personalityData;
+    final cat = _selectedCat;
+    final personality = cat?.personalityData;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -437,8 +662,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: 24),
 
           // Cat preview
-          if (_previewCat != null) ...[
-            PixelCatSprite.fromCat(cat: _previewCat!, size: 120),
+          if (cat != null) ...[
+            PixelCatSprite.fromCat(cat: cat, size: 120),
             const SizedBox(height: 12),
             if (personality != null)
               Text(

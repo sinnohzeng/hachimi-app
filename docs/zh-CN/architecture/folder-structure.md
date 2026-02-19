@@ -95,13 +95,15 @@ hachimi-app/
 │   │   ├── cat_room/
 │   │   │   └── cat_room_screen.dart        # 2 列 CatHouse 网格，像素风猫咪
 │   │   ├── habits/
-│   │   │   └── adoption_flow_screen.dart   # 3 步习惯创建 + 单猫领养
+│   │   │   └── adoption_flow_screen.dart   # 3 步习惯创建 + 3 猫选择领养
 │   │   ├── home/
 │   │   │   └── home_screen.dart            # 4 标签 NavigationBar 外壳 + 今日标签
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3 页引导走马灯
 │   │   ├── profile/
-│   │   │   └── profile_screen.dart         # 统计数据、猫咪相册、设置
+│   │   │   └── profile_screen.dart         # 统计数据、猫咪相册、设置入口
+│   │   ├── settings/
+│   │   │   └── settings_screen.dart        # 通知、语言、关于、账号操作
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # 活动热力图 + 各习惯进度
 │   │   └── timer/
@@ -113,7 +115,7 @@ hachimi-app/
 │       ├── accessory_shop_section.dart     # CatDetailScreen 中的配饰网格 + 购买流程
 │       ├── cat_house_card.dart             # CatHouse 2 列网格中的单只猫咪卡片
 │       ├── check_in_banner.dart            # HomeScreen 上的每日签到金币横幅
-│       ├── emoji_picker.dart               # 约 30 个 Emoji 的精选网格（用于习惯图标）
+│       ├── emoji_picker.dart               # 分类 Emoji 选择器（约 200 个 Emoji，7 个分类标签 + 快速选择）
 │       ├── offline_banner.dart             # 离线指示器：cloud_off 图标 + 同步提示
 │       ├── pixel_cat_sprite.dart           # 像素风猫咪显示组件（从 Provider 渲染 ui.Image）
 │       ├── progress_ring.dart              # 圆形进度指示器（计时器圆环）

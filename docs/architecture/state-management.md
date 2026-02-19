@@ -145,7 +145,7 @@ Device connectivity (independent of auth):
 ### `catFirestoreServiceProvider`
 
 - **Type**: `Provider<CatFirestoreService>`
-- **File**: `lib/providers/cat_provider.dart`
+- **File**: `lib/providers/auth_provider.dart`
 - **Source**: Instantiates `CatFirestoreService` with Firestore instance
 - **Consumers**: `catsProvider`, `allCatsProvider`, and any provider that needs to read/write cat documents
 - **SSOT for**: The singleton service instance for all cat-related Firestore operations

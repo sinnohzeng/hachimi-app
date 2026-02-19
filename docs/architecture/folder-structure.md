@@ -95,13 +95,15 @@ hachimi-app/
 │   │   ├── cat_room/
 │   │   │   └── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
 │   │   ├── habits/
-│   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + single-cat adoption
+│   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + 3-cat adoption choice
 │   │   ├── home/
 │   │   │   └── home_screen.dart            # 4-tab NavigationBar shell + Today tab
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3-page intro carousel
 │   │   ├── profile/
-│   │   │   └── profile_screen.dart         # Stats, cat album, settings
+│   │   │   └── profile_screen.dart         # Stats, cat album, settings entry
+│   │   ├── settings/
+│   │   │   └── settings_screen.dart        # Notifications, language, about, account actions
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # Activity heatmap + per-habit progress
 │   │   └── timer/
@@ -113,7 +115,7 @@ hachimi-app/
 │       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
 │       ├── cat_house_card.dart             # Single cat card in CatHouse 2-column grid
 │       ├── check_in_banner.dart            # Daily check-in coin bonus banner on HomeScreen
-│       ├── emoji_picker.dart               # Curated ~30-emoji grid for habit icon selection
+│       ├── emoji_picker.dart               # Categorized emoji picker (~200 emojis in 7 tabs + quick pick)
 │       ├── offline_banner.dart             # Offline indicator: cloud_off + sync message
 │       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
 │       ├── progress_ring.dart              # Circular progress indicator (timer ring)
