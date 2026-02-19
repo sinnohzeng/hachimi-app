@@ -49,6 +49,12 @@ service cloud.firestore {
           allow read, write: if request.auth != null && request.auth.uid == userId;
         }
       }
+
+      // Monthly check-in progress (used by CoinService)
+      // Collection path: users/{uid}/monthlyCheckIns/{yyyy-MM}
+      match /monthlyCheckIns/{month} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Deny all other access
@@ -116,6 +122,24 @@ npm test
 - Unauthenticated read of any document: should DENY
 - Authenticated user writing to cats subcollection: should ALLOW
 - Authenticated user writing to another user's cats: should DENY
+
+---
+
+## Known Pitfalls
+
+### Collection name mismatch causes silent permission-denied
+
+**Symptom:** A widget throws `[cloud_firestore/permission-denied]` on one screen but all other screens work fine.
+
+**Root cause:** Firestore rules use a **deny-all-by-default** pattern. If a service writes to collection `monthlyCheckIns` but the rules only cover `checkIns`, Firestore denies access silently — no compile error, no warning at deploy time.
+
+**How it was caught (2026-02-19):** `CheckInBanner` on the Today tab accessed `users/{uid}/monthlyCheckIns/{month}` via `CoinService`, but `firestore.rules` only declared a rule for `checkIns`. The fix was adding a `monthlyCheckIns` rule and redeploying.
+
+**Prevention checklist when adding a new subcollection:**
+1. Add rule to `firestore.rules`
+2. Mirror the rule description in this document (EN + zh-CN)
+3. Deploy rules **before** shipping the feature: `firebase deploy --only firestore:rules --project hachimi-ai`
+4. Verify in Firebase Console → Firestore → Rules tab
 
 ---
 

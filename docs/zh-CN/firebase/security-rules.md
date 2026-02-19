@@ -49,6 +49,12 @@ service cloud.firestore {
           allow read, write: if request.auth != null && request.auth.uid == userId;
         }
       }
+
+      // 月度签到进度（由 CoinService 使用）
+      // 集合路径：users/{uid}/monthlyCheckIns/{yyyy-MM}
+      match /monthlyCheckIns/{month} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // 拒绝所有其他访问
@@ -106,3 +112,21 @@ firebase emulators:start --only firestore
 - 未认证用户读取任意文档：应 **拒绝**
 - 已认证用户写入 cats 子集合：应 **允许**
 - 已认证用户写入他人的 cats 子集合：应 **拒绝**
+
+---
+
+## 已知陷阱
+
+### 集合名称不匹配导致静默 permission-denied
+
+**现象：** 某一页面的 Widget 抛出 `[cloud_firestore/permission-denied]`，而其他页面正常工作。
+
+**根本原因：** Firestore 规则采用 **默认拒绝** 模式。若 Service 层写入的集合名为 `monthlyCheckIns`，但规则中只声明了 `checkIns`，Firestore 会静默拒绝访问——部署时不报编译错误，也不给出警告。
+
+**发现经过（2026-02-19）：** `CheckInBanner` 位于 Today 标签页，通过 `CoinService` 访问 `users/{uid}/monthlyCheckIns/{month}`，但 `firestore.rules` 中只声明了 `checkIns` 的规则。修复方式：补充 `monthlyCheckIns` 规则后重新部署。
+
+**新增子集合时的检查清单：**
+1. 在 `firestore.rules` 中添加对应规则
+2. 在本文档（EN + zh-CN）的「当前规则」部分同步更新说明
+3. 在功能上线 **前** 部署规则：`firebase deploy --only firestore:rules --project hachimi-ai`
+4. 在 Firebase 控制台 → Firestore → 「规则」标签页验证部署结果
