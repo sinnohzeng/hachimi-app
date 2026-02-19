@@ -30,6 +30,7 @@ class FocusCompleteScreen extends ConsumerWidget {
   final XpResult xpResult;
   final StageUpResult? stageUp;
   final bool isAbandoned;
+  final int coinsEarned;
 
   const FocusCompleteScreen({
     super.key,
@@ -38,6 +39,7 @@ class FocusCompleteScreen extends ConsumerWidget {
     required this.xpResult,
     this.stageUp,
     this.isAbandoned = false,
+    this.coinsEarned = 0,
   });
 
   @override
@@ -141,6 +143,14 @@ class FocusCompleteScreen extends ConsumerWidget {
                           value: '+$minutes min',
                           icon: Icons.timer_outlined,
                         ),
+                        if (coinsEarned > 0) ...[
+                          const Divider(height: 16),
+                          _StatRow(
+                            label: 'Coins earned',
+                            value: '+$coinsEarned',
+                            icon: Icons.monetization_on,
+                          ),
+                        ],
                         const Divider(height: 16),
                         _StatRow(
                           label: 'Base XP',

@@ -47,7 +47,7 @@ class StreakHeatmap extends StatelessWidget {
       children: [
         // Heatmap grid
         SizedBox(
-          height: 7 * 14.0 + 6 * 2.0, // 7 cells + 6 gaps
+          height: 7 * (14.0 + 2.0), // 7 cells × (14 height + 2 margin)
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(totalWeeks, (weekIndex) {

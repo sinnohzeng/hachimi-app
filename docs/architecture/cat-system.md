@@ -216,15 +216,16 @@ Dormant cats appear at 70% opacity. Graduated cats appear at 50% opacity with a 
 
 ### Coin Economy
 
-Coins are earned through **daily check-in**:
-- First session of the day awards **+50 coins**
-- Only one check-in bonus per calendar day (tracked via `lastCheckInDate` on the user document)
+Coins are earned through two channels:
 
-The coin balance is stored as `coins` on the `users/{uid}` document and exposed via `coinBalanceProvider`.
+1. **Focus Reward**: Every completed focus session awards **+10 coins per minute** of actual focus time. Abandoned sessions with ≥ 5 minutes still earn the per-minute reward; sessions < 5 minutes earn 0 coins.
+2. **Daily Check-in**: First session of the day awards an additional **+50 coins** bonus (once per calendar day, tracked via `lastCheckInDate` on the user document).
+
+The coin balance is stored as `coins` on the `users/{uid}` document and exposed via `coinBalanceProvider`. The per-minute rate is defined as `focusRewardCoinsPerMinute` in `pixel_cat_constants.dart`.
 
 ### Accessories
 
-Accessories are cosmetic items that overlay on the cat's sprite. Each accessory has a **tiered price** based on rarity, and is permanently unlocked per cat. A cat can **equip** one accessory at a time, which renders on its sprite.
+Accessories are cosmetic items that overlay on the cat's sprite. Each accessory has a **tiered price** based on rarity, and is permanently added to the user's **inventory** upon purchase. A cat can **equip** one accessory at a time, which renders on its sprite. Accessories can be freely moved between cats via equip/unequip.
 
 #### Tiered Pricing
 
@@ -238,23 +239,39 @@ Accessories are cosmetic items that overlay on the cat's sprite. Each accessory 
 
 Price data is defined in `pixel_cat_constants.dart` via `accessoryPriceMap`.
 
+#### Inventory Model
+
+Accessories use a **user-level inventory** model instead of per-cat storage:
+
+- `users/{uid}.inventory` — `List<String>` of unequipped accessory IDs (the "box")
+- Each cat's `equippedAccessory` — the one accessory currently rendered on the cat
+- An accessory ID exists in **exactly one place**: either in `inventory` or on one cat's `equippedAccessory`
+
 #### Equip/Unequip
 
 - Each cat has an `equippedAccessory` field (nullable String) — the currently equipped accessory ID
 - Only one accessory can be equipped at a time per cat
-- Equipping is done via `CatFirestoreService.equipAccessory()` / `unequipAccessory()`
+- Equipping: `InventoryService.equipAccessory()` — removes from inventory, sets on cat (if cat already has one, the old one returns to inventory)
+- Unequipping: `InventoryService.unequipAccessory()` — removes from cat, returns to inventory
 - The equipped accessory ID flows through the rendering pipeline: `Cat.equippedAccessory` → `PixelCatSprite.accessoryId` → `CatSpriteParams.accessoryId` → `PixelCatRenderer.renderCat(accessoryId:)`
-- CatDetailScreen shows an "Accessories" card with equip/unequip controls
+- CatDetailScreen shows an "Accessories" card with equip/unequip controls sourced from `inventoryProvider`
 
 #### Accessory Shop
 
 - Accessed from CatRoomScreen AppBar (storefront icon) → route `/accessory-shop`
 - 3 tabs: Plants, Wild, Collars
 - Each tab: 3-column grid of `AccessoryCard` widgets
-- Purchase flow: tap unowned item → BottomSheet with cat selector → confirm → `CoinService.purchaseAccessory()`
-
-- Purchased accessories are stored in the cat's `accessories` field (a `List<String>` of accessory IDs)
+- Purchase flow: tap unowned item → confirm dialog → `CoinService.purchaseAccessory()`
+- Purchased accessories go to `users/{uid}.inventory` (not to any specific cat)
+- "Owned" check: accessory is in `inventory` OR on any cat's `equippedAccessory`
 - The accessory layer is drawn as layer 13 in the rendering pipeline
+
+#### Inventory Screen
+
+- Accessed from CatRoomScreen AppBar (inventory icon) → route `/inventory`
+- Two sections: "In Box" (from `inventoryProvider`) and "Equipped on Cats" (from all cats' `equippedAccessory`)
+- Tap an inventory item → cat picker → equip to selected cat
+- Tap an equipped item → unequip (returns to box)
 
 ### Check-In Banner
 

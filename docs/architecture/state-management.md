@@ -219,6 +219,22 @@ Device connectivity (independent of auth):
 - **Consumers**: `AccessoryShopScreen`, `AccessoryCard` widget
 - **Fields**: `id`, `displayName`, `price`, `category` ('plant'/'wild'/'collar'), `isOwned`, `isEquipped`
 
+### `inventoryProvider`
+
+- **Type**: `StreamProvider<List<String>>`
+- **File**: `lib/providers/inventory_provider.dart`
+- **Source**: `InventoryService.watchInventory(uid)` — real-time stream of user's `inventory` field
+- **Consumers**: `InventoryScreen`, `AccessoryShopScreen`, `_AccessoriesCard`
+- **SSOT for**: The user's unequipped accessory inventory
+
+### `inventoryServiceProvider`
+
+- **Type**: `Provider<InventoryService>`
+- **File**: `lib/providers/auth_provider.dart`
+- **Source**: Instantiates `InventoryService`
+- **Consumers**: `InventoryScreen`, `_AccessoriesCard`
+- **SSOT for**: The singleton service for inventory equip/unequip operations
+
 ---
 
 ### `focusTimerProvider`

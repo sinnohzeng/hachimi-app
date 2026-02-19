@@ -91,20 +91,14 @@ class CoinService {
     });
   }
 
-  /// 购买饰品：batch 扣币 + 追加饰品到猫。
+  /// 购买饰品：扣币 + 追加配饰到用户 inventory。
   /// 返回 true 表示购买成功。
   Future<bool> purchaseAccessory({
     required String uid,
-    required String catId,
     required String accessoryId,
     required int price,
   }) async {
     final userRef = _userRef(uid);
-    final catRef = _db
-        .collection('users')
-        .doc(uid)
-        .collection('cats')
-        .doc(catId);
 
     return _db.runTransaction((tx) async {
       final userDoc = await tx.get(userRef);
@@ -113,22 +107,14 @@ class CoinService {
 
       if (balance < price) return false;
 
-      final catDoc = await tx.get(catRef);
-      if (!catDoc.exists) return false;
-
-      final catData = catDoc.data() ?? {};
-      final accessories = List<String>.from(
-          catData['accessories'] as List<dynamic>? ?? []);
-
-      if (accessories.contains(accessoryId)) return false;
-
-      accessories.add(accessoryId);
+      // 检查是否已在 inventory 中
+      final inventory = List<String>.from(
+          userData['inventory'] as List<dynamic>? ?? []);
+      if (inventory.contains(accessoryId)) return false;
 
       tx.update(userRef, {
         'coins': FieldValue.increment(-price),
-      });
-      tx.update(catRef, {
-        'accessories': accessories,
+        'inventory': FieldValue.arrayUnion([accessoryId]),
       });
       return true;
     });

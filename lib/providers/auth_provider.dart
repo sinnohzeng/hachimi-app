@@ -5,6 +5,7 @@ import 'package:hachimi_app/services/analytics_service.dart';
 import 'package:hachimi_app/services/firestore_service.dart';
 import 'package:hachimi_app/services/cat_firestore_service.dart';
 import 'package:hachimi_app/services/coin_service.dart';
+import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/migration_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
@@ -18,6 +19,8 @@ final catFirestoreServiceProvider =
     Provider<CatFirestoreService>((ref) => CatFirestoreService());
 final coinServiceProvider =
     Provider<CoinService>((ref) => CoinService());
+final inventoryServiceProvider =
+    Provider<InventoryService>((ref) => InventoryService());
 final migrationServiceProvider =
     Provider<MigrationService>((ref) => MigrationService());
 final xpServiceProvider =

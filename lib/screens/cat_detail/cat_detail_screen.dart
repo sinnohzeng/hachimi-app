@@ -9,6 +9,7 @@ import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
     show accessoryDisplayName;
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/providers/inventory_provider.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 
 /// Cat detail page — pixel cat sprite, time-based growth progress,
@@ -546,7 +547,7 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
   }
 }
 
-/// 饰品装备/卸下卡片。
+/// 饰品装备/卸下卡片 — 数据来源为 inventoryProvider。
 class _AccessoriesCard extends ConsumerWidget {
   final Cat cat;
   const _AccessoriesCard({required this.cat});
@@ -557,8 +558,9 @@ class _AccessoriesCard extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final hasEquipped = cat.equippedAccessory != null;
-    final ownedAccessories = cat.accessories;
+    final hasEquipped = cat.equippedAccessory != null &&
+        cat.equippedAccessory!.isNotEmpty;
+    final inventory = ref.watch(inventoryProvider).value ?? [];
 
     return Card(
       child: Padding(
@@ -616,11 +618,11 @@ class _AccessoriesCard extends ConsumerWidget {
               ],
             ),
 
-            // 已拥有饰品网格
-            if (ownedAccessories.isNotEmpty) ...[
+            // 道具箱中可装备的饰品
+            if (inventory.isNotEmpty) ...[
               const SizedBox(height: 12),
               Text(
-                'Owned (${ownedAccessories.length})',
+                'From Inventory (${inventory.length})',
                 style: textTheme.labelMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -629,25 +631,17 @@ class _AccessoriesCard extends ConsumerWidget {
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
-                children: ownedAccessories.map((id) {
-                  final isEquipped = cat.equippedAccessory == id;
+                children: inventory.map((id) {
                   return ActionChip(
-                    avatar: isEquipped
-                        ? Icon(Icons.check_circle,
-                            size: 16, color: colorScheme.primary)
-                        : null,
                     label: Text(
                       accessoryDisplayName(id),
                       style: textTheme.labelSmall,
                     ),
-                    onPressed: isEquipped ? null : () => _equip(ref, id),
-                    backgroundColor: isEquipped
-                        ? colorScheme.primaryContainer
-                        : null,
+                    onPressed: () => _equip(ref, id),
                   );
                 }).toList(),
               ),
-            ] else
+            ] else if (!hasEquipped)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
@@ -666,7 +660,7 @@ class _AccessoriesCard extends ConsumerWidget {
   void _equip(WidgetRef ref, String accessoryId) {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    ref.read(catFirestoreServiceProvider).equipAccessory(
+    ref.read(inventoryServiceProvider).equipAccessory(
           uid: uid,
           catId: cat.id,
           accessoryId: accessoryId,
@@ -676,7 +670,7 @@ class _AccessoriesCard extends ConsumerWidget {
   void _unequip(WidgetRef ref) {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    ref.read(catFirestoreServiceProvider).unequipAccessory(
+    ref.read(inventoryServiceProvider).unequipAccessory(
           uid: uid,
           catId: cat.id,
         );

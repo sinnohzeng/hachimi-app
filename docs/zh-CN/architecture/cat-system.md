@@ -220,15 +220,16 @@ CatHouse 用 **2 列 GridView** 布局替代了之前的房间场景。每只活
 
 ### 金币经济
 
-金币通过 **每日签到** 获得：
-- 当天首次会话奖励 **+50 金币**
-- 每个日历日仅一次签到奖励（通过用户文档上的 `lastCheckInDate` 追踪）
+金币通过两个渠道获得：
 
-金币余额存储于 `users/{uid}` 文档的 `coins` 字段，并通过 `coinBalanceProvider` 暴露。
+1. **专注奖励**：每次专注会话完成后奖励 **每分钟 +10 金币**（按实际专注时长计算）。放弃但 ≥ 5 分钟的会话仍可获得按分钟计算的奖励；< 5 分钟则不获得金币。
+2. **每日签到**：当天首次会话额外奖励 **+50 金币**（每个日历日仅一次，通过用户文档上的 `lastCheckInDate` 追踪）。
+
+金币余额存储于 `users/{uid}` 文档的 `coins` 字段，并通过 `coinBalanceProvider` 暴露。每分钟奖励率定义于 `pixel_cat_constants.dart` 的 `focusRewardCoinsPerMinute`。
 
 ### 配饰
 
-配饰是叠加在猫咪精灵图上的装饰物品。每件配饰采用 **梯度定价**，购买后永久解锁至对应猫咪。猫咪可以 **装备** 一件配饰，装备后会渲染在精灵图上。
+配饰是叠加在猫咪精灵图上的装饰物品。每件配饰采用 **梯度定价**，购买后永久加入用户的 **道具箱**。猫咪可以 **装备** 一件配饰，装备后会渲染在精灵图上。配饰可在不同猫咪间自由转移。
 
 #### 梯度定价体系
 
@@ -242,23 +243,39 @@ CatHouse 用 **2 列 GridView** 布局替代了之前的房间场景。每只活
 
 价格数据定义于 `pixel_cat_constants.dart` 的 `accessoryPriceMap`。
 
+#### 道具箱模型
+
+配饰采用 **用户级道具箱** 模型，而非按猫存储：
+
+- `users/{uid}.inventory` — 未装备的配饰 ID 列表（「箱子」）
+- 每只猫的 `equippedAccessory` — 当前渲染在猫身上的一件配饰
+- 每个配饰 ID **只存在于一个位置**：要么在 `inventory` 中，要么在某只猫的 `equippedAccessory` 上
+
 #### 装备/卸下
 
 - 每只猫有 `equippedAccessory` 字段（可空 String）—— 当前装备的配饰 ID
 - 每只猫同时只能装备一件配饰
-- 通过 `CatFirestoreService.equipAccessory()` / `unequipAccessory()` 实现装备操作
+- 装备：`InventoryService.equipAccessory()` —— 从道具箱移除，设置到猫上（若猫已有装备，旧配饰自动返回道具箱）
+- 卸下：`InventoryService.unequipAccessory()` —— 从猫上移除，返回道具箱
 - 装备的配饰 ID 流经渲染管线：`Cat.equippedAccessory` → `PixelCatSprite.accessoryId` → `CatSpriteParams.accessoryId` → `PixelCatRenderer.renderCat(accessoryId:)`
-- CatDetailScreen 显示「Accessories」卡片，含装备/卸下控件
+- CatDetailScreen 显示「Accessories」卡片，数据来源为 `inventoryProvider`
 
 #### 饰品商店
 
 - 从 CatRoomScreen AppBar（商店图标）进入 → 路由 `/accessory-shop`
 - 3 个标签：Plants、Wild、Collars
 - 每个标签：3 列网格展示 `AccessoryCard` 组件
-- 购买流程：点击未拥有饰品 → BottomSheet 选猫 → 确认 → `CoinService.purchaseAccessory()`
-
-- 已购买的配饰存储于猫咪的 `accessories` 字段（`List<String>` 类型的配饰 ID 列表）
+- 购买流程：点击未拥有饰品 → 确认对话框 → `CoinService.purchaseAccessory()`
+- 购买的配饰进入 `users/{uid}.inventory`（不绑定到特定猫）
+- 「已拥有」判断：配饰在 `inventory` 中 **或** 在任一猫的 `equippedAccessory` 上
 - 配饰图层绘制在渲染管线的第 13 层
+
+#### 道具箱页面
+
+- 从 CatRoomScreen AppBar（道具箱图标）进入 → 路由 `/inventory`
+- 两个区域：「箱中」（来自 `inventoryProvider`）和「已装备在猫上」（来自所有猫的 `equippedAccessory`）
+- 点击箱中道具 → 选猫 → 装备到选中的猫
+- 点击已装备道具 → 卸下（返回箱中）
 
 ### 签到横幅
 

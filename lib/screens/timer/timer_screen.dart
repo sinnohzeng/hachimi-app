@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -142,6 +143,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       return;
     }
 
+    // Calculate coins earned (durationMinutes × 10)
+    final coinsEarned = minutes * focusRewardCoinsPerMinute;
+
     // Calculate XP (still used for display)
     final xpService = ref.read(xpServiceProvider);
     final streakDays = habit.currentStreak;
@@ -174,6 +178,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       xpEarned: xpResult.totalXp,
       mode: timerState.mode == TimerMode.countdown ? 'countdown' : 'stopwatch',
       completed: isCompleted,
+      coinsEarned: coinsEarned,
     );
 
     await ref.read(firestoreServiceProvider).logFocusSession(
@@ -191,6 +196,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           'xpResult': xpResult,
           'stageUp': stageUp,
           'isAbandoned': isAbandoned,
+          'coinsEarned': coinsEarned,
         },
       );
     }

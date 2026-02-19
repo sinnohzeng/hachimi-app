@@ -35,6 +35,64 @@ class MigrationService {
     return false;
   }
 
+  /// 迁移旧版 per-cat accessories 到 user-level inventory。
+  /// 幂等：若所有猫的 accessories 已为空，则不执行任何操作。
+  Future<bool> migrateAccessoriesToInventory(String uid) async {
+    final catsSnapshot = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('cats')
+        .get();
+
+    // 收集所有猫的 accessories（排除各猫已装备的 equippedAccessory）
+    final inventoryIds = <String>{};
+    final catUpdates = <String, List<String>>{}; // catId → old accessories
+
+    for (final doc in catsSnapshot.docs) {
+      final data = doc.data();
+      final accessories = List<String>.from(
+          data['accessories'] as List<dynamic>? ?? []);
+      if (accessories.isEmpty) continue;
+
+      final equipped = data['equippedAccessory'] as String?;
+
+      // 未装备的配饰进入 inventory
+      for (final id in accessories) {
+        if (id != equipped) {
+          inventoryIds.add(id);
+        }
+      }
+      catUpdates[doc.id] = accessories;
+    }
+
+    // 无需迁移
+    if (catUpdates.isEmpty) return false;
+
+    // 单个 batch 操作：写入 inventory + 清空各猫 accessories
+    final batch = _db.batch();
+    final userRef = _db.collection('users').doc(uid);
+
+    if (inventoryIds.isNotEmpty) {
+      batch.update(userRef, {
+        'inventory': FieldValue.arrayUnion(inventoryIds.toList()),
+      });
+    }
+
+    for (final catId in catUpdates.keys) {
+      final catRef = _db
+          .collection('users')
+          .doc(uid)
+          .collection('cats')
+          .doc(catId);
+      batch.update(catRef, {
+        'accessories': <String>[],
+      });
+    }
+
+    await batch.commit();
+    return true;
+  }
+
   /// 清除用户全部业务数据（习惯、猫、签到记录）。
   /// 用户确认后调用，重新进入 onboarding 流程。
   Future<void> clearAllUserData(String uid) async {

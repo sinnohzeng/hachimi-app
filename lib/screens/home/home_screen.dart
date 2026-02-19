@@ -7,7 +7,6 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
@@ -86,7 +85,6 @@ class _TodayTab extends ConsumerWidget {
     final todayMinutes = ref.watch(todayMinutesPerHabitProvider);
     final catsAsync = ref.watch(catsProvider);
     final stats = ref.watch(statsProvider);
-    final coinBalance = ref.watch(coinBalanceProvider).value ?? 0;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -96,25 +94,6 @@ class _TodayTab extends ConsumerWidget {
         SliverAppBar(
           floating: true,
           title: const Text('Hachimi'),
-          actions: [
-            // Coin balance
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.monetization_on, size: 20, color: Color(0xFFFFD700)),
-                  const SizedBox(width: 4),
-                  Text(
-                    '$coinBalance',
-                    style: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
 
         // Daily check-in trigger

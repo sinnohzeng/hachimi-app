@@ -238,6 +238,9 @@ List<String> get allAccessories => [
 /// 每日签到金币奖励
 const int dailyCheckInCoins = 50;
 
+/// 专注奖励：每分钟 +10 金币
+const int focusRewardCoinsPerMinute = 10;
+
 // ─── Accessory Pricing（饰品梯度定价）───
 // 每日签到 50 金币。Budget = 1 天，Legendary = 7 天。
 

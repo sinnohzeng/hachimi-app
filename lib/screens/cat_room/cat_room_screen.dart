@@ -6,6 +6,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
@@ -22,6 +23,31 @@ class CatRoomScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('CatHouse'),
         actions: [
+          // Coin balance
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.monetization_on,
+                    size: 20, color: Color(0xFFFFD700)),
+                const SizedBox(width: 4),
+                Text(
+                  '${ref.watch(coinBalanceProvider).value ?? 0}',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.inventory_2),
+            tooltip: 'Inventory',
+            onPressed: () => Navigator.of(context).pushNamed(
+              AppRouter.inventory,
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.storefront),
             tooltip: 'Accessory Shop',

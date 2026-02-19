@@ -23,6 +23,7 @@ class FirestoreService {
       'email': email,
       'displayName': displayName ?? email.split('@').first,
       'coins': 0,
+      'inventory': <String>[],
       'lastCheckInDate': null,
       'createdAt': FieldValue.serverTimestamp(),
     });
@@ -205,6 +206,14 @@ class FirestoreService {
       batch.update(catRef, {
         'totalMinutes': FieldValue.increment(session.durationMinutes),
         'lastSessionAt': FieldValue.serverTimestamp(),
+      });
+    }
+
+    // 5. Award focus coins (durationMinutes × coinsPerMinute)
+    if (session.coinsEarned > 0) {
+      final userRef = _db.collection('users').doc(uid);
+      batch.update(userRef, {
+        'coins': FieldValue.increment(session.coinsEarned),
       });
     }
 

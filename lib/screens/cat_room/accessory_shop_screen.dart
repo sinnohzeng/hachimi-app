@@ -18,13 +18,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
-import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
+import 'package:hachimi_app/providers/inventory_provider.dart';
 import 'package:hachimi_app/widgets/accessory_card.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// 饰品商店 — 3 标签分类展示 + 购买流程。
 class AccessoryShopScreen extends ConsumerWidget {
@@ -35,11 +34,14 @@ class AccessoryShopScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final balance = ref.watch(coinBalanceProvider).value ?? 0;
     final cats = ref.watch(catsProvider).value ?? [];
+    final inventory = ref.watch(inventoryProvider).value ?? [];
 
-    // 构建所有饰品的 owned 集合（任一猫拥有即视为已购买）
-    final ownedSet = <String>{};
+    // owned = inventory + 各猫已装备的
+    final ownedSet = <String>{...inventory};
     for (final cat in cats) {
-      ownedSet.addAll(cat.accessories);
+      if (cat.equippedAccessory != null) {
+        ownedSet.add(cat.equippedAccessory!);
+      }
     }
 
     final prices = accessoryPriceMap;
@@ -110,17 +112,14 @@ class AccessoryShopScreen extends ConsumerWidget {
           children: [
             _AccessoryGrid(
               items: plantItems,
-              cats: cats,
               balance: balance,
             ),
             _AccessoryGrid(
               items: wildItems,
-              cats: cats,
               balance: balance,
             ),
             _AccessoryGrid(
               items: collarItems,
-              cats: cats,
               balance: balance,
             ),
           ],
@@ -133,12 +132,10 @@ class AccessoryShopScreen extends ConsumerWidget {
 /// 饰品网格 — 3 列 GridView。
 class _AccessoryGrid extends ConsumerWidget {
   final List<AccessoryInfo> items;
-  final List<Cat> cats;
   final int balance;
 
   const _AccessoryGrid({
     required this.items,
-    required this.cats,
     required this.balance,
   });
 
@@ -163,210 +160,70 @@ class _AccessoryGrid extends ConsumerWidget {
           info: item,
           onTap: item.isOwned
               ? null
-              : () => _showPurchaseSheet(context, ref, item),
+              : () => _showPurchaseDialog(context, ref, item),
         );
       },
     );
   }
 
-  void _showPurchaseSheet(
+  void _showPurchaseDialog(
       BuildContext context, WidgetRef ref, AccessoryInfo item) {
     HapticFeedback.mediumImpact();
 
-    if (cats.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No active cats to receive accessories')),
-      );
-      return;
-    }
+    final canAfford = balance >= item.price;
 
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      builder: (ctx) => _PurchaseSheet(
-        item: item,
-        cats: cats,
-        balance: balance,
-      ),
-    );
-  }
-}
-
-/// 购买 BottomSheet — 选猫 + 确认购买。
-class _PurchaseSheet extends ConsumerStatefulWidget {
-  final AccessoryInfo item;
-  final List<Cat> cats;
-  final int balance;
-
-  const _PurchaseSheet({
-    required this.item,
-    required this.cats,
-    required this.balance,
-  });
-
-  @override
-  ConsumerState<_PurchaseSheet> createState() => _PurchaseSheetState();
-}
-
-class _PurchaseSheetState extends ConsumerState<_PurchaseSheet> {
-  int _selectedCatIndex = 0;
-  bool _purchasing = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final canAfford = widget.balance >= widget.item.price;
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      builder: (ctx) => AlertDialog(
+        title: Text('Buy ${item.displayName}?'),
+        content: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 饰品名称和价格
-            Text(
-              'Buy ${widget.item.displayName}?',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.monetization_on, size: 18, color: colorScheme.primary),
-                const SizedBox(width: 4),
-                Text(
-                  '${widget.item.price} coins',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // 猫咪选择器
-            Text(
-              'Choose a cat:',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: widget.cats.length,
-                itemBuilder: (context, index) {
-                  final cat = widget.cats[index];
-                  final isSelected = index == _selectedCatIndex;
-                  final alreadyOwns = cat.accessories.contains(widget.item.id);
-                  return GestureDetector(
-                    onTap: alreadyOwns
-                        ? null
-                        : () => setState(() => _selectedCatIndex = index),
-                    child: Container(
-                      width: 80,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected && !alreadyOwns
-                              ? colorScheme.primary
-                              : Colors.transparent,
-                          width: 2,
-                        ),
-                        color: alreadyOwns
-                            ? colorScheme.surfaceContainerHighest
-                            : isSelected
-                                ? colorScheme.primaryContainer
-                                : colorScheme.surfaceContainerLow,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          PixelCatSprite.fromCat(cat: cat, size: 48),
-                          const SizedBox(height: 2),
-                          Text(
-                            alreadyOwns ? 'Has it' : cat.name,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: alreadyOwns
-                                  ? colorScheme.onSurfaceVariant
-                                  : null,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // 购买按钮
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: canAfford && !_purchasing
-                    ? () => _purchase(context)
-                    : null,
-                child: _purchasing
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(canAfford
-                        ? 'Purchase'
-                        : 'Not enough coins (need ${widget.item.price})'),
-              ),
-            ),
+            Icon(Icons.monetization_on,
+                size: 18, color: Theme.of(ctx).colorScheme.primary),
+            const SizedBox(width: 4),
+            Text('${item.price} coins'),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: canAfford
+                ? () => _purchase(ctx, ref, item)
+                : null,
+            child: Text(canAfford
+                ? 'Purchase'
+                : 'Not enough coins'),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _purchase(BuildContext context) async {
-    setState(() => _purchasing = true);
-
-    final cat = widget.cats[_selectedCatIndex];
+  Future<void> _purchase(
+      BuildContext context, WidgetRef ref, AccessoryInfo item) async {
     final uid = ref.read(currentUidProvider);
-    if (uid == null) {
-      setState(() => _purchasing = false);
-      return;
-    }
+    if (uid == null) return;
+
+    Navigator.of(context).pop();
 
     final success = await ref.read(coinServiceProvider).purchaseAccessory(
           uid: uid,
-          catId: cat.id,
-          accessoryId: widget.item.id,
-          price: widget.item.price,
+          accessoryId: item.id,
+          price: item.price,
         );
 
     if (!context.mounted) return;
-    Navigator.of(context).pop();
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Purchased! ${widget.item.displayName} added to ${cat.name}'),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Not enough coins (need ${widget.item.price}, have ${widget.balance})'),
-        ),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success
+            ? 'Purchased! ${item.displayName} added to inventory'
+            : 'Not enough coins (need ${item.price})'),
+      ),
+    );
   }
 }

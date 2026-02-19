@@ -219,6 +219,22 @@ Firebase Auth 流 ──────────────► authStateProvide
 - **消费者**：`AccessoryShopScreen`、`AccessoryCard` 组件
 - **字段**：`id`、`displayName`、`price`、`category`（'plant'/'wild'/'collar'）、`isOwned`、`isEquipped`
 
+### `inventoryProvider`
+
+- **类型**：`StreamProvider<List<String>>`
+- **文件**：`lib/providers/inventory_provider.dart`
+- **数据源**：`InventoryService.watchInventory(uid)` —— 用户 `inventory` 字段的实时流
+- **消费者**：`InventoryScreen`、`AccessoryShopScreen`、`_AccessoriesCard`
+- **SSOT**：用户未装备的配饰道具箱
+
+### `inventoryServiceProvider`
+
+- **类型**：`Provider<InventoryService>`
+- **文件**：`lib/providers/auth_provider.dart`
+- **数据源**：实例化 `InventoryService`
+- **消费者**：`InventoryScreen`、`_AccessoriesCard`
+- **SSOT**：道具箱装备/卸下操作的单例服务
+
 ---
 
 ### `focusTimerProvider`

@@ -28,6 +28,7 @@ users/{uid}                          <- 用户基本信息文档
 | `createdAt` | timestamp | 是 | 账户创建时间戳 |
 | `fcmToken` | string | 否 | Firebase Cloud Messaging 设备令牌 |
 | `coins` | int | 是 | 当前金币余额，用于购买配饰（默认值：0） |
+| `inventory` | list\<string\> | 是 | 用户级道具箱——已拥有但未装备的配饰 ID 列表（默认值：空列表） |
 | `lastCheckInDate` | string | 否 | 最近一次每日签到奖励领取的 ISO 日期字符串 "YYYY-MM-DD" |
 
 **说明：**
@@ -82,6 +83,7 @@ users/{uid}                          <- 用户基本信息文档
 | `xpEarned` | int | 是 | 会话结束时奖励的 XP（由 `XpService` 计算） |
 | `mode` | string | 是 | 计时器模式：`"countdown"` 或 `"stopwatch"` |
 | `completed` | bool | 是 | `true` 表示正常完成；`false` 表示提前放弃 |
+| `coinsEarned` | int | 是 | 会话结束时奖励的金币（`durationMinutes × 10`；放弃 < 5 分钟则为 0） |
 
 **放弃会话的 XP 规则：**
 - `completed == false` 且 `durationMinutes >= 5`：`xpEarned = durationMinutes x 1`（仅基础 XP）
@@ -102,7 +104,7 @@ users/{uid}                          <- 用户基本信息文档
 | `personality` | string | 是 | 性格 ID——详见[猫咪系统](cat-system.md) |
 | `totalMinutes` | int | 是 | 该猫咪对应习惯累计的专注分钟数。阶段从此字段计算。 |
 | `targetMinutes` | int | 是 | 从习惯的 `targetHours` 派生的目标分钟数（targetHours x 60）。用于阶段计算。 |
-| `accessories` | list\<string\> | 是 | 猫咪拥有的配饰 ID 列表（默认值：空列表） |
+| `accessories` | list\<string\> | 是 | **已弃用** —— 旧版按猫存储的配饰列表。已迁移至 `users/{uid}.inventory`。仅在迁移期间使用。 |
 | `equippedAccessory` | string | 否 | 当前装备的配饰 ID（null = 未装备） |
 | `boundHabitId` | string | 是 | 生成此猫咪的习惯 ID |
 | `state` | string | 是 | `"active"`、`"dormant"` 或 `"graduated"` |
@@ -168,9 +170,10 @@ dormant --[习惯重新激活]--> active（未来功能）
 2. `UPDATE users/{uid}/habits/{habitId}` — 累加 `totalMinutes`，更新 `currentStreak`、`bestStreak`、`lastCheckInDate`
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — 设置为当前时间
-5. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — 遗留打卡条目（用于热力图）
-6. （有条件）`UPDATE users/{uid}.coins` — 若 `lastCheckInDate != today` 则 `FieldValue.increment(50)`（每日签到奖励）
-7. （有条件）`UPDATE users/{uid}.lastCheckInDate` — 若发放了奖励则设置为今日日期字符串
+5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)`（专注奖励：`durationMinutes × 10`）
+6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — 遗留打卡条目（用于热力图）
+7. （有条件）`UPDATE users/{uid}.coins` — 若 `lastCheckInDate != today` 则 `FieldValue.increment(50)`（每日签到奖励）
+8. （有条件）`UPDATE users/{uid}.lastCheckInDate` — 若发放了奖励则设置为今日日期字符串
 
 ### 3. 习惯删除（毕业）
 **方法：** `FirestoreService.deleteHabit(uid, habitId)`
@@ -179,12 +182,30 @@ dormant --[习惯重新激活]--> active（未来功能）
 1. `DELETE users/{uid}/habits/{habitId}` — 删除习惯文档
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
-### 4. 配饰购买
-**方法：** `CoinService.purchaseAccessory(uid, catId, accessoryId)`
+### 4. 配饰购买（道具箱模型）
+**方法：** `CoinService.purchaseAccessory(uid, accessoryId, price)`
 
-批量操作包括：
-1. `UPDATE users/{uid}.coins` — `FieldValue.increment(-150)`（扣除费用）
-2. `UPDATE users/{uid}/cats/{catId}.accessories` — `FieldValue.arrayUnion([accessoryId])`
+事务操作包括：
+1. `READ users/{uid}` — 检查余额和已有道具箱
+2. `UPDATE users/{uid}.coins` — `FieldValue.increment(-price)`（扣除费用）
+3. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([accessoryId])`（加入道具箱）
+
+### 5. 装备配饰
+**方法：** `InventoryService.equipAccessory(uid, catId, accessoryId)`
+
+事务操作包括：
+1. `UPDATE users/{uid}.inventory` — `FieldValue.arrayRemove([accessoryId])`（从道具箱移除）
+2. `READ users/{uid}/cats/{catId}` — 获取当前 `equippedAccessory`
+3. 若猫已有装备：`UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([oldAccessoryId])`（旧配饰返回道具箱）
+4. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — 设为 `accessoryId`
+
+### 6. 卸下配饰
+**方法：** `InventoryService.unequipAccessory(uid, catId)`
+
+事务操作包括：
+1. `READ users/{uid}/cats/{catId}` — 获取当前 `equippedAccessory`
+2. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([equippedAccessory])`（返回道具箱）
+3. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — 设为 `null`
 
 ---
 

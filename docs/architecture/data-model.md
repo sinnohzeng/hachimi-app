@@ -28,6 +28,7 @@ The top-level user document. Created on first sign-in.
 | `createdAt` | timestamp | yes | Account creation timestamp |
 | `fcmToken` | string | no | Firebase Cloud Messaging device token for push notifications |
 | `coins` | int | yes | Current coin balance for purchasing accessories (default: 0) |
+| `inventory` | list\<string\> | yes | User-level accessory inventory — IDs of owned but unequipped accessories (default: empty list) |
 | `lastCheckInDate` | string | no | ISO date string "YYYY-MM-DD" of the most recent daily check-in bonus claim |
 
 **Notes:**
@@ -82,6 +83,7 @@ One document per focus session. `sessionId` is a Firestore auto-generated ID.
 | `xpEarned` | int | yes | XP awarded at session end (computed by `XpService`) |
 | `mode` | string | yes | Timer mode: "countdown" or "stopwatch" |
 | `completed` | bool | yes | `true` if user completed the session; `false` if they gave up early |
+| `coinsEarned` | int | yes | Coins awarded at session end (`durationMinutes × 10`; 0 if abandoned < 5 min) |
 
 **XP for Abandoned Sessions:**
 - If `completed == false` AND `durationMinutes >= 5`: `xpEarned = durationMinutes x 1` (base XP only)
@@ -102,7 +104,7 @@ One document per cat. `catId` is a Firestore auto-generated ID.
 | `personality` | string | yes | Personality ID from `CatPersonality.id` — see [Cat System](cat-system.md) |
 | `totalMinutes` | int | yes | Total focus minutes accumulated for this cat's habit. Stage is computed from this. |
 | `targetMinutes` | int | yes | Target minutes derived from the habit's `targetHours` (targetHours x 60). Used for stage calculation. |
-| `accessories` | list\<string\> | yes | List of accessory IDs owned by this cat (default: empty list) |
+| `accessories` | list\<string\> | yes | **DEPRECATED** — Legacy per-cat owned accessories. Migrated to `users/{uid}.inventory`. Only used during migration. |
 | `equippedAccessory` | string | no | Currently equipped accessory ID (null = none equipped) |
 | `boundHabitId` | string | yes | Reference to the habit that spawned this cat |
 | `state` | string | yes | "active", "dormant", or "graduated" |
@@ -170,9 +172,10 @@ Batch includes:
 2. `UPDATE users/{uid}/habits/{habitId}` — increment `totalMinutes`, update `currentStreak`, `bestStreak`, `lastCheckInDate`
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — set to now
-5. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — legacy check-in entry (for heatmap)
-6. (Conditional) `UPDATE users/{uid}.coins` — `FieldValue.increment(50)` if `lastCheckInDate != today` (daily check-in bonus)
-7. (Conditional) `UPDATE users/{uid}.lastCheckInDate` — set to today's date string if bonus was awarded
+5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)` (focus reward: `durationMinutes × 10`)
+6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — legacy check-in entry (for heatmap)
+7. (Conditional) `UPDATE users/{uid}.coins` — `FieldValue.increment(50)` if `lastCheckInDate != today` (daily check-in bonus)
+8. (Conditional) `UPDATE users/{uid}.lastCheckInDate` — set to today's date string if bonus was awarded
 
 ### 3. Habit Deletion (Graduation)
 **Method:** `FirestoreService.deleteHabit(uid, habitId)`
@@ -181,12 +184,30 @@ Batch includes:
 1. `DELETE users/{uid}/habits/{habitId}` — remove habit document
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
-### 4. Accessory Purchase
-**Method:** `CoinService.purchaseAccessory(uid, catId, accessoryId)`
+### 4. Accessory Purchase (Inventory Model)
+**Method:** `CoinService.purchaseAccessory(uid, accessoryId, price)`
 
-Batch includes:
-1. `UPDATE users/{uid}.coins` — `FieldValue.increment(-150)` (deduct cost)
-2. `UPDATE users/{uid}/cats/{catId}.accessories` — `FieldValue.arrayUnion([accessoryId])`
+Transaction includes:
+1. `READ users/{uid}` — check balance and existing inventory
+2. `UPDATE users/{uid}.coins` — `FieldValue.increment(-price)` (deduct cost)
+3. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([accessoryId])` (add to inventory)
+
+### 5. Equip Accessory
+**Method:** `InventoryService.equipAccessory(uid, catId, accessoryId)`
+
+Transaction includes:
+1. `UPDATE users/{uid}.inventory` — `FieldValue.arrayRemove([accessoryId])` (remove from box)
+2. `READ users/{uid}/cats/{catId}` — get current `equippedAccessory`
+3. If cat already has an equipped accessory: `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([oldAccessoryId])` (return old to box)
+4. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — set to `accessoryId`
+
+### 6. Unequip Accessory
+**Method:** `InventoryService.unequipAccessory(uid, catId)`
+
+Transaction includes:
+1. `READ users/{uid}/cats/{catId}` — get current `equippedAccessory`
+2. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([equippedAccessory])` (return to box)
+3. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — set to `null`
 
 ---
 

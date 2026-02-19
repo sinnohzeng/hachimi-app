@@ -12,6 +12,7 @@ class FocusSession {
   final int xpEarned;
   final String mode; // 'countdown' or 'stopwatch'
   final bool completed; // true if finished naturally, false if abandoned
+  final int coinsEarned; // coins awarded (durationMinutes × 10)
 
   const FocusSession({
     required this.id,
@@ -23,6 +24,7 @@ class FocusSession {
     required this.xpEarned,
     required this.mode,
     required this.completed,
+    this.coinsEarned = 0,
   });
 
   factory FocusSession.fromFirestore(DocumentSnapshot doc) {
@@ -38,6 +40,7 @@ class FocusSession {
       xpEarned: data['xpEarned'] as int? ?? 0,
       mode: data['mode'] as String? ?? 'countdown',
       completed: data['completed'] as bool? ?? false,
+      coinsEarned: data['coinsEarned'] as int? ?? 0,
     );
   }
 
@@ -51,6 +54,7 @@ class FocusSession {
       'xpEarned': xpEarned,
       'mode': mode,
       'completed': completed,
+      'coinsEarned': coinsEarned,
     };
   }
 }

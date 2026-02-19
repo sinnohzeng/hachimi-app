@@ -138,6 +138,10 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
   Future<void> _checkMigration() async {
     final migrationService = ref.read(migrationServiceProvider);
     final needs = await migrationService.checkNeedsMigration(widget.uid);
+
+    // Lazy migrate per-cat accessories to user-level inventory
+    await migrationService.migrateAccessoriesToInventory(widget.uid);
+
     if (mounted) {
       setState(() {
         _checked = true;

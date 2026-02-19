@@ -10,6 +10,7 @@ import 'package:hachimi_app/screens/cat_detail/cat_detail_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 import 'package:hachimi_app/screens/settings/settings_screen.dart';
 import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
+import 'package:hachimi_app/screens/cat_room/inventory_screen.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 class AppRouter {
@@ -27,6 +28,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String settingsPage = '/settings';
   static const String accessoryShop = '/accessory-shop';
+  static const String inventory = '/inventory';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -62,6 +64,7 @@ class AppRouter {
             xpResult: args['xpResult'] as XpResult,
             stageUp: args['stageUp'] as StageUpResult?,
             isAbandoned: args['isAbandoned'] as bool? ?? false,
+            coinsEarned: args['coinsEarned'] as int? ?? 0,
           ),
         );
       case habitDetail:
@@ -81,6 +84,9 @@ class AppRouter {
       case accessoryShop:
         return MaterialPageRoute(
             builder: (_) => const AccessoryShopScreen());
+      case inventory:
+        return MaterialPageRoute(
+            builder: (_) => const InventoryScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }

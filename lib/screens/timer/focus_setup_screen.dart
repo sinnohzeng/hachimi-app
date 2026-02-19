@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:hachimi_app/widgets/circular_duration_picker.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// Focus setup screen — select duration and mode before starting a session.
@@ -21,16 +22,9 @@ class FocusSetupScreen extends ConsumerStatefulWidget {
 class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
   int _selectedMinutes = 25;
   TimerMode _selectedMode = TimerMode.countdown;
-  bool _customSelected = false;
-  final _customController = TextEditingController();
+  bool _initialized = false;
 
-  static const List<int> durationOptions = [15, 25, 40, 60];
-
-  @override
-  void dispose() {
-    _customController.dispose();
-    super.dispose();
-  }
+  static const List<int> presetOptions = [5, 10, 20, 30, 45, 60, 90, 120];
 
   void _startFocus() {
     final habits = ref.read(habitsProvider).value ?? [];
@@ -74,11 +68,10 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
       );
     }
 
-    // Set default to habit's goal minutes
-    if (!_customSelected &&
-        durationOptions.contains(habit.goalMinutes) &&
-        _selectedMinutes == 25) {
-      _selectedMinutes = habit.goalMinutes;
+    // Set default to habit's goal minutes (clamped to 1-120)
+    if (!_initialized) {
+      _initialized = true;
+      _selectedMinutes = habit.goalMinutes.clamp(1, 120);
     }
 
     final bgColor = cat != null
@@ -150,43 +143,32 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
 
               const Spacer(flex: 1),
 
-              // Duration selector
+              // Circular duration picker
+              CircularDurationPicker(
+                value: _selectedMinutes,
+                onChanged: (min) => setState(() {
+                  _selectedMinutes = min;
+                }),
+              ),
+              const SizedBox(height: 16),
+
+              // Preset chips
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  children: [
-                    Text(
-                      'Focus Duration',
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        ...durationOptions.map((min) {
-                          final isSelected =
-                              !_customSelected && _selectedMinutes == min;
-                          return ChoiceChip(
-                            label: Text('${min}min'),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() {
-                              _selectedMinutes = min;
-                              _customSelected = false;
-                            }),
-                          );
-                        }),
-                        ActionChip(
-                          label: Text(_customSelected
-                              ? '${_selectedMinutes}min'
-                              : 'Custom'),
-                          avatar: const Icon(Icons.edit, size: 18),
-                          onPressed: _showCustomDuration,
-                        ),
-                      ],
-                    ),
-                  ],
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  alignment: WrapAlignment.center,
+                  children: presetOptions.map((min) {
+                    final isSelected = _selectedMinutes == min;
+                    return ChoiceChip(
+                      label: Text('$min'),
+                      selected: isSelected,
+                      onSelected: (_) => setState(() {
+                        _selectedMinutes = min;
+                      }),
+                    );
+                  }).toList(),
                 ),
               ),
               const SizedBox(height: 24),
@@ -241,44 +223,4 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     );
   }
 
-  Future<void> _showCustomDuration() async {
-    _customController.text = _selectedMinutes.toString();
-    final result = await showDialog<int>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Custom Duration'),
-        content: TextField(
-          controller: _customController,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Minutes',
-            suffixText: 'min',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(_customController.text);
-              if (value != null && value > 0 && value <= 180) {
-                Navigator.of(ctx).pop(value);
-              }
-            },
-            child: const Text('Set'),
-          ),
-        ],
-      ),
-    );
-
-    if (result != null) {
-      setState(() {
-        _selectedMinutes = result;
-        _customSelected = true;
-      });
-    }
-  }
 }
