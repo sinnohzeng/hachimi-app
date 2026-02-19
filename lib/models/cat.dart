@@ -1,19 +1,31 @@
+// ---
+// 📘 文件说明：
+// Cat 数据模型 — 映射 Firestore `users/{uid}/cats/{catId}`。
+// v2: 从品种/XP 体系迁移到像素猫外观参数/时间进度体系。
+//
+// 📋 程序整体伪代码：
+// 1. 定义 Cat 字段（appearance + totalMinutes + targetMinutes）；
+// 2. 提供 computedStage / growthProgress 计算属性；
+// 3. Firestore 序列化/反序列化；
+//
+// 🕒 创建时间：2026-02-18
+// ---
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/models/cat_appearance.dart';
 
-/// Cat data model — maps to Firestore `users/{uid}/cats/{catId}`.
-/// Each cat is bound to exactly one habit via [boundHabitId].
+/// Cat 数据模型 — 每只猫绑定一个习惯。
+/// 成长阶段基于 totalMinutes / targetMinutes 百分比计算。
 class Cat {
   final String id;
   final String name;
-  final String breed; // e.g. 'orange_tabby'
-  final String pattern; // e.g. 'mackerel'
-  final String personality; // e.g. 'playful'
-  final String rarity; // 'common' / 'uncommon' / 'rare'
-  final int xp;
-  final int stage; // 1=kitten, 2=young, 3=adult, 4=shiny
-  final String mood; // 'happy' / 'neutral' / 'lonely' / 'missing'
-  final String? roomSlot; // e.g. 'sofa', assigned based on personality
+  final String personality;
+  final CatAppearance appearance;
+  final int totalMinutes;
+  final int targetMinutes;
+  final List<String> accessories;
   final String boundHabitId;
   final String state; // 'active' / 'graduated' / 'dormant'
   final DateTime createdAt;
@@ -22,73 +34,95 @@ class Cat {
   const Cat({
     required this.id,
     required this.name,
-    required this.breed,
-    required this.pattern,
     required this.personality,
-    required this.rarity,
-    this.xp = 0,
-    this.stage = 1,
-    this.mood = 'happy',
-    this.roomSlot,
+    required this.appearance,
+    this.totalMinutes = 0,
+    required this.targetMinutes,
+    this.accessories = const [],
     required this.boundHabitId,
     this.state = 'active',
     required this.createdAt,
     this.lastSessionAt,
   });
 
-  /// Current growth stage computed from XP.
-  int get computedStage => stageForXp(xp);
-
-  /// Current mood computed from last session time.
-  String get computedMood => calculateMood(lastSessionAt);
-
-  /// XP remaining to reach the next stage, or null if max.
-  int? get xpToNext => xpToNextStage(xp);
-
-  /// XP progress within the current stage (0.0 - 1.0).
-  double get stageProgress {
-    final current = catStages[computedStage - 1].xpThreshold;
-    if (computedStage >= 4) {
-      // Max stage: show progress relative to last threshold
-      return 1.0;
-    }
-    final next = catStages[computedStage].xpThreshold;
-    final range = next - current;
-    if (range <= 0) return 1.0;
-    return ((xp - current) / range).clamp(0.0, 1.0);
+  /// 成长进度 (0.0 - 1.0)
+  double get growthProgress {
+    if (targetMinutes <= 0) return 0.0;
+    return (totalMinutes / targetMinutes).clamp(0.0, 1.0);
   }
 
-  /// The breed metadata for this cat.
-  CatBreed? get breedData => breedMap[breed];
+  /// 当前成长阶段：kitten / adolescent / adult / senior
+  String get computedStage => stageForProgress(growthProgress);
 
-  /// The personality metadata for this cat.
-  CatPersonality? get personalityData => personalityMap[personality];
+  /// 当前阶段内的进度 (0.0 - 1.0)
+  double get stageProgress => stageProgressInRange(growthProgress);
 
-  /// The mood metadata for this cat.
+  /// 当前 sprite 索引（根据阶段 + 变体 + 长毛）
+  int get spriteIndex => computeSpriteIndex(
+        stage: computedStage,
+        variant: appearance.spriteVariant,
+        isLonghair: appearance.isLonghair,
+      );
+
+  /// 心情（基于 lastSessionAt 计算）
+  String get computedMood => calculateMood(lastSessionAt);
+
+  /// 心情元数据
   CatMood get moodData => moodById(computedMood);
 
-  /// Stage name for display.
-  String get stageName => stageNameForLevel(computedStage);
+  /// 性格元数据
+  CatPersonality? get personalityData => personalityMap[personality];
 
-  /// Speech bubble message based on personality × mood.
+  /// 语音气泡消息
   String get speechMessage {
     final key = '$personality:$computedMood';
     return moodMessages[key] ?? 'Meow~';
   }
 
+  /// 阶段显示名称
+  String get stageName {
+    switch (computedStage) {
+      case 'kitten':
+        return 'Kitten';
+      case 'adolescent':
+        return 'Adolescent';
+      case 'adult':
+        return 'Adult';
+      case 'senior':
+        return 'Senior';
+      default:
+        return 'Kitten';
+    }
+  }
+
   factory Cat.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    final appearanceMap = data['appearance'] as Map<String, dynamic>?;
+
     return Cat(
       id: doc.id,
       name: data['name'] as String? ?? '',
-      breed: data['breed'] as String? ?? 'orange_tabby',
-      pattern: data['pattern'] as String? ?? 'classic_stripe',
       personality: data['personality'] as String? ?? 'playful',
-      rarity: data['rarity'] as String? ?? 'common',
-      xp: data['xp'] as int? ?? 0,
-      stage: data['stage'] as int? ?? 1,
-      mood: data['mood'] as String? ?? 'happy',
-      roomSlot: data['roomSlot'] as String?,
+      appearance: appearanceMap != null
+          ? CatAppearance.fromMap(appearanceMap)
+          : const CatAppearance(
+              peltType: 'SingleColour',
+              peltColor: 'WHITE',
+              tint: 'none',
+              eyeColor: 'YELLOW',
+              whitePatchesTint: 'none',
+              skinColor: 'PINK',
+              isTortie: false,
+              isLonghair: false,
+              reverse: false,
+              spriteVariant: 0,
+            ),
+      totalMinutes: data['totalMinutes'] as int? ?? 0,
+      targetMinutes: data['targetMinutes'] as int? ?? 6000,
+      accessories: (data['accessories'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       boundHabitId: data['boundHabitId'] as String? ?? '',
       state: data['state'] as String? ?? 'active',
       createdAt:
@@ -100,14 +134,11 @@ class Cat {
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
-      'breed': breed,
-      'pattern': pattern,
       'personality': personality,
-      'rarity': rarity,
-      'xp': xp,
-      'stage': stage,
-      'mood': mood,
-      'roomSlot': roomSlot,
+      'appearance': appearance.toMap(),
+      'totalMinutes': totalMinutes,
+      'targetMinutes': targetMinutes,
+      'accessories': accessories,
       'boundHabitId': boundHabitId,
       'state': state,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -119,14 +150,11 @@ class Cat {
   Cat copyWith({
     String? id,
     String? name,
-    String? breed,
-    String? pattern,
     String? personality,
-    String? rarity,
-    int? xp,
-    int? stage,
-    String? mood,
-    String? roomSlot,
+    CatAppearance? appearance,
+    int? totalMinutes,
+    int? targetMinutes,
+    List<String>? accessories,
     String? boundHabitId,
     String? state,
     DateTime? createdAt,
@@ -135,14 +163,11 @@ class Cat {
     return Cat(
       id: id ?? this.id,
       name: name ?? this.name,
-      breed: breed ?? this.breed,
-      pattern: pattern ?? this.pattern,
       personality: personality ?? this.personality,
-      rarity: rarity ?? this.rarity,
-      xp: xp ?? this.xp,
-      stage: stage ?? this.stage,
-      mood: mood ?? this.mood,
-      roomSlot: roomSlot ?? this.roomSlot,
+      appearance: appearance ?? this.appearance,
+      totalMinutes: totalMinutes ?? this.totalMinutes,
+      targetMinutes: targetMinutes ?? this.targetMinutes,
+      accessories: accessories ?? this.accessories,
       boundHabitId: boundHabitId ?? this.boundHabitId,
       state: state ?? this.state,
       createdAt: createdAt ?? this.createdAt,

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/providers/coin_provider.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
+import 'package:hachimi_app/widgets/check_in_banner.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/stats/stats_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
@@ -55,7 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.pets_outlined),
             selectedIcon: Icon(Icons.pets),
-            label: 'Cat Room',
+            label: 'CatHouse',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
@@ -73,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// Today tab — shows featured cat card and habit list with cat avatars.
+/// Today tab — shows coin balance, featured cat card and habit list.
 class _TodayTab extends ConsumerWidget {
   const _TodayTab();
 
@@ -83,16 +86,39 @@ class _TodayTab extends ConsumerWidget {
     final todayMinutes = ref.watch(todayMinutesPerHabitProvider);
     final catsAsync = ref.watch(catsProvider);
     final stats = ref.watch(statsProvider);
+    final coinBalance = ref.watch(coinBalanceProvider).value ?? 0;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return CustomScrollView(
       slivers: [
-        const SliverAppBar(
+        SliverAppBar(
           floating: true,
-          title: Text('Hachimi'),
+          title: const Text('Hachimi'),
+          actions: [
+            // Coin balance
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.monetization_on, size: 20, color: Color(0xFFFFD700)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$coinBalance',
+                    style: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+
+        // Daily check-in trigger
+        const SliverToBoxAdapter(child: CheckInBanner()),
 
         // Offline banner
         const SliverToBoxAdapter(child: OfflineBanner()),
@@ -131,7 +157,7 @@ class _TodayTab extends ConsumerWidget {
           ),
         ),
 
-        // Featured cat card (closest to level-up)
+        // Featured cat card
         catsAsync.when(
           loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
           error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -228,15 +254,13 @@ class _TodayTab extends ConsumerWidget {
     );
   }
 
-  /// Find the cat closest to leveling up.
   Cat? _findFeaturedCat(List<Cat> cats) {
     if (cats.isEmpty) return null;
     Cat? best;
     double bestProgress = -1;
 
     for (final cat in cats) {
-      // Prefer cats that are close to leveling up but not max
-      if (cat.computedStage < 4) {
+      if (cat.computedStage != 'senior') {
         final progress = cat.stageProgress;
         if (progress > bestProgress) {
           bestProgress = progress;
@@ -244,7 +268,6 @@ class _TodayTab extends ConsumerWidget {
         }
       }
     }
-    // If all cats are max level, return the most recently active
     return best ?? cats.first;
   }
 
@@ -284,7 +307,7 @@ class _TodayTab extends ConsumerWidget {
   }
 }
 
-/// Featured cat card — shows the cat closest to leveling up.
+/// Featured cat card — shows the cat closest to stage-up.
 class _FeaturedCatCard extends ConsumerWidget {
   final Cat cat;
 
@@ -299,8 +322,7 @@ class _FeaturedCatCard extends ConsumerWidget {
     final habits = ref.watch(habitsProvider).value ?? [];
     final habit =
         habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
-    final breedData = cat.breedData;
-    final bgColor = breedData?.colors.base ?? colorScheme.primary;
+    final stageClr = stageColor(cat.computedStage);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -316,20 +338,15 @@ class _FeaturedCatCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
                 colors: [
-                  bgColor.withValues(alpha: 0.08),
-                  bgColor.withValues(alpha: 0.03),
+                  stageClr.withValues(alpha: 0.08),
+                  stageClr.withValues(alpha: 0.03),
                 ],
               ),
             ),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                CatSprite.fromCat(
-                  breed: cat.breed,
-                  stage: cat.computedStage,
-                  mood: cat.computedMood,
-                  size: 72,
-                ),
+                PixelCatSprite.fromCat(cat: cat, size: 72),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -350,19 +367,19 @@ class _FeaturedCatCard extends ConsumerWidget {
                           ),
                         ),
                       const SizedBox(height: 8),
-                      // XP progress
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
-                          value: cat.stageProgress,
+                          value: cat.growthProgress,
                           minHeight: 6,
                           backgroundColor:
                               colorScheme.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation(stageClr),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${cat.xp} XP  •  ${cat.stageName}',
+                        '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m  •  ${cat.stageName}',
                         style: textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -388,9 +405,8 @@ class _FeaturedCatCard extends ConsumerWidget {
   }
 }
 
-/// Habit row with cat avatar — replaces the old HabitCard.
 class _HabitRow extends StatelessWidget {
-  final dynamic habit; // Habit type
+  final dynamic habit;
   final Cat? cat;
   final int todayMinutes;
   final VoidCallback onTap;
@@ -421,12 +437,7 @@ class _HabitRow extends StatelessWidget {
             children: [
               // Cat avatar or habit emoji
               if (cat != null)
-                CatSprite.fromCat(
-                  breed: cat!.breed,
-                  stage: cat!.computedStage,
-                  mood: cat!.computedMood,
-                  size: 48,
-                )
+                PixelCatSprite.fromCat(cat: cat!, size: 48)
               else
                 Container(
                   width: 48,

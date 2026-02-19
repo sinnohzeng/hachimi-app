@@ -1,24 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
-import 'package:hachimi_app/services/cat_generation_service.dart';
+import 'package:hachimi_app/services/pixel_cat_generation_service.dart';
 
-/// Cat generation service — singleton.
-final catGenerationServiceProvider =
-    Provider<CatGenerationService>((ref) => CatGenerationService());
+/// Pixel cat generation service — singleton.
+final pixelCatGenerationServiceProvider =
+    Provider<PixelCatGenerationService>((ref) => PixelCatGenerationService());
 
-/// Active cats — streams active cats from Firestore.
+/// Active cats — streams active cats from Firestore via CatFirestoreService.
 final catsProvider = StreamProvider<List<Cat>>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value([]);
-  return ref.watch(firestoreServiceProvider).watchCats(uid);
+  return ref.watch(catFirestoreServiceProvider).watchCats(uid);
 });
 
 /// All cats — includes graduated and dormant cats for Cat Album.
 final allCatsProvider = StreamProvider<List<Cat>>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value([]);
-  return ref.watch(firestoreServiceProvider).watchAllCats(uid);
+  return ref.watch(catFirestoreServiceProvider).watchAllCats(uid);
 });
 
 /// Cat by habit ID — family provider for quick lookups.
@@ -40,10 +40,4 @@ final catByIdProvider = Provider.family<Cat?, String>((ref, catId) {
   } catch (_) {
     return null;
   }
-});
-
-/// Owned breeds — for the draft algorithm to ensure variety.
-final ownedBreedsProvider = Provider<List<String>>((ref) {
-  final cats = ref.watch(allCatsProvider).value ?? [];
-  return cats.map((c) => c.breed).toSet().toList();
 });

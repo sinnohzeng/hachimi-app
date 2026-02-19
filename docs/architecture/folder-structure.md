@@ -17,7 +17,8 @@ hachimi-app/
 │   │   ├── data-model.md                   # Firestore schema (SSOT)
 │   │   ├── cat-system.md                   # Cat game design (SSOT)
 │   │   ├── state-management.md             # Riverpod provider graph (SSOT)
-│   │   └── folder-structure.md             # This file
+│   │   ├── folder-structure.md             # This file
+│   │   └── localization.md                 # i18n approach + ARB workflow
 │   ├── product/
 │   │   ├── prd.md                          # PRD v3.0 (SSOT)
 │   │   └── user-stories.md                 # User stories + acceptance criteria
@@ -44,14 +45,20 @@ hachimi-app/
 │   ├── core/                               # Shared cross-cutting concerns
 │   │   ├── constants/
 │   │   │   ├── analytics_events.dart       # SSOT: all GA4 event names + params
-│   │   │   └── cat_constants.dart          # SSOT: breeds, stages, moods, room slots
+│   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
+│   │   │   └── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
 │   │   ├── router/
 │   │   │   └── app_router.dart             # Named route registry + route constants
 │   │   └── theme/
 │   │       └── app_theme.dart              # SSOT: Material 3 theme (seed color, typography)
 │   │
+│   ├── l10n/                               # Localization ARB source files
+│   │   ├── app_en.arb                      # English strings (primary)
+│   │   └── app_zh.arb                      # Chinese strings
+│   │
 │   ├── models/                             # Data models (Dart classes, no Flutter dependency)
 │   │   ├── cat.dart                        # Cat — Firestore model + computed getters (stage, mood)
+│   │   ├── cat_appearance.dart             # CatAppearance — pixel-cat-maker parameter value object
 │   │   ├── habit.dart                      # Habit — Firestore model
 │   │   ├── focus_session.dart              # FocusSession — session history record
 │   │   └── check_in.dart                   # CheckInEntry — daily check-in entry (legacy compat)
@@ -59,16 +66,22 @@ hachimi-app/
 │   ├── services/                           # Firebase SDK isolation layer (no UI, no BuildContext)
 │   │   ├── analytics_service.dart          # Firebase Analytics wrapper — log events
 │   │   ├── auth_service.dart               # Firebase Auth wrapper — sign in/out/up
-│   │   ├── cat_generation_service.dart     # Draft algorithm — weighted breed selection
-│   │   ├── firestore_service.dart          # Firestore CRUD + atomic batch operations
+│   │   ├── cat_firestore_service.dart      # Cat-specific Firestore CRUD (watchCats, watchAllCats)
+│   │   ├── coin_service.dart               # Coin balance + accessory purchase operations
+│   │   ├── firestore_service.dart          # General Firestore CRUD + atomic batch operations
 │   │   ├── focus_timer_service.dart        # Android foreground service wrapper
+│   │   ├── migration_service.dart          # Data migration for schema evolution (e.g. breed -> appearance)
 │   │   ├── notification_service.dart       # FCM + flutter_local_notifications
+│   │   ├── pixel_cat_generation_service.dart # Random cat generation — appearance + personality
+│   │   ├── pixel_cat_renderer.dart         # 13-layer sprite compositor (pixel-cat-maker engine)
 │   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
 │   │   └── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
+│   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
+│   │   ├── coin_provider.dart              # coinServiceProvider, coinBalanceProvider, hasCheckedInTodayProvider
 │   │   ├── focus_timer_provider.dart       # focusTimerProvider (FSM state machine)
 │   │   ├── connectivity_provider.dart      # connectivityProvider, isOfflineProvider
 │   │   ├── habits_provider.dart            # habitsProvider, todayCheckInsProvider
@@ -78,11 +91,11 @@ hachimi-app/
 │   │   ├── auth/
 │   │   │   └── login_screen.dart           # Login + Register (email/password + Google)
 │   │   ├── cat_detail/
-│   │   │   └── cat_detail_screen.dart      # Cat info, XP bar, heatmap, milestones
+│   │   │   └── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
 │   │   ├── cat_room/
-│   │   │   └── cat_room_screen.dart        # Illustrated room scene with positioned cats
+│   │   │   └── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
 │   │   ├── habits/
-│   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + cat adoption
+│   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + single-cat adoption
 │   │   ├── home/
 │   │   │   └── home_screen.dart            # 4-tab NavigationBar shell + Today tab
 │   │   ├── onboarding/
@@ -97,31 +110,37 @@ hachimi-app/
 │   │       └── timer_screen.dart           # Active timer with foreground service
 │   │
 │   └── widgets/                            # Reusable UI components (stateless preferred)
-│       ├── cat_preview_card.dart           # Cat candidate card in adoption Step 2
-│       ├── cat_sprite.dart                 # Cat display: breed tinting + stage/mood selection
+│       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
+│       ├── cat_house_card.dart             # Single cat card in CatHouse 2-column grid
+│       ├── check_in_banner.dart            # Daily check-in coin bonus banner on HomeScreen
 │       ├── emoji_picker.dart               # Curated ~30-emoji grid for habit icon selection
-│       ├── offline_banner.dart            # Offline indicator: cloud_off + sync message
+│       ├── offline_banner.dart             # Offline indicator: cloud_off + sync message
+│       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
 │       ├── progress_ring.dart              # Circular progress indicator (timer ring)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
 │       └── streak_indicator.dart           # Fire badge showing current streak count
 │
 ├── assets/
-│   ├── sprites/                            # Cat sprite PNGs: cat_{stage}_{mood}.png
-│   │   ├── cat_kitten_happy.png
-│   │   ├── cat_kitten_neutral.png
-│   │   ├── cat_kitten_sad.png
-│   │   ├── cat_young_happy.png
-│   │   ├── cat_young_neutral.png
-│   │   ├── cat_young_sad.png
-│   │   ├── cat_adult_happy.png
-│   │   ├── cat_adult_neutral.png
-│   │   ├── cat_adult_sad.png
-│   │   ├── cat_shiny_happy.png
-│   │   ├── cat_shiny_neutral.png
-│   │   └── cat_shiny_sad.png
+│   ├── pixel_cat/                          # Pixel-cat-maker sprite layers
+│   │   ├── body/                           # Base body sprites by peltType + variant
+│   │   ├── pelt/                           # Pelt color overlays
+│   │   ├── white/                          # White patch patterns
+│   │   ├── white_tint/                     # White patch tint overlays
+│   │   ├── points/                         # Color-point patterns (Siamese etc.)
+│   │   ├── vitiligo/                       # Vitiligo patch overlay
+│   │   ├── tortie/                         # Tortoiseshell base layers
+│   │   ├── tortie_pattern/                 # Tortoiseshell pattern variants
+│   │   ├── tortie_color/                   # Tortoiseshell color overlays
+│   │   ├── fur/                            # Fur length overlays (long/short)
+│   │   ├── eyes/                           # Eye color sprites
+│   │   ├── skin/                           # Skin (nose/ear) color sprites
+│   │   ├── tint/                           # Overall tint overlays
+│   │   └── accessories/                    # Accessory overlay sprites
 │   └── room/
 │       ├── room_day.png                    # Daytime room background
 │       └── room_night.png                  # Nighttime room background
+│
+├── l10n.yaml                               # Flutter gen-l10n configuration
 │
 ├── android/                                # Android platform project
 │   ├── app/
@@ -144,16 +163,17 @@ hachimi-app/
 
 | Category | Convention | Example |
 |----------|-----------|---------|
-| Dart files | `snake_case.dart` | `cat_generation_service.dart` |
-| Classes | `PascalCase` | `CatGenerationService` |
-| Constants | `camelCase` (variables), `kConstantName` (compile-time) | `catBreeds`, `kMaxRoomCats` |
-| Providers | `camelCase` + `Provider` suffix | `catsProvider`, `focusTimerProvider` |
+| Dart files | `snake_case.dart` | `pixel_cat_renderer.dart` |
+| Classes | `PascalCase` | `PixelCatRenderer` |
+| Constants | `camelCase` (variables), `kConstantName` (compile-time) | `catPersonalities`, `kMaxCoins` |
+| Providers | `camelCase` + `Provider` suffix | `catsProvider`, `coinBalanceProvider` |
 | Screens | `PascalCase` + `Screen` suffix | `CatRoomScreen` |
-| Widgets | `PascalCase` descriptive noun | `CatSprite`, `StreakHeatmap` |
-| Services | `PascalCase` + `Service` suffix | `FirestoreService` |
-| Models | `PascalCase` noun | `Cat`, `Habit`, `FocusSession` |
-| Assets | `snake_case` | `cat_kitten_happy.png`, `room_day.png` |
+| Widgets | `PascalCase` descriptive noun | `PixelCatSprite`, `CatHouseCard` |
+| Services | `PascalCase` + `Service` suffix | `CatFirestoreService`, `CoinService` |
+| Models | `PascalCase` noun | `Cat`, `CatAppearance`, `Habit` |
+| Assets | `snake_case` | `body_tabby_0.png`, `room_day.png` |
 | Doc files | `kebab-case.md` | `data-model.md`, `cat-system.md` |
+| ARB keys | `screenName` + purpose in camelCase | `homeTabToday`, `adoptionConfirmButton` |
 
 ---
 
@@ -167,6 +187,7 @@ hachimi-app/
 | `screens/` | Providers, Widgets, Models (read-only), Router | Services (never import directly) |
 | `widgets/` | Models (read-only), Theme | Services, Providers |
 | `core/` | Dart core only | All others |
+| `l10n/` | (Generated) Dart core only | All others |
 
 **Enforcement:** If a Screen needs to call a Service, it must do so through a Provider method, not by importing the Service directly. This keeps the dependency graph acyclic and testable.
 
@@ -176,5 +197,5 @@ hachimi-app/
 
 Each Dart file contains exactly one public class (or one public top-level function for utilities). Small private helper classes (prefixed with `_`) may live in the same file as the public class they support.
 
-**Good:** `cat_room_screen.dart` contains `CatRoomScreen` and private `_SpeechBubble`
+**Good:** `cat_room_screen.dart` contains `CatRoomScreen` and private `_CatHouseGridDelegate`
 **Bad:** `screens.dart` containing `CatRoomScreen`, `CatDetailScreen`, and `TimerScreen`

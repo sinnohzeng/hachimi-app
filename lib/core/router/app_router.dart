@@ -56,7 +56,7 @@ class AppRouter {
             habitId: args['habitId'] as String,
             minutes: args['minutes'] as int,
             xpResult: args['xpResult'] as XpResult,
-            levelUp: args['levelUp'] as LevelUpResult?,
+            stageUp: args['stageUp'] as StageUpResult?,
             isAbandoned: args['isAbandoned'] as bool? ?? false,
           ),
         );

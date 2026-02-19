@@ -7,12 +7,12 @@
 ## Collection Hierarchy
 
 ```
-users/{uid}                          ← User profile document
-├── habits/{habitId}                 ← Habit metadata + streak tracking
-│   └── sessions/{sessionId}        ← Focus session history
-├── cats/{catId}                     ← Cat state (XP, stage, mood, room slot)
-└── checkIns/{date}                  ← Date-partitioned check-in buckets (backward compat)
-    └── entries/{entryId}            ← Per-session minute log entries
+users/{uid}                          <- User profile document
+├── habits/{habitId}                 <- Habit metadata + streak tracking
+│   └── sessions/{sessionId}        <- Focus session history
+├── cats/{catId}                     <- Cat state (appearance, growth, accessories)
+└── checkIns/{date}                  <- Date-partitioned check-in buckets (backward compat)
+    └── entries/{entryId}            <- Per-session minute log entries
 ```
 
 ---
@@ -27,10 +27,14 @@ The top-level user document. Created on first sign-in.
 | `email` | string | yes | User's email address |
 | `createdAt` | timestamp | yes | Account creation timestamp |
 | `fcmToken` | string | no | Firebase Cloud Messaging device token for push notifications |
+| `coins` | int | yes | Current coin balance for purchasing accessories (default: 0) |
+| `lastCheckInDate` | string | no | ISO date string "YYYY-MM-DD" of the most recent daily check-in bonus claim |
 
 **Notes:**
 - `uid` is the Firebase Auth UID and serves as both the document ID and the top-level namespace for all user data.
 - `fcmToken` is updated on each app launch via `NotificationService.initialize()`. Multiple devices are not currently supported (last write wins).
+- `coins` is modified via `FieldValue.increment()` to prevent race conditions. It is never set to a calculated total directly.
+- `lastCheckInDate` is compared against today's date to determine if the daily check-in bonus has already been claimed.
 
 ---
 
@@ -44,7 +48,7 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | `icon` | string | yes | — | Emoji character used as the habit icon, e.g. "📚" |
 | `catId` | string | yes | — | Reference to the bound cat document ID in `users/{uid}/cats/` |
 | `goalMinutes` | int | yes | 25 | Daily focus goal in minutes (used for progress display) |
-| `targetHours` | int | yes | 100 | Cumulative long-term target in hours (used for overall progress) |
+| `targetHours` | int | yes | — | Cumulative long-term target in hours (required, used for cat growth calculation) |
 | `totalMinutes` | int | yes | 0 | Total minutes logged across all time |
 | `currentStreak` | int | yes | 0 | Current consecutive days with at least one session |
 | `bestStreak` | int | yes | 0 | All-time highest consecutive day streak |
@@ -60,7 +64,7 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 - Otherwise: `currentStreak = 1` (streak broken)
 - Update `bestStreak = max(bestStreak, currentStreak)` after each update.
 
-**Dart Model:** `lib/models/habit.dart` → `class Habit`
+**Dart Model:** `lib/models/habit.dart` -> `class Habit`
 
 ---
 
@@ -80,10 +84,10 @@ One document per focus session. `sessionId` is a Firestore auto-generated ID.
 | `completed` | bool | yes | `true` if user completed the session; `false` if they gave up early |
 
 **XP for Abandoned Sessions:**
-- If `completed == false` AND `durationMinutes >= 5`: `xpEarned = durationMinutes × 1` (base XP only)
+- If `completed == false` AND `durationMinutes >= 5`: `xpEarned = durationMinutes x 1` (base XP only)
 - If `completed == false` AND `durationMinutes < 5`: `xpEarned = 0`
 
-**Dart Model:** `lib/models/focus_session.dart` → `class FocusSession`
+**Dart Model:** `lib/models/focus_session.dart` -> `class FocusSession`
 
 ---
 
@@ -94,12 +98,11 @@ One document per cat. `catId` is a Firestore auto-generated ID.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | yes | Cat's given name, e.g. "Mochi" |
-| `breed` | string | yes | Breed ID from `CatBreed.id` — see [Cat System](cat-system.md) for full list |
-| `pattern` | string | yes | Pattern ID: "classic_stripe", "spotted", or "solid" |
+| `appearance` | map | yes | Pixel-cat-maker appearance parameters — see [Cat System](cat-system.md) for full parameter list |
 | `personality` | string | yes | Personality ID from `CatPersonality.id` — see [Cat System](cat-system.md) |
-| `rarity` | string | yes | Rarity tier: "common", "uncommon", or "rare" |
-| `xp` | int | yes | Total XP accumulated. Stage is computed from this at read time. |
-| `roomSlot` | string | no | Room slot ID where this cat sits — see [Cat System](cat-system.md) for slot list |
+| `totalMinutes` | int | yes | Total focus minutes accumulated for this cat's habit. Stage is computed from this. |
+| `targetMinutes` | int | yes | Target minutes derived from the habit's `targetHours` (targetHours x 60). Used for stage calculation. |
+| `accessories` | list\<string\> | yes | List of accessory IDs the cat currently has equipped (default: empty list) |
 | `boundHabitId` | string | yes | Reference to the habit that spawned this cat |
 | `state` | string | yes | "active", "dormant", or "graduated" |
 | `lastSessionAt` | timestamp | no | Timestamp of the most recent focus session for this cat's habit |
@@ -110,21 +113,22 @@ These are derived from stored fields at read time to prevent drift.
 
 | Computed | Derived From | Logic |
 |----------|-------------|-------|
-| `stage` | `xp` | kitten (0), young (100+), adult (300+), shiny (600+) |
+| `stage` | `totalMinutes`, `targetMinutes` | kitten (< 20%), adolescent (20%–45%), adult (45%–75%), senior (>= 75%) |
 | `mood` | `lastSessionAt` | happy (under 24h), neutral (1–3d), lonely (3–7d), missing (over 7d) |
 
 **Why not store `stage` and `mood` directly?**
-Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`xp` and `lastSessionAt`), the app always shows the correct state without background jobs.
+Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`totalMinutes`, `targetMinutes`, and `lastSessionAt`), the app always shows the correct state without background jobs.
 
 **State Transitions:**
 
 ```
-active ──[habit deactivated]──► dormant
-active ──[habit deleted]──────► graduated
-dormant ──[habit reactivated]─► active  (future feature)
+active --[habit deactivated]--> dormant
+active --[habit deleted]------> graduated
+dormant --[habit reactivated]-> active  (future feature)
 ```
 
-**Dart Model:** `lib/models/cat.dart` → `class Cat`
+**Dart Model:** `lib/models/cat.dart` -> `class Cat`
+**Appearance Model:** `lib/models/cat_appearance.dart` -> `class CatAppearance`
 
 ---
 
@@ -141,7 +145,7 @@ Legacy check-in storage, preserved for backward compatibility and used by the he
 | `minutes` | int | yes | Minutes logged in this session |
 | `completedAt` | timestamp | yes | When this entry was created |
 
-**Dart Model:** `lib/models/check_in.dart` → `class CheckInEntry`
+**Dart Model:** `lib/models/check_in.dart` -> `class CheckInEntry`
 
 ---
 
@@ -153,8 +157,8 @@ Operations that span multiple documents use Firestore **batch writes** to guaran
 **Method:** `FirestoreService.createHabitWithCat(uid, habit, cat)`
 
 Batch includes:
-1. `SET users/{uid}/habits/{habitId}` — new habit document
-2. `SET users/{uid}/cats/{catId}` — new cat document (with `boundHabitId` pointing to habit)
+1. `SET users/{uid}/habits/{habitId}` — new habit document (with `targetHours` as required field)
+2. `SET users/{uid}/cats/{catId}` — new cat document with `appearance` Map, `targetMinutes` (= `targetHours x 60`), `totalMinutes: 0`, `accessories: []`, and `boundHabitId` pointing to habit
 3. `UPDATE users/{uid}/habits/{habitId}.catId` — back-reference from habit to cat
 
 ### 2. Focus Session Completion
@@ -163,9 +167,11 @@ Batch includes:
 Batch includes:
 1. `SET users/{uid}/habits/{habitId}/sessions/{sessionId}` — session record
 2. `UPDATE users/{uid}/habits/{habitId}` — increment `totalMinutes`, update `currentStreak`, `bestStreak`, `lastCheckInDate`
-3. `UPDATE users/{uid}/cats/{catId}.xp` — `xp += session.xpEarned`
+3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — set to now
 5. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — legacy check-in entry (for heatmap)
+6. (Conditional) `UPDATE users/{uid}.coins` — `FieldValue.increment(50)` if `lastCheckInDate != today` (daily check-in bonus)
+7. (Conditional) `UPDATE users/{uid}.lastCheckInDate` — set to today's date string if bonus was awarded
 
 ### 3. Habit Deletion (Graduation)
 **Method:** `FirestoreService.deleteHabit(uid, habitId)`
@@ -173,6 +179,13 @@ Batch includes:
 Batch includes:
 1. `DELETE users/{uid}/habits/{habitId}` — remove habit document
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
+
+### 4. Accessory Purchase
+**Method:** `CoinService.purchaseAccessory(uid, catId, accessoryId)`
+
+Batch includes:
+1. `UPDATE users/{uid}.coins` — `FieldValue.increment(-150)` (deduct cost)
+2. `UPDATE users/{uid}/cats/{catId}.accessories` — `FieldValue.arrayUnion([accessoryId])`
 
 ---
 
@@ -194,10 +207,12 @@ All other queries use single-field default indexes.
 
 1. **No orphaned cats**: Every cat document must have a valid `boundHabitId`. Use batch writes to enforce this.
 2. **No orphaned habit references**: When a habit is deleted, the bound cat's state is updated to "graduated" in the same batch.
-3. **XP never decreases**: `xp` is always incremented, never set to a lower value.
-4. **Stage is computed, not stored**: Never write `stage` to Firestore. Always derive it from `xp`.
+3. **totalMinutes never decreases**: `totalMinutes` is always incremented, never set to a lower value.
+4. **Stage is computed, not stored**: Never write `stage` to Firestore. Always derive it from `totalMinutes` and `targetMinutes`.
 5. **Mood is computed, not stored**: Never write `mood` to Firestore. Always derive it from `lastSessionAt`.
 6. **`totalMinutes` is additive**: Always use `FieldValue.increment(delta)` — never overwrite with a calculated total (prevents race conditions).
+7. **Coins never go negative**: The `CoinService` must validate sufficient balance before deducting. The purchase batch write should fail gracefully if balance is insufficient.
+8. **Appearance is immutable**: The `appearance` map is set at cat creation and never modified afterward.
 
 ---
 

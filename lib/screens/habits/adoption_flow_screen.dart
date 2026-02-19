@@ -5,12 +5,11 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/widgets/emoji_picker.dart';
-import 'package:hachimi_app/widgets/cat_preview_card.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// 3-step adoption flow: Define Habit → Adopt Cat → Name Cat.
 /// Creates both a habit and its bound cat in Firestore on completion.
 class AdoptionFlowScreen extends ConsumerStatefulWidget {
-  /// If true, shows first-time-user messaging.
   final bool isFirstHabit;
 
   const AdoptionFlowScreen({super.key, this.isFirstHabit = false});
@@ -29,16 +28,17 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   final _nameController = TextEditingController();
   String _selectedEmoji = '📚';
   int _goalMinutes = 25;
+  int _targetHours = 100;
   String? _reminderTime;
 
-  // Step 2: Cat draft
-  List<Cat> _draftCats = [];
-  int _selectedCatIndex = -1;
+  // Step 2: Cat preview (single cat + refresh)
+  Cat? _previewCat;
 
   // Step 3: Name cat
   final _catNameController = TextEditingController();
 
   static const List<int> goalOptions = [15, 25, 40, 60];
+  static const List<int> targetHourOptions = [50, 100, 200, 500];
 
   @override
   void dispose() {
@@ -50,25 +50,16 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
   void _nextStep() {
     if (_currentStep == 0) {
-      // Validate step 1
       if (_nameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please enter a habit name')),
         );
         return;
       }
-      // Generate cat draft
-      _generateDraft();
+      _generateCat();
     } else if (_currentStep == 1) {
-      // Validate step 2
-      if (_selectedCatIndex < 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a kitten to adopt')),
-        );
-        return;
-      }
-      // Pre-fill cat name
-      _catNameController.text = _draftCats[_selectedCatIndex].name;
+      if (_previewCat == null) return;
+      _catNameController.text = _previewCat!.name;
     }
 
     setState(() => _currentStep++);
@@ -90,15 +81,13 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     }
   }
 
-  void _generateDraft() {
-    final catGenService = ref.read(catGenerationServiceProvider);
-    final ownedBreeds = ref.read(ownedBreedsProvider);
+  void _generateCat() {
+    final catGenService = ref.read(pixelCatGenerationServiceProvider);
     setState(() {
-      _draftCats = catGenService.generateDraft(
-        userOwnedBreeds: ownedBreeds,
-        boundHabitId: '', // Will be set on creation
+      _previewCat = catGenService.generateCat(
+        boundHabitId: '',
+        targetMinutes: _targetHours * 60,
       );
-      _selectedCatIndex = -1;
     });
   }
 
@@ -116,7 +105,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       final uid = ref.read(currentUidProvider);
       if (uid == null) return;
 
-      final selectedCat = _draftCats[_selectedCatIndex].copyWith(
+      final selectedCat = _previewCat!.copyWith(
         name: _catNameController.text.trim(),
       );
 
@@ -124,19 +113,19 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             uid: uid,
             name: _nameController.text.trim(),
             icon: _selectedEmoji,
+            targetHours: _targetHours,
             goalMinutes: _goalMinutes,
             reminderTime: _reminderTime,
             cat: selectedCat,
           );
 
-      // Log analytics
       await ref.read(analyticsServiceProvider).logHabitCreated(
             habitName: _nameController.text.trim(),
-            targetHours: 0,
+            targetHours: _targetHours,
           );
 
       if (mounted) {
-        Navigator.of(context).pop(true); // Return true to indicate success
+        Navigator.of(context).pop(true);
       }
     } on Exception catch (e) {
       if (mounted) {
@@ -168,26 +157,21 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       ),
       body: Column(
         children: [
-          // Step indicator
           _StepIndicator(
             currentStep: _currentStep,
             steps: const ['Define Habit', 'Adopt Cat', 'Name Cat'],
           ),
-
-          // Page content
           Expanded(
             child: PageView(
               controller: _pageController,
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 _buildStep1HabitForm(theme),
-                _buildStep2CatDraft(theme),
+                _buildStep2CatPreview(theme),
                 _buildStep3NameCat(theme),
               ],
             ),
           ),
-
-          // Bottom action button
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -205,9 +189,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          _currentStep == 2
-                              ? '🐱 Adopt!'
-                              : 'Next',
+                          _currentStep == 2 ? 'Adopt!' : 'Next',
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -235,7 +217,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           if (widget.isFirstHabit) ...[
             Text(
-              'What habit do you want to build? 🌱',
+              'What habit do you want to build?',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -271,6 +253,29 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: 24),
 
+          // Target hours
+          Text('Total target hours', style: textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            'Your cat grows as you accumulate focus time',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: targetHourOptions.map((hours) {
+              final isSelected = _targetHours == hours;
+              return ChoiceChip(
+                label: Text('${hours}h'),
+                selected: isSelected,
+                onSelected: (_) => setState(() => _targetHours = hours),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+
           // Daily goal time
           Text('Daily focus goal', style: textTheme.titleMedium),
           const SizedBox(height: 12),
@@ -287,7 +292,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Reminder time (optional)
+          // Reminder time
           Text('Daily reminder (optional)', style: textTheme.titleMedium),
           const SizedBox(height: 12),
           Wrap(
@@ -338,9 +343,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     }
   }
 
-  // ─── Step 2: Cat Draft ───
+  // ─── Step 2: Cat Preview (single + refresh) ───
 
-  Widget _buildStep2CatDraft(ThemeData theme) {
+  Widget _buildStep2CatPreview(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
@@ -350,11 +355,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           const SizedBox(height: 16),
           Text(
-            '🐱',
-            style: const TextStyle(fontSize: 48),
-          ),
-          const SizedBox(height: 12),
-          Text(
             'A kitten is waiting for you!',
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
@@ -363,7 +363,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Choose your companion for "${_nameController.text.trim()}"',
+            'Your companion for "${_nameController.text.trim()}"',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -371,30 +371,52 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: 32),
 
-          // 3 cat candidates
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(_draftCats.length, (index) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: CatPreviewCard(
-                    cat: _draftCats[index],
-                    isSelected: _selectedCatIndex == index,
-                    onTap: () => setState(() => _selectedCatIndex = index),
+          // Cat sprite (large preview)
+          if (_previewCat != null) ...[
+            PixelCatSprite.fromCat(cat: _previewCat!, size: 160),
+            const SizedBox(height: 16),
+            Text(
+              _previewCat!.name,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Personality tag
+            if (_previewCat!.personalityData != null)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${_previewCat!.personalityData!.emoji} ${_previewCat!.personalityData!.name}',
+                  style: textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onTertiaryContainer,
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            if (_previewCat!.personalityData != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _previewCat!.personalityData!.flavorText,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ],
           const SizedBox(height: 24),
 
-          // Refresh draft button
+          // Refresh button
           TextButton.icon(
-            onPressed: _generateDraft,
+            onPressed: _generateCat,
             icon: const Icon(Icons.refresh),
-            label: const Text('Show different kittens'),
+            label: const Text('Try another kitten'),
           ),
         ],
       ),
@@ -406,14 +428,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   Widget _buildStep3NameCat(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final selectedCat =
-        _selectedCatIndex >= 0 ? _draftCats[_selectedCatIndex] : null;
-    final breed = selectedCat != null
-        ? breedMap[selectedCat.breed]
-        : null;
-    final personality = selectedCat != null
-        ? personalityMap[selectedCat.personality]
-        : null;
+    final personality = _previewCat?.personalityData;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -422,40 +437,16 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: 24),
 
           // Cat preview
-          if (selectedCat != null) ...[
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: (breed?.colors.base ?? colorScheme.primary)
-                    .withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: (breed?.colors.base ?? colorScheme.primary)
-                      .withValues(alpha: 0.5),
-                  width: 3,
+          if (_previewCat != null) ...[
+            PixelCatSprite.fromCat(cat: _previewCat!, size: 120),
+            const SizedBox(height: 12),
+            if (personality != null)
+              Text(
+                '${personality.emoji} ${personality.name}',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              child: const Center(
-                child: Text('🐱', style: TextStyle(fontSize: 48)),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Breed + personality
-            Text(
-              breed?.name ?? selectedCat.breed,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${personality?.emoji ?? ''} ${personality?.name ?? selectedCat.personality}',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
           ],
           const SizedBox(height: 32),
 
@@ -477,9 +468,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 icon: const Icon(Icons.casino),
                 tooltip: 'Random name',
                 onPressed: () {
-                  final catGenService = ref.read(catGenerationServiceProvider);
+                  final names = randomCatNames;
+                  final name = (names.toList()..shuffle()).first;
                   setState(() {
-                    _catNameController.text = catGenService.randomName();
+                    _catNameController.text = name;
                   });
                 },
               ),
@@ -489,8 +481,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: 16),
 
           Text(
-            'Your cat will help you stay focused on "${_nameController.text.trim()}" '
-            'and grow as you build your habit!',
+            'Your cat will grow as you focus on "${_nameController.text.trim()}"! '
+            'Target: ${_targetHours}h total.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -519,7 +511,6 @@ class _StepIndicator extends StatelessWidget {
       child: Row(
         children: List.generate(steps.length * 2 - 1, (index) {
           if (index.isOdd) {
-            // Connector line
             final stepIndex = index ~/ 2;
             return Expanded(
               child: Container(
@@ -552,7 +543,8 @@ class _StepIndicator extends StatelessWidget {
                 ),
                 child: Center(
                   child: stepIndex < currentStep
-                      ? Icon(Icons.check, size: 16, color: colorScheme.onPrimary)
+                      ? Icon(Icons.check,
+                          size: 16, color: colorScheme.onPrimary)
                       : Text(
                           '${stepIndex + 1}',
                           style: textTheme.labelSmall?.copyWith(

@@ -1,0 +1,131 @@
+{
+  "@@locale": "en",
+  "appTitle": "Hachimi",
+
+  "homeTabToday": "Today",
+  "homeTabCatHouse": "CatHouse",
+  "homeTabStats": "Stats",
+  "homeTabProfile": "Profile",
+
+  "adoptionStepDefineHabit": "Define Habit",
+  "adoptionStepAdoptCat": "Adopt Cat",
+  "adoptionStepNameCat": "Name Cat",
+  "adoptionHabitName": "Habit Name",
+  "adoptionHabitNameHint": "e.g. Daily Reading",
+  "adoptionDailyGoal": "Daily Goal",
+  "adoptionTargetHours": "Target Hours",
+  "adoptionTargetHoursHint": "Total hours to complete this habit",
+  "adoptionMinutes": "{count} min",
+  "@adoptionMinutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "adoptionRefreshCat": "Try another",
+  "adoptionPersonality": "Personality: {name}",
+  "@adoptionPersonality": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "adoptionNameYourCat": "Name your cat",
+  "adoptionRandomName": "Random",
+  "adoptionCreate": "Create Habit & Adopt",
+  "adoptionNext": "Next",
+  "adoptionBack": "Back",
+
+  "catHouseTitle": "CatHouse",
+  "catHouseEmpty": "No cats yet! Create a habit to adopt your first cat.",
+  "catHouseGrowth": "{minutes} / {target} min",
+  "@catHouseGrowth": {
+    "placeholders": {
+      "minutes": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+
+  "catDetailGrowthProgress": "Growth Progress",
+  "catDetailTotalMinutes": "{minutes} min focused",
+  "@catDetailTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "catDetailTargetMinutes": "Target: {minutes} min",
+  "@catDetailTargetMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "catDetailRename": "Rename",
+  "catDetailAccessories": "Accessories",
+  "catDetailStartFocus": "Start Focus",
+  "catDetailBoundHabit": "Bound Habit",
+  "catDetailStage": "Stage: {stage}",
+  "@catDetailStage": {
+    "placeholders": { "stage": { "type": "String" } }
+  },
+
+  "coinBalance": "{amount} coins",
+  "@coinBalance": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
+  "coinCheckInReward": "+{amount} coins!",
+  "@coinCheckInReward": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
+  "coinCheckInTitle": "Daily Check-in",
+  "coinInsufficientBalance": "Not enough coins",
+
+  "shopTitle": "Accessory Shop",
+  "shopPrice": "{price} coins",
+  "@shopPrice": {
+    "placeholders": { "price": { "type": "int" } }
+  },
+  "shopPurchase": "Buy",
+  "shopEquipped": "Equipped",
+
+  "focusCompleteMinutes": "+{minutes} min",
+  "@focusCompleteMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "focusCompleteStageUp": "Stage Up!",
+  "focusCompleteGreatJob": "Great job!",
+  "focusCompleteDone": "Done",
+
+  "timerGiveUp": "Give Up",
+  "timerPause": "Pause",
+  "timerResume": "Resume",
+  "timerDone": "Done",
+
+  "profileLanguage": "Language",
+  "profileAbout": "About",
+  "profileAboutAttribution": "Pixel cat sprites based on pixel-cat-maker (CC BY-NC 4.0)",
+  "profileLogout": "Log Out",
+  "profileDeleteAccount": "Delete Account",
+
+  "stageKitten": "Kitten",
+  "stageAdolescent": "Adolescent",
+  "stageAdult": "Adult",
+  "stageSenior": "Senior",
+
+  "migrationTitle": "Data Update Required",
+  "migrationMessage": "This version uses a new cat system. Your existing data needs to be cleared to continue.",
+  "migrationConfirm": "Clear Data & Continue",
+  "migrationCancel": "Cancel",
+
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonLoading": "Loading...",
+  "commonError": "Something went wrong",
+  "commonRetry": "Retry",
+
+  "todaySummaryMinutes": "Today",
+  "todaySummaryTotal": "Total",
+  "todaySummaryCats": "Cats",
+  "todayFeaturedCat": "Featured Cat",
+  "todayAddHabit": "Add Habit",
+  "todayNoHabits": "Create your first habit to get started!",
+
+  "habitDetailStreak": "Streak",
+  "habitDetailBestStreak": "Best",
+  "habitDetailTotalMinutes": "Total",
+
+  "settingsNotifications": "Notifications",
+  "settingsVersion": "Version"
+}

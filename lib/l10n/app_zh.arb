@@ -1,0 +1,98 @@
+{
+  "@@locale": "zh",
+  "appTitle": "Hachimi",
+
+  "homeTabToday": "今天",
+  "homeTabCatHouse": "猫屋",
+  "homeTabStats": "统计",
+  "homeTabProfile": "我的",
+
+  "adoptionStepDefineHabit": "定义习惯",
+  "adoptionStepAdoptCat": "领养猫猫",
+  "adoptionStepNameCat": "起个名字",
+  "adoptionHabitName": "习惯名称",
+  "adoptionHabitNameHint": "例如：每日阅读",
+  "adoptionDailyGoal": "每日目标",
+  "adoptionTargetHours": "目标时长",
+  "adoptionTargetHoursHint": "完成这个习惯的总时长",
+  "adoptionMinutes": "{count} 分钟",
+  "adoptionRefreshCat": "换一只",
+  "adoptionPersonality": "性格：{name}",
+  "adoptionNameYourCat": "给猫猫起个名字",
+  "adoptionRandomName": "随机",
+  "adoptionCreate": "创建习惯并领养",
+  "adoptionNext": "下一步",
+  "adoptionBack": "上一步",
+
+  "catHouseTitle": "猫屋",
+  "catHouseEmpty": "还没有猫猫！创建一个习惯来领养你的第一只猫。",
+  "catHouseGrowth": "{minutes} / {target} 分钟",
+
+  "catDetailGrowthProgress": "成长进度",
+  "catDetailTotalMinutes": "已专注 {minutes} 分钟",
+  "catDetailTargetMinutes": "目标：{minutes} 分钟",
+  "catDetailRename": "重命名",
+  "catDetailAccessories": "饰品",
+  "catDetailStartFocus": "开始专注",
+  "catDetailBoundHabit": "绑定习惯",
+  "catDetailStage": "阶段：{stage}",
+
+  "coinBalance": "{amount} 金币",
+  "coinCheckInReward": "+{amount} 金币！",
+  "coinCheckInTitle": "每日签到",
+  "coinInsufficientBalance": "金币不足",
+
+  "shopTitle": "饰品商店",
+  "shopPrice": "{price} 金币",
+  "shopPurchase": "购买",
+  "shopEquipped": "已装备",
+
+  "focusCompleteMinutes": "+{minutes} 分钟",
+  "focusCompleteStageUp": "阶段提升！",
+  "focusCompleteGreatJob": "干得好！",
+  "focusCompleteDone": "完成",
+
+  "timerGiveUp": "放弃",
+  "timerPause": "暂停",
+  "timerResume": "继续",
+  "timerDone": "完成",
+
+  "profileLanguage": "语言",
+  "profileAbout": "关于",
+  "profileAboutAttribution": "像素猫素材基于 pixel-cat-maker（CC BY-NC 4.0）",
+  "profileLogout": "退出登录",
+  "profileDeleteAccount": "删除账号",
+
+  "stageKitten": "幼猫",
+  "stageAdolescent": "少年猫",
+  "stageAdult": "成年猫",
+  "stageSenior": "长老猫",
+
+  "migrationTitle": "数据更新",
+  "migrationMessage": "此版本使用了全新的猫猫系统，需要清除现有数据才能继续。",
+  "migrationConfirm": "清除数据并继续",
+  "migrationCancel": "取消",
+
+  "commonCancel": "取消",
+  "commonConfirm": "确认",
+  "commonSave": "保存",
+  "commonDelete": "删除",
+  "commonEdit": "编辑",
+  "commonLoading": "加载中...",
+  "commonError": "出了点问题",
+  "commonRetry": "重试",
+
+  "todaySummaryMinutes": "今天",
+  "todaySummaryTotal": "总计",
+  "todaySummaryCats": "猫猫",
+  "todayFeaturedCat": "明星猫猫",
+  "todayAddHabit": "添加习惯",
+  "todayNoHabits": "创建第一个习惯来开始吧！",
+
+  "habitDetailStreak": "连续",
+  "habitDetailBestStreak": "最佳",
+  "habitDetailTotalMinutes": "总计",
+
+  "settingsNotifications": "通知",
+  "settingsVersion": "版本"
+}

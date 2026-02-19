@@ -1,17 +1,34 @@
+// ---
+// 📘 文件说明：
+// 专注完成庆祝页面 — 展示本次专注的时长、XP 奖励明细、猫猫阶段跃迁提示。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. 接收 habitId、分钟数、XpResult、StageUpResult 参数；
+// 2. 从 Provider 加载关联的 habit 和 cat 数据；
+// 3. 显示像素猫 sprite + 阶段跃迁标签（若有）；
+// 4. XP 明细卡片；
+// 5. Done 按钮返回首页；
+//
+// 🧩 文件结构：
+// - FocusCompleteScreen：主页面 ConsumerWidget；
+// - _XpRow：XP 明细行组件；
+// ---
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/services/xp_service.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// Focus complete celebration screen.
-/// Shows XP earned, level-up animation, and session stats.
+/// Shows minutes earned, XP breakdown, stage-up animation, and session stats.
 class FocusCompleteScreen extends ConsumerWidget {
   final String habitId;
   final int minutes;
   final XpResult xpResult;
-  final LevelUpResult? levelUp;
+  final StageUpResult? stageUp;
   final bool isAbandoned;
 
   const FocusCompleteScreen({
@@ -19,7 +36,7 @@ class FocusCompleteScreen extends ConsumerWidget {
     required this.habitId,
     required this.minutes,
     required this.xpResult,
-    this.levelUp,
+    this.stageUp,
     this.isAbandoned = false,
   });
 
@@ -35,7 +52,7 @@ class FocusCompleteScreen extends ConsumerWidget {
         ? ref.watch(catByIdProvider(habit!.catId!))
         : null;
 
-    final didLevelUp = levelUp?.didLevelUp ?? false;
+    final didStageUp = stageUp?.didStageUp ?? false;
 
     return Scaffold(
       body: SafeArea(
@@ -49,7 +66,7 @@ class FocusCompleteScreen extends ConsumerWidget {
 
                 // Status emoji
                 Text(
-                  isAbandoned ? '🤗' : (didLevelUp ? '🎉' : '✨'),
+                  isAbandoned ? '🤗' : (didStageUp ? '🎉' : '✨'),
                   style: const TextStyle(fontSize: 48),
                 ),
                 const SizedBox(height: 16),
@@ -58,7 +75,7 @@ class FocusCompleteScreen extends ConsumerWidget {
                 Text(
                   isAbandoned
                       ? "It's okay!"
-                      : (didLevelUp
+                      : (didStageUp
                           ? '${cat?.name ?? "Your cat"} evolved!'
                           : 'Great job!'),
                   style: textTheme.headlineMedium?.copyWith(
@@ -80,12 +97,7 @@ class FocusCompleteScreen extends ConsumerWidget {
 
                 // Cat display
                 if (cat != null) ...[
-                  CatSprite.fromCat(
-                    breed: cat.breed,
-                    stage: cat.computedStage,
-                    mood: 'happy',
-                    size: 120,
-                  ),
+                  PixelCatSprite.fromCat(cat: cat, size: 120),
                   const SizedBox(height: 12),
                   Text(
                     cat.name,
@@ -93,7 +105,7 @@ class FocusCompleteScreen extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (didLevelUp)
+                  if (didStageUp)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Container(
@@ -102,13 +114,14 @@ class FocusCompleteScreen extends ConsumerWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.tertiaryContainer,
+                          color: stageColor(stageUp!.newStage)
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          'Evolved to ${levelUp!.newStageName}!',
+                          'Evolved to ${stageUp!.newStage[0].toUpperCase()}${stageUp!.newStage.substring(1)}!',
                           style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onTertiaryContainer,
+                            color: stageColor(stageUp!.newStage),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -117,20 +130,26 @@ class FocusCompleteScreen extends ConsumerWidget {
                 ],
                 const SizedBox(height: 32),
 
-                // XP breakdown
+                // Session stats breakdown
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _XpRow(
+                        _StatRow(
                           label: 'Focus time',
-                          value: '+${xpResult.baseXp} XP',
+                          value: '+$minutes min',
                           icon: Icons.timer_outlined,
+                        ),
+                        const Divider(height: 16),
+                        _StatRow(
+                          label: 'Base XP',
+                          value: '+${xpResult.baseXp} XP',
+                          icon: Icons.star_outline,
                         ),
                         if (xpResult.streakBonus > 0) ...[
                           const Divider(height: 16),
-                          _XpRow(
+                          _StatRow(
                             label: 'Streak bonus',
                             value: '+${xpResult.streakBonus} XP',
                             icon: Icons.local_fire_department,
@@ -138,7 +157,7 @@ class FocusCompleteScreen extends ConsumerWidget {
                         ],
                         if (xpResult.milestoneBonus > 0) ...[
                           const Divider(height: 16),
-                          _XpRow(
+                          _StatRow(
                             label: 'Milestone bonus',
                             value: '+${xpResult.milestoneBonus} XP',
                             icon: Icons.emoji_events,
@@ -146,14 +165,14 @@ class FocusCompleteScreen extends ConsumerWidget {
                         ],
                         if (xpResult.fullHouseBonus > 0) ...[
                           const Divider(height: 16),
-                          _XpRow(
+                          _StatRow(
                             label: 'Full house bonus',
                             value: '+${xpResult.fullHouseBonus} XP',
                             icon: Icons.home,
                           ),
                         ],
                         const Divider(height: 16),
-                        _XpRow(
+                        _StatRow(
                           label: 'Total',
                           value: '+${xpResult.totalXp} XP',
                           icon: Icons.star,
@@ -172,7 +191,6 @@ class FocusCompleteScreen extends ConsumerWidget {
                   height: 52,
                   child: FilledButton(
                     onPressed: () {
-                      // Pop back to home
                       Navigator.of(context)
                           .popUntil((route) => route.isFirst);
                     },
@@ -194,13 +212,13 @@ class FocusCompleteScreen extends ConsumerWidget {
   }
 }
 
-class _XpRow extends StatelessWidget {
+class _StatRow extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
   final bool isBold;
 
-  const _XpRow({
+  const _StatRow({
     required this.label,
     required this.value,
     required this.icon,

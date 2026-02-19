@@ -1,6 +1,6 @@
 # 架构概览
 
-> **SSOT**（Single Source of Truth，单一真值来源） ：本文档是系统架构的权威参考。所有实现决策必须与此处描述的原则保持一致。
+> **SSOT**（Single Source of Truth，单一真值来源）：本文档是系统架构的权威参考。所有实现决策必须与此处描述的原则保持一致。
 
 ---
 
@@ -21,6 +21,7 @@
 | A/B 测试 | Firebase Remote Config | 5.x | 动态配置、功能开关 |
 | 崩溃报告 | Firebase Crashlytics | 4.x | 生产环境错误监控 |
 | 网络连接 | connectivity_plus | 6.x | 设备网络状态监测 |
+| 国际化 | flutter_localizations + gen-l10n | — | 通过 ARB 文件进行编译期本地化 |
 
 ---
 
@@ -43,15 +44,18 @@
 │  ├── currentUidProvider        ├── statsProvider                │
 │  ├── habitsProvider            ├── todayMinutesPerHabitProvider │
 │  ├── todayCheckInsProvider     ├── catsProvider                 │
-│  ├── catByIdProvider（family） └── ownedBreedsProvider          │
-│  ├── catByHabitProvider（family）                               │
-│  ├── connectivityProvider    └── isOfflineProvider             │
+│  ├── catByIdProvider（family） ├── pixelCatRendererProvider     │
+│  ├── catByHabitProvider（fam.）├── catSpriteImageProvider（fam.）│
+│  ├── connectivityProvider      ├── coinBalanceProvider          │
+│  ├── isOfflineProvider         └── hasCheckedInTodayProvider    │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services（数据层——Firebase SDK 封装）                           │
 │  ├── AuthService               ├── XpService（纯 Dart）         │
 │  ├── FirestoreService          ├── NotificationService          │
-│  ├── AnalyticsService          ├── RemoteConfigService          │
-│  ├── CatGenerationService      └── FocusTimerService            │
+│  ├── CatFirestoreService       ├── RemoteConfigService          │
+│  ├── PixelCatRenderer          ├── FocusTimerService            │
+│  ├── PixelCatGenerationService ├── MigrationService             │
+│  ├── CoinService               └── AnalyticsService             │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -78,26 +82,30 @@
 | 业务数据 | Firestore |
 | 认证状态 | `authStateProvider`（`providers/auth_provider.dart`） |
 | 猫咪列表 | `catsProvider`（`providers/cat_provider.dart`） |
+| 猫咪精灵图 | `catSpriteImageProvider`（`providers/cat_sprite_provider.dart`） |
+| 金币余额 | `coinBalanceProvider`（`providers/coin_provider.dart`） |
 | 计时器状态 | `focusTimerProvider`（`providers/focus_timer_provider.dart`） |
 | 计算统计 | `statsProvider`（`providers/stats_provider.dart`） |
 | UI 主题 | `lib/core/theme/app_theme.dart` |
 | 分析事件名 | `lib/core/constants/analytics_events.dart` |
 | 猫咪游戏元数据 | `lib/core/constants/cat_constants.dart` |
+| 像素猫外观参数 | `lib/core/constants/pixel_cat_constants.dart` |
 | 命名路由 | `lib/core/router/app_router.dart` |
 | 动态配置 | Firebase Remote Config |
 | 设备网络连接 | `connectivityProvider`（`providers/connectivity_provider.dart`） |
+| 本地化字符串 | `lib/l10n/app_en.arb`（源）+ 生成的 `AppLocalizations` |
 
 ### 3. 严格依赖方向
 
 ```
-Screens → Providers → Services → Firebase SDK
+Screens -> Providers -> Services -> Firebase SDK
 ```
 
 **规则：**
 - Screens 只通过 `ref.watch` / `ref.read` 从 Providers 读取数据——不直接导入 Services
 - Providers 编排 Services 并暴露响应式状态——不直接访问 Firebase SDK
 - Services 封装所有 Firebase SDK 交互——不包含 UI 代码，不使用 BuildContext
-- 纯计算（XP、品种生成）放在无 Firebase 依赖的 Services 中
+- 纯计算（XP、猫咪生成）放在无 Firebase 依赖的 Services 中
 
 ### 4. 响应式优于命令式
 
@@ -106,6 +114,10 @@ Screens → Providers → Services → Firebase SDK
 ### 5. 原子 Firestore 操作
 
 跨多个文档的操作（如创建习惯 + 猫咪、记录专注会话）使用 Firestore **批量写入** 保证一致性。任意写入失败则全部回滚。
+
+### 6. 国际化（i18n）
+
+所有用户可见的字符串均外部化到 ARB 文件（`lib/l10n/app_en.arb`、`lib/l10n/app_zh.arb`）中，并通过 `flutter gen-l10n` 编译为 Dart 代码。Screen 和 Widget 中不允许硬编码用户可见的字符串。详见 [localization.md](localization.md) 完整工作流。
 
 ---
 
@@ -124,7 +136,7 @@ Screens → Providers → Services → Firebase SDK
 | `/cat-detail` | CatDetailScreen | `catId: String` |
 | `/profile` | ProfileScreen | — |
 
-**根路由** 由 `AuthGate` → `_FirstHabitGate` 管理：
+**根路由** 由 `AuthGate` -> `_FirstHabitGate` 管理：
 1. `AuthGate` 检查引导完成状态（SharedPreferences）和 Firebase Auth 状态
 2. `_FirstHabitGate` 检测首次用户（零个习惯）并自动导航到领养流程
 
@@ -137,29 +149,47 @@ Screens → Providers → Services → Firebase SDK
     │
     ▼
 AuthGate
-    ├── 引导未完成 → OnboardingScreen
-    │       └── 完成 → AuthGate（循环）
+    ├── 引导未完成 -> OnboardingScreen
+    │       └── 完成 -> AuthGate（循环）
     │
     └── 引导已完成
             │
             ▼
         Firebase Auth 流
-            ├── user == null → LoginScreen
-            └── user != null → _FirstHabitGate
-                    ├── habits.isEmpty → AdoptionFlow（isFirstHabit: true）
-                    └── habits.any → HomeScreen
+            ├── user == null -> LoginScreen
+            └── user != null -> _FirstHabitGate
+                    ├── habits.isEmpty -> AdoptionFlow（isFirstHabit: true）
+                    └── habits.any -> HomeScreen
 ```
+
+---
+
+## 状态管理详情
+
+详见 [state-management.md](state-management.md) 完整 Provider 图谱。
+
+**使用的核心模式：**
+
+| 模式 | 使用场景 | 示例 |
+|------|---------|------|
+| `StreamProvider` | Firestore 实时流 | `habitsProvider`、`catsProvider`、`coinBalanceProvider` |
+| `FutureProvider.family` | 异步按键计算 | `catSpriteImageProvider(catId)` |
+| `StateNotifierProvider` | 有方法的可变本地状态 | `focusTimerProvider` |
+| `Provider` | 计算/派生值 | `statsProvider`、`hasCheckedInTodayProvider` |
+| `Provider.family` | 参数化查询 | `catByIdProvider(catId)`、`catByHabitProvider(habitId)` |
+| `ref.watch()` | 在 `build()` 中的响应式订阅 | 所有 Screen 的 `build` 方法 |
+| `ref.read()` | 事件处理中的一次性读取 | 按钮 `onPressed` 回调 |
 
 ---
 
 ## 后台计时器架构
 
-专注计时器是一个 **双 Isolate 系统** ：
+专注计时器是一个 **双 Isolate 系统**：
 
 1. **主 Isolate** — `FocusTimerNotifier`（Riverpod）持有权威计时器状态。使用 `Timer.periodic(1s)` 并将完整的 `FocusTimerState` 暴露给 UI。
 
 2. **后台 Isolate** — `flutter_foreground_task` 在独立 Isolate 中运行最小化的 `_TimerTaskHandler`。其唯一职责是保持 Android 前台服务存活并显示持久通知。主 Isolate 通过 `FocusTimerService.updateNotification()` 在每个计时周期更新通知文本。
 
 `AppLifecycleState` 变化通过 `WidgetsBindingObserver` 监听：
-- `paused` / `hidden` → 记录时间戳（`onAppBackgrounded`）
-- `resumed` → 计算离开时长；>15s 自动暂停，>5min 自动结束（`onAppResumed`）
+- `paused` / `hidden` -> 记录时间戳（`onAppBackgrounded`）
+- `resumed` -> 计算离开时长；>15s 自动暂停，>5min 自动结束（`onAppResumed`）

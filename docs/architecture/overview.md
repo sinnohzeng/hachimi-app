@@ -21,6 +21,7 @@
 | A/B Testing | Firebase Remote Config | 5.x | Dynamic config, feature flags |
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
 | Connectivity | connectivity_plus | 6.x | Device network status monitoring |
+| i18n | flutter_localizations + gen-l10n | — | Compile-time localization via ARB files |
 
 ---
 
@@ -43,15 +44,18 @@
 │  ├── currentUidProvider        ├── statsProvider                │
 │  ├── habitsProvider            ├── todayMinutesPerHabitProvider │
 │  ├── todayCheckInsProvider     ├── catsProvider                 │
-│  ├── catByIdProvider (family)  └── ownedBreedsProvider          │
-│  ├── catByHabitProvider (family)                                │
-│  ├── connectivityProvider     └── isOfflineProvider             │
+│  ├── catByIdProvider (family)  ├── pixelCatRendererProvider     │
+│  ├── catByHabitProvider (fam.) ├── catSpriteImageProvider (fam.)│
+│  ├── connectivityProvider      ├── coinBalanceProvider          │
+│  ├── isOfflineProvider         └── hasCheckedInTodayProvider    │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services  (Data Layer — Firebase SDK isolation)               │
 │  ├── AuthService               ├── XpService (pure Dart)        │
 │  ├── FirestoreService          ├── NotificationService          │
-│  ├── AnalyticsService          ├── RemoteConfigService          │
-│  ├── CatGenerationService      └── FocusTimerService            │
+│  ├── CatFirestoreService       ├── RemoteConfigService          │
+│  ├── PixelCatRenderer          ├── FocusTimerService            │
+│  ├── PixelCatGenerationService ├── MigrationService             │
+│  ├── CoinService               └── AnalyticsService             │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -78,26 +82,30 @@ Every concern in the system has exactly one authoritative source:
 | Business data | Firestore |
 | Authentication state | `authStateProvider` in `providers/auth_provider.dart` |
 | Cats list | `catsProvider` in `providers/cat_provider.dart` |
+| Cat sprites | `catSpriteImageProvider` in `providers/cat_sprite_provider.dart` |
+| Coin balance | `coinBalanceProvider` in `providers/coin_provider.dart` |
 | Timer state | `focusTimerProvider` in `providers/focus_timer_provider.dart` |
 | Computed stats | `statsProvider` in `providers/stats_provider.dart` |
 | UI theme | `lib/core/theme/app_theme.dart` |
 | Analytics event names | `lib/core/constants/analytics_events.dart` |
 | Cat game metadata | `lib/core/constants/cat_constants.dart` |
+| Pixel cat appearance params | `lib/core/constants/pixel_cat_constants.dart` |
 | Named routes | `lib/core/router/app_router.dart` |
 | Dynamic configuration | Firebase Remote Config (keys in `remote_config_service.dart`) |
 | Device connectivity | `connectivityProvider` in `providers/connectivity_provider.dart` |
+| Localized strings | `lib/l10n/app_en.arb` (source) + generated `AppLocalizations` |
 
 ### 3. Strict Dependency Flow
 
 ```
-Screens  →  Providers  →  Services  →  Firebase SDK
+Screens  ->  Providers  ->  Services  ->  Firebase SDK
 ```
 
 **Rules:**
 - Screens only read from Providers (via `ref.watch` / `ref.read`) — never import Services directly
 - Providers orchestrate Services and expose reactive state — never access Firebase SDK directly
 - Services encapsulate all Firebase SDK interactions — no UI code, no BuildContext
-- Pure computation (XP, breed generation) lives in Services with no Firebase dependency
+- Pure computation (XP, cat generation) lives in Services with no Firebase dependency
 
 ### 4. Reactive over Imperative
 
@@ -107,6 +115,10 @@ Prefer `StreamProvider` and `ref.watch()` over one-shot `Future` fetches. State 
 
 Operations that span multiple documents (e.g., creating a habit + cat, logging a focus session) use Firestore **batch writes** to guarantee consistency. If any write fails, all writes roll back.
 
+### 6. Internationalization (i18n)
+
+All user-facing strings are externalized into ARB files (`lib/l10n/app_en.arb`, `lib/l10n/app_zh.arb`) and compiled to Dart via `flutter gen-l10n`. Hard-coded user-facing strings are not permitted in screens or widgets. See [localization.md](localization.md) for the full workflow.
+
 ---
 
 ## Navigation
@@ -114,18 +126,18 @@ Operations that span multiple documents (e.g., creating a habit + cat, logging a
 The app uses Flutter's `Navigator 1.0` with named routes managed by `AppRouter`:
 
 ```
-/login              → LoginScreen
-/home               → HomeScreen (4-tab NavigationBar shell)
-/adoption           → AdoptionFlowScreen  (args: isFirstHabit: bool)
-/focus-setup        → FocusSetupScreen    (args: habitId: String)
-/timer              → TimerScreen         (args: habitId: String)
-/focus-complete     → FocusCompleteScreen (args: Map<String, dynamic>)
-/habit-detail       → HabitDetailScreen   (args: habitId: String)
-/cat-detail         → CatDetailScreen     (args: catId: String)
-/profile            → ProfileScreen
+/login              -> LoginScreen
+/home               -> HomeScreen (4-tab NavigationBar shell)
+/adoption           -> AdoptionFlowScreen  (args: isFirstHabit: bool)
+/focus-setup        -> FocusSetupScreen    (args: habitId: String)
+/timer              -> TimerScreen         (args: habitId: String)
+/focus-complete     -> FocusCompleteScreen (args: Map<String, dynamic>)
+/habit-detail       -> HabitDetailScreen   (args: habitId: String)
+/cat-detail         -> CatDetailScreen     (args: catId: String)
+/profile            -> ProfileScreen
 ```
 
-**Root routing** is managed by `AuthGate` → `_FirstHabitGate`:
+**Root routing** is managed by `AuthGate` -> `_FirstHabitGate`:
 1. `AuthGate` checks onboarding completion (SharedPreferences) and Firebase Auth state
 2. `_FirstHabitGate` detects first-time users (zero habits) and auto-navigates to adoption flow
 
@@ -138,17 +150,17 @@ App Launch
     │
     ▼
 AuthGate
-    ├── onboarding not complete → OnboardingScreen
-    │       └── complete → AuthGate (loop)
+    ├── onboarding not complete -> OnboardingScreen
+    │       └── complete -> AuthGate (loop)
     │
     └── onboarding complete
             │
             ▼
         Firebase Auth stream
-            ├── user == null → LoginScreen
-            └── user != null → _FirstHabitGate
-                    ├── habits.isEmpty → AdoptionFlow (isFirstHabit: true)
-                    └── habits.any → HomeScreen
+            ├── user == null -> LoginScreen
+            └── user != null -> _FirstHabitGate
+                    ├── habits.isEmpty -> AdoptionFlow (isFirstHabit: true)
+                    └── habits.any -> HomeScreen
 ```
 
 ---
@@ -161,9 +173,10 @@ See [state-management.md](state-management.md) for full provider graph.
 
 | Pattern | Use Case | Example |
 |---------|----------|---------|
-| `StreamProvider` | Firestore real-time streams | `habitsProvider`, `catsProvider` |
+| `StreamProvider` | Firestore real-time streams | `habitsProvider`, `catsProvider`, `coinBalanceProvider` |
+| `FutureProvider.family` | Async per-key computation | `catSpriteImageProvider(catId)` |
 | `StateNotifierProvider` | Mutable local state with methods | `focusTimerProvider` |
-| `Provider` | Computed/derived values | `statsProvider`, `todayMinutesPerHabitProvider` |
+| `Provider` | Computed/derived values | `statsProvider`, `hasCheckedInTodayProvider` |
 | `Provider.family` | Parameterized lookups | `catByIdProvider(catId)`, `catByHabitProvider(habitId)` |
 | `ref.watch()` | Reactive subscription in `build()` | All screen `build` methods |
 | `ref.read()` | One-shot read in event handlers | Button `onPressed` callbacks |
@@ -179,5 +192,5 @@ The focus timer is a **two-isolate system**:
 2. **Background isolate** — `flutter_foreground_task` runs a minimal `_TimerTaskHandler` in a separate isolate. Its sole job is to keep the Android foreground service alive and display the persistent notification. The main isolate updates the notification text via `FocusTimerService.updateNotification()` each tick.
 
 `AppLifecycleState` changes are observed via `WidgetsBindingObserver`:
-- `paused` / `hidden` → record timestamp (`onAppBackgrounded`)
-- `resumed` → calculate away duration; auto-pause if >15 s, auto-end if >5 min (`onAppResumed`)
+- `paused` / `hidden` -> record timestamp (`onAppBackgrounded`)
+- `resumed` -> calculate away duration; auto-pause if >15 s, auto-end if >5 min (`onAppResumed`)

@@ -3,11 +3,11 @@ import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/check_in.dart';
 import 'package:hachimi_app/models/focus_session.dart';
-import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:intl/intl.dart';
 
-/// FirestoreService — wraps all Firestore CRUD operations.
-/// Firestore is the SSOT for all business data.
+/// FirestoreService — wraps Firestore CRUD for users, habits, sessions, stats.
+/// Cat-specific CRUD has been extracted to CatFirestoreService.
+/// Coin operations are in CoinService.
 /// See docs/architecture/data-model.md for schema definition.
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -22,6 +22,8 @@ class FirestoreService {
     await _db.collection('users').doc(uid).set({
       'email': email,
       'displayName': displayName ?? email.split('@').first,
+      'coins': 0,
+      'lastCheckInDate': null,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -30,6 +32,9 @@ class FirestoreService {
 
   CollectionReference _habitsRef(String uid) =>
       _db.collection('users').doc(uid).collection('habits');
+
+  CollectionReference _catsRef(String uid) =>
+      _db.collection('users').doc(uid).collection('cats');
 
   Stream<List<Habit>> watchHabits(String uid) {
     return _habitsRef(uid)
@@ -72,10 +77,12 @@ class FirestoreService {
   }
 
   /// Create a habit and its bound cat in a single batch.
+  /// Cat stores appearance Map + targetMinutes (targetHours × 60).
   Future<({String habitId, String catId})> createHabitWithCat({
     required String uid,
     required String name,
     required String icon,
+    required int targetHours,
     required int goalMinutes,
     String? reminderTime,
     required Cat cat,
@@ -87,7 +94,7 @@ class FirestoreService {
     batch.set(habitRef, {
       'name': name,
       'icon': icon,
-      'targetHours': 0, // Will accumulate over time
+      'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
       'catId': '', // Will update after cat is created
@@ -99,9 +106,14 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    // 2. Create cat document
+    // 2. Create cat document with pixel cat appearance
     final catRef = _catsRef(uid).doc();
-    final catData = cat.copyWith(boundHabitId: habitRef.id).toFirestore();
+    final catData = cat
+        .copyWith(
+          boundHabitId: habitRef.id,
+          targetMinutes: targetHours * 60,
+        )
+        .toFirestore();
     catData['createdAt'] = FieldValue.serverTimestamp();
     batch.set(catRef, catData);
 
@@ -121,114 +133,12 @@ class FirestoreService {
     if (habitDoc.exists) {
       final habit = Habit.fromFirestore(habitDoc);
       if (habit.catId != null && habit.catId!.isNotEmpty) {
-        await graduateCat(uid: uid, catId: habit.catId!);
+        await _catsRef(uid)
+            .doc(habit.catId!)
+            .update({'state': 'graduated'});
       }
     }
     await _habitsRef(uid).doc(habitId).delete();
-  }
-
-  // ─── Cats ───
-
-  CollectionReference _catsRef(String uid) =>
-      _db.collection('users').doc(uid).collection('cats');
-
-  /// Watch all active cats for a user.
-  Stream<List<Cat>> watchCats(String uid) {
-    return _catsRef(uid)
-        .where('state', isEqualTo: 'active')
-        .orderBy('createdAt', descending: false)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Cat.fromFirestore(doc)).toList());
-  }
-
-  /// Watch all cats (including graduated/dormant) for the Cat Album.
-  Stream<List<Cat>> watchAllCats(String uid) {
-    return _catsRef(uid)
-        .orderBy('createdAt', descending: false)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Cat.fromFirestore(doc)).toList());
-  }
-
-  /// Get a single cat by ID.
-  Future<Cat?> getCat(String uid, String catId) async {
-    final doc = await _catsRef(uid).doc(catId).get();
-    if (!doc.exists) return null;
-    return Cat.fromFirestore(doc);
-  }
-
-  /// Update cat XP and recalculate stage.
-  Future<void> updateCatXp({
-    required String uid,
-    required String catId,
-    required int xpDelta,
-  }) async {
-    final catRef = _catsRef(uid).doc(catId);
-    final catDoc = await catRef.get();
-    if (!catDoc.exists) return;
-
-    final cat = Cat.fromFirestore(catDoc);
-    final newXp = cat.xp + xpDelta;
-    final newStage = stageForXp(newXp);
-
-    await catRef.update({
-      'xp': newXp,
-      'stage': newStage,
-      'lastSessionAt': FieldValue.serverTimestamp(),
-      'mood': 'happy', // Just had a session
-    });
-  }
-
-  /// Update cat mood.
-  Future<void> updateCatMood({
-    required String uid,
-    required String catId,
-    required String mood,
-  }) async {
-    await _catsRef(uid).doc(catId).update({'mood': mood});
-  }
-
-  /// Refresh moods for all active cats based on lastSessionAt.
-  Future<void> refreshAllCatMoods(String uid) async {
-    final snapshot = await _catsRef(uid)
-        .where('state', isEqualTo: 'active')
-        .get();
-
-    final batch = _db.batch();
-    for (final doc in snapshot.docs) {
-      final cat = Cat.fromFirestore(doc);
-      final newMood = calculateMood(cat.lastSessionAt);
-      if (newMood != cat.mood) {
-        batch.update(doc.reference, {'mood': newMood});
-      }
-    }
-    await batch.commit();
-  }
-
-  /// Archive a cat (set state to dormant).
-  Future<void> archiveCat({
-    required String uid,
-    required String catId,
-  }) async {
-    await _catsRef(uid).doc(catId).update({'state': 'dormant'});
-  }
-
-  /// Graduate a cat (set state to graduated, freeze stats).
-  Future<void> graduateCat({
-    required String uid,
-    required String catId,
-  }) async {
-    await _catsRef(uid).doc(catId).update({'state': 'graduated'});
-  }
-
-  /// Get breeds owned by the user (for draft algorithm variety).
-  Future<List<String>> getOwnedBreeds(String uid) async {
-    final snapshot = await _catsRef(uid).get();
-    return snapshot.docs
-        .map((doc) => (doc.data() as Map<String, dynamic>)['breed'] as String)
-        .toSet()
-        .toList();
   }
 
   // ─── Focus Sessions ───
@@ -239,7 +149,7 @@ class FirestoreService {
   /// Log a completed focus session with atomic batch updates:
   /// 1. Write session document
   /// 2. Update habit totals + streak
-  /// 3. Update cat XP + stage + mood
+  /// 3. Update cat totalMinutes + lastSessionAt
   Future<void> logFocusSession({
     required String uid,
     required FocusSession session,
@@ -251,11 +161,11 @@ class FirestoreService {
     final sessionRef = _sessionsRef(uid, session.habitId).doc();
     batch.set(sessionRef, session.toFirestore());
 
-    // 2. Add legacy check-in entry (backward compat with existing stats)
+    // 2. Add check-in entry
     final entryRef = _entriesRef(uid, today).doc();
     batch.set(entryRef, {
       'habitId': session.habitId,
-      'habitName': '', // Will be filled by caller if needed
+      'habitName': '',
       'minutes': session.durationMinutes,
       'completedAt': FieldValue.serverTimestamp(),
     });
@@ -289,23 +199,13 @@ class FirestoreService {
       });
     }
 
-    // 4. Update cat XP + stage + mood
+    // 4. Update cat totalMinutes + lastSessionAt (time-based growth)
     if (session.catId.isNotEmpty) {
       final catRef = _catsRef(uid).doc(session.catId);
-      final catDoc = await catRef.get();
-
-      if (catDoc.exists) {
-        final cat = Cat.fromFirestore(catDoc);
-        final newXp = cat.xp + session.xpEarned;
-        final newStage = stageForXp(newXp);
-
-        batch.update(catRef, {
-          'xp': newXp,
-          'stage': newStage,
-          'mood': 'happy',
-          'lastSessionAt': FieldValue.serverTimestamp(),
-        });
-      }
+      batch.update(catRef, {
+        'totalMinutes': FieldValue.increment(session.durationMinutes),
+        'lastSessionAt': FieldValue.serverTimestamp(),
+      });
     }
 
     await batch.commit();
@@ -360,13 +260,10 @@ class FirestoreService {
 
       int newStreak = habit.currentStreak;
       if (habit.lastCheckInDate == today) {
-        // Already checked in today, just add minutes
         newStreak = habit.currentStreak;
       } else if (habit.lastCheckInDate == yesterday) {
-        // Consecutive day
         newStreak = habit.currentStreak + 1;
       } else {
-        // Streak broken, start at 1
         newStreak = 1;
       }
 
@@ -403,7 +300,6 @@ class FirestoreService {
   }
 
   /// Get daily focus minutes for a specific habit over the last N days.
-  /// Returns a map of date strings (yyyy-MM-dd) to minutes.
   Future<Map<String, int>> getDailyMinutesForHabit({
     required String uid,
     required String habitId,

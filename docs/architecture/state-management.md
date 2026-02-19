@@ -27,6 +27,20 @@ Firebase Auth stream ───────────────────�
                    (Provider<Map<String, int>>)
 
 
+Pixel cat rendering (singleton + per-cat cache):
+
+         pixelCatRendererProvider (Provider<PixelCatRenderer>)
+                        │
+                        ▼
+         catSpriteImageProvider (FutureProvider.family<ui.Image, String>)
+
+
+Coin economy:
+
+  coinServiceProvider ──► coinBalanceProvider (StreamProvider<int>)
+                          hasCheckedInTodayProvider (Provider<bool>)
+
+
 Timer state (local, not Firestore):
 
          focusTimerProvider (StateNotifierProvider<FocusTimerNotifier, FocusTimerState>)
@@ -100,16 +114,16 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<List<Cat>>`
 - **File**: `lib/providers/cat_provider.dart`
-- **Source**: `FirestoreService.watchCats(uid)` — streams only `state == "active"` cats
-- **Consumers**: `CatRoomScreen`, `HomeScreen` (cat avatars in habit list), `ProfileScreen` (rarity breakdown)
+- **Source**: `CatFirestoreService.watchCats(uid)` — streams only `state == "active"` cats
+- **Consumers**: `CatRoomScreen` (CatHouse grid), `HomeScreen` (cat avatars in habit list), `ProfileScreen`
 - **SSOT for**: The user's active cats, always current
 
 ### `allCatsProvider`
 
 - **Type**: `StreamProvider<List<Cat>>`
 - **File**: `lib/providers/cat_provider.dart`
-- **Source**: `FirestoreService.watchAllCats(uid)` — streams all cats regardless of state
-- **Consumers**: Cat Album (Profile screen), `ownedBreedsProvider`
+- **Source**: `CatFirestoreService.watchAllCats(uid)` — streams all cats regardless of state
+- **Consumers**: Cat Album (Profile screen)
 - **SSOT for**: Complete cat history including dormant and graduated cats
 
 ### `catByIdProvider`
@@ -128,13 +142,66 @@ Device connectivity (independent of auth):
 - **Consumers**: `HomeScreen` habit rows (mini cat avatar), `FocusSetupScreen`
 - **Usage**: `ref.watch(catByHabitProvider(habitId))`
 
-### `ownedBreedsProvider`
+### `catFirestoreServiceProvider`
 
-- **Type**: `Provider<Set<String>>`
+- **Type**: `Provider<CatFirestoreService>`
 - **File**: `lib/providers/cat_provider.dart`
-- **Source**: Derived from `allCatsProvider` — collects all breed IDs ever owned
-- **Consumers**: `CatGenerationService` (to guarantee at least 1 new breed in each draft)
-- **SSOT for**: Set of breed IDs the user has ever adopted
+- **Source**: Instantiates `CatFirestoreService` with Firestore instance
+- **Consumers**: `catsProvider`, `allCatsProvider`, and any provider that needs to read/write cat documents
+- **SSOT for**: The singleton service instance for all cat-related Firestore operations
+
+---
+
+### `pixelCatRendererProvider`
+
+- **Type**: `Provider<PixelCatRenderer>` (singleton)
+- **File**: `lib/providers/cat_sprite_provider.dart`
+- **Source**: Instantiates a single `PixelCatRenderer` that manages asset loading and sprite composition
+- **Consumers**: `catSpriteImageProvider`
+- **SSOT for**: The pixel-cat-maker rendering engine instance. Singleton to share loaded assets across all sprites.
+
+### `catSpriteImageProvider`
+
+- **Type**: `FutureProvider.family<ui.Image, String>` (keyed by catId)
+- **File**: `lib/providers/cat_sprite_provider.dart`
+- **Source**: Calls `ref.watch(pixelCatRendererProvider).renderCat(catAppearance)` — composites the 13-layer sprite for a given cat's appearance parameters
+- **Consumers**: `PixelCatSprite` widget, `CatHouseCard` widget
+- **SSOT for**: The composited pixel-art image for a specific cat
+- **Usage**: `ref.watch(catSpriteImageProvider(catId))`
+
+### `pixelCatGenerationServiceProvider`
+
+- **Type**: `Provider<PixelCatGenerationService>`
+- **File**: `lib/providers/cat_provider.dart`
+- **Source**: Instantiates `PixelCatGenerationService`
+- **Consumers**: `AdoptionFlowScreen` (to generate random cats for adoption)
+- **SSOT for**: The service that produces randomized cat appearance and personality
+
+---
+
+### `coinServiceProvider`
+
+- **Type**: `Provider<CoinService>`
+- **File**: `lib/providers/coin_provider.dart`
+- **Source**: Instantiates `CoinService` with Firestore instance
+- **Consumers**: Screens that handle accessory purchases and check-in bonus display
+- **SSOT for**: The singleton service instance for coin-related operations
+
+### `coinBalanceProvider`
+
+- **Type**: `StreamProvider<int>`
+- **File**: `lib/providers/coin_provider.dart`
+- **Source**: `CoinService.watchBalance(uid)` — real-time stream of the user's `coins` field
+- **Consumers**: `CatDetailScreen` (accessory shop balance), `CheckInBanner`, `ProfileScreen`
+- **SSOT for**: The user's current coin balance, always current with Firestore
+
+### `hasCheckedInTodayProvider`
+
+- **Type**: `Provider<bool>`
+- **File**: `lib/providers/coin_provider.dart`
+- **Source**: Derived from the user document's `lastCheckInDate` — compares with today's date string
+- **Consumers**: `CheckInBanner` widget (to show/hide the daily bonus prompt)
+- **SSOT for**: Whether the user has already claimed today's daily check-in coin bonus
 
 ---
 
@@ -198,9 +265,10 @@ Device connectivity (independent of auth):
 
 | Pattern | When To Use | Example |
 |---------|------------|---------|
-| `StreamProvider` | Firestore real-time data | `habitsProvider`, `catsProvider` |
+| `StreamProvider` | Firestore real-time data | `habitsProvider`, `catsProvider`, `coinBalanceProvider` |
+| `FutureProvider.family` | Async per-key computation | `catSpriteImageProvider(catId)` |
 | `StateNotifierProvider` | Mutable local state with methods | `focusTimerProvider` |
-| `Provider` | Computed/derived values (pure function of other providers) | `statsProvider`, `todayMinutesPerHabitProvider` |
+| `Provider` | Computed/derived values (pure function of other providers) | `statsProvider`, `todayMinutesPerHabitProvider`, `hasCheckedInTodayProvider` |
 | `Provider.family` | Parameterized lookups | `catByIdProvider(catId)` |
 | `ref.watch()` | Reactive subscription in `build()` — rebuilds widget on change | All `ConsumerWidget.build()` methods |
 | `ref.read()` | One-shot read in event handlers — does NOT subscribe | Button `onPressed` callbacks |
@@ -211,7 +279,7 @@ Device connectivity (independent of auth):
 ## Rules
 
 1. **Screens only read from Providers** via `ref.watch()` or `ref.read()` — never import Services directly into screens.
-2. **Mutations go through Service methods** — called via `ref.read(someProvider.notifier).method()` or directly via `FirestoreService` injected into a Notifier.
+2. **Mutations go through Service methods** — called via `ref.read(someProvider.notifier).method()` or directly via a Service injected into a Notifier.
 3. **No local state for Firestore data** — if it's in Firestore, use a `StreamProvider` to stream it. Don't cache it in `StatefulWidget`.
 4. **UI-only state** (timer running, dialog open, animation playing) belongs in `StateNotifierProvider` or `StateProvider`, never in Firestore.
 5. **Family providers are auto-disposed** when no consumer is watching — this is correct; do not override with `keepAlive()` unless there's a specific reason.

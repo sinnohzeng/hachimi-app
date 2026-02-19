@@ -1,3 +1,19 @@
+// ---
+// 📘 文件说明：
+// 专注计时器页面 — 沉浸式全屏视图，显示像素猫、环形进度条和计时器。
+// 支持倒计时 / 正计时两种模式，后台前台 Service 通知。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. 从 Provider 获取 habit 和 cat 数据；
+// 2. 管理计时器状态（idle/running/paused/completed/abandoned）；
+// 3. 前台 Service 推送通知；
+// 4. 完成后计算 XP、检测阶段跃迁、保存 session、跳转完成页；
+//
+// 🧩 文件结构：
+// - TimerScreen：主页面 ConsumerStatefulWidget；
+// - _buildControls：根据状态渲染不同按钮；
+// ---
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -8,12 +24,11 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/xp_service.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
 /// Focus timer in-progress screen.
-/// Full-screen immersive view with cat, circular progress, and timer.
+/// Full-screen immersive view with pixel cat, circular progress, and timer.
 class TimerScreen extends ConsumerStatefulWidget {
   final String habitId;
 
@@ -25,7 +40,6 @@ class TimerScreen extends ConsumerStatefulWidget {
 
 class _TimerScreenState extends ConsumerState<TimerScreen>
     with WidgetsBindingObserver {
-  final XpService _xpService = XpService();
   bool _hasStarted = false;
 
   @override
@@ -55,9 +69,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final timerState = ref.read(focusTimerProvider);
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
-    final cat = habit?.catId != null
-        ? ref.read(catByIdProvider(habit!.catId!))
-        : null;
 
     ref.read(focusTimerProvider.notifier).start();
     setState(() => _hasStarted = true);
@@ -65,7 +76,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     // Start foreground service
     FocusTimerService.start(
       habitName: habit?.name ?? 'Focus',
-      catEmoji: cat != null ? '🐱' : '⏱️',
+      catEmoji: '🐱',
       totalSeconds: timerState.totalSeconds,
       isCountdown: timerState.mode == TimerMode.countdown,
     );
@@ -89,8 +100,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       builder: (ctx) => AlertDialog(
         title: const Text('Give up?'),
         content: const Text(
-          'If you focused for at least 5 minutes, you\'ll earn partial XP. '
-          'Your cat will understand!',
+          'If you focused for at least 5 minutes, the time still counts '
+          'towards your cat\'s growth. Your cat will understand!',
         ),
         actions: [
           TextButton(
@@ -125,28 +136,32 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final isCompleted = timerState.status == TimerStatus.completed;
     final isAbandoned = timerState.status == TimerStatus.abandoned;
 
-    // No XP if < 5 minutes and abandoned
+    // No reward if < 5 minutes and abandoned
     if (isAbandoned && minutes < 5) {
       if (mounted) Navigator.of(context).pop();
       return;
     }
 
-    // Calculate XP
+    // Calculate XP (still used for display)
+    final xpService = ref.read(xpServiceProvider);
     final streakDays = habit.currentStreak;
     final allHabitsDone = false; // TODO: check if all habits done today
-    final xpResult = _xpService.calculateXp(
+    final xpResult = xpService.calculateXp(
       minutes: minutes,
       streakDays: streakDays,
       allHabitsDone: allHabitsDone,
     );
 
-    // Check for level-up
+    // Check for stage-up (time-based growth)
     final cat =
         habit.catId != null ? ref.read(catByIdProvider(habit.catId!)) : null;
-    LevelUpResult? levelUp;
-    if (cat != null) {
-      levelUp = _xpService.checkLevelUp(cat.xp, cat.xp + xpResult.totalXp);
-    }
+    final stageUp = cat != null
+        ? xpService.checkStageUp(
+            oldTotalMinutes: cat.totalMinutes,
+            newTotalMinutes: cat.totalMinutes + minutes,
+            targetMinutes: cat.targetMinutes,
+          )
+        : null;
 
     // Save to Firestore
     final session = FocusSession(
@@ -174,7 +189,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           'habitId': widget.habitId,
           'minutes': minutes,
           'xpResult': xpResult,
-          'levelUp': levelUp,
+          'stageUp': stageUp,
           'isAbandoned': isAbandoned,
         },
       );
@@ -195,11 +210,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         : null;
 
     // Update foreground notification with current time
-    if (_hasStarted &&
-        timerState.status == TimerStatus.running) {
+    if (_hasStarted && timerState.status == TimerStatus.running) {
       FocusTimerService.updateNotification(
         title: '🐱 ${habit?.name ?? "Focus"}',
-        text: '${timerState.displayTime} ${timerState.mode == TimerMode.countdown ? "remaining" : "elapsed"}',
+        text:
+            '${timerState.displayTime} ${timerState.mode == TimerMode.countdown ? "remaining" : "elapsed"}',
       );
     }
 
@@ -219,8 +234,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    final breedData = cat != null ? breedMap[cat.breed] : null;
-    final bgColor = breedData?.colors.base ?? colorScheme.primary;
+    // Use stage color for background gradient
+    final bgColor = cat != null
+        ? stageColor(cat.computedStage)
+        : colorScheme.primary;
 
     return Scaffold(
       body: Container(
@@ -269,8 +286,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.local_fire_department,
-                                size: 14),
+                            const Icon(Icons.local_fire_department, size: 14),
                             const SizedBox(width: 2),
                             Text(
                               '${habit.currentStreak}',
@@ -304,12 +320,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     ),
                     // Cat sprite
                     if (cat != null)
-                      CatSprite.fromCat(
-                        breed: cat.breed,
-                        stage: cat.computedStage,
-                        mood: cat.computedMood,
-                        size: 100,
-                      )
+                      PixelCatSprite.fromCat(cat: cat, size: 100)
                     else
                       Text(habit.icon,
                           style: const TextStyle(fontSize: 64)),

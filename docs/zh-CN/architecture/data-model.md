@@ -1,18 +1,18 @@
 # 数据模型 — Firestore 模式（SSOT）
 
-> **SSOT**（Single Source of Truth，单一真值来源） ：本文档是所有 Firestore 集合、文档模式及数据完整性规则的权威来源。`lib/models/` 和 `lib/services/firestore_service.dart` 的实现必须与此规范完全一致。
+> **SSOT**（Single Source of Truth，单一真值来源）：本文档是所有 Firestore 集合、文档模式及数据完整性规则的权威来源。`lib/models/` 和 `lib/services/firestore_service.dart` 的实现必须与此规范完全一致。
 
 ---
 
 ## 集合层级
 
 ```
-users/{uid}                          ← 用户基本信息文档
-├── habits/{habitId}                 ← 习惯元数据 + 连续记录追踪
-│   └── sessions/{sessionId}        ← 专注会话历史
-├── cats/{catId}                     ← 猫咪状态（XP、阶段、心情、房间槽位）
-└── checkIns/{date}                  ← 按日期分区的打卡桶（向后兼容）
-    └── entries/{entryId}            ← 每次会话的分钟数记录
+users/{uid}                          <- 用户基本信息文档
+├── habits/{habitId}                 <- 习惯元数据 + 连续记录追踪
+│   └── sessions/{sessionId}        <- 专注会话历史
+├── cats/{catId}                     <- 猫咪状态（外观、成长、配饰）
+└── checkIns/{date}                  <- 按日期分区的打卡桶（向后兼容）
+    └── entries/{entryId}            <- 每次会话的分钟数记录
 ```
 
 ---
@@ -27,10 +27,14 @@ users/{uid}                          ← 用户基本信息文档
 | `email` | string | 是 | 用户邮箱地址 |
 | `createdAt` | timestamp | 是 | 账户创建时间戳 |
 | `fcmToken` | string | 否 | Firebase Cloud Messaging 设备令牌 |
+| `coins` | int | 是 | 当前金币余额，用于购买配饰（默认值：0） |
+| `lastCheckInDate` | string | 否 | 最近一次每日签到奖励领取的 ISO 日期字符串 "YYYY-MM-DD" |
 
 **说明：**
 - `uid` 是 Firebase Auth UID，同时作为文档 ID 和所有用户数据的顶层命名空间。
 - `fcmToken` 在每次应用启动时通过 `NotificationService.initialize()` 更新，目前不支持多设备（后写优先）。
+- `coins` 通过 `FieldValue.increment()` 修改以防止竞态条件，不直接设置为计算后的总值。
+- `lastCheckInDate` 与今日日期比较，判断是否已领取每日签到奖励。
 
 ---
 
@@ -40,11 +44,11 @@ users/{uid}                          ← 用户基本信息文档
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| `name` | string | 是 | — | 习惯显示名称，如 "每日阅读" |
+| `name` | string | 是 | — | 习惯显示名称，如「每日阅读」 |
 | `icon` | string | 是 | — | 习惯图标 Emoji，如 "📚" |
 | `catId` | string | 是 | — | 绑定猫咪文档 ID（位于 `users/{uid}/cats/`） |
 | `goalMinutes` | int | 是 | 25 | 每日专注目标分钟数（用于进度显示） |
-| `targetHours` | int | 是 | 100 | 累计长期目标小时数（用于整体进度） |
+| `targetHours` | int | 是 | — | 累计长期目标小时数（必填，用于猫咪成长计算） |
 | `totalMinutes` | int | 是 | 0 | 所有时间累计记录的总分钟数 |
 | `currentStreak` | int | 是 | 0 | 当前连续打卡天数 |
 | `bestStreak` | int | 是 | 0 | 历史最高连续打卡天数 |
@@ -60,7 +64,7 @@ users/{uid}                          ← 用户基本信息文档
 - 其他情况：`currentStreak = 1`（连续记录中断）
 - 每次更新后：`bestStreak = max(bestStreak, currentStreak)`
 
-**Dart 模型：** `lib/models/habit.dart` → `class Habit`
+**Dart 模型：** `lib/models/habit.dart` -> `class Habit`
 
 ---
 
@@ -80,10 +84,10 @@ users/{uid}                          ← 用户基本信息文档
 | `completed` | bool | 是 | `true` 表示正常完成；`false` 表示提前放弃 |
 
 **放弃会话的 XP 规则：**
-- `completed == false` 且 `durationMinutes >= 5`：`xpEarned = durationMinutes × 1`（仅基础 XP）
+- `completed == false` 且 `durationMinutes >= 5`：`xpEarned = durationMinutes x 1`（仅基础 XP）
 - `completed == false` 且 `durationMinutes < 5`：`xpEarned = 0`
 
-**Dart 模型：** `lib/models/focus_session.dart` → `class FocusSession`
+**Dart 模型：** `lib/models/focus_session.dart` -> `class FocusSession`
 
 ---
 
@@ -94,12 +98,11 @@ users/{uid}                          ← 用户基本信息文档
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `name` | string | 是 | 猫咪名字，如 "Mochi" |
-| `breed` | string | 是 | 品种 ID——详见[猫咪系统](cat-system.md) |
-| `pattern` | string | 是 | 花纹 ID：`"classic_stripe"`、`"spotted"` 或 `"solid"` |
+| `appearance` | map | 是 | pixel-cat-maker 外观参数——详见[猫咪系统](cat-system.md)完整参数列表 |
 | `personality` | string | 是 | 性格 ID——详见[猫咪系统](cat-system.md) |
-| `rarity` | string | 是 | 稀有度：`"common"`、`"uncommon"` 或 `"rare"` |
-| `xp` | int | 是 | 累计总 XP。阶段在读取时从此字段计算得出。 |
-| `roomSlot` | string | 否 | 猫咪在房间中所在的槽位 ID |
+| `totalMinutes` | int | 是 | 该猫咪对应习惯累计的专注分钟数。阶段从此字段计算。 |
+| `targetMinutes` | int | 是 | 从习惯的 `targetHours` 派生的目标分钟数（targetHours x 60）。用于阶段计算。 |
+| `accessories` | list\<string\> | 是 | 猫咪当前装备的配饰 ID 列表（默认值：空列表） |
 | `boundHabitId` | string | 是 | 生成此猫咪的习惯 ID |
 | `state` | string | 是 | `"active"`、`"dormant"` 或 `"graduated"` |
 | `lastSessionAt` | timestamp | 否 | 最近一次专注会话的时间戳 |
@@ -109,20 +112,21 @@ users/{uid}                          ← 用户基本信息文档
 
 | 计算字段 | 来源 | 计算逻辑 |
 |---------|------|---------|
-| `stage` | `xp` | kitten（0）、young（100+）、adult（300+）、shiny（600+） |
+| `stage` | `totalMinutes`、`targetMinutes` | kitten（< 20%）、adolescent（20%-45%）、adult（45%-75%）、senior（>= 75%） |
 | `mood` | `lastSessionAt` | happy（24h 内）、neutral（1-3 天）、lonely（3-7 天）、missing（7 天以上） |
 
 **为何不直接存储 `stage` 和 `mood`？**
-存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`xp` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。
+存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`totalMinutes`、`targetMinutes` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。
 
 **状态转换：**
 ```
-active ──[习惯停用]──► dormant
-active ──[习惯删除]──► graduated
-dormant ──[习惯重新激活]─► active（未来功能）
+active --[习惯停用]--> dormant
+active --[习惯删除]--> graduated
+dormant --[习惯重新激活]--> active（未来功能）
 ```
 
-**Dart 模型：** `lib/models/cat.dart` → `class Cat`
+**Dart 模型：** `lib/models/cat.dart` -> `class Cat`
+**外观模型：** `lib/models/cat_appearance.dart` -> `class CatAppearance`
 
 ---
 
@@ -139,7 +143,7 @@ dormant ──[习惯重新激活]─► active（未来功能）
 | `minutes` | int | 是 | 本次会话记录的分钟数 |
 | `completedAt` | timestamp | 是 | 条目创建时间 |
 
-**Dart 模型：** `lib/models/check_in.dart` → `class CheckInEntry`
+**Dart 模型：** `lib/models/check_in.dart` -> `class CheckInEntry`
 
 ---
 
@@ -151,8 +155,8 @@ dormant ──[习惯重新激活]─► active（未来功能）
 **方法：** `FirestoreService.createHabitWithCat(uid, habit, cat)`
 
 批量操作包括：
-1. `SET users/{uid}/habits/{habitId}` — 新习惯文档
-2. `SET users/{uid}/cats/{catId}` — 新猫咪文档（含指向习惯的 `boundHabitId`）
+1. `SET users/{uid}/habits/{habitId}` — 新习惯文档（`targetHours` 为必填字段）
+2. `SET users/{uid}/cats/{catId}` — 新猫咪文档，包含 `appearance` Map、`targetMinutes`（= `targetHours x 60`）、`totalMinutes: 0`、`accessories: []` 和指向习惯的 `boundHabitId`
 3. `UPDATE users/{uid}/habits/{habitId}.catId` — 习惯到猫咪的反向引用
 
 ### 2. 专注会话完成
@@ -161,9 +165,11 @@ dormant ──[习惯重新激活]─► active（未来功能）
 批量操作包括：
 1. `SET users/{uid}/habits/{habitId}/sessions/{sessionId}` — 会话记录
 2. `UPDATE users/{uid}/habits/{habitId}` — 累加 `totalMinutes`，更新 `currentStreak`、`bestStreak`、`lastCheckInDate`
-3. `UPDATE users/{uid}/cats/{catId}.xp` — `xp += session.xpEarned`
+3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — 设置为当前时间
 5. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — 遗留打卡条目（用于热力图）
+6. （有条件）`UPDATE users/{uid}.coins` — 若 `lastCheckInDate != today` 则 `FieldValue.increment(50)`（每日签到奖励）
+7. （有条件）`UPDATE users/{uid}.lastCheckInDate` — 若发放了奖励则设置为今日日期字符串
 
 ### 3. 习惯删除（毕业）
 **方法：** `FirestoreService.deleteHabit(uid, habitId)`
@@ -171,6 +177,13 @@ dormant ──[习惯重新激活]─► active（未来功能）
 批量操作包括：
 1. `DELETE users/{uid}/habits/{habitId}` — 删除习惯文档
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
+
+### 4. 配饰购买
+**方法：** `CoinService.purchaseAccessory(uid, catId, accessoryId)`
+
+批量操作包括：
+1. `UPDATE users/{uid}.coins` — `FieldValue.increment(-150)`（扣除费用）
+2. `UPDATE users/{uid}/cats/{catId}.accessories` — `FieldValue.arrayUnion([accessoryId])`
 
 ---
 
@@ -190,9 +203,23 @@ dormant ──[习惯重新激活]─► active（未来功能）
 
 ## 数据完整性规则
 
-1. **无孤立猫咪** ：每个猫咪文档必须有有效的 `boundHabitId`，通过批量写入保证。
-2. **无孤立习惯引用** ：删除习惯时，绑定猫咪的状态在同一批次中更新为 `"graduated"`。
-3. **XP 只增不减** ：`xp` 始终递增，不能设置为更低的值。
-4. **阶段是计算值，不存储** ：不向 Firestore 写入 `stage`，始终从 `xp` 派生。
-5. **心情是计算值，不存储** ：不向 Firestore 写入 `mood`，始终从 `lastSessionAt` 派生。
-6. **`totalMinutes` 是累加的** ：始终使用 `FieldValue.increment(delta)`——不用计算后的总值覆盖（防止竞态条件）。
+1. **无孤立猫咪**：每个猫咪文档必须有有效的 `boundHabitId`，通过批量写入保证。
+2. **无孤立习惯引用**：删除习惯时，绑定猫咪的状态在同一批次中更新为 `"graduated"`。
+3. **totalMinutes 只增不减**：`totalMinutes` 始终递增，不能设置为更低的值。
+4. **阶段是计算值，不存储**：不向 Firestore 写入 `stage`，始终从 `totalMinutes` 和 `targetMinutes` 派生。
+5. **心情是计算值，不存储**：不向 Firestore 写入 `mood`，始终从 `lastSessionAt` 派生。
+6. **`totalMinutes` 是累加的**：始终使用 `FieldValue.increment(delta)`——不用计算后的总值覆盖（防止竞态条件）。
+7. **金币不能为负**：`CoinService` 在扣除前必须验证余额充足。余额不足时购买批量写入应优雅失败。
+8. **外观不可变**：`appearance` Map 在猫咪创建时设置，此后不再修改。
+
+---
+
+## 安全模型
+
+所有文档按 `uid` 完全隔离。详见[安全规则](../firebase/security-rules.md)完整规则规范。
+
+**访问模式摘要：**
+- 用户只能读写自己 `users/{uid}` 路径下的文档。
+- 无跨用户数据访问。
+- 无公共集合。
+- 匿名访问对所有路径均被拒绝。

@@ -5,11 +5,11 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 
-/// Cat detail page — shows large cat sprite, XP progress, habit info,
-/// and streak heatmap.
+/// Cat detail page — pixel cat sprite, time-based growth progress,
+/// habit info, rename, and streak heatmap.
 class CatDetailScreen extends ConsumerWidget {
   final String catId;
 
@@ -32,20 +32,14 @@ class CatDetailScreen extends ConsumerWidget {
     final habits = ref.watch(habitsProvider).value ?? [];
     final habit =
         habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
-    final breedData = breedMap[cat.breed];
-    final personalityData = personalityMap[cat.personality];
-    final bgColor = breedData?.colors.base ?? colorScheme.primary;
+    final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
-
-    // Stage progress
-    final nextStageThreshold = cat.computedStage < 4
-        ? catStages[cat.computedStage].xpThreshold
-        : null;
+    final stageClr = stageColor(cat.computedStage);
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Gradient app bar with cat
+          // Gradient app bar with pixel cat
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
@@ -56,7 +50,7 @@ class CatDetailScreen extends ConsumerWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      bgColor.withValues(alpha: 0.2),
+                      stageClr.withValues(alpha: 0.2),
                       colorScheme.surface,
                     ],
                   ),
@@ -66,37 +60,34 @@ class CatDetailScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 48),
-                      CatSprite.fromCat(
-                        breed: cat.breed,
-                        stage: cat.computedStage,
-                        mood: cat.computedMood,
-                        size: 120,
-                      ),
+                      PixelCatSprite.fromCat(cat: cat, size: 120),
                       const SizedBox(height: 12),
-                      Text(
-                        cat.name,
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${breedData?.name ?? cat.breed} ',
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                            cat.name,
+                            style: textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
-                            '${personalityData?.emoji ?? ''} ${personalityData?.name ?? cat.personality}',
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.edit, size: 18),
+                            onPressed: () => _showRenameDialog(context, ref, cat),
+                            tooltip: 'Rename',
+                            visualDensity: VisualDensity.compact,
                           ),
                         ],
                       ),
+                      const SizedBox(height: 4),
+                      if (personality != null)
+                        Text(
+                          '${personality.emoji} ${personality.name}',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -129,7 +120,7 @@ class CatDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // XP Progress
+                // Growth progress (time-based)
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -146,22 +137,23 @@ class CatDetailScreen extends ConsumerWidget {
                             ),
                             const Spacer(),
                             Text(
-                              '${cat.stageName} ${catStages[cat.computedStage - 1].emoji}',
+                              cat.stageName,
                               style: textTheme.labelLarge?.copyWith(
-                                color: colorScheme.primary,
+                                color: stageClr,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        // XP bar
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
-                            value: cat.stageProgress,
+                            value: cat.growthProgress,
                             minHeight: 12,
                             backgroundColor:
                                 colorScheme.surfaceContainerHighest,
+                            valueColor: AlwaysStoppedAnimation(stageClr),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -169,70 +161,45 @@ class CatDetailScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${cat.xp} XP',
+                              '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m',
                               style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            if (nextStageThreshold != null)
-                              Text(
-                                'Next: $nextStageThreshold XP',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              )
-                            else
-                              Text(
-                                'MAX LEVEL',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              'Target: ${cat.targetMinutes ~/ 60}h',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
+                            ),
                           ],
                         ),
                         // Stage milestones
                         const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: catStages.map((stage) {
-                            final isReached = cat.xp >= stage.xpThreshold;
-                            return Column(
-                              children: [
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isReached
-                                        ? colorScheme.primary
-                                        : colorScheme
-                                            .surfaceContainerHighest,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      stage.emoji,
-                                      style:
-                                          const TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  stage.name,
-                                  style: textTheme.labelSmall?.copyWith(
-                                    color: isReached
-                                        ? colorScheme.primary
-                                        : colorScheme.onSurfaceVariant,
-                                    fontWeight: isReached
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                          children: [
+                            _StageMilestone(
+                              name: 'Kitten',
+                              isReached: true,
+                              color: stageColor('kitten'),
+                            ),
+                            _StageMilestone(
+                              name: 'Adolescent',
+                              isReached: cat.growthProgress >= 0.20,
+                              color: stageColor('adolescent'),
+                            ),
+                            _StageMilestone(
+                              name: 'Adult',
+                              isReached: cat.growthProgress >= 0.45,
+                              color: stageColor('adult'),
+                            ),
+                            _StageMilestone(
+                              name: 'Senior',
+                              isReached: cat.growthProgress >= 0.75,
+                              color: stageColor('senior'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -262,8 +229,7 @@ class CatDetailScreen extends ConsumerWidget {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       habit.name,
@@ -327,6 +293,7 @@ class CatDetailScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+
                 // Streak heatmap
                 if (habit != null)
                   _HabitHeatmapCard(habitId: habit.id),
@@ -347,23 +314,23 @@ class CatDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 12),
                         _InfoRow(
-                          label: 'Breed',
-                          value: breedData?.name ?? cat.breed,
-                        ),
-                        _InfoRow(
-                          label: 'Rarity',
-                          value: cat.rarity.toUpperCase(),
-                          valueColor: _rarityColor(cat.rarity),
-                        ),
-                        _InfoRow(
                           label: 'Personality',
                           value:
-                              '${personalityData?.emoji ?? ''} ${personalityData?.name ?? cat.personality}',
+                              '${personality?.emoji ?? ''} ${personality?.name ?? cat.personality}',
                         ),
                         _InfoRow(
                           label: 'State',
                           value: cat.state.toUpperCase(),
                         ),
+                        _InfoRow(
+                          label: 'Pelt',
+                          value: cat.appearance.peltType,
+                        ),
+                        if (cat.appearance.isLonghair)
+                          const _InfoRow(
+                            label: 'Fur',
+                            value: 'Longhair',
+                          ),
                       ],
                     ),
                   ),
@@ -377,19 +344,89 @@ class CatDetailScreen extends ConsumerWidget {
     );
   }
 
-  Color _rarityColor(String rarity) {
-    switch (rarity) {
-      case 'rare':
-        return const Color(0xFFE040FB);
-      case 'uncommon':
-        return const Color(0xFF448AFF);
-      default:
-        return const Color(0xFF66BB6A);
-    }
+  void _showRenameDialog(BuildContext context, WidgetRef ref, cat) {
+    final controller = TextEditingController(text: cat.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename Cat'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'New name',
+            prefixIcon: Icon(Icons.pets),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isEmpty) return;
+              final uid = ref.read(currentUidProvider);
+              if (uid == null) return;
+              await ref.read(catFirestoreServiceProvider).renameCat(
+                    uid: uid,
+                    catId: cat.id,
+                    newName: newName,
+                  );
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            child: const Text('Rename'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
-/// Loads and displays a streak heatmap for a specific habit.
+class _StageMilestone extends StatelessWidget {
+  final String name;
+  final bool isReached;
+  final Color color;
+
+  const _StageMilestone({
+    required this.name,
+    required this.isReached,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isReached ? color : colorScheme.surfaceContainerHighest,
+          ),
+          child: isReached
+              ? Icon(Icons.check, size: 14, color: Colors.white)
+              : null,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          name,
+          style: textTheme.labelSmall?.copyWith(
+            color: isReached ? color : colorScheme.onSurfaceVariant,
+            fontWeight: isReached ? FontWeight.bold : FontWeight.normal,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _HabitHeatmapCard extends ConsumerStatefulWidget {
   final String habitId;
 
@@ -413,11 +450,12 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    final data = await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
-          uid: uid,
-          habitId: widget.habitId,
-          lastNDays: 91,
-        );
+    final data =
+        await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
+              uid: uid,
+              habitId: widget.habitId,
+              lastNDays: 91,
+            );
 
     if (mounted) {
       setState(() {
@@ -463,13 +501,8 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
-  final Color? valueColor;
 
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -491,7 +524,6 @@ class _InfoRow extends StatelessWidget {
             value,
             style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: valueColor,
             ),
           ),
         ],

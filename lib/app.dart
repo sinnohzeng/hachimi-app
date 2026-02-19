@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -20,6 +21,16 @@ class HachimiApp extends ConsumerWidget {
       title: 'Hachimi',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      // i18n support
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('zh'),
+      ],
       home: const AuthGate(),
       onGenerateRoute: AppRouter.onGenerateRoute,
       navigatorObservers: [analyticsService.observer],
@@ -79,7 +90,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       data: (user) {
         debugPrint('[APP] authState: data, user=${user?.uid}');
         if (user == null) return const LoginScreen();
-        return const _FirstHabitGate();
+        return _VersionGate(uid: user.uid);
       },
       loading: () {
         debugPrint('[APP] authState: loading');
@@ -95,10 +106,111 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 }
 
+/// _VersionGate — detects old data schema and prompts data reset.
+/// Inserted between AuthGate and _FirstHabitGate.
+class _VersionGate extends ConsumerStatefulWidget {
+  final String uid;
+  const _VersionGate({required this.uid});
+
+  @override
+  ConsumerState<_VersionGate> createState() => _VersionGateState();
+}
+
+class _VersionGateState extends ConsumerState<_VersionGate> {
+  bool _checked = false;
+  bool _needsMigration = false;
+  bool _clearing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkMigration();
+  }
+
+  Future<void> _checkMigration() async {
+    final migrationService = ref.read(migrationServiceProvider);
+    final needs = await migrationService.checkNeedsMigration(widget.uid);
+    if (mounted) {
+      setState(() {
+        _checked = true;
+        _needsMigration = needs;
+      });
+    }
+  }
+
+  Future<void> _clearData() async {
+    setState(() => _clearing = true);
+    final migrationService = ref.read(migrationServiceProvider);
+    await migrationService.clearAllUserData(widget.uid);
+    if (mounted) {
+      setState(() {
+        _needsMigration = false;
+        _clearing = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_checked) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_needsMigration) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '🐱',
+                  style: TextStyle(fontSize: 64),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Data Update Required',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Hachimi has been updated with a new pixel cat system! '
+                  'Your old cat data is no longer compatible. '
+                  'Please reset to start fresh with the new experience.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15, color: Colors.grey),
+                ),
+                const SizedBox(height: 32),
+                if (_clearing)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton.icon(
+                    onPressed: _clearData,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reset & Start Fresh'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return _FirstHabitGate(uid: widget.uid);
+  }
+}
+
 /// _FirstHabitGate — shows HomeScreen immediately, but if the user has
 /// zero habits, auto-navigates to the adoption flow with first-time messaging.
 class _FirstHabitGate extends ConsumerStatefulWidget {
-  const _FirstHabitGate();
+  final String uid;
+  const _FirstHabitGate({required this.uid});
 
   @override
   ConsumerState<_FirstHabitGate> createState() => _FirstHabitGateState();

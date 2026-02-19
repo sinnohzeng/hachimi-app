@@ -1,6 +1,7 @@
-import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 
 /// XP calculation result returned after a focus session.
+/// Still used for timer completion page display.
 class XpResult {
   final int baseXp;
   final int streakBonus;
@@ -17,22 +18,21 @@ class XpResult {
   });
 }
 
-/// Level-up check result.
-class LevelUpResult {
-  final bool didLevelUp;
-  final int oldStage;
-  final int newStage;
-  final String newStageName;
+/// Stage-up check result (percentage-based growth system).
+class StageUpResult {
+  final bool didStageUp;
+  final String oldStage;
+  final String newStage;
 
-  const LevelUpResult({
-    required this.didLevelUp,
+  const StageUpResult({
+    required this.didStageUp,
     required this.oldStage,
     required this.newStage,
-    required this.newStageName,
   });
 }
 
-/// XpService — pure Dart calculation for XP earning and level-up detection.
+/// XpService — pure Dart calculation for focus session rewards
+/// and stage transition detection.
 /// No Firebase dependency — can be tested in isolation.
 class XpService {
   /// Calculate XP earned from a focus session.
@@ -54,7 +54,6 @@ class XpService {
     final streakBonus = streakDays >= 3 ? 5 : 0;
 
     // Milestone bonus: +30 one-time for 7/14/30-day streaks
-    // Note: caller is responsible for checking if milestone was already awarded
     int milestoneBonus = 0;
     if (streakDays == 7 || streakDays == 14 || streakDays == 30) {
       milestoneBonus = 30;
@@ -75,15 +74,30 @@ class XpService {
     );
   }
 
-  /// Check if XP change results in a level-up (stage change).
-  LevelUpResult checkLevelUp(int oldXp, int newXp) {
-    final oldStage = stageForXp(oldXp);
-    final newStage = stageForXp(newXp);
-    return LevelUpResult(
-      didLevelUp: newStage > oldStage,
+  /// Check if adding minutes results in a stage transition.
+  /// Uses percentage-based thresholds: kitten / adolescent / adult / senior.
+  StageUpResult checkStageUp({
+    required int oldTotalMinutes,
+    required int newTotalMinutes,
+    required int targetMinutes,
+  }) {
+    if (targetMinutes <= 0) {
+      return const StageUpResult(
+        didStageUp: false,
+        oldStage: 'kitten',
+        newStage: 'kitten',
+      );
+    }
+
+    final oldProgress = (oldTotalMinutes / targetMinutes).clamp(0.0, 1.0);
+    final newProgress = (newTotalMinutes / targetMinutes).clamp(0.0, 1.0);
+    final oldStage = stageForProgress(oldProgress);
+    final newStage = stageForProgress(newProgress);
+
+    return StageUpResult(
+      didStageUp: oldStage != newStage,
       oldStage: oldStage,
       newStage: newStage,
-      newStageName: stageNameForLevel(newStage),
     );
   }
 }

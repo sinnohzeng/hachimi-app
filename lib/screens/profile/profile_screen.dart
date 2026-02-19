@@ -1,11 +1,29 @@
+// ---
+// 📘 文件说明：
+// 用户个人资料页面 — 展示用户信息、统计数据、猫猫图鉴、设置与关于。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. 从 Provider 加载用户、统计和所有猫猫数据；
+// 2. 展示用户头像和基本信息；
+// 3. 统计卡片（总专注时长、猫猫数量、最长连续）；
+// 4. 猫猫图鉴网格预览；
+// 5. 设置（通知、语言）+ 关于（版本、归属声明）；
+// 6. 危险区（登出、删除账号）；
+//
+// 🧩 文件结构：
+// - ProfileScreen：主页面；
+// - _StatBadge / _CatAlbumGrid / _CatAlbumTile / _SectionHeader：子组件；
+// ---
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -19,15 +37,11 @@ class ProfileScreen extends ConsumerWidget {
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];
 
-    // Count cats by rarity
-    final commonCount = allCats.where((c) => c.rarity == 'common').length;
-    final uncommonCount = allCats.where((c) => c.rarity == 'uncommon').length;
-    final rareCount = allCats.where((c) => c.rarity == 'rare').length;
-
-    // Max cat level
-    int maxLevel = 0;
+    // Count cats by stage
+    final stageCounts = <String, int>{};
     for (final cat in allCats) {
-      if (cat.computedStage > maxLevel) maxLevel = cat.computedStage;
+      final stage = cat.computedStage;
+      stageCounts[stage] = (stageCounts[stage] ?? 0) + 1;
     }
 
     return Scaffold(
@@ -97,7 +111,8 @@ class ProfileScreen extends ConsumerWidget {
                       children: [
                         _StatBadge(
                           icon: Icons.timer_outlined,
-                          value: '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
+                          value:
+                              '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
                           label: 'Total Focus',
                           color: colorScheme.primary,
                         ),
@@ -119,24 +134,29 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       const Divider(),
                       const SizedBox(height: 12),
-                      // Rarity breakdown
+                      // Stage breakdown
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _RarityChip(
-                            label: 'Common',
-                            count: commonCount,
-                            color: const Color(0xFF66BB6A),
+                          _StageChip(
+                            label: 'Kitten',
+                            count: stageCounts['kitten'] ?? 0,
+                            color: stageColor('kitten'),
                           ),
-                          _RarityChip(
-                            label: 'Uncommon',
-                            count: uncommonCount,
-                            color: const Color(0xFF448AFF),
+                          _StageChip(
+                            label: 'Adolescent',
+                            count: stageCounts['adolescent'] ?? 0,
+                            color: stageColor('adolescent'),
                           ),
-                          _RarityChip(
-                            label: 'Rare',
-                            count: rareCount,
-                            color: const Color(0xFFE040FB),
+                          _StageChip(
+                            label: 'Adult',
+                            count: stageCounts['adult'] ?? 0,
+                            color: stageColor('adult'),
+                          ),
+                          _StageChip(
+                            label: 'Senior',
+                            count: stageCounts['senior'] ?? 0,
+                            color: stageColor('senior'),
                           ),
                         ],
                       ),
@@ -220,7 +240,17 @@ class ProfileScreen extends ConsumerWidget {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Version'),
-            subtitle: Text('1.0.0'),
+            subtitle: Text('1.1.0'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('Pixel Cat Sprites'),
+            subtitle: Text(
+              'by pixel-cat-maker (CC BY-NC 4.0)',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
 
           // Extra spacing to push danger zone to the bottom
@@ -417,12 +447,12 @@ class _StatBadge extends StatelessWidget {
   }
 }
 
-class _RarityChip extends StatelessWidget {
+class _StageChip extends StatelessWidget {
   final String label;
   final int count;
   final Color color;
 
-  const _RarityChip({
+  const _StageChip({
     required this.label,
     required this.count,
     required this.color,
@@ -431,7 +461,7 @@ class _RarityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
@@ -444,9 +474,9 @@ class _RarityChip extends StatelessWidget {
             height: 8,
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Text(
-            '$count $label',
+            '$count',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w600,
@@ -507,12 +537,7 @@ class _CatAlbumTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: CatSprite.fromCat(
-                    breed: cat.breed,
-                    stage: cat.computedStage,
-                    mood: cat.computedMood,
-                    size: 48,
-                  ),
+                  child: PixelCatSprite.fromCat(cat: cat, size: 48),
                 ),
               ),
             ),

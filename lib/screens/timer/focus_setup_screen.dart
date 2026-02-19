@@ -5,7 +5,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
-import 'package:hachimi_app/widgets/cat_sprite.dart';
+import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// Focus setup screen — select duration and mode before starting a session.
 /// Shows the cat companion and habit info prominently.
@@ -80,8 +80,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
       _selectedMinutes = habit.goalMinutes;
     }
 
-    final breedData = cat != null ? breedMap[cat.breed] : null;
-    final bgColor = breedData?.colors.base ?? colorScheme.primary;
+    final bgColor = cat != null
+        ? stageColor(cat.computedStage)
+        : colorScheme.primary;
 
     return Scaffold(
       body: Container(
@@ -124,12 +125,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
 
               // Cat display
               if (cat != null) ...[
-                CatSprite.fromCat(
-                  breed: cat.breed,
-                  stage: cat.computedStage,
-                  mood: cat.computedMood,
-                  size: 120,
-                ),
+                PixelCatSprite.fromCat(cat: cat, size: 120),
                 const SizedBox(height: 12),
                 Text(
                   cat.name,
@@ -145,11 +141,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   ),
                 ),
               ] else ...[
-                CatSprite(breed: 'orange_tabby', size: 120),
-                const SizedBox(height: 12),
                 Text(
                   habit.icon,
-                  style: const TextStyle(fontSize: 48),
+                  style: const TextStyle(fontSize: 64),
                 ),
               ],
 
