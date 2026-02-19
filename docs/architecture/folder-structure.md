@@ -81,11 +81,14 @@ hachimi-app/
 │   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
+│   │   ├── accessory_provider.dart          # AccessoryInfo data class for shop + equip UI
 │   │   ├── coin_provider.dart              # coinServiceProvider, coinBalanceProvider, hasCheckedInTodayProvider
-│   │   ├── focus_timer_provider.dart       # focusTimerProvider (FSM state machine)
 │   │   ├── connectivity_provider.dart      # connectivityProvider, isOfflineProvider
+│   │   ├── focus_timer_provider.dart       # focusTimerProvider (FSM + SharedPreferences persistence)
 │   │   ├── habits_provider.dart            # habitsProvider, todayCheckInsProvider
-│   │   └── stats_provider.dart             # statsProvider (computed HabitStats)
+│   │   ├── locale_provider.dart            # localeProvider (app language override)
+│   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
+│   │   └── theme_provider.dart             # themeProvider (theme mode + seed color)
 │   │
 │   ├── screens/                            # Full-page widgets (consume providers, no business logic)
 │   │   ├── auth/
@@ -93,7 +96,8 @@ hachimi-app/
 │   │   ├── cat_detail/
 │   │   │   └── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
 │   │   ├── cat_room/
-│   │   │   └── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
+│   │   │   ├── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
+│   │   │   └── accessory_shop_screen.dart  # Accessory shop: 3-tab grid + purchase flow
 │   │   ├── habits/
 │   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + 3-cat adoption choice
 │   │   ├── home/
@@ -112,6 +116,7 @@ hachimi-app/
 │   │       └── timer_screen.dart           # Active timer with foreground service
 │   │
 │   └── widgets/                            # Reusable UI components (stateless preferred)
+│       ├── accessory_card.dart             # Reusable accessory card (name, price badge, owned badge)
 │       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
 │       ├── cat_house_card.dart             # Single cat card in CatHouse 2-column grid
 │       ├── check_in_banner.dart            # Daily check-in coin bonus banner on HomeScreen

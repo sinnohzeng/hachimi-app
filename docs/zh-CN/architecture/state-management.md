@@ -41,9 +41,15 @@ Firebase Auth 流 ──────────────► authStateProvide
                           hasCheckedInTodayProvider (Provider<bool>)
 
 
-计时器状态（本地状态，非 Firestore）：
+计时器状态（本地状态，非 Firestore —— 通过 SharedPreferences 持久化以支持崩溃恢复）：
 
   focusTimerProvider (StateNotifierProvider<FocusTimerNotifier, FocusTimerState>)
+
+
+主题与语言（通过 SharedPreferences 持久化）：
+
+  themeProvider (StateNotifierProvider<ThemeNotifier, ThemeSettings>)
+  localeProvider (StateNotifierProvider<LocaleNotifier, Locale?>)
 
 
 设备网络连接（独立于认证状态）：
@@ -205,22 +211,33 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 ---
 
+### `AccessoryInfo`
+
+- **类型**：数据类（非 Provider）
+- **文件**：`lib/providers/accessory_provider.dart`
+- **用途**：轻量值对象，整合饰品 ID、显示名、价格、分类、拥有/装备状态
+- **消费者**：`AccessoryShopScreen`、`AccessoryCard` 组件
+- **字段**：`id`、`displayName`、`price`、`category`（'plant'/'wild'/'collar'）、`isOwned`、`isEquipped`
+
+---
+
 ### `focusTimerProvider`
 
-- **类型**：`StateNotifierProvider<FocusTimerNotifier, FocusTimerState>`
+- **类型**：`StateNotifierProvider<FocusTimerNotifier, FocusTimerState>`（非 autoDispose —— 全局单例）
 - **文件**：`lib/providers/focus_timer_provider.dart`
-- **数据源**：本地状态（Provider 本身无 Firebase 依赖）
-- **消费者**：`TimerScreen`、`FocusCompleteScreen`
+- **数据源**：本地状态，通过 SharedPreferences 持久化以支持崩溃恢复
+- **消费者**：`TimerScreen`、`FocusCompleteScreen`、`_FirstHabitGate`（会话恢复）
 - **SSOT**：活跃专注计时器的有限状态机（FSM，Finite State Machine）
 
 **`FocusTimerState` 字段：**
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `habitId` | String? | 当前活跃习惯 |
-| `catId` | String? | 正在获得 XP 的猫咪 |
+| `habitId` | String | 当前活跃习惯 |
+| `catId` | String | 正在获得 XP 的猫咪 |
+| `habitName` | String | 习惯显示名称（用于通知 + 恢复对话框） |
 | `totalSeconds` | int | 目标时长（倒计时模式）或 0（正计时模式） |
-| `remainingSeconds` | int | 剩余秒数（倒计时模式） |
+| `remainingSeconds` | int | 剩余秒数（倒计时模式，计算属性） |
 | `elapsedSeconds` | int | 已用秒数（两种模式均记录） |
 | `status` | 枚举 | `idle`、`running`、`paused`、`completed`、`abandoned` |
 | `mode` | 枚举 | `countdown`（倒计时）、`stopwatch`（正计时） |
@@ -230,16 +247,64 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 | 方法 | 说明 |
 |------|------|
-| `start(habitId, catId, seconds, mode)` | 初始化并启动计时器 |
+| `configure(habitId, catId, habitName, seconds, mode)` | 初始化计时器参数 |
+| `start()` | 启动计时器心跳 |
 | `pause()` | 暂停计时器（记录 `pausedAt`） |
 | `resume()` | 从暂停状态恢复 |
-| `complete()` | 标记为已完成，触发会话保存 |
-| `abandon()` | 标记为已放弃（>= 5 分钟获得部分 XP） |
+| `complete()` | 标记为已完成，清除持久化数据 |
+| `abandon()` | 标记为已放弃（>= 5 分钟获得部分 XP），清除持久化数据 |
 | `onAppBackgrounded()` | 记录应用进入后台的时间戳 |
-| `onAppResumed(away)` | 处理返回：< 15s 继续，> 5min 自动结束 |
-| `reset()` | 返回 `idle` 状态 |
+| `onAppResumed()` | 处理返回：< 15s 继续，> 5min 自动结束 |
+| `reset()` | 返回 `idle` 状态，清除持久化数据 |
+| `restoreSession()` | 从 SharedPreferences 恢复中断的会话 |
+| `static hasInterruptedSession()` | 检查是否有已保存的会话需要恢复 |
+| `static clearSavedState()` | 清除持久化的会话数据 |
 
-**计时器心跳**：`Timer.periodic(const Duration(seconds: 1), _onTick)` —— 通过 `ref.onDispose()` 进行清理。
+**持久化**：每 5 秒 + 状态变更时，计时器状态保存到 SharedPreferences（键前缀 `focus_timer_`）。`complete()`、`abandon()` 和 `reset()` 时清除。
+
+**通知更新**：`_onTick()` 直接调用 `FocusTimerService.updateNotification()`，确保前台通知在 App 后台时也能实时更新。
+
+**计时器心跳**：`Timer.periodic(const Duration(seconds: 1), _onTick)` —— 在 `dispose()` 中取消。
+
+---
+
+### `themeProvider`
+
+- **类型**：`StateNotifierProvider<ThemeNotifier, ThemeSettings>`
+- **文件**：`lib/providers/theme_provider.dart`
+- **数据源**：本地状态，通过 SharedPreferences 持久化
+- **消费者**：`HachimiApp`（MaterialApp 的 theme/darkTheme/themeMode）、`SettingsScreen`
+- **SSOT**：应用主题模式（跟随系统/浅色/深色）和种子色
+
+**`ThemeSettings` 字段：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `mode` | ThemeMode | `system`（跟随系统）、`light`（浅色）、`dark`（深色） |
+| `seedColor` | Color | Material Design 3 种子色（默认：Google Blue `0xFF4285F4`） |
+
+**`ThemeNotifier` 方法：**
+
+| 方法 | 说明 |
+|------|------|
+| `setMode(ThemeMode)` | 切换主题模式 |
+| `setSeedColor(Color)` | 从 8 色预设色板选择种子色 |
+
+---
+
+### `localeProvider`
+
+- **类型**：`StateNotifierProvider<LocaleNotifier, Locale?>`
+- **文件**：`lib/providers/locale_provider.dart`
+- **数据源**：本地状态，通过 SharedPreferences 持久化
+- **消费者**：`HachimiApp`（MaterialApp locale）、`SettingsScreen`
+- **SSOT**：应用语言覆盖（`null` = 跟随系统，`Locale('en')` 或 `Locale('zh')` = 用户手动选择）
+
+**`LocaleNotifier` 方法：**
+
+| 方法 | 说明 |
+|------|------|
+| `setLocale(Locale?)` | 设置语言；null 表示跟随系统 |
 
 ---
 

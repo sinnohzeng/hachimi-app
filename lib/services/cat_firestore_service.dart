@@ -79,6 +79,27 @@ class CatFirestoreService {
     await _catsRef(uid).doc(catId).update({'accessories': accessories});
   }
 
+  /// 装备饰品到猫。
+  Future<void> equipAccessory({
+    required String uid,
+    required String catId,
+    required String accessoryId,
+  }) async {
+    await _catsRef(uid).doc(catId).update({
+      'equippedAccessory': accessoryId,
+    });
+  }
+
+  /// 卸下猫的饰品。
+  Future<void> unequipAccessory({
+    required String uid,
+    required String catId,
+  }) async {
+    await _catsRef(uid).doc(catId).update({
+      'equippedAccessory': null,
+    });
+  }
+
   /// 毕业（习惯完成或删除时调用）。
   Future<void> graduateCat({
     required String uid,

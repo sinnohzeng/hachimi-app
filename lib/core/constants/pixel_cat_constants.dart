@@ -235,11 +235,119 @@ List<String> get allAccessories => [
       '$color$style',
 ];
 
-/// 默认饰品价格（金币）
-const int defaultAccessoryPrice = 150;
-
 /// 每日签到金币奖励
 const int dailyCheckInCoins = 50;
+
+// ─── Accessory Pricing（饰品梯度定价）───
+// 每日签到 50 金币。Budget = 1 天，Legendary = 7 天。
+
+/// Budget 级植物（50 金币）
+const List<String> _budgetPlants = [
+  'MAPLE LEAF', 'HOLLY', 'HERBS', 'PETALS', 'CLOVER', 'DAISY',
+  'RYE STALK', 'CATTAIL', 'NETTLE', 'HEATHER', 'GORSE',
+  'DRY HERBS', 'DRY CATMINT', 'DRY NETTLES', 'DRY LAURELS',
+];
+
+/// Standard 级植物（100 金币）
+const List<String> _standardPlants = [
+  'BLUE BERRIES', 'FORGET ME NOTS', 'POPPY', 'ORANGE POPPY', 'CYAN POPPY',
+  'WHITE POPPY', 'PINK POPPY', 'BLUEBELLS', 'SNAPDRAGON', 'RASPBERRY', 'LAUREL',
+];
+
+/// Premium 级植物（150 金币）
+const List<String> _premiumPlants = [
+  'LAVENDER', 'CATMINT', 'JUNIPER',
+  'BULB WHITE', 'BULB YELLOW', 'BULB ORANGE', 'BULB PINK', 'BULB BLUE',
+];
+
+/// Legendary 级植物（350 金币）
+const List<String> _legendaryPlants = [
+  'LILY OF THE VALLEY', 'OAK LEAVES', 'MAPLE SEED',
+];
+
+/// Legendary 级项圈颜色（所有样式均 350 金币）
+const Set<String> _legendaryCollarColors = {'RAINBOW', 'SPIKES', 'MULTI'};
+
+/// 饰品梯度价格表 — 根据稀有度分级定价。
+/// Budget: 50, Standard: 100, Premium: 150, Rare: 250, Legendary: 350
+Map<String, int> get accessoryPriceMap {
+  final map = <String, int>{};
+
+  for (final id in _budgetPlants) {
+    map[id] = 50;
+  }
+  for (final id in _standardPlants) {
+    map[id] = 100;
+  }
+  for (final id in _premiumPlants) {
+    map[id] = 150;
+  }
+  for (final id in _legendaryPlants) {
+    map[id] = 350;
+  }
+  for (final id in wildAccessories) {
+    map[id] = 250;
+  }
+
+  // 项圈定价：Legendary 颜色 > NYLON > BELL/BOW > 普通
+  for (final style in collarStyles) {
+    for (final color in collarColors) {
+      final id = '$color$style';
+      if (_legendaryCollarColors.contains(color)) {
+        map[id] = 350;
+      } else if (style == 'NYLON') {
+        map[id] = 250;
+      } else if (style == 'BELL' || style == 'BOW') {
+        map[id] = 150;
+      } else {
+        map[id] = 100;
+      }
+    }
+  }
+
+  return map;
+}
+
+/// 获取饰品价格，未在价格表中则返回 150（默认值）。
+int accessoryPrice(String accessoryId) =>
+    accessoryPriceMap[accessoryId] ?? 150;
+
+/// 饰品 ID → 可读显示名称。
+String accessoryDisplayName(String id) {
+  // 植物和野生饰品：直接 title case
+  if (plantAccessories.contains(id) || wildAccessories.contains(id)) {
+    return id
+        .split(' ')
+        .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
+        .join(' ');
+  }
+
+  // 项圈：解析 color + style
+  for (final style in collarStyles.reversed) {
+    if (style.isNotEmpty && id.endsWith(style)) {
+      final color = id.substring(0, id.length - style.length);
+      final colorName =
+          color[0].toUpperCase() + color.substring(1).toLowerCase();
+      final styleName =
+          style[0].toUpperCase() + style.substring(1).toLowerCase();
+      return '$colorName $styleName Collar';
+    }
+  }
+  // 普通项圈（无样式后缀）
+  if (collarColors.contains(id)) {
+    final colorName = id[0].toUpperCase() + id.substring(1).toLowerCase();
+    return '$colorName Collar';
+  }
+
+  return id;
+}
+
+/// 判断饰品类别：'plant' / 'wild' / 'collar'
+String accessoryCategory(String id) {
+  if (plantAccessories.contains(id)) return 'plant';
+  if (wildAccessories.contains(id)) return 'wild';
+  return 'collar';
+}
 
 // ─── Sprite Index 计算 ───
 

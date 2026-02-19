@@ -224,11 +224,37 @@ The coin balance is stored as `coins` on the `users/{uid}` document and exposed 
 
 ### Accessories
 
-Accessories are cosmetic items that overlay on the cat's sprite. Each accessory costs **150 coins** and is permanently unlocked per cat.
+Accessories are cosmetic items that overlay on the cat's sprite. Each accessory has a **tiered price** based on rarity, and is permanently unlocked per cat. A cat can **equip** one accessory at a time, which renders on its sprite.
+
+#### Tiered Pricing
+
+| Tier | Price (coins) | Days to Earn | Representative Items |
+|------|--------------|-------------|---------------------|
+| Budget | 50 | 1 | Common plants: Maple Leaf, Holly, Herbs, Clover, Daisy, all Dry series |
+| Standard | 100 | 2 | Flowers/berries: Poppies, Bluebells, Snapdragon + plain collars |
+| Premium | 150 | 3 | Rare plants: Lavender, Catmint, Juniper, all Bulbs + Bell/Bow collars |
+| Rare | 250 | 5 | Wild accessories: feathers, moth/butterfly wings + Nylon collars |
+| Legendary | 350 | 7 | Rainbow/Spikes/Multi collars + Lily of the Valley, Oak Leaves, Maple Seed |
+
+Price data is defined in `pixel_cat_constants.dart` via `accessoryPriceMap`.
+
+#### Equip/Unequip
+
+- Each cat has an `equippedAccessory` field (nullable String) — the currently equipped accessory ID
+- Only one accessory can be equipped at a time per cat
+- Equipping is done via `CatFirestoreService.equipAccessory()` / `unequipAccessory()`
+- The equipped accessory ID flows through the rendering pipeline: `Cat.equippedAccessory` → `PixelCatSprite.accessoryId` → `CatSpriteParams.accessoryId` → `PixelCatRenderer.renderCat(accessoryId:)`
+- CatDetailScreen shows an "Accessories" card with equip/unequip controls
+
+#### Accessory Shop
+
+- Accessed from CatRoomScreen AppBar (storefront icon) → route `/accessory-shop`
+- 3 tabs: Plants, Wild, Collars
+- Each tab: 3-column grid of `AccessoryCard` widgets
+- Purchase flow: tap unowned item → BottomSheet with cat selector → confirm → `CoinService.purchaseAccessory()`
 
 - Purchased accessories are stored in the cat's `accessories` field (a `List<String>` of accessory IDs)
-- The accessory layer is drawn on top of layer 13 (tint overlay) in the rendering pipeline
-- Accessories are purchased via the `AccessoryShopSection` widget in `CatDetailScreen`
+- The accessory layer is drawn as layer 13 in the rendering pipeline
 
 ### Check-In Banner
 

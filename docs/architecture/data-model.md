@@ -102,7 +102,8 @@ One document per cat. `catId` is a Firestore auto-generated ID.
 | `personality` | string | yes | Personality ID from `CatPersonality.id` — see [Cat System](cat-system.md) |
 | `totalMinutes` | int | yes | Total focus minutes accumulated for this cat's habit. Stage is computed from this. |
 | `targetMinutes` | int | yes | Target minutes derived from the habit's `targetHours` (targetHours x 60). Used for stage calculation. |
-| `accessories` | list\<string\> | yes | List of accessory IDs the cat currently has equipped (default: empty list) |
+| `accessories` | list\<string\> | yes | List of accessory IDs owned by this cat (default: empty list) |
+| `equippedAccessory` | string | no | Currently equipped accessory ID (null = none equipped) |
 | `boundHabitId` | string | yes | Reference to the habit that spawned this cat |
 | `state` | string | yes | "active", "dormant", or "graduated" |
 | `lastSessionAt` | timestamp | no | Timestamp of the most recent focus session for this cat's habit |

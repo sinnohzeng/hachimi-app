@@ -15,11 +15,19 @@ final pixelCatRendererProvider =
     Provider<PixelCatRenderer>((ref) => PixelCatRenderer());
 
 /// Sprite 渲染参数。
-typedef CatSpriteParams = ({CatAppearance appearance, int spriteIndex});
+typedef CatSpriteParams = ({
+  CatAppearance appearance,
+  int spriteIndex,
+  String? accessoryId,
+});
 
-/// 渲染结果缓存 — 按 appearance + spriteIndex 组合 family。
+/// 渲染结果缓存 — 按 appearance + spriteIndex + accessoryId 组合 family。
 final catSpriteImageProvider =
     FutureProvider.family<ui.Image, CatSpriteParams>((ref, params) {
   final renderer = ref.watch(pixelCatRendererProvider);
-  return renderer.renderCat(params.appearance, params.spriteIndex);
+  return renderer.renderCat(
+    params.appearance,
+    params.spriteIndex,
+    accessoryId: params.accessoryId,
+  );
 });

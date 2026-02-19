@@ -228,11 +228,37 @@ CatHouse 用 **2 列 GridView** 布局替代了之前的房间场景。每只活
 
 ### 配饰
 
-配饰是叠加在猫咪精灵图上的装饰物品。每件配饰售价 **150 金币**，购买后永久解锁至对应猫咪。
+配饰是叠加在猫咪精灵图上的装饰物品。每件配饰采用 **梯度定价**，购买后永久解锁至对应猫咪。猫咪可以 **装备** 一件配饰，装备后会渲染在精灵图上。
+
+#### 梯度定价体系
+
+| 等级 | 价格（金币） | 攒币天数 | 代表饰品 |
+|------|------------|---------|---------|
+| Budget（基础） | 50 | 1 | 常见植物：Maple Leaf、Holly、Herbs、Clover、Daisy、全部 Dry 系列 |
+| Standard（标准） | 100 | 2 | 花卉/浆果：全部 Poppy、Bluebells、Snapdragon + 普通项圈 |
+| Premium（优质） | 150 | 3 | 稀有植物：Lavender、Catmint、Juniper、全部 Bulb + Bell/Bow 项圈 |
+| Rare（稀有） | 250 | 5 | 野生配饰：羽毛、蛾翅/蝶翅/蝉翼 + Nylon 项圈 |
+| Legendary（传说） | 350 | 7 | Rainbow/Spikes/Multi 项圈 + Lily of the Valley、Oak Leaves、Maple Seed |
+
+价格数据定义于 `pixel_cat_constants.dart` 的 `accessoryPriceMap`。
+
+#### 装备/卸下
+
+- 每只猫有 `equippedAccessory` 字段（可空 String）—— 当前装备的配饰 ID
+- 每只猫同时只能装备一件配饰
+- 通过 `CatFirestoreService.equipAccessory()` / `unequipAccessory()` 实现装备操作
+- 装备的配饰 ID 流经渲染管线：`Cat.equippedAccessory` → `PixelCatSprite.accessoryId` → `CatSpriteParams.accessoryId` → `PixelCatRenderer.renderCat(accessoryId:)`
+- CatDetailScreen 显示「Accessories」卡片，含装备/卸下控件
+
+#### 饰品商店
+
+- 从 CatRoomScreen AppBar（商店图标）进入 → 路由 `/accessory-shop`
+- 3 个标签：Plants、Wild、Collars
+- 每个标签：3 列网格展示 `AccessoryCard` 组件
+- 购买流程：点击未拥有饰品 → BottomSheet 选猫 → 确认 → `CoinService.purchaseAccessory()`
 
 - 已购买的配饰存储于猫咪的 `accessories` 字段（`List<String>` 类型的配饰 ID 列表）
-- 配饰图层绘制在第 13 层（色调叠加）之上
-- 通过 `CatDetailScreen` 中的 `AccessoryShopSection` 组件购买配饰
+- 配饰图层绘制在渲染管线的第 13 层
 
 ### 签到横幅
 

@@ -19,7 +19,18 @@ class CatRoomScreen extends ConsumerWidget {
     final catsAsync = ref.watch(catsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('CatHouse')),
+      appBar: AppBar(
+        title: const Text('CatHouse'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.storefront),
+            tooltip: 'Accessory Shop',
+            onPressed: () => Navigator.of(context).pushNamed(
+              AppRouter.accessoryShop,
+            ),
+          ),
+        ],
+      ),
       body: catsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),

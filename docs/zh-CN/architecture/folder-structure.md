@@ -81,11 +81,14 @@ hachimi-app/
 │   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider、catSpriteImageProvider (family)
+│   │   ├── accessory_provider.dart          # AccessoryInfo 数据类，用于商店和装备 UI
 │   │   ├── coin_provider.dart              # coinServiceProvider、coinBalanceProvider、hasCheckedInTodayProvider
-│   │   ├── focus_timer_provider.dart       # focusTimerProvider（有限状态机）
 │   │   ├── connectivity_provider.dart      # connectivityProvider、isOfflineProvider
+│   │   ├── focus_timer_provider.dart       # focusTimerProvider（有限状态机 + SharedPreferences 持久化）
 │   │   ├── habits_provider.dart            # habitsProvider、todayCheckInsProvider
-│   │   └── stats_provider.dart             # statsProvider（计算型 HabitStats）
+│   │   ├── locale_provider.dart            # localeProvider（应用语言覆盖）
+│   │   ├── stats_provider.dart             # statsProvider（计算型 HabitStats）
+│   │   └── theme_provider.dart             # themeProvider（主题模式 + 种子色）
 │   │
 │   ├── screens/                            # 全页界面（消费 Provider，无业务逻辑）
 │   │   ├── auth/
@@ -93,7 +96,8 @@ hachimi-app/
 │   │   ├── cat_detail/
 │   │   │   └── cat_detail_screen.dart      # 猫咪信息、进度条、热力图、配饰
 │   │   ├── cat_room/
-│   │   │   └── cat_room_screen.dart        # 2 列 CatHouse 网格，像素风猫咪
+│   │   │   ├── cat_room_screen.dart        # 2 列 CatHouse 网格，像素风猫咪
+│   │   │   └── accessory_shop_screen.dart  # 饰品商店：3 标签网格 + 购买流程
 │   │   ├── habits/
 │   │   │   └── adoption_flow_screen.dart   # 3 步习惯创建 + 3 猫选择领养
 │   │   ├── home/
@@ -112,6 +116,7 @@ hachimi-app/
 │   │       └── timer_screen.dart           # 活跃计时器（含前台服务）
 │   │
 │   └── widgets/                            # 可复用 UI 组件（优先无状态）
+│       ├── accessory_card.dart             # 可复用饰品卡片（名称、价格标签、已拥有徽章）
 │       ├── accessory_shop_section.dart     # CatDetailScreen 中的配饰网格 + 购买流程
 │       ├── cat_house_card.dart             # CatHouse 2 列网格中的单只猫咪卡片
 │       ├── check_in_banner.dart            # HomeScreen 上的每日签到金币横幅

@@ -24,16 +24,18 @@ import 'package:hachimi_app/providers/cat_sprite_provider.dart';
 class PixelCatSprite extends ConsumerWidget {
   final CatAppearance appearance;
   final int spriteIndex;
+  final String? accessoryId;
   final double size;
 
   const PixelCatSprite({
     super.key,
     required this.appearance,
     required this.spriteIndex,
+    this.accessoryId,
     this.size = 100,
   });
 
-  /// 从 Cat 对象快捷构造。
+  /// 从 Cat 对象快捷构造 — 自动读取 equippedAccessory。
   factory PixelCatSprite.fromCat({
     Key? key,
     required Cat cat,
@@ -43,13 +45,18 @@ class PixelCatSprite extends ConsumerWidget {
       key: key,
       appearance: cat.appearance,
       spriteIndex: cat.spriteIndex,
+      accessoryId: cat.equippedAccessory,
       size: size,
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final params = (appearance: appearance, spriteIndex: spriteIndex);
+    final params = (
+      appearance: appearance,
+      spriteIndex: spriteIndex,
+      accessoryId: accessoryId,
+    );
     final imageAsync = ref.watch(catSpriteImageProvider(params));
 
     return RepaintBoundary(

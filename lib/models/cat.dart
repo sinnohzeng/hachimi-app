@@ -26,6 +26,7 @@ class Cat {
   final int totalMinutes;
   final int targetMinutes;
   final List<String> accessories;
+  final String? equippedAccessory;
   final String boundHabitId;
   final String state; // 'active' / 'graduated' / 'dormant'
   final DateTime createdAt;
@@ -39,6 +40,7 @@ class Cat {
     this.totalMinutes = 0,
     required this.targetMinutes,
     this.accessories = const [],
+    this.equippedAccessory,
     required this.boundHabitId,
     this.state = 'active',
     required this.createdAt,
@@ -123,6 +125,7 @@ class Cat {
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      equippedAccessory: data['equippedAccessory'] as String?,
       boundHabitId: data['boundHabitId'] as String? ?? '',
       state: data['state'] as String? ?? 'active',
       createdAt:
@@ -139,6 +142,7 @@ class Cat {
       'totalMinutes': totalMinutes,
       'targetMinutes': targetMinutes,
       'accessories': accessories,
+      'equippedAccessory': equippedAccessory,
       'boundHabitId': boundHabitId,
       'state': state,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -155,6 +159,7 @@ class Cat {
     int? totalMinutes,
     int? targetMinutes,
     List<String>? accessories,
+    String? equippedAccessory,
     String? boundHabitId,
     String? state,
     DateTime? createdAt,
@@ -168,6 +173,7 @@ class Cat {
       totalMinutes: totalMinutes ?? this.totalMinutes,
       targetMinutes: targetMinutes ?? this.targetMinutes,
       accessories: accessories ?? this.accessories,
+      equippedAccessory: equippedAccessory ?? this.equippedAccessory,
       boundHabitId: boundHabitId ?? this.boundHabitId,
       state: state ?? this.state,
       createdAt: createdAt ?? this.createdAt,

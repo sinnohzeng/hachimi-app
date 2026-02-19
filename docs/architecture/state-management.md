@@ -41,9 +41,15 @@ Coin economy:
                           hasCheckedInTodayProvider (Provider<bool>)
 
 
-Timer state (local, not Firestore):
+Timer state (local, not Firestore — persisted to SharedPreferences for crash recovery):
 
          focusTimerProvider (StateNotifierProvider<FocusTimerNotifier, FocusTimerState>)
+
+
+Theme & locale (persisted to SharedPreferences):
+
+         themeProvider (StateNotifierProvider<ThemeNotifier, ThemeSettings>)
+         localeProvider (StateNotifierProvider<LocaleNotifier, Locale?>)
 
 
 Device connectivity (independent of auth):
@@ -205,22 +211,33 @@ Device connectivity (independent of auth):
 
 ---
 
+### `AccessoryInfo`
+
+- **Type**: Data class (not a Provider)
+- **File**: `lib/providers/accessory_provider.dart`
+- **Purpose**: Lightweight value object combining accessory ID, display name, price, category, owned/equipped status
+- **Consumers**: `AccessoryShopScreen`, `AccessoryCard` widget
+- **Fields**: `id`, `displayName`, `price`, `category` ('plant'/'wild'/'collar'), `isOwned`, `isEquipped`
+
+---
+
 ### `focusTimerProvider`
 
-- **Type**: `StateNotifierProvider<FocusTimerNotifier, FocusTimerState>`
+- **Type**: `StateNotifierProvider<FocusTimerNotifier, FocusTimerState>` (NOT autoDispose — global singleton)
 - **File**: `lib/providers/focus_timer_provider.dart`
-- **Source**: Local state only (no Firebase dependency in the provider itself)
-- **Consumers**: `TimerScreen`, `FocusCompleteScreen`
+- **Source**: Local state, persisted to SharedPreferences for crash recovery
+- **Consumers**: `TimerScreen`, `FocusCompleteScreen`, `_FirstHabitGate` (session recovery)
 - **SSOT for**: The active focus timer state machine
 
 **`FocusTimerState` fields:**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `habitId` | String? | Active habit |
-| `catId` | String? | Cat earning XP |
+| `habitId` | String | Active habit |
+| `catId` | String | Cat earning XP |
+| `habitName` | String | Habit display name (for notification + recovery dialog) |
 | `totalSeconds` | int | Target duration (countdown) or 0 (stopwatch) |
-| `remainingSeconds` | int | Seconds left (countdown mode) |
+| `remainingSeconds` | int | Seconds left (countdown mode, computed) |
 | `elapsedSeconds` | int | Seconds elapsed (both modes) |
 | `status` | enum | `idle`, `running`, `paused`, `completed`, `abandoned` |
 | `mode` | enum | `countdown`, `stopwatch` |
@@ -230,16 +247,64 @@ Device connectivity (independent of auth):
 
 | Method | Description |
 |--------|-------------|
-| `start(habitId, catId, seconds, mode)` | Initialize and start the timer |
+| `configure(habitId, catId, habitName, seconds, mode)` | Initialize timer parameters |
+| `start()` | Start the timer tick |
 | `pause()` | Pause the timer (record `pausedAt`) |
 | `resume()` | Resume from paused state |
-| `complete()` | Mark as completed, trigger session save |
-| `abandon()` | Mark as abandoned (partial XP if >= 5 min) |
+| `complete()` | Mark as completed, clear saved state |
+| `abandon()` | Mark as abandoned (partial XP if >= 5 min), clear saved state |
 | `onAppBackgrounded()` | Record backgrounding timestamp |
-| `onAppResumed(away)` | Handle return: auto-pause under 15s, auto-end over 5min |
-| `reset()` | Return to `idle` state |
+| `onAppResumed()` | Handle return: auto-pause under 15s, auto-end over 5min |
+| `reset()` | Return to `idle` state, clear saved state |
+| `restoreSession()` | Restore interrupted session from SharedPreferences |
+| `static hasInterruptedSession()` | Check if there's a saved session to recover |
+| `static clearSavedState()` | Clear persisted session data |
 
-**Timer tick:** `Timer.periodic(const Duration(seconds: 1), _onTick)` — disposed via `ref.onDispose()`.
+**Persistence:** Every 5 seconds + on state changes, the timer state is saved to SharedPreferences (keys prefixed `focus_timer_`). On `complete()`, `abandon()`, and `reset()`, saved state is cleared.
+
+**Notification updates:** `_onTick()` directly calls `FocusTimerService.updateNotification()` so the foreground notification stays current even when the app is in the background.
+
+**Timer tick:** `Timer.periodic(const Duration(seconds: 1), _onTick)` — cancelled in `dispose()`.
+
+---
+
+### `themeProvider`
+
+- **Type**: `StateNotifierProvider<ThemeNotifier, ThemeSettings>`
+- **File**: `lib/providers/theme_provider.dart`
+- **Source**: Local state, persisted to SharedPreferences
+- **Consumers**: `HachimiApp` (MaterialApp theme/darkTheme/themeMode), `SettingsScreen`
+- **SSOT for**: App theme mode (system/light/dark) and seed color
+
+**`ThemeSettings` fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mode` | ThemeMode | `system`, `light`, `dark` |
+| `seedColor` | Color | Material Design 3 seed color (default: Google Blue `0xFF4285F4`) |
+
+**`ThemeNotifier` methods:**
+
+| Method | Description |
+|--------|-------------|
+| `setMode(ThemeMode)` | Switch theme mode |
+| `setSeedColor(Color)` | Set seed color from 8-color preset palette |
+
+---
+
+### `localeProvider`
+
+- **Type**: `StateNotifierProvider<LocaleNotifier, Locale?>`
+- **File**: `lib/providers/locale_provider.dart`
+- **Source**: Local state, persisted to SharedPreferences
+- **Consumers**: `HachimiApp` (MaterialApp locale), `SettingsScreen`
+- **SSOT for**: App language override (`null` = follow system, `Locale('en')` or `Locale('zh')` = user override)
+
+**`LocaleNotifier` methods:**
+
+| Method | Description |
+|--------|-------------|
+| `setLocale(Locale?)` | Set locale; null to follow system |
 
 ---
 

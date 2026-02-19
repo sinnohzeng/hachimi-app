@@ -102,7 +102,8 @@ users/{uid}                          <- 用户基本信息文档
 | `personality` | string | 是 | 性格 ID——详见[猫咪系统](cat-system.md) |
 | `totalMinutes` | int | 是 | 该猫咪对应习惯累计的专注分钟数。阶段从此字段计算。 |
 | `targetMinutes` | int | 是 | 从习惯的 `targetHours` 派生的目标分钟数（targetHours x 60）。用于阶段计算。 |
-| `accessories` | list\<string\> | 是 | 猫咪当前装备的配饰 ID 列表（默认值：空列表） |
+| `accessories` | list\<string\> | 是 | 猫咪拥有的配饰 ID 列表（默认值：空列表） |
+| `equippedAccessory` | string | 否 | 当前装备的配饰 ID（null = 未装备） |
 | `boundHabitId` | string | 是 | 生成此猫咪的习惯 ID |
 | `state` | string | 是 | `"active"`、`"dormant"` 或 `"graduated"` |
 | `lastSessionAt` | timestamp | 否 | 最近一次专注会话的时间戳 |

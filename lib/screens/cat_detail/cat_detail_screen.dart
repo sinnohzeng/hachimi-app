@@ -6,6 +6,9 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
+    show accessoryDisplayName;
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 
 /// Cat detail page — pixel cat sprite, time-based growth progress,
@@ -299,6 +302,10 @@ class CatDetailScreen extends ConsumerWidget {
                   _HabitHeatmapCard(habitId: habit.id),
                 const SizedBox(height: 16),
 
+                // Accessories card
+                _AccessoriesCard(cat: cat),
+                const SizedBox(height: 16),
+
                 // Cat info card
                 Card(
                   child: Padding(
@@ -536,6 +543,143 @@ class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
         ),
       ),
     );
+  }
+}
+
+/// 饰品装备/卸下卡片。
+class _AccessoriesCard extends ConsumerWidget {
+  final Cat cat;
+  const _AccessoriesCard({required this.cat});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    final hasEquipped = cat.equippedAccessory != null;
+    final ownedAccessories = cat.accessories;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Accessories',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 当前装备
+            Row(
+              children: [
+                Text(
+                  'Equipped: ',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (hasEquipped)
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          accessoryDisplayName(cat.equippedAccessory!),
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton.icon(
+                          onPressed: () => _unequip(ref),
+                          icon: const Icon(Icons.remove_circle_outline, size: 16),
+                          label: const Text('Unequip'),
+                          style: TextButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Text(
+                    'None',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+
+            // 已拥有饰品网格
+            if (ownedAccessories.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Owned (${ownedAccessories.length})',
+                style: textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: ownedAccessories.map((id) {
+                  final isEquipped = cat.equippedAccessory == id;
+                  return ActionChip(
+                    avatar: isEquipped
+                        ? Icon(Icons.check_circle,
+                            size: 16, color: colorScheme.primary)
+                        : null,
+                    label: Text(
+                      accessoryDisplayName(id),
+                      style: textTheme.labelSmall,
+                    ),
+                    onPressed: isEquipped ? null : () => _equip(ref, id),
+                    backgroundColor: isEquipped
+                        ? colorScheme.primaryContainer
+                        : null,
+                  );
+                }).toList(),
+              ),
+            ] else
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'No accessories yet. Visit the shop!',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _equip(WidgetRef ref, String accessoryId) {
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+    ref.read(catFirestoreServiceProvider).equipAccessory(
+          uid: uid,
+          catId: cat.id,
+          accessoryId: accessoryId,
+        );
+  }
+
+  void _unequip(WidgetRef ref) {
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+    ref.read(catFirestoreServiceProvider).unequipAccessory(
+          uid: uid,
+          catId: cat.id,
+        );
   }
 }
 
