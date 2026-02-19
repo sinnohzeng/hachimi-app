@@ -1,7 +1,6 @@
 // ---
 // 📘 文件说明：
-// 设置页面 — 通知、语言、关于信息、账号操作（登出/删除账号）。
-// 从 Profile 页面拆分出来，隔离敏感操作。
+// 设置页面 — 外观（主题模式/主题色）、通知、语言、关于信息、账号操作。
 //
 // 🧩 文件结构：
 // - SettingsScreen：主页面；
@@ -10,7 +9,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/locale_provider.dart';
+import 'package:hachimi_app/providers/theme_provider.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -20,6 +24,8 @@ class SettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final themeSettings = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -31,17 +37,57 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.notifications_outlined),
             title: const Text('Notifications'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Navigate to notification settings
-            },
+            onTap: () => _showNotificationSettings(context),
           ),
           ListTile(
             leading: const Icon(Icons.language),
             title: const Text('Language'),
+            subtitle: Text(
+              _localeName(locale),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Navigate to language settings
-            },
+            onTap: () => _showLanguageSettings(context, ref),
+          ),
+
+          const SizedBox(height: 8),
+          const Divider(),
+
+          // Appearance section
+          _SectionHeader(title: 'Appearance', colorScheme: colorScheme),
+          ListTile(
+            leading: const Icon(Icons.dark_mode_outlined),
+            title: const Text('Theme Mode'),
+            subtitle: Text(
+              _themeModeName(themeSettings.mode),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showThemeModeSettings(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('Theme Color'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: themeSettings.seedColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+            onTap: () => _showThemeColorSettings(context, ref),
           ),
 
           const SizedBox(height: 8),
@@ -52,10 +98,10 @@ class SettingsScreen extends ConsumerWidget {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Version'),
-            subtitle: Text('1.1.1'),
+            subtitle: Text('1.2.0'),
           ),
           ListTile(
-            leading: const Icon(Icons.palette_outlined),
+            leading: const Icon(Icons.pets_outlined),
             title: const Text('Pixel Cat Sprites'),
             subtitle: Text(
               'by pixel-cat-maker (CC BY-NC 4.0)',
@@ -72,7 +118,7 @@ class SettingsScreen extends ConsumerWidget {
               showLicensePage(
                 context: context,
                 applicationName: 'Hachimi',
-                applicationVersion: '1.1.1',
+                applicationVersion: '1.2.0',
               );
             },
           ),
@@ -110,6 +156,86 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  // --- Notification Settings ---
+
+  void _showNotificationSettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => const _NotificationSettingsDialog(),
+    );
+  }
+
+  // --- Language Settings ---
+
+  String _localeName(Locale? locale) {
+    if (locale == null) return 'System default';
+    switch (locale.languageCode) {
+      case 'en':
+        return 'English';
+      case 'zh':
+        return 'Chinese';
+      default:
+        return locale.languageCode;
+    }
+  }
+
+  void _showLanguageSettings(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.read(localeProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) => _LanguageDialog(currentLocale: currentLocale),
+    ).then((result) {
+      if (result != null) {
+        if (result == 'system') {
+          ref.read(localeProvider.notifier).setLocale(null);
+        } else {
+          ref.read(localeProvider.notifier).setLocale(Locale(result as String));
+        }
+      }
+    });
+  }
+
+  // --- Theme Mode Settings ---
+
+  String _themeModeName(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.system:
+        return 'System';
+      case ThemeMode.light:
+        return 'Light';
+      case ThemeMode.dark:
+        return 'Dark';
+    }
+  }
+
+  void _showThemeModeSettings(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.read(themeProvider).mode;
+    showDialog(
+      context: context,
+      builder: (ctx) => _ThemeModeDialog(currentMode: currentMode),
+    ).then((result) {
+      if (result != null) {
+        ref.read(themeProvider.notifier).setMode(result as ThemeMode);
+      }
+    });
+  }
+
+  // --- Theme Color Settings ---
+
+  void _showThemeColorSettings(BuildContext context, WidgetRef ref) {
+    final currentColor = ref.read(themeProvider).seedColor;
+    showDialog(
+      context: context,
+      builder: (ctx) => _ThemeColorDialog(currentColor: currentColor),
+    ).then((result) {
+      if (result != null) {
+        ref.read(themeProvider.notifier).setSeedColor(result as Color);
+      }
+    });
+  }
+
+  // --- Account Actions ---
 
   void _confirmLogout(BuildContext context, WidgetRef ref) {
     showDialog(
@@ -168,6 +294,208 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// --- Private Dialogs ---
+
+/// Notification settings dialog with focus reminders toggle.
+class _NotificationSettingsDialog extends StatefulWidget {
+  const _NotificationSettingsDialog();
+
+  @override
+  State<_NotificationSettingsDialog> createState() =>
+      _NotificationSettingsDialogState();
+}
+
+class _NotificationSettingsDialogState
+    extends State<_NotificationSettingsDialog> {
+  static const _key = 'notifications_enabled';
+  bool _enabled = true;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _enabled = prefs.getBool(_key) ?? true;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _toggle(bool value) async {
+    setState(() => _enabled = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, value);
+
+    if (!value) {
+      await NotificationService().cancelAll();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Notifications'),
+      content: _loaded
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  title: const Text('Focus Reminders'),
+                  subtitle: const Text(
+                    'Receive daily reminders to stay on track',
+                  ),
+                  value: _enabled,
+                  onChanged: _toggle,
+                ),
+              ],
+            )
+          : const SizedBox(
+              height: 48,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Done'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Language selection dialog.
+class _LanguageDialog extends StatelessWidget {
+  final Locale? currentLocale;
+  const _LanguageDialog({required this.currentLocale});
+
+  @override
+  Widget build(BuildContext context) {
+    final currentCode = currentLocale?.languageCode ?? 'system';
+
+    return AlertDialog(
+      title: const Text('Language'),
+      contentPadding: const EdgeInsets.only(top: 12),
+      content: RadioGroup<String>(
+        groupValue: currentCode,
+        onChanged: (value) => Navigator.of(context).pop(value),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<String>(
+              title: const Text('System default'),
+              value: 'system',
+            ),
+            RadioListTile<String>(
+              title: const Text('English'),
+              value: 'en',
+            ),
+            RadioListTile<String>(
+              title: const Text('Chinese'),
+              value: 'zh',
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Theme mode selection dialog.
+class _ThemeModeDialog extends StatelessWidget {
+  final ThemeMode currentMode;
+  const _ThemeModeDialog({required this.currentMode});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Theme Mode'),
+      contentPadding: const EdgeInsets.only(top: 12),
+      content: RadioGroup<ThemeMode>(
+        groupValue: currentMode,
+        onChanged: (value) => Navigator.of(context).pop(value),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<ThemeMode>(
+              title: const Text('System'),
+              value: ThemeMode.system,
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('Light'),
+              value: ThemeMode.light,
+            ),
+            RadioListTile<ThemeMode>(
+              title: const Text('Dark'),
+              value: ThemeMode.dark,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Theme color selection dialog with 8-color grid.
+class _ThemeColorDialog extends StatelessWidget {
+  final Color currentColor;
+  const _ThemeColorDialog({required this.currentColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return AlertDialog(
+      title: const Text('Theme Color'),
+      content: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: AppTheme.presetColors.map((color) {
+          final isSelected = color.toARGB32() == currentColor.toARGB32();
+          return GestureDetector(
+            onTap: () => Navigator.of(context).pop(color),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: isSelected
+                    ? Border.all(color: colorScheme.onSurface, width: 3)
+                    : null,
+              ),
+              child: isSelected
+                  ? Icon(Icons.check, color: Colors.white, size: 24)
+                  : null,
+            ),
+          );
+        }).toList(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
     );
   }
 }

@@ -209,14 +209,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? ref.watch(catByIdProvider(habit!.catId!))
         : null;
 
-    // Update foreground notification with current time
-    if (_hasStarted && timerState.status == TimerStatus.running) {
-      FocusTimerService.updateNotification(
-        title: '🐱 ${habit?.name ?? "Focus"}',
-        text:
-            '${timerState.displayTime} ${timerState.mode == TimerMode.countdown ? "remaining" : "elapsed"}',
-      );
-    }
+    // Notification updates are now driven by FocusTimerNotifier._onTick()
+    // so they work even when the app is in the background.
 
     // Handle completed/abandoned state
     if (timerState.status == TimerStatus.completed ||

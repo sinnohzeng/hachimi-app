@@ -1,5 +1,27 @@
+// ---
+// 📘 文件说明：
+// 专注计时器 Provider — 管理计时器生命周期、通知更新和崩溃恢复。
+// 使用 SharedPreferences 持久化活跃会话，App 被杀后可恢复。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. configure() 初始化计时器参数（含 habitName）；
+// 2. start() 启动周期性心跳，每秒更新 state 并刷新通知；
+// 3. 每 5 秒自动保存状态到 SharedPreferences；
+// 4. complete/abandon/reset 时清除持久化数据；
+// 5. 静态方法 hasInterruptedSession() 检测未完成会话；
+// 6. restoreSession() 从 SharedPreferences 恢复状态；
+//
+// 🧩 文件结构：
+// - TimerStatus/TimerMode：枚举；
+// - FocusTimerState：状态值对象；
+// - FocusTimerNotifier：StateNotifier + 持久化逻辑；
+// - focusTimerProvider：全局 Provider（非 autoDispose）；
+// ---
+
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hachimi_app/services/focus_timer_service.dart';
 
 /// Timer status for focus sessions.
 enum TimerStatus { idle, running, paused, completed, abandoned }
@@ -11,6 +33,7 @@ enum TimerMode { countdown, stopwatch }
 class FocusTimerState {
   final String habitId;
   final String catId;
+  final String habitName;
   final int totalSeconds; // Target duration (countdown mode)
   final int elapsedSeconds; // Actual focused time
   final TimerStatus status;
@@ -21,6 +44,7 @@ class FocusTimerState {
   const FocusTimerState({
     this.habitId = '',
     this.catId = '',
+    this.habitName = '',
     this.totalSeconds = 1500, // 25 min default
     this.elapsedSeconds = 0,
     this.status = TimerStatus.idle,
@@ -63,6 +87,7 @@ class FocusTimerState {
   FocusTimerState copyWith({
     String? habitId,
     String? catId,
+    String? habitName,
     int? totalSeconds,
     int? elapsedSeconds,
     TimerStatus? status,
@@ -73,6 +98,7 @@ class FocusTimerState {
     return FocusTimerState(
       habitId: habitId ?? this.habitId,
       catId: catId ?? this.catId,
+      habitName: habitName ?? this.habitName,
       totalSeconds: totalSeconds ?? this.totalSeconds,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
       status: status ?? this.status,
@@ -83,16 +109,75 @@ class FocusTimerState {
   }
 }
 
-/// Focus timer notifier — manages the timer lifecycle.
+/// Focus timer notifier — manages the timer lifecycle, notification updates,
+/// and SharedPreferences persistence for crash recovery.
 class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   Timer? _ticker;
+  int _ticksSinceSave = 0;
+
+  // SharedPreferences key prefix
+  static const _prefix = 'focus_timer_';
+  static const _keyHabitId = '${_prefix}habitId';
+  static const _keyCatId = '${_prefix}catId';
+  static const _keyHabitName = '${_prefix}habitName';
+  static const _keyTotalSeconds = '${_prefix}totalSeconds';
+  static const _keyElapsedSeconds = '${_prefix}elapsedSeconds';
+  static const _keyMode = '${_prefix}mode';
+  static const _keyStartedAt = '${_prefix}startedAt';
 
   FocusTimerNotifier() : super(const FocusTimerState());
+
+  /// Check if there's an interrupted session saved in SharedPreferences.
+  static Future<bool> hasInterruptedSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(_keyStartedAt);
+  }
+
+  /// Get saved session info for the recovery dialog.
+  static Future<Map<String, dynamic>?> getSavedSessionInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final startedAtStr = prefs.getString(_keyStartedAt);
+    if (startedAtStr == null) return null;
+
+    final startedAt = DateTime.tryParse(startedAtStr);
+    if (startedAt == null) return null;
+
+    final habitName = prefs.getString(_keyHabitName) ?? 'Focus';
+    final habitId = prefs.getString(_keyHabitId) ?? '';
+    final elapsed = prefs.getInt(_keyElapsedSeconds) ?? 0;
+    final total = prefs.getInt(_keyTotalSeconds) ?? 0;
+    final modeIndex = prefs.getInt(_keyMode) ?? 0;
+
+    // Calculate wall-clock elapsed since startedAt
+    final wallClockElapsed = DateTime.now().difference(startedAt).inSeconds;
+
+    return {
+      'habitId': habitId,
+      'habitName': habitName,
+      'elapsed': elapsed,
+      'wallClockElapsed': wallClockElapsed,
+      'totalSeconds': total,
+      'mode': TimerMode.values[modeIndex],
+    };
+  }
+
+  /// Clear saved session data (called when user discards recovery).
+  static Future<void> clearSavedState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyHabitId);
+    await prefs.remove(_keyCatId);
+    await prefs.remove(_keyHabitName);
+    await prefs.remove(_keyTotalSeconds);
+    await prefs.remove(_keyElapsedSeconds);
+    await prefs.remove(_keyMode);
+    await prefs.remove(_keyStartedAt);
+  }
 
   /// Initialize the timer with habit/cat info and duration.
   void configure({
     required String habitId,
     required String catId,
+    required String habitName,
     required int durationSeconds,
     required TimerMode mode,
   }) {
@@ -100,10 +185,64 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
     state = FocusTimerState(
       habitId: habitId,
       catId: catId,
+      habitName: habitName,
       totalSeconds: durationSeconds,
       elapsedSeconds: 0,
       status: TimerStatus.idle,
       mode: mode,
+    );
+  }
+
+  /// Restore a previously interrupted session.
+  /// Sets status to paused so user can manually resume.
+  Future<void> restoreSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final startedAtStr = prefs.getString(_keyStartedAt);
+    if (startedAtStr == null) return;
+
+    final startedAt = DateTime.tryParse(startedAtStr);
+    if (startedAt == null) return;
+
+    final habitId = prefs.getString(_keyHabitId) ?? '';
+    final catId = prefs.getString(_keyCatId) ?? '';
+    final habitName = prefs.getString(_keyHabitName) ?? '';
+    final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? 1500;
+    final savedElapsed = prefs.getInt(_keyElapsedSeconds) ?? 0;
+    final modeIndex = prefs.getInt(_keyMode) ?? 0;
+    final mode = TimerMode.values[modeIndex];
+
+    // Use wall-clock time for better accuracy
+    final wallClockElapsed = DateTime.now().difference(startedAt).inSeconds;
+    final effectiveElapsed = wallClockElapsed > savedElapsed
+        ? wallClockElapsed
+        : savedElapsed;
+
+    // Countdown mode: check if would have completed
+    if (mode == TimerMode.countdown && effectiveElapsed >= totalSeconds) {
+      state = FocusTimerState(
+        habitId: habitId,
+        catId: catId,
+        habitName: habitName,
+        totalSeconds: totalSeconds,
+        elapsedSeconds: totalSeconds,
+        status: TimerStatus.completed,
+        mode: mode,
+        startedAt: startedAt,
+      );
+      await _clearSavedState();
+      return;
+    }
+
+    // Otherwise restore as paused
+    state = FocusTimerState(
+      habitId: habitId,
+      catId: catId,
+      habitName: habitName,
+      totalSeconds: totalSeconds,
+      elapsedSeconds: effectiveElapsed.clamp(0, totalSeconds),
+      status: TimerStatus.paused,
+      mode: mode,
+      startedAt: startedAt,
     );
   }
 
@@ -117,21 +256,45 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
       startedAt: state.startedAt ?? DateTime.now(),
     );
 
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      final newElapsed = state.elapsedSeconds + 1;
+    _ticksSinceSave = 0;
+    _saveState(); // Save immediately on start
 
-      // Countdown: check if time is up
-      if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
-        _ticker?.cancel();
-        state = state.copyWith(
-          elapsedSeconds: state.totalSeconds,
-          status: TimerStatus.completed,
-        );
-        return;
-      }
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
+  }
 
-      state = state.copyWith(elapsedSeconds: newElapsed);
-    });
+  void _onTick() {
+    final newElapsed = state.elapsedSeconds + 1;
+
+    // Countdown: check if time is up
+    if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
+      _ticker?.cancel();
+      state = state.copyWith(
+        elapsedSeconds: state.totalSeconds,
+        status: TimerStatus.completed,
+      );
+      _clearSavedState();
+      return;
+    }
+
+    state = state.copyWith(elapsedSeconds: newElapsed);
+
+    // Update foreground notification
+    _updateNotification();
+
+    // Save state every 5 seconds
+    _ticksSinceSave++;
+    if (_ticksSinceSave >= 5) {
+      _ticksSinceSave = 0;
+      _saveState();
+    }
+  }
+
+  void _updateNotification() {
+    final label = state.mode == TimerMode.countdown ? 'remaining' : 'elapsed';
+    FocusTimerService.updateNotification(
+      title: '\u{1F431} ${state.habitName.isNotEmpty ? state.habitName : "Focus"}',
+      text: '${state.displayTime} $label',
+    );
   }
 
   /// Pause the timer.
@@ -141,6 +304,7 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
       status: TimerStatus.paused,
       pausedAt: DateTime.now(),
     );
+    _saveState();
   }
 
   /// Resume from pause.
@@ -153,12 +317,14 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   void complete() {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.completed);
+    _clearSavedState();
   }
 
   /// Abandon the session.
   void abandon() {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.abandoned);
+    _clearSavedState();
   }
 
   /// Handle app going to background.
@@ -192,6 +358,7 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
           pausedAt: null,
         );
       }
+      _clearSavedState();
       return;
     }
 
@@ -214,6 +381,7 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
         status: TimerStatus.completed,
         pausedAt: null,
       );
+      _clearSavedState();
     } else {
       state = state.copyWith(
         elapsedSeconds: newElapsed,
@@ -225,7 +393,27 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   /// Reset to idle state.
   void reset() {
     _ticker?.cancel();
+    _clearSavedState();
     state = const FocusTimerState();
+  }
+
+  /// Persist current timer state to SharedPreferences.
+  Future<void> _saveState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyHabitId, state.habitId);
+    await prefs.setString(_keyCatId, state.catId);
+    await prefs.setString(_keyHabitName, state.habitName);
+    await prefs.setInt(_keyTotalSeconds, state.totalSeconds);
+    await prefs.setInt(_keyElapsedSeconds, state.elapsedSeconds);
+    await prefs.setInt(_keyMode, state.mode.index);
+    if (state.startedAt != null) {
+      await prefs.setString(_keyStartedAt, state.startedAt!.toIso8601String());
+    }
+  }
+
+  /// Clear persisted state.
+  Future<void> _clearSavedState() async {
+    await FocusTimerNotifier.clearSavedState();
   }
 
   @override
@@ -235,9 +423,10 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   }
 }
 
-/// Focus timer provider.
+/// Focus timer provider — global singleton (NOT autoDispose).
+/// Timer is a cross-screen concern that must survive navigation.
 final focusTimerProvider =
-    StateNotifierProvider.autoDispose<FocusTimerNotifier, FocusTimerState>(
+    StateNotifierProvider<FocusTimerNotifier, FocusTimerState>(
   (ref) {
     return FocusTimerNotifier();
   },

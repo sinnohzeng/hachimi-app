@@ -43,6 +43,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     ref.read(focusTimerProvider.notifier).configure(
           habitId: widget.habitId,
           catId: catId,
+          habitName: habit.name,
           durationSeconds: _selectedMinutes * 60,
           mode: _selectedMode,
         );

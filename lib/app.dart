@@ -5,7 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/providers/locale_provider.dart';
+import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
@@ -16,11 +19,16 @@ class HachimiApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analyticsService = ref.read(analyticsServiceProvider);
+    final themeSettings = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
 
     return MaterialApp(
       title: 'Hachimi',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.lightTheme(themeSettings.seedColor),
+      darkTheme: AppTheme.darkTheme(themeSettings.seedColor),
+      themeMode: themeSettings.mode,
+      locale: locale,
       // i18n support
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -218,6 +226,68 @@ class _FirstHabitGate extends ConsumerStatefulWidget {
 
 class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   bool _checkedFirstHabit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInterruptedSession();
+  }
+
+  Future<void> _checkInterruptedSession() async {
+    final hasSession = await FocusTimerNotifier.hasInterruptedSession();
+    if (!mounted) return;
+
+    if (hasSession) {
+      final info = await FocusTimerNotifier.getSavedSessionInfo();
+      if (!mounted || info == null) return;
+
+      final habitName = info['habitName'] as String;
+      final elapsed = info['wallClockElapsed'] as int;
+      final habitId = info['habitId'] as String;
+      final mins = elapsed ~/ 60;
+      final secs = elapsed % 60;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Resume session?'),
+            content: Text(
+              'You had an active focus session ($habitName, '
+              '${mins}m ${secs}s). Resume?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Discard'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Resume'),
+              ),
+            ],
+          ),
+        ).then((resume) async {
+          if (!mounted) return;
+          if (resume == true) {
+            await ref.read(focusTimerProvider.notifier).restoreSession();
+            if (mounted && habitId.isNotEmpty) {
+              Navigator.of(context).pushNamed(
+                AppRouter.timer,
+                arguments: habitId,
+              );
+            }
+          } else {
+            await FocusTimerNotifier.clearSavedState();
+          }
+        });
+      });
+    }
+
+    // Session check complete — no state tracking needed
+  }
 
   @override
   Widget build(BuildContext context) {

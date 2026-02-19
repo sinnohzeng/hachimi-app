@@ -7,9 +7,22 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  static const Color seedColor = Color(0xFF4285F4); // Google Blue
+  static const Color defaultSeedColor = Color(0xFF4285F4); // Google Blue
 
-  static ThemeData get lightTheme {
+  /// Preset color palette — 8 Material Design 3 recommended seed colors.
+  static const List<Color> presetColors = [
+    Color(0xFF4285F4), // Google Blue (default)
+    Color(0xFF009688), // Teal
+    Color(0xFF7C4DFF), // Purple
+    Color(0xFFE91E63), // Pink
+    Color(0xFFFF9800), // Orange
+    Color(0xFF4CAF50), // Green
+    Color(0xFFF44336), // Red
+    Color(0xFF3F51B5), // Indigo
+  ];
+
+  static ThemeData lightTheme([Color? seed]) {
+    final seedColor = seed ?? defaultSeedColor;
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: Brightness.light,
@@ -17,6 +30,22 @@ class AppTheme {
 
     final textTheme = GoogleFonts.robotoTextTheme();
 
+    return _buildTheme(colorScheme, textTheme);
+  }
+
+  static ThemeData darkTheme([Color? seed]) {
+    final seedColor = seed ?? defaultSeedColor;
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+    );
+
+    final textTheme = GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme);
+
+    return _buildTheme(colorScheme, textTheme);
+  }
+
+  static ThemeData _buildTheme(ColorScheme colorScheme, TextTheme textTheme) {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,

@@ -89,7 +89,7 @@ class StreakHeatmap extends StatelessWidget {
             }),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
         // Stats row
         Row(
@@ -113,7 +113,7 @@ class StreakHeatmap extends StatelessWidget {
         ),
 
         // Legend
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
