@@ -12,6 +12,8 @@
 // 🕒 创建时间：2026-02-18
 // ---
 
+import 'package:flutter/material.dart';
+
 // ─── Pelt Types（皮毛图案类型） ───
 // 对应 pixel-cat-maker inheritance.ts 中的分类
 
@@ -367,6 +369,58 @@ String accessoryCategory(String id) {
   if (plantAccessories.contains(id)) return 'plant';
   if (wildAccessories.contains(id)) return 'wild';
   return 'collar';
+}
+
+// ─── Pelt Color → Material Color 映射 ───
+
+/// 将 peltColor ID 映射到柔和的 Material 颜色，用于 CatDetailScreen 背景渐变。
+Color peltColorToMaterial(String peltColor) {
+  switch (peltColor) {
+    // 白/灰系
+    case 'WHITE':
+      return const Color(0xFFE0E0E0);
+    case 'PALEGREY':
+      return const Color(0xFFB0BEC5);
+    case 'SILVER':
+      return const Color(0xFF90A4AE);
+    case 'GREY':
+      return const Color(0xFF78909C);
+    case 'DARKGREY':
+      return const Color(0xFF607D8B);
+    case 'GHOST':
+      return const Color(0xFF546E7A);
+    // 黑色 — 提亮以保证渐变可视性
+    case 'BLACK':
+      return const Color(0xFF455A64);
+    // 橘/奶油系
+    case 'CREAM':
+      return const Color(0xFFFFE0B2);
+    case 'PALEGINGER':
+      return const Color(0xFFFFCC80);
+    case 'GOLDEN':
+      return const Color(0xFFFFB74D);
+    case 'GINGER':
+      return const Color(0xFFFF9800);
+    case 'DARKGINGER':
+      return const Color(0xFFF57C00);
+    case 'SIENNA':
+      return const Color(0xFFE65100);
+    // 棕色系
+    case 'LIGHTBROWN':
+      return const Color(0xFFBCAAA4);
+    case 'LILAC':
+      return const Color(0xFFB39DDB);
+    case 'BROWN':
+      return const Color(0xFF8D6E63);
+    case 'GOLDEN-BROWN':
+      return const Color(0xFFA1887F);
+    case 'DARKBROWN':
+      return const Color(0xFF6D4C41);
+    case 'CHOCOLATE':
+      return const Color(0xFF4E342E);
+    default:
+      return const Color(0xFFB0BEC5);
+  }
 }
 
 // ─── Sprite Index 计算 ───

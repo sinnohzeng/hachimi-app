@@ -205,7 +205,15 @@ Batch includes:
 1. `DELETE users/{uid}/habits/{habitId}` — remove habit document
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
-### 4. Accessory Purchase (Inventory Model)
+### 4. Habit Update (Edit)
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, icon?})`
+
+Single document update:
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name` and/or `icon`)
+
+**Validation**: At least one field must be non-null. Empty strings are rejected.
+
+### 5. Accessory Purchase (Inventory Model)
 **Method:** `CoinService.purchaseAccessory(uid, accessoryId, price)`
 
 Transaction includes:
@@ -213,7 +221,7 @@ Transaction includes:
 2. `UPDATE users/{uid}.coins` — `FieldValue.increment(-price)` (deduct cost)
 3. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([accessoryId])` (add to inventory)
 
-### 5. Equip Accessory
+### 6. Equip Accessory
 **Method:** `InventoryService.equipAccessory(uid, catId, accessoryId)`
 
 Transaction includes:
@@ -222,7 +230,7 @@ Transaction includes:
 3. If cat already has an equipped accessory: `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([oldAccessoryId])` (return old to box)
 4. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — set to `accessoryId`
 
-### 6. Unequip Accessory
+### 7. Unequip Accessory
 **Method:** `InventoryService.unequipAccessory(uid, catId)`
 
 Transaction includes:
@@ -230,7 +238,7 @@ Transaction includes:
 2. `UPDATE users/{uid}.inventory` — `FieldValue.arrayUnion([equippedAccessory])` (return to box)
 3. `UPDATE users/{uid}/cats/{catId}.equippedAccessory` — set to `null`
 
-### 7. Daily Check-In (Monthly)
+### 8. Daily Check-In (Monthly)
 **Method:** `CoinService.checkIn(uid)`
 
 Transaction includes:

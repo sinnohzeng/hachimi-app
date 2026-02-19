@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -41,6 +42,8 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           durationSeconds: _selectedMinutes * 60,
           mode: _selectedMode,
         );
+
+    HapticFeedback.lightImpact();
 
     // Navigate to focus timer screen
     Navigator.of(context).pushReplacementNamed(

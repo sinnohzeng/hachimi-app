@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -7,25 +8,70 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
-    show accessoryDisplayName;
+    show accessoryDisplayName, computeSpriteIndex, peltColorToMaterial;
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 
-/// Cat detail page — pixel cat sprite, time-based growth progress,
-/// habit info, rename, and streak heatmap.
-class CatDetailScreen extends ConsumerWidget {
+/// Cat detail page — pixel cat sprite with tap-to-cycle pose,
+/// pelt-colored header, time-based growth progress,
+/// habit info with edit, rename, and streak heatmap.
+class CatDetailScreen extends ConsumerStatefulWidget {
   final String catId;
 
   const CatDetailScreen({super.key, required this.catId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CatDetailScreen> createState() => _CatDetailScreenState();
+}
+
+class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
+    with SingleTickerProviderStateMixin {
+  /// Local-only display variant for pose cycling (not persisted).
+  int? _displayVariant;
+
+  /// Bounce animation controller for tap-to-cycle.
+  late final AnimationController _bounceController;
+  late final Animation<double> _bounceAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _bounceAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
+    ]).animate(CurvedAnimation(
+      parent: _bounceController,
+      curve: Curves.easeOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  void _cyclePose(Cat cat) {
+    final current = _displayVariant ?? cat.appearance.spriteVariant;
+    setState(() {
+      _displayVariant = (current + 1) % 3;
+    });
+    HapticFeedback.lightImpact();
+    _bounceController.forward(from: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final cat = ref.watch(catByIdProvider(catId));
+    final cat = ref.watch(catByIdProvider(widget.catId));
     if (cat == null) {
       return Scaffold(
         appBar: AppBar(),
@@ -39,6 +85,18 @@ class CatDetailScreen extends ConsumerWidget {
     final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
     final stageClr = stageColor(cat.computedStage);
+
+    // Pelt color themed gradient: 70% pelt + 30% stage
+    final peltClr = peltColorToMaterial(cat.appearance.peltColor);
+    final headerColor = Color.lerp(peltClr, stageClr, 0.3)!;
+
+    // Compute sprite index with local display variant override
+    final displayVariant = _displayVariant ?? cat.appearance.spriteVariant;
+    final spriteIndex = computeSpriteIndex(
+      stage: cat.computedStage,
+      variant: displayVariant,
+      isLonghair: cat.appearance.isLonghair,
+    );
 
     return Scaffold(
       body: CustomScrollView(
@@ -54,7 +112,7 @@ class CatDetailScreen extends ConsumerWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      stageClr.withValues(alpha: 0.2),
+                      headerColor.withValues(alpha: 0.25),
                       colorScheme.surface,
                     ],
                   ),
@@ -64,7 +122,23 @@ class CatDetailScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 48),
-                      PixelCatSprite.fromCat(cat: cat, size: 120),
+                      // Tappable cat sprite with bounce animation
+                      GestureDetector(
+                        onTap: () => _cyclePose(cat),
+                        child: AnimatedBuilder(
+                          animation: _bounceAnimation,
+                          builder: (context, child) => Transform.scale(
+                            scale: _bounceAnimation.value,
+                            child: child,
+                          ),
+                          child: PixelCatSprite(
+                            appearance: cat.appearance,
+                            spriteIndex: spriteIndex,
+                            accessoryId: cat.equippedAccessory,
+                            size: 120,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +152,7 @@ class CatDetailScreen extends ConsumerWidget {
                           const SizedBox(width: 4),
                           IconButton(
                             icon: const Icon(Icons.edit, size: 18),
-                            onPressed: () => _showRenameDialog(context, ref, cat),
+                            onPressed: () => _showRenameDialog(context, cat),
                             tooltip: 'Rename',
                             visualDensity: VisualDensity.compact,
                           ),
@@ -211,7 +285,7 @@ class CatDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Habit info
+                // Habit info with edit button
                 if (habit != null)
                   Card(
                     child: Padding(
@@ -219,11 +293,23 @@ class CatDetailScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Bound Habit',
-                            style: textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'Bound Habit',
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined, size: 18),
+                                onPressed: () =>
+                                    _showEditHabitDialog(context, habit),
+                                tooltip: 'Edit habit',
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           Row(
@@ -352,7 +438,7 @@ class CatDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showRenameDialog(BuildContext context, WidgetRef ref, cat) {
+  void _showRenameDialog(BuildContext context, Cat cat) {
     final controller = TextEditingController(text: cat.name);
     showDialog(
       context: context,
@@ -377,14 +463,87 @@ class CatDetailScreen extends ConsumerWidget {
               if (newName.isEmpty) return;
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
+              HapticFeedback.mediumImpact();
               await ref.read(catFirestoreServiceProvider).renameCat(
                     uid: uid,
                     catId: cat.id,
                     newName: newName,
                   );
-              if (ctx.mounted) Navigator.of(ctx).pop();
+              if (ctx.mounted) {
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Cat renamed!'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: const Text('Rename'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditHabitDialog(BuildContext context, dynamic habit) {
+    final nameController = TextEditingController(text: habit.name);
+    final iconController = TextEditingController(text: habit.icon);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Habit'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: iconController,
+              decoration: const InputDecoration(
+                labelText: 'Icon (emoji)',
+                prefixIcon: Icon(Icons.emoji_emotions_outlined),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Habit name',
+                prefixIcon: Icon(Icons.label_outline),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final newName = nameController.text.trim();
+              final newIcon = iconController.text.trim();
+              if (newName.isEmpty && newIcon.isEmpty) return;
+              final uid = ref.read(currentUidProvider);
+              if (uid == null) return;
+              HapticFeedback.mediumImpact();
+              await ref.read(firestoreServiceProvider).updateHabit(
+                    uid: uid,
+                    habitId: habit.id,
+                    name: newName.isNotEmpty ? newName : null,
+                    icon: newIcon.isNotEmpty ? newIcon : null,
+                  );
+              if (ctx.mounted) {
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Habit updated!'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
@@ -418,7 +577,7 @@ class _StageMilestone extends StatelessWidget {
             color: isReached ? color : colorScheme.surfaceContainerHighest,
           ),
           child: isReached
-              ? Icon(Icons.check, size: 14, color: Colors.white)
+              ? const Icon(Icons.check, size: 14, color: Colors.white)
               : null,
         ),
         const SizedBox(height: 4),
@@ -597,7 +756,7 @@ class _AccessoriesCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         TextButton.icon(
-                          onPressed: () => _unequip(ref),
+                          onPressed: () => _unequip(context, ref),
                           icon: const Icon(Icons.remove_circle_outline, size: 16),
                           label: const Text('Unequip'),
                           style: TextButton.styleFrom(
@@ -637,7 +796,7 @@ class _AccessoriesCard extends ConsumerWidget {
                       accessoryDisplayName(id),
                       style: textTheme.labelSmall,
                     ),
-                    onPressed: () => _equip(ref, id),
+                    onPressed: () => _equip(context, ref, id),
                   );
                 }).toList(),
               ),
@@ -657,23 +816,37 @@ class _AccessoriesCard extends ConsumerWidget {
     );
   }
 
-  void _equip(WidgetRef ref, String accessoryId) {
+  void _equip(BuildContext context, WidgetRef ref, String accessoryId) {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
+    HapticFeedback.selectionClick();
     ref.read(inventoryServiceProvider).equipAccessory(
           uid: uid,
           catId: cat.id,
           accessoryId: accessoryId,
         );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Equipped ${accessoryDisplayName(accessoryId)}'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
-  void _unequip(WidgetRef ref) {
+  void _unequip(BuildContext context, WidgetRef ref) {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
+    HapticFeedback.selectionClick();
     ref.read(inventoryServiceProvider).unequipAccessory(
           uid: uid,
           catId: cat.id,
         );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Unequipped'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 }
 

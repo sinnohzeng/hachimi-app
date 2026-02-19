@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -229,6 +230,11 @@ class _TodayTab extends ConsumerWidget {
             );
           },
         ),
+
+        // Bottom breathing space for FAB + NavigationBar
+        const SliverToBoxAdapter(
+          child: SizedBox(height: 100),
+        ),
       ],
     );
   }
@@ -269,6 +275,7 @@ class _TodayTab extends ConsumerWidget {
             onPressed: () async {
               final uid = ref.read(currentUidProvider);
               if (uid != null) {
+                HapticFeedback.mediumImpact();
                 await ref
                     .read(firestoreServiceProvider)
                     .deleteHabit(uid: uid, habitId: habitId);
@@ -276,7 +283,15 @@ class _TodayTab extends ConsumerWidget {
                     .read(analyticsServiceProvider)
                     .logHabitDeleted(habitName: habitName);
               }
-              if (ctx.mounted) Navigator.of(ctx).pop();
+              if (ctx.mounted) {
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(
+                    content: Text('$habitName graduated'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: const Text('Delete'),
           ),

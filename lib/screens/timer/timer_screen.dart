@@ -15,6 +15,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -119,6 +120,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
 
     if (confirmed == true) {
+      HapticFeedback.mediumImpact();
       ref.read(focusTimerProvider.notifier).abandon();
     }
   }

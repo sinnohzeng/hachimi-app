@@ -203,7 +203,16 @@ dormant --[习惯重新激活]--> active（未来功能）
 1. `DELETE users/{uid}/habits/{habitId}` — 删除习惯文档
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
-### 4. 配饰购买（道具箱模型）
+### 4. 习惯更新（编辑）
+**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, icon?})`
+
+单文档更新：
+1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name` 和/或 `icon`）
+
+**验证**：至少一个字段不为 null，空字符串将被拒绝。
+
+### 5. 配饰购买（道具箱模型）
+
 **方法：** `CoinService.purchaseAccessory(uid, accessoryId, price)`
 
 事务操作包括：

@@ -16,6 +16,7 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Forest-style circular duration picker.
 /// Draggable ring that maps 0°–360° to 1–120 minutes.
@@ -39,25 +40,75 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
   static const int _maxMinutes = 120;
   static const int _minMinutes = 1;
 
-  /// Convert touch position to minutes.
-  int _positionToMinutes(Offset localPosition) {
+  /// Track previous angle to detect boundary crossings during drag.
+  double? _previousAngle;
+
+  /// Convert touch position to angle in radians (0..2π, 0 = 12 o'clock).
+  double _positionToAngle(Offset localPosition) {
     final center = Offset(widget.size / 2, widget.size / 2);
     final dx = localPosition.dx - center.dx;
     final dy = localPosition.dy - center.dy;
 
-    // atan2 gives angle from positive X axis; we want angle from 12 o'clock (negative Y).
-    // Rotate by +90° so 12 o'clock = 0°.
+    // atan2 gives angle from positive X axis; rotate by +90° so 12 o'clock = 0°.
     var angle = atan2(dy, dx) + pi / 2;
     if (angle < 0) angle += 2 * pi;
+    return angle;
+  }
 
-    // Map 0..2π to 0..120 minutes
+  /// Convert angle to minutes.
+  int _angleToMinutes(double angle) {
     final minutes = (angle / (2 * pi) * _maxMinutes).round();
     return minutes.clamp(_minMinutes, _maxMinutes);
   }
 
-  void _handlePan(Offset localPosition) {
-    final minutes = _positionToMinutes(localPosition);
+  void _handleTap(Offset localPosition) {
+    // Taps can freely jump to any position — no anti-wrap clamping.
+    final angle = _positionToAngle(localPosition);
+    _previousAngle = angle;
+    final minutes = _angleToMinutes(angle);
     if (minutes != widget.value) {
+      HapticFeedback.selectionClick();
+      widget.onChanged(minutes);
+    }
+  }
+
+  void _handlePanStart(Offset localPosition) {
+    _previousAngle = _positionToAngle(localPosition);
+  }
+
+  void _handlePan(Offset localPosition) {
+    final angle = _positionToAngle(localPosition);
+    final prev = _previousAngle;
+
+    if (prev != null) {
+      // Detect crossing the 360°/0° boundary (near 12 o'clock).
+      // A large jump (> π) between consecutive pan events indicates wrapping.
+      final delta = angle - prev;
+      if (delta > pi) {
+        // Crossed backward past 0° (e.g. from near 1min to near 120min)
+        // → clamp to minimum
+        _previousAngle = 0.0;
+        if (widget.value != _minMinutes) {
+          HapticFeedback.selectionClick();
+          widget.onChanged(_minMinutes);
+        }
+        return;
+      } else if (delta < -pi) {
+        // Crossed forward past 360° (e.g. from near 120min to near 1min)
+        // → clamp to maximum
+        _previousAngle = 2 * pi;
+        if (widget.value != _maxMinutes) {
+          HapticFeedback.selectionClick();
+          widget.onChanged(_maxMinutes);
+        }
+        return;
+      }
+    }
+
+    _previousAngle = angle;
+    final minutes = _angleToMinutes(angle);
+    if (minutes != widget.value) {
+      HapticFeedback.selectionClick();
       widget.onChanged(minutes);
     }
   }
@@ -68,9 +119,10 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
     final colorScheme = theme.colorScheme;
 
     return GestureDetector(
-      onPanStart: (details) => _handlePan(details.localPosition),
+      onPanStart: (details) => _handlePanStart(details.localPosition),
       onPanUpdate: (details) => _handlePan(details.localPosition),
-      onTapDown: (details) => _handlePan(details.localPosition),
+      onPanEnd: (_) => _previousAngle = null,
+      onTapDown: (details) => _handleTap(details.localPosition),
       child: SizedBox(
         width: widget.size,
         height: widget.size,

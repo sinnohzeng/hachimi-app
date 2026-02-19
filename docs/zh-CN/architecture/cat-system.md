@@ -157,6 +157,32 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 
 ---
 
+## 毛色背景映射
+
+`pixel_cat_constants.dart` 中的 `peltColorToMaterial()` 函数将 19 种 `peltColor` ID 映射到柔和的 Material 颜色。此颜色在 CatDetailScreen 头部渐变中以 70% 的权重混合（另 30% 为阶段色），为每只猫提供个性化的背景。
+
+| 颜色分组 | 毛色 ID | Material 颜色范围 |
+|---------|---------|-----------------|
+| 白/灰系 | WHITE、PALEGREY、SILVER、GREY、DARKGREY、GHOST | #E0E0E0 – #546E7A |
+| 黑色 | BLACK | #455A64（已提亮以保证渐变可视性） |
+| 橘/奶油系 | CREAM、PALEGINGER、GOLDEN、GINGER、DARKGINGER、SIENNA | #FFE0B2 – #E65100 |
+| 棕色系 | LIGHTBROWN、LILAC、BROWN、GOLDEN-BROWN、DARKBROWN、CHOCOLATE | #BCAAA4 – #4E342E |
+
+**实现**：`Color peltColorToMaterial(String peltColor)`，位于 `lib/core/constants/pixel_cat_constants.dart`。
+
+---
+
+## 猫咪姿势点击切换
+
+在 CatDetailScreen 中，点击猫咪精灵图可循环切换 3 种精灵变体（0 → 1 → 2 → 0）。这是 **纯本地 UI 状态** —— 不会修改持久化的 `appearance.spriteVariant`。离开页面后显示变体会重置。
+
+- **触发方式**：`PixelCatSprite` 组件上的 `GestureDetector.onTap`
+- **动画**：缩放弹跳（0.9x → 1.0x，约 200ms），使用 `AnimationController`
+- **触觉反馈**：每次点击触发 `HapticFeedback.lightImpact()`
+- **精灵索引覆盖**：使用本地变体替代 `cat.appearance.spriteVariant` 调用 `computeSpriteIndex(stage, _displayVariant, isLonghair)`
+
+---
+
 ## 精灵图渲染管线
 
 `PixelCatRenderer` 通过从 `assets/pixel_cat/` 目录叠加 13 个图层来合成猫咪精灵图。图层从底部到顶部按以下顺序绘制：

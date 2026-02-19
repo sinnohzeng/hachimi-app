@@ -218,11 +218,23 @@ class _AccessoryGrid extends ConsumerWidget {
 
     if (!context.mounted) return;
 
+    if (success) HapticFeedback.mediumImpact();
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(success
-            ? 'Purchased! ${item.displayName} added to inventory'
-            : 'Not enough coins (need ${item.price})'),
+        content: Row(
+          children: [
+            if (success)
+              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            if (success) const SizedBox(width: 8),
+            Expanded(
+              child: Text(success
+                  ? 'Purchased! ${item.displayName} added to inventory'
+                  : 'Not enough coins (need ${item.price})'),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

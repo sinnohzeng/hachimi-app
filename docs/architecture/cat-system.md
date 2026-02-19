@@ -154,6 +154,32 @@ Sessions ended early (Give Up) still earn XP if the user focused for **>= 5 minu
 
 ---
 
+## Pelt Color Background Mapping
+
+The `peltColorToMaterial()` function in `pixel_cat_constants.dart` maps each of the 19 `peltColor` IDs to a soft Material color. This color is used as a 70% weight in the CatDetailScreen header gradient (mixed 30% with the stage color) to give each cat a personalized background.
+
+| Color Group | Pelt Color IDs | Material Color Range |
+|-------------|---------------|---------------------|
+| White/Grey | WHITE, PALEGREY, SILVER, GREY, DARKGREY, GHOST | #E0E0E0 – #546E7A |
+| Black | BLACK | #455A64 (lightened for gradient visibility) |
+| Ginger/Cream | CREAM, PALEGINGER, GOLDEN, GINGER, DARKGINGER, SIENNA | #FFE0B2 – #E65100 |
+| Brown | LIGHTBROWN, LILAC, BROWN, GOLDEN-BROWN, DARKBROWN, CHOCOLATE | #BCAAA4 – #4E342E |
+
+**Implementation**: `Color peltColorToMaterial(String peltColor)` in `lib/core/constants/pixel_cat_constants.dart`.
+
+---
+
+## Cat Pose Tap-to-Cycle
+
+In CatDetailScreen, tapping the cat sprite cycles through the 3 sprite variants (0 → 1 → 2 → 0). This is a **local UI-only state** — the persisted `appearance.spriteVariant` is not modified. The display variant resets when navigating away.
+
+- **Trigger**: `GestureDetector.onTap` on the `PixelCatSprite` widget
+- **Animation**: Scale bounce (0.9x → 1.0x over ~200ms) using `AnimationController`
+- **Haptic**: `HapticFeedback.lightImpact()` on each tap
+- **Sprite index override**: `computeSpriteIndex(stage, _displayVariant, isLonghair)` is called with the local variant instead of `cat.appearance.spriteVariant`
+
+---
+
 ## Sprite Rendering Pipeline
 
 The `PixelCatRenderer` composites a cat sprite by layering 13 image layers from the `assets/pixel_cat/` directory. Layers are drawn bottom-to-top in the following order:

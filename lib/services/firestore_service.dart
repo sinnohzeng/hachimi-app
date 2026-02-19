@@ -125,6 +125,20 @@ class FirestoreService {
     return (habitId: habitRef.id, catId: catRef.id);
   }
 
+  /// Update a habit's name and/or icon.
+  Future<void> updateHabit({
+    required String uid,
+    required String habitId,
+    String? name,
+    String? icon,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (name != null && name.trim().isNotEmpty) updates['name'] = name.trim();
+    if (icon != null && icon.trim().isNotEmpty) updates['icon'] = icon.trim();
+    if (updates.isEmpty) return;
+    await _habitsRef(uid).doc(habitId).update(updates);
+  }
+
   Future<void> deleteHabit({
     required String uid,
     required String habitId,

@@ -46,11 +46,13 @@ class StreakHeatmap extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Heatmap grid
-        SizedBox(
-          height: 7 * (14.0 + 2.0), // 7 cells × (14 height + 2 margin)
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(totalWeeks, (weekIndex) {
+        Center(
+          child: SizedBox(
+            height: 7 * (14.0 + 2.0), // 7 cells × (14 height + 2 margin)
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.generate(totalWeeks, (weekIndex) {
               return Column(
                 children: List.generate(7, (dayIndex) {
                   final dayOffset = weekIndex * 7 + dayIndex -
@@ -88,6 +90,7 @@ class StreakHeatmap extends StatelessWidget {
               );
             }),
           ),
+        ),
         ),
         const SizedBox(height: 8),
 

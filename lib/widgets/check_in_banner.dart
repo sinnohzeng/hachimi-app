@@ -13,6 +13,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -55,6 +56,8 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       ref.invalidate(monthlyCheckInProvider);
 
       // 构建反馈文案
+      HapticFeedback.mediumImpact();
+
       String message = '+${result.dailyCoins} coins! Daily check-in complete';
       if (result.milestoneBonus > 0) {
         message += ' + ${result.milestoneBonus} milestone bonus!';

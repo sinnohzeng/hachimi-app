@@ -15,6 +15,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -55,6 +56,11 @@ class FocusCompleteScreen extends ConsumerWidget {
         : null;
 
     final didStageUp = stageUp?.didStageUp ?? false;
+
+    // Trigger haptic feedback on screen build (celebration moment)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      HapticFeedback.heavyImpact();
+    });
 
     return Scaffold(
       body: SafeArea(
