@@ -9,6 +9,18 @@
 
 import 'package:flutter/material.dart';
 
+// ─── Cat State（生命周期状态）───
+
+/// 猫的生命周期状态常量 — Firestore 中 state 字段的合法值。
+class CatState {
+  CatState._();
+  static const String active = 'active';
+  static const String graduated = 'graduated';
+  static const String dormant = 'dormant';
+
+  static const List<String> values = [active, graduated, dormant];
+}
+
 // ─── Personalities ───
 
 class CatPersonality {

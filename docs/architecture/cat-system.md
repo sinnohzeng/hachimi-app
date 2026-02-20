@@ -141,8 +141,12 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 |-----------|---------|-----------|
 | `baseXp` | `minutes x 1` | Always |
 | `streakBonus` | `+5` per session | `currentStreak >= 3` |
-| `milestoneBonus` | `+30` one-time | Streak reaches 7, 14, or 30 days |
+| `milestoneBonus` | `+30` one-time | Streak reaches a milestone day (see below) |
 | `fullHouseBonus` | `+10` per session | All habits completed today |
+
+**Streak Milestone Constants** (defined in `lib/core/constants/pixel_cat_constants.dart`):
+- `streakMilestones = [7, 14, 30]` — the streak day thresholds that trigger a milestone bonus
+- `streakMilestoneXpBonus = 30` — XP awarded for each milestone reached
 
 The XP multiplier from Remote Config (`xp_multiplier`, default `1.0`) scales `totalXp` for promotional events.
 

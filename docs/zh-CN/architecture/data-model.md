@@ -292,6 +292,29 @@ dormant --[习惯重新激活]--> active（未来功能）
 - 无公共集合。
 - 匿名访问对所有路径均被拒绝。
 
+**Firestore 安全规则 — 字段校验：**
+
+`firestore.rules` 文件在写操作时强制执行服务端字段校验：
+
+| 集合 | 字段 | 校验规则 |
+|------|------|---------|
+| `habits` | `targetHours` | `int`，范围 `1–10000` |
+| `habits` | `goalMinutes` | `int`（可选），范围 `1–480` |
+| `cats` | `name` | `string`，长度 `1–30` 字符 |
+| `cats` | `state` | `string`，必须为 `['active', 'graduated', 'dormant']` 之一 |
+| `cats` | `totalMinutes` | `int`，`>= 0` |
+
+这些规则与客户端校验互补，防止无效数据写入 Firestore。
+
+**猫咪状态常量：**
+
+有效的猫咪状态值定义于 `lib/core/constants/cat_constants.dart` 的 `CatState` 类中：
+- `CatState.active` = `'active'`
+- `CatState.graduated` = `'graduated'`
+- `CatState.dormant` = `'dormant'`
+
+所有引用猫咪状态字符串的代码必须使用这些常量，而非硬编码字符串字面量。
+
 ---
 
 ## 本地存储 — SQLite + SharedPreferences

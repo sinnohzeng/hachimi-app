@@ -54,6 +54,11 @@ class ChatService {
   })  : _llmService = llmService,
         _dbService = dbService;
 
+  /// 释放资源。
+  void dispose() {
+    _tokenController.close();
+  }
+
   /// 获取最近的聊天消息。
   Future<List<ChatMessage>> getRecentMessages(String catId) {
     return _dbService.getRecentMessages(catId, limit: 50);

@@ -196,9 +196,28 @@ hachimi-app/
 │
 ├── l10n.yaml                               # Flutter gen-l10n 配置
 │
+├── test/                                   # 自动化测试
+│   ├── widget_test.dart                   # 框架健全性检查
+│   ├── dart_test.yaml                     # 测试配置（golden 标签排除）
+│   ├── models/
+│   │   └── habit_test.dart                # Habit 模型单元测试
+│   ├── providers/
+│   │   ├── stats_provider_test.dart       # HabitStats 计算属性测试
+│   │   ├── focus_timer_provider_test.dart # FocusTimerState 计算属性测试
+│   │   ├── chat_provider_test.dart        # ChatState 默认值 + copyWith 测试
+│   │   └── llm_provider_test.dart         # LlmAvailability + ModelDownloadState 测试
+│   ├── services/
+│   │   ├── chat_service_test.dart         # ChatRole + ChatMessage 序列化测试
+│   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap 往返测试
+│   └── widgets/
+│       ├── empty_state_test.dart          # EmptyState 组件测试
+│       ├── error_state_test.dart          # ErrorState 组件测试
+│       └── skeleton_loader_test.dart      # SkeletonLoader 组件测试
+│
 ├── android/                                # Android 平台项目
 │   ├── app/
 │   │   ├── google-services.json            # Firebase 配置（已 gitignore）
+│   │   ├── proguard-rules.pro              # R8/ProGuard 保留规则（Firebase、FFI、llama_cpp_dart）
 │   │   └── src/main/
 │   │       ├── AndroidManifest.xml         # 权限 + 服务声明
 │   │       └── kotlin/com/hachimi/hachimi_app/
@@ -217,6 +236,7 @@ hachimi-app/
 │   ├── setup-release-signing.sh           # 交互式配置：keystore 生成 + GitHub Secrets 输出
 │   └── setup_llm_vendor.sh               # 克隆 llama_cpp_dart 并 pin llama.cpp commit
 │
+├── dart_test.yaml                         # 测试配置（排除 golden 标签）
 ├── firestore.rules                         # 已部署的 Firestore 安全规则
 ├── firebase.json                           # Firebase 项目配置
 ├── pubspec.yaml                            # Flutter 依赖

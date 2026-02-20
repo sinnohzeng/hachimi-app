@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 class AddHabitScreen extends ConsumerStatefulWidget {
@@ -63,7 +64,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Quest'),
+        title: Text(context.l10n.addHabitTitle),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingLg,
@@ -75,14 +76,14 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               // Name field
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Quest name',
-                  hintText: 'e.g. LeetCode Practice',
-                  prefixIcon: Icon(Icons.edit),
+                decoration: InputDecoration(
+                  labelText: context.l10n.addHabitQuestName,
+                  hintText: context.l10n.addHabitQuestHint,
+                  prefixIcon: const Icon(Icons.edit),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a quest name';
+                    return context.l10n.addHabitValidName;
                   }
                   return null;
                 },
@@ -93,19 +94,19 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               TextFormField(
                 controller: _hoursController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Target hours',
-                  hintText: 'e.g. 100',
-                  prefixIcon: Icon(Icons.flag),
+                decoration: InputDecoration(
+                  labelText: context.l10n.addHabitTargetHours,
+                  hintText: context.l10n.addHabitTargetHint,
+                  prefixIcon: const Icon(Icons.flag),
                   suffixText: 'hours',
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter target hours';
+                    return context.l10n.addHabitValidTarget;
                   }
                   final hours = int.tryParse(value.trim());
                   if (hours == null || hours <= 0) {
-                    return 'Please enter a valid number';
+                    return context.l10n.addHabitValidNumber;
                   }
                   return null;
                 },
@@ -124,7 +125,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.check),
-                  label: const Text('Create Quest'),
+                  label: Text(context.l10n.addHabitCreate),
                 ),
               ),
             ],

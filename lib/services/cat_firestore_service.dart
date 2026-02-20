@@ -13,6 +13,8 @@
 // ---
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 
 /// CatFirestoreService — 猫 CRUD 操作独立服务。
@@ -26,7 +28,7 @@ class CatFirestoreService {
   /// 监听所有 active 猫。
   Stream<List<Cat>> watchCats(String uid) {
     return _catsRef(uid)
-        .where('state', isEqualTo: 'active')
+        .where('state', isEqualTo: CatState.active)
         .orderBy('createdAt', descending: false)
         .snapshots()
         .map((snapshot) =>
@@ -55,10 +57,15 @@ class CatFirestoreService {
     required String catId,
     required int minutesDelta,
   }) async {
-    await _catsRef(uid).doc(catId).update({
-      'totalMinutes': FieldValue.increment(minutesDelta),
-      'lastSessionAt': FieldValue.serverTimestamp(),
-    });
+    try {
+      await _catsRef(uid).doc(catId).update({
+        'totalMinutes': FieldValue.increment(minutesDelta),
+        'lastSessionAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('[CatFirestoreService] updateCatProgress failed: $e');
+      rethrow;
+    }
   }
 
   /// 重命名猫。
@@ -67,7 +74,12 @@ class CatFirestoreService {
     required String catId,
     required String newName,
   }) async {
-    await _catsRef(uid).doc(catId).update({'name': newName});
+    try {
+      await _catsRef(uid).doc(catId).update({'name': newName});
+    } catch (e) {
+      debugPrint('[CatFirestoreService] renameCat failed: $e');
+      rethrow;
+    }
   }
 
   /// 更新猫的饰品列表。
@@ -105,7 +117,12 @@ class CatFirestoreService {
     required String uid,
     required String catId,
   }) async {
-    await _catsRef(uid).doc(catId).update({'state': 'graduated'});
+    try {
+      await _catsRef(uid).doc(catId).update({'state': CatState.graduated});
+    } catch (e) {
+      debugPrint('[CatFirestoreService] graduateCat failed: $e');
+      rethrow;
+    }
   }
 
   /// 休眠（手动归档）。
@@ -113,6 +130,11 @@ class CatFirestoreService {
     required String uid,
     required String catId,
   }) async {
-    await _catsRef(uid).doc(catId).update({'state': 'dormant'});
+    try {
+      await _catsRef(uid).doc(catId).update({'state': CatState.dormant});
+    } catch (e) {
+      debugPrint('[CatFirestoreService] archiveCat failed: $e');
+      rethrow;
+    }
   }
 }

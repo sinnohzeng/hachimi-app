@@ -75,7 +75,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     if (habit == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Quest not found')),
+        body: Center(child: Text(context.l10n.focusSetupQuestNotFound)),
       );
     }
 
@@ -187,16 +187,16 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
               Padding(
                 padding: AppSpacing.paddingHLg,
                 child: SegmentedButton<TimerMode>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: TimerMode.countdown,
-                      label: Text('Countdown'),
-                      icon: Icon(Icons.hourglass_bottom, size: 18),
+                      label: Text(context.l10n.focusSetupCountdown),
+                      icon: const Icon(Icons.hourglass_bottom, size: 18),
                     ),
                     ButtonSegment(
                       value: TimerMode.stopwatch,
-                      label: Text('Stopwatch'),
-                      icon: Icon(Icons.timer, size: 18),
+                      label: Text(context.l10n.focusSetupStopwatch),
+                      icon: const Icon(Icons.timer, size: 18),
                     ),
                   ],
                   selected: {_selectedMode},
@@ -217,7 +217,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   child: FilledButton(
                     onPressed: _startFocus,
                     child: Text(
-                      'Start Focus',
+                      context.l10n.focusSetupStartFocus,
                       style: textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

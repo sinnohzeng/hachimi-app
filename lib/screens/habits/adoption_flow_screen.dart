@@ -58,7 +58,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     if (_currentStep == 0) {
       if (_nameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a quest name')),
+          SnackBar(content: Text(context.l10n.adoptionValidQuestName)),
         );
         return;
       }
@@ -120,7 +120,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   Future<void> _adopt() async {
     if (_catNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please name your cat')),
+        SnackBar(content: Text(context.l10n.adoptionValidCatName)),
       );
       return;
     }
@@ -176,7 +176,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.adoptionError(e.toString()))),
         );
       }
     } finally {
@@ -192,8 +192,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.isFirstHabit
-            ? 'Adopt Your First Cat!'
-            : 'New Quest'),
+            ? context.l10n.adoptionTitleFirst
+            : context.l10n.adoptionTitleNew),
         leading: _currentStep > 0
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -205,7 +205,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           _StepIndicator(
             currentStep: _currentStep,
-            steps: const ['Define Quest', 'Adopt Cat', 'Name Cat'],
+            steps: [context.l10n.adoptionStepDefineQuest, context.l10n.adoptionStepAdoptCat2, context.l10n.adoptionStepNameCat2],
           ),
           Expanded(
             child: PageView(
@@ -235,7 +235,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          _currentStep == 2 ? 'Adopt!' : 'Next',
+                          _currentStep == 2 ? context.l10n.adoptionAdopt : context.l10n.adoptionNext,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -263,14 +263,14 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           if (widget.isFirstHabit) ...[
             Text(
-              'What quest do you want to start?',
+              context.l10n.adoptionQuestPrompt,
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'A kitten will be assigned to help you stay on track!',
+              context.l10n.adoptionKittenHint,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -281,20 +281,20 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           // Habit name
           TextFormField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Quest name',
-              hintText: 'e.g. Prepare interview questions',
-              prefixIcon: Icon(Icons.edit_outlined),
+            decoration: InputDecoration(
+              labelText: context.l10n.adoptionQuestName,
+              hintText: context.l10n.adoptionQuestHint,
+              prefixIcon: const Icon(Icons.edit_outlined),
             ),
             textInputAction: TextInputAction.done,
           ),
           const SizedBox(height: AppSpacing.lg),
 
           // Target hours with custom option
-          Text('Total target hours', style: textTheme.titleMedium),
+          Text(context.l10n.adoptionTotalTarget, style: textTheme.titleMedium),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Your cat grows as you accumulate focus time',
+            context.l10n.adoptionGrowthHint,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -322,7 +322,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 )
               else
                 ActionChip(
-                  label: const Text('Custom'),
+                  label: Text(context.l10n.adoptionCustom),
                   avatar: const Icon(Icons.tune, size: 18),
                   onPressed: _showCustomTargetDialog,
                 ),
@@ -331,7 +331,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Daily goal time with custom option
-          Text('Daily focus goal', style: textTheme.titleMedium),
+          Text(context.l10n.adoptionDailyGoalLabel, style: textTheme.titleMedium),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
@@ -355,7 +355,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 )
               else
                 ActionChip(
-                  label: const Text('Custom'),
+                  label: Text(context.l10n.adoptionCustom),
                   avatar: const Icon(Icons.tune, size: 18),
                   onPressed: _showCustomGoalDialog,
                 ),
@@ -364,13 +364,13 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Reminder time
-          Text('Daily reminder (optional)', style: textTheme.titleMedium),
+          Text(context.l10n.adoptionReminderLabel, style: textTheme.titleMedium),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
             children: [
               ChoiceChip(
-                label: const Text('None'),
+                label: Text(context.l10n.adoptionReminderNone),
                 selected: _reminderTime == null,
                 onSelected: (_) => setState(() => _reminderTime = null),
               ),
@@ -390,7 +390,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 onSelected: (_) => setState(() => _reminderTime = '21:00'),
               ),
               ActionChip(
-                label: const Text('Custom'),
+                label: Text(context.l10n.adoptionCustom),
                 avatar: const Icon(Icons.access_time, size: 18),
                 onPressed: () => _pickCustomTime(context),
               ),
@@ -408,28 +408,28 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Custom daily goal'),
+        title: Text(context.l10n.adoptionCustomGoalTitle),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Minutes per day',
-            hintText: '5 - 180',
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionMinutesPerDay,
+            hintText: context.l10n.adoptionMinutesHint,
             suffixText: 'min',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () {
               final value = int.tryParse(controller.text.trim());
               if (value == null || value < 5 || value > 180) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter a value between 5 and 180')),
+                  SnackBar(content: Text(context.l10n.adoptionValidMinutes)),
                 );
                 return;
               }
@@ -439,7 +439,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               });
               Navigator.of(ctx).pop();
             },
-            child: const Text('Set'),
+            child: Text(context.l10n.adoptionSet),
           ),
         ],
       ),
@@ -453,29 +453,29 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Custom target hours'),
+        title: Text(context.l10n.adoptionCustomTargetTitle),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Total hours',
-            hintText: '10 - 2000',
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionTotalHours,
+            hintText: context.l10n.adoptionHoursHint,
             suffixText: 'h',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () {
               final value = int.tryParse(controller.text.trim());
               if (value == null || value < 10 || value > 2000) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Enter a value between 10 and 2000')),
+                  SnackBar(
+                      content: Text(context.l10n.adoptionValidHours)),
                 );
                 return;
               }
@@ -485,7 +485,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               });
               Navigator.of(ctx).pop();
             },
-            child: const Text('Set'),
+            child: Text(context.l10n.adoptionSet),
           ),
         ],
       ),
@@ -517,7 +517,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       child: Column(
         children: [
           Text(
-            'Choose your kitten!',
+            context.l10n.adoptionChooseKitten,
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -525,7 +525,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Your companion for "${_nameController.text.trim()}"',
+            context.l10n.adoptionCompanionFor(_nameController.text.trim()),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -654,7 +654,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           TextButton.icon(
             onPressed: _generateCats,
             icon: const Icon(Icons.refresh),
-            label: const Text('Reroll All'),
+            label: Text(context.l10n.adoptionRerollAll),
           ),
         ],
       ),
@@ -691,7 +691,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
           // Name input
           Text(
-            'Name your cat',
+            context.l10n.adoptionNameYourCat2,
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -700,12 +700,12 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           TextFormField(
             controller: _catNameController,
             decoration: InputDecoration(
-              labelText: 'Cat name',
-              hintText: 'e.g. Mochi',
+              labelText: context.l10n.adoptionCatName,
+              hintText: context.l10n.adoptionCatHint,
               prefixIcon: const Icon(Icons.pets),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.casino),
-                tooltip: 'Random name',
+                tooltip: context.l10n.adoptionRandomTooltip,
                 onPressed: () {
                   const names = randomCatNames;
                   final name = (names.toList()..shuffle()).first;
@@ -720,8 +720,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.base),
 
           Text(
-            'Your cat will grow as you focus on "${_nameController.text.trim()}"! '
-            'Target: ${_targetHours}h total.',
+            context.l10n.adoptionGrowthTarget(_nameController.text.trim(), _targetHours),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

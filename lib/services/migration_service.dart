@@ -11,6 +11,7 @@
 // ---
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 /// MigrationService — 旧版本数据检测 + 清除。
 class MigrationService {
@@ -96,24 +97,29 @@ class MigrationService {
   /// 清除用户全部业务数据（习惯、猫、签到记录）。
   /// 用户确认后调用，重新进入 onboarding 流程。
   Future<void> clearAllUserData(String uid) async {
-    final userRef = _db.collection('users').doc(uid);
+    try {
+      final userRef = _db.collection('users').doc(uid);
 
-    // 逐集合删除（Firestore 不支持递归删除子集合）
-    await _deleteSubcollection(userRef.collection('cats'));
-    await _deleteSubcollection(userRef.collection('habits'));
+      // 逐集合删除（Firestore 不支持递归删除子集合）
+      await _deleteSubcollection(userRef.collection('cats'));
+      await _deleteSubcollection(userRef.collection('habits'));
 
-    // checkIns 是按日期分的嵌套子集合
-    final checkInsSnapshot = await userRef.collection('checkIns').get();
-    for (final dateDoc in checkInsSnapshot.docs) {
-      await _deleteSubcollection(dateDoc.reference.collection('entries'));
-      await dateDoc.reference.delete();
+      // checkIns 是按日期分的嵌套子集合
+      final checkInsSnapshot = await userRef.collection('checkIns').get();
+      for (final dateDoc in checkInsSnapshot.docs) {
+        await _deleteSubcollection(dateDoc.reference.collection('entries'));
+        await dateDoc.reference.delete();
+      }
+
+      // 重置用户 profile 字段（保留账号）
+      await userRef.update({
+        'coins': 0,
+        'lastCheckInDate': null,
+      });
+    } catch (e) {
+      debugPrint('[MigrationService] clearAllUserData failed: $e');
+      rethrow;
     }
-
-    // 重置用户 profile 字段（保留账号）
-    await userRef.update({
-      'coins': 0,
-      'lastCheckInDate': null,
-    });
   }
 
   /// 批量删除一个集合下的所有文档。
@@ -128,7 +134,12 @@ class MigrationService {
       for (final doc in snapshot.docs) {
         batch.delete(doc.reference);
       }
-      await batch.commit();
+      try {
+        await batch.commit();
+      } catch (e) {
+        debugPrint('[MigrationService] _deleteSubcollection batch failed: $e');
+        rethrow;
+      }
     } while (snapshot.docs.length == batchSize);
   }
 }

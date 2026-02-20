@@ -148,7 +148,7 @@ class LlmService {
 
   /// 流式文本生成（用于聊天）。
   /// 返回 token stream，每个事件是一个 token。
-  /// 调用方需自行收集 token 拼接完整回复。
+  /// 调用方需自行收集 token 拼接完整回复，并调用 [cleanResponse] 清理特殊 token。
   Stream<String> generateStream(String prompt) {
     final parent = _parent;
     if (parent == null || _status != LlmEngineStatus.ready) {

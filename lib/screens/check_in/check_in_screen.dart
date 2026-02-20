@@ -16,8 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
+import 'package:intl/intl.dart';
 
 class CheckInScreen extends ConsumerWidget {
   const CheckInScreen({super.key});
@@ -28,7 +30,7 @@ class CheckInScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Monthly Check-In')),
+      appBar: AppBar(title: Text(context.l10n.checkInTitle)),
       body: monthlyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -69,7 +71,7 @@ class _StatsCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     // 找出下一个未达成的里程碑
-    String nextMilestoneText = 'All milestones claimed!';
+    String nextMilestoneText = context.l10n.checkInAllMilestones;
     final allThresholds = [...checkInMilestones.keys, daysInMonth];
     for (final threshold in allThresholds) {
       if (!monthly.milestonesClaimed.contains(threshold) &&
@@ -78,7 +80,7 @@ class _StatsCard extends StatelessWidget {
             ? checkInFullMonthBonus
             : checkInMilestones[threshold]!;
         final remaining = threshold - monthly.checkedCount;
-        nextMilestoneText = '$remaining more days → +$bonus coins';
+        nextMilestoneText = context.l10n.checkInMilestoneProgress(remaining, bonus);
         break;
       }
     }
@@ -94,13 +96,13 @@ class _StatsCard extends StatelessWidget {
               children: [
                 _StatItem(
                   value: '${monthly.checkedCount}/$daysInMonth',
-                  label: 'Days',
+                  label: context.l10n.checkInDays,
                   icon: Icons.calendar_today,
                   color: colorScheme.onPrimaryContainer,
                 ),
                 _StatItem(
                   value: '${monthly.totalCoins}',
-                  label: 'Coins earned',
+                  label: context.l10n.checkInCoinsEarned,
                   icon: Icons.monetization_on,
                   color: colorScheme.onPrimaryContainer,
                 ),
@@ -196,7 +198,7 @@ class _CalendarGrid extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${_monthName(month)} $year',
+              DateFormat.yMMMM(Localizations.localeOf(context).toString()).format(DateTime(year, month)),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -302,13 +304,6 @@ class _CalendarGrid extends StatelessWidget {
     return weeks;
   }
 
-  String _monthName(int month) {
-    const names = [
-      '', 'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-    return names[month];
-  }
 }
 
 /// 里程碑进度卡片。
@@ -335,7 +330,7 @@ class _MilestonesCard extends StatelessWidget {
         threshold: daysInMonth,
         bonus: checkInFullMonthBonus,
         isClaimed: monthly.milestonesClaimed.contains(daysInMonth),
-        label: 'Full month',
+        label: context.l10n.checkInFullMonth,
       ),
     ];
 
@@ -346,7 +341,7 @@ class _MilestonesCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Milestones',
+              context.l10n.checkInMilestones,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -400,7 +395,7 @@ class _MilestoneRow extends StatelessWidget {
     final progress =
         (currentCount / milestone.threshold).clamp(0.0, 1.0);
     final label =
-        milestone.label ?? '${milestone.threshold} days';
+        milestone.label ?? context.l10n.checkInNDays(milestone.threshold);
 
     return Row(
       children: [
@@ -482,7 +477,7 @@ class _RewardScheduleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Reward Schedule',
+              context.l10n.checkInRewardSchedule,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -490,16 +485,16 @@ class _RewardScheduleCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             _RewardRow(
               icon: Icons.work_outline,
-              label: 'Weekday (Mon–Fri)',
-              value: '$checkInCoinsWeekday coins/day',
+              label: context.l10n.checkInWeekday,
+              value: context.l10n.checkInWeekdayReward(checkInCoinsWeekday),
               color: colorScheme.onSurfaceVariant,
               theme: theme,
             ),
             const SizedBox(height: AppSpacing.sm),
             _RewardRow(
               icon: Icons.weekend_outlined,
-              label: 'Weekend (Sat–Sun)',
-              value: '$checkInCoinsWeekend coins/day',
+              label: context.l10n.checkInWeekend,
+              value: context.l10n.checkInWeekdayReward(checkInCoinsWeekend),
               color: colorScheme.tertiary,
               theme: theme,
             ),

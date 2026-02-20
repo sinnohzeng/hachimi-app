@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/streak_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -119,7 +121,12 @@ class FirestoreService {
     // 3. Update habit with cat reference
     batch.update(habitRef, {'catId': catRef.id});
 
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (e) {
+      debugPrint('[FirestoreService] createHabitWithCat batch failed: $e');
+      rethrow;
+    }
     return (habitId: habitRef.id, catId: catRef.id);
   }
 
@@ -169,7 +176,7 @@ class FirestoreService {
       if (habit.catId != null && habit.catId!.isNotEmpty) {
         await _catsRef(uid)
             .doc(habit.catId!)
-            .update({'state': 'graduated'});
+            .update({'state': CatState.graduated});
       }
     }
     await _habitsRef(uid).doc(habitId).delete();
@@ -249,7 +256,12 @@ class FirestoreService {
       });
     }
 
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (e) {
+      debugPrint('[FirestoreService] saveFocusSession batch failed: $e');
+      rethrow;
+    }
   }
 
   // ─── Check-ins ───
@@ -315,7 +327,12 @@ class FirestoreService {
       });
     }
 
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (e) {
+      debugPrint('[FirestoreService] logCheckIn batch failed: $e');
+      rethrow;
+    }
   }
 
   // ─── Stats ───
@@ -324,16 +341,20 @@ class FirestoreService {
     required String uid,
     required int lastNDays,
   }) async {
-    final dates = <String>[];
-    for (int i = 0; i < lastNDays; i++) {
-      final date = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(Duration(days: i)));
-      final snapshot = await _entriesRef(uid, date).limit(1).get();
-      if (snapshot.docs.isNotEmpty) {
-        dates.add(date);
-      }
-    }
-    return dates;
+    final allDates = List.generate(
+      lastNDays,
+      (i) => DateFormat('yyyy-MM-dd')
+          .format(DateTime.now().subtract(Duration(days: i))),
+    );
+
+    final results = await Future.wait(
+      allDates.map((date) async {
+        final snapshot = await _entriesRef(uid, date).limit(1).get();
+        return snapshot.docs.isNotEmpty ? date : null;
+      }),
+    );
+
+    return results.whereType<String>().toList();
   }
 
   /// Get daily focus minutes for a specific habit over the last N days.
@@ -352,6 +373,7 @@ class FirestoreService {
     final futures = dates.map((date) async {
       final snapshot = await _entriesRef(uid, date)
           .where('habitId', isEqualTo: habitId)
+          .limit(100)
           .get();
       int dayTotal = 0;
       for (final doc in snapshot.docs) {

@@ -2520,6 +2520,642 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Stopwatch'**
   String get focusSetupStopwatch;
+
+  /// No description provided for @focusSetupStartFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Focus'**
+  String get focusSetupStartFocus;
+
+  /// No description provided for @focusSetupQuestNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest not found'**
+  String get focusSetupQuestNotFound;
+
+  /// No description provided for @checkInButtonLogMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Log more time'**
+  String get checkInButtonLogMore;
+
+  /// No description provided for @checkInButtonStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start timer'**
+  String get checkInButtonStart;
+
+  /// No description provided for @adoptionTitleFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopt Your First Cat!'**
+  String get adoptionTitleFirst;
+
+  /// No description provided for @adoptionTitleNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New Quest'**
+  String get adoptionTitleNew;
+
+  /// No description provided for @adoptionStepDefineQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Define Quest'**
+  String get adoptionStepDefineQuest;
+
+  /// No description provided for @adoptionStepAdoptCat2.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopt Cat'**
+  String get adoptionStepAdoptCat2;
+
+  /// No description provided for @adoptionStepNameCat2.
+  ///
+  /// In en, this message translates to:
+  /// **'Name Cat'**
+  String get adoptionStepNameCat2;
+
+  /// No description provided for @adoptionAdopt.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopt!'**
+  String get adoptionAdopt;
+
+  /// No description provided for @adoptionQuestPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What quest do you want to start?'**
+  String get adoptionQuestPrompt;
+
+  /// No description provided for @adoptionKittenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A kitten will be assigned to help you stay on track!'**
+  String get adoptionKittenHint;
+
+  /// No description provided for @adoptionQuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest name'**
+  String get adoptionQuestName;
+
+  /// No description provided for @adoptionQuestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Prepare interview questions'**
+  String get adoptionQuestHint;
+
+  /// No description provided for @adoptionTotalTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Total target hours'**
+  String get adoptionTotalTarget;
+
+  /// No description provided for @adoptionGrowthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cat grows as you accumulate focus time'**
+  String get adoptionGrowthHint;
+
+  /// No description provided for @adoptionCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get adoptionCustom;
+
+  /// No description provided for @adoptionDailyGoalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily focus goal'**
+  String get adoptionDailyGoalLabel;
+
+  /// No description provided for @adoptionReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder (optional)'**
+  String get adoptionReminderLabel;
+
+  /// No description provided for @adoptionReminderNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get adoptionReminderNone;
+
+  /// No description provided for @adoptionCustomGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom daily goal'**
+  String get adoptionCustomGoalTitle;
+
+  /// No description provided for @adoptionMinutesPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes per day'**
+  String get adoptionMinutesPerDay;
+
+  /// No description provided for @adoptionMinutesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'5 - 180'**
+  String get adoptionMinutesHint;
+
+  /// No description provided for @adoptionValidMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a value between 5 and 180'**
+  String get adoptionValidMinutes;
+
+  /// No description provided for @adoptionCustomTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom target hours'**
+  String get adoptionCustomTargetTitle;
+
+  /// No description provided for @adoptionTotalHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Total hours'**
+  String get adoptionTotalHours;
+
+  /// No description provided for @adoptionHoursHint.
+  ///
+  /// In en, this message translates to:
+  /// **'10 - 2000'**
+  String get adoptionHoursHint;
+
+  /// No description provided for @adoptionValidHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a value between 10 and 2000'**
+  String get adoptionValidHours;
+
+  /// No description provided for @adoptionSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get adoptionSet;
+
+  /// No description provided for @adoptionChooseKitten.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your kitten!'**
+  String get adoptionChooseKitten;
+
+  /// No description provided for @adoptionCompanionFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Your companion for \"{quest}\"'**
+  String adoptionCompanionFor(String quest);
+
+  /// No description provided for @adoptionRerollAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reroll All'**
+  String get adoptionRerollAll;
+
+  /// No description provided for @adoptionNameYourCat2.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your cat'**
+  String get adoptionNameYourCat2;
+
+  /// No description provided for @adoptionCatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat name'**
+  String get adoptionCatName;
+
+  /// No description provided for @adoptionCatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Mochi'**
+  String get adoptionCatHint;
+
+  /// No description provided for @adoptionRandomTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Random name'**
+  String get adoptionRandomTooltip;
+
+  /// No description provided for @adoptionGrowthTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cat will grow as you focus on \"{quest}\"! Target: {hours}h total.'**
+  String adoptionGrowthTarget(String quest, int hours);
+
+  /// No description provided for @adoptionValidQuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a quest name'**
+  String get adoptionValidQuestName;
+
+  /// No description provided for @adoptionValidCatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please name your cat'**
+  String get adoptionValidCatName;
+
+  /// No description provided for @adoptionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String adoptionError(String message);
+
+  /// No description provided for @loginAppName.
+  ///
+  /// In en, this message translates to:
+  /// **'Hachimi'**
+  String get loginAppName;
+
+  /// No description provided for @loginTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise cats. Complete quests.'**
+  String get loginTagline;
+
+  /// No description provided for @loginContinueGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get loginContinueGoogle;
+
+  /// No description provided for @loginContinueEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Email'**
+  String get loginContinueEmail;
+
+  /// No description provided for @loginAlreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get loginAlreadyHaveAccount;
+
+  /// No description provided for @loginLogIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get loginLogIn;
+
+  /// No description provided for @loginWelcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back!'**
+  String get loginWelcomeBack;
+
+  /// No description provided for @loginCreateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get loginCreateAccount;
+
+  /// No description provided for @loginEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get loginEmail;
+
+  /// No description provided for @loginPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginPassword;
+
+  /// No description provided for @loginConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get loginConfirmPassword;
+
+  /// No description provided for @loginValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get loginValidEmail;
+
+  /// No description provided for @loginValidEmailFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get loginValidEmailFormat;
+
+  /// No description provided for @loginValidPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get loginValidPassword;
+
+  /// No description provided for @loginValidPasswordLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get loginValidPasswordLength;
+
+  /// No description provided for @loginValidPasswordMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get loginValidPasswordMatch;
+
+  /// No description provided for @loginCreateAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get loginCreateAccountButton;
+
+  /// No description provided for @loginNoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get loginNoAccount;
+
+  /// No description provided for @loginRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get loginRegister;
+
+  /// No description provided for @checkInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Check-In'**
+  String get checkInTitle;
+
+  /// No description provided for @checkInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get checkInDays;
+
+  /// No description provided for @checkInCoinsEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Coins earned'**
+  String get checkInCoinsEarned;
+
+  /// No description provided for @checkInAllMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'All milestones claimed!'**
+  String get checkInAllMilestones;
+
+  /// No description provided for @checkInMilestoneProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining} more days → +{bonus} coins'**
+  String checkInMilestoneProgress(int remaining, int bonus);
+
+  /// No description provided for @checkInMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get checkInMilestones;
+
+  /// No description provided for @checkInFullMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Full month'**
+  String get checkInFullMonth;
+
+  /// No description provided for @checkInRewardSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward Schedule'**
+  String get checkInRewardSchedule;
+
+  /// No description provided for @checkInWeekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday (Mon–Fri)'**
+  String get checkInWeekday;
+
+  /// No description provided for @checkInWeekdayReward.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} coins/day'**
+  String checkInWeekdayReward(int coins);
+
+  /// No description provided for @checkInWeekend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend (Sat–Sun)'**
+  String get checkInWeekend;
+
+  /// No description provided for @checkInNDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String checkInNDays(int count);
+
+  /// No description provided for @onboardTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Hachimi'**
+  String get onboardTitle1;
+
+  /// No description provided for @onboardSubtitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise cats, complete quests'**
+  String get onboardSubtitle1;
+
+  /// No description provided for @onboardBody1.
+  ///
+  /// In en, this message translates to:
+  /// **'Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!'**
+  String get onboardBody1;
+
+  /// No description provided for @onboardTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus & Earn XP'**
+  String get onboardTitle2;
+
+  /// No description provided for @onboardSubtitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Time fuels growth'**
+  String get onboardSubtitle2;
+
+  /// No description provided for @onboardBody2.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a focus session and your cat earns XP.\nBuild streaks for bonus rewards.\nEvery minute counts toward evolution!'**
+  String get onboardBody2;
+
+  /// No description provided for @onboardTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Them Evolve'**
+  String get onboardTitle3;
+
+  /// No description provided for @onboardSubtitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Kitten → Shiny'**
+  String get onboardSubtitle3;
+
+  /// No description provided for @onboardBody3.
+  ///
+  /// In en, this message translates to:
+  /// **'Cats evolve through 4 stages as they grow.\nCollect different breeds, unlock rare cats,\nand fill your cozy cat room!'**
+  String get onboardBody3;
+
+  /// No description provided for @onboardSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardSkip;
+
+  /// No description provided for @onboardLetsGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go!'**
+  String get onboardLetsGo;
+
+  /// No description provided for @onboardNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardNext;
+
+  /// No description provided for @catRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CatHouse'**
+  String get catRoomTitle;
+
+  /// No description provided for @catRoomInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get catRoomInventory;
+
+  /// No description provided for @catRoomShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessory Shop'**
+  String get catRoomShop;
+
+  /// No description provided for @catRoomLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load cats'**
+  String get catRoomLoadError;
+
+  /// No description provided for @catRoomEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CatHouse is empty'**
+  String get catRoomEmptyTitle;
+
+  /// No description provided for @catRoomEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a quest to adopt your first cat!'**
+  String get catRoomEmptySubtitle;
+
+  /// No description provided for @catRoomEditQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Quest'**
+  String get catRoomEditQuest;
+
+  /// No description provided for @catRoomRenameCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Cat'**
+  String get catRoomRenameCat;
+
+  /// No description provided for @catRoomArchiveCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Cat'**
+  String get catRoomArchiveCat;
+
+  /// No description provided for @catRoomNewName.
+  ///
+  /// In en, this message translates to:
+  /// **'New name'**
+  String get catRoomNewName;
+
+  /// No description provided for @catRoomRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get catRoomRename;
+
+  /// No description provided for @catRoomArchiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive cat?'**
+  String get catRoomArchiveTitle;
+
+  /// No description provided for @catRoomArchiveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will archive \"{name}\" and delete its bound quest. The cat will still appear in your album.'**
+  String catRoomArchiveMessage(String name);
+
+  /// No description provided for @catRoomArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get catRoomArchive;
+
+  /// No description provided for @addHabitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Quest'**
+  String get addHabitTitle;
+
+  /// No description provided for @addHabitQuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest name'**
+  String get addHabitQuestName;
+
+  /// No description provided for @addHabitQuestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. LeetCode Practice'**
+  String get addHabitQuestHint;
+
+  /// No description provided for @addHabitValidName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a quest name'**
+  String get addHabitValidName;
+
+  /// No description provided for @addHabitTargetHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Target hours'**
+  String get addHabitTargetHours;
+
+  /// No description provided for @addHabitTargetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 100'**
+  String get addHabitTargetHint;
+
+  /// No description provided for @addHabitValidTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter target hours'**
+  String get addHabitValidTarget;
+
+  /// No description provided for @addHabitValidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get addHabitValidNumber;
+
+  /// No description provided for @addHabitCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Quest'**
+  String get addHabitCreate;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

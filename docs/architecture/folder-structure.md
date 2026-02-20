@@ -197,9 +197,28 @@ hachimi-app/
 │
 ├── l10n.yaml                               # Flutter gen-l10n configuration
 │
+├── test/                                   # Automated tests
+│   ├── widget_test.dart                   # Framework sanity check
+│   ├── dart_test.yaml                     # Test configuration (golden tag exclusions)
+│   ├── models/
+│   │   └── habit_test.dart                # Habit model unit tests
+│   ├── providers/
+│   │   ├── stats_provider_test.dart       # HabitStats computed properties
+│   │   ├── focus_timer_provider_test.dart # FocusTimerState computed properties
+│   │   ├── chat_provider_test.dart        # ChatState defaults + copyWith
+│   │   └── llm_provider_test.dart         # LlmAvailability + ModelDownloadState
+│   ├── services/
+│   │   ├── chat_service_test.dart         # ChatRole + ChatMessage serialization
+│   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap roundtrip
+│   └── widgets/
+│       ├── empty_state_test.dart          # EmptyState widget test
+│       ├── error_state_test.dart          # ErrorState widget test
+│       └── skeleton_loader_test.dart      # SkeletonLoader widget test
+│
 ├── android/                                # Android platform project
 │   ├── app/
 │   │   ├── google-services.json            # Firebase config (gitignored)
+│   │   ├── proguard-rules.pro              # R8/ProGuard keep rules (Firebase, FFI, llama_cpp_dart)
 │   │   └── src/main/
 │   │       ├── AndroidManifest.xml         # Permissions + service declarations
 │   │       └── kotlin/com/hachimi/hachimi_app/
@@ -218,6 +237,7 @@ hachimi-app/
 │   ├── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
 │   └── setup_llm_vendor.sh               # Clone llama_cpp_dart with pinned llama.cpp commit
 │
+├── dart_test.yaml                         # Test configuration (exclude golden tags)
 ├── firestore.rules                         # Deployed Firestore security rules
 ├── firebase.json                           # Firebase project configuration
 ├── pubspec.yaml                            # Flutter dependencies

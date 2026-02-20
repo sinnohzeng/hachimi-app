@@ -122,7 +122,12 @@ class ChatNotifier extends Notifier<ChatState> {
           partialResponse: state.partialResponse + token,
         );
       },
-      onError: (_) {},
+      onError: (e) {
+        state = state.copyWith(
+          status: ChatStatus.error,
+          error: e.toString(),
+        );
+      },
     );
 
     try {

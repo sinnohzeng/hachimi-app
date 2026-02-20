@@ -30,6 +30,7 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
@@ -74,6 +75,7 @@ class PixelCatRenderer {
   Future<void> _ensureConfigLoaded() async {
     if (_spritesIndex != null) return;
 
+    try {
     final indexJson = await rootBundle.loadString(
         'assets/pixel_cat/config/spritesIndex.json');
     final offsetJson = await rootBundle.loadString(
@@ -122,6 +124,16 @@ class PixelCatRenderer {
           .map((e) => e as String)
           .toList();
     }
+    } catch (e) {
+      debugPrint('[PixelCatRenderer] _ensureConfigLoaded failed: $e');
+      // 初始化空默认值防止重复尝试
+      _spritesIndex ??= {};
+      _offsetMap ??= [];
+      _tintColors ??= {};
+      _diluteTintColors ??= {};
+      _whitePatchesTintColors ??= {};
+      _peltInfo ??= {};
+    }
   }
 
   Map<String, List<int>?> _parseTintMap(Map<String, dynamic>? map) {
@@ -144,12 +156,17 @@ class PixelCatRenderer {
     if (_spritesheetCache.containsKey(name)) {
       return _spritesheetCache[name]!;
     }
-    final data = await rootBundle.load(
-        'assets/pixel_cat/spritesheets/$name.png');
-    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-    final frame = await codec.getNextFrame();
-    _spritesheetCache[name] = frame.image;
-    return frame.image;
+    try {
+      final data = await rootBundle.load(
+          'assets/pixel_cat/spritesheets/$name.png');
+      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+      final frame = await codec.getNextFrame();
+      _spritesheetCache[name] = frame.image;
+      return frame.image;
+    } catch (e) {
+      debugPrint('[PixelCatRenderer] _loadSpritesheet($name) failed: $e');
+      rethrow;
+    }
   }
 
   /// 从 spritesheet 裁切并绘制单个 50×50 sprite 到 canvas

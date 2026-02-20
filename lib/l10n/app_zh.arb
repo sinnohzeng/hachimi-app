@@ -581,5 +581,145 @@
   "diaryEmptyHint": "完成一次专注，猫猫就会写下第一篇日记！",
 
   "focusSetupCountdown": "倒计时",
-  "focusSetupStopwatch": "正计时"
+  "focusSetupStopwatch": "正计时",
+  "focusSetupStartFocus": "开始专注",
+  "focusSetupQuestNotFound": "找不到任务",
+
+  "checkInButtonLogMore": "继续记录",
+  "checkInButtonStart": "开始计时",
+
+  "adoptionTitleFirst": "领养你的第一只猫！",
+  "adoptionTitleNew": "新任务",
+  "adoptionStepDefineQuest": "定义任务",
+  "adoptionStepAdoptCat2": "领养猫猫",
+  "adoptionStepNameCat2": "给猫取名",
+  "adoptionAdopt": "领养！",
+  "adoptionQuestPrompt": "你想开始什么任务？",
+  "adoptionKittenHint": "一只小猫会被分配来陪你坚持！",
+  "adoptionQuestName": "任务名称",
+  "adoptionQuestHint": "例如 准备面试题",
+  "adoptionTotalTarget": "总目标小时数",
+  "adoptionGrowthHint": "你的猫会随着你积累专注时间而成长",
+  "adoptionCustom": "自定义",
+  "adoptionDailyGoalLabel": "每日专注目标",
+  "adoptionReminderLabel": "每日提醒（可选）",
+  "adoptionReminderNone": "不设置",
+  "adoptionCustomGoalTitle": "自定义每日目标",
+  "adoptionMinutesPerDay": "每天分钟数",
+  "adoptionMinutesHint": "5 - 180",
+  "adoptionValidMinutes": "请输入 5 到 180 之间的值",
+  "adoptionCustomTargetTitle": "自定义目标小时数",
+  "adoptionTotalHours": "总小时数",
+  "adoptionHoursHint": "10 - 2000",
+  "adoptionValidHours": "请输入 10 到 2000 之间的值",
+  "adoptionSet": "设定",
+  "adoptionChooseKitten": "选择你的小猫！",
+  "adoptionCompanionFor": "「{quest}」的伙伴",
+  "@adoptionCompanionFor": {
+    "placeholders": { "quest": { "type": "String" } }
+  },
+  "adoptionRerollAll": "全部重选",
+  "adoptionNameYourCat2": "给猫取个名字",
+  "adoptionCatName": "猫名",
+  "adoptionCatHint": "例如 年糕",
+  "adoptionRandomTooltip": "随机名字",
+  "adoptionGrowthTarget": "你的猫会在你专注「{quest}」时成长！目标：{hours}小时。",
+  "@adoptionGrowthTarget": {
+    "placeholders": {
+      "quest": { "type": "String" },
+      "hours": { "type": "int" }
+    }
+  },
+  "adoptionValidQuestName": "请输入任务名称",
+  "adoptionValidCatName": "请给猫猫取个名字",
+  "adoptionError": "错误：{message}",
+  "@adoptionError": {
+    "placeholders": { "message": { "type": "String" } }
+  },
+
+  "loginAppName": "Hachimi",
+  "loginTagline": "养猫咪，完成任务。",
+  "loginContinueGoogle": "使用 Google 登录",
+  "loginContinueEmail": "使用邮箱登录",
+  "loginAlreadyHaveAccount": "已有账号？",
+  "loginLogIn": "登录",
+  "loginWelcomeBack": "欢迎回来！",
+  "loginCreateAccount": "创建账号",
+  "loginEmail": "邮箱",
+  "loginPassword": "密码",
+  "loginConfirmPassword": "确认密码",
+  "loginValidEmail": "请输入邮箱",
+  "loginValidEmailFormat": "请输入有效的邮箱地址",
+  "loginValidPassword": "请输入密码",
+  "loginValidPasswordLength": "密码至少 6 个字符",
+  "loginValidPasswordMatch": "两次密码不一致",
+  "loginCreateAccountButton": "创建账号",
+  "loginNoAccount": "还没有账号？",
+  "loginRegister": "注册",
+
+  "checkInTitle": "月度签到",
+  "checkInDays": "天数",
+  "checkInCoinsEarned": "获得金币",
+  "checkInAllMilestones": "所有里程碑已达成！",
+  "checkInMilestoneProgress": "还差 {remaining} 天 → +{bonus} 金币",
+  "@checkInMilestoneProgress": {
+    "placeholders": {
+      "remaining": { "type": "int" },
+      "bonus": { "type": "int" }
+    }
+  },
+  "checkInMilestones": "里程碑",
+  "checkInFullMonth": "全月签到",
+  "checkInRewardSchedule": "奖励说明",
+  "checkInWeekday": "工作日（周一至周五）",
+  "checkInWeekdayReward": "{coins} 金币/天",
+  "@checkInWeekdayReward": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInWeekend": "周末（周六、周日）",
+  "checkInNDays": "{count} 天",
+  "@checkInNDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "onboardTitle1": "欢迎来到 Hachimi",
+  "onboardSubtitle1": "养猫咪，完成任务",
+  "onboardBody1": "每个任务都会搭配一只小猫。\n专注你的目标，看着它们\n从小猫成长为闪亮的大猫！",
+  "onboardTitle2": "专注 & 赚取 XP",
+  "onboardSubtitle2": "时间驱动成长",
+  "onboardBody2": "开始专注，猫猫就能获得 XP。\n保持连续签到获取额外奖励。\n每一分钟都能促进进化！",
+  "onboardTitle3": "见证它们进化",
+  "onboardSubtitle3": "小猫 → 闪亮",
+  "onboardBody3": "猫猫在成长过程中会经历 4 个阶段。\n收集不同品种，解锁稀有猫猫，\n填满你温馨的猫房！",
+  "onboardSkip": "跳过",
+  "onboardLetsGo": "开始吧！",
+  "onboardNext": "下一步",
+
+  "catRoomTitle": "猫猫小屋",
+  "catRoomInventory": "背包",
+  "catRoomShop": "饰品商店",
+  "catRoomLoadError": "加载猫猫失败",
+  "catRoomEmptyTitle": "猫猫小屋空空如也",
+  "catRoomEmptySubtitle": "开始一个任务来领养你的第一只猫！",
+  "catRoomEditQuest": "编辑任务",
+  "catRoomRenameCat": "重命名猫猫",
+  "catRoomArchiveCat": "归档猫猫",
+  "catRoomNewName": "新名字",
+  "catRoomRename": "重命名",
+  "catRoomArchiveTitle": "归档猫猫？",
+  "catRoomArchiveMessage": "这将归档「{name}」并删除其绑定的任务。猫猫仍会出现在图鉴中。",
+  "@catRoomArchiveMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomArchive": "归档",
+
+  "addHabitTitle": "新任务",
+  "addHabitQuestName": "任务名称",
+  "addHabitQuestHint": "例如 LeetCode 刷题",
+  "addHabitValidName": "请输入任务名称",
+  "addHabitTargetHours": "目标小时数",
+  "addHabitTargetHint": "例如 100",
+  "addHabitValidTarget": "请输入目标小时数",
+  "addHabitValidNumber": "请输入有效数字",
+  "addHabitCreate": "创建任务"
 }

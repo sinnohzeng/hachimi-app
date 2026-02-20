@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// CheckInButton — primary action button for starting a timer or manual check-in.
 class CheckInButton extends StatelessWidget {
@@ -20,7 +21,9 @@ class CheckInButton extends StatelessWidget {
       icon: Icon(
         hasCheckedInToday ? Icons.add : Icons.play_arrow,
       ),
-      label: Text(hasCheckedInToday ? 'Log more time' : 'Start timer'),
+      label: Text(hasCheckedInToday
+          ? context.l10n.checkInButtonLogMore
+          : context.l10n.checkInButtonStart),
       style: FilledButton.styleFrom(
         backgroundColor: hasCheckedInToday
             ? colorScheme.secondaryContainer

@@ -147,17 +147,28 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
   }
 
   Future<void> _checkMigration() async {
-    final migrationService = ref.read(migrationServiceProvider);
-    final needs = await migrationService.checkNeedsMigration(widget.uid);
+    try {
+      final migrationService = ref.read(migrationServiceProvider);
+      final needs = await migrationService.checkNeedsMigration(widget.uid);
 
-    // Lazy migrate per-cat accessories to user-level inventory
-    await migrationService.migrateAccessoriesToInventory(widget.uid);
+      // Lazy migrate per-cat accessories to user-level inventory
+      await migrationService.migrateAccessoriesToInventory(widget.uid);
 
-    if (mounted) {
-      setState(() {
-        _checked = true;
-        _needsMigration = needs;
-      });
+      if (mounted) {
+        setState(() {
+          _checked = true;
+          _needsMigration = needs;
+        });
+      }
+    } catch (e) {
+      debugPrint('[VersionGate] migration check failed: $e');
+      // 迁移检查失败时跳过，允许用户正常使用
+      if (mounted) {
+        setState(() {
+          _checked = true;
+          _needsMigration = false;
+        });
+      }
     }
   }
 

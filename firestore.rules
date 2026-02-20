@@ -9,7 +9,17 @@ service cloud.firestore {
 
       // Habits subcollection
       match /habits/{habitId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.targetHours is int
+          && request.resource.data.targetHours >= 1
+          && request.resource.data.targetHours <= 10000
+          && (!('goalMinutes' in request.resource.data)
+              || (request.resource.data.goalMinutes is int
+                  && request.resource.data.goalMinutes >= 1
+                  && request.resource.data.goalMinutes <= 480));
+        allow delete: if request.auth != null && request.auth.uid == userId;
 
         // Focus sessions within a habit
         match /sessions/{sessionId} {
@@ -19,7 +29,16 @@ service cloud.firestore {
 
       // Cats subcollection
       match /cats/{catId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 30
+          && request.resource.data.state in ['active', 'graduated', 'dormant']
+          && request.resource.data.totalMinutes is int
+          && request.resource.data.totalMinutes >= 0;
+        allow delete: if request.auth != null && request.auth.uid == userId;
       }
 
       // Check-ins subcollection (date-partitioned)

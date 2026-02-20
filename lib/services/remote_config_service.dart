@@ -43,18 +43,19 @@ class RemoteConfigService {
   String get checkInSuccessMessage =>
       _remoteConfig.getString(keyCheckInSuccessMessage);
 
-  /// XP multiplier for events/promotions (default: 1.0).
-  double get xpMultiplier => _remoteConfig.getDouble(keyXpMultiplier);
+  /// XP multiplier for events/promotions (default: 1.0, range: 0.1-10.0).
+  double get xpMultiplier =>
+      _remoteConfig.getDouble(keyXpMultiplier).clamp(0.1, 10.0);
 
   /// Notification copy variant for A/B testing (default: 'A').
   String get notificationCopyVariant =>
       _remoteConfig.getString(keyNotificationCopyVariant);
 
-  /// Days without a session before mood becomes 'lonely' (default: 3).
+  /// Days without a session before mood becomes 'lonely' (default: 3, range: 1-30).
   int get moodThresholdLonelyDays =>
-      _remoteConfig.getInt(keyMoodThresholdLonelyDays);
+      _remoteConfig.getInt(keyMoodThresholdLonelyDays).clamp(1, 30);
 
-  /// Default focus duration in minutes for new habits (default: 25).
+  /// Default focus duration in minutes for new habits (default: 25, range: 5-180).
   int get defaultFocusDuration =>
-      _remoteConfig.getInt(keyDefaultFocusDuration);
+      _remoteConfig.getInt(keyDefaultFocusDuration).clamp(5, 180);
 }

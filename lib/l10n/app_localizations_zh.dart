@@ -1301,4 +1301,336 @@ class SZh extends S {
 
   @override
   String get focusSetupStopwatch => '正计时';
+
+  @override
+  String get focusSetupStartFocus => '开始专注';
+
+  @override
+  String get focusSetupQuestNotFound => '找不到任务';
+
+  @override
+  String get checkInButtonLogMore => '继续记录';
+
+  @override
+  String get checkInButtonStart => '开始计时';
+
+  @override
+  String get adoptionTitleFirst => '领养你的第一只猫！';
+
+  @override
+  String get adoptionTitleNew => '新任务';
+
+  @override
+  String get adoptionStepDefineQuest => '定义任务';
+
+  @override
+  String get adoptionStepAdoptCat2 => '领养猫猫';
+
+  @override
+  String get adoptionStepNameCat2 => '给猫取名';
+
+  @override
+  String get adoptionAdopt => '领养！';
+
+  @override
+  String get adoptionQuestPrompt => '你想开始什么任务？';
+
+  @override
+  String get adoptionKittenHint => '一只小猫会被分配来陪你坚持！';
+
+  @override
+  String get adoptionQuestName => '任务名称';
+
+  @override
+  String get adoptionQuestHint => '例如 准备面试题';
+
+  @override
+  String get adoptionTotalTarget => '总目标小时数';
+
+  @override
+  String get adoptionGrowthHint => '你的猫会随着你积累专注时间而成长';
+
+  @override
+  String get adoptionCustom => '自定义';
+
+  @override
+  String get adoptionDailyGoalLabel => '每日专注目标';
+
+  @override
+  String get adoptionReminderLabel => '每日提醒（可选）';
+
+  @override
+  String get adoptionReminderNone => '不设置';
+
+  @override
+  String get adoptionCustomGoalTitle => '自定义每日目标';
+
+  @override
+  String get adoptionMinutesPerDay => '每天分钟数';
+
+  @override
+  String get adoptionMinutesHint => '5 - 180';
+
+  @override
+  String get adoptionValidMinutes => '请输入 5 到 180 之间的值';
+
+  @override
+  String get adoptionCustomTargetTitle => '自定义目标小时数';
+
+  @override
+  String get adoptionTotalHours => '总小时数';
+
+  @override
+  String get adoptionHoursHint => '10 - 2000';
+
+  @override
+  String get adoptionValidHours => '请输入 10 到 2000 之间的值';
+
+  @override
+  String get adoptionSet => '设定';
+
+  @override
+  String get adoptionChooseKitten => '选择你的小猫！';
+
+  @override
+  String adoptionCompanionFor(String quest) {
+    return '「$quest」的伙伴';
+  }
+
+  @override
+  String get adoptionRerollAll => '全部重选';
+
+  @override
+  String get adoptionNameYourCat2 => '给猫取个名字';
+
+  @override
+  String get adoptionCatName => '猫名';
+
+  @override
+  String get adoptionCatHint => '例如 年糕';
+
+  @override
+  String get adoptionRandomTooltip => '随机名字';
+
+  @override
+  String adoptionGrowthTarget(String quest, int hours) {
+    return '你的猫会在你专注「$quest」时成长！目标：$hours小时。';
+  }
+
+  @override
+  String get adoptionValidQuestName => '请输入任务名称';
+
+  @override
+  String get adoptionValidCatName => '请给猫猫取个名字';
+
+  @override
+  String adoptionError(String message) {
+    return '错误：$message';
+  }
+
+  @override
+  String get loginAppName => 'Hachimi';
+
+  @override
+  String get loginTagline => '养猫咪，完成任务。';
+
+  @override
+  String get loginContinueGoogle => '使用 Google 登录';
+
+  @override
+  String get loginContinueEmail => '使用邮箱登录';
+
+  @override
+  String get loginAlreadyHaveAccount => '已有账号？';
+
+  @override
+  String get loginLogIn => '登录';
+
+  @override
+  String get loginWelcomeBack => '欢迎回来！';
+
+  @override
+  String get loginCreateAccount => '创建账号';
+
+  @override
+  String get loginEmail => '邮箱';
+
+  @override
+  String get loginPassword => '密码';
+
+  @override
+  String get loginConfirmPassword => '确认密码';
+
+  @override
+  String get loginValidEmail => '请输入邮箱';
+
+  @override
+  String get loginValidEmailFormat => '请输入有效的邮箱地址';
+
+  @override
+  String get loginValidPassword => '请输入密码';
+
+  @override
+  String get loginValidPasswordLength => '密码至少 6 个字符';
+
+  @override
+  String get loginValidPasswordMatch => '两次密码不一致';
+
+  @override
+  String get loginCreateAccountButton => '创建账号';
+
+  @override
+  String get loginNoAccount => '还没有账号？';
+
+  @override
+  String get loginRegister => '注册';
+
+  @override
+  String get checkInTitle => '月度签到';
+
+  @override
+  String get checkInDays => '天数';
+
+  @override
+  String get checkInCoinsEarned => '获得金币';
+
+  @override
+  String get checkInAllMilestones => '所有里程碑已达成！';
+
+  @override
+  String checkInMilestoneProgress(int remaining, int bonus) {
+    return '还差 $remaining 天 → +$bonus 金币';
+  }
+
+  @override
+  String get checkInMilestones => '里程碑';
+
+  @override
+  String get checkInFullMonth => '全月签到';
+
+  @override
+  String get checkInRewardSchedule => '奖励说明';
+
+  @override
+  String get checkInWeekday => '工作日（周一至周五）';
+
+  @override
+  String checkInWeekdayReward(int coins) {
+    return '$coins 金币/天';
+  }
+
+  @override
+  String get checkInWeekend => '周末（周六、周日）';
+
+  @override
+  String checkInNDays(int count) {
+    return '$count 天';
+  }
+
+  @override
+  String get onboardTitle1 => '欢迎来到 Hachimi';
+
+  @override
+  String get onboardSubtitle1 => '养猫咪，完成任务';
+
+  @override
+  String get onboardBody1 => '每个任务都会搭配一只小猫。\n专注你的目标，看着它们\n从小猫成长为闪亮的大猫！';
+
+  @override
+  String get onboardTitle2 => '专注 & 赚取 XP';
+
+  @override
+  String get onboardSubtitle2 => '时间驱动成长';
+
+  @override
+  String get onboardBody2 => '开始专注，猫猫就能获得 XP。\n保持连续签到获取额外奖励。\n每一分钟都能促进进化！';
+
+  @override
+  String get onboardTitle3 => '见证它们进化';
+
+  @override
+  String get onboardSubtitle3 => '小猫 → 闪亮';
+
+  @override
+  String get onboardBody3 => '猫猫在成长过程中会经历 4 个阶段。\n收集不同品种，解锁稀有猫猫，\n填满你温馨的猫房！';
+
+  @override
+  String get onboardSkip => '跳过';
+
+  @override
+  String get onboardLetsGo => '开始吧！';
+
+  @override
+  String get onboardNext => '下一步';
+
+  @override
+  String get catRoomTitle => '猫猫小屋';
+
+  @override
+  String get catRoomInventory => '背包';
+
+  @override
+  String get catRoomShop => '饰品商店';
+
+  @override
+  String get catRoomLoadError => '加载猫猫失败';
+
+  @override
+  String get catRoomEmptyTitle => '猫猫小屋空空如也';
+
+  @override
+  String get catRoomEmptySubtitle => '开始一个任务来领养你的第一只猫！';
+
+  @override
+  String get catRoomEditQuest => '编辑任务';
+
+  @override
+  String get catRoomRenameCat => '重命名猫猫';
+
+  @override
+  String get catRoomArchiveCat => '归档猫猫';
+
+  @override
+  String get catRoomNewName => '新名字';
+
+  @override
+  String get catRoomRename => '重命名';
+
+  @override
+  String get catRoomArchiveTitle => '归档猫猫？';
+
+  @override
+  String catRoomArchiveMessage(String name) {
+    return '这将归档「$name」并删除其绑定的任务。猫猫仍会出现在图鉴中。';
+  }
+
+  @override
+  String get catRoomArchive => '归档';
+
+  @override
+  String get addHabitTitle => '新任务';
+
+  @override
+  String get addHabitQuestName => '任务名称';
+
+  @override
+  String get addHabitQuestHint => '例如 LeetCode 刷题';
+
+  @override
+  String get addHabitValidName => '请输入任务名称';
+
+  @override
+  String get addHabitTargetHours => '目标小时数';
+
+  @override
+  String get addHabitTargetHint => '例如 100';
+
+  @override
+  String get addHabitValidTarget => '请输入目标小时数';
+
+  @override
+  String get addHabitValidNumber => '请输入有效数字';
+
+  @override
+  String get addHabitCreate => '创建任务';
 }

@@ -42,10 +42,12 @@ final diaryServiceProvider = Provider<DiaryService>((ref) {
 });
 
 final chatServiceProvider = Provider<ChatService>((ref) {
-  return ChatService(
+  final service = ChatService(
     llmService: ref.watch(llmServiceInstanceProvider),
     dbService: ref.watch(localDatabaseProvider),
   );
+  ref.onDispose(service.dispose);
+  return service;
 });
 
 // ─── AI Feature Toggle ───

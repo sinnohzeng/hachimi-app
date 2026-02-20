@@ -237,6 +237,14 @@ List<String> get allAccessories => [
       '$color$style',
 ];
 
+// ─── Streak Milestones ───
+
+/// 连续签到里程碑天数 — 达到时给予一次性 XP 奖励。
+const List<int> streakMilestones = [7, 14, 30];
+
+/// 连续签到里程碑 XP 奖励。
+const int streakMilestoneXpBonus = 30;
+
 /// 签到金币：工作日（周一至周五）
 const int checkInCoinsWeekday = 10;
 

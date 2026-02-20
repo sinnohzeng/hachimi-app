@@ -293,6 +293,29 @@ All documents are fully isolated per `uid`. See [Security Rules](../firebase/sec
 - No public collections.
 - Anonymous access is denied for all paths.
 
+**Firestore Security Rules — Field Validation:**
+
+The `firestore.rules` file enforces server-side field validation on write operations:
+
+| Collection | Field | Validation Rule |
+|-----------|-------|----------------|
+| `habits` | `targetHours` | `int`, range `1–10000` |
+| `habits` | `goalMinutes` | `int` (optional), range `1–480` |
+| `cats` | `name` | `string`, length `1–30` characters |
+| `cats` | `state` | `string`, must be one of `['active', 'graduated', 'dormant']` |
+| `cats` | `totalMinutes` | `int`, `>= 0` |
+
+These rules complement client-side validation to prevent invalid data from reaching Firestore.
+
+**Cat State Constants:**
+
+The valid cat state values are defined as constants in `lib/core/constants/cat_constants.dart` via the `CatState` class:
+- `CatState.active` = `'active'`
+- `CatState.graduated` = `'graduated'`
+- `CatState.dormant` = `'dormant'`
+
+All code referencing cat state strings must use these constants instead of hardcoded string literals.
+
 ---
 
 ## Local Storage — SQLite + SharedPreferences

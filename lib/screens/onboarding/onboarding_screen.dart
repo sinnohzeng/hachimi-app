@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/app.dart' show kOnboardingCompleteKey;
 
@@ -16,38 +17,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
 
-  static const _pages = [
+  List<_OnboardingPageData> _buildPages(BuildContext context) => [
     _OnboardingPageData(
       emoji: '🐱',
-      title: 'Welcome to Hachimi',
-      subtitle: 'Raise cats, complete quests',
-      body: 'Every quest you start comes with a kitten.\n'
-          'Focus on your goals and watch them grow\n'
-          'from tiny kittens into shiny cats!',
+      title: context.l10n.onboardTitle1,
+      subtitle: context.l10n.onboardSubtitle1,
+      body: context.l10n.onboardBody1,
       colorRole: _ColorRole.primary,
     ),
     _OnboardingPageData(
       emoji: '⏱️',
-      title: 'Focus & Earn XP',
-      subtitle: 'Time fuels growth',
-      body: 'Start a focus session and your cat earns XP.\n'
-          'Build streaks for bonus rewards.\n'
-          'Every minute counts toward evolution!',
+      title: context.l10n.onboardTitle2,
+      subtitle: context.l10n.onboardSubtitle2,
+      body: context.l10n.onboardBody2,
       colorRole: _ColorRole.secondary,
     ),
     _OnboardingPageData(
       emoji: '✨',
-      title: 'Watch Them Evolve',
-      subtitle: 'Kitten → Shiny',
-      body: 'Cats evolve through 4 stages as they grow.\n'
-          'Collect different breeds, unlock rare cats,\n'
-          'and fill your cozy cat room!',
+      title: context.l10n.onboardTitle3,
+      subtitle: context.l10n.onboardSubtitle3,
+      body: context.l10n.onboardBody3,
       colorRole: _ColorRole.tertiary,
     ),
   ];
 
+  static const _pageCount = 3;
+
   void _next() {
-    if (_currentPage < _pages.length - 1) {
+    if (_currentPage < _pageCount - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -76,7 +73,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final pageData = _pages[_currentPage];
+    final pages = _buildPages(context);
+    final pageData = pages[_currentPage];
     final onColor = pageData.onColor(colorScheme);
 
     return Scaffold(
@@ -85,21 +83,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Page view
           PageView.builder(
             controller: _pageController,
-            itemCount: _pages.length,
+            itemCount: pages.length,
             onPageChanged: (index) => setState(() => _currentPage = index),
             itemBuilder: (context, index) =>
-                _OnboardingPage(data: _pages[index]),
+                _OnboardingPage(data: pages[index]),
           ),
 
           // Skip button (top right, hidden on last page)
-          if (_currentPage < _pages.length - 1)
+          if (_currentPage < pages.length - 1)
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
               right: 8,
               child: TextButton(
                 onPressed: _skip,
                 child: Text(
-                  'Skip',
+                  context.l10n.onboardSkip,
                   style: textTheme.bodyLarge?.copyWith(
                     color: onColor.withValues(alpha: 0.7),
                   ),
@@ -122,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        _pages.length,
+                        pages.length,
                         (index) => AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -155,9 +153,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         child: Text(
-                          _currentPage == _pages.length - 1
-                              ? "Let's Go!"
-                              : 'Next',
+                          _currentPage == pages.length - 1
+                              ? context.l10n.onboardLetsGo
+                              : context.l10n.onboardNext,
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: pageData.gradientColors(colorScheme).first,

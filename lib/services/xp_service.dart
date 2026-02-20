@@ -53,10 +53,10 @@ class XpService {
     // Streak bonus: +5 per session if streak >= 3
     final streakBonus = streakDays >= 3 ? 5 : 0;
 
-    // Milestone bonus: +30 one-time for 7/14/30-day streaks
+    // Milestone bonus: one-time for streak milestones (7/14/30 days)
     int milestoneBonus = 0;
-    if (streakDays == 7 || streakDays == 14 || streakDays == 30) {
-      milestoneBonus = 30;
+    if (streakMilestones.contains(streakDays)) {
+      milestoneBonus = streakMilestoneXpBonus;
     }
 
     // Full house: +10 if all habits done today

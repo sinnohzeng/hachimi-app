@@ -15,6 +15,7 @@
 // ---
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
@@ -80,7 +81,8 @@ class CoinService {
     final userRef = _userRef(uid);
     final monthRef = _monthlyCheckInRef(uid, month);
 
-    return _db.runTransaction((tx) async {
+    try {
+    return await _db.runTransaction((tx) async {
       // 1. 检查今日是否已签到
       final userDoc = await tx.get(userRef);
       final userData = userDoc.data() as Map<String, dynamic>? ?? {};
@@ -90,16 +92,20 @@ class CoinService {
       // 2. 读取当月签到文档
       final monthDoc = await tx.get(monthRef);
       final existingDays = monthDoc.exists
-          ? List<int>.from(
-              (monthDoc.data() as Map<String, dynamic>)['checkedDays']
+          ? ((monthDoc.data() as Map<String, dynamic>)['checkedDays']
                       as List<dynamic>? ??
                   [])
+              .whereType<num>()
+              .map((e) => e.toInt())
+              .toList()
           : <int>[];
       final existingMilestones = monthDoc.exists
-          ? List<int>.from(
-              (monthDoc.data() as Map<String, dynamic>)['milestonesClaimed']
+          ? ((monthDoc.data() as Map<String, dynamic>)['milestonesClaimed']
                       as List<dynamic>? ??
                   [])
+              .whereType<num>()
+              .map((e) => e.toInt())
+              .toList()
           : <int>[];
       // 3. 计算每日奖励
       final dailyCoins = isWeekend ? checkInCoinsWeekend : checkInCoinsWeekday;
@@ -156,6 +162,10 @@ class CoinService {
         newMilestones: newMilestones,
       );
     });
+    } catch (e) {
+      debugPrint('[CoinService] checkIn transaction failed: $e');
+      rethrow;
+    }
   }
 
   /// 扣减金币。余额不足返回 false。
@@ -166,18 +176,23 @@ class CoinService {
     assert(amount > 0, 'amount must be positive');
     final userRef = _userRef(uid);
 
-    return _db.runTransaction((tx) async {
-      final doc = await tx.get(userRef);
-      final data = doc.data() as Map<String, dynamic>? ?? {};
-      final balance = data['coins'] as int? ?? 0;
+    try {
+      return await _db.runTransaction((tx) async {
+        final doc = await tx.get(userRef);
+        final data = doc.data() as Map<String, dynamic>? ?? {};
+        final balance = data['coins'] as int? ?? 0;
 
-      if (balance < amount) return false;
+        if (balance < amount) return false;
 
-      tx.update(userRef, {
-        'coins': FieldValue.increment(-amount),
+        tx.update(userRef, {
+          'coins': FieldValue.increment(-amount),
+        });
+        return true;
       });
-      return true;
-    });
+    } catch (e) {
+      debugPrint('[CoinService] spendCoins transaction failed: $e');
+      rethrow;
+    }
   }
 
   /// 购买饰品：扣币 + 追加配饰到用户 inventory。
@@ -191,23 +206,28 @@ class CoinService {
     assert(accessoryId.isNotEmpty, 'accessoryId must not be empty');
     final userRef = _userRef(uid);
 
-    return _db.runTransaction((tx) async {
-      final userDoc = await tx.get(userRef);
-      final userData = userDoc.data() as Map<String, dynamic>? ?? {};
-      final balance = userData['coins'] as int? ?? 0;
+    try {
+      return await _db.runTransaction((tx) async {
+        final userDoc = await tx.get(userRef);
+        final userData = userDoc.data() as Map<String, dynamic>? ?? {};
+        final balance = userData['coins'] as int? ?? 0;
 
-      if (balance < price) return false;
+        if (balance < price) return false;
 
-      // 检查是否已在 inventory 中
-      final inventory = List<String>.from(
-          userData['inventory'] as List<dynamic>? ?? []);
-      if (inventory.contains(accessoryId)) return false;
+        // 检查是否已在 inventory 中
+        final inventory = List<String>.from(
+            userData['inventory'] as List<dynamic>? ?? []);
+        if (inventory.contains(accessoryId)) return false;
 
-      tx.update(userRef, {
-        'coins': FieldValue.increment(-price),
-        'inventory': FieldValue.arrayUnion([accessoryId]),
+        tx.update(userRef, {
+          'coins': FieldValue.increment(-price),
+          'inventory': FieldValue.arrayUnion([accessoryId]),
+        });
+        return true;
       });
-      return true;
-    });
+    } catch (e) {
+      debugPrint('[CoinService] purchaseAccessory transaction failed: $e');
+      rethrow;
+    }
   }
 }

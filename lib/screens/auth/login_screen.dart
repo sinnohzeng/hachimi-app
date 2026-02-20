@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -83,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // App name
                 Text(
-                  'Hachimi',
+                  context.l10n.loginAppName,
                   style: textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onPrimary,
@@ -93,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Tagline
                 Text(
-                  'Raise cats. Complete quests.',
+                  context.l10n.loginTagline,
                   style: textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.7),
                   ),
@@ -127,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             errorBuilder: (_, __, ___) =>
                                 const Icon(Icons.g_mobiledata, size: 24),
                           ),
-                    label: const Text('Continue with Google'),
+                    label: Text(context.l10n.loginContinueGoogle),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -146,7 +147,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     icon: const Icon(Icons.email_outlined, size: 20),
-                    label: const Text('Continue with Email'),
+                    label: Text(context.l10n.loginContinueEmail),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.base),
@@ -156,7 +157,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      context.l10n.loginAlreadyHaveAccount,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       ),
@@ -171,7 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         );
                       },
                       child: Text(
-                        'Log In',
+                        context.l10n.loginLogIn,
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -316,7 +317,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Hachimi',
+                          context.l10n.loginAppName,
                           style: textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onPrimary,
@@ -326,7 +327,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
 
                         // Toggle hint
                         Text(
-                          _isLogin ? 'Welcome back!' : 'Create your account',
+                          _isLogin ? context.l10n.loginWelcomeBack : context.l10n.loginCreateAccount,
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
@@ -340,15 +341,15 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           style: TextStyle(color: colorScheme.onPrimary),
                           decoration: _inputDecoration(
                             colorScheme: colorScheme,
-                            label: 'Email',
+                            label: context.l10n.loginEmail,
                             icon: Icons.email_outlined,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return context.l10n.loginValidEmail;
                             }
                             if (!value.contains('@')) {
-                              return 'Please enter a valid email';
+                              return context.l10n.loginValidEmailFormat;
                             }
                             return null;
                           },
@@ -362,7 +363,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           style: TextStyle(color: colorScheme.onPrimary),
                           decoration: _inputDecoration(
                             colorScheme: colorScheme,
-                            label: 'Password',
+                            label: context.l10n.loginPassword,
                             icon: Icons.lock_outlined,
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -377,10 +378,10 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
+                              return context.l10n.loginValidPassword;
                             }
                             if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return context.l10n.loginValidPasswordLength;
                             }
                             return null;
                           },
@@ -395,7 +396,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             style: TextStyle(color: colorScheme.onPrimary),
                             decoration: _inputDecoration(
                               colorScheme: colorScheme,
-                              label: 'Confirm Password',
+                              label: context.l10n.loginConfirmPassword,
                               icon: Icons.lock_outlined,
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -411,7 +412,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             ),
                             validator: (value) {
                               if (value != _passwordController.text) {
-                                return 'Passwords do not match';
+                                return context.l10n.loginValidPasswordMatch;
                               }
                               return null;
                             },
@@ -440,7 +441,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                         strokeWidth: 2),
                                   )
                                 : Text(
-                                    _isLogin ? 'Log In' : 'Create Account',
+                                    _isLogin ? context.l10n.loginLogIn : context.l10n.loginCreateAccountButton,
                                     style: textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: colorScheme.primary,
@@ -456,8 +457,8 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           children: [
                             Text(
                               _isLogin
-                                  ? "Don't have an account? "
-                                  : 'Already have an account? ',
+                                  ? context.l10n.loginNoAccount
+                                  : context.l10n.loginAlreadyHaveAccount,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onPrimary.withValues(alpha: 0.7),
                               ),
@@ -466,7 +467,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                               onTap: () =>
                                   setState(() => _isLogin = !_isLogin),
                               child: Text(
-                                _isLogin ? 'Register' : 'Log In',
+                                _isLogin ? context.l10n.loginRegister : context.l10n.loginLogIn,
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onPrimary,
                                   fontWeight: FontWeight.bold,

@@ -581,5 +581,145 @@
   "diaryEmptyHint": "Complete a focus session and your cat will write their first diary entry!",
 
   "focusSetupCountdown": "Countdown",
-  "focusSetupStopwatch": "Stopwatch"
+  "focusSetupStopwatch": "Stopwatch",
+  "focusSetupStartFocus": "Start Focus",
+  "focusSetupQuestNotFound": "Quest not found",
+
+  "checkInButtonLogMore": "Log more time",
+  "checkInButtonStart": "Start timer",
+
+  "adoptionTitleFirst": "Adopt Your First Cat!",
+  "adoptionTitleNew": "New Quest",
+  "adoptionStepDefineQuest": "Define Quest",
+  "adoptionStepAdoptCat2": "Adopt Cat",
+  "adoptionStepNameCat2": "Name Cat",
+  "adoptionAdopt": "Adopt!",
+  "adoptionQuestPrompt": "What quest do you want to start?",
+  "adoptionKittenHint": "A kitten will be assigned to help you stay on track!",
+  "adoptionQuestName": "Quest name",
+  "adoptionQuestHint": "e.g. Prepare interview questions",
+  "adoptionTotalTarget": "Total target hours",
+  "adoptionGrowthHint": "Your cat grows as you accumulate focus time",
+  "adoptionCustom": "Custom",
+  "adoptionDailyGoalLabel": "Daily focus goal",
+  "adoptionReminderLabel": "Daily reminder (optional)",
+  "adoptionReminderNone": "None",
+  "adoptionCustomGoalTitle": "Custom daily goal",
+  "adoptionMinutesPerDay": "Minutes per day",
+  "adoptionMinutesHint": "5 - 180",
+  "adoptionValidMinutes": "Enter a value between 5 and 180",
+  "adoptionCustomTargetTitle": "Custom target hours",
+  "adoptionTotalHours": "Total hours",
+  "adoptionHoursHint": "10 - 2000",
+  "adoptionValidHours": "Enter a value between 10 and 2000",
+  "adoptionSet": "Set",
+  "adoptionChooseKitten": "Choose your kitten!",
+  "adoptionCompanionFor": "Your companion for \"{quest}\"",
+  "@adoptionCompanionFor": {
+    "placeholders": { "quest": { "type": "String" } }
+  },
+  "adoptionRerollAll": "Reroll All",
+  "adoptionNameYourCat2": "Name your cat",
+  "adoptionCatName": "Cat name",
+  "adoptionCatHint": "e.g. Mochi",
+  "adoptionRandomTooltip": "Random name",
+  "adoptionGrowthTarget": "Your cat will grow as you focus on \"{quest}\"! Target: {hours}h total.",
+  "@adoptionGrowthTarget": {
+    "placeholders": {
+      "quest": { "type": "String" },
+      "hours": { "type": "int" }
+    }
+  },
+  "adoptionValidQuestName": "Please enter a quest name",
+  "adoptionValidCatName": "Please name your cat",
+  "adoptionError": "Error: {message}",
+  "@adoptionError": {
+    "placeholders": { "message": { "type": "String" } }
+  },
+
+  "loginAppName": "Hachimi",
+  "loginTagline": "Raise cats. Complete quests.",
+  "loginContinueGoogle": "Continue with Google",
+  "loginContinueEmail": "Continue with Email",
+  "loginAlreadyHaveAccount": "Already have an account? ",
+  "loginLogIn": "Log In",
+  "loginWelcomeBack": "Welcome back!",
+  "loginCreateAccount": "Create your account",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "loginConfirmPassword": "Confirm Password",
+  "loginValidEmail": "Please enter your email",
+  "loginValidEmailFormat": "Please enter a valid email",
+  "loginValidPassword": "Please enter your password",
+  "loginValidPasswordLength": "Password must be at least 6 characters",
+  "loginValidPasswordMatch": "Passwords do not match",
+  "loginCreateAccountButton": "Create Account",
+  "loginNoAccount": "Don't have an account? ",
+  "loginRegister": "Register",
+
+  "checkInTitle": "Monthly Check-In",
+  "checkInDays": "Days",
+  "checkInCoinsEarned": "Coins earned",
+  "checkInAllMilestones": "All milestones claimed!",
+  "checkInMilestoneProgress": "{remaining} more days → +{bonus} coins",
+  "@checkInMilestoneProgress": {
+    "placeholders": {
+      "remaining": { "type": "int" },
+      "bonus": { "type": "int" }
+    }
+  },
+  "checkInMilestones": "Milestones",
+  "checkInFullMonth": "Full month",
+  "checkInRewardSchedule": "Reward Schedule",
+  "checkInWeekday": "Weekday (Mon–Fri)",
+  "checkInWeekdayReward": "{coins} coins/day",
+  "@checkInWeekdayReward": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInWeekend": "Weekend (Sat–Sun)",
+  "checkInNDays": "{count} days",
+  "@checkInNDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "onboardTitle1": "Welcome to Hachimi",
+  "onboardSubtitle1": "Raise cats, complete quests",
+  "onboardBody1": "Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!",
+  "onboardTitle2": "Focus & Earn XP",
+  "onboardSubtitle2": "Time fuels growth",
+  "onboardBody2": "Start a focus session and your cat earns XP.\nBuild streaks for bonus rewards.\nEvery minute counts toward evolution!",
+  "onboardTitle3": "Watch Them Evolve",
+  "onboardSubtitle3": "Kitten → Shiny",
+  "onboardBody3": "Cats evolve through 4 stages as they grow.\nCollect different breeds, unlock rare cats,\nand fill your cozy cat room!",
+  "onboardSkip": "Skip",
+  "onboardLetsGo": "Let's Go!",
+  "onboardNext": "Next",
+
+  "catRoomTitle": "CatHouse",
+  "catRoomInventory": "Inventory",
+  "catRoomShop": "Accessory Shop",
+  "catRoomLoadError": "Failed to load cats",
+  "catRoomEmptyTitle": "Your CatHouse is empty",
+  "catRoomEmptySubtitle": "Start a quest to adopt your first cat!",
+  "catRoomEditQuest": "Edit Quest",
+  "catRoomRenameCat": "Rename Cat",
+  "catRoomArchiveCat": "Archive Cat",
+  "catRoomNewName": "New name",
+  "catRoomRename": "Rename",
+  "catRoomArchiveTitle": "Archive cat?",
+  "catRoomArchiveMessage": "This will archive \"{name}\" and delete its bound quest. The cat will still appear in your album.",
+  "@catRoomArchiveMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomArchive": "Archive",
+
+  "addHabitTitle": "New Quest",
+  "addHabitQuestName": "Quest name",
+  "addHabitQuestHint": "e.g. LeetCode Practice",
+  "addHabitValidName": "Please enter a quest name",
+  "addHabitTargetHours": "Target hours",
+  "addHabitTargetHint": "e.g. 100",
+  "addHabitValidTarget": "Please enter target hours",
+  "addHabitValidNumber": "Please enter a valid number",
+  "addHabitCreate": "Create Quest"
 }

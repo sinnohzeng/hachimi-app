@@ -143,8 +143,12 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 |---------|------|------|
 | `baseXp`（基础 XP） | `分钟数 x 1` | 始终 |
 | `streakBonus`（连击奖励） | `+5` / 会话 | `currentStreak >= 3` |
-| `milestoneBonus`（里程碑奖励） | `+30` 一次性 | 连续记录达到 7、14 或 30 天 |
+| `milestoneBonus`（里程碑奖励） | `+30` 一次性 | 连续记录达到里程碑天数（见下） |
 | `fullHouseBonus`（全家福奖励） | `+10` / 会话 | 今日所有习惯均已完成 |
+
+**连续记录里程碑常量**（定义于 `lib/core/constants/pixel_cat_constants.dart`）：
+- `streakMilestones = [7, 14, 30]` — 触发里程碑奖励的连续天数阈值
+- `streakMilestoneXpBonus = 30` — 每达到一个里程碑时奖励的 XP
 
 来自 Remote Config 的 XP 倍率（键：`xp_multiplier`，默认值：`1.0`）用于活动期间缩放 `totalXp`。
 

@@ -1320,4 +1320,342 @@ class SEn extends S {
 
   @override
   String get focusSetupStopwatch => 'Stopwatch';
+
+  @override
+  String get focusSetupStartFocus => 'Start Focus';
+
+  @override
+  String get focusSetupQuestNotFound => 'Quest not found';
+
+  @override
+  String get checkInButtonLogMore => 'Log more time';
+
+  @override
+  String get checkInButtonStart => 'Start timer';
+
+  @override
+  String get adoptionTitleFirst => 'Adopt Your First Cat!';
+
+  @override
+  String get adoptionTitleNew => 'New Quest';
+
+  @override
+  String get adoptionStepDefineQuest => 'Define Quest';
+
+  @override
+  String get adoptionStepAdoptCat2 => 'Adopt Cat';
+
+  @override
+  String get adoptionStepNameCat2 => 'Name Cat';
+
+  @override
+  String get adoptionAdopt => 'Adopt!';
+
+  @override
+  String get adoptionQuestPrompt => 'What quest do you want to start?';
+
+  @override
+  String get adoptionKittenHint =>
+      'A kitten will be assigned to help you stay on track!';
+
+  @override
+  String get adoptionQuestName => 'Quest name';
+
+  @override
+  String get adoptionQuestHint => 'e.g. Prepare interview questions';
+
+  @override
+  String get adoptionTotalTarget => 'Total target hours';
+
+  @override
+  String get adoptionGrowthHint =>
+      'Your cat grows as you accumulate focus time';
+
+  @override
+  String get adoptionCustom => 'Custom';
+
+  @override
+  String get adoptionDailyGoalLabel => 'Daily focus goal';
+
+  @override
+  String get adoptionReminderLabel => 'Daily reminder (optional)';
+
+  @override
+  String get adoptionReminderNone => 'None';
+
+  @override
+  String get adoptionCustomGoalTitle => 'Custom daily goal';
+
+  @override
+  String get adoptionMinutesPerDay => 'Minutes per day';
+
+  @override
+  String get adoptionMinutesHint => '5 - 180';
+
+  @override
+  String get adoptionValidMinutes => 'Enter a value between 5 and 180';
+
+  @override
+  String get adoptionCustomTargetTitle => 'Custom target hours';
+
+  @override
+  String get adoptionTotalHours => 'Total hours';
+
+  @override
+  String get adoptionHoursHint => '10 - 2000';
+
+  @override
+  String get adoptionValidHours => 'Enter a value between 10 and 2000';
+
+  @override
+  String get adoptionSet => 'Set';
+
+  @override
+  String get adoptionChooseKitten => 'Choose your kitten!';
+
+  @override
+  String adoptionCompanionFor(String quest) {
+    return 'Your companion for \"$quest\"';
+  }
+
+  @override
+  String get adoptionRerollAll => 'Reroll All';
+
+  @override
+  String get adoptionNameYourCat2 => 'Name your cat';
+
+  @override
+  String get adoptionCatName => 'Cat name';
+
+  @override
+  String get adoptionCatHint => 'e.g. Mochi';
+
+  @override
+  String get adoptionRandomTooltip => 'Random name';
+
+  @override
+  String adoptionGrowthTarget(String quest, int hours) {
+    return 'Your cat will grow as you focus on \"$quest\"! Target: ${hours}h total.';
+  }
+
+  @override
+  String get adoptionValidQuestName => 'Please enter a quest name';
+
+  @override
+  String get adoptionValidCatName => 'Please name your cat';
+
+  @override
+  String adoptionError(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String get loginAppName => 'Hachimi';
+
+  @override
+  String get loginTagline => 'Raise cats. Complete quests.';
+
+  @override
+  String get loginContinueGoogle => 'Continue with Google';
+
+  @override
+  String get loginContinueEmail => 'Continue with Email';
+
+  @override
+  String get loginAlreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get loginLogIn => 'Log In';
+
+  @override
+  String get loginWelcomeBack => 'Welcome back!';
+
+  @override
+  String get loginCreateAccount => 'Create your account';
+
+  @override
+  String get loginEmail => 'Email';
+
+  @override
+  String get loginPassword => 'Password';
+
+  @override
+  String get loginConfirmPassword => 'Confirm Password';
+
+  @override
+  String get loginValidEmail => 'Please enter your email';
+
+  @override
+  String get loginValidEmailFormat => 'Please enter a valid email';
+
+  @override
+  String get loginValidPassword => 'Please enter your password';
+
+  @override
+  String get loginValidPasswordLength =>
+      'Password must be at least 6 characters';
+
+  @override
+  String get loginValidPasswordMatch => 'Passwords do not match';
+
+  @override
+  String get loginCreateAccountButton => 'Create Account';
+
+  @override
+  String get loginNoAccount => 'Don\'t have an account? ';
+
+  @override
+  String get loginRegister => 'Register';
+
+  @override
+  String get checkInTitle => 'Monthly Check-In';
+
+  @override
+  String get checkInDays => 'Days';
+
+  @override
+  String get checkInCoinsEarned => 'Coins earned';
+
+  @override
+  String get checkInAllMilestones => 'All milestones claimed!';
+
+  @override
+  String checkInMilestoneProgress(int remaining, int bonus) {
+    return '$remaining more days → +$bonus coins';
+  }
+
+  @override
+  String get checkInMilestones => 'Milestones';
+
+  @override
+  String get checkInFullMonth => 'Full month';
+
+  @override
+  String get checkInRewardSchedule => 'Reward Schedule';
+
+  @override
+  String get checkInWeekday => 'Weekday (Mon–Fri)';
+
+  @override
+  String checkInWeekdayReward(int coins) {
+    return '$coins coins/day';
+  }
+
+  @override
+  String get checkInWeekend => 'Weekend (Sat–Sun)';
+
+  @override
+  String checkInNDays(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get onboardTitle1 => 'Welcome to Hachimi';
+
+  @override
+  String get onboardSubtitle1 => 'Raise cats, complete quests';
+
+  @override
+  String get onboardBody1 =>
+      'Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!';
+
+  @override
+  String get onboardTitle2 => 'Focus & Earn XP';
+
+  @override
+  String get onboardSubtitle2 => 'Time fuels growth';
+
+  @override
+  String get onboardBody2 =>
+      'Start a focus session and your cat earns XP.\nBuild streaks for bonus rewards.\nEvery minute counts toward evolution!';
+
+  @override
+  String get onboardTitle3 => 'Watch Them Evolve';
+
+  @override
+  String get onboardSubtitle3 => 'Kitten → Shiny';
+
+  @override
+  String get onboardBody3 =>
+      'Cats evolve through 4 stages as they grow.\nCollect different breeds, unlock rare cats,\nand fill your cozy cat room!';
+
+  @override
+  String get onboardSkip => 'Skip';
+
+  @override
+  String get onboardLetsGo => 'Let\'s Go!';
+
+  @override
+  String get onboardNext => 'Next';
+
+  @override
+  String get catRoomTitle => 'CatHouse';
+
+  @override
+  String get catRoomInventory => 'Inventory';
+
+  @override
+  String get catRoomShop => 'Accessory Shop';
+
+  @override
+  String get catRoomLoadError => 'Failed to load cats';
+
+  @override
+  String get catRoomEmptyTitle => 'Your CatHouse is empty';
+
+  @override
+  String get catRoomEmptySubtitle => 'Start a quest to adopt your first cat!';
+
+  @override
+  String get catRoomEditQuest => 'Edit Quest';
+
+  @override
+  String get catRoomRenameCat => 'Rename Cat';
+
+  @override
+  String get catRoomArchiveCat => 'Archive Cat';
+
+  @override
+  String get catRoomNewName => 'New name';
+
+  @override
+  String get catRoomRename => 'Rename';
+
+  @override
+  String get catRoomArchiveTitle => 'Archive cat?';
+
+  @override
+  String catRoomArchiveMessage(String name) {
+    return 'This will archive \"$name\" and delete its bound quest. The cat will still appear in your album.';
+  }
+
+  @override
+  String get catRoomArchive => 'Archive';
+
+  @override
+  String get addHabitTitle => 'New Quest';
+
+  @override
+  String get addHabitQuestName => 'Quest name';
+
+  @override
+  String get addHabitQuestHint => 'e.g. LeetCode Practice';
+
+  @override
+  String get addHabitValidName => 'Please enter a quest name';
+
+  @override
+  String get addHabitTargetHours => 'Target hours';
+
+  @override
+  String get addHabitTargetHint => 'e.g. 100';
+
+  @override
+  String get addHabitValidTarget => 'Please enter target hours';
+
+  @override
+  String get addHabitValidNumber => 'Please enter a valid number';
+
+  @override
+  String get addHabitCreate => 'Create Quest';
 }

@@ -12,6 +12,7 @@
 // 🕒 创建时间：2026-02-19
 // ---
 
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
@@ -95,7 +96,8 @@ class DiaryService {
       // 保存到 SQLite
       final saved = await _dbService.insertDiaryEntry(entry);
       return saved ? entry : null;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[DiaryService] generate failed: $e');
       return null;
     }
   }

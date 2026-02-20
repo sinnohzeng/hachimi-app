@@ -28,7 +28,7 @@ class CatRoomScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CatHouse'),
+        title: Text(context.l10n.catRoomTitle),
         actions: [
           // Coin balance
           Padding(
@@ -50,14 +50,14 @@ class CatRoomScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.inventory_2),
-            tooltip: 'Inventory',
+            tooltip: context.l10n.catRoomInventory,
             onPressed: () => Navigator.of(context).pushNamed(
               AppRouter.inventory,
             ),
           ),
           IconButton(
             icon: const Icon(Icons.storefront),
-            tooltip: 'Accessory Shop',
+            tooltip: context.l10n.catRoomShop,
             onPressed: () => Navigator.of(context).pushNamed(
               AppRouter.accessoryShop,
             ),
@@ -67,22 +67,22 @@ class CatRoomScreen extends ConsumerWidget {
       body: catsAsync.when(
         loading: () => const SkeletonGrid(),
         error: (e, _) => ErrorState(
-          message: 'Failed to load cats',
+          message: context.l10n.catRoomLoadError,
           onRetry: () => ref.invalidate(catsProvider),
         ),
         data: (cats) {
-          if (cats.isEmpty) return _buildEmpty(theme);
+          if (cats.isEmpty) return _buildEmpty(context);
           return _buildGrid(context, ref, cats);
         },
       ),
     );
   }
 
-  Widget _buildEmpty(ThemeData theme) {
-    return const EmptyState(
+  Widget _buildEmpty(BuildContext context) {
+    return EmptyState(
       icon: Icons.home_outlined,
-      title: 'Your CatHouse is empty',
-      subtitle: 'Start a quest to adopt your first cat!',
+      title: context.l10n.catRoomEmptyTitle,
+      subtitle: context.l10n.catRoomEmptySubtitle,
     );
   }
 
@@ -106,7 +106,7 @@ class CatRoomScreen extends ConsumerWidget {
             if (habit != null)
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: const Text('Edit Quest'),
+                title: Text(context.l10n.catRoomEditQuest),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   Navigator.of(context).pushNamed(
@@ -117,7 +117,7 @@ class CatRoomScreen extends ConsumerWidget {
               ),
             ListTile(
               leading: const Icon(Icons.drive_file_rename_outline),
-              title: const Text('Rename Cat'),
+              title: Text(context.l10n.catRoomRenameCat),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _showRenameDialog(context, ref, cat);
@@ -127,7 +127,7 @@ class CatRoomScreen extends ConsumerWidget {
               leading: Icon(Icons.archive_outlined,
                   color: Theme.of(ctx).colorScheme.error),
               title: Text(
-                'Archive Cat',
+                context.l10n.catRoomArchiveCat,
                 style: TextStyle(color: Theme.of(ctx).colorScheme.error),
               ),
               onTap: () {
@@ -147,19 +147,19 @@ class CatRoomScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Rename Cat'),
+        title: Text(context.l10n.catRoomRenameCat),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'New name',
-            prefixIcon: Icon(Icons.pets),
+          decoration: InputDecoration(
+            labelText: context.l10n.catRoomNewName,
+            prefixIcon: const Icon(Icons.pets),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -174,7 +174,7 @@ class CatRoomScreen extends ConsumerWidget {
                   );
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
-            child: const Text('Rename'),
+            child: Text(context.l10n.catRoomRename),
           ),
         ],
       ),
@@ -185,15 +185,14 @@ class CatRoomScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Archive cat?'),
+        title: Text(context.l10n.catRoomArchiveTitle),
         content: Text(
-          'This will archive "${cat.name}" and delete its bound quest. '
-          'The cat will still appear in your album.',
+          context.l10n.catRoomArchiveMessage(cat.name),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -214,7 +213,7 @@ class CatRoomScreen extends ConsumerWidget {
                     );
               }
             },
-            child: const Text('Archive'),
+            child: Text(context.l10n.catRoomArchive),
           ),
         ],
       ),

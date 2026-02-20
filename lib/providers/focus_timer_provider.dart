@@ -312,10 +312,11 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   }
 
   void _onTick() {
-    if (state.startedAt == null) return;
+    final startedAt = state.startedAt;
+    if (startedAt == null) return;
 
     // Wall-clock calculation: elapsed = (now - startedAt) - totalPausedSeconds
-    final wallTotal = DateTime.now().difference(state.startedAt!).inSeconds;
+    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
     final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(0, wallTotal);
 
     // Countdown: check if time is up

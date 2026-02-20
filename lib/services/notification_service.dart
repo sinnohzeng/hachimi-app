@@ -50,6 +50,16 @@ class NotificationService {
 
   bool _pluginsInitialized = false;
 
+  /// 待处理的导航路由（通知点击后存储，由 UI 层消费）。
+  String? _pendingNavigation;
+
+  /// 消费待处理的导航路由（取出后清空）。
+  String? consumePendingNavigation() {
+    final nav = _pendingNavigation;
+    _pendingNavigation = null;
+    return nav;
+  }
+
   /// Initialize plugins and notification channels WITHOUT requesting permissions.
   /// Safe to call at app startup.
   Future<void> initializePlugins() async {
@@ -173,7 +183,9 @@ class NotificationService {
   // ─── Notification Handlers ───
 
   void _onNotificationTapped(NotificationResponse response) {
-    // Handle local notification taps — navigate based on payload
+    final payload = response.payload;
+    if (payload == null || payload.isEmpty) return;
+    _pendingNavigation = payload;
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
@@ -197,7 +209,12 @@ class NotificationService {
   }
 
   void _handleMessageOpenedApp(RemoteMessage message) {
-    // Navigate to relevant screen based on message data
+    final data = message.data;
+    final habitId = data['habitId'] as String?;
+    final type = data['type'] as String?;
+    if (habitId != null && habitId.isNotEmpty) {
+      _pendingNavigation = '${type ?? 'habit'}:$habitId';
+    }
   }
 
   // ─── Scheduling ───

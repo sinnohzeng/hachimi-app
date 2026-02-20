@@ -91,6 +91,9 @@ jobs:
             exit 1
           fi
 
+      - name: Check formatting
+        run: dart format --set-exit-if-changed lib/ test/
+
       - name: Static analysis
         run: dart analyze lib/
 
@@ -99,6 +102,14 @@ jobs:
 
       - name: Build release APK
         run: flutter build apk --release
+
+      - name: Report APK size
+        run: |
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          SIZE=$(stat --format="%s" "$APK")
+          SIZE_MB=$(echo "scale=2; $SIZE / 1048576" | bc)
+          echo "### APK Size" >> $GITHUB_STEP_SUMMARY
+          echo "**${SIZE_MB} MB** (\`${SIZE}\` bytes)" >> $GITHUB_STEP_SUMMARY
         env:
           GRADLE_OPTS: "-Xmx4G -XX:MaxMetaspaceSize=2G"
 
