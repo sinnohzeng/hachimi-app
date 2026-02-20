@@ -8,7 +8,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 /// CatHouse — 2-column grid layout showing all active cats.
 class CatRoomScreen extends ConsumerWidget {
@@ -83,7 +83,7 @@ class CatRoomScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create a habit to adopt your first cat!',
+            'Start a quest to adopt your first cat!',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -113,7 +113,7 @@ class CatRoomScreen extends ConsumerWidget {
             if (habit != null)
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
-                title: const Text('Edit Habit'),
+                title: const Text('Edit Quest'),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   Navigator.of(context).pushNamed(
@@ -194,7 +194,7 @@ class CatRoomScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Archive cat?'),
         content: Text(
-          'This will archive "${cat.name}" and delete its bound habit. '
+          'This will archive "${cat.name}" and delete its bound quest. '
           'The cat will still appear in your album.',
         ),
         actions: [
@@ -295,7 +295,7 @@ class _CatHouseCard extends StatelessWidget {
           child: Column(
             children: [
               // Pixel cat sprite
-              PixelCatSprite.fromCat(cat: cat, size: 80),
+              TappableCatSprite(cat: cat, size: 80),
               const SizedBox(height: 4),
 
               // Name + habit (flexible to prevent overflow)

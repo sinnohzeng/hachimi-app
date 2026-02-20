@@ -1,21 +1,52 @@
+// ---
+// 📘 文件说明：
+// Cat Detail 页面 — 猫猫和关联任务的核心信息中枢。
+// 展示猫猫形象、成长进度、专注统计、每日提醒、活动热力图、饰品和详细外观信息。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. 从 Provider 加载猫猫和关联 Habit 数据；
+// 2. SliverAppBar：TappableCatSprite + 猫名 + 性格标签；
+// 3. 心情标签；
+// 4. 成长进度卡片（时间制进度条 + 阶段里程碑）；
+// 5. 专注统计卡片（替代旧 "Bound Habit" 卡片）；
+// 6. 每日提醒卡片（设置/修改/移除提醒）；
+// 7. 活动热力图卡片；
+// 8. 饰品装备卡片；
+// 9. 增强版猫猫信息卡片（性格 + 外观详情 + 状态）；
+//
+// 🧩 文件结构：
+// - CatDetailScreen：主页面 ConsumerStatefulWidget；
+// - _FocusStatsCard：专注统计卡片；
+// - _ReminderCard：每日提醒卡片；
+// - _EditQuestSheet：编辑任务 BottomSheet；
+// - _EnhancedCatInfoCard：增强版猫猫信息卡片；
+// - _StageMilestone / _HabitHeatmapCard / _AccessoriesCard / _InfoRow / _StatCell：辅助组件；
+//
+// 🕒 创建时间：2026-02-18
+// 🕒 重构时间：2026-02-19
+// ---
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/utils/appearance_descriptions.dart';
+import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/cat_appearance.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
-import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
-    show accessoryDisplayName, computeSpriteIndex, peltColorToMaterial;
-import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
+    show accessoryDisplayName, peltColorToMaterial;
 
-/// Cat detail page — pixel cat sprite with tap-to-cycle pose,
-/// pelt-colored header, time-based growth progress,
-/// habit info with edit, rename, and streak heatmap.
+/// Cat detail page — the central hub for a cat and its bound quest.
 class CatDetailScreen extends ConsumerStatefulWidget {
   final String catId;
 
@@ -25,46 +56,7 @@ class CatDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<CatDetailScreen> createState() => _CatDetailScreenState();
 }
 
-class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
-    with SingleTickerProviderStateMixin {
-  /// Local-only display variant for pose cycling (not persisted).
-  int? _displayVariant;
-
-  /// Bounce animation controller for tap-to-cycle.
-  late final AnimationController _bounceController;
-  late final Animation<double> _bounceAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _bounceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _bounceAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
-    ]).animate(CurvedAnimation(
-      parent: _bounceController,
-      curve: Curves.easeOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _bounceController.dispose();
-    super.dispose();
-  }
-
-  void _cyclePose(Cat cat) {
-    final current = _displayVariant ?? cat.appearance.spriteVariant;
-    setState(() {
-      _displayVariant = (current + 1) % 3;
-    });
-    HapticFeedback.lightImpact();
-    _bounceController.forward(from: 0);
-  }
-
+class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -89,14 +81,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
     // Pelt color themed gradient: 70% pelt + 30% stage
     final peltClr = peltColorToMaterial(cat.appearance.peltColor);
     final headerColor = Color.lerp(peltClr, stageClr, 0.3)!;
-
-    // Compute sprite index with local display variant override
-    final displayVariant = _displayVariant ?? cat.appearance.spriteVariant;
-    final spriteIndex = computeSpriteIndex(
-      stage: cat.computedStage,
-      variant: displayVariant,
-      isLonghair: cat.appearance.isLonghair,
-    );
 
     return Scaffold(
       body: CustomScrollView(
@@ -123,22 +107,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
                     children: [
                       const SizedBox(height: 48),
                       // Tappable cat sprite with bounce animation
-                      GestureDetector(
-                        onTap: () => _cyclePose(cat),
-                        child: AnimatedBuilder(
-                          animation: _bounceAnimation,
-                          builder: (context, child) => Transform.scale(
-                            scale: _bounceAnimation.value,
-                            child: child,
-                          ),
-                          child: PixelCatSprite(
-                            appearance: cat.appearance,
-                            spriteIndex: spriteIndex,
-                            accessoryId: cat.equippedAccessory,
-                            size: 120,
-                          ),
-                        ),
-                      ),
+                      TappableCatSprite(cat: cat, size: 120),
                       const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -199,241 +168,125 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
                 const SizedBox(height: 24),
 
                 // Growth progress (time-based)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Growth Progress',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              cat.stageName,
-                              style: textTheme.labelLarge?.copyWith(
-                                color: stageClr,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: cat.growthProgress,
-                            minHeight: 12,
-                            backgroundColor:
-                                colorScheme.surfaceContainerHighest,
-                            valueColor: AlwaysStoppedAnimation(stageClr),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            Text(
-                              'Target: ${cat.targetMinutes ~/ 60}h',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                        // Stage milestones
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _StageMilestone(
-                              name: 'Kitten',
-                              isReached: true,
-                              color: stageColor('kitten'),
-                            ),
-                            _StageMilestone(
-                              name: 'Adolescent',
-                              isReached: cat.growthProgress >= 0.20,
-                              color: stageColor('adolescent'),
-                            ),
-                            _StageMilestone(
-                              name: 'Adult',
-                              isReached: cat.growthProgress >= 0.45,
-                              color: stageColor('adult'),
-                            ),
-                            _StageMilestone(
-                              name: 'Senior',
-                              isReached: cat.growthProgress >= 0.75,
-                              color: stageColor('senior'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildGrowthCard(context, cat, stageClr),
                 const SizedBox(height: 16),
 
-                // Habit info with edit button
-                if (habit != null)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Bound Habit',
-                                style: textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, size: 18),
-                                onPressed: () =>
-                                    _showEditHabitDialog(context, habit),
-                                tooltip: 'Edit habit',
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Text(habit.icon,
-                                  style: const TextStyle(fontSize: 28)),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      habit.name,
-                                      style: textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Goal: ${habit.goalMinutes}min/day  •  Total: ${habit.totalMinutes ~/ 60}h ${habit.totalMinutes % 60}m',
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (habit.currentStreak > 0)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.tertiaryContainer,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                          Icons.local_fire_department,
-                                          size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${habit.currentStreak}',
-                                        style:
-                                            textTheme.labelMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton.tonalIcon(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed(
-                                  AppRouter.focusSetup,
-                                  arguments: habit.id,
-                                );
-                              },
-                              icon: const Icon(Icons.play_arrow),
-                              label: const Text('Start Focus'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                // Focus statistics card (replaces old "Bound Habit" card)
+                if (habit != null) ...[
+                  _FocusStatsCard(habit: habit, cat: cat),
+                  const SizedBox(height: 16),
+                ],
+
+                // Reminder card
+                if (habit != null) ...[
+                  _ReminderCard(habit: habit, cat: cat),
+                  const SizedBox(height: 16),
+                ],
 
                 // Streak heatmap
-                if (habit != null)
-                  _HabitHeatmapCard(habitId: habit.id),
+                if (habit != null) _HabitHeatmapCard(habitId: habit.id),
                 const SizedBox(height: 16),
 
                 // Accessories card
                 _AccessoriesCard(cat: cat),
                 const SizedBox(height: 16),
 
-                // Cat info card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Cat Info',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _InfoRow(
-                          label: 'Personality',
-                          value:
-                              '${personality?.emoji ?? ''} ${personality?.name ?? cat.personality}',
-                        ),
-                        _InfoRow(
-                          label: 'State',
-                          value: cat.state.toUpperCase(),
-                        ),
-                        _InfoRow(
-                          label: 'Pelt',
-                          value: cat.appearance.peltType,
-                        ),
-                        if (cat.appearance.isLonghair)
-                          const _InfoRow(
-                            label: 'Fur',
-                            value: 'Longhair',
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Enhanced cat info card
+                _EnhancedCatInfoCard(cat: cat),
                 const SizedBox(height: 32),
               ]),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGrowthCard(BuildContext context, Cat cat, Color stageClr) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Growth Progress',
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  cat.stageName,
+                  style: textTheme.labelLarge?.copyWith(
+                    color: stageClr,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: cat.growthProgress,
+                minHeight: 12,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation(stageClr),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  'Target: ${cat.targetMinutes ~/ 60}h',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            // Stage milestones
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _StageMilestone(
+                  name: 'Kitten',
+                  isReached: true,
+                  color: stageColor('kitten'),
+                ),
+                _StageMilestone(
+                  name: 'Adolescent',
+                  isReached: cat.growthProgress >= 0.20,
+                  color: stageColor('adolescent'),
+                ),
+                _StageMilestone(
+                  name: 'Adult',
+                  isReached: cat.growthProgress >= 0.45,
+                  color: stageColor('adult'),
+                ),
+                _StageMilestone(
+                  name: 'Senior',
+                  isReached: cat.growthProgress >= 0.75,
+                  color: stageColor('senior'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -485,68 +338,714 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen>
       ),
     );
   }
+}
 
-  void _showEditHabitDialog(BuildContext context, dynamic habit) {
-    final nameController = TextEditingController(text: habit.name);
-    final iconController = TextEditingController(text: habit.icon);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Edit Habit'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+// ─── Focus Statistics Card ───
+
+/// Shows quest info, 2-column stats grid, and Start Focus button.
+class _FocusStatsCard extends ConsumerWidget {
+  final Habit habit;
+  final Cat cat;
+
+  const _FocusStatsCard({required this.habit, required this.cat});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
+    final todayMap = ref.watch(todayMinutesPerHabitProvider);
+    final todayMinutes = todayMap[habit.id] ?? 0;
+    final daysActive =
+        max(1, DateTime.now().difference(habit.createdAt).inDays);
+    final avgDaily = habit.totalMinutes ~/ daysActive;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: iconController,
-              decoration: const InputDecoration(
-                labelText: 'Icon (emoji)',
-                prefixIcon: Icon(Icons.emoji_emotions_outlined),
-              ),
-              autofocus: true,
+            // Header: icon + name + Quest badge + edit button
+            Row(
+              children: [
+                Text(habit.icon, style: const TextStyle(fontSize: 24)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    habit.name,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Quest',
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  onPressed: () => _showEditQuestSheet(context),
+                  tooltip: 'Edit quest',
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Habit name',
-                prefixIcon: Icon(Icons.label_outline),
+            const SizedBox(height: 16),
+
+            // 2-column stats grid
+            Table(
+              children: [
+                _statRow(
+                  context,
+                  Icons.flag_outlined,
+                  'Daily goal',
+                  '${habit.goalMinutes} min',
+                  Icons.today,
+                  "Today's focus",
+                  '$todayMinutes min',
+                ),
+                _statRow(
+                  context,
+                  Icons.timer_outlined,
+                  'Total focus',
+                  '${habit.totalMinutes ~/ 60}h ${habit.totalMinutes % 60}m',
+                  Icons.emoji_events_outlined,
+                  'Target',
+                  '${habit.targetHours}h',
+                ),
+                _statRow(
+                  context,
+                  Icons.pie_chart_outline,
+                  'Completion',
+                  '${(habit.progressPercent * 100).toStringAsFixed(0)}%',
+                  Icons.local_fire_department,
+                  'Current streak',
+                  '${habit.currentStreak}d',
+                ),
+                _statRow(
+                  context,
+                  Icons.star_outline,
+                  'Best streak',
+                  '${habit.bestStreak}d',
+                  Icons.trending_up,
+                  'Avg daily',
+                  '${avgDaily}m',
+                ),
+                _statRow(
+                  context,
+                  Icons.calendar_today_outlined,
+                  'Days active',
+                  '$daysActive',
+                  null,
+                  null,
+                  null,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Start Focus button
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonalIcon(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    AppRouter.focusSetup,
+                    arguments: habit.id,
+                  );
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Start Focus'),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final newName = nameController.text.trim();
-              final newIcon = iconController.text.trim();
-              if (newName.isEmpty && newIcon.isEmpty) return;
-              final uid = ref.read(currentUidProvider);
-              if (uid == null) return;
-              HapticFeedback.mediumImpact();
-              await ref.read(firestoreServiceProvider).updateHabit(
-                    uid: uid,
-                    habitId: habit.id,
-                    name: newName.isNotEmpty ? newName : null,
-                    icon: newIcon.isNotEmpty ? newIcon : null,
-                  );
-              if (ctx.mounted) {
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                    content: Text('Habit updated!'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
       ),
+    );
+  }
+
+  TableRow _statRow(
+    BuildContext context,
+    IconData icon1,
+    String label1,
+    String value1,
+    IconData? icon2,
+    String? label2,
+    String? value2,
+  ) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: _StatCell(icon: icon1, label: label1, value: value1),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: icon2 != null
+              ? _StatCell(icon: icon2, label: label2!, value: value2!)
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+
+  void _showEditQuestSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: _EditQuestSheet(habit: habit),
+      ),
+    );
+  }
+}
+
+// ─── Reminder Card ───
+
+/// Shows/sets/removes a daily reminder for this quest.
+class _ReminderCard extends ConsumerWidget {
+  final Habit habit;
+  final Cat cat;
+
+  const _ReminderCard({required this.habit, required this.cat});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+    final hasReminder =
+        habit.reminderTime != null && habit.reminderTime!.isNotEmpty;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(
+              hasReminder
+                  ? Icons.notifications_active
+                  : Icons.notifications_none,
+              color: hasReminder
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Daily Reminder',
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    hasReminder
+                        ? '${habit.reminderTime} every day'
+                        : 'No reminder set',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (hasReminder) ...[
+              TextButton(
+                onPressed: () => _setReminder(context, ref),
+                child: const Text('Change'),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, size: 18, color: colorScheme.error),
+                onPressed: () => _removeReminder(context, ref),
+                tooltip: 'Remove reminder',
+                visualDensity: VisualDensity.compact,
+              ),
+            ] else
+              OutlinedButton.icon(
+                onPressed: () => _setReminder(context, ref),
+                icon: const Icon(Icons.add_alarm, size: 18),
+                label: const Text('Set'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _setReminder(BuildContext context, WidgetRef ref) async {
+    final initial = habit.reminderTime != null
+        ? _parseTime(habit.reminderTime!)
+        : const TimeOfDay(hour: 8, minute: 0);
+    final picked = await showTimePicker(context: context, initialTime: initial);
+    if (picked == null || !context.mounted) return;
+
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+    final timeStr = _formatTimeOfDay(picked);
+
+    await ref.read(firestoreServiceProvider).updateHabit(
+          uid: uid,
+          habitId: habit.id,
+          reminderTime: timeStr,
+        );
+    await ref.read(notificationServiceProvider).scheduleDailyReminder(
+          habitId: habit.id,
+          habitName: habit.name,
+          catName: cat.name,
+          hour: picked.hour,
+          minute: picked.minute,
+        );
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Reminder set for $timeStr'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeReminder(BuildContext context, WidgetRef ref) async {
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+
+    await ref.read(firestoreServiceProvider).updateHabit(
+          uid: uid,
+          habitId: habit.id,
+          clearReminder: true,
+        );
+    await ref.read(notificationServiceProvider).cancelDailyReminder(habit.id);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Reminder removed'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  static TimeOfDay _parseTime(String time) {
+    final parts = time.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  static String _formatTimeOfDay(TimeOfDay t) {
+    return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// ─── Edit Quest Sheet ───
+
+/// Modal bottom sheet for editing quest: emoji, name, goal, target.
+class _EditQuestSheet extends ConsumerStatefulWidget {
+  final Habit habit;
+
+  const _EditQuestSheet({required this.habit});
+
+  @override
+  ConsumerState<_EditQuestSheet> createState() => _EditQuestSheetState();
+}
+
+class _EditQuestSheetState extends ConsumerState<_EditQuestSheet> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _iconController;
+  late int _selectedGoal;
+  late int _selectedTarget;
+  bool _isSaving = false;
+
+  static const _defaultGoalOptions = [15, 25, 40, 60];
+  static const _defaultTargetOptions = [50, 100, 200, 500];
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.habit.name);
+    _iconController = TextEditingController(text: widget.habit.icon);
+    _selectedGoal = widget.habit.goalMinutes;
+    _selectedTarget = widget.habit.targetHours;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _iconController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
+    // Include current value in chips if non-standard
+    final goalChips = _buildChipValues(_defaultGoalOptions, _selectedGoal);
+    final targetChips = _buildChipValues(_defaultTargetOptions, _selectedTarget);
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 32,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Text(
+              'Edit Quest',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Emoji field
+            TextField(
+              controller: _iconController,
+              decoration: const InputDecoration(
+                labelText: 'Icon (emoji)',
+                prefixIcon: Icon(Icons.emoji_emotions_outlined),
+              ),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 16),
+
+            // Name field
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Quest name',
+                prefixIcon: Icon(Icons.label_outline),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Daily goal chips
+            Text('Daily goal (minutes)', style: textTheme.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: goalChips.map((mins) {
+                return ChoiceChip(
+                  label: Text('$mins'),
+                  selected: _selectedGoal == mins,
+                  onSelected: (_) => setState(() => _selectedGoal = mins),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 24),
+
+            // Target hours chips
+            Text('Target total (hours)', style: textTheme.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: targetChips.map((hrs) {
+                return ChoiceChip(
+                  label: Text('$hrs'),
+                  selected: _selectedTarget == hrs,
+                  onSelected: (_) => setState(() => _selectedTarget = hrs),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 32),
+
+            // Save button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: FilledButton(
+                onPressed: _isSaving ? null : _save,
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<int> _buildChipValues(List<int> defaults, int current) {
+    final chips = [...defaults];
+    if (!chips.contains(current)) {
+      chips.add(current);
+      chips.sort();
+    }
+    return chips;
+  }
+
+  Future<void> _save() async {
+    final name = _nameController.text.trim();
+    final icon = _iconController.text.trim();
+    if (name.isEmpty) return;
+
+    setState(() => _isSaving = true);
+
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+
+    HapticFeedback.mediumImpact();
+    await ref.read(firestoreServiceProvider).updateHabit(
+          uid: uid,
+          habitId: widget.habit.id,
+          name: name != widget.habit.name ? name : null,
+          icon: icon.isNotEmpty && icon != widget.habit.icon ? icon : null,
+          goalMinutes: _selectedGoal != widget.habit.goalMinutes
+              ? _selectedGoal
+              : null,
+          targetHours: _selectedTarget != widget.habit.targetHours
+              ? _selectedTarget
+              : null,
+        );
+
+    if (mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Quest updated!'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+}
+
+// ─── Enhanced Cat Info Card ───
+
+/// About card — personality, appearance summary, expandable details, status.
+class _EnhancedCatInfoCard extends StatelessWidget {
+  final Cat cat;
+
+  const _EnhancedCatInfoCard({required this.cat});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+    final personality = personalityMap[cat.personality];
+    final a = cat.appearance;
+    final summary = fullSummary(a);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'About ${cat.name}',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Personality
+            if (personality != null) ...[
+              Row(
+                children: [
+                  Text(
+                    '${personality.emoji} ',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    personality.name,
+                    style: textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                personality.flavorText,
+                style: textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+            // Summary line
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(summary, style: textTheme.bodyMedium),
+            ),
+            const SizedBox(height: 8),
+
+            // Expandable appearance details
+            Theme(
+              data: theme.copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text('Appearance details', style: textTheme.labelLarge),
+                tilePadding: EdgeInsets.zero,
+                childrenPadding: EdgeInsets.zero,
+                children: _buildAppearanceDetails(a),
+              ),
+            ),
+
+            const Divider(height: 24),
+            _InfoRow(
+              label: 'Status',
+              value:
+                  cat.state[0].toUpperCase() + cat.state.substring(1),
+            ),
+            _InfoRow(label: 'Adopted', value: _formatDate(cat.createdAt)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildAppearanceDetails(CatAppearance a) {
+    final details = <Widget>[
+      _InfoRow(label: 'Fur pattern', value: peltTypeDescription(a.peltType)),
+      _InfoRow(label: 'Fur color', value: peltColorDescription(a.peltColor)),
+      _InfoRow(
+          label: 'Fur length', value: furLengthDescription(a.isLonghair)),
+      _InfoRow(
+          label: 'Eyes', value: eyeDescription(a.eyeColor, a.eyeColor2)),
+    ];
+
+    if (a.whitePatches != null) {
+      details.add(_InfoRow(label: 'White patches', value: a.whitePatches!));
+    }
+    final patchesTint = whitePatchesTintDescription(a.whitePatchesTint);
+    if (patchesTint != null) {
+      details.add(_InfoRow(label: 'Patches tint', value: patchesTint));
+    }
+    if (a.tint != 'none') {
+      details.add(_InfoRow(
+        label: 'Tint',
+        value: a.tint[0].toUpperCase() + a.tint.substring(1),
+      ));
+    }
+    if (a.points != null) {
+      details.add(_InfoRow(label: 'Points', value: a.points!));
+    }
+    if (a.vitiligo != null) {
+      details.add(_InfoRow(label: 'Vitiligo', value: a.vitiligo!));
+    }
+    if (a.isTortie) {
+      details.add(const _InfoRow(label: 'Tortoiseshell', value: 'Yes'));
+      if (a.tortiePattern != null) {
+        details
+            .add(_InfoRow(label: 'Tortie pattern', value: a.tortiePattern!));
+      }
+      if (a.tortieColor != null) {
+        details.add(_InfoRow(
+          label: 'Tortie color',
+          value: peltColorDescription(a.tortieColor!),
+        ));
+      }
+    }
+    details
+        .add(_InfoRow(label: 'Skin', value: skinColorDescription(a.skinColor)));
+
+    return details;
+  }
+
+  static String _formatDate(DateTime d) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${months[d.month - 1]} ${d.day}, ${d.year}';
+  }
+}
+
+// ─── Helper Widgets ───
+
+class _StatCell extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _StatCell({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: colorScheme.onSurfaceVariant),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Text(
+                value,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -757,11 +1256,13 @@ class _AccessoriesCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         TextButton.icon(
                           onPressed: () => _unequip(context, ref),
-                          icon: const Icon(Icons.remove_circle_outline, size: 16),
+                          icon: const Icon(Icons.remove_circle_outline,
+                              size: 16),
                           label: const Text('Unequip'),
                           style: TextButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8),
                           ),
                         ),
                       ],

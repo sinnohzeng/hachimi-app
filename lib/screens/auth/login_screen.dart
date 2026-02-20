@@ -92,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Tagline
                 Text(
-                  'Raise cats. Build habits.',
+                  'Raise cats. Complete quests.',
                   style: textTheme.bodyLarge?.copyWith(
                     color: Colors.white70,
                   ),

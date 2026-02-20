@@ -115,6 +115,9 @@ hachimi-app/
 │   │       ├── focus_complete_screen.dart  # XP 动画 + 会话总结
 │   │       └── timer_screen.dart           # 活跃计时器（含前台服务）
 │   │
+│   │   └── utils/
+│   │       └── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
+│   │
 │   └── widgets/                            # 可复用 UI 组件（优先无状态）
 │       ├── accessory_card.dart             # 可复用饰品卡片（名称、价格标签、已拥有徽章）
 │       ├── accessory_shop_section.dart     # CatDetailScreen 中的配饰网格 + 购买流程
@@ -123,6 +126,7 @@ hachimi-app/
 │       ├── emoji_picker.dart               # 分类 Emoji 选择器（约 200 个 Emoji，7 个分类标签 + 快速选择）
 │       ├── offline_banner.dart             # 离线指示器：cloud_off 图标 + 同步提示
 │       ├── pixel_cat_sprite.dart           # 像素风猫咪显示组件（从 Provider 渲染 ui.Image）
+│       ├── tappable_cat_sprite.dart       # 点击切换姿势封装组件（弹跳 + 触觉 + 本地变体）
 │       ├── progress_ring.dart              # 圆形进度指示器（计时器圆环）
 │       ├── streak_heatmap.dart             # 91 天 GitHub 风格活动热力图
 │       └── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章

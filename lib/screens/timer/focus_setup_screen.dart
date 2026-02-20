@@ -7,7 +7,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/widgets/circular_duration_picker.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 /// Focus setup screen — select duration and mode before starting a session.
 /// Shows the cat companion and habit info prominently.
@@ -67,7 +67,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     if (habit == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Habit not found')),
+        body: const Center(child: Text('Quest not found')),
       );
     }
 
@@ -122,7 +122,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
 
               // Cat display
               if (cat != null) ...[
-                PixelCatSprite.fromCat(cat: cat, size: 120),
+                TappableCatSprite(cat: cat, size: 120),
                 const SizedBox(height: 12),
                 Text(
                   cat.name,

@@ -22,7 +22,7 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -424,7 +424,7 @@ class _CatAlbumTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: PixelCatSprite.fromCat(cat: cat, size: 48),
+                  child: TappableCatSprite(cat: cat, size: 48),
                 ),
               ),
             ),

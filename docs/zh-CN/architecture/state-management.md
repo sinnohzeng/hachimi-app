@@ -244,6 +244,15 @@ Firebase Auth 流 ──────────────► authStateProvide
 - **消费者**：`InventoryScreen`、`_AccessoriesCard`
 - **SSOT**：道具箱装备/卸下操作的单例服务
 
+### `notificationServiceProvider`
+
+- **类型**：`Provider<NotificationService>`
+- **文件**：`lib/providers/auth_provider.dart`
+- **数据源**：实例化 `NotificationService`（单例）
+- **消费者**：`CatDetailScreen`（提醒卡片）、`SettingsScreen`、`TimerScreen`（权限引导 Banner）、`AdoptionFlowScreen`（提醒调度）
+- **SSOT**：调度/取消本地通知及 FCM 管理的单例服务
+- **初始化**：`NotificationService().initializePlugins()` 在 `main.dart` 应用启动时调用，初始化插件并创建通知渠道，不请求权限。权限在用户设置提醒或启动专注计时时按需请求。
+
 ---
 
 ### `focusTimerProvider`
@@ -264,9 +273,11 @@ Firebase Auth 流 ──────────────► authStateProvide
 | `totalSeconds` | int | 目标时长（倒计时模式）或 0（正计时模式） |
 | `remainingSeconds` | int | 剩余秒数（倒计时模式，计算属性） |
 | `elapsedSeconds` | int | 已用秒数（两种模式均记录） |
+| `totalPausedSeconds` | int | 累计暂停秒数（用于墙钟时间计算） |
 | `status` | 枚举 | `idle`、`running`、`paused`、`completed`、`abandoned` |
 | `mode` | 枚举 | `countdown`（倒计时）、`stopwatch`（正计时） |
 | `startedAt` | DateTime? | 会话开始时间戳 |
+| `pausedAt` | DateTime? | 暂停或进入后台时的时间戳 |
 
 **`FocusTimerNotifier` 方法：**
 
@@ -275,17 +286,19 @@ Firebase Auth 流 ──────────────► authStateProvide
 | `configure(habitId, catId, habitName, seconds, mode)` | 初始化计时器参数 |
 | `start()` | 启动计时器心跳 |
 | `pause()` | 暂停计时器（记录 `pausedAt`） |
-| `resume()` | 从暂停状态恢复 |
+| `resume()` | 从暂停状态恢复（将暂停时长累加到 `totalPausedSeconds`） |
 | `complete()` | 标记为已完成，清除持久化数据 |
 | `abandon()` | 标记为已放弃（>= 5 分钟获得部分 XP），清除持久化数据 |
-| `onAppBackgrounded()` | 记录应用进入后台的时间戳 |
-| `onAppResumed()` | 处理返回：< 15s 继续，> 5min 自动结束 |
+| `onAppBackgrounded()` | 记录 `pausedAt` 时间戳并保存状态；计时器通过墙钟继续运行 |
+| `onAppResumed()` | 从墙钟重算已过时间；倒计时结束或离开 >30 分钟时自动完成 |
 | `reset()` | 返回 `idle` 状态，清除持久化数据 |
 | `restoreSession()` | 从 SharedPreferences 恢复中断的会话 |
 | `static hasInterruptedSession()` | 检查是否有已保存的会话需要恢复 |
 | `static clearSavedState()` | 清除持久化的会话数据 |
 
-**持久化**：每 5 秒 + 状态变更时，计时器状态保存到 SharedPreferences（键前缀 `focus_timer_`）。`complete()`、`abandon()` 和 `reset()` 时清除。
+**墙钟锚定策略**：`_onTick()` 通过 `DateTime.now() - startedAt - totalPausedSeconds` 计算已过时间，而非每次心跳递增 1。这确保即使 App 进入后台、Dart isolate 被挂起，显示时间始终正确。恢复前台时，计时器自动追赶到真实时间。
+
+**持久化**：每 5 秒 + 状态变更时，计时器状态（含 `totalPausedSeconds`）保存到 SharedPreferences（键前缀 `focus_timer_`）。`complete()`、`abandon()` 和 `reset()` 时清除。
 
 **通知更新**：`_onTick()` 直接调用 `FocusTimerService.updateNotification()`，确保前台通知在 App 后台时也能实时更新。
 

@@ -169,14 +169,87 @@ The `peltColorToMaterial()` function in `pixel_cat_constants.dart` maps each of 
 
 ---
 
-## Cat Pose Tap-to-Cycle
+## TappableCatSprite — Reusable Tap-to-Cycle Widget
 
-In CatDetailScreen, tapping the cat sprite cycles through the 3 sprite variants (0 → 1 → 2 → 0). This is a **local UI-only state** — the persisted `appearance.spriteVariant` is not modified. The display variant resets when navigating away.
+**File:** `lib/widgets/tappable_cat_sprite.dart`
 
-- **Trigger**: `GestureDetector.onTap` on the `PixelCatSprite` widget
-- **Animation**: Scale bounce (0.9x → 1.0x over ~200ms) using `AnimationController`
-- **Haptic**: `HapticFeedback.lightImpact()` on each tap
-- **Sprite index override**: `computeSpriteIndex(stage, _displayVariant, isLonghair)` is called with the local variant instead of `cat.appearance.spriteVariant`
+`TappableCatSprite` is a reusable `StatefulWidget` that wraps `PixelCatSprite` with tap-to-cycle pose animation and bounce feedback. It is used **everywhere** a cat sprite appears in the app (10+ screens).
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `cat` | `Cat` | required | The cat to display |
+| `size` | `double` | required | Sprite display size in logical pixels |
+| `enableTap` | `bool` | `true` | Whether tap-to-cycle is enabled |
+
+**Internal State:**
+- `_displayVariant` (int?) — local-only pose index, not persisted. Resets when widget is disposed.
+- `_bounceController` — `AnimationController` (200ms) for scale bounce animation.
+
+**Behavior:**
+- **Tap**: Cycles variant = `(current + 1) % 3`, triggers `HapticFeedback.lightImpact()`, plays bounce
+- **Animation**: Scale bounce (0.9x → 1.0x over ~200ms) via `TweenSequence`
+- **Sprite**: Calls `computeSpriteIndex(stage, _displayVariant, isLonghair)` with local variant override
+- **Build**: `GestureDetector` → `AnimatedBuilder` → `Transform.scale` → `PixelCatSprite`
+
+**Usage locations (10+ files):**
+- `cat_detail_screen.dart` (120px), `home_screen.dart` (72px featured card), `focus_setup_screen.dart` (120px), `timer_screen.dart` (100px), `focus_complete_screen.dart` (120px), `cat_room_screen.dart` (80px), `profile_screen.dart` (48px), `adoption_flow_screen.dart` (preview)
+
+> **Note:** `PixelCatSprite` is retained as the low-level rendering widget. `TappableCatSprite` is the interaction layer wrapper.
+
+---
+
+## Appearance Parameter Human-Readable Descriptions
+
+**File:** `lib/core/utils/appearance_descriptions.dart`
+
+Provides human-readable descriptions for all cat appearance parameters. Used by the Cat Detail Page's enhanced Cat Info Card.
+
+| Function | Input → Output | Example |
+|----------|---------------|---------|
+| `peltTypeDescription(String)` | Pelt type ID → readable name | `"tabby"` → `"Classic tabby stripes"` |
+| `peltColorDescription(String)` | Pelt color ID → readable name | `"GINGER"` → `"Bright ginger"` |
+| `eyeDescription(String, String?)` | Eye color + second eye → description | `"BLUE", "GREEN"` → `"Heterochromia (Blue / Green)"` |
+| `furLengthDescription(bool)` | isLonghair → readable | `true` → `"Longhair"` |
+| `fullSummary(CatAppearance)` | Full appearance → 1-line summary | `"Ginger tabby, golden eyes, longhair"` |
+
+---
+
+## Cat Detail Page Layout
+
+The Cat Detail Page (`CatDetailScreen`) is the **information hub** for a cat and its associated quest. Layout from top to bottom:
+
+```
+┌─────────────────────────────────────┐
+│ SliverAppBar (280px)                │
+│   TappableCatSprite (120px)         │
+│   Cat Name + Rename Button          │
+│   Personality Badge                 │
+├─────────────────────────────────────┤
+│ Mood Badge                          │
+├─────────────────────────────────────┤
+│ Growth Progress Card                │
+├─────────────────────────────────────┤
+│ Focus Statistics Card               │
+│   habit.icon + name + [Edit]        │
+│   2-column stats grid (9 metrics)   │
+│   [Start Focus] button              │
+├─────────────────────────────────────┤
+│ Reminder Card                       │
+│   Set / Change / Remove reminder    │
+├─────────────────────────────────────┤
+│ Activity Heatmap Card               │
+├─────────────────────────────────────┤
+│ Accessories Card                    │
+├─────────────────────────────────────┤
+│ Cat Info Card (expandable)          │
+│   Personality + flavor text         │
+│   1-line appearance summary         │
+│   [Expand] full appearance details  │
+│   Status + Adopted date             │
+└─────────────────────────────────────┘
+```
 
 ---
 

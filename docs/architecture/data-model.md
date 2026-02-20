@@ -206,12 +206,15 @@ Batch includes:
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
 ### 4. Habit Update (Edit)
-**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, icon?})`
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, icon?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
 
-Single document update:
-1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name` and/or `icon`)
+Single or multi-document update:
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `icon`, `goalMinutes`, `targetHours`, `reminderTime`; if `clearReminder == true`, set `reminderTime` to `null`)
+2. If `targetHours` changed: `UPDATE users/{uid}/cats/{catId}.targetMinutes` — sync to `targetHours × 60` (reads habit's `catId` to find bound cat)
 
-**Validation**: At least one field must be non-null. Empty strings are rejected.
+**Validation**: At least one field must be non-null or `clearReminder` must be true. Empty strings are rejected.
+
+> **Note:** Internal identifier remains `habit`. User-facing term is **Quest**.
 
 ### 5. Accessory Purchase (Inventory Model)
 **Method:** `CoinService.purchaseAccessory(uid, accessoryId, price)`

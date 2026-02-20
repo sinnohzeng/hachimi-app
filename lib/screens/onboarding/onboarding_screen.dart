@@ -19,8 +19,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingPageData(
       emoji: '🐱',
       title: 'Welcome to Hachimi',
-      subtitle: 'Raise cats, build habits',
-      body: 'Every habit you create comes with a kitten.\n'
+      subtitle: 'Raise cats, complete quests',
+      body: 'Every quest you start comes with a kitten.\n'
           'Focus on your goals and watch them grow\n'
           'from tiny kittens into shiny cats!',
       gradientColors: [Color(0xFF6C63FF), Color(0xFF3F3D9E)],

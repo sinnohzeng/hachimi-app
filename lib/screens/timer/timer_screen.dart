@@ -26,7 +26,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
 /// Focus timer in-progress screen.
@@ -235,7 +235,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     if (habit == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Habit not found')),
+        body: const Center(child: Text('Quest not found')),
       );
     }
 
@@ -325,7 +325,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     ),
                     // Cat sprite
                     if (cat != null)
-                      PixelCatSprite.fromCat(cat: cat, size: 100)
+                      TappableCatSprite(cat: cat, size: 100)
                     else
                       Text(habit.icon,
                           style: const TextStyle(fontSize: 64)),

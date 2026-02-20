@@ -172,14 +172,87 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 
 ---
 
-## 猫咪姿势点击切换
+## TappableCatSprite — 可复用点击切换组件
 
-在 CatDetailScreen 中，点击猫咪精灵图可循环切换 3 种精灵变体（0 → 1 → 2 → 0）。这是 **纯本地 UI 状态** —— 不会修改持久化的 `appearance.spriteVariant`。离开页面后显示变体会重置。
+**文件：** `lib/widgets/tappable_cat_sprite.dart`
 
-- **触发方式**：`PixelCatSprite` 组件上的 `GestureDetector.onTap`
-- **动画**：缩放弹跳（0.9x → 1.0x，约 200ms），使用 `AnimationController`
-- **触觉反馈**：每次点击触发 `HapticFeedback.lightImpact()`
-- **精灵索引覆盖**：使用本地变体替代 `cat.appearance.spriteVariant` 调用 `computeSpriteIndex(stage, _displayVariant, isLonghair)`
+`TappableCatSprite` 是一个可复用的 `StatefulWidget`，封装了 `PixelCatSprite` 并添加了点击切换姿势动画和弹跳反馈。在应用中所有出现猫咪精灵图的页面（10+ 个）都使用此组件。
+
+**属性：**
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `cat` | `Cat` | 必填 | 要显示的猫咪 |
+| `size` | `double` | 必填 | 精灵图显示大小（逻辑像素） |
+| `enableTap` | `bool` | `true` | 是否启用点击切换 |
+
+**内部状态：**
+- `_displayVariant`（int?）—— 纯本地姿势索引，不持久化。组件销毁时重置。
+- `_bounceController` —— `AnimationController`（200ms），用于缩放弹跳动画。
+
+**行为：**
+- **点击**：循环 variant = `(current + 1) % 3`，触发 `HapticFeedback.lightImpact()`，播放弹跳
+- **动画**：缩放弹跳（0.9x → 1.0x，约 200ms），通过 `TweenSequence` 实现
+- **精灵图**：使用本地变体覆盖调用 `computeSpriteIndex(stage, _displayVariant, isLonghair)`
+- **构建**：`GestureDetector` → `AnimatedBuilder` → `Transform.scale` → `PixelCatSprite`
+
+**使用位置（10+ 个文件）：**
+- `cat_detail_screen.dart`（120px）、`home_screen.dart`（72px 精选猫咪卡片）、`focus_setup_screen.dart`（120px）、`timer_screen.dart`（100px）、`focus_complete_screen.dart`（120px）、`cat_room_screen.dart`（80px）、`profile_screen.dart`（48px）、`adoption_flow_screen.dart`（预览）
+
+> **注意：** `PixelCatSprite` 保留为底层渲染组件。`TappableCatSprite` 是交互层包装。
+
+---
+
+## 外观参数人类可读描述
+
+**文件：** `lib/core/utils/appearance_descriptions.dart`
+
+为所有猫咪外观参数提供人类可读的描述。用于猫咪详情页增强版 Cat Info Card。
+
+| 函数 | 输入 → 输出 | 示例 |
+|------|------------|------|
+| `peltTypeDescription(String)` | 毛皮类型 ID → 可读名称 | `"tabby"` → `"Classic tabby stripes"` |
+| `peltColorDescription(String)` | 毛色 ID → 可读名称 | `"GINGER"` → `"Bright ginger"` |
+| `eyeDescription(String, String?)` | 眼睛颜色 + 第二眼 → 描述 | `"BLUE", "GREEN"` → `"Heterochromia (Blue / Green)"` |
+| `furLengthDescription(bool)` | isLonghair → 可读 | `true` → `"Longhair"` |
+| `fullSummary(CatAppearance)` | 完整外观 → 1 行摘要 | `"Ginger tabby, golden eyes, longhair"` |
+
+---
+
+## 猫咪详情页布局
+
+猫咪详情页（`CatDetailScreen`）是猫咪及其关联任务的 **信息中枢**。布局从上到下：
+
+```
+┌─────────────────────────────────────┐
+│ SliverAppBar（280px）               │
+│   TappableCatSprite（120px）        │
+│   猫咪名字 + 重命名按钮             │
+│   性格徽章                          │
+├─────────────────────────────────────┤
+│ 心情徽章                            │
+├─────────────────────────────────────┤
+│ 成长进度卡片                        │
+├─────────────────────────────────────┤
+│ 专注统计卡片                        │
+│   habit.icon + 名称 + [编辑]        │
+│   2 列统计网格（9 项指标）           │
+│   [开始专注] 按钮                   │
+├─────────────────────────────────────┤
+│ 提醒卡片                            │
+│   设置 / 修改 / 移除提醒            │
+├─────────────────────────────────────┤
+│ 活动热力图卡片                      │
+├─────────────────────────────────────┤
+│ 配饰卡片                            │
+├─────────────────────────────────────┤
+│ 猫咪信息卡片（可展开）              │
+│   性格 + 性格语录                   │
+│   1 行外观摘要                      │
+│   [展开] 完整外观详情               │
+│   状态 + 领养日期                   │
+└─────────────────────────────────────┘
+```
 
 ---
 

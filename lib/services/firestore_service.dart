@@ -125,18 +125,41 @@ class FirestoreService {
     return (habitId: habitRef.id, catId: catRef.id);
   }
 
-  /// Update a habit's name and/or icon.
+  /// Update a habit's editable fields.
+  /// When [targetHours] changes, syncs [cat.targetMinutes] = targetHours × 60.
   Future<void> updateHabit({
     required String uid,
     required String habitId,
     String? name,
     String? icon,
+    int? goalMinutes,
+    int? targetHours,
+    String? reminderTime,
+    bool clearReminder = false,
   }) async {
     final updates = <String, dynamic>{};
     if (name != null && name.trim().isNotEmpty) updates['name'] = name.trim();
     if (icon != null && icon.trim().isNotEmpty) updates['icon'] = icon.trim();
+    if (goalMinutes != null) updates['goalMinutes'] = goalMinutes;
+    if (targetHours != null) updates['targetHours'] = targetHours;
+    if (reminderTime != null) updates['reminderTime'] = reminderTime;
+    if (clearReminder) updates['reminderTime'] = null;
     if (updates.isEmpty) return;
+
     await _habitsRef(uid).doc(habitId).update(updates);
+
+    // Sync cat.targetMinutes when targetHours changes
+    if (targetHours != null) {
+      final habitDoc = await _habitsRef(uid).doc(habitId).get();
+      if (habitDoc.exists) {
+        final catId = (habitDoc.data() as Map<String, dynamic>)['catId'] as String?;
+        if (catId != null && catId.isNotEmpty) {
+          await _catsRef(uid).doc(catId).update({
+            'targetMinutes': targetHours * 60,
+          });
+        }
+      }
+    }
   }
 
   Future<void> deleteHabit({

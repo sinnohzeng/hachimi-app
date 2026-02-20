@@ -88,7 +88,7 @@ class StatsScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Per-Habit Progress', style: textTheme.titleMedium),
+            child: Text('Per-Quest Progress', style: textTheme.titleMedium),
           ),
         ),
 
@@ -106,7 +106,7 @@ class StatsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(32),
                   child: Center(
                     child: Text(
-                      'No habits yet',
+                      'No quests yet',
                       style: textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

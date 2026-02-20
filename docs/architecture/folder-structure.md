@@ -115,6 +115,9 @@ hachimi-app/
 │   │       ├── focus_complete_screen.dart  # XP animation + session summary
 │   │       └── timer_screen.dart           # Active timer with foreground service
 │   │
+│   │   └── utils/
+│   │       └── appearance_descriptions.dart # Human-readable descriptions for cat appearance parameters
+│   │
 │   └── widgets/                            # Reusable UI components (stateless preferred)
 │       ├── accessory_card.dart             # Reusable accessory card (name, price badge, owned badge)
 │       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
@@ -123,6 +126,7 @@ hachimi-app/
 │       ├── emoji_picker.dart               # Categorized emoji picker (~200 emojis in 7 tabs + quick pick)
 │       ├── offline_banner.dart             # Offline indicator: cloud_off + sync message
 │       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
+│       ├── tappable_cat_sprite.dart       # Tap-to-cycle pose wrapper (bounce + haptic + local variant)
 │       ├── progress_ring.dart              # Circular progress indicator (timer ring)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
 │       └── streak_indicator.dart           # Fire badge showing current streak count

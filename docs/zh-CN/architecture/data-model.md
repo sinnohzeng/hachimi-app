@@ -204,12 +204,15 @@ dormant --[习惯重新激活]--> active（未来功能）
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
 ### 4. 习惯更新（编辑）
-**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, icon?})`
+**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, icon?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
 
-单文档更新：
-1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name` 和/或 `icon`）
+单文档或多文档更新：
+1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`icon`、`goalMinutes`、`targetHours`、`reminderTime`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`）
+2. 若 `targetHours` 发生变更：`UPDATE users/{uid}/cats/{catId}.targetMinutes` — 同步为 `targetHours × 60`（通过读取 habit 的 `catId` 找到绑定的猫咪）
 
-**验证**：至少一个字段不为 null，空字符串将被拒绝。
+**验证**：至少一个字段不为 null 或 `clearReminder` 必须为 true，空字符串将被拒绝。
+
+> **注意：** 内部标识符仍为 `habit`，面向用户的术语为 **Quest（任务）**。
 
 ### 5. 配饰购买（道具箱模型）
 

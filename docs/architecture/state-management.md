@@ -244,6 +244,15 @@ Device connectivity (independent of auth):
 - **Consumers**: `InventoryScreen`, `_AccessoriesCard`
 - **SSOT for**: The singleton service for inventory equip/unequip operations
 
+### `notificationServiceProvider`
+
+- **Type**: `Provider<NotificationService>`
+- **File**: `lib/providers/auth_provider.dart`
+- **Source**: Instantiates `NotificationService` (singleton)
+- **Consumers**: `CatDetailScreen` (reminder card), `SettingsScreen`, `TimerScreen` (permission banner), `AdoptionFlowScreen` (reminder scheduling)
+- **SSOT for**: The singleton service for scheduling/cancelling local notifications and FCM management
+- **Initialization**: `NotificationService().initializePlugins()` is called in `main.dart` during app startup. This initializes the plugin and creates notification channels without requesting permissions. Permission is requested lazily when the user sets a reminder or starts a focus session.
+
 ---
 
 ### `focusTimerProvider`
@@ -264,9 +273,11 @@ Device connectivity (independent of auth):
 | `totalSeconds` | int | Target duration (countdown) or 0 (stopwatch) |
 | `remainingSeconds` | int | Seconds left (countdown mode, computed) |
 | `elapsedSeconds` | int | Seconds elapsed (both modes) |
+| `totalPausedSeconds` | int | Cumulative paused seconds (used for wall-clock calculation) |
 | `status` | enum | `idle`, `running`, `paused`, `completed`, `abandoned` |
 | `mode` | enum | `countdown`, `stopwatch` |
 | `startedAt` | DateTime? | Session start timestamp |
+| `pausedAt` | DateTime? | Timestamp when timer was paused or app went to background |
 
 **`FocusTimerNotifier` methods:**
 
@@ -275,17 +286,19 @@ Device connectivity (independent of auth):
 | `configure(habitId, catId, habitName, seconds, mode)` | Initialize timer parameters |
 | `start()` | Start the timer tick |
 | `pause()` | Pause the timer (record `pausedAt`) |
-| `resume()` | Resume from paused state |
+| `resume()` | Resume from paused state (accumulate pause duration into `totalPausedSeconds`) |
 | `complete()` | Mark as completed, clear saved state |
 | `abandon()` | Mark as abandoned (partial XP if >= 5 min), clear saved state |
-| `onAppBackgrounded()` | Record backgrounding timestamp |
-| `onAppResumed()` | Handle return: auto-pause under 15s, auto-end over 5min |
+| `onAppBackgrounded()` | Record `pausedAt` timestamp and save state; timer continues running via wall-clock |
+| `onAppResumed()` | Recompute elapsed from wall-clock; auto-complete if countdown finished or >30 min away |
 | `reset()` | Return to `idle` state, clear saved state |
 | `restoreSession()` | Restore interrupted session from SharedPreferences |
 | `static hasInterruptedSession()` | Check if there's a saved session to recover |
 | `static clearSavedState()` | Clear persisted session data |
 
-**Persistence:** Every 5 seconds + on state changes, the timer state is saved to SharedPreferences (keys prefixed `focus_timer_`). On `complete()`, `abandon()`, and `reset()`, saved state is cleared.
+**Wall-clock anchoring strategy:** `_onTick()` computes elapsed time as `DateTime.now() - startedAt - totalPausedSeconds` instead of incrementing by 1 each tick. This ensures the displayed time is always correct even when the app is backgrounded and the Dart isolate is suspended. On resume from background, the timer catches up to real time automatically.
+
+**Persistence:** Every 5 seconds + on state changes, the timer state (including `totalPausedSeconds`) is saved to SharedPreferences (keys prefixed `focus_timer_`). On `complete()`, `abandon()`, and `reset()`, saved state is cleared.
 
 **Notification updates:** `_onTick()` directly calls `FocusTimerService.updateNotification()` so the foreground notification stays current even when the app is in the background.
 

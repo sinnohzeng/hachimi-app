@@ -25,7 +25,7 @@ class HabitDetailScreen extends ConsumerWidget {
         if (habit == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Habit not found')),
+            body: const Center(child: Text('Quest not found')),
           );
         }
 

@@ -6,6 +6,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/widgets/emoji_picker.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 /// 3-step adoption flow: Define Habit → Adopt Cat → Name Cat.
 /// Creates both a habit and its bound cat in Firestore on completion.
@@ -55,7 +56,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     if (_currentStep == 0) {
       if (_nameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a habit name')),
+          const SnackBar(content: Text('Please enter a quest name')),
         );
         return;
       }
@@ -170,7 +171,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       appBar: AppBar(
         title: Text(widget.isFirstHabit
             ? 'Adopt Your First Cat!'
-            : 'New Habit'),
+            : 'New Quest'),
         leading: _currentStep > 0
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -182,7 +183,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           _StepIndicator(
             currentStep: _currentStep,
-            steps: const ['Define Habit', 'Adopt Cat', 'Name Cat'],
+            steps: const ['Define Quest', 'Adopt Cat', 'Name Cat'],
           ),
           Expanded(
             child: PageView(
@@ -240,7 +241,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           if (widget.isFirstHabit) ...[
             Text(
-              'What habit do you want to build?',
+              'What quest do you want to start?',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -259,7 +260,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           TextFormField(
             controller: _nameController,
             decoration: const InputDecoration(
-              labelText: 'Habit name',
+              labelText: 'Quest name',
               hintText: 'e.g. Prepare interview questions',
               prefixIcon: Icon(Icons.edit_outlined),
             ),
@@ -521,7 +522,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
           // Large preview of selected cat
           if (cat != null) ...[
-            PixelCatSprite.fromCat(cat: cat, size: 120),
+            TappableCatSprite(cat: cat, size: 120),
             const SizedBox(height: 12),
             Text(
               cat.name,
@@ -663,7 +664,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
           // Cat preview
           if (cat != null) ...[
-            PixelCatSprite.fromCat(cat: cat, size: 120),
+            TappableCatSprite(cat: cat, size: 120),
             const SizedBox(height: 12),
             if (personality != null)
               Text(

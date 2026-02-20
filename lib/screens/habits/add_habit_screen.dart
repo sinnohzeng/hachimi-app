@@ -81,7 +81,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Habit'),
+        title: const Text('New Quest'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -94,13 +94,13 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Habit name',
+                  labelText: 'Quest name',
                   hintText: 'e.g. LeetCode Practice',
                   prefixIcon: Icon(Icons.edit),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a habit name';
+                    return 'Please enter a quest name';
                   }
                   return null;
                 },
@@ -172,7 +172,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.check),
-                  label: const Text('Create Habit'),
+                  label: const Text('Create Quest'),
                 ),
               ),
             ],

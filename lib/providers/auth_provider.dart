@@ -7,6 +7,7 @@ import 'package:hachimi_app/services/cat_firestore_service.dart';
 import 'package:hachimi_app/services/coin_service.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/migration_service.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 /// Service providers — singletons
@@ -25,6 +26,8 @@ final migrationServiceProvider =
     Provider<MigrationService>((ref) => MigrationService());
 final xpServiceProvider =
     Provider<XpService>((ref) => XpService());
+final notificationServiceProvider =
+    Provider<NotificationService>((ref) => NotificationService());
 
 /// Auth state — SSOT for current user authentication.
 /// Streams from Firebase Auth state changes.

@@ -9,6 +9,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
 import 'package:hachimi_app/widgets/check_in_banner.dart';
@@ -41,7 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? FloatingActionButton(
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRouter.adoption),
-              tooltip: 'Add habit',
+              tooltip: 'New quest',
               child: const Icon(Icons.add),
             )
           : null,
@@ -160,7 +161,7 @@ class _TodayTab extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Your Habits',
+              'Your Quests',
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -186,14 +187,14 @@ class _TodayTab extends ConsumerWidget {
                       const Text('🐱', style: TextStyle(fontSize: 64)),
                       const SizedBox(height: 16),
                       Text(
-                        'No habits yet',
+                        'No quests yet',
                         style: textTheme.titleLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tap + to create a habit and adopt a cat!',
+                        'Tap + to start a quest and adopt a cat!',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -261,7 +262,7 @@ class _TodayTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete habit?'),
+        title: const Text('Delete quest?'),
         content: Text(
           'Are you sure you want to delete "$habitName"? '
           'The cat will be graduated to your album.',
@@ -287,7 +288,7 @@ class _TodayTab extends ConsumerWidget {
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   SnackBar(
-                    content: Text('$habitName graduated'),
+                    content: Text('$habitName completed'),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -340,7 +341,7 @@ class _FeaturedCatCard extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                PixelCatSprite.fromCat(cat: cat, size: 72),
+                TappableCatSprite(cat: cat, size: 72),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

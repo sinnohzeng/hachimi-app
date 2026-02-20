@@ -21,7 +21,7 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/services/xp_service.dart';
-import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 /// Focus complete celebration screen.
 /// Shows minutes earned, XP breakdown, stage-up animation, and session stats.
@@ -105,7 +105,7 @@ class FocusCompleteScreen extends ConsumerWidget {
 
                 // Cat display
                 if (cat != null) ...[
-                  PixelCatSprite.fromCat(cat: cat, size: 120),
+                  TappableCatSprite(cat: cat, size: 120),
                   const SizedBox(height: 12),
                   Text(
                     cat.name,
