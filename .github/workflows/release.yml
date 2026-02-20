@@ -67,6 +67,10 @@ jobs:
           storeFile=${{ github.workspace }}/android/app/hachimi-release.jks
           EOF
 
+      # Accept Android SDK licenses (needed for NDK 29 used by llama_cpp_dart)
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
+
       # Create empty asset directories (git doesn't track empty dirs)
       - name: Create empty asset directories
         run: mkdir -p assets/sprites assets/room
