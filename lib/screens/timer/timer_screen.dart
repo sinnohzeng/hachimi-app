@@ -20,6 +20,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/background_color_utils.dart';
+import 'package:hachimi_app/widgets/animated_mesh_background.dart';
+import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/focus_session.dart';
@@ -210,6 +213,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     await ref.read(firestoreServiceProvider).logFocusSession(
           uid: uid,
           session: session,
+          habitName: habit.name,
         );
 
     if (mounted) {
@@ -276,10 +280,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    // Use stage color for background gradient
+    // Use stage color for mesh gradient background
     final bgColor = cat != null
         ? stageColor(cat.computedStage)
         : colorScheme.primary;
+    final meshColors = timerMeshColors(bgColor, colorScheme);
 
     // Grace period: first 10 seconds allow free exit
     final isRunningOrPaused = timerState.status == TimerStatus.running ||
@@ -304,19 +309,26 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         _giveUp();
       },
       child: Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              bgColor.withValues(alpha: 0.15),
-              bgColor.withValues(alpha: 0.05),
-              colorScheme.surface,
-            ],
+      body: Stack(
+        children: [
+          // Layer 1: Slow breathing mesh gradient
+          Positioned.fill(
+            child: AnimatedMeshBackground(
+              colors: meshColors,
+              speed: 0.3,
+            ),
           ),
-        ),
-        child: SafeArea(
+          // Layer 2: Subtle floating dust particles
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: ParticleOverlay(
+                mode: ParticleMode.dust,
+                child: SizedBox.expand(),
+              ),
+            ),
+          ),
+          // Layer 3: Original content
+          SafeArea(
           child: Column(
             children: [
               // Notification permission banner
@@ -501,6 +513,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             ],
           ),
         ),
+        ],
       ),
     ));
   }

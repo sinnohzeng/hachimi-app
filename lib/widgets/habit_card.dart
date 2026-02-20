@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
@@ -41,7 +42,10 @@ class HabitCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     final icon = iconMap[habit.icon] ?? Icons.check_circle;
 
-    return Card(
+    return Semantics(
+      label: '${habit.name}, ${habit.progressText}',
+      button: true,
+      child: Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
         onTap: onTap,
@@ -74,7 +78,7 @@ class HabitCard extends StatelessWidget {
                     if (todayMinutes > 0) ...[
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Today: ${todayMinutes}min',
+                        context.l10n.habitTodayMinutes(todayMinutes),
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.w500,
@@ -94,12 +98,13 @@ class HabitCard extends StatelessWidget {
                 icon: Icon(Icons.delete_outline,
                     color: colorScheme.onSurfaceVariant),
                 onPressed: onDelete,
-                tooltip: 'Delete habit',
+                tooltip: context.l10n.habitDeleteTooltip,
               ),
             ],
           ),
         ),
       ),
+    ),
     );
   }
 }

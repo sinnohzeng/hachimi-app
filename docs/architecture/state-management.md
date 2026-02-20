@@ -152,7 +152,7 @@ Device connectivity (independent of auth):
 ### `catFirestoreServiceProvider`
 
 - **Type**: `Provider<CatFirestoreService>`
-- **File**: `lib/providers/auth_provider.dart`
+- **File**: `lib/providers/service_providers.dart`
 - **Source**: Instantiates `CatFirestoreService` with Firestore instance
 - **Consumers**: `catsProvider`, `allCatsProvider`, and any provider that needs to read/write cat documents
 - **SSOT for**: The singleton service instance for all cat-related Firestore operations
@@ -239,7 +239,7 @@ Device connectivity (independent of auth):
 ### `inventoryServiceProvider`
 
 - **Type**: `Provider<InventoryService>`
-- **File**: `lib/providers/auth_provider.dart`
+- **File**: `lib/providers/service_providers.dart`
 - **Source**: Instantiates `InventoryService`
 - **Consumers**: `InventoryScreen`, `_AccessoriesCard`
 - **SSOT for**: The singleton service for inventory equip/unequip operations
@@ -247,7 +247,7 @@ Device connectivity (independent of auth):
 ### `notificationServiceProvider`
 
 - **Type**: `Provider<NotificationService>`
-- **File**: `lib/providers/auth_provider.dart`
+- **File**: `lib/providers/service_providers.dart`
 - **Source**: Instantiates `NotificationService` (singleton)
 - **Consumers**: `CatDetailScreen` (reminder card), `SettingsScreen`, `TimerScreen` (permission banner), `AdoptionFlowScreen` (reminder scheduling)
 - **SSOT for**: The singleton service for scheduling/cancelling local notifications and FCM management

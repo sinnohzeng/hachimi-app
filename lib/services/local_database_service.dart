@@ -9,8 +9,10 @@
 // 🕒 创建时间：2026-02-19
 // ---
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/diary_entry.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 
@@ -86,7 +88,8 @@ class LocalDatabaseService {
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[LocalDB] insertDiaryEntry failed: $e');
       return false;
     }
   }
@@ -106,7 +109,7 @@ class LocalDatabaseService {
   /// 获取指定猫猫当天的日记。
   Future<DiaryEntry?> getTodayDiary(String catId) async {
     final db = await database;
-    final today = _todayString();
+    final today = AppDateUtils.todayString();
     final maps = await db.query(
       'diary_entries',
       where: 'cat_id = ? AND date = ?',
@@ -159,13 +162,6 @@ class LocalDatabaseService {
       where: 'cat_id = ?',
       whereArgs: [catId],
     );
-  }
-
-  // ─── Helpers ───
-
-  static String _todayString() {
-    final now = DateTime.now();
-    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
   /// 关闭数据库连接。

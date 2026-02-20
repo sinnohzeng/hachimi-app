@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/connectivity_provider.dart';
 
 /// Offline banner — shows a Material 3 warning bar when the device has no
@@ -16,7 +17,7 @@ class OfflineBanner extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Semantics(
-      label: 'Offline mode',
+      label: context.l10n.offlineModeLabel,
       liveRegion: true,
       child: Container(
         width: double.infinity,
@@ -36,7 +37,7 @@ class OfflineBanner extends ConsumerWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                "You're offline — changes will sync when reconnected",
+                context.l10n.offlineMessage,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: colorScheme.onErrorContainer,
                     ),

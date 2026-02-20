@@ -136,6 +136,7 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
       state = LlmAvailability.ready;
     } catch (e) {
       state = LlmAvailability.error;
+      rethrow;
     }
   }
 

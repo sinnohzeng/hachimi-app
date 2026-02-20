@@ -24,22 +24,27 @@ class ThemeSettings {
   final ThemeMode mode;
   final Color seedColor;
   final bool useDynamicColor;
+  final bool enableBackgroundAnimation;
 
   const ThemeSettings({
     this.mode = ThemeMode.system,
     this.seedColor = const Color(0xFF4285F4),
     this.useDynamicColor = true,
+    this.enableBackgroundAnimation = true,
   });
 
   ThemeSettings copyWith({
     ThemeMode? mode,
     Color? seedColor,
     bool? useDynamicColor,
+    bool? enableBackgroundAnimation,
   }) {
     return ThemeSettings(
       mode: mode ?? this.mode,
       seedColor: seedColor ?? this.seedColor,
       useDynamicColor: useDynamicColor ?? this.useDynamicColor,
+      enableBackgroundAnimation:
+          enableBackgroundAnimation ?? this.enableBackgroundAnimation,
     );
   }
 }
@@ -49,6 +54,7 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
   static const _keyThemeMode = 'theme_mode';
   static const _keySeedColor = 'theme_seed_color';
   static const _keyDynamicColor = 'theme_dynamic_color';
+  static const _keyBgAnimation = 'theme_bg_animation';
 
   @override
   ThemeSettings build() {
@@ -75,11 +81,18 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     _persist();
   }
 
+  /// Toggle animated backgrounds (mesh gradient + floating particles).
+  void setBackgroundAnimation(bool enabled) {
+    state = state.copyWith(enableBackgroundAnimation: enabled);
+    _persist();
+  }
+
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyThemeMode, state.mode.index);
     await prefs.setInt(_keySeedColor, state.seedColor.toARGB32());
     await prefs.setBool(_keyDynamicColor, state.useDynamicColor);
+    await prefs.setBool(_keyBgAnimation, state.enableBackgroundAnimation);
   }
 
   Future<void> _load() async {
@@ -87,6 +100,7 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     final modeIndex = prefs.getInt(_keyThemeMode);
     final colorValue = prefs.getInt(_keySeedColor);
     final dynamicColor = prefs.getBool(_keyDynamicColor);
+    final bgAnimation = prefs.getBool(_keyBgAnimation);
 
     state = ThemeSettings(
       mode: modeIndex != null ? ThemeMode.values[modeIndex] : ThemeMode.system,
@@ -94,6 +108,7 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
           ? Color(colorValue)
           : AppTheme.defaultSeedColor,
       useDynamicColor: dynamicColor ?? true,
+      enableBackgroundAnimation: bgAnimation ?? true,
     );
   }
 }

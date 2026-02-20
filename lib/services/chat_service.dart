@@ -115,34 +115,31 @@ class ChatService {
         _tokenController.add(token);
       }
 
-      final response = _cleanResponse(buffer.toString());
+      final response = _llmService.cleanResponse(buffer.toString());
       final cleanedResponse =
           response.isEmpty ? _fallbackResponse(chatCtx.isZhLocale) : response;
 
       // 5. 保存助手回复到 SQLite
-      final assistantMsg = ChatMessage(
-        id: _uuid.v4(),
-        catId: chatCtx.cat.id,
-        role: ChatRole.assistant,
-        content: cleanedResponse,
-        createdAt: DateTime.now(),
-      );
-      await _dbService.insertChatMessage(assistantMsg);
-
+      await _saveAssistantMessage(chatCtx.cat.id, cleanedResponse);
       return cleanedResponse;
     } catch (e) {
       // 生成失败时返回 fallback 并保存
       final fallback = _fallbackResponse(chatCtx.isZhLocale);
-      final assistantMsg = ChatMessage(
-        id: _uuid.v4(),
-        catId: chatCtx.cat.id,
-        role: ChatRole.assistant,
-        content: fallback,
-        createdAt: DateTime.now(),
-      );
-      await _dbService.insertChatMessage(assistantMsg);
+      await _saveAssistantMessage(chatCtx.cat.id, fallback);
       return fallback;
     }
+  }
+
+  /// 保存助手回复消息到 SQLite。
+  Future<void> _saveAssistantMessage(String catId, String content) async {
+    final msg = ChatMessage(
+      id: _uuid.v4(),
+      catId: catId,
+      role: ChatRole.assistant,
+      content: content,
+      createdAt: DateTime.now(),
+    );
+    await _dbService.insertChatMessage(msg);
   }
 
   /// 停止当前生成。
@@ -183,15 +180,6 @@ class ChatService {
     buffer.write(ChatPrompt.assistantPrefix);
 
     return buffer.toString();
-  }
-
-  /// 清理生成文本中的特殊 token 标记。
-  String _cleanResponse(String text) {
-    return text
-        .replaceAll('<|im_end|>', '')
-        .replaceAll('<|im_start|>', '')
-        .replaceAll('<|endoftext|>', '')
-        .trim();
   }
 
   String _fallbackResponse(bool isZhLocale) {

@@ -16,8 +16,14 @@
   "adoptionTargetHours": "目标时长",
   "adoptionTargetHoursHint": "完成这个习惯的总时长",
   "adoptionMinutes": "{count} 分钟",
+  "@adoptionMinutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "adoptionRefreshCat": "换一只",
   "adoptionPersonality": "性格：{name}",
+  "@adoptionPersonality": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "adoptionNameYourCat": "给猫猫起个名字",
   "adoptionRandomName": "随机",
   "adoptionCreate": "创建习惯并领养",
@@ -27,34 +33,70 @@
   "catHouseTitle": "猫屋",
   "catHouseEmpty": "还没有猫猫！创建一个习惯来领养你的第一只猫。",
   "catHouseGrowth": "{minutes} / {target} 分钟",
+  "@catHouseGrowth": {
+    "placeholders": {
+      "minutes": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
 
   "catDetailGrowthProgress": "成长进度",
   "catDetailTotalMinutes": "已专注 {minutes} 分钟",
+  "@catDetailTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
   "catDetailTargetMinutes": "目标：{minutes} 分钟",
+  "@catDetailTargetMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
   "catDetailRename": "重命名",
   "catDetailAccessories": "饰品",
   "catDetailStartFocus": "开始专注",
   "catDetailBoundHabit": "绑定习惯",
   "catDetailStage": "阶段：{stage}",
+  "@catDetailStage": {
+    "placeholders": { "stage": { "type": "String" } }
+  },
 
   "coinBalance": "{amount} 金币",
+  "@coinBalance": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
   "coinCheckInReward": "+{amount} 金币！",
+  "@coinCheckInReward": {
+    "placeholders": { "amount": { "type": "int" } }
+  },
   "coinCheckInTitle": "每日签到",
   "coinInsufficientBalance": "金币不足",
 
   "shopTitle": "饰品商店",
   "shopPrice": "{price} 金币",
+  "@shopPrice": {
+    "placeholders": { "price": { "type": "int" } }
+  },
   "shopPurchase": "购买",
   "shopEquipped": "已装备",
 
   "focusCompleteMinutes": "+{minutes} 分钟",
+  "@focusCompleteMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
   "focusCompleteStageUp": "阶段提升！",
   "focusCompleteGreatJob": "干得好！",
   "focusCompleteDone": "完成",
   "focusCompleteItsOkay": "没关系！",
   "focusCompleteEvolved": "{catName} 进化了！",
+  "@focusCompleteEvolved": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
   "focusCompleteFocusedFor": "你专注了 {minutes} 分钟",
+  "@focusCompleteFocusedFor": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
   "focusCompleteAbandonedMessage": "{catName} 说：「我们下次再来！」",
+  "@focusCompleteAbandonedMessage": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
   "focusCompleteFocusTime": "专注时长",
   "focusCompleteCoinsEarned": "获得金币",
   "focusCompleteBaseXp": "基础 XP",
@@ -63,11 +105,21 @@
   "focusCompleteFullHouseBonus": "全勤奖励",
   "focusCompleteTotal": "总计",
   "focusCompleteEvolvedTo": "进化到 {stage}！",
+  "@focusCompleteEvolvedTo": {
+    "placeholders": { "stage": { "type": "String" } }
+  },
   "focusCompleteYourCat": "你的猫猫",
   "focusCompleteDiaryWriting": "正在写日记...",
   "focusCompleteDiaryWritten": "日记已写好！",
   "focusCompleteNotifTitle": "任务完成！",
   "focusCompleteNotifBody": "{catName} 通过 {minutes} 分钟专注获得了 +{xp} XP",
+  "@focusCompleteNotifBody": {
+    "placeholders": {
+      "catName": { "type": "String" },
+      "xp": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
 
   "stageKitten": "幼猫",
   "stageAdolescent": "少年猫",
@@ -80,6 +132,12 @@
 
   "sessionResumeTitle": "恢复会话？",
   "sessionResumeMessage": "你有一个未完成的专注会话（{habitName}，{elapsed}）。是否恢复？",
+  "@sessionResumeMessage": {
+    "placeholders": {
+      "habitName": { "type": "String" },
+      "elapsed": { "type": "String" }
+    }
+  },
   "sessionResumeButton": "恢复",
   "sessionDiscard": "丢弃",
 
@@ -92,10 +150,22 @@
   "todayFocus": "专注",
   "todayDeleteQuestTitle": "删除任务？",
   "todayDeleteQuestMessage": "确定要删除「{name}」吗？猫猫将被送入图鉴。",
+  "@todayDeleteQuestMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "todayQuestCompleted": "{name} 已完成",
+  "@todayQuestCompleted": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "todayFailedToLoad": "加载任务失败",
   "todayMinToday": "今天 {count} 分钟",
+  "@todayMinToday": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "todayGoalMinPerDay": "目标：{count} 分钟/天",
+  "@todayGoalMinPerDay": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "todayFeaturedCat": "明星猫猫",
   "todayAddHabit": "添加习惯",
   "todayNoHabits": "创建第一个习惯来开始吧！",
@@ -115,6 +185,9 @@
   "timerNotificationDismiss": "忽略",
   "timerNotificationEnable": "启用",
   "timerGraceBack": "返回（{seconds}s）",
+  "@timerGraceBack": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
   "giveUpTitle": "放弃？",
   "giveUpMessage": "如果你已专注超过 5 分钟，时间仍会计入猫猫的成长。猫猫会理解的！",
   "giveUpKeepGoing": "继续加油",
@@ -162,7 +235,13 @@
   "profileBestStreak": "最长连续",
   "profileCatAlbum": "猫猫图鉴",
   "profileCatAlbumCount": "{count} 只猫",
+  "@profileCatAlbumCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "profileSeeAll": "查看全部 {count} 只猫",
+  "@profileSeeAll": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "profileGraduated": "已毕业",
   "profileSettings": "设置",
 
@@ -216,6 +295,9 @@
   "catDetailRenameTooltip": "重命名",
   "catDetailGrowthTitle": "成长进度",
   "catDetailTarget": "目标：{hours}h",
+  "@catDetailTarget": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
   "catDetailRenameTitle": "重命名猫猫",
   "catDetailNewName": "新名字",
   "catDetailRenamed": "猫猫已重命名！",
@@ -238,17 +320,26 @@
   "catDetailQuestUpdated": "任务已更新！",
   "catDetailDailyReminder": "每日提醒",
   "catDetailEveryDay": "每天 {time}",
+  "@catDetailEveryDay": {
+    "placeholders": { "time": { "type": "String" } }
+  },
   "catDetailNoReminder": "未设置提醒",
   "catDetailChange": "更改",
   "catDetailRemoveReminder": "移除提醒",
   "catDetailSet": "设置",
   "catDetailReminderSet": "提醒已设置为 {time}",
+  "@catDetailReminderSet": {
+    "placeholders": { "time": { "type": "String" } }
+  },
   "catDetailReminderRemoved": "提醒已移除",
   "catDetailDiaryTitle": "Hachimi 日记",
   "catDetailDiaryLoading": "加载中...",
   "catDetailDiaryError": "无法加载日记",
   "catDetailDiaryEmpty": "今天还没有日记。完成一次专注吧！",
   "catDetailChatWith": "和 {name} 聊天",
+  "@catDetailChatWith": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "catDetailChatSubtitle": "和你的猫猫对话",
   "catDetailActivity": "活动",
   "catDetailActivityError": "加载活动数据失败",
@@ -257,10 +348,19 @@
   "catDetailNone": "无",
   "catDetailUnequip": "卸下",
   "catDetailFromInventory": "道具箱（{count}）",
+  "@catDetailFromInventory": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "catDetailNoAccessories": "还没有饰品。去商店看看吧！",
   "catDetailEquippedItem": "已装备 {name}",
+  "@catDetailEquippedItem": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "catDetailUnequipped": "已卸下",
   "catDetailAbout": "关于 {name}",
+  "@catDetailAbout": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "catDetailAppearanceDetails": "外观详情",
   "catDetailStatus": "状态",
   "catDetailAdopted": "领养日期",
@@ -276,5 +376,24 @@
   "catDetailTortoiseshell": "玳瑁",
   "catDetailTortiePattern": "玳瑁花纹",
   "catDetailTortieColor": "玳瑁颜色",
-  "catDetailSkin": "肤色"
+  "catDetailSkin": "肤色",
+
+  "offlineMessage": "你已离线——重新连接时将自动同步",
+  "offlineModeLabel": "离线模式",
+  "habitTodayMinutes": "今天：{count}分钟",
+  "@habitTodayMinutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "habitDeleteTooltip": "删除习惯",
+  "heatmapActiveDays": "活跃天数",
+  "heatmapTotal": "总计",
+  "heatmapRate": "达标率",
+  "heatmapLess": "少",
+  "heatmapMore": "多",
+  "accessoryEquipped": "已装备",
+  "accessoryOwned": "已拥有",
+  "pickerMinUnit": "分钟",
+
+  "settingsBackgroundAnimation": "动态背景",
+  "settingsBackgroundAnimationSubtitle": "流体渐变和浮动粒子效果"
 }

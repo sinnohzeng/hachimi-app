@@ -52,11 +52,9 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     final result = await coinService.checkIn(uid);
 
     if (result != null && mounted) {
-      // 刷新签到状态
       ref.invalidate(hasCheckedInTodayProvider);
       ref.invalidate(monthlyCheckInProvider);
 
-      // 构建反馈文案
       HapticFeedback.mediumImpact();
 
       String message = '+${result.dailyCoins} coins! Daily check-in complete';

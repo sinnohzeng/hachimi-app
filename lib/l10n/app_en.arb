@@ -376,5 +376,24 @@
   "catDetailTortoiseshell": "Tortoiseshell",
   "catDetailTortiePattern": "Tortie pattern",
   "catDetailTortieColor": "Tortie color",
-  "catDetailSkin": "Skin"
+  "catDetailSkin": "Skin",
+
+  "offlineMessage": "You're offline — changes will sync when reconnected",
+  "offlineModeLabel": "Offline mode",
+  "habitTodayMinutes": "Today: {count}min",
+  "@habitTodayMinutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "habitDeleteTooltip": "Delete habit",
+  "heatmapActiveDays": "Active days",
+  "heatmapTotal": "Total",
+  "heatmapRate": "Rate",
+  "heatmapLess": "Less",
+  "heatmapMore": "More",
+  "accessoryEquipped": "Equipped",
+  "accessoryOwned": "Owned",
+  "pickerMinUnit": "min",
+
+  "settingsBackgroundAnimation": "Animated backgrounds",
+  "settingsBackgroundAnimationSubtitle": "Mesh gradient and floating particles"
 }

@@ -61,3 +61,4 @@ ios/Runner/GoogleService-Info.plist
 
 # Vendored native packages (cloned by scripts/setup_llm_vendor.sh)
 packages/
+android/build/.last_build_id

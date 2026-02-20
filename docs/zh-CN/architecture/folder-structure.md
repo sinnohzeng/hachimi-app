@@ -50,6 +50,11 @@ hachimi-app/
 │   │   │   ├── cat_constants.dart          # SSOT：阶段、心情、性格
 │   │   │   ├── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
 │   │   │   └── llm_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
+│   │   ├── utils/
+│   │   │   ├── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
+│   │   │   ├── date_utils.dart             # AppDateUtils — 统一日期字符串格式化
+│   │   │   ├── streak_utils.dart           # StreakUtils — 连续打卡计算逻辑
+│   │   │   └── background_color_utils.dart # 从猫咪阶段/毛色提取 mesh 渐变色
 │   │   ├── router/
 │   │   │   └── app_router.dart             # 命名路由注册表 + 路由常量
 │   │   └── theme/
@@ -92,7 +97,8 @@ hachimi-app/
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
 │   │   ├── app_info_provider.dart           # appInfoProvider（运行时从 package_info_plus 读取版本）
-│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider
+│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider（re-exports service_providers）
+│   │   ├── service_providers.dart          # 非认证 Service 单例（Firestore、Analytics、Coin、XP 等）
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider、catSpriteImageProvider (family)
 │   │   ├── accessory_provider.dart          # AccessoryInfo 数据类，用于商店和装备 UI
@@ -113,7 +119,16 @@ hachimi-app/
 │   │   ├── cat_detail/
 │   │   │   ├── cat_detail_screen.dart      # 猫咪信息、进度条、热力图、配饰
 │   │   │   ├── cat_diary_screen.dart     # AI 生成日记列表页
-│   │   │   └── cat_chat_screen.dart      # 猫猫聊天页（流式回复）
+│   │   │   ├── cat_chat_screen.dart      # 猫猫聊天页（流式回复）
+│   │   │   └── components/              # CatDetailScreen 提取的子组件
+│   │   │       ├── focus_stats_card.dart
+│   │   │       ├── reminder_card.dart
+│   │   │       ├── edit_quest_sheet.dart
+│   │   │       ├── cat_info_card.dart
+│   │   │       ├── diary_preview_card.dart
+│   │   │       ├── chat_entry_card.dart
+│   │   │       ├── habit_heatmap_card.dart
+│   │   │       └── accessories_card.dart
 │   │   ├── cat_room/
 │   │   │   ├── cat_room_screen.dart        # 2 列 CatHouse 网格，像素风猫咪
 │   │   │   └── accessory_shop_screen.dart  # 饰品商店：3 标签网格 + 购买流程
@@ -127,16 +142,20 @@ hachimi-app/
 │   │   │   └── profile_screen.dart         # 统计数据、猫咪相册、设置入口
 │   │   ├── settings/
 │   │   │   ├── settings_screen.dart        # 通知、语言、关于、账号操作
-│   │   │   └── model_test_chat_screen.dart # AI 模型测试聊天（验证 LLM 是否正常）
+│   │   │   ├── model_test_chat_screen.dart # AI 模型测试聊天（验证 LLM 是否正常）
+│   │   │   └── components/              # SettingsScreen 提取的子组件
+│   │   │       ├── notification_settings_dialog.dart
+│   │   │       ├── language_dialog.dart
+│   │   │       ├── theme_mode_dialog.dart
+│   │   │       ├── theme_color_dialog.dart
+│   │   │       ├── ai_model_section.dart
+│   │   │       └── section_header.dart
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # 活动热力图 + 各习惯进度
 │   │   └── timer/
 │   │       ├── focus_setup_screen.dart     # 启动前的时长 + 模式选择
 │   │       ├── focus_complete_screen.dart  # XP 动画 + 会话总结
 │   │       └── timer_screen.dart           # 活跃计时器（含前台服务）
-│   │
-│   │   └── utils/
-│   │       └── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
 │   │
 │   └── widgets/                            # 可复用 UI 组件（优先无状态）
 │       ├── accessory_card.dart             # 可复用饰品卡片（名称、价格标签、已拥有徽章）
@@ -152,7 +171,9 @@ hachimi-app/
 │       ├── empty_state.dart               # 统一空状态（图标 + 标题 + 副标题 + 可选 CTA）
 │       ├── error_state.dart               # 统一错误状态（图标 + 消息 + 重试按钮）
 │       ├── streak_heatmap.dart             # 91 天 GitHub 风格活动热力图
-│       └── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章
+│       ├── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章
+│       ├── animated_mesh_background.dart  # 可复用动态 mesh 渐变背景（含开关支持）
+│       └── particle_overlay.dart          # 浮动粒子覆盖层（萤火虫/浮尘预设）
 │
 ├── assets/
 │   ├── pixel_cat/                          # pixel-cat-maker 精灵图层

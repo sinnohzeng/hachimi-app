@@ -41,7 +41,7 @@ class HachimiApp extends ConsumerWidget {
               ? AppTheme.lightThemeFromScheme(lightDynamic)
               : AppTheme.lightTheme(themeSettings.seedColor),
           darkTheme: useDynamic
-              ? AppTheme.lightThemeFromScheme(darkDynamic!)
+              ? AppTheme.lightThemeFromScheme(darkDynamic ?? lightDynamic)
               : AppTheme.darkTheme(themeSettings.seedColor),
           themeMode: themeSettings.mode,
           locale: locale,

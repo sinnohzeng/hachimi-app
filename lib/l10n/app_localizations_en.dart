@@ -853,4 +853,50 @@ class SEn extends S {
 
   @override
   String get catDetailSkin => 'Skin';
+
+  @override
+  String get offlineMessage =>
+      'You\'re offline — changes will sync when reconnected';
+
+  @override
+  String get offlineModeLabel => 'Offline mode';
+
+  @override
+  String habitTodayMinutes(int count) {
+    return 'Today: ${count}min';
+  }
+
+  @override
+  String get habitDeleteTooltip => 'Delete habit';
+
+  @override
+  String get heatmapActiveDays => 'Active days';
+
+  @override
+  String get heatmapTotal => 'Total';
+
+  @override
+  String get heatmapRate => 'Rate';
+
+  @override
+  String get heatmapLess => 'Less';
+
+  @override
+  String get heatmapMore => 'More';
+
+  @override
+  String get accessoryEquipped => 'Equipped';
+
+  @override
+  String get accessoryOwned => 'Owned';
+
+  @override
+  String get pickerMinUnit => 'min';
+
+  @override
+  String get settingsBackgroundAnimation => 'Animated backgrounds';
+
+  @override
+  String get settingsBackgroundAnimationSubtitle =>
+      'Mesh gradient and floating particles';
 }

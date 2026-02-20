@@ -16,17 +16,11 @@
 //
 // 🧩 文件结构：
 // - CatDetailScreen：主页面 ConsumerStatefulWidget；
-// - _FocusStatsCard：专注统计卡片；
-// - _ReminderCard：每日提醒卡片；
-// - _EditQuestSheet：编辑任务 BottomSheet；
-// - _EnhancedCatInfoCard：增强版猫猫信息卡片；
-// - _StageMilestone / _HabitHeatmapCard / _AccessoriesCard / _InfoRow / _StatCell：辅助组件；
+// - 各子组件已拆分至 components/ 目录；
 //
 // 🕒 创建时间：2026-02-18
 // 🕒 重构时间：2026-02-19
 // ---
-
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -35,20 +29,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/core/utils/appearance_descriptions.dart';
 import 'package:hachimi_app/models/cat.dart';
-import 'package:hachimi_app/models/cat_appearance.dart';
-import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
-import 'package:hachimi_app/providers/diary_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/providers/inventory_provider.dart';
 import 'package:hachimi_app/providers/llm_provider.dart';
-import 'package:hachimi_app/widgets/streak_heatmap.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
-import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
-    show accessoryDisplayName, peltColorToMaterial;
+import 'package:hachimi_app/core/utils/background_color_utils.dart';
+import 'package:hachimi_app/widgets/animated_mesh_background.dart';
+import 'package:hachimi_app/widgets/particle_overlay.dart';
+
+import 'components/focus_stats_card.dart';
+import 'components/reminder_card.dart';
+import 'components/diary_preview_card.dart';
+import 'components/chat_entry_card.dart';
+import 'components/habit_heatmap_card.dart';
+import 'components/accessories_card.dart';
+import 'components/cat_info_card.dart';
 
 /// Cat detail page — the central hub for a cat and its bound quest.
 class CatDetailScreen extends ConsumerStatefulWidget {
@@ -82,87 +79,84 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final moodData = moodById(cat.computedMood);
     final stageClr = stageColor(cat.computedStage);
 
-    // Pelt color themed gradient: 70% pelt + 30% stage
-    final peltClr = peltColorToMaterial(cat.appearance.peltColor);
-    final headerColor = Color.lerp(peltClr, stageClr, 0.3)!;
+    // Mesh gradient colors derived from cat appearance
+    final meshColors = catMeshColors(
+      cat.computedStage,
+      cat.appearance.peltColor,
+      colorScheme,
+    );
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // Gradient app bar with pixel cat
-          SliverAppBar(
-            expandedHeight: 280,
-            pinned: true,
-            actions: [
-              // 聊天入口 — 仅当 AI 功能就绪时显示
-              if (ref.watch(llmAvailabilityProvider) ==
-                  LlmAvailability.ready)
-                IconButton(
-                  icon: const Icon(Icons.chat_bubble_outline),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      AppRouter.catChat,
-                      arguments: widget.catId,
-                    );
-                  },
-                  tooltip: context.l10n.catDetailChatTooltip,
-                ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      headerColor.withValues(alpha: 0.25),
-                      colorScheme.surface,
-                    ],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: AppSpacing.xxl),
-                      // Tappable cat sprite with bounce animation + Hero
-                      Hero(
-                        tag: 'cat-${cat.id}',
-                        child: TappableCatSprite(cat: cat, size: 120),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Row(
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              // Gradient app bar with pixel cat
+              SliverAppBar(
+                expandedHeight: 280,
+                pinned: true,
+                actions: [
+                  // 聊天入口 — 仅当 AI 功能就绪时显示
+                  if (ref.watch(llmAvailabilityProvider) ==
+                      LlmAvailability.ready)
+                    IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          AppRouter.catChat,
+                          arguments: widget.catId,
+                        );
+                      },
+                      tooltip: context.l10n.catDetailChatTooltip,
+                    ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  background: AnimatedMeshBackground(
+                    colors: meshColors,
+                    speed: 1.0,
+                    child: SafeArea(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            cat.name,
-                            style: textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: AppSpacing.xxl),
+                          // Tappable cat sprite with bounce animation + Hero
+                          Hero(
+                            tag: 'cat-${cat.id}',
+                            child: TappableCatSprite(cat: cat, size: 120),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                cat.name,
+                                style: textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 18),
+                                onPressed: () => _showRenameDialog(context, cat),
+                                tooltip: context.l10n.catDetailRenameTooltip,
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          if (personality != null)
+                            Text(
+                              '${personality.emoji} ${personality.name}',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          IconButton(
-                            icon: const Icon(Icons.edit, size: 18),
-                            onPressed: () => _showRenameDialog(context, cat),
-                            tooltip: context.l10n.catDetailRenameTooltip,
-                            visualDensity: VisualDensity.compact,
-                          ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.xs),
-                      if (personality != null)
-                        Text(
-                          '${personality.emoji} ${personality.name}',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
 
           SliverPadding(
             padding: AppSpacing.paddingBase,
@@ -195,41 +189,56 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
                 // Focus statistics card (replaces old "Bound Habit" card)
                 if (habit != null) ...[
-                  _FocusStatsCard(habit: habit, cat: cat),
+                  FocusStatsCard(habit: habit, cat: cat),
                   const SizedBox(height: AppSpacing.base),
                 ],
 
                 // Hachimi Diary card — AI 日记预览
                 if (ref.watch(llmAvailabilityProvider) ==
                     LlmAvailability.ready) ...[
-                  _DiaryPreviewCard(catId: cat.id),
+                  DiaryPreviewCard(catId: cat.id),
                   const SizedBox(height: AppSpacing.base),
 
                   // 聊天入口卡片 — 提升可发现性
-                  _ChatEntryCard(catId: cat.id, catName: cat.name),
+                  ChatEntryCard(catId: cat.id, catName: cat.name),
                   const SizedBox(height: AppSpacing.base),
                 ],
 
                 // Reminder card
                 if (habit != null) ...[
-                  _ReminderCard(habit: habit, cat: cat),
+                  ReminderCard(habit: habit, cat: cat),
                   const SizedBox(height: AppSpacing.base),
                 ],
 
                 // Streak heatmap
-                if (habit != null) _HabitHeatmapCard(habitId: habit.id),
+                if (habit != null) HabitHeatmapCard(habitId: habit.id),
                 const SizedBox(height: AppSpacing.base),
 
                 // Accessories card
-                _AccessoriesCard(cat: cat),
+                AccessoriesCard(cat: cat),
                 const SizedBox(height: AppSpacing.base),
 
                 // Enhanced cat info card
-                _EnhancedCatInfoCard(cat: cat),
+                EnhancedCatInfoCard(cat: cat),
                 const SizedBox(height: AppSpacing.xl),
               ]),
             ),
           ),
+          ],
+        ),
+        // Particle overlay — covers header area only
+        const Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 280,
+          child: IgnorePointer(
+            child: ParticleOverlay(
+              mode: ParticleMode.firefly,
+              child: SizedBox.expand(),
+            ),
+          ),
+        ),
         ],
       ),
     );
@@ -296,22 +305,22 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _StageMilestone(
+                StageMilestone(
                   name: context.l10n.stageKitten,
                   isReached: true,
                   color: stageColor('kitten'),
                 ),
-                _StageMilestone(
+                StageMilestone(
                   name: context.l10n.stageAdolescent,
                   isReached: cat.growthProgress >= 0.20,
                   color: stageColor('adolescent'),
                 ),
-                _StageMilestone(
+                StageMilestone(
                   name: context.l10n.stageAdult,
                   isReached: cat.growthProgress >= 0.45,
                   color: stageColor('adult'),
                 ),
-                _StageMilestone(
+                StageMilestone(
                   name: context.l10n.stageSenior,
                   isReached: cat.growthProgress >= 0.75,
                   color: stageColor('senior'),
@@ -366,1201 +375,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               }
             },
             child: Text(context.l10n.catDetailRename),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Focus Statistics Card ───
-
-/// Shows quest info, 2-column stats grid, and Start Focus button.
-class _FocusStatsCard extends ConsumerWidget {
-  final Habit habit;
-  final Cat cat;
-
-  const _FocusStatsCard({required this.habit, required this.cat});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-
-    final todayMap = ref.watch(todayMinutesPerHabitProvider);
-    final todayMinutes = todayMap[habit.id] ?? 0;
-    final daysActive =
-        max(1, DateTime.now().difference(habit.createdAt).inDays);
-    final avgDaily = habit.totalMinutes ~/ daysActive;
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: icon + name + Quest badge + edit button
-            Row(
-              children: [
-                Text(habit.icon, style: const TextStyle(fontSize: 24)),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    habit.name,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    context.l10n.catDetailQuestBadge,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                  onPressed: () => _showEditQuestSheet(context),
-                  tooltip: context.l10n.catDetailEditQuest,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.base),
-
-            // 2-column stats grid
-            Table(
-              children: [
-                _statRow(
-                  context,
-                  Icons.flag_outlined,
-                  context.l10n.catDetailDailyGoal,
-                  '${habit.goalMinutes} min',
-                  Icons.today,
-                  context.l10n.catDetailTodaysFocus,
-                  '$todayMinutes min',
-                ),
-                _statRow(
-                  context,
-                  Icons.timer_outlined,
-                  context.l10n.catDetailTotalFocus,
-                  '${habit.totalMinutes ~/ 60}h ${habit.totalMinutes % 60}m',
-                  Icons.emoji_events_outlined,
-                  context.l10n.catDetailTargetLabel,
-                  '${habit.targetHours}h',
-                ),
-                _statRow(
-                  context,
-                  Icons.pie_chart_outline,
-                  context.l10n.catDetailCompletion,
-                  '${(habit.progressPercent * 100).toStringAsFixed(0)}%',
-                  Icons.local_fire_department,
-                  context.l10n.catDetailCurrentStreak,
-                  '${habit.currentStreak}d',
-                ),
-                _statRow(
-                  context,
-                  Icons.star_outline,
-                  context.l10n.catDetailBestStreakLabel,
-                  '${habit.bestStreak}d',
-                  Icons.trending_up,
-                  context.l10n.catDetailAvgDaily,
-                  '${avgDaily}m',
-                ),
-                _statRow(
-                  context,
-                  Icons.calendar_today_outlined,
-                  context.l10n.catDetailDaysActive,
-                  '$daysActive',
-                  null,
-                  null,
-                  null,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.base),
-
-            // Start Focus button
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonalIcon(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    AppRouter.focusSetup,
-                    arguments: habit.id,
-                  );
-                },
-                icon: const Icon(Icons.play_arrow),
-                label: Text(context.l10n.catDetailStartFocus),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  TableRow _statRow(
-    BuildContext context,
-    IconData icon1,
-    String label1,
-    String value1,
-    IconData? icon2,
-    String? label2,
-    String? value2,
-  ) {
-    return TableRow(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: _StatCell(icon: icon1, label: label1, value: value1),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: icon2 != null
-              ? _StatCell(icon: icon2, label: label2!, value: value2!)
-              : const SizedBox.shrink(),
-        ),
-      ],
-    );
-  }
-
-  void _showEditQuestSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-        child: _EditQuestSheet(habit: habit),
-      ),
-    );
-  }
-}
-
-// ─── Reminder Card ───
-
-/// Shows/sets/removes a daily reminder for this quest.
-class _ReminderCard extends ConsumerWidget {
-  final Habit habit;
-  final Cat cat;
-
-  const _ReminderCard({required this.habit, required this.cat});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-    final hasReminder =
-        habit.reminderTime != null && habit.reminderTime!.isNotEmpty;
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Row(
-          children: [
-            Icon(
-              hasReminder
-                  ? Icons.notifications_active
-                  : Icons.notifications_none,
-              color: hasReminder
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.l10n.catDetailDailyReminder,
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    hasReminder
-                        ? context.l10n.catDetailEveryDay(habit.reminderTime!)
-                        : context.l10n.catDetailNoReminder,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (hasReminder) ...[
-              TextButton(
-                onPressed: () => _setReminder(context, ref),
-                child: Text(context.l10n.catDetailChange),
-              ),
-              IconButton(
-                icon: Icon(Icons.close, size: 18, color: colorScheme.error),
-                onPressed: () => _removeReminder(context, ref),
-                tooltip: context.l10n.catDetailRemoveReminder,
-                visualDensity: VisualDensity.compact,
-              ),
-            ] else
-              OutlinedButton.icon(
-                onPressed: () => _setReminder(context, ref),
-                icon: const Icon(Icons.add_alarm, size: 18),
-                label: Text(context.l10n.catDetailSet),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _setReminder(BuildContext context, WidgetRef ref) async {
-    final initial = habit.reminderTime != null
-        ? _parseTime(habit.reminderTime!)
-        : const TimeOfDay(hour: 8, minute: 0);
-    final picked = await showTimePicker(context: context, initialTime: initial);
-    if (picked == null || !context.mounted) return;
-
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-    final timeStr = _formatTimeOfDay(picked);
-
-    await ref.read(firestoreServiceProvider).updateHabit(
-          uid: uid,
-          habitId: habit.id,
-          reminderTime: timeStr,
-        );
-    await ref.read(notificationServiceProvider).scheduleDailyReminder(
-          habitId: habit.id,
-          habitName: habit.name,
-          catName: cat.name,
-          hour: picked.hour,
-          minute: picked.minute,
-        );
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.catDetailReminderSet(timeStr)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
-  Future<void> _removeReminder(BuildContext context, WidgetRef ref) async {
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-
-    await ref.read(firestoreServiceProvider).updateHabit(
-          uid: uid,
-          habitId: habit.id,
-          clearReminder: true,
-        );
-    await ref.read(notificationServiceProvider).cancelDailyReminder(habit.id);
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.catDetailReminderRemoved),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
-  static TimeOfDay _parseTime(String time) {
-    final parts = time.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-  }
-
-  static String _formatTimeOfDay(TimeOfDay t) {
-    return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
-  }
-}
-
-// ─── Edit Quest Sheet ───
-
-/// Modal bottom sheet for editing quest: emoji, name, goal, target.
-class _EditQuestSheet extends ConsumerStatefulWidget {
-  final Habit habit;
-
-  const _EditQuestSheet({required this.habit});
-
-  @override
-  ConsumerState<_EditQuestSheet> createState() => _EditQuestSheetState();
-}
-
-class _EditQuestSheetState extends ConsumerState<_EditQuestSheet> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _iconController;
-  late int _selectedGoal;
-  late int _selectedTarget;
-  bool _isSaving = false;
-
-  static const _defaultGoalOptions = [15, 25, 40, 60];
-  static const _defaultTargetOptions = [50, 100, 200, 500];
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.habit.name);
-    _iconController = TextEditingController(text: widget.habit.icon);
-    _selectedGoal = widget.habit.goalMinutes;
-    _selectedTarget = widget.habit.targetHours;
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _iconController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-
-    // Include current value in chips if non-standard
-    final goalChips = _buildChipValues(_defaultGoalOptions, _selectedGoal);
-    final targetChips = _buildChipValues(_defaultTargetOptions, _selectedTarget);
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.base),
-
-            Text(
-              context.l10n.catDetailEditQuestTitle,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Emoji field
-            TextField(
-              controller: _iconController,
-              decoration: InputDecoration(
-                labelText: context.l10n.catDetailIconEmoji,
-                prefixIcon: const Icon(Icons.emoji_emotions_outlined),
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 24),
-            ),
-            const SizedBox(height: AppSpacing.base),
-
-            // Name field
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: context.l10n.catDetailQuestName,
-                prefixIcon: const Icon(Icons.label_outline),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Daily goal chips
-            Text(context.l10n.catDetailDailyGoalMinutes, style: textTheme.labelLarge),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 8,
-              children: goalChips.map((mins) {
-                return ChoiceChip(
-                  label: Text('$mins'),
-                  selected: _selectedGoal == mins,
-                  onSelected: (_) => setState(() => _selectedGoal = mins),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Target hours chips
-            Text(context.l10n.catDetailTargetTotalHours, style: textTheme.labelLarge),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 8,
-              children: targetChips.map((hrs) {
-                return ChoiceChip(
-                  label: Text('$hrs'),
-                  selected: _selectedTarget == hrs,
-                  onSelected: (_) => setState(() => _selectedTarget = hrs),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // Save button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton(
-                onPressed: _isSaving ? null : _save,
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(context.l10n.commonSave),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<int> _buildChipValues(List<int> defaults, int current) {
-    final chips = [...defaults];
-    if (!chips.contains(current)) {
-      chips.add(current);
-      chips.sort();
-    }
-    return chips;
-  }
-
-  Future<void> _save() async {
-    final name = _nameController.text.trim();
-    final icon = _iconController.text.trim();
-    if (name.isEmpty) return;
-
-    setState(() => _isSaving = true);
-
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-
-    HapticFeedback.mediumImpact();
-    await ref.read(firestoreServiceProvider).updateHabit(
-          uid: uid,
-          habitId: widget.habit.id,
-          name: name != widget.habit.name ? name : null,
-          icon: icon.isNotEmpty && icon != widget.habit.icon ? icon : null,
-          goalMinutes: _selectedGoal != widget.habit.goalMinutes
-              ? _selectedGoal
-              : null,
-          targetHours: _selectedTarget != widget.habit.targetHours
-              ? _selectedTarget
-              : null,
-        );
-
-    if (mounted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.catDetailQuestUpdated),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-}
-
-// ─── Enhanced Cat Info Card ───
-
-/// About card — personality, appearance summary, expandable details, status.
-class _EnhancedCatInfoCard extends StatelessWidget {
-  final Cat cat;
-
-  const _EnhancedCatInfoCard({required this.cat});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-    final personality = personalityMap[cat.personality];
-    final a = cat.appearance;
-    final summary = fullSummary(a);
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.catDetailAbout(cat.name),
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Personality
-            if (personality != null) ...[
-              Row(
-                children: [
-                  Text(
-                    '${personality.emoji} ',
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    personality.name,
-                    style: textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                personality.flavorText,
-                style: textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
-
-            // Summary line
-            Container(
-              width: double.infinity,
-              padding: AppSpacing.paddingMd,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(summary, style: textTheme.bodyMedium),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
-            // Expandable appearance details
-            Theme(
-              data: theme.copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                title: Text(context.l10n.catDetailAppearanceDetails, style: textTheme.labelLarge),
-                tilePadding: EdgeInsets.zero,
-                childrenPadding: EdgeInsets.zero,
-                children: _buildAppearanceDetails(context, a),
-              ),
-            ),
-
-            const Divider(height: 24),
-            _InfoRow(
-              label: context.l10n.catDetailStatus,
-              value:
-                  cat.state[0].toUpperCase() + cat.state.substring(1),
-            ),
-            _InfoRow(label: context.l10n.catDetailAdopted, value: _formatDate(cat.createdAt)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildAppearanceDetails(BuildContext context, CatAppearance a) {
-    final l10n = context.l10n;
-    final details = <Widget>[
-      _InfoRow(label: l10n.catDetailFurPattern, value: peltTypeDescription(a.peltType)),
-      _InfoRow(label: l10n.catDetailFurColor, value: peltColorDescription(a.peltColor)),
-      _InfoRow(
-          label: l10n.catDetailFurLength, value: furLengthDescription(a.isLonghair)),
-      _InfoRow(
-          label: l10n.catDetailEyes, value: eyeDescription(a.eyeColor, a.eyeColor2)),
-    ];
-
-    if (a.whitePatches != null) {
-      details.add(_InfoRow(label: l10n.catDetailWhitePatches, value: a.whitePatches!));
-    }
-    final patchesTint = whitePatchesTintDescription(a.whitePatchesTint);
-    if (patchesTint != null) {
-      details.add(_InfoRow(label: l10n.catDetailPatchesTint, value: patchesTint));
-    }
-    if (a.tint != 'none') {
-      details.add(_InfoRow(
-        label: l10n.catDetailTint,
-        value: a.tint[0].toUpperCase() + a.tint.substring(1),
-      ));
-    }
-    if (a.points != null) {
-      details.add(_InfoRow(label: l10n.catDetailPoints, value: a.points!));
-    }
-    if (a.vitiligo != null) {
-      details.add(_InfoRow(label: l10n.catDetailVitiligo, value: a.vitiligo!));
-    }
-    if (a.isTortie) {
-      details.add(_InfoRow(label: l10n.catDetailTortoiseshell, value: 'Yes'));
-      if (a.tortiePattern != null) {
-        details
-            .add(_InfoRow(label: l10n.catDetailTortiePattern, value: a.tortiePattern!));
-      }
-      if (a.tortieColor != null) {
-        details.add(_InfoRow(
-          label: l10n.catDetailTortieColor,
-          value: peltColorDescription(a.tortieColor!),
-        ));
-      }
-    }
-    details
-        .add(_InfoRow(label: l10n.catDetailSkin, value: skinColorDescription(a.skinColor)));
-
-    return details;
-  }
-
-  static String _formatDate(DateTime d) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    return '${months[d.month - 1]} ${d.day}, ${d.year}';
-  }
-}
-
-// ─── Diary Preview Card ───
-
-/// 日记预览卡片 — 展示今日日记摘要，点击进入日记列表。
-class _DiaryPreviewCard extends ConsumerWidget {
-  final String catId;
-
-  const _DiaryPreviewCard({required this.catId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-    final todayDiary = ref.watch(todayDiaryProvider(catId));
-
-    return Card(
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).pushNamed(
-            AppRouter.catDiary,
-            arguments: catId,
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: AppSpacing.paddingBase,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text('📖', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    context.l10n.catDetailDiaryTitle,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.chevron_right,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              todayDiary.when(
-                loading: () => Text(
-                  context.l10n.catDetailDiaryLoading,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                error: (_, __) => Text(
-                  context.l10n.catDetailDiaryError,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                data: (entry) {
-                  if (entry == null) {
-                    return Text(
-                      context.l10n.catDetailDiaryEmpty,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    );
-                  }
-                  return Text(
-                    entry.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      height: 1.4,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Chat Entry Card ───
-
-/// 聊天入口卡片 — 在 Diary Preview 下方，提升聊天功能可发现性。
-class _ChatEntryCard extends StatelessWidget {
-  final String catId;
-  final String catName;
-
-  const _ChatEntryCard({required this.catId, required this.catName});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-
-    return Card(
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).pushNamed(
-            AppRouter.catChat,
-            arguments: catId,
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: AppSpacing.paddingBase,
-          child: Row(
-            children: [
-              const Text('\u{1F4AC}', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.catDetailChatWith(catName),
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      context.l10n.catDetailChatSubtitle,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Helper Widgets ───
-
-class _StatCell extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _StatCell({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: colorScheme.onSurfaceVariant),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                value,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StageMilestone extends StatelessWidget {
-  final String name;
-  final bool isReached;
-  final Color color;
-
-  const _StageMilestone({
-    required this.name,
-    required this.isReached,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isReached ? color : colorScheme.surfaceContainerHighest,
-          ),
-          child: isReached
-              ? const Icon(Icons.check, size: 14, color: Colors.white)
-              : null,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          name,
-          style: textTheme.labelSmall?.copyWith(
-            color: isReached ? color : colorScheme.onSurfaceVariant,
-            fontWeight: isReached ? FontWeight.bold : FontWeight.normal,
-            fontSize: 10,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HabitHeatmapCard extends ConsumerStatefulWidget {
-  final String habitId;
-
-  const _HabitHeatmapCard({required this.habitId});
-
-  @override
-  ConsumerState<_HabitHeatmapCard> createState() => _HabitHeatmapCardState();
-}
-
-class _HabitHeatmapCardState extends ConsumerState<_HabitHeatmapCard> {
-  Map<String, int>? _dailyMinutes;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final uid = ref.read(currentUidProvider);
-      if (uid == null) return;
-
-      final data =
-          await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
-                uid: uid,
-                habitId: widget.habitId,
-                lastNDays: 91,
-              );
-
-      if (mounted) {
-        setState(() {
-          _dailyMinutes = data;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _error = e.toString();
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.catDetailActivity,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            if (_isLoading)
-              const Center(
-                child: Padding(
-                  padding: AppSpacing.paddingBase,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              )
-            else if (_error != null)
-              Center(
-                child: Padding(
-                  padding: AppSpacing.paddingBase,
-                  child: Column(
-                    children: [
-                      Icon(Icons.cloud_off,
-                          color: colorScheme.onSurfaceVariant, size: 32),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        context.l10n.catDetailActivityError,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      TextButton.icon(
-                        onPressed: _loadData,
-                        icon: const Icon(Icons.refresh, size: 18),
-                        label: Text(context.l10n.commonRetry),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              StreakHeatmap(dailyMinutes: _dailyMinutes ?? {}),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 饰品装备/卸下卡片 — 数据来源为 inventoryProvider。
-class _AccessoriesCard extends ConsumerWidget {
-  final Cat cat;
-  const _AccessoriesCard({required this.cat});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
-    final hasEquipped = cat.equippedAccessory != null &&
-        cat.equippedAccessory!.isNotEmpty;
-    final inventory = ref.watch(inventoryProvider).value ?? [];
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.catDetailAccessoriesTitle,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-
-            // 当前装备
-            Row(
-              children: [
-                Text(
-                  context.l10n.catDetailEquipped,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                if (hasEquipped)
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Text(
-                          accessoryDisplayName(cat.equippedAccessory!),
-                          style: textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        TextButton.icon(
-                          onPressed: () => _unequip(context, ref),
-                          icon: const Icon(Icons.remove_circle_outline,
-                              size: 16),
-                          label: Text(context.l10n.catDetailUnequip),
-                          style: TextButton.styleFrom(
-                            visualDensity: VisualDensity.compact,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  Text(
-                    context.l10n.catDetailNone,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
-            ),
-
-            // 道具箱中可装备的饰品
-            if (inventory.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                context.l10n.catDetailFromInventory(inventory.length),
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: inventory.map((id) {
-                  return ActionChip(
-                    label: Text(
-                      accessoryDisplayName(id),
-                      style: textTheme.labelSmall,
-                    ),
-                    onPressed: () => _equip(context, ref, id),
-                  );
-                }).toList(),
-              ),
-            ] else if (!hasEquipped)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  context.l10n.catDetailNoAccessories,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _equip(BuildContext context, WidgetRef ref, String accessoryId) {
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-    HapticFeedback.selectionClick();
-    ref.read(inventoryServiceProvider).equipAccessory(
-          uid: uid,
-          catId: cat.id,
-          accessoryId: accessoryId,
-        );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.catDetailEquippedItem(accessoryDisplayName(accessoryId))),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _unequip(BuildContext context, WidgetRef ref) {
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-    HapticFeedback.selectionClick();
-    ref.read(inventoryServiceProvider).unequipAccessory(
-          uid: uid,
-          catId: cat.id,
-        );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.catDetailUnequipped),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _InfoRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: AppSpacing.paddingVXs,
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
           ),
         ],
       ),

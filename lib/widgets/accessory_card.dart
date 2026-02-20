@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
 
 /// 饰品卡片 — 商店网格中的单个饰品展示。
@@ -27,7 +28,10 @@ class AccessoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Card(
+    return Semantics(
+      label: '${info.displayName} accessory, ${info.isEquipped ? "equipped" : info.isOwned ? "owned" : "${info.price} coins"}',
+      button: onTap != null,
+      child: Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -67,7 +71,7 @@ class AccessoryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Equipped',
+                    context.l10n.accessoryEquipped,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onPrimary,
                       fontSize: 10,
@@ -85,7 +89,7 @@ class AccessoryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Owned',
+                    context.l10n.accessoryOwned,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onTertiaryContainer,
                       fontSize: 10,
@@ -115,6 +119,7 @@ class AccessoryCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

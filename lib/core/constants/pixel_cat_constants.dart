@@ -237,10 +237,6 @@ List<String> get allAccessories => [
       '$color$style',
 ];
 
-/// 每日签到金币奖励（旧，保留向后兼容引用）
-@Deprecated('Use checkInCoinsWeekday / checkInCoinsWeekend instead')
-const int dailyCheckInCoins = 50;
-
 /// 签到金币：工作日（周一至周五）
 const int checkInCoinsWeekday = 10;
 

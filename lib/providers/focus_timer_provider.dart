@@ -275,7 +275,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         mode: mode,
         startedAt: startedAt,
       );
-      await _clearSavedState();
+      await FocusTimerNotifier.clearSavedState();
       return;
     }
 
@@ -325,7 +325,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         elapsedSeconds: state.totalSeconds,
         status: TimerStatus.completed,
       );
-      _clearSavedState();
+      FocusTimerNotifier.clearSavedState();
       AtomicIslandService.cancel();
       return;
     }
@@ -410,7 +410,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void complete() {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.completed);
-    _clearSavedState();
+    FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
   }
 
@@ -418,7 +418,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void abandon() {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.abandoned);
-    _clearSavedState();
+    FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
   }
 
@@ -463,7 +463,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         status: TimerStatus.completed,
         clearPausedAt: true,
       );
-      _clearSavedState();
+      FocusTimerNotifier.clearSavedState();
       return;
     }
 
@@ -475,7 +475,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         status: TimerStatus.completed,
         clearPausedAt: true,
       );
-      _clearSavedState();
+      FocusTimerNotifier.clearSavedState();
       return;
     }
 
@@ -493,7 +493,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Reset to idle state.
   void reset() {
     _ticker?.cancel();
-    _clearSavedState();
+    FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
     state = const FocusTimerState();
   }
@@ -519,10 +519,6 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     }
   }
 
-  /// Clear persisted state.
-  Future<void> _clearSavedState() async {
-    await FocusTimerNotifier.clearSavedState();
-  }
 }
 
 /// Focus timer provider — global singleton (keepAlive).

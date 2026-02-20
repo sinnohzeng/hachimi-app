@@ -17,6 +17,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// Forest-style circular duration picker.
 /// Draggable ring that maps 0°–360° to 1–120 minutes.
@@ -55,7 +56,6 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
     return angle;
   }
 
-  /// Convert angle to minutes.
   int _angleToMinutes(double angle) {
     final minutes = (angle / (2 * pi) * _maxMinutes).round();
     return minutes.clamp(_minMinutes, _maxMinutes);
@@ -148,7 +148,7 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
                   ),
                 ),
                 Text(
-                  'min',
+                  context.l10n.pickerMinUnit,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -246,21 +246,16 @@ class _DurationPickerPainter extends CustomPainter {
       center.dy + radius * sin(thumbAngle),
     );
 
-    // Thumb shadow
     canvas.drawCircle(
       thumbCenter + const Offset(0, 1),
       _thumbRadius,
       Paint()..color = thumbColor.withValues(alpha: 0.3),
     );
-
-    // Thumb fill
     canvas.drawCircle(
       thumbCenter,
       _thumbRadius,
       Paint()..color = thumbColor,
     );
-
-    // Thumb inner circle
     canvas.drawCircle(
       thumbCenter,
       _thumbRadius - 4,

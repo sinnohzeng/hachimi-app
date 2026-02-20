@@ -63,7 +63,7 @@ import 'app_localizations_zh.dart';
 /// property.
 abstract class S {
   S(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -85,16 +85,16 @@ abstract class S {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('zh')
+    Locale('zh'),
   ];
 
   /// No description provided for @appTitle.
@@ -1644,6 +1644,90 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Skin'**
   String get catDetailSkin;
+
+  /// No description provided for @offlineMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline — changes will sync when reconnected'**
+  String get offlineMessage;
+
+  /// No description provided for @offlineModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline mode'**
+  String get offlineModeLabel;
+
+  /// No description provided for @habitTodayMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {count}min'**
+  String habitTodayMinutes(int count);
+
+  /// No description provided for @habitDeleteTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete habit'**
+  String get habitDeleteTooltip;
+
+  /// No description provided for @heatmapActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active days'**
+  String get heatmapActiveDays;
+
+  /// No description provided for @heatmapTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get heatmapTotal;
+
+  /// No description provided for @heatmapRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get heatmapRate;
+
+  /// No description provided for @heatmapLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get heatmapLess;
+
+  /// No description provided for @heatmapMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get heatmapMore;
+
+  /// No description provided for @accessoryEquipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipped'**
+  String get accessoryEquipped;
+
+  /// No description provided for @accessoryOwned.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned'**
+  String get accessoryOwned;
+
+  /// No description provided for @pickerMinUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get pickerMinUnit;
+
+  /// No description provided for @settingsBackgroundAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Animated backgrounds'**
+  String get settingsBackgroundAnimation;
+
+  /// No description provided for @settingsBackgroundAnimationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mesh gradient and floating particles'**
+  String get settingsBackgroundAnimationSubtitle;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -1672,8 +1756,9 @@ S lookupS(Locale locale) {
   }
 
   throw FlutterError(
-      'S.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'S.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

@@ -50,6 +50,11 @@ hachimi-app/
 │   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
 │   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
 │   │   │   └── llm_constants.dart          # SSOT: LLM model metadata, prompts, inference params
+│   │   ├── utils/
+│   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
+│   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
+│   │   │   ├── streak_utils.dart           # StreakUtils — streak calculation logic
+│   │   │   └── background_color_utils.dart # Mesh gradient color extraction from cat stage/pelt
 │   │   ├── router/
 │   │   │   └── app_router.dart             # Named route registry + route constants
 │   │   └── theme/
@@ -92,7 +97,8 @@ hachimi-app/
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
-│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
+│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider (re-exports service_providers)
+│   │   ├── service_providers.dart          # Non-auth service singletons (Firestore, Analytics, Coin, XP, etc.)
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
 │   │   ├── accessory_provider.dart          # AccessoryInfo data class for shop + equip UI
@@ -113,7 +119,16 @@ hachimi-app/
 │   │   ├── cat_detail/
 │   │   │   ├── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
 │   │   │   ├── cat_diary_screen.dart     # AI-generated diary list page
-│   │   │   └── cat_chat_screen.dart      # Cat chat page with streaming responses
+│   │   │   ├── cat_chat_screen.dart      # Cat chat page with streaming responses
+│   │   │   └── components/              # Extracted sub-widgets for CatDetailScreen
+│   │   │       ├── focus_stats_card.dart
+│   │   │       ├── reminder_card.dart
+│   │   │       ├── edit_quest_sheet.dart
+│   │   │       ├── cat_info_card.dart
+│   │   │       ├── diary_preview_card.dart
+│   │   │       ├── chat_entry_card.dart
+│   │   │       ├── habit_heatmap_card.dart
+│   │   │       └── accessories_card.dart
 │   │   ├── cat_room/
 │   │   │   ├── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
 │   │   │   └── accessory_shop_screen.dart  # Accessory shop: 3-tab grid + purchase flow
@@ -127,7 +142,14 @@ hachimi-app/
 │   │   │   └── profile_screen.dart         # Stats, cat album, settings entry
 │   │   ├── settings/
 │   │   │   ├── settings_screen.dart        # Notifications, language, about, account actions
-│   │   │   └── model_test_chat_screen.dart # AI model test chat (verify LLM works)
+│   │   │   ├── model_test_chat_screen.dart # AI model test chat (verify LLM works)
+│   │   │   └── components/              # Extracted sub-widgets for SettingsScreen
+│   │   │       ├── notification_settings_dialog.dart
+│   │   │       ├── language_dialog.dart
+│   │   │       ├── theme_mode_dialog.dart
+│   │   │       ├── theme_color_dialog.dart
+│   │   │       ├── ai_model_section.dart
+│   │   │       └── section_header.dart
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # Activity heatmap + per-habit progress
 │   │   └── timer/
@@ -135,8 +157,6 @@ hachimi-app/
 │   │       ├── focus_complete_screen.dart  # XP animation + session summary
 │   │       └── timer_screen.dart           # Active timer with foreground service
 │   │
-│   │   └── utils/
-│   │       └── appearance_descriptions.dart # Human-readable descriptions for cat appearance parameters
 │   │
 │   └── widgets/                            # Reusable UI components (stateless preferred)
 │       ├── accessory_card.dart             # Reusable accessory card (name, price badge, owned badge)
@@ -152,7 +172,9 @@ hachimi-app/
 │       ├── empty_state.dart               # Unified empty state (icon + title + subtitle + optional CTA)
 │       ├── error_state.dart               # Unified error state (icon + message + retry button)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
-│       └── streak_indicator.dart           # Fire badge showing current streak count
+│       ├── streak_indicator.dart           # Fire badge showing current streak count
+│       ├── animated_mesh_background.dart  # Reusable animated mesh gradient background with toggle
+│       └── particle_overlay.dart          # Floating particle overlay (firefly/dust presets)
 │
 ├── assets/
 │   ├── pixel_cat/                          # Pixel-cat-maker sprite layers

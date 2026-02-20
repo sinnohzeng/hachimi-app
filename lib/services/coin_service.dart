@@ -16,6 +16,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:intl/intl.dart';
 
@@ -28,12 +29,6 @@ class CoinService {
 
   DocumentReference _monthlyCheckInRef(String uid, String month) =>
       _db.collection('users').doc(uid).collection('monthlyCheckIns').doc(month);
-
-  /// 今日日期字符串。
-  String _todayDate() => DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-  /// 当月字符串，如 "2026-02"。
-  String _currentMonth() => DateFormat('yyyy-MM').format(DateTime.now());
 
   /// 当月总天数。
   int _daysInMonth(DateTime date) =>
@@ -59,12 +54,12 @@ class CoinService {
     final doc = await _userRef(uid).get();
     final data = doc.data() as Map<String, dynamic>?;
     final lastDate = data?['lastCheckInDate'] as String?;
-    return lastDate == _todayDate();
+    return lastDate == AppDateUtils.todayString();
   }
 
   /// 实时监听当月签到文档。
   Stream<MonthlyCheckIn?> watchMonthlyCheckIn(String uid) {
-    final month = _currentMonth();
+    final month = AppDateUtils.currentMonth();
     return _monthlyCheckInRef(uid, month).snapshots().map((doc) {
       if (!doc.exists) return MonthlyCheckIn.empty(month);
       return MonthlyCheckIn.fromFirestore(doc);
@@ -168,6 +163,7 @@ class CoinService {
     required String uid,
     required int amount,
   }) async {
+    assert(amount > 0, 'amount must be positive');
     final userRef = _userRef(uid);
 
     return _db.runTransaction((tx) async {
@@ -191,6 +187,8 @@ class CoinService {
     required String accessoryId,
     required int price,
   }) async {
+    assert(price > 0, 'price must be positive');
+    assert(accessoryId.isNotEmpty, 'accessoryId must not be empty');
     final userRef = _userRef(uid);
 
     return _db.runTransaction((tx) async {

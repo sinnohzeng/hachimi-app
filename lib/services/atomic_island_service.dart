@@ -14,6 +14,7 @@
 // 🕒 创建时间：2026-02-19
 // ---
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// AtomicIslandService — platform channel wrapper for vivo Atomic Island
@@ -41,8 +42,8 @@ class AtomicIslandService {
         'endTimeMs': endTimeMs,
         'startTimeMs': startTimeMs,
       });
-    } catch (_) {
-      // 静默失败 — flutter_foreground_task 的基础通知仍作为 fallback
+    } catch (e) {
+      debugPrint('[AtomicIsland] updateNotification failed: $e');
     }
   }
 
@@ -50,8 +51,8 @@ class AtomicIslandService {
   static Future<void> cancel() async {
     try {
       await _channel.invokeMethod('cancelTimerNotification');
-    } catch (_) {
-      // 静默失败
+    } catch (e) {
+      debugPrint('[AtomicIsland] cancel failed: $e');
     }
   }
 }

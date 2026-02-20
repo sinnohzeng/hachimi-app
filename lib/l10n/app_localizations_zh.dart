@@ -841,4 +841,48 @@ class SZh extends S {
 
   @override
   String get catDetailSkin => '肤色';
+
+  @override
+  String get offlineMessage => '你已离线——重新连接时将自动同步';
+
+  @override
+  String get offlineModeLabel => '离线模式';
+
+  @override
+  String habitTodayMinutes(int count) {
+    return '今天：$count分钟';
+  }
+
+  @override
+  String get habitDeleteTooltip => '删除习惯';
+
+  @override
+  String get heatmapActiveDays => '活跃天数';
+
+  @override
+  String get heatmapTotal => '总计';
+
+  @override
+  String get heatmapRate => '达标率';
+
+  @override
+  String get heatmapLess => '少';
+
+  @override
+  String get heatmapMore => '多';
+
+  @override
+  String get accessoryEquipped => '已装备';
+
+  @override
+  String get accessoryOwned => '已拥有';
+
+  @override
+  String get pickerMinUnit => '分钟';
+
+  @override
+  String get settingsBackgroundAnimation => '动态背景';
+
+  @override
+  String get settingsBackgroundAnimationSubtitle => '流体渐变和浮动粒子效果';
 }

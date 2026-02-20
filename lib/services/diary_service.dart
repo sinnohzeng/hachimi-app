@@ -14,6 +14,7 @@
 
 import 'package:uuid/uuid.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/diary_entry.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -83,7 +84,7 @@ class DiaryService {
         catId: ctx.cat.id,
         habitId: ctx.habit.id,
         content: _formatDiaryContent(content, ctx.isZhLocale),
-        date: _todayString(),
+        date: AppDateUtils.todayString(),
         personality: ctx.cat.personality,
         mood: ctx.cat.computedMood,
         stage: ctx.cat.computedStage,
@@ -138,8 +139,4 @@ class DiaryService {
     return text.trimRight();
   }
 
-  static String _todayString() {
-    final now = DateTime.now();
-    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-  }
 }

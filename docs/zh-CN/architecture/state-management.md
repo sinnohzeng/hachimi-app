@@ -152,7 +152,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 ### `catFirestoreServiceProvider`
 
 - **类型**：`Provider<CatFirestoreService>`
-- **文件**：`lib/providers/auth_provider.dart`
+- **文件**：`lib/providers/service_providers.dart`
 - **数据源**：使用 Firestore 实例初始化 `CatFirestoreService`
 - **消费者**：`catsProvider`、`allCatsProvider` 及任何需要读写猫咪文档的 Provider
 - **SSOT**：所有猫咪相关 Firestore 操作的单例服务实例
@@ -239,7 +239,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 ### `inventoryServiceProvider`
 
 - **类型**：`Provider<InventoryService>`
-- **文件**：`lib/providers/auth_provider.dart`
+- **文件**：`lib/providers/service_providers.dart`
 - **数据源**：实例化 `InventoryService`
 - **消费者**：`InventoryScreen`、`_AccessoriesCard`
 - **SSOT**：道具箱装备/卸下操作的单例服务
@@ -247,7 +247,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 ### `notificationServiceProvider`
 
 - **类型**：`Provider<NotificationService>`
-- **文件**：`lib/providers/auth_provider.dart`
+- **文件**：`lib/providers/service_providers.dart`
 - **数据源**：实例化 `NotificationService`（单例）
 - **消费者**：`CatDetailScreen`（提醒卡片）、`SettingsScreen`、`TimerScreen`（权限引导 Banner）、`AdoptionFlowScreen`（提醒调度）
 - **SSOT**：调度/取消本地通知及 FCM 管理的单例服务

@@ -36,8 +36,7 @@ class LlmConstants {
   /// 下载前要求的最小可用空间（模型 + 300 MB 缓冲）
   static const int minFreeSpaceBytes = 1420000000; // ~1.32 GB
 
-  /// SHA-256 校验值（首次下载后需更新为真实值）
-  /// TODO: 下载模型后用实际 hash 替换此占位值
+  /// SHA-256 校验值。空字符串表示跳过校验（模型文件未固定版本时适用）。
   static const String modelSha256 = '';
 
   // ─── Inference Parameters ───

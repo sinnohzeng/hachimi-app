@@ -85,7 +85,6 @@ class PixelCatRenderer {
     final peltInfoJson = await rootBundle.loadString(
         'assets/pixel_cat/config/peltInfo.json');
 
-    // Parse spritesIndex
     final indexMap = json.decode(indexJson) as Map<String, dynamic>;
     _spritesIndex = {};
     for (final entry in indexMap.entries) {
@@ -97,7 +96,6 @@ class PixelCatRenderer {
       );
     }
 
-    // Parse spritesOffsetMap
     final offsetList = json.decode(offsetJson) as List<dynamic>;
     _offsetMap = offsetList
         .cast<Map<String, dynamic>>()
@@ -107,19 +105,16 @@ class PixelCatRenderer {
             ))
         .toList();
 
-    // Parse tints
     final tintData = json.decode(tintJson) as Map<String, dynamic>;
     _tintColors = _parseTintMap(
         tintData['tint_colours'] as Map<String, dynamic>?);
     _diluteTintColors = _parseTintMap(
         tintData['dilute_tint_colours'] as Map<String, dynamic>?);
 
-    // Parse white patches tints
     final wpTintData = json.decode(wpTintJson) as Map<String, dynamic>;
     _whitePatchesTintColors = _parseTintMap(
         wpTintData['tint_colours'] as Map<String, dynamic>?);
 
-    // Parse peltInfo
     final peltData = json.decode(peltInfoJson) as Map<String, dynamic>;
     _peltInfo = {};
     for (final entry in peltData.entries) {
@@ -202,7 +197,6 @@ class PixelCatRenderer {
   ) async {
     final tintColor = ui.Color.fromARGB(255, tintRgb[0], tintRgb[1], tintRgb[2]);
 
-    // 1. 创建 source-in 遮罩的色调层
     final tintRecorder = ui.PictureRecorder();
     final tintCanvas = ui.Canvas(tintRecorder);
     tintCanvas.drawImage(source, ui.Offset.zero, ui.Paint());
@@ -215,7 +209,6 @@ class PixelCatRenderer {
     final tintOverlay = await tintRecorder.endRecording()
         .toImage(spriteSize, spriteSize);
 
-    // 2. 在 source 上用 blendMode 混合色调
     final resultRecorder = ui.PictureRecorder();
     final resultCanvas = ui.Canvas(resultRecorder);
     resultCanvas.drawImage(source, ui.Offset.zero, ui.Paint());
@@ -225,7 +218,7 @@ class PixelCatRenderer {
       ui.Paint()..blendMode = blendMode,
     );
 
-    // 3. 用原图的 alpha 通道裁切结果（保持透明区域）
+    // 用原图的 alpha 通道裁切结果（保持透明区域）
     final clipRecorder = ui.PictureRecorder();
     final clipCanvas = ui.Canvas(clipRecorder);
     final tintedImage = await resultRecorder.endRecording()
@@ -249,9 +242,8 @@ class PixelCatRenderer {
     final recorder = ui.PictureRecorder();
     final canvas = ui.Canvas(recorder);
 
-    // 先绘制 mask
     await _drawSprite(maskSpriteName, spriteNumber, canvas);
-    // 再用 srcIn 绘制 sprite（只在 mask 不透明区域显示）
+    // srcIn: sprite 只在 mask 不透明区域显示
     final spriteImage = await _renderSpriteToImage(spriteName, spriteNumber);
     canvas.drawImage(
       spriteImage,
@@ -274,13 +266,11 @@ class PixelCatRenderer {
   }) async {
     await _ensureConfigLoaded();
 
-    // 检查缓存
     final cacheKey = '${appearance.cacheKey}:$spriteIndex:$accessoryId';
     if (_renderCache.containsKey(cacheKey)) {
       return _renderCache[cacheKey]!;
     }
 
-    // 工作画布
     final recorder = ui.PictureRecorder();
     final canvas = ui.Canvas(recorder);
 
@@ -291,7 +281,6 @@ class PixelCatRenderer {
       await _drawSprite(
           '$spriteName${appearance.peltColor}', spriteIndex, canvas);
     } else {
-      // 玳瑁底色
       final base = appearance.tortieBase ?? 'single';
       await _drawSprite(
           '$base${appearance.peltColor}', spriteIndex, canvas);
@@ -310,7 +299,6 @@ class PixelCatRenderer {
           : '$patternSprite${appearance.tortieColor}';
       final maskName = 'tortiemask${appearance.tortiePattern}';
 
-      // 尝试渲染遮罩合成
       if (_spritesIndex!.containsKey(tortieSpriteName) &&
           _spritesIndex!.containsKey(maskName)) {
         final masked = await _renderMaskedSprite(
@@ -322,7 +310,6 @@ class PixelCatRenderer {
       }
     }
 
-    // 获取当前画布快照用于 tint 操作
     var currentImage = await recorder.endRecording()
         .toImage(spriteSize, spriteSize);
 
@@ -345,7 +332,6 @@ class PixelCatRenderer {
       }
     }
 
-    // 开始新画布继续分层
     final mainRecorder = ui.PictureRecorder();
     final mainCanvas = ui.Canvas(mainRecorder);
     mainCanvas.drawImage(currentImage, ui.Offset.zero, ui.Paint());
@@ -409,7 +395,6 @@ class PixelCatRenderer {
     // ── Layer 9: 伤疤（跳过 — Hachimi 不使用伤疤系统）──
 
     // ── Layer 10-11: 明暗 + 线稿 ──
-    // 获取当前画布快照用于 shading
     final preShadingImage = await mainRecorder.endRecording()
         .toImage(spriteSize, spriteSize);
 
@@ -438,7 +423,6 @@ class PixelCatRenderer {
       }
     }
 
-    // 输出到结果画布（处理水平翻转）
     final outRecorder = ui.PictureRecorder();
     final outCanvas = ui.Canvas(outRecorder);
     final layeredImage = await finalRecorder.endRecording()
@@ -458,7 +442,6 @@ class PixelCatRenderer {
     final result = await outRecorder.endRecording()
         .toImage(spriteSize, spriteSize);
 
-    // 缓存结果
     _renderCache[cacheKey] = result;
     _renderCacheKeys.add(cacheKey);
     while (_renderCacheKeys.length > _maxCacheSize) {

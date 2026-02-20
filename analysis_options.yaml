@@ -26,6 +26,13 @@ linter:
     prefer_is_empty: true
     avoid_unnecessary_containers: true
 
+    # Additional quality rules
+    prefer_null_aware_operators: true
+    unnecessary_statements: true
+    sized_box_shrink_expand: true
+    use_if_null_to_convert_nulls: true
+    prefer_const_literals_to_create_immutables: true
+
 analyzer:
   errors:
     avoid_print: error

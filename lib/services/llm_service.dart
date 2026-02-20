@@ -20,6 +20,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 
@@ -132,7 +133,7 @@ class LlmService {
       await completionSub.cancel();
 
       _status = LlmEngineStatus.ready;
-      return _cleanResponse(result);
+      return cleanResponse(result);
     } catch (e) {
       _resetOnError(e);
       rethrow;
@@ -195,8 +196,8 @@ class LlmService {
   Future<void> stopGeneration() async {
     try {
       await _parent?.stop();
-    } catch (_) {
-      // ignore stop errors
+    } catch (e) {
+      debugPrint('[LlmService] stop error: $e');
     }
     if (_status == LlmEngineStatus.generating) {
       _status = LlmEngineStatus.ready;
@@ -207,8 +208,8 @@ class LlmService {
   Future<void> unloadModel() async {
     try {
       await _parent?.dispose();
-    } catch (_) {
-      // ignore dispose errors
+    } catch (e) {
+      debugPrint('[LlmService] dispose error: $e');
     }
     _parent = null;
     _status = LlmEngineStatus.unloaded;
@@ -223,7 +224,7 @@ class LlmService {
   }
 
   /// 清理生成文本中的特殊 token 标记。
-  String _cleanResponse(String text) {
+  String cleanResponse(String text) {
     return text
         .replaceAll('<|im_end|>', '')
         .replaceAll('<|im_start|>', '')

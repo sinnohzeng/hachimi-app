@@ -1,33 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/services/auth_service.dart';
-import 'package:hachimi_app/services/analytics_service.dart';
-import 'package:hachimi_app/services/firestore_service.dart';
-import 'package:hachimi_app/services/cat_firestore_service.dart';
-import 'package:hachimi_app/services/coin_service.dart';
-import 'package:hachimi_app/services/inventory_service.dart';
-import 'package:hachimi_app/services/migration_service.dart';
-import 'package:hachimi_app/services/notification_service.dart';
-import 'package:hachimi_app/services/xp_service.dart';
 
-/// Service providers — singletons
+// Re-export service_providers so existing imports continue to work.
+export 'package:hachimi_app/providers/service_providers.dart';
+
+/// Auth service — singleton
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
-final firestoreServiceProvider =
-    Provider<FirestoreService>((ref) => FirestoreService());
-final analyticsServiceProvider =
-    Provider<AnalyticsService>((ref) => AnalyticsService());
-final catFirestoreServiceProvider =
-    Provider<CatFirestoreService>((ref) => CatFirestoreService());
-final coinServiceProvider =
-    Provider<CoinService>((ref) => CoinService());
-final inventoryServiceProvider =
-    Provider<InventoryService>((ref) => InventoryService());
-final migrationServiceProvider =
-    Provider<MigrationService>((ref) => MigrationService());
-final xpServiceProvider =
-    Provider<XpService>((ref) => XpService());
-final notificationServiceProvider =
-    Provider<NotificationService>((ref) => NotificationService());
 
 /// Auth state — SSOT for current user authentication.
 /// Streams from Firebase Auth state changes.

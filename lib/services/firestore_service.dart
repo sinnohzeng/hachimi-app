@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/core/utils/streak_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/check_in.dart';
@@ -191,8 +193,9 @@ class FirestoreService {
   Future<void> logFocusSession({
     required String uid,
     required FocusSession session,
+    String habitName = '',
   }) async {
-    final today = _todayDate();
+    final today = AppDateUtils.todayString();
     final batch = _db.batch();
 
     // 1. Write session document
@@ -203,7 +206,7 @@ class FirestoreService {
     final entryRef = _entriesRef(uid, today).doc();
     batch.set(entryRef, {
       'habitId': session.habitId,
-      'habitName': '',
+      'habitName': habitName,
       'minutes': session.durationMinutes,
       'completedAt': FieldValue.serverTimestamp(),
     });
@@ -217,14 +220,12 @@ class FirestoreService {
       final yesterday = DateFormat('yyyy-MM-dd')
           .format(DateTime.now().subtract(const Duration(days: 1)));
 
-      int newStreak = habit.currentStreak;
-      if (habit.lastCheckInDate == today) {
-        newStreak = habit.currentStreak;
-      } else if (habit.lastCheckInDate == yesterday) {
-        newStreak = habit.currentStreak + 1;
-      } else {
-        newStreak = 1;
-      }
+      final newStreak = StreakUtils.calculateNewStreak(
+        lastCheckInDate: habit.lastCheckInDate,
+        today: today,
+        yesterday: yesterday,
+        currentStreak: habit.currentStreak,
+      );
 
       final newBest =
           newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
@@ -259,8 +260,6 @@ class FirestoreService {
 
   // ─── Check-ins ───
 
-  String _todayDate() => DateFormat('yyyy-MM-dd').format(DateTime.now());
-
   CollectionReference _entriesRef(String uid, String date) => _db
       .collection('users')
       .doc(uid)
@@ -269,7 +268,7 @@ class FirestoreService {
       .collection('entries');
 
   Stream<List<CheckInEntry>> watchTodayCheckIns(String uid) {
-    final today = _todayDate();
+    final today = AppDateUtils.todayString();
     return _entriesRef(uid, today)
         .orderBy('completedAt', descending: true)
         .snapshots()
@@ -283,7 +282,7 @@ class FirestoreService {
     required String habitName,
     required int minutes,
   }) async {
-    final today = _todayDate();
+    final today = AppDateUtils.todayString();
     final batch = _db.batch();
 
     // 1. Add check-in entry
@@ -304,14 +303,12 @@ class FirestoreService {
       final yesterday = DateFormat('yyyy-MM-dd')
           .format(DateTime.now().subtract(const Duration(days: 1)));
 
-      int newStreak = habit.currentStreak;
-      if (habit.lastCheckInDate == today) {
-        newStreak = habit.currentStreak;
-      } else if (habit.lastCheckInDate == yesterday) {
-        newStreak = habit.currentStreak + 1;
-      } else {
-        newStreak = 1;
-      }
+      final newStreak = StreakUtils.calculateNewStreak(
+        lastCheckInDate: habit.lastCheckInDate,
+        today: today,
+        yesterday: yesterday,
+        currentStreak: habit.currentStreak,
+      );
 
       final newBest =
           newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
