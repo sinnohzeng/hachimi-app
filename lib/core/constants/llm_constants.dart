@@ -26,15 +26,15 @@ class LlmConstants {
   /// GGUF 文件名
   static const String modelFileName = 'Qwen3-1.7B-Q4_K_M.gguf';
 
-  /// 模型下载 URL（HuggingFace mirror）
+  /// 模型下载 URL（unsloth 社区量化，包含完整 Q4_K_M 版本）
   static const String modelDownloadUrl =
-      'https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/qwen3-1.7b-q4_k_m.gguf';
+      'https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf';
 
   /// 模型文件大小（字节），用于预检磁盘空间
-  static const int modelFileSizeBytes = 1200000000; // ~1.2 GB
+  static const int modelFileSizeBytes = 1107409472; // ~1.03 GB
 
-  /// 下载前要求的最小可用空间（模型 + 200 MB 缓冲）
-  static const int minFreeSpaceBytes = 1400000000; // ~1.4 GB
+  /// 下载前要求的最小可用空间（模型 + 300 MB 缓冲）
+  static const int minFreeSpaceBytes = 1420000000; // ~1.32 GB
 
   /// SHA-256 校验值（首次下载后需更新为真实值）
   /// TODO: 下载模型后用实际 hash 替换此占位值
