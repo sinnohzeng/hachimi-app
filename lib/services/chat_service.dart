@@ -157,10 +157,9 @@ class ChatService {
     // System prompt
     final systemPrompt = ChatPrompt.buildSystem(
       catName: cat.name,
-      personalityName: personality?.name ?? 'Playful',
-      personalityFlavorText: personality?.flavorText ?? '',
-      moodName: moodData.name,
-      stageName: cat.stageName,
+      personalityId: personality?.id ?? 'playful',
+      moodId: moodData.id,
+      stageId: cat.computedStage,
       habitName: '${habit.icon} ${habit.name}',
       isZhLocale: chatCtx.isZhLocale,
     );

@@ -3,6 +3,8 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -336,7 +338,7 @@ class _CatHouseCard extends StatelessWidget {
 
               // Stage label
               Text(
-                cat.stageName,
+                context.l10n.stageName(cat.computedStage),
                 style: textTheme.labelSmall?.copyWith(
                   color: stageClr,
                   fontWeight: FontWeight.w600,

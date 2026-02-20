@@ -20,7 +20,8 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
-import 'package:hachimi_app/core/utils/appearance_descriptions.dart';
+import 'package:hachimi_app/l10n/appearance_l10n.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
@@ -36,9 +37,10 @@ class EnhancedCatInfoCard extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final personality = personalityMap[cat.personality];
     final a = cat.appearance;
-    final summary = fullSummary(a);
+    final summary = l10n.fullAppearanceSummary(a);
 
     return Card(
       child: Padding(
@@ -63,7 +65,7 @@ class EnhancedCatInfoCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 20),
                   ),
                   Text(
-                    personality.name,
+                    l10n.personalityName(personality.id),
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -72,7 +74,7 @@ class EnhancedCatInfoCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                personality.flavorText,
+                l10n.personalityFlavor(personality.id),
                 style: textTheme.bodySmall?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: colorScheme.onSurfaceVariant,
@@ -121,18 +123,18 @@ class EnhancedCatInfoCard extends StatelessWidget {
   List<Widget> _buildAppearanceDetails(BuildContext context, CatAppearance a) {
     final l10n = context.l10n;
     final details = <Widget>[
-      InfoRow(label: l10n.catDetailFurPattern, value: peltTypeDescription(a.peltType)),
-      InfoRow(label: l10n.catDetailFurColor, value: peltColorDescription(a.peltColor)),
+      InfoRow(label: l10n.catDetailFurPattern, value: l10n.peltTypeName(a.peltType)),
+      InfoRow(label: l10n.catDetailFurColor, value: l10n.peltColorName(a.peltColor)),
       InfoRow(
-          label: l10n.catDetailFurLength, value: furLengthDescription(a.isLonghair)),
+          label: l10n.catDetailFurLength, value: l10n.furLength(a.isLonghair)),
       InfoRow(
-          label: l10n.catDetailEyes, value: eyeDescription(a.eyeColor, a.eyeColor2)),
+          label: l10n.catDetailEyes, value: l10n.eyeDesc(a.eyeColor, a.eyeColor2)),
     ];
 
     if (a.whitePatches != null) {
       details.add(InfoRow(label: l10n.catDetailWhitePatches, value: a.whitePatches!));
     }
-    final patchesTint = whitePatchesTintDescription(a.whitePatchesTint);
+    final patchesTint = l10n.whitePatchesTintName(a.whitePatchesTint);
     if (patchesTint != null) {
       details.add(InfoRow(label: l10n.catDetailPatchesTint, value: patchesTint));
     }
@@ -149,7 +151,7 @@ class EnhancedCatInfoCard extends StatelessWidget {
       details.add(InfoRow(label: l10n.catDetailVitiligo, value: a.vitiligo!));
     }
     if (a.isTortie) {
-      details.add(InfoRow(label: l10n.catDetailTortoiseshell, value: 'Yes'));
+      details.add(InfoRow(label: l10n.catDetailTortoiseshell, value: l10n.commonYes));
       if (a.tortiePattern != null) {
         details
             .add(InfoRow(label: l10n.catDetailTortiePattern, value: a.tortiePattern!));
@@ -157,12 +159,12 @@ class EnhancedCatInfoCard extends StatelessWidget {
       if (a.tortieColor != null) {
         details.add(InfoRow(
           label: l10n.catDetailTortieColor,
-          value: peltColorDescription(a.tortieColor!),
+          value: l10n.peltColorName(a.tortieColor!),
         ));
       }
     }
     details
-        .add(InfoRow(label: l10n.catDetailSkin, value: skinColorDescription(a.skinColor)));
+        .add(InfoRow(label: l10n.catDetailSkin, value: l10n.skinColorName(a.skinColor)));
 
     return details;
   }

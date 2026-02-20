@@ -29,6 +29,9 @@
   "adoptionCreate": "创建习惯并领养",
   "adoptionNext": "下一步",
   "adoptionBack": "上一步",
+  "adoptionCatNameLabel": "猫猫名字",
+  "adoptionCatNameHint": "例如：小年糕",
+  "adoptionRandomNameTooltip": "随机名字",
 
   "catHouseTitle": "猫屋",
   "catHouseEmpty": "还没有猫猫！创建一个习惯来领养你的第一只猫。",
@@ -264,6 +267,7 @@
   "commonPause": "暂停",
   "commonLogOut": "退出登录",
   "commonDeleteAccount": "删除账号",
+  "commonYes": "是",
 
   "testChatTitle": "测试 AI 模型",
   "testChatLoadingModel": "模型加载中...",
@@ -395,5 +399,188 @@
   "pickerMinUnit": "分钟",
 
   "settingsBackgroundAnimation": "动态背景",
-  "settingsBackgroundAnimationSubtitle": "流体渐变和浮动粒子效果"
+  "settingsBackgroundAnimationSubtitle": "流体渐变和浮动粒子效果",
+
+  "personalityLazy": "慵懒",
+  "personalityCurious": "好奇",
+  "personalityPlayful": "活泼",
+  "personalityShy": "害羞",
+  "personalityBrave": "勇敢",
+  "personalityClingy": "粘人",
+
+  "personalityFlavorLazy": "一天要睡 23 个小时。剩下那小时？也在睡。",
+  "personalityFlavorCurious": "已经在到处闻来闻去了！",
+  "personalityFlavorPlayful": "停不下来追蝴蝶！",
+  "personalityFlavorShy": "花了 3 分钟才从箱子里探出头来...",
+  "personalityFlavorBrave": "箱子还没打开就跳出来了！",
+  "personalityFlavorClingy": "马上开始呼噜，死活不撒手。",
+
+  "moodHappy": "开心",
+  "moodNeutral": "平静",
+  "moodLonely": "孤单",
+  "moodMissing": "想你了",
+
+  "moodMsgLazyHappy": "喵~！该美美地睡一觉了...",
+  "moodMsgCuriousHappy": "今天我们去探索什么？",
+  "moodMsgPlayfulHappy": "喵~！准备好干活了！",
+  "moodMsgShyHappy": "...你、你在就好了。",
+  "moodMsgBraveHappy": "一起征服今天吧！",
+  "moodMsgClingyHappy": "耶！你回来了！别再走了！",
+  "moodMsgLazyNeutral": "*哈欠* 哦，嗨...",
+  "moodMsgCuriousNeutral": "嗯？那边是什么？",
+  "moodMsgPlayfulNeutral": "想玩吗？算了，待会再说...",
+  "moodMsgShyNeutral": "*慢慢探出头来*",
+  "moodMsgBraveNeutral": "一如既往地站岗。",
+  "moodMsgClingyNeutral": "我一直在等你...",
+  "moodMsgLazyLonely": "连睡觉都觉得孤单了...",
+  "moodMsgCuriousLonely": "不知道你什么时候回来...",
+  "moodMsgPlayfulLonely": "没有你，玩具都不好玩了...",
+  "moodMsgShyLonely": "*安静地蜷缩起来*",
+  "moodMsgBraveLonely": "我会继续等。我很勇敢。",
+  "moodMsgClingyLonely": "你去哪儿了... \uD83E\uDD7A",
+  "moodMsgLazyMissing": "*满怀期待地睁开一只眼*",
+  "moodMsgCuriousMissing": "是不是发生了什么事...？",
+  "moodMsgPlayfulMissing": "我帮你留着你最喜欢的玩具...",
+  "moodMsgShyMissing": "*藏起来了，但一直盯着门口*",
+  "moodMsgBraveMissing": "我知道你会回来的。我相信。",
+  "moodMsgClingyMissing": "好想你... 快回来吧。",
+
+  "peltTypeTabby": "经典虎斑纹",
+  "peltTypeTicked": "刺鼠纹",
+  "peltTypeMackerel": "鲭鱼纹",
+  "peltTypeClassic": "经典漩涡纹",
+  "peltTypeSokoke": "索科克大理石纹",
+  "peltTypeAgouti": "刺鼠色",
+  "peltTypeSpeckled": "斑点毛",
+  "peltTypeRosette": "玫瑰斑纹",
+  "peltTypeSingleColour": "纯色",
+  "peltTypeTwoColour": "双色",
+  "peltTypeSmoke": "烟色渐层",
+  "peltTypeSinglestripe": "单条纹",
+  "peltTypeBengal": "豹纹",
+  "peltTypeMarbled": "大理石纹",
+  "peltTypeMasked": "面罩脸",
+
+  "peltColorWhite": "白色",
+  "peltColorPaleGrey": "浅灰色",
+  "peltColorSilver": "银色",
+  "peltColorGrey": "灰色",
+  "peltColorDarkGrey": "深灰色",
+  "peltColorGhost": "幽灰色",
+  "peltColorBlack": "黑色",
+  "peltColorCream": "奶油色",
+  "peltColorPaleGinger": "浅姜黄色",
+  "peltColorGolden": "金色",
+  "peltColorGinger": "姜黄色",
+  "peltColorDarkGinger": "深姜黄色",
+  "peltColorSienna": "赭色",
+  "peltColorLightBrown": "浅棕色",
+  "peltColorLilac": "丁香色",
+  "peltColorBrown": "棕色",
+  "peltColorGoldenBrown": "金棕色",
+  "peltColorDarkBrown": "深棕色",
+  "peltColorChocolate": "巧克力色",
+
+  "eyeColorYellow": "黄色",
+  "eyeColorAmber": "琥珀色",
+  "eyeColorHazel": "榛色",
+  "eyeColorPaleGreen": "浅绿色",
+  "eyeColorGreen": "绿色",
+  "eyeColorBlue": "蓝色",
+  "eyeColorDarkBlue": "深蓝色",
+  "eyeColorBlueYellow": "蓝黄色",
+  "eyeColorBlueGreen": "蓝绿色",
+  "eyeColorGrey": "灰色",
+  "eyeColorCyan": "青色",
+  "eyeColorEmerald": "翡翠色",
+  "eyeColorHeatherBlue": "石楠蓝",
+  "eyeColorSunlitIce": "冰晶色",
+  "eyeColorCopper": "铜色",
+  "eyeColorSage": "鼠尾草色",
+  "eyeColorCobalt": "钴蓝色",
+  "eyeColorPaleBlue": "浅蓝色",
+  "eyeColorBronze": "青铜色",
+  "eyeColorSilver": "银色",
+  "eyeColorPaleYellow": "浅黄色",
+
+  "eyeDescNormal": "{color}眼睛",
+  "@eyeDescNormal": {
+    "placeholders": { "color": { "type": "String" } }
+  },
+  "eyeDescHeterochromia": "异色瞳（{primary} / {secondary}）",
+  "@eyeDescHeterochromia": {
+    "placeholders": {
+      "primary": { "type": "String" },
+      "secondary": { "type": "String" }
+    }
+  },
+
+  "skinColorPink": "粉色",
+  "skinColorRed": "红色",
+  "skinColorBlack": "黑色",
+  "skinColorDark": "深色",
+  "skinColorDarkBrown": "深棕色",
+  "skinColorBrown": "棕色",
+  "skinColorLightBrown": "浅棕色",
+  "skinColorDarkGrey": "深灰色",
+  "skinColorGrey": "灰色",
+  "skinColorDarkSalmon": "深鲑色",
+  "skinColorSalmon": "鲑色",
+  "skinColorPeach": "桃色",
+
+  "furLengthLonghair": "长毛",
+  "furLengthShorthair": "短毛",
+
+  "whiteTintOffwhite": "米白色调",
+  "whiteTintCream": "奶油色调",
+  "whiteTintDarkCream": "深奶油色调",
+  "whiteTintGray": "灰色调",
+  "whiteTintPink": "粉色调",
+
+  "notifReminderTitle": "{catName}想你了！",
+  "@notifReminderTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifReminderBody": "{habitName}的时间到了——猫猫在等你！",
+  "@notifReminderBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+  "notifStreakTitle": "{catName}很担心！",
+  "@notifStreakTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifStreakBody": "你的 {streak} 天连续记录有危险。快来一次专注吧！",
+  "@notifStreakBody": {
+    "placeholders": { "streak": { "type": "int" } }
+  },
+  "notifEvolutionTitle": "{catName}进化了！",
+  "@notifEvolutionTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifEvolutionBody": "{catName}成长为了{stageName}！继续加油！",
+  "@notifEvolutionBody": {
+    "placeholders": {
+      "catName": { "type": "String" },
+      "stageName": { "type": "String" }
+    }
+  },
+
+  "durationHoursMinutes": "{hours}时{minutes}分",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+
+  "diaryScreenTitle": "{name}的日记",
+  "@diaryScreenTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "diaryFailedToLoad": "加载日记失败",
+  "diaryEmptyTitle": "还没有日记",
+  "diaryEmptyHint": "完成一次专注，猫猫就会写下第一篇日记！",
+
+  "focusSetupCountdown": "倒计时",
+  "focusSetupStopwatch": "正计时"
 }

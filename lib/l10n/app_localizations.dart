@@ -223,6 +223,24 @@ abstract class S {
   /// **'Back'**
   String get adoptionBack;
 
+  /// No description provided for @adoptionCatNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat name'**
+  String get adoptionCatNameLabel;
+
+  /// No description provided for @adoptionCatNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Mochi'**
+  String get adoptionCatNameHint;
+
+  /// No description provided for @adoptionRandomNameTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Random name'**
+  String get adoptionRandomNameTooltip;
+
   /// No description provided for @catHouseTitle.
   ///
   /// In en, this message translates to:
@@ -1111,6 +1129,12 @@ abstract class S {
   /// **'Delete Account'**
   String get commonDeleteAccount;
 
+  /// No description provided for @commonYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get commonYes;
+
   /// No description provided for @testChatTitle.
   ///
   /// In en, this message translates to:
@@ -1728,6 +1752,780 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Mesh gradient and floating particles'**
   String get settingsBackgroundAnimationSubtitle;
+
+  /// No description provided for @personalityLazy.
+  ///
+  /// In en, this message translates to:
+  /// **'Lazy'**
+  String get personalityLazy;
+
+  /// No description provided for @personalityCurious.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious'**
+  String get personalityCurious;
+
+  /// No description provided for @personalityPlayful.
+  ///
+  /// In en, this message translates to:
+  /// **'Playful'**
+  String get personalityPlayful;
+
+  /// No description provided for @personalityShy.
+  ///
+  /// In en, this message translates to:
+  /// **'Shy'**
+  String get personalityShy;
+
+  /// No description provided for @personalityBrave.
+  ///
+  /// In en, this message translates to:
+  /// **'Brave'**
+  String get personalityBrave;
+
+  /// No description provided for @personalityClingy.
+  ///
+  /// In en, this message translates to:
+  /// **'Clingy'**
+  String get personalityClingy;
+
+  /// No description provided for @personalityFlavorLazy.
+  ///
+  /// In en, this message translates to:
+  /// **'Will nap 23 hours a day. The other hour? Also napping.'**
+  String get personalityFlavorLazy;
+
+  /// No description provided for @personalityFlavorCurious.
+  ///
+  /// In en, this message translates to:
+  /// **'Already sniffing everything in sight!'**
+  String get personalityFlavorCurious;
+
+  /// No description provided for @personalityFlavorPlayful.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t stop chasing butterflies!'**
+  String get personalityFlavorPlayful;
+
+  /// No description provided for @personalityFlavorShy.
+  ///
+  /// In en, this message translates to:
+  /// **'Took 3 minutes to peek out of the box...'**
+  String get personalityFlavorShy;
+
+  /// No description provided for @personalityFlavorBrave.
+  ///
+  /// In en, this message translates to:
+  /// **'Jumped out of the box before it was even opened!'**
+  String get personalityFlavorBrave;
+
+  /// No description provided for @personalityFlavorClingy.
+  ///
+  /// In en, this message translates to:
+  /// **'Immediately started purring and won\'t let go.'**
+  String get personalityFlavorClingy;
+
+  /// No description provided for @moodHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy'**
+  String get moodHappy;
+
+  /// No description provided for @moodNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get moodNeutral;
+
+  /// No description provided for @moodLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'Lonely'**
+  String get moodLonely;
+
+  /// No description provided for @moodMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing You'**
+  String get moodMissing;
+
+  /// No description provided for @moodMsgLazyHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Nya~! Time for a well-deserved nap...'**
+  String get moodMsgLazyHappy;
+
+  /// No description provided for @moodMsgCuriousHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'What are we exploring today?'**
+  String get moodMsgCuriousHappy;
+
+  /// No description provided for @moodMsgPlayfulHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Nya~! Ready to work!'**
+  String get moodMsgPlayfulHappy;
+
+  /// No description provided for @moodMsgShyHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'...I-I\'m glad you\'re here.'**
+  String get moodMsgShyHappy;
+
+  /// No description provided for @moodMsgBraveHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s conquer today together!'**
+  String get moodMsgBraveHappy;
+
+  /// No description provided for @moodMsgClingyHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Yay! You\'re back! Don\'t leave again!'**
+  String get moodMsgClingyHappy;
+
+  /// No description provided for @moodMsgLazyNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'*yawn* Oh, hey...'**
+  String get moodMsgLazyNeutral;
+
+  /// No description provided for @moodMsgCuriousNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Hmm, what\'s that over there?'**
+  String get moodMsgCuriousNeutral;
+
+  /// No description provided for @moodMsgPlayfulNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Wanna play? Maybe later...'**
+  String get moodMsgPlayfulNeutral;
+
+  /// No description provided for @moodMsgShyNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'*peeks out slowly*'**
+  String get moodMsgShyNeutral;
+
+  /// No description provided for @moodMsgBraveNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Standing guard, as always.'**
+  String get moodMsgBraveNeutral;
+
+  /// No description provided for @moodMsgClingyNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve been waiting for you...'**
+  String get moodMsgClingyNeutral;
+
+  /// No description provided for @moodMsgLazyLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'Even napping feels lonely...'**
+  String get moodMsgLazyLonely;
+
+  /// No description provided for @moodMsgCuriousLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'I wonder when you\'ll come back...'**
+  String get moodMsgCuriousLonely;
+
+  /// No description provided for @moodMsgPlayfulLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'The toys aren\'t fun without you...'**
+  String get moodMsgPlayfulLonely;
+
+  /// No description provided for @moodMsgShyLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'*curls up quietly*'**
+  String get moodMsgShyLonely;
+
+  /// No description provided for @moodMsgBraveLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll keep waiting. I\'m brave.'**
+  String get moodMsgBraveLonely;
+
+  /// No description provided for @moodMsgClingyLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'Where did you go... 🥺'**
+  String get moodMsgClingyLonely;
+
+  /// No description provided for @moodMsgLazyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'*opens one eye hopefully*'**
+  String get moodMsgLazyMissing;
+
+  /// No description provided for @moodMsgCuriousMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Did something happen...?'**
+  String get moodMsgCuriousMissing;
+
+  /// No description provided for @moodMsgPlayfulMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'I saved your favorite toy...'**
+  String get moodMsgPlayfulMissing;
+
+  /// No description provided for @moodMsgShyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'*hiding, but watching the door*'**
+  String get moodMsgShyMissing;
+
+  /// No description provided for @moodMsgBraveMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'I know you\'ll come back. I believe.'**
+  String get moodMsgBraveMissing;
+
+  /// No description provided for @moodMsgClingyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'I miss you so much... please come back.'**
+  String get moodMsgClingyMissing;
+
+  /// No description provided for @peltTypeTabby.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic tabby stripes'**
+  String get peltTypeTabby;
+
+  /// No description provided for @peltTypeTicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticked agouti pattern'**
+  String get peltTypeTicked;
+
+  /// No description provided for @peltTypeMackerel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mackerel tabby'**
+  String get peltTypeMackerel;
+
+  /// No description provided for @peltTypeClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic swirl pattern'**
+  String get peltTypeClassic;
+
+  /// No description provided for @peltTypeSokoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Sokoke marble pattern'**
+  String get peltTypeSokoke;
+
+  /// No description provided for @peltTypeAgouti.
+  ///
+  /// In en, this message translates to:
+  /// **'Agouti ticked'**
+  String get peltTypeAgouti;
+
+  /// No description provided for @peltTypeSpeckled.
+  ///
+  /// In en, this message translates to:
+  /// **'Speckled coat'**
+  String get peltTypeSpeckled;
+
+  /// No description provided for @peltTypeRosette.
+  ///
+  /// In en, this message translates to:
+  /// **'Rosette spotted'**
+  String get peltTypeRosette;
+
+  /// No description provided for @peltTypeSingleColour.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid color'**
+  String get peltTypeSingleColour;
+
+  /// No description provided for @peltTypeTwoColour.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-tone'**
+  String get peltTypeTwoColour;
+
+  /// No description provided for @peltTypeSmoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoke shading'**
+  String get peltTypeSmoke;
+
+  /// No description provided for @peltTypeSinglestripe.
+  ///
+  /// In en, this message translates to:
+  /// **'Single stripe'**
+  String get peltTypeSinglestripe;
+
+  /// No description provided for @peltTypeBengal.
+  ///
+  /// In en, this message translates to:
+  /// **'Bengal pattern'**
+  String get peltTypeBengal;
+
+  /// No description provided for @peltTypeMarbled.
+  ///
+  /// In en, this message translates to:
+  /// **'Marbled pattern'**
+  String get peltTypeMarbled;
+
+  /// No description provided for @peltTypeMasked.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked face'**
+  String get peltTypeMasked;
+
+  /// No description provided for @peltColorWhite.
+  ///
+  /// In en, this message translates to:
+  /// **'White'**
+  String get peltColorWhite;
+
+  /// No description provided for @peltColorPaleGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale grey'**
+  String get peltColorPaleGrey;
+
+  /// No description provided for @peltColorSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get peltColorSilver;
+
+  /// No description provided for @peltColorGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey'**
+  String get peltColorGrey;
+
+  /// No description provided for @peltColorDarkGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark grey'**
+  String get peltColorDarkGrey;
+
+  /// No description provided for @peltColorGhost.
+  ///
+  /// In en, this message translates to:
+  /// **'Ghost grey'**
+  String get peltColorGhost;
+
+  /// No description provided for @peltColorBlack.
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get peltColorBlack;
+
+  /// No description provided for @peltColorCream.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream'**
+  String get peltColorCream;
+
+  /// No description provided for @peltColorPaleGinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale ginger'**
+  String get peltColorPaleGinger;
+
+  /// No description provided for @peltColorGolden.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden'**
+  String get peltColorGolden;
+
+  /// No description provided for @peltColorGinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Ginger'**
+  String get peltColorGinger;
+
+  /// No description provided for @peltColorDarkGinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark ginger'**
+  String get peltColorDarkGinger;
+
+  /// No description provided for @peltColorSienna.
+  ///
+  /// In en, this message translates to:
+  /// **'Sienna'**
+  String get peltColorSienna;
+
+  /// No description provided for @peltColorLightBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Light brown'**
+  String get peltColorLightBrown;
+
+  /// No description provided for @peltColorLilac.
+  ///
+  /// In en, this message translates to:
+  /// **'Lilac'**
+  String get peltColorLilac;
+
+  /// No description provided for @peltColorBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown'**
+  String get peltColorBrown;
+
+  /// No description provided for @peltColorGoldenBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden brown'**
+  String get peltColorGoldenBrown;
+
+  /// No description provided for @peltColorDarkBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown'**
+  String get peltColorDarkBrown;
+
+  /// No description provided for @peltColorChocolate.
+  ///
+  /// In en, this message translates to:
+  /// **'Chocolate'**
+  String get peltColorChocolate;
+
+  /// No description provided for @eyeColorYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get eyeColorYellow;
+
+  /// No description provided for @eyeColorAmber.
+  ///
+  /// In en, this message translates to:
+  /// **'Amber'**
+  String get eyeColorAmber;
+
+  /// No description provided for @eyeColorHazel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazel'**
+  String get eyeColorHazel;
+
+  /// No description provided for @eyeColorPaleGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale green'**
+  String get eyeColorPaleGreen;
+
+  /// No description provided for @eyeColorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get eyeColorGreen;
+
+  /// No description provided for @eyeColorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get eyeColorBlue;
+
+  /// No description provided for @eyeColorDarkBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blue'**
+  String get eyeColorDarkBlue;
+
+  /// No description provided for @eyeColorBlueYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-yellow'**
+  String get eyeColorBlueYellow;
+
+  /// No description provided for @eyeColorBlueGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-green'**
+  String get eyeColorBlueGreen;
+
+  /// No description provided for @eyeColorGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey'**
+  String get eyeColorGrey;
+
+  /// No description provided for @eyeColorCyan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyan'**
+  String get eyeColorCyan;
+
+  /// No description provided for @eyeColorEmerald.
+  ///
+  /// In en, this message translates to:
+  /// **'Emerald'**
+  String get eyeColorEmerald;
+
+  /// No description provided for @eyeColorHeatherBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Heather blue'**
+  String get eyeColorHeatherBlue;
+
+  /// No description provided for @eyeColorSunlitIce.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunlit ice'**
+  String get eyeColorSunlitIce;
+
+  /// No description provided for @eyeColorCopper.
+  ///
+  /// In en, this message translates to:
+  /// **'Copper'**
+  String get eyeColorCopper;
+
+  /// No description provided for @eyeColorSage.
+  ///
+  /// In en, this message translates to:
+  /// **'Sage'**
+  String get eyeColorSage;
+
+  /// No description provided for @eyeColorCobalt.
+  ///
+  /// In en, this message translates to:
+  /// **'Cobalt'**
+  String get eyeColorCobalt;
+
+  /// No description provided for @eyeColorPaleBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale blue'**
+  String get eyeColorPaleBlue;
+
+  /// No description provided for @eyeColorBronze.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get eyeColorBronze;
+
+  /// No description provided for @eyeColorSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get eyeColorSilver;
+
+  /// No description provided for @eyeColorPaleYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale yellow'**
+  String get eyeColorPaleYellow;
+
+  /// No description provided for @eyeDescNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'{color} eyes'**
+  String eyeDescNormal(String color);
+
+  /// No description provided for @eyeDescHeterochromia.
+  ///
+  /// In en, this message translates to:
+  /// **'Heterochromia ({primary} / {secondary})'**
+  String eyeDescHeterochromia(String primary, String secondary);
+
+  /// No description provided for @skinColorPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get skinColorPink;
+
+  /// No description provided for @skinColorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get skinColorRed;
+
+  /// No description provided for @skinColorBlack.
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get skinColorBlack;
+
+  /// No description provided for @skinColorDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get skinColorDark;
+
+  /// No description provided for @skinColorDarkBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown'**
+  String get skinColorDarkBrown;
+
+  /// No description provided for @skinColorBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown'**
+  String get skinColorBrown;
+
+  /// No description provided for @skinColorLightBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Light brown'**
+  String get skinColorLightBrown;
+
+  /// No description provided for @skinColorDarkGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark grey'**
+  String get skinColorDarkGrey;
+
+  /// No description provided for @skinColorGrey.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey'**
+  String get skinColorGrey;
+
+  /// No description provided for @skinColorDarkSalmon.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark salmon'**
+  String get skinColorDarkSalmon;
+
+  /// No description provided for @skinColorSalmon.
+  ///
+  /// In en, this message translates to:
+  /// **'Salmon'**
+  String get skinColorSalmon;
+
+  /// No description provided for @skinColorPeach.
+  ///
+  /// In en, this message translates to:
+  /// **'Peach'**
+  String get skinColorPeach;
+
+  /// No description provided for @furLengthLonghair.
+  ///
+  /// In en, this message translates to:
+  /// **'Longhair'**
+  String get furLengthLonghair;
+
+  /// No description provided for @furLengthShorthair.
+  ///
+  /// In en, this message translates to:
+  /// **'Shorthair'**
+  String get furLengthShorthair;
+
+  /// No description provided for @whiteTintOffwhite.
+  ///
+  /// In en, this message translates to:
+  /// **'Off-white tint'**
+  String get whiteTintOffwhite;
+
+  /// No description provided for @whiteTintCream.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream tint'**
+  String get whiteTintCream;
+
+  /// No description provided for @whiteTintDarkCream.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark cream tint'**
+  String get whiteTintDarkCream;
+
+  /// No description provided for @whiteTintGray.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey tint'**
+  String get whiteTintGray;
+
+  /// No description provided for @whiteTintPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink tint'**
+  String get whiteTintPink;
+
+  /// No description provided for @notifReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{catName} misses you!'**
+  String notifReminderTitle(String catName);
+
+  /// No description provided for @notifReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for {habitName} — your cat is waiting!'**
+  String notifReminderBody(String habitName);
+
+  /// No description provided for @notifStreakTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{catName} is worried!'**
+  String notifStreakTitle(String catName);
+
+  /// No description provided for @notifStreakBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {streak}-day streak is at risk. A quick session will save it!'**
+  String notifStreakBody(int streak);
+
+  /// No description provided for @notifEvolutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{catName} evolved!'**
+  String notifEvolutionTitle(String catName);
+
+  /// No description provided for @notifEvolutionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{catName} grew into a {stageName}! Keep up the great work!'**
+  String notifEvolutionBody(String catName, String stageName);
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String durationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @diaryScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} Diary'**
+  String diaryScreenTitle(String name);
+
+  /// No description provided for @diaryFailedToLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load diary'**
+  String get diaryFailedToLoad;
+
+  /// No description provided for @diaryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No diary entries yet'**
+  String get diaryEmptyTitle;
+
+  /// No description provided for @diaryEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a focus session and your cat will write their first diary entry!'**
+  String get diaryEmptyHint;
+
+  /// No description provided for @focusSetupCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown'**
+  String get focusSetupCountdown;
+
+  /// No description provided for @focusSetupStopwatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopwatch'**
+  String get focusSetupStopwatch;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

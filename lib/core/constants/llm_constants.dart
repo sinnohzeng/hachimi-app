@@ -67,18 +67,58 @@ class LlmConstants {
   static const String prefModelVersion = 'ai_model_version';
 }
 
+// ─── Prompt Metadata Lookup Tables ───
+// LLM prompts use hardcoded EN/ZH lookup tables instead of the UI's ARB system,
+// because prompts are a technical concern (not UI l10n) and services lack BuildContext.
+
+const _personalityNameEn = {
+  'lazy': 'Lazy', 'curious': 'Curious', 'playful': 'Playful',
+  'shy': 'Shy', 'brave': 'Brave', 'clingy': 'Clingy',
+};
+const _personalityNameZh = {
+  'lazy': '慵懒', 'curious': '好奇', 'playful': '活泼',
+  'shy': '害羞', 'brave': '勇敢', 'clingy': '粘人',
+};
+const _personalityFlavorEn = {
+  'lazy': 'Will nap 23 hours a day.',
+  'curious': 'Already sniffing everything in sight!',
+  'playful': "Can't stop chasing butterflies!",
+  'shy': 'Took 3 minutes to peek out of the box...',
+  'brave': 'Jumped out of the box before it was even opened!',
+  'clingy': "Immediately started purring and won't let go.",
+};
+const _personalityFlavorZh = {
+  'lazy': '一天要睡 23 个小时。',
+  'curious': '已经在到处闻来闻去了！',
+  'playful': '停不下来追蝴蝶！',
+  'shy': '花了 3 分钟才从箱子里探出头来...',
+  'brave': '箱子还没打开就跳出来了！',
+  'clingy': '马上开始呼噜，死活不撒手。',
+};
+const _moodNameEn = {
+  'happy': 'Happy', 'neutral': 'Neutral', 'lonely': 'Lonely', 'missing': 'Missing You',
+};
+const _moodNameZh = {
+  'happy': '开心', 'neutral': '平静', 'lonely': '孤单', 'missing': '想你了',
+};
+const _stageNameEn = {
+  'kitten': 'Kitten', 'adolescent': 'Adolescent', 'adult': 'Adult', 'senior': 'Senior',
+};
+const _stageNameZh = {
+  'kitten': '幼猫', 'adolescent': '少年猫', 'adult': '成年猫', 'senior': '长老猫',
+};
+
 /// 日记 prompt 构建器。
 class DiaryPrompt {
   DiaryPrompt._();
 
-  /// 构建日记生成的完整 prompt。
+  /// 构建日记生成的完整 prompt。参数使用 ID，内部查表获取本地化文案。
   static String build({
     required String catName,
-    required String personalityName,
-    required String personalityFlavorText,
-    required String moodName,
+    required String personalityId,
+    required String moodId,
     required int hoursSinceLastSession,
-    required String stageName,
+    required String stageId,
     required int progressPercent,
     required String habitIcon,
     required String habitName,
@@ -91,67 +131,40 @@ class DiaryPrompt {
     required bool isZhLocale,
   }) {
     if (isZhLocale) {
-      return _buildZh(
-        catName: catName,
-        personalityName: personalityName,
-        personalityFlavorText: personalityFlavorText,
-        moodName: moodName,
-        hoursSinceLastSession: hoursSinceLastSession,
-        stageName: stageName,
-        progressPercent: progressPercent,
-        habitIcon: habitIcon,
-        habitName: habitName,
-        todayMinutes: todayMinutes,
-        goalMinutes: goalMinutes,
-        currentStreak: currentStreak,
-        totalHours: totalHours,
-        totalMins: totalMins,
-        targetHours: targetHours,
-      );
+      final pName = _personalityNameZh[personalityId] ?? '活泼';
+      final pFlavor = _personalityFlavorZh[personalityId] ?? '';
+      final mName = _moodNameZh[moodId] ?? '平静';
+      final sName = _stageNameZh[stageId] ?? '幼猫';
+      return '<|im_start|>system\n'
+          '你是$catName，一只$pName性格的虚拟猫猫。你正在写今天的日记。\n'
+          '\n'
+          '关于你的情况：\n'
+          '- 性格：$pName — $pFlavor\n'
+          '- 当前心情：$mName（距离上次见到主人已经$hoursSinceLastSession小时）\n'
+          '- 成长阶段：$sName（成长进度 $progressPercent%）\n'
+          '- 主人的目标：$habitIcon $habitName\n'
+          '- 今天的专注：$todayMinutes分钟（目标$goalMinutes分钟）\n'
+          '- 连续打卡：$currentStreak天\n'
+          '- 总进度：$totalHours小时$totalMins分 / $targetHours小时\n'
+          '\n'
+          '用第一人称写一篇短日记（2-4句话）。\n'
+          '根据性格调整语气。如果主人今天完成了专注，表达开心；如果很久没来，根据心情表达想念。\n'
+          '不要提到自己是AI。\n'
+          '<|im_end|>\n'
+          '<|im_start|>assistant\n'
+          '亲爱的日记，\n\n';
     }
-    return _buildEn(
-      catName: catName,
-      personalityName: personalityName,
-      personalityFlavorText: personalityFlavorText,
-      moodName: moodName,
-      hoursSinceLastSession: hoursSinceLastSession,
-      stageName: stageName,
-      progressPercent: progressPercent,
-      habitIcon: habitIcon,
-      habitName: habitName,
-      todayMinutes: todayMinutes,
-      goalMinutes: goalMinutes,
-      currentStreak: currentStreak,
-      totalHours: totalHours,
-      totalMins: totalMins,
-      targetHours: targetHours,
-    );
-  }
-
-  static String _buildEn({
-    required String catName,
-    required String personalityName,
-    required String personalityFlavorText,
-    required String moodName,
-    required int hoursSinceLastSession,
-    required String stageName,
-    required int progressPercent,
-    required String habitIcon,
-    required String habitName,
-    required int todayMinutes,
-    required int goalMinutes,
-    required int currentStreak,
-    required int totalHours,
-    required int totalMins,
-    required int targetHours,
-  }) {
+    final pName = _personalityNameEn[personalityId] ?? 'Playful';
+    final pFlavor = _personalityFlavorEn[personalityId] ?? '';
+    final mName = _moodNameEn[moodId] ?? 'Neutral';
+    final sName = _stageNameEn[stageId] ?? 'Kitten';
     return '<|im_start|>system\n'
-        'You are $catName, a virtual cat with a $personalityName personality. You are writing today\'s diary.\n'
+        'You are $catName, a virtual cat with a $pName personality. You are writing today\'s diary.\n'
         '\n'
         'About you:\n'
-        '- Personality: $personalityName — $personalityFlavorText\n'
-        '- Current mood: $moodName (last saw your owner ${hoursSinceLastSession}h ago)\n'
-        '- Growth stage: $stageName ($progressPercent% progress)\n'
+        '- Personality: $pName — $pFlavor\n'
+        '- Current mood: $mName (last saw your owner ${hoursSinceLastSession}h ago)\n'
+        '- Growth stage: $sName ($progressPercent% progress)\n'
         '- Owner\'s quest: $habitIcon $habitName\n'
         '- Today\'s focus: ${todayMinutes}min (goal: ${goalMinutes}min)\n'
         '- Current streak: ${currentStreak}d\n'
@@ -163,43 +176,6 @@ class DiaryPrompt {
         '<|im_end|>\n'
         '<|im_start|>assistant\n'
         'Dear diary,\n\n';
-  }
-
-  static String _buildZh({
-    required String catName,
-    required String personalityName,
-    required String personalityFlavorText,
-    required String moodName,
-    required int hoursSinceLastSession,
-    required String stageName,
-    required int progressPercent,
-    required String habitIcon,
-    required String habitName,
-    required int todayMinutes,
-    required int goalMinutes,
-    required int currentStreak,
-    required int totalHours,
-    required int totalMins,
-    required int targetHours,
-  }) {
-    return '<|im_start|>system\n'
-        '你是$catName，一只$personalityName性格的虚拟猫猫。你正在写今天的日记。\n'
-        '\n'
-        '关于你的情况：\n'
-        '- 性格：$personalityName — $personalityFlavorText\n'
-        '- 当前心情：$moodName（距离上次见到主人已经$hoursSinceLastSession小时）\n'
-        '- 成长阶段：$stageName（成长进度 $progressPercent%）\n'
-        '- 主人的目标：$habitIcon $habitName\n'
-        '- 今天的专注：$todayMinutes分钟（目标$goalMinutes分钟）\n'
-        '- 连续打卡：$currentStreak天\n'
-        '- 总进度：$totalHours小时$totalMins分 / $targetHours小时\n'
-        '\n'
-        '用第一人称写一篇短日记（2-4句话）。\n'
-        '根据性格调整语气。如果主人今天完成了专注，表达开心；如果很久没来，根据心情表达想念。\n'
-        '不要提到自己是AI。\n'
-        '<|im_end|>\n'
-        '<|im_start|>assistant\n'
-        '亲爱的日记，\n\n';
   }
 }
 
@@ -221,21 +197,24 @@ class TestPrompt {
 class ChatPrompt {
   ChatPrompt._();
 
-  /// 构建聊天的 system prompt。
+  /// 构建聊天的 system prompt。参数使用 ID，内部查表获取本地化文案。
   static String buildSystem({
     required String catName,
-    required String personalityName,
-    required String personalityFlavorText,
-    required String moodName,
-    required String stageName,
+    required String personalityId,
+    required String moodId,
+    required String stageId,
     required String habitName,
     required bool isZhLocale,
   }) {
     if (isZhLocale) {
+      final pName = _personalityNameZh[personalityId] ?? '活泼';
+      final pFlavor = _personalityFlavorZh[personalityId] ?? '';
+      final mName = _moodNameZh[moodId] ?? '平静';
+      final sName = _stageNameZh[stageId] ?? '幼猫';
       return '<|im_start|>system\n'
-          '你是$catName，一只$personalityName性格的猫猫，正在和你的主人聊天。\n'
-          '性格特点：$personalityFlavorText\n'
-          '当前心情：$moodName。成长阶段：$stageName。\n'
+          '你是$catName，一只$pName性格的猫猫，正在和你的主人聊天。\n'
+          '性格特点：$pFlavor\n'
+          '当前心情：$mName。成长阶段：$sName。\n'
           '主人的目标：$habitName。\n'
           '\n'
           '规则：\n'
@@ -246,10 +225,14 @@ class ChatPrompt {
           '- 不要提到自己是AI\n'
           '<|im_end|>\n';
     }
+    final pName = _personalityNameEn[personalityId] ?? 'Playful';
+    final pFlavor = _personalityFlavorEn[personalityId] ?? '';
+    final mName = _moodNameEn[moodId] ?? 'Neutral';
+    final sName = _stageNameEn[stageId] ?? 'Kitten';
     return '<|im_start|>system\n'
-        'You are $catName, a cat with a $personalityName personality, chatting with your owner.\n'
-        'Personality: $personalityFlavorText\n'
-        'Current mood: $moodName. Growth stage: $stageName.\n'
+        'You are $catName, a cat with a $pName personality, chatting with your owner.\n'
+        'Personality: $pFlavor\n'
+        'Current mood: $mName. Growth stage: $sName.\n'
         'Owner\'s quest: $habitName.\n'
         '\n'
         'Rules:\n'

@@ -13,55 +13,21 @@ import 'package:flutter/material.dart';
 
 class CatPersonality {
   final String id;
-  final String name;
   final String emoji;
-  final String flavorText;
 
   const CatPersonality({
     required this.id,
-    required this.name,
     required this.emoji,
-    required this.flavorText,
   });
 }
 
 const List<CatPersonality> catPersonalities = [
-  CatPersonality(
-    id: 'lazy',
-    name: 'Lazy',
-    emoji: '😴',
-    flavorText: 'Will nap 23 hours a day. The other hour? Also napping.',
-  ),
-  CatPersonality(
-    id: 'curious',
-    name: 'Curious',
-    emoji: '🔍',
-    flavorText: 'Already sniffing everything in sight!',
-  ),
-  CatPersonality(
-    id: 'playful',
-    name: 'Playful',
-    emoji: '🎯',
-    flavorText: "Can't stop chasing butterflies!",
-  ),
-  CatPersonality(
-    id: 'shy',
-    name: 'Shy',
-    emoji: '🙈',
-    flavorText: 'Took 3 minutes to peek out of the box...',
-  ),
-  CatPersonality(
-    id: 'brave',
-    name: 'Brave',
-    emoji: '🦁',
-    flavorText: 'Jumped out of the box before it was even opened!',
-  ),
-  CatPersonality(
-    id: 'clingy',
-    name: 'Clingy',
-    emoji: '🥺',
-    flavorText: "Immediately started purring and won't let go.",
-  ),
+  CatPersonality(id: 'lazy', emoji: '😴'),
+  CatPersonality(id: 'curious', emoji: '🔍'),
+  CatPersonality(id: 'playful', emoji: '🎯'),
+  CatPersonality(id: 'shy', emoji: '🙈'),
+  CatPersonality(id: 'brave', emoji: '🦁'),
+  CatPersonality(id: 'clingy', emoji: '🥺'),
 ];
 
 /// 快速查找 personalityId → CatPersonality
@@ -73,54 +39,20 @@ final Map<String, CatPersonality> personalityMap = {
 
 class CatMood {
   final String id;
-  final String name;
   final String emoji;
   final String spriteKey;
 
   const CatMood({
     required this.id,
-    required this.name,
     required this.emoji,
     required this.spriteKey,
   });
 }
 
-const CatMood moodHappy = CatMood(id: 'happy', name: 'Happy', emoji: '😸', spriteKey: 'happy');
-const CatMood moodNeutral = CatMood(id: 'neutral', name: 'Neutral', emoji: '😺', spriteKey: 'neutral');
-const CatMood moodLonely = CatMood(id: 'lonely', name: 'Lonely', emoji: '🥺', spriteKey: 'sad');
-const CatMood moodMissing = CatMood(id: 'missing', name: 'Missing You', emoji: '😿', spriteKey: 'sad');
-
-/// 心情消息 — personality:mood 组合矩阵
-const Map<String, String> moodMessages = {
-  // Happy
-  'lazy:happy': 'Nya~! Time for a well-deserved nap...',
-  'curious:happy': 'What are we exploring today?',
-  'playful:happy': 'Nya~! Ready to work!',
-  'shy:happy': '...I-I\'m glad you\'re here.',
-  'brave:happy': 'Let\'s conquer today together!',
-  'clingy:happy': 'Yay! You\'re back! Don\'t leave again!',
-  // Neutral
-  'lazy:neutral': '*yawn* Oh, hey...',
-  'curious:neutral': 'Hmm, what\'s that over there?',
-  'playful:neutral': 'Wanna play? Maybe later...',
-  'shy:neutral': '*peeks out slowly*',
-  'brave:neutral': 'Standing guard, as always.',
-  'clingy:neutral': 'I\'ve been waiting for you...',
-  // Lonely
-  'lazy:lonely': 'Even napping feels lonely...',
-  'curious:lonely': 'I wonder when you\'ll come back...',
-  'playful:lonely': 'The toys aren\'t fun without you...',
-  'shy:lonely': '*curls up quietly*',
-  'brave:lonely': 'I\'ll keep waiting. I\'m brave.',
-  'clingy:lonely': 'Where did you go... 🥺',
-  // Missing
-  'lazy:missing': '*opens one eye hopefully*',
-  'curious:missing': 'Did something happen...?',
-  'playful:missing': 'I saved your favorite toy...',
-  'shy:missing': '*hiding, but watching the door*',
-  'brave:missing': 'I know you\'ll come back. I believe.',
-  'clingy:missing': 'I miss you so much... please come back.',
-};
+const CatMood moodHappy = CatMood(id: 'happy', emoji: '😸', spriteKey: 'happy');
+const CatMood moodNeutral = CatMood(id: 'neutral', emoji: '😺', spriteKey: 'neutral');
+const CatMood moodLonely = CatMood(id: 'lonely', emoji: '🥺', spriteKey: 'sad');
+const CatMood moodMissing = CatMood(id: 'missing', emoji: '😿', spriteKey: 'sad');
 
 /// 根据最近一次专注时间计算心情
 String calculateMood(DateTime? lastSessionAt) {
@@ -180,4 +112,17 @@ const List<String> randomCatNames = [
   'Pudding', 'Cookie', 'Waffle', 'Mocha', 'Latte',
   'Caramel', 'Biscuit', 'Sesame', 'Matcha', 'Azuki',
   'Hachi', 'Sakura', 'Hinata', 'Sora', 'Ren',
+];
+
+const List<String> randomCatNamesZh = [
+  '年糕', '团子', '豆沙', '芋圆', '汤圆',
+  '布丁', '麻薯', '糯米', '奶茶', '可可',
+  '小橘', '花卷', '饺子', '包子', '馒头',
+  '芒果', '桃子', '柿子', '栗子', '橙子',
+  '小黑', '小白', '大橘', '狸花', '三花',
+  '豆豆', '球球', '咪咪', '喵喵', '毛毛',
+  '蛋挞', '曲奇', '芝士', '抹茶', '红豆',
+  '小鱼', '虎斑', '雪球', '棉花', '云朵',
+  '饭团', '薯条', '甜甜', '乖乖', '萌萌',
+  '七七', '八八', '小樱', '小星', '月月',
 ];

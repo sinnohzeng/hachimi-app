@@ -28,6 +28,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -146,7 +147,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                           const SizedBox(height: AppSpacing.xs),
                           if (personality != null)
                             Text(
-                              '${personality.emoji} ${personality.name}',
+                              '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
@@ -174,7 +175,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      '${moodData.emoji} ${moodData.name}',
+                      '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
                       style: textTheme.labelLarge?.copyWith(
                         color: colorScheme.onTertiaryContainer,
                       ),
@@ -264,7 +265,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 ),
                 const Spacer(),
                 Text(
-                  cat.stageName,
+                  context.l10n.stageName(cat.computedStage),
                   style: textTheme.labelLarge?.copyWith(
                     color: stageClr,
                     fontWeight: FontWeight.bold,

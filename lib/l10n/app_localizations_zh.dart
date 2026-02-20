@@ -76,6 +76,15 @@ class SZh extends S {
   String get adoptionBack => '上一步';
 
   @override
+  String get adoptionCatNameLabel => '猫猫名字';
+
+  @override
+  String get adoptionCatNameHint => '例如：小年糕';
+
+  @override
+  String get adoptionRandomNameTooltip => '随机名字';
+
+  @override
   String get catHouseTitle => '猫屋';
 
   @override
@@ -562,6 +571,9 @@ class SZh extends S {
   String get commonDeleteAccount => '删除账号';
 
   @override
+  String get commonYes => '是';
+
+  @override
   String get testChatTitle => '测试 AI 模型';
 
   @override
@@ -885,4 +897,411 @@ class SZh extends S {
 
   @override
   String get settingsBackgroundAnimationSubtitle => '流体渐变和浮动粒子效果';
+
+  @override
+  String get personalityLazy => '慵懒';
+
+  @override
+  String get personalityCurious => '好奇';
+
+  @override
+  String get personalityPlayful => '活泼';
+
+  @override
+  String get personalityShy => '害羞';
+
+  @override
+  String get personalityBrave => '勇敢';
+
+  @override
+  String get personalityClingy => '粘人';
+
+  @override
+  String get personalityFlavorLazy => '一天要睡 23 个小时。剩下那小时？也在睡。';
+
+  @override
+  String get personalityFlavorCurious => '已经在到处闻来闻去了！';
+
+  @override
+  String get personalityFlavorPlayful => '停不下来追蝴蝶！';
+
+  @override
+  String get personalityFlavorShy => '花了 3 分钟才从箱子里探出头来...';
+
+  @override
+  String get personalityFlavorBrave => '箱子还没打开就跳出来了！';
+
+  @override
+  String get personalityFlavorClingy => '马上开始呼噜，死活不撒手。';
+
+  @override
+  String get moodHappy => '开心';
+
+  @override
+  String get moodNeutral => '平静';
+
+  @override
+  String get moodLonely => '孤单';
+
+  @override
+  String get moodMissing => '想你了';
+
+  @override
+  String get moodMsgLazyHappy => '喵~！该美美地睡一觉了...';
+
+  @override
+  String get moodMsgCuriousHappy => '今天我们去探索什么？';
+
+  @override
+  String get moodMsgPlayfulHappy => '喵~！准备好干活了！';
+
+  @override
+  String get moodMsgShyHappy => '...你、你在就好了。';
+
+  @override
+  String get moodMsgBraveHappy => '一起征服今天吧！';
+
+  @override
+  String get moodMsgClingyHappy => '耶！你回来了！别再走了！';
+
+  @override
+  String get moodMsgLazyNeutral => '*哈欠* 哦，嗨...';
+
+  @override
+  String get moodMsgCuriousNeutral => '嗯？那边是什么？';
+
+  @override
+  String get moodMsgPlayfulNeutral => '想玩吗？算了，待会再说...';
+
+  @override
+  String get moodMsgShyNeutral => '*慢慢探出头来*';
+
+  @override
+  String get moodMsgBraveNeutral => '一如既往地站岗。';
+
+  @override
+  String get moodMsgClingyNeutral => '我一直在等你...';
+
+  @override
+  String get moodMsgLazyLonely => '连睡觉都觉得孤单了...';
+
+  @override
+  String get moodMsgCuriousLonely => '不知道你什么时候回来...';
+
+  @override
+  String get moodMsgPlayfulLonely => '没有你，玩具都不好玩了...';
+
+  @override
+  String get moodMsgShyLonely => '*安静地蜷缩起来*';
+
+  @override
+  String get moodMsgBraveLonely => '我会继续等。我很勇敢。';
+
+  @override
+  String get moodMsgClingyLonely => '你去哪儿了... 🥺';
+
+  @override
+  String get moodMsgLazyMissing => '*满怀期待地睁开一只眼*';
+
+  @override
+  String get moodMsgCuriousMissing => '是不是发生了什么事...？';
+
+  @override
+  String get moodMsgPlayfulMissing => '我帮你留着你最喜欢的玩具...';
+
+  @override
+  String get moodMsgShyMissing => '*藏起来了，但一直盯着门口*';
+
+  @override
+  String get moodMsgBraveMissing => '我知道你会回来的。我相信。';
+
+  @override
+  String get moodMsgClingyMissing => '好想你... 快回来吧。';
+
+  @override
+  String get peltTypeTabby => '经典虎斑纹';
+
+  @override
+  String get peltTypeTicked => '刺鼠纹';
+
+  @override
+  String get peltTypeMackerel => '鲭鱼纹';
+
+  @override
+  String get peltTypeClassic => '经典漩涡纹';
+
+  @override
+  String get peltTypeSokoke => '索科克大理石纹';
+
+  @override
+  String get peltTypeAgouti => '刺鼠色';
+
+  @override
+  String get peltTypeSpeckled => '斑点毛';
+
+  @override
+  String get peltTypeRosette => '玫瑰斑纹';
+
+  @override
+  String get peltTypeSingleColour => '纯色';
+
+  @override
+  String get peltTypeTwoColour => '双色';
+
+  @override
+  String get peltTypeSmoke => '烟色渐层';
+
+  @override
+  String get peltTypeSinglestripe => '单条纹';
+
+  @override
+  String get peltTypeBengal => '豹纹';
+
+  @override
+  String get peltTypeMarbled => '大理石纹';
+
+  @override
+  String get peltTypeMasked => '面罩脸';
+
+  @override
+  String get peltColorWhite => '白色';
+
+  @override
+  String get peltColorPaleGrey => '浅灰色';
+
+  @override
+  String get peltColorSilver => '银色';
+
+  @override
+  String get peltColorGrey => '灰色';
+
+  @override
+  String get peltColorDarkGrey => '深灰色';
+
+  @override
+  String get peltColorGhost => '幽灰色';
+
+  @override
+  String get peltColorBlack => '黑色';
+
+  @override
+  String get peltColorCream => '奶油色';
+
+  @override
+  String get peltColorPaleGinger => '浅姜黄色';
+
+  @override
+  String get peltColorGolden => '金色';
+
+  @override
+  String get peltColorGinger => '姜黄色';
+
+  @override
+  String get peltColorDarkGinger => '深姜黄色';
+
+  @override
+  String get peltColorSienna => '赭色';
+
+  @override
+  String get peltColorLightBrown => '浅棕色';
+
+  @override
+  String get peltColorLilac => '丁香色';
+
+  @override
+  String get peltColorBrown => '棕色';
+
+  @override
+  String get peltColorGoldenBrown => '金棕色';
+
+  @override
+  String get peltColorDarkBrown => '深棕色';
+
+  @override
+  String get peltColorChocolate => '巧克力色';
+
+  @override
+  String get eyeColorYellow => '黄色';
+
+  @override
+  String get eyeColorAmber => '琥珀色';
+
+  @override
+  String get eyeColorHazel => '榛色';
+
+  @override
+  String get eyeColorPaleGreen => '浅绿色';
+
+  @override
+  String get eyeColorGreen => '绿色';
+
+  @override
+  String get eyeColorBlue => '蓝色';
+
+  @override
+  String get eyeColorDarkBlue => '深蓝色';
+
+  @override
+  String get eyeColorBlueYellow => '蓝黄色';
+
+  @override
+  String get eyeColorBlueGreen => '蓝绿色';
+
+  @override
+  String get eyeColorGrey => '灰色';
+
+  @override
+  String get eyeColorCyan => '青色';
+
+  @override
+  String get eyeColorEmerald => '翡翠色';
+
+  @override
+  String get eyeColorHeatherBlue => '石楠蓝';
+
+  @override
+  String get eyeColorSunlitIce => '冰晶色';
+
+  @override
+  String get eyeColorCopper => '铜色';
+
+  @override
+  String get eyeColorSage => '鼠尾草色';
+
+  @override
+  String get eyeColorCobalt => '钴蓝色';
+
+  @override
+  String get eyeColorPaleBlue => '浅蓝色';
+
+  @override
+  String get eyeColorBronze => '青铜色';
+
+  @override
+  String get eyeColorSilver => '银色';
+
+  @override
+  String get eyeColorPaleYellow => '浅黄色';
+
+  @override
+  String eyeDescNormal(String color) {
+    return '$color眼睛';
+  }
+
+  @override
+  String eyeDescHeterochromia(String primary, String secondary) {
+    return '异色瞳（$primary / $secondary）';
+  }
+
+  @override
+  String get skinColorPink => '粉色';
+
+  @override
+  String get skinColorRed => '红色';
+
+  @override
+  String get skinColorBlack => '黑色';
+
+  @override
+  String get skinColorDark => '深色';
+
+  @override
+  String get skinColorDarkBrown => '深棕色';
+
+  @override
+  String get skinColorBrown => '棕色';
+
+  @override
+  String get skinColorLightBrown => '浅棕色';
+
+  @override
+  String get skinColorDarkGrey => '深灰色';
+
+  @override
+  String get skinColorGrey => '灰色';
+
+  @override
+  String get skinColorDarkSalmon => '深鲑色';
+
+  @override
+  String get skinColorSalmon => '鲑色';
+
+  @override
+  String get skinColorPeach => '桃色';
+
+  @override
+  String get furLengthLonghair => '长毛';
+
+  @override
+  String get furLengthShorthair => '短毛';
+
+  @override
+  String get whiteTintOffwhite => '米白色调';
+
+  @override
+  String get whiteTintCream => '奶油色调';
+
+  @override
+  String get whiteTintDarkCream => '深奶油色调';
+
+  @override
+  String get whiteTintGray => '灰色调';
+
+  @override
+  String get whiteTintPink => '粉色调';
+
+  @override
+  String notifReminderTitle(String catName) {
+    return '$catName想你了！';
+  }
+
+  @override
+  String notifReminderBody(String habitName) {
+    return '$habitName的时间到了——猫猫在等你！';
+  }
+
+  @override
+  String notifStreakTitle(String catName) {
+    return '$catName很担心！';
+  }
+
+  @override
+  String notifStreakBody(int streak) {
+    return '你的 $streak 天连续记录有危险。快来一次专注吧！';
+  }
+
+  @override
+  String notifEvolutionTitle(String catName) {
+    return '$catName进化了！';
+  }
+
+  @override
+  String notifEvolutionBody(String catName, String stageName) {
+    return '$catName成长为了$stageName！继续加油！';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours时$minutes分';
+  }
+
+  @override
+  String diaryScreenTitle(String name) {
+    return '$name的日记';
+  }
+
+  @override
+  String get diaryFailedToLoad => '加载日记失败';
+
+  @override
+  String get diaryEmptyTitle => '还没有日记';
+
+  @override
+  String get diaryEmptyHint => '完成一次专注，猫猫就会写下第一篇日记！';
+
+  @override
+  String get focusSetupCountdown => '倒计时';
+
+  @override
+  String get focusSetupStopwatch => '正计时';
 }

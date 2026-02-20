@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/diary_provider.dart';
 
@@ -116,7 +118,7 @@ class CatDiaryScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              '${moodData.emoji} ${moodData.name}',
+                              '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
                               style: textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onTertiaryContainer,
                               ),
@@ -127,7 +129,7 @@ class CatDiaryScreen extends ConsumerWidget {
                       if (personality != null) ...[
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '${personality.emoji} ${personality.name} · ${entry.stage}',
+                          '${personality.emoji} ${context.l10n.personalityName(personality.id)} · ${context.l10n.stageName(entry.stage)}',
                           style: textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

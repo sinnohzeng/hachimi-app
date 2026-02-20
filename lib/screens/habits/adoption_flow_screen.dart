@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -691,7 +693,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             const SizedBox(height: AppSpacing.md),
             if (personality != null)
               Text(
-                '${personality.emoji} ${personality.name}',
+                '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
@@ -137,7 +139,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   ),
                 ),
                 Text(
-                  cat.speechMessage,
+                  context.l10n.moodMessage(cat.personality, cat.computedMood),
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,

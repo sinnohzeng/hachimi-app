@@ -112,11 +112,10 @@ class DiaryService {
 
     return DiaryPrompt.build(
       catName: cat.name,
-      personalityName: personality?.name ?? 'Playful',
-      personalityFlavorText: personality?.flavorText ?? '',
-      moodName: moodData.name,
+      personalityId: personality?.id ?? 'playful',
+      moodId: moodData.id,
       hoursSinceLastSession: hoursSince,
-      stageName: cat.stageName,
+      stageId: cat.computedStage,
       progressPercent: (cat.growthProgress * 100).round(),
       habitIcon: habit.icon,
       habitName: habit.name,

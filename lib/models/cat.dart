@@ -75,28 +75,6 @@ class Cat {
   /// 性格元数据
   CatPersonality? get personalityData => personalityMap[personality];
 
-  /// 语音气泡消息
-  String get speechMessage {
-    final key = '$personality:$computedMood';
-    return moodMessages[key] ?? 'Meow~';
-  }
-
-  /// 阶段显示名称
-  String get stageName {
-    switch (computedStage) {
-      case 'kitten':
-        return 'Kitten';
-      case 'adolescent':
-        return 'Adolescent';
-      case 'adult':
-        return 'Adult';
-      case 'senior':
-        return 'Senior';
-      default:
-        return 'Kitten';
-    }
-  }
-
   factory Cat.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final appearanceMap = data['appearance'] as Map<String, dynamic>?;

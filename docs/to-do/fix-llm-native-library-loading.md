@@ -1,7 +1,8 @@
 # 修复 AI 模型加载失败 — Native Library 编译问题
 
-**Status**: In Progress
+**Status**: Build Verified
 **Created**: 2026-02-20
+**Verified**: 2026-02-20
 **Priority**: Critical — AI 功能完全不可用
 
 ---
@@ -46,47 +47,49 @@ unzip -l app-release.apk | grep "\.so"
 
 - [x] `LlmAvailabilityNotifier.loadModel()` 的 catch 块添加 `rethrow`，让 UI 层能拿到实际错误消息
 
-### Step 3: 构建 debug APK 并验证 — TODO
+### Step 3: 构建 debug APK 并验证 — DONE
 
-```bash
-# 1. 清理并重新构建
-flutter clean && flutter pub get
-flutter build apk --debug
+构建验证于 2026-02-20 在 Linux (阿里云 ECS) 完成。
 
-# 2. 验证 native .so 文件存在
-unzip -l build/app/outputs/flutter-apk/app-debug.apk | grep "\.so"
-# 期望看到：lib/arm64-v8a/libmtmd.so, libllama.so, libggml.so
+**发现的额外问题与修复：**
 
-# 3. 安装到 vivo 测试
-adb shell settings put global package_verifier_enable 0
-adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
+1. **Flutter 插件注册缺失**：`llama_cpp_dart/pubspec.yaml` 缺少 `flutter.plugin.platforms` 声明，Flutter 不会编译其 native 代码
+   - 修复：添加 `ffiPlugin: true` 声明（android / linux / macos）
+2. **CMake 参数缺失**：`llama_cpp_dart/android/build.gradle`（主插件）缺少 cmake arguments（BUILD_SHARED_LIBS、OpenCL 等）
+   - 修复：从 `llamalib/build.gradle` 移植 cmake arguments
+3. **NDK 版本不匹配**：插件使用 `android.ndkVersion`（Flutter 默认 27.x），但需要 NDK 29
+   - 修复：硬编码 `ndkVersion "29.0.13846066"`
+4. **mtmd 源文件缺失**：`src/CMakeLists.txt` 的 mtmd target 未编译 `models/` 子目录下的 clip 实现文件
+   - 修复：添加所有 15 个 model .cpp 文件到 `add_library(mtmd ...)`
 
-# 4. 测试模型加载
-# 打开 AI 功能 → 下载模型 → 测试模型 → 应能正常加载
+**验证结果：**
 
-# 5. 检查 logcat 无 native library 加载错误
-adb logcat -c && adb logcat -s flutter
+```
+unzip -l app-debug.apk | grep -E "(libmtmd|libllama|libggml)"
+  938440  lib/arm64-v8a/libggml-base.so
+ 1258720  lib/arm64-v8a/libggml-cpu.so
+ 1005760  lib/arm64-v8a/libggml-opencl.so
+  129240  lib/arm64-v8a/libggml.so
+ 5292024  lib/arm64-v8a/libllama.so
+ 1433024  lib/arm64-v8a/libmtmd.so
+  905872  lib/x86_64/libggml-base.so
+ 1074992  lib/x86_64/libggml-cpu.so
+ 1003976  lib/x86_64/libggml-opencl.so
+  119976  lib/x86_64/libggml.so
+ 5179752  lib/x86_64/libllama.so
+ 1480272  lib/x86_64/libmtmd.so
 ```
 
-### Step 4: 如果 Step 3 仍失败 — 排查 CMake — TODO (contingency)
+### Step 4: 设备测试 — TODO
 
-检查构建日志中 CMake 相关输出，可能需要：
+构建验证通过，待在 vivo 设备上测试模型加载：
 
-1. **确认 NDK 版本匹配**：llamalib 要求 `29.0.13846066`
-   ```bash
-   ls $ANDROID_HOME/ndk/
-   ```
-2. **确认 OpenCL 预编译库路径正确**：检查 CMake 能否找到 OpenCL headers/libs
-3. **暂时关闭 OpenCL**（降级方案）：先验证 CPU-only 推理
-   - 修改 `llamalib/build.gradle`：`-DGGML_OPENCL=OFF`
-   - 如果 CPU-only 构建成功，说明问题在 OpenCL 依赖
-4. **检查构建日志**：
-   ```bash
-   # 保存完整构建日志
-   flutter build apk --debug -v 2>&1 | tee /tmp/build_debug.log
-   # 搜索 CMake 错误
-   grep -i "error\|fatal\|failed" /tmp/build_debug.log | head -20
-   ```
+```bash
+adb shell settings put global package_verifier_enable 0
+adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
+# 打开 AI 功能 → 下载模型 → 测试模型 → 应能正常加载
+adb logcat -c && adb logcat -s flutter
+```
 
 ---
 
@@ -96,10 +99,14 @@ adb logcat -c && adb logcat -s flutter
 |------|----------|------|
 | `packages/llama_cpp_dart/android/llamalib/build.gradle` | 删除硬编码 CMake 路径 | Done |
 | `lib/providers/llm_provider.dart` | loadModel() 错误传播（rethrow） | Done |
+| `packages/llama_cpp_dart/pubspec.yaml` | 添加 `flutter.plugin.platforms` ffiPlugin 声明 | Done |
+| `packages/llama_cpp_dart/android/build.gradle` | 添加 cmake arguments、固定 NDK 版本、指定 cmake 3.22.1 | Done |
+| `packages/llama_cpp_dart/src/CMakeLists.txt` | mtmd target 添加 models/ 子目录全部 cpp 文件 | Done |
 
 ## 验证清单
 
-- [ ] `unzip -l app-debug.apk | grep mtmd` → 必须看到 `lib/arm64-v8a/libmtmd.so`
+- [x] `unzip -l app-debug.apk | grep mtmd` → 必须看到 `lib/arm64-v8a/libmtmd.so` ✓
+- [x] APK 包含全部 native 库（libmtmd.so + libllama.so + libggml*.so，arm64-v8a + x86_64）✓
 - [ ] 安装 debug APK → 打开 AI 功能 → 下载模型 → 测试模型 → 应能正常加载
 - [ ] `adb logcat -s flutter` → 确认无 native library 加载错误
 

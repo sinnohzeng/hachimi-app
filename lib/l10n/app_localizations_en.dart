@@ -76,6 +76,15 @@ class SEn extends S {
   String get adoptionBack => 'Back';
 
   @override
+  String get adoptionCatNameLabel => 'Cat name';
+
+  @override
+  String get adoptionCatNameHint => 'e.g. Mochi';
+
+  @override
+  String get adoptionRandomNameTooltip => 'Random name';
+
+  @override
   String get catHouseTitle => 'CatHouse';
 
   @override
@@ -570,6 +579,9 @@ class SEn extends S {
   String get commonDeleteAccount => 'Delete Account';
 
   @override
+  String get commonYes => 'Yes';
+
+  @override
   String get testChatTitle => 'Test AI Model';
 
   @override
@@ -899,4 +911,416 @@ class SEn extends S {
   @override
   String get settingsBackgroundAnimationSubtitle =>
       'Mesh gradient and floating particles';
+
+  @override
+  String get personalityLazy => 'Lazy';
+
+  @override
+  String get personalityCurious => 'Curious';
+
+  @override
+  String get personalityPlayful => 'Playful';
+
+  @override
+  String get personalityShy => 'Shy';
+
+  @override
+  String get personalityBrave => 'Brave';
+
+  @override
+  String get personalityClingy => 'Clingy';
+
+  @override
+  String get personalityFlavorLazy =>
+      'Will nap 23 hours a day. The other hour? Also napping.';
+
+  @override
+  String get personalityFlavorCurious =>
+      'Already sniffing everything in sight!';
+
+  @override
+  String get personalityFlavorPlayful => 'Can\'t stop chasing butterflies!';
+
+  @override
+  String get personalityFlavorShy => 'Took 3 minutes to peek out of the box...';
+
+  @override
+  String get personalityFlavorBrave =>
+      'Jumped out of the box before it was even opened!';
+
+  @override
+  String get personalityFlavorClingy =>
+      'Immediately started purring and won\'t let go.';
+
+  @override
+  String get moodHappy => 'Happy';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodLonely => 'Lonely';
+
+  @override
+  String get moodMissing => 'Missing You';
+
+  @override
+  String get moodMsgLazyHappy => 'Nya~! Time for a well-deserved nap...';
+
+  @override
+  String get moodMsgCuriousHappy => 'What are we exploring today?';
+
+  @override
+  String get moodMsgPlayfulHappy => 'Nya~! Ready to work!';
+
+  @override
+  String get moodMsgShyHappy => '...I-I\'m glad you\'re here.';
+
+  @override
+  String get moodMsgBraveHappy => 'Let\'s conquer today together!';
+
+  @override
+  String get moodMsgClingyHappy => 'Yay! You\'re back! Don\'t leave again!';
+
+  @override
+  String get moodMsgLazyNeutral => '*yawn* Oh, hey...';
+
+  @override
+  String get moodMsgCuriousNeutral => 'Hmm, what\'s that over there?';
+
+  @override
+  String get moodMsgPlayfulNeutral => 'Wanna play? Maybe later...';
+
+  @override
+  String get moodMsgShyNeutral => '*peeks out slowly*';
+
+  @override
+  String get moodMsgBraveNeutral => 'Standing guard, as always.';
+
+  @override
+  String get moodMsgClingyNeutral => 'I\'ve been waiting for you...';
+
+  @override
+  String get moodMsgLazyLonely => 'Even napping feels lonely...';
+
+  @override
+  String get moodMsgCuriousLonely => 'I wonder when you\'ll come back...';
+
+  @override
+  String get moodMsgPlayfulLonely => 'The toys aren\'t fun without you...';
+
+  @override
+  String get moodMsgShyLonely => '*curls up quietly*';
+
+  @override
+  String get moodMsgBraveLonely => 'I\'ll keep waiting. I\'m brave.';
+
+  @override
+  String get moodMsgClingyLonely => 'Where did you go... 🥺';
+
+  @override
+  String get moodMsgLazyMissing => '*opens one eye hopefully*';
+
+  @override
+  String get moodMsgCuriousMissing => 'Did something happen...?';
+
+  @override
+  String get moodMsgPlayfulMissing => 'I saved your favorite toy...';
+
+  @override
+  String get moodMsgShyMissing => '*hiding, but watching the door*';
+
+  @override
+  String get moodMsgBraveMissing => 'I know you\'ll come back. I believe.';
+
+  @override
+  String get moodMsgClingyMissing => 'I miss you so much... please come back.';
+
+  @override
+  String get peltTypeTabby => 'Classic tabby stripes';
+
+  @override
+  String get peltTypeTicked => 'Ticked agouti pattern';
+
+  @override
+  String get peltTypeMackerel => 'Mackerel tabby';
+
+  @override
+  String get peltTypeClassic => 'Classic swirl pattern';
+
+  @override
+  String get peltTypeSokoke => 'Sokoke marble pattern';
+
+  @override
+  String get peltTypeAgouti => 'Agouti ticked';
+
+  @override
+  String get peltTypeSpeckled => 'Speckled coat';
+
+  @override
+  String get peltTypeRosette => 'Rosette spotted';
+
+  @override
+  String get peltTypeSingleColour => 'Solid color';
+
+  @override
+  String get peltTypeTwoColour => 'Two-tone';
+
+  @override
+  String get peltTypeSmoke => 'Smoke shading';
+
+  @override
+  String get peltTypeSinglestripe => 'Single stripe';
+
+  @override
+  String get peltTypeBengal => 'Bengal pattern';
+
+  @override
+  String get peltTypeMarbled => 'Marbled pattern';
+
+  @override
+  String get peltTypeMasked => 'Masked face';
+
+  @override
+  String get peltColorWhite => 'White';
+
+  @override
+  String get peltColorPaleGrey => 'Pale grey';
+
+  @override
+  String get peltColorSilver => 'Silver';
+
+  @override
+  String get peltColorGrey => 'Grey';
+
+  @override
+  String get peltColorDarkGrey => 'Dark grey';
+
+  @override
+  String get peltColorGhost => 'Ghost grey';
+
+  @override
+  String get peltColorBlack => 'Black';
+
+  @override
+  String get peltColorCream => 'Cream';
+
+  @override
+  String get peltColorPaleGinger => 'Pale ginger';
+
+  @override
+  String get peltColorGolden => 'Golden';
+
+  @override
+  String get peltColorGinger => 'Ginger';
+
+  @override
+  String get peltColorDarkGinger => 'Dark ginger';
+
+  @override
+  String get peltColorSienna => 'Sienna';
+
+  @override
+  String get peltColorLightBrown => 'Light brown';
+
+  @override
+  String get peltColorLilac => 'Lilac';
+
+  @override
+  String get peltColorBrown => 'Brown';
+
+  @override
+  String get peltColorGoldenBrown => 'Golden brown';
+
+  @override
+  String get peltColorDarkBrown => 'Dark brown';
+
+  @override
+  String get peltColorChocolate => 'Chocolate';
+
+  @override
+  String get eyeColorYellow => 'Yellow';
+
+  @override
+  String get eyeColorAmber => 'Amber';
+
+  @override
+  String get eyeColorHazel => 'Hazel';
+
+  @override
+  String get eyeColorPaleGreen => 'Pale green';
+
+  @override
+  String get eyeColorGreen => 'Green';
+
+  @override
+  String get eyeColorBlue => 'Blue';
+
+  @override
+  String get eyeColorDarkBlue => 'Dark blue';
+
+  @override
+  String get eyeColorBlueYellow => 'Blue-yellow';
+
+  @override
+  String get eyeColorBlueGreen => 'Blue-green';
+
+  @override
+  String get eyeColorGrey => 'Grey';
+
+  @override
+  String get eyeColorCyan => 'Cyan';
+
+  @override
+  String get eyeColorEmerald => 'Emerald';
+
+  @override
+  String get eyeColorHeatherBlue => 'Heather blue';
+
+  @override
+  String get eyeColorSunlitIce => 'Sunlit ice';
+
+  @override
+  String get eyeColorCopper => 'Copper';
+
+  @override
+  String get eyeColorSage => 'Sage';
+
+  @override
+  String get eyeColorCobalt => 'Cobalt';
+
+  @override
+  String get eyeColorPaleBlue => 'Pale blue';
+
+  @override
+  String get eyeColorBronze => 'Bronze';
+
+  @override
+  String get eyeColorSilver => 'Silver';
+
+  @override
+  String get eyeColorPaleYellow => 'Pale yellow';
+
+  @override
+  String eyeDescNormal(String color) {
+    return '$color eyes';
+  }
+
+  @override
+  String eyeDescHeterochromia(String primary, String secondary) {
+    return 'Heterochromia ($primary / $secondary)';
+  }
+
+  @override
+  String get skinColorPink => 'Pink';
+
+  @override
+  String get skinColorRed => 'Red';
+
+  @override
+  String get skinColorBlack => 'Black';
+
+  @override
+  String get skinColorDark => 'Dark';
+
+  @override
+  String get skinColorDarkBrown => 'Dark brown';
+
+  @override
+  String get skinColorBrown => 'Brown';
+
+  @override
+  String get skinColorLightBrown => 'Light brown';
+
+  @override
+  String get skinColorDarkGrey => 'Dark grey';
+
+  @override
+  String get skinColorGrey => 'Grey';
+
+  @override
+  String get skinColorDarkSalmon => 'Dark salmon';
+
+  @override
+  String get skinColorSalmon => 'Salmon';
+
+  @override
+  String get skinColorPeach => 'Peach';
+
+  @override
+  String get furLengthLonghair => 'Longhair';
+
+  @override
+  String get furLengthShorthair => 'Shorthair';
+
+  @override
+  String get whiteTintOffwhite => 'Off-white tint';
+
+  @override
+  String get whiteTintCream => 'Cream tint';
+
+  @override
+  String get whiteTintDarkCream => 'Dark cream tint';
+
+  @override
+  String get whiteTintGray => 'Grey tint';
+
+  @override
+  String get whiteTintPink => 'Pink tint';
+
+  @override
+  String notifReminderTitle(String catName) {
+    return '$catName misses you!';
+  }
+
+  @override
+  String notifReminderBody(String habitName) {
+    return 'Time for $habitName — your cat is waiting!';
+  }
+
+  @override
+  String notifStreakTitle(String catName) {
+    return '$catName is worried!';
+  }
+
+  @override
+  String notifStreakBody(int streak) {
+    return 'Your $streak-day streak is at risk. A quick session will save it!';
+  }
+
+  @override
+  String notifEvolutionTitle(String catName) {
+    return '$catName evolved!';
+  }
+
+  @override
+  String notifEvolutionBody(String catName, String stageName) {
+    return '$catName grew into a $stageName! Keep up the great work!';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String diaryScreenTitle(String name) {
+    return '$name Diary';
+  }
+
+  @override
+  String get diaryFailedToLoad => 'Failed to load diary';
+
+  @override
+  String get diaryEmptyTitle => 'No diary entries yet';
+
+  @override
+  String get diaryEmptyHint =>
+      'Complete a focus session and your cat will write their first diary entry!';
+
+  @override
+  String get focusSetupCountdown => 'Countdown';
+
+  @override
+  String get focusSetupStopwatch => 'Stopwatch';
 }

@@ -29,6 +29,9 @@
   "adoptionCreate": "Create Habit & Adopt",
   "adoptionNext": "Next",
   "adoptionBack": "Back",
+  "adoptionCatNameLabel": "Cat name",
+  "adoptionCatNameHint": "e.g. Mochi",
+  "adoptionRandomNameTooltip": "Random name",
 
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "No cats yet! Create a habit to adopt your first cat.",
@@ -264,6 +267,7 @@
   "commonPause": "Pause",
   "commonLogOut": "Log Out",
   "commonDeleteAccount": "Delete Account",
+  "commonYes": "Yes",
 
   "testChatTitle": "Test AI Model",
   "testChatLoadingModel": "Loading model...",
@@ -395,5 +399,188 @@
   "pickerMinUnit": "min",
 
   "settingsBackgroundAnimation": "Animated backgrounds",
-  "settingsBackgroundAnimationSubtitle": "Mesh gradient and floating particles"
+  "settingsBackgroundAnimationSubtitle": "Mesh gradient and floating particles",
+
+  "personalityLazy": "Lazy",
+  "personalityCurious": "Curious",
+  "personalityPlayful": "Playful",
+  "personalityShy": "Shy",
+  "personalityBrave": "Brave",
+  "personalityClingy": "Clingy",
+
+  "personalityFlavorLazy": "Will nap 23 hours a day. The other hour? Also napping.",
+  "personalityFlavorCurious": "Already sniffing everything in sight!",
+  "personalityFlavorPlayful": "Can't stop chasing butterflies!",
+  "personalityFlavorShy": "Took 3 minutes to peek out of the box...",
+  "personalityFlavorBrave": "Jumped out of the box before it was even opened!",
+  "personalityFlavorClingy": "Immediately started purring and won't let go.",
+
+  "moodHappy": "Happy",
+  "moodNeutral": "Neutral",
+  "moodLonely": "Lonely",
+  "moodMissing": "Missing You",
+
+  "moodMsgLazyHappy": "Nya~! Time for a well-deserved nap...",
+  "moodMsgCuriousHappy": "What are we exploring today?",
+  "moodMsgPlayfulHappy": "Nya~! Ready to work!",
+  "moodMsgShyHappy": "...I-I'm glad you're here.",
+  "moodMsgBraveHappy": "Let's conquer today together!",
+  "moodMsgClingyHappy": "Yay! You're back! Don't leave again!",
+  "moodMsgLazyNeutral": "*yawn* Oh, hey...",
+  "moodMsgCuriousNeutral": "Hmm, what's that over there?",
+  "moodMsgPlayfulNeutral": "Wanna play? Maybe later...",
+  "moodMsgShyNeutral": "*peeks out slowly*",
+  "moodMsgBraveNeutral": "Standing guard, as always.",
+  "moodMsgClingyNeutral": "I've been waiting for you...",
+  "moodMsgLazyLonely": "Even napping feels lonely...",
+  "moodMsgCuriousLonely": "I wonder when you'll come back...",
+  "moodMsgPlayfulLonely": "The toys aren't fun without you...",
+  "moodMsgShyLonely": "*curls up quietly*",
+  "moodMsgBraveLonely": "I'll keep waiting. I'm brave.",
+  "moodMsgClingyLonely": "Where did you go... \uD83E\uDD7A",
+  "moodMsgLazyMissing": "*opens one eye hopefully*",
+  "moodMsgCuriousMissing": "Did something happen...?",
+  "moodMsgPlayfulMissing": "I saved your favorite toy...",
+  "moodMsgShyMissing": "*hiding, but watching the door*",
+  "moodMsgBraveMissing": "I know you'll come back. I believe.",
+  "moodMsgClingyMissing": "I miss you so much... please come back.",
+
+  "peltTypeTabby": "Classic tabby stripes",
+  "peltTypeTicked": "Ticked agouti pattern",
+  "peltTypeMackerel": "Mackerel tabby",
+  "peltTypeClassic": "Classic swirl pattern",
+  "peltTypeSokoke": "Sokoke marble pattern",
+  "peltTypeAgouti": "Agouti ticked",
+  "peltTypeSpeckled": "Speckled coat",
+  "peltTypeRosette": "Rosette spotted",
+  "peltTypeSingleColour": "Solid color",
+  "peltTypeTwoColour": "Two-tone",
+  "peltTypeSmoke": "Smoke shading",
+  "peltTypeSinglestripe": "Single stripe",
+  "peltTypeBengal": "Bengal pattern",
+  "peltTypeMarbled": "Marbled pattern",
+  "peltTypeMasked": "Masked face",
+
+  "peltColorWhite": "White",
+  "peltColorPaleGrey": "Pale grey",
+  "peltColorSilver": "Silver",
+  "peltColorGrey": "Grey",
+  "peltColorDarkGrey": "Dark grey",
+  "peltColorGhost": "Ghost grey",
+  "peltColorBlack": "Black",
+  "peltColorCream": "Cream",
+  "peltColorPaleGinger": "Pale ginger",
+  "peltColorGolden": "Golden",
+  "peltColorGinger": "Ginger",
+  "peltColorDarkGinger": "Dark ginger",
+  "peltColorSienna": "Sienna",
+  "peltColorLightBrown": "Light brown",
+  "peltColorLilac": "Lilac",
+  "peltColorBrown": "Brown",
+  "peltColorGoldenBrown": "Golden brown",
+  "peltColorDarkBrown": "Dark brown",
+  "peltColorChocolate": "Chocolate",
+
+  "eyeColorYellow": "Yellow",
+  "eyeColorAmber": "Amber",
+  "eyeColorHazel": "Hazel",
+  "eyeColorPaleGreen": "Pale green",
+  "eyeColorGreen": "Green",
+  "eyeColorBlue": "Blue",
+  "eyeColorDarkBlue": "Dark blue",
+  "eyeColorBlueYellow": "Blue-yellow",
+  "eyeColorBlueGreen": "Blue-green",
+  "eyeColorGrey": "Grey",
+  "eyeColorCyan": "Cyan",
+  "eyeColorEmerald": "Emerald",
+  "eyeColorHeatherBlue": "Heather blue",
+  "eyeColorSunlitIce": "Sunlit ice",
+  "eyeColorCopper": "Copper",
+  "eyeColorSage": "Sage",
+  "eyeColorCobalt": "Cobalt",
+  "eyeColorPaleBlue": "Pale blue",
+  "eyeColorBronze": "Bronze",
+  "eyeColorSilver": "Silver",
+  "eyeColorPaleYellow": "Pale yellow",
+
+  "eyeDescNormal": "{color} eyes",
+  "@eyeDescNormal": {
+    "placeholders": { "color": { "type": "String" } }
+  },
+  "eyeDescHeterochromia": "Heterochromia ({primary} / {secondary})",
+  "@eyeDescHeterochromia": {
+    "placeholders": {
+      "primary": { "type": "String" },
+      "secondary": { "type": "String" }
+    }
+  },
+
+  "skinColorPink": "Pink",
+  "skinColorRed": "Red",
+  "skinColorBlack": "Black",
+  "skinColorDark": "Dark",
+  "skinColorDarkBrown": "Dark brown",
+  "skinColorBrown": "Brown",
+  "skinColorLightBrown": "Light brown",
+  "skinColorDarkGrey": "Dark grey",
+  "skinColorGrey": "Grey",
+  "skinColorDarkSalmon": "Dark salmon",
+  "skinColorSalmon": "Salmon",
+  "skinColorPeach": "Peach",
+
+  "furLengthLonghair": "Longhair",
+  "furLengthShorthair": "Shorthair",
+
+  "whiteTintOffwhite": "Off-white tint",
+  "whiteTintCream": "Cream tint",
+  "whiteTintDarkCream": "Dark cream tint",
+  "whiteTintGray": "Grey tint",
+  "whiteTintPink": "Pink tint",
+
+  "notifReminderTitle": "{catName} misses you!",
+  "@notifReminderTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifReminderBody": "Time for {habitName} — your cat is waiting!",
+  "@notifReminderBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+  "notifStreakTitle": "{catName} is worried!",
+  "@notifStreakTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifStreakBody": "Your {streak}-day streak is at risk. A quick session will save it!",
+  "@notifStreakBody": {
+    "placeholders": { "streak": { "type": "int" } }
+  },
+  "notifEvolutionTitle": "{catName} evolved!",
+  "@notifEvolutionTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "notifEvolutionBody": "{catName} grew into a {stageName}! Keep up the great work!",
+  "@notifEvolutionBody": {
+    "placeholders": {
+      "catName": { "type": "String" },
+      "stageName": { "type": "String" }
+    }
+  },
+
+  "durationHoursMinutes": "{hours}h {minutes}m",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+
+  "diaryScreenTitle": "{name} Diary",
+  "@diaryScreenTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "diaryFailedToLoad": "Failed to load diary",
+  "diaryEmptyTitle": "No diary entries yet",
+  "diaryEmptyHint": "Complete a focus session and your cat will write their first diary entry!",
+
+  "focusSetupCountdown": "Countdown",
+  "focusSetupStopwatch": "Stopwatch"
 }
