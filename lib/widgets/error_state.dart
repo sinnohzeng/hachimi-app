@@ -7,6 +7,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// ErrorState — Material 3 style error state with icon, message, and retry button.
 ///
@@ -34,7 +35,7 @@ class ErrorState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: AppSpacing.paddingXl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -43,7 +44,7 @@ class ErrorState extends StatelessWidget {
               size: 48,
               color: colorScheme.error,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.base),
             Text(
               message,
               style: textTheme.bodyLarge?.copyWith(
@@ -52,7 +53,7 @@ class ErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
               FilledButton.tonalIcon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),

@@ -108,9 +108,7 @@ class LlmService {
       final completer = Completer<String>();
 
       streamSub = parent.stream.listen(
-        (token) {
-          buffer.write(token);
-        },
+        buffer.write,
         onError: (e) {
           if (!completer.isCompleted) {
             completer.completeError(e);
@@ -161,9 +159,7 @@ class LlmService {
     StreamSubscription<CompletionEvent>? completionSub;
 
     streamSub = parent.stream.listen(
-      (token) {
-        controller.add(token);
-      },
+      controller.add,
       onError: (e) {
         _resetOnError(e);
         controller.addError(e);

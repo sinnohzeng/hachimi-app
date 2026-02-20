@@ -492,6 +492,44 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 
 ---
 
+## 模型测试聊天（Model Test Chat）
+
+一个轻量聊天页面，位于 **设置 → AI 模型 → 「测试模型」**，用户下载本地 LLM 后可快速验证模型是否正常工作，无需导航至特定猫咪页面。
+
+### 用途
+
+下载 1.2 GB 模型后，用户需要一种零摩擦的方式确认一切正常。测试聊天提供了这个功能。
+
+### 与猫猫聊天的区别
+
+| 方面 | 猫猫聊天 | 模型测试聊天 |
+|------|---------|------------|
+| 入口 | CatDetailScreen AppBar | 设置 → AI 模型区块 |
+| 角色 | 猫猫性格角色扮演 | 通用 AI 助手 |
+| 消息持久化 | SQLite（应用重启后保留） | 仅内存（退出即丢失） |
+| System prompt | 性格 + 心情 + 习惯上下文 | 简单的「helpful assistant」提示 |
+| 服务层 | ChatService（含历史记录） | 直接调用 LlmService.generateStream() |
+
+### 入口
+
+「测试模型」按钮仅在 `LlmAvailability == ready` 时显示于 AI 模型设置区块。导航至 `/model-test-chat` 路由。
+
+### System Prompt
+
+通过 `TestPrompt.buildPrompt()` 使用最小化 ChatML 格式 prompt：
+```
+<|im_start|>system
+You are a helpful AI assistant. Respond concisely in 1-2 sentences.
+<|im_end|>
+<|im_start|>user
+{message}<|im_end|>
+<|im_start|>assistant
+```
+
+**常量定义：** `lib/core/constants/llm_constants.dart` -> `class TestPrompt`
+
+---
+
 ## 猫咪状态
 
 | 状态 | 含义 | 显示 |

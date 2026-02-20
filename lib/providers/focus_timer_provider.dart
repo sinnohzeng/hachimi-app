@@ -343,6 +343,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     }
   }
 
+  // TODO: L10N — needs platform-level string resources or locale forwarding
+  // Provider layer has no BuildContext, so notification text stays hardcoded.
+  // Completion notification L10N is handled in timer_screen.dart (has context).
   void _updateNotification() {
     final label = state.mode == TimerMode.countdown ? 'remaining' : 'elapsed';
     final catDisplayName = state.catName.isNotEmpty ? state.catName : 'Your cat';

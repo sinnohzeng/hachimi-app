@@ -13,6 +13,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
@@ -34,16 +35,16 @@ class CheckInScreen extends ConsumerWidget {
         data: (monthly) {
           final data = monthly ?? MonthlyCheckIn.empty('');
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingBase,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _StatsCard(monthly: data, theme: theme),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.base),
                 _CalendarGrid(monthly: data, theme: theme),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.base),
                 _MilestonesCard(monthly: data, theme: theme),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.base),
                 _RewardScheduleCard(theme: theme),
               ],
             ),
@@ -105,7 +106,7 @@ class _StatsCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -116,7 +117,7 @@ class _StatsCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.flag, size: 16, color: colorScheme.primary),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     nextMilestoneText,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -152,7 +153,7 @@ class _StatItem extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -190,7 +191,7 @@ class _CalendarGrid extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingBase,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -200,7 +201,7 @@ class _CalendarGrid extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             // 星期标题行
             Row(
               children: List.generate(7, (i) {
@@ -220,7 +221,7 @@ class _CalendarGrid extends StatelessWidget {
                 );
               }),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             // 日期网格
             ..._buildWeeks(
               daysInMonth: daysInMonth,
@@ -340,7 +341,7 @@ class _MilestonesCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingBase,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -350,7 +351,7 @@ class _MilestonesCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             for (final m in milestones) ...[
               _MilestoneRow(
                 milestone: m,
@@ -358,7 +359,7 @@ class _MilestonesCard extends StatelessWidget {
                 colorScheme: colorScheme,
                 theme: theme,
               ),
-              if (m != milestones.last) const SizedBox(height: 8),
+              if (m != milestones.last) const SizedBox(height: AppSpacing.sm),
             ],
           ],
         ),
@@ -410,7 +411,7 @@ class _MilestoneRow extends StatelessWidget {
               : colorScheme.onSurfaceVariant,
           size: 20,
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,7 +445,7 @@ class _MilestoneRow extends StatelessWidget {
                 ],
               ),
               if (!milestone.isClaimed) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
@@ -476,7 +477,7 @@ class _RewardScheduleCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingBase,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -486,7 +487,7 @@ class _RewardScheduleCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             _RewardRow(
               icon: Icons.work_outline,
               label: 'Weekday (Mon–Fri)',
@@ -494,7 +495,7 @@ class _RewardScheduleCard extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
               theme: theme,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             _RewardRow(
               icon: Icons.weekend_outlined,
               label: 'Weekend (Sat–Sun)',
@@ -529,7 +530,7 @@ class _RewardRow extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 20, color: color),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Text(label, style: theme.textTheme.bodyMedium),
         ),

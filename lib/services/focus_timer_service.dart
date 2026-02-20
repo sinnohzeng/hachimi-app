@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 /// FocusTimerService — manages the Android foreground service for focus sessions.
@@ -7,7 +8,7 @@ class FocusTimerService {
   static void init() {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'hachimi_focus_timer_v2',
+        channelId: 'hachimi_focus',
         channelName: 'Focus Timer',
         channelDescription: 'Shows focus timer progress',
         channelImportance: NotificationChannelImportance.HIGH,
@@ -35,11 +36,15 @@ class FocusTimerService {
     required int totalSeconds,
     required bool isCountdown,
   }) async {
-    await FlutterForegroundTask.startService(
-      notificationTitle: '$catEmoji $habitName',
-      notificationText: 'Focus session starting...',
-      callback: _startCallback,
-    );
+    try {
+      await FlutterForegroundTask.startService(
+        notificationTitle: '$catEmoji $habitName',
+        notificationText: 'Focus session starting...',
+        callback: _startCallback,
+      );
+    } catch (e) {
+      debugPrint('[FocusTimerService] Failed to start foreground service: $e');
+    }
   }
 
   /// Update the notification text (called from main isolate).

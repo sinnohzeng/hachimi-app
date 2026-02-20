@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
@@ -46,7 +47,7 @@ class HabitCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.paddingBase,
           child: Row(
             children: [
               // Icon + Progress ring
@@ -55,7 +56,7 @@ class HabitCard extends StatelessWidget {
                 size: 56,
                 child: Icon(icon, color: colorScheme.primary, size: 28),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.base),
 
               // Name + progress text + today
               Expanded(
@@ -63,7 +64,7 @@ class HabitCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(habit.name, style: textTheme.titleMedium),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       habit.progressText,
                       style: textTheme.bodySmall?.copyWith(
@@ -71,7 +72,7 @@ class HabitCard extends StatelessWidget {
                       ),
                     ),
                     if (todayMinutes > 0) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         'Today: ${todayMinutes}min',
                         style: textTheme.bodySmall?.copyWith(

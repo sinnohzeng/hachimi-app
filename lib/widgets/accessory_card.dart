@@ -8,6 +8,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
 
 /// 饰品卡片 — 商店网格中的单个饰品展示。
@@ -31,7 +32,7 @@ class AccessoryCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: AppSpacing.paddingSm,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -40,7 +41,7 @@ class AccessoryCard extends StatelessWidget {
                 _categoryEmoji(info.category),
                 style: const TextStyle(fontSize: 28),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               // 饰品名称
               Text(
@@ -52,7 +53,7 @@ class AccessoryCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               // 价格标签 / 已拥有徽章 / 已装备徽章
               if (info.isEquipped)

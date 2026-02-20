@@ -7,6 +7,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -38,10 +39,10 @@ class CatDiaryScreen extends ConsumerWidget {
             children: [
               Icon(Icons.error_outline,
                   size: 48, color: colorScheme.onSurfaceVariant),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.base),
               Text('Failed to load diary',
                   style: textTheme.bodyLarge),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               TextButton.icon(
                 onPressed: () => ref.invalidate(diaryEntriesProvider(catId)),
                 icon: const Icon(Icons.refresh),
@@ -54,19 +55,19 @@ class CatDiaryScreen extends ConsumerWidget {
           if (entries.isEmpty) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: AppSpacing.paddingXl,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('📖', style: const TextStyle(fontSize: 48)),
-                    const SizedBox(height: 16),
+                    const Text('📖', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: AppSpacing.base),
                     Text(
                       'No diary entries yet',
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Complete a focus session and your cat will write their first diary entry!',
                       style: textTheme.bodyMedium?.copyWith(
@@ -81,9 +82,9 @@ class CatDiaryScreen extends ConsumerWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingBase,
             itemCount: entries.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) {
               final entry = entries[index];
               final moodData = moodById(entry.mood);
@@ -91,7 +92,7 @@ class CatDiaryScreen extends ConsumerWidget {
 
               return Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.paddingBase,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -124,7 +125,7 @@ class CatDiaryScreen extends ConsumerWidget {
                         ],
                       ),
                       if (personality != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           '${personality.emoji} ${personality.name} · ${entry.stage}',
                           style: textTheme.labelSmall?.copyWith(
@@ -132,7 +133,7 @@ class CatDiaryScreen extends ConsumerWidget {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
 
                       // 日记正文
                       Text(

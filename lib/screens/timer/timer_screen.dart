@@ -15,11 +15,13 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -79,9 +81,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
 
-    // Check notification permission — show banner if not granted
+    // Check notification permission — request if not granted
     final notifService = NotificationService();
-    final hasPermission = await notifService.isPermissionGranted();
+    var hasPermission = await notifService.isPermissionGranted();
+    if (!hasPermission) {
+      hasPermission = await notifService.requestPermission();
+    }
     if (!hasPermission && mounted) {
       setState(() => _showPermissionBanner = true);
     }
@@ -118,22 +123,20 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   }
 
   Future<void> _giveUp() async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Give up?'),
-        content: const Text(
-          'If you focused for at least 5 minutes, the time still counts '
-          'towards your cat\'s growth. Your cat will understand!',
-        ),
+        title: Text(l10n.giveUpTitle),
+        content: Text(l10n.giveUpMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Keep Going'),
+            child: Text(l10n.giveUpKeepGoing),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Give Up'),
+            child: Text(l10n.giveUpConfirm),
           ),
         ],
       ),
@@ -172,7 +175,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     // Calculate XP (still used for display)
     final xpService = ref.read(xpServiceProvider);
     final streakDays = habit.currentStreak;
-    final allHabitsDone = false; // TODO: check if all habits done today
+    const allHabitsDone = false; // TODO: check if all habits done today
     final xpResult = xpService.calculateXp(
       minutes: minutes,
       streakDays: streakDays,
@@ -210,6 +213,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         );
 
     if (mounted) {
+      // Send completion notification (only on successful completion)
+      if (isCompleted) {
+        final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
+        NotificationService().showFocusComplete(
+          title: context.l10n.focusCompleteNotifTitle,
+          body: context.l10n.focusCompleteNotifBody(catName, xpResult.totalXp, minutes),
+        );
+      }
+
       // Navigate to completion screen
       Navigator.of(context).pushReplacementNamed(
         AppRouter.focusComplete,
@@ -260,7 +272,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     if (habit == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Quest not found')),
+        body: Center(child: Text(context.l10n.timerQuestNotFound)),
       );
     }
 
@@ -312,15 +324,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 MaterialBanner(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 8),
-                  content: const Text(
-                    'Enable notifications to see timer progress when the app is in the background',
-                  ),
+                  content: Text(context.l10n.timerNotificationBanner),
                   leading: const Icon(Icons.notifications_off_outlined),
                   actions: [
                     TextButton(
                       onPressed: () =>
                           setState(() => _showPermissionBanner = false),
-                      child: const Text('Dismiss'),
+                      child: Text(context.l10n.timerNotificationDismiss),
                     ),
                     TextButton(
                       onPressed: () async {
@@ -331,7 +341,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                               _showPermissionBanner = !granted);
                         }
                       },
-                      child: const Text('Enable'),
+                      child: Text(context.l10n.timerNotificationEnable),
                     ),
                   ],
                 ),
@@ -346,7 +356,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                       habit.icon,
                       style: const TextStyle(fontSize: 20),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       habit.name,
                       style: textTheme.titleMedium?.copyWith(
@@ -354,7 +364,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                       ),
                     ),
                     if (habit.currentStreak > 0) ...[
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -408,7 +418,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Timer display
               Semantics(
@@ -422,13 +432,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
 
               // Mode indicator
               Text(
                 timerState.mode == TimerMode.countdown
-                    ? 'remaining'
-                    : 'elapsed',
+                    ? context.l10n.timerRemaining
+                    : context.l10n.timerElapsed,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -436,7 +446,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
               // Paused indicator
               if (timerState.status == TimerStatus.paused) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -445,7 +455,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'PAUSED',
+                    context.l10n.timerPaused,
                     style: textTheme.labelMedium?.copyWith(
                       color: colorScheme.onErrorContainer,
                       fontWeight: FontWeight.bold,
@@ -472,7 +482,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                       ? TextButton(
                           onPressed: _goBack,
                           child: Text(
-                            '返回 (${10 - timerState.elapsedSeconds}s)',
+                            context.l10n.timerGraceBack(10 - timerState.elapsedSeconds),
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -481,7 +491,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                       : TextButton(
                           onPressed: _giveUp,
                           child: Text(
-                            'Give Up',
+                            context.l10n.timerGiveUp,
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -507,7 +517,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             onPressed: _startTimer,
             icon: const Icon(Icons.play_arrow, size: 28),
             label: Text(
-              'Start',
+              context.l10n.timerStart,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -528,7 +538,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     onPressed: _pauseTimer,
                     icon: const Icon(Icons.pause, size: 28),
                     label: Text(
-                      'Pause',
+                      context.l10n.timerPause,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -536,7 +546,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: SizedBox(
                   height: 56,
@@ -544,7 +554,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     onPressed: _completeTimer,
                     icon: const Icon(Icons.check, size: 28),
                     label: Text(
-                      'Done',
+                      context.l10n.timerDone,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,
@@ -564,7 +574,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             onPressed: _pauseTimer,
             icon: const Icon(Icons.pause, size: 28),
             label: Text(
-              'Pause',
+              context.l10n.timerPause,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -581,19 +591,19 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 child: FilledButton.icon(
                   onPressed: _resumeTimer,
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('Resume'),
+                  label: Text(context.l10n.timerResume),
                 ),
               ),
             ),
             if (timerState.mode == TimerMode.stopwatch) ...[
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: SizedBox(
                   height: 56,
                   child: FilledButton.tonalIcon(
                     onPressed: _completeTimer,
                     icon: const Icon(Icons.check),
-                    label: const Text('Done'),
+                    label: Text(context.l10n.timerDone),
                   ),
                 ),
               ),

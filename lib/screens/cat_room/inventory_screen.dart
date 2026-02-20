@@ -13,6 +13,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -52,7 +53,7 @@ class InventoryScreen extends ConsumerWidget {
         title: const Text('Inventory'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingBase,
         children: [
           // 箱中道具
           Text(
@@ -61,10 +62,10 @@ class InventoryScreen extends ConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           if (inventory.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: AppSpacing.paddingVLg,
               child: Center(
                 child: Text(
                   'Your inventory is empty.\nPurchase accessories from the shop!',
@@ -88,9 +89,9 @@ class InventoryScreen extends ConsumerWidget {
               }).toList(),
             ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
           const Divider(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.base),
 
           // 已装备在猫上
           Text(
@@ -99,10 +100,10 @@ class InventoryScreen extends ConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           if (equippedItems.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: AppSpacing.paddingVLg,
               child: Center(
                 child: Text(
                   'No accessories equipped on any cat.',
@@ -151,7 +152,7 @@ class InventoryScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.paddingBase,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -161,7 +162,7 @@ class InventoryScreen extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               SizedBox(
                 height: 100,
                 child: ListView.builder(

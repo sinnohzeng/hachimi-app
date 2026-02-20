@@ -96,6 +96,10 @@ class NotificationService {
           importance: Importance.high,
         ),
       );
+
+      // Clean up old channel IDs from previous versions
+      await androidPlugin.deleteNotificationChannel(channelId: 'hachimi_focus_timer');
+      await androidPlugin.deleteNotificationChannel(channelId: 'hachimi_focus_timer_v2');
     }
 
     _pluginsInitialized = true;
@@ -221,7 +225,7 @@ class NotificationService {
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       title: '$catName misses you!',
-      body: "Time for $habitName — your cat is waiting!",
+      body: 'Time for $habitName — your cat is waiting!',
       matchDateTimeComponents: DateTimeComponents.time,
       payload: 'habit:$habitId',
     );
@@ -266,8 +270,31 @@ class NotificationService {
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       title: '$catName is worried!',
-      body: "Your $streak-day streak is at risk. A quick session will save it!",
+      body: 'Your $streak-day streak is at risk. A quick session will save it!',
       payload: 'streak:$habitId',
+    );
+  }
+
+  /// Show a focus completion notification.
+  /// Called from TimerScreen with localized strings (screen has BuildContext).
+  Future<void> showFocusComplete({
+    required String title,
+    required String body,
+  }) async {
+    await _localNotifications.show(
+      id: 300000,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _focusChannelId,
+          _focusChannelName,
+          channelDescription: _focusChannelDesc,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
     );
   }
 

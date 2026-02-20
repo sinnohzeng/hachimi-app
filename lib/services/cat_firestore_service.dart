@@ -30,7 +30,7 @@ class CatFirestoreService {
         .orderBy('createdAt', descending: false)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => Cat.fromFirestore(doc)).toList());
+            snapshot.docs.map(Cat.fromFirestore).toList());
   }
 
   /// 监听所有猫（含 graduated / dormant），用于猫图鉴。
@@ -39,7 +39,7 @@ class CatFirestoreService {
         .orderBy('createdAt', descending: false)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => Cat.fromFirestore(doc)).toList());
+            snapshot.docs.map(Cat.fromFirestore).toList());
   }
 
   /// 获取单只猫。

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -220,7 +221,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.paddingBase,
               child: SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -257,7 +258,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     final textTheme = theme.textTheme;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: AppSpacing.paddingLg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,14 +269,14 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               'A kitten will be assigned to help you stay on track!',
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.lg),
           ],
 
           // Habit name
@@ -288,27 +289,27 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ),
             textInputAction: TextInputAction.done,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Emoji picker
           Text('Choose an icon', style: textTheme.titleMedium),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           EmojiPicker(
             selected: _selectedEmoji,
             onSelected: (emoji) => setState(() => _selectedEmoji = emoji),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Target hours with custom option
           Text('Total target hours', style: textTheme.titleMedium),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             'Your cat grows as you accumulate focus time',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
             children: [
@@ -337,11 +338,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Daily goal time with custom option
           Text('Daily focus goal', style: textTheme.titleMedium),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
             children: [
@@ -370,11 +371,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Reminder time
           Text('Daily reminder (optional)', style: textTheme.titleMedium),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
             children: [
@@ -522,7 +523,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     final cat = _selectedCat;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: AppSpacing.paddingLg,
       child: Column(
         children: [
           Text(
@@ -532,7 +533,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             'Your companion for "${_nameController.text.trim()}"',
             style: textTheme.bodyMedium?.copyWith(
@@ -540,19 +541,19 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Large preview of selected cat
           if (cat != null) ...[
             TappableCatSprite(cat: cat, size: 120),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               cat.name,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             if (cat.personalityData != null)
               Container(
                 padding:
@@ -569,7 +570,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
               ),
             if (cat.personalityData != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 cat.personalityData!.flavorText,
                 style: textTheme.bodySmall?.copyWith(
@@ -580,7 +581,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               ),
             ],
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // 3-cat selection row
           Row(
@@ -601,7 +602,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                         duration: const Duration(milliseconds: 200),
                         width: 80,
                         height: 96,
-                        padding: const EdgeInsets.all(4),
+                        padding: AppSpacing.paddingXs,
                         decoration: BoxDecoration(
                           color: isSelected
                               ? colorScheme.primaryContainer
@@ -617,7 +618,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                           children: [
                             PixelCatSprite.fromCat(
                                 cat: previewCat, size: 56),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.xs),
                             Text(
                               previewCat.name,
                               style: textTheme.labelSmall,
@@ -657,7 +658,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               );
             }),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.base),
 
           // Reroll all button
           TextButton.icon(
@@ -679,15 +680,15 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     final personality = cat?.personalityData;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: AppSpacing.paddingLg,
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Cat preview
           if (cat != null) ...[
             TappableCatSprite(cat: cat, size: 120),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             if (personality != null)
               Text(
                 '${personality.emoji} ${personality.name}',
@@ -696,7 +697,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
               ),
           ],
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xl),
 
           // Name input
           Text(
@@ -705,7 +706,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.base),
           TextFormField(
             controller: _catNameController,
             decoration: InputDecoration(
@@ -716,7 +717,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 icon: const Icon(Icons.casino),
                 tooltip: 'Random name',
                 onPressed: () {
-                  final names = randomCatNames;
+                  const names = randomCatNames;
                   final name = (names.toList()..shuffle()).first;
                   setState(() {
                     _catNameController.text = name;
@@ -726,7 +727,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ),
             textInputAction: TextInputAction.done,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.base),
 
           Text(
             'Your cat will grow as you focus on "${_nameController.text.trim()}"! '
@@ -804,7 +805,7 @@ class _StepIndicator extends StatelessWidget {
                         ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 steps[stepIndex],
                 style: textTheme.labelSmall?.copyWith(

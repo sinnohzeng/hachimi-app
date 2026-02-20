@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
@@ -32,7 +33,7 @@ class HabitDetailScreen extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(title: Text(habit.name)),
           body: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: AppSpacing.paddingLg,
             child: Column(
               children: [
                 // Large progress ring
@@ -59,7 +60,7 @@ class HabitDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
 
                 // Stats
                 _DetailRow(
@@ -108,11 +109,11 @@ class _DetailRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: AppSpacing.paddingVSm,
       child: Row(
         children: [
           Icon(icon, color: colorScheme.primary),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.base),
           Expanded(
             child: Text(label, style: textTheme.bodyLarge),
           ),

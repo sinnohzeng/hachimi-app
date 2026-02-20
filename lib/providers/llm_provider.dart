@@ -152,7 +152,7 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
 
 final llmAvailabilityProvider =
     StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>(
-  (ref) => LlmAvailabilityNotifier(ref),
+  LlmAvailabilityNotifier.new,
 );
 
 // ─── Model Download Progress ───
@@ -318,5 +318,5 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
 
 final modelDownloadProvider =
     StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>(
-  (ref) => ModelDownloadNotifier(ref),
+  ModelDownloadNotifier.new,
 );

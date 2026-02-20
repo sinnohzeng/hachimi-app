@@ -43,6 +43,25 @@ class AppSpacing {
   static const EdgeInsets paddingHLg = EdgeInsets.symmetric(horizontal: lg);
 
   // --- Vertical-only ---
+  static const EdgeInsets paddingVXs = EdgeInsets.symmetric(vertical: xs);
   static const EdgeInsets paddingVSm = EdgeInsets.symmetric(vertical: sm);
   static const EdgeInsets paddingVBase = EdgeInsets.symmetric(vertical: base);
+  static const EdgeInsets paddingVLg = EdgeInsets.symmetric(vertical: lg);
+  static const EdgeInsets paddingVXl = EdgeInsets.symmetric(vertical: xl);
+
+  // --- Single-side ---
+  static const EdgeInsets paddingTopSm = EdgeInsets.only(top: sm);
+  static const EdgeInsets paddingTopMd = EdgeInsets.only(top: md);
+  static const EdgeInsets paddingTopBase = EdgeInsets.only(top: base);
+  static const EdgeInsets paddingBottomSm = EdgeInsets.only(bottom: sm);
+  static const EdgeInsets paddingBottomBase = EdgeInsets.only(bottom: base);
+  static const EdgeInsets paddingBottomXl = EdgeInsets.only(bottom: xl);
+
+  // --- Common mixed patterns ---
+  static const EdgeInsets paddingListTile =
+      EdgeInsets.symmetric(horizontal: base, vertical: xs);
+  static const EdgeInsets paddingSection =
+      EdgeInsets.fromLTRB(base, lg, base, sm);
+  static const EdgeInsets paddingCard =
+      EdgeInsets.symmetric(horizontal: base, vertical: xs);
 }

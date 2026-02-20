@@ -204,6 +204,20 @@ class DiaryPrompt {
   }
 }
 
+/// 模型测试 prompt 构建器 — 无猫猫角色，纯验证用途。
+class TestPrompt {
+  TestPrompt._();
+
+  /// 构建测试聊天的完整 prompt。
+  static String buildPrompt(String userMessage) {
+    return '<|im_start|>system\n'
+        'You are a helpful AI assistant. Respond concisely in 1-2 sentences.\n'
+        '<|im_end|>\n'
+        '<|im_start|>user\n$userMessage<|im_end|>\n'
+        '<|im_start|>assistant\n';
+  }
+}
+
 /// 聊天 prompt 构建器。
 class ChatPrompt {
   ChatPrompt._();

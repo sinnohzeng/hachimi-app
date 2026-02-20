@@ -15,9 +15,11 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -43,11 +45,13 @@ class ProfileScreen extends ConsumerWidget {
       stageCounts[stage] = (stageCounts[stage] ?? 0) + 1;
     }
 
+    final l10n = context.l10n;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: Text(l10n.profileTitle)),
       body: ListView(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // User avatar
           Center(
@@ -63,7 +67,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           // Display name
           Center(
@@ -74,7 +78,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
 
           // Email
           if (user?.email != null)
@@ -87,24 +91,24 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
           // Stats overview
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppSpacing.paddingHBase,
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.paddingBase,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your Journey',
+                      l10n.profileYourJourney,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.base),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -112,27 +116,27 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.timer_outlined,
                           value:
                               '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
-                          label: 'Total Focus',
+                          label: l10n.profileTotalFocus,
                           color: colorScheme.primary,
                         ),
                         _StatBadge(
                           icon: Icons.pets,
                           value: '${allCats.length}',
-                          label: 'Total Cats',
+                          label: l10n.profileTotalCats,
                           color: colorScheme.tertiary,
                         ),
                         _StatBadge(
                           icon: Icons.local_fire_department,
                           value: '${stats.longestStreak}',
-                          label: 'Best Streak',
+                          label: l10n.profileBestStreak,
                           color: colorScheme.error,
                         ),
                       ],
                     ),
                     if (allCats.isNotEmpty) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.base),
                       const Divider(),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       // Stage breakdown
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -168,37 +172,37 @@ class ProfileScreen extends ConsumerWidget {
 
           // Cat Album section
           if (allCats.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.base),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: AppSpacing.paddingHBase,
               child: Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.paddingBase,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Text(
-                            'Cat Album',
+                            l10n.profileCatAlbum,
                             style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const Spacer(),
                           Text(
-                            '${allCats.length} cats',
+                            l10n.profileCatAlbumCount(allCats.length),
                             style: textTheme.labelMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       // Cat grid preview (max 6)
                       _CatAlbumGrid(cats: allCats.take(6).toList()),
                       if (allCats.length > 6) ...[
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton.icon(
@@ -206,7 +210,7 @@ class ProfileScreen extends ConsumerWidget {
                               _showFullAlbum(context, allCats);
                             },
                             icon: const Icon(Icons.grid_view),
-                            label: Text('See all ${allCats.length} cats'),
+                            label: Text(l10n.profileSeeAll(allCats.length)),
                           ),
                         ),
                       ],
@@ -217,17 +221,17 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ],
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.base),
           const Divider(),
 
           // Settings entry
           ListTile(
             leading: const Icon(Icons.settings_outlined),
-            title: const Text('Settings'),
+            title: Text(l10n.profileSettings),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).pushNamed(AppRouter.settingsPage),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xl),
         ],
       ),
     );
@@ -254,11 +258,11 @@ class ProfileScreen extends ConsumerWidget {
         builder: (ctx, scrollController) => Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.paddingBase,
               child: Row(
                 children: [
                   Text(
-                    'Cat Album',
+                    ctx.l10n.profileCatAlbum,
                     style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -274,7 +278,7 @@ class ProfileScreen extends ConsumerWidget {
             Expanded(
               child: GridView.builder(
                 controller: scrollController,
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.paddingBase,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   mainAxisSpacing: 12,
@@ -316,7 +320,7 @@ class _StatBadge extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: textTheme.titleMedium?.copyWith(
@@ -361,7 +365,7 @@ class _StageChip extends StatelessWidget {
             height: 8,
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(
             '$count',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -428,7 +432,7 @@ class _CatAlbumTile extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               cat.name,
               style: theme.textTheme.labelSmall,
@@ -437,7 +441,7 @@ class _CatAlbumTile extends StatelessWidget {
             ),
             if (isGraduated)
               Text(
-                'Graduated',
+                context.l10n.profileGraduated,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 9,

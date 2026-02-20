@@ -12,6 +12,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -134,19 +135,19 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
   ) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: AppSpacing.paddingXl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('💬', style: const TextStyle(fontSize: 48)),
-            const SizedBox(height: 16),
+            const Text('💬', style: TextStyle(fontSize: 48)),
+            const SizedBox(height: AppSpacing.base),
             Text(
               'Say hi to $catName!',
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Start a conversation with your cat. They will reply based on their personality!',
               style: textTheme.bodyMedium?.copyWith(
@@ -250,7 +251,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                   onSubmitted: canSend ? (_) => _send(cat, habit) : null,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
 
               // 发送/停止按钮
               if (isGenerating)
@@ -345,9 +346,9 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
+        margin: AppSpacing.paddingVXs,
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),

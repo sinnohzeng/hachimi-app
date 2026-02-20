@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/app.dart' show kOnboardingCompleteKey;
 
@@ -136,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Next / Get Started button
                     SizedBox(
@@ -253,7 +254,7 @@ class _OnboardingPage extends StatelessWidget {
                   color: onColor.withValues(alpha: 0.7),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
 
               // Title
               Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
@@ -20,16 +21,16 @@ class StatsScreen extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverAppBar(
+        const SliverAppBar(
           floating: true,
-          title: const Text('Statistics'),
+          title: Text('Statistics'),
           automaticallyImplyLeading: false,
         ),
 
         // Summary cards
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingBase,
             child: Row(
               children: [
                 Expanded(
@@ -41,7 +42,7 @@ class StatsScreen extends ConsumerWidget {
                     onColor: colorScheme.onPrimaryContainer,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: _StatCard(
                     label: 'Best Streak',
@@ -59,21 +60,21 @@ class StatsScreen extends ConsumerWidget {
         // Overall progress
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppSpacing.paddingHBase,
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.paddingBase,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Overall Progress', style: textTheme.titleMedium),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     LinearProgressIndicator(
                       value: stats.overallProgress,
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       '${(stats.overallProgress * 100).toStringAsFixed(1)}% of all goals',
                       style: textTheme.bodySmall?.copyWith(
@@ -127,7 +128,7 @@ class StatsScreen extends ConsumerWidget {
                     margin:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: AppSpacing.paddingBase,
                       child: Row(
                         children: [
                           ProgressRing(
@@ -140,14 +141,14 @@ class StatsScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: AppSpacing.base),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(habit.name,
                                     style: textTheme.titleSmall),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   habit.progressText,
                                   style: textTheme.bodySmall?.copyWith(
@@ -186,10 +187,10 @@ class StatsScreen extends ConsumerWidget {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingBase,
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.paddingBase,
                 child: _CalendarHeatmap(),
               ),
             ),
@@ -224,12 +225,12 @@ class _StatCard extends StatelessWidget {
     return Card(
       color: color,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.paddingBase,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: onColor),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               value,
               style: textTheme.titleLarge?.copyWith(

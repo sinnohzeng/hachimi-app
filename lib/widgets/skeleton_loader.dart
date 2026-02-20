@@ -12,6 +12,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// SkeletonLoader — generic shimmer placeholder block.
 ///
@@ -92,11 +93,11 @@ class SkeletonCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: AppSpacing.paddingMd,
         child: Row(
           children: [
             const SkeletonLoader(width: 48, height: 48, borderRadius: 24),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +106,7 @@ class SkeletonCard extends StatelessWidget {
                     width: MediaQuery.of(context).size.width * 0.35,
                     height: 14,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   SkeletonLoader(
                     width: MediaQuery.of(context).size.width * 0.25,
                     height: 12,
@@ -130,7 +131,7 @@ class SkeletonGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: AppSpacing.paddingMd,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.78,
@@ -138,18 +139,18 @@ class SkeletonGrid extends StatelessWidget {
         mainAxisSpacing: 12,
       ),
       itemCount: count,
-      itemBuilder: (context, index) => Card(
+      itemBuilder: (context, index) => const Card(
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: AppSpacing.paddingMd,
           child: Column(
             children: [
-              const SkeletonLoader(width: 80, height: 80, borderRadius: 8),
-              const SizedBox(height: 8),
-              const SkeletonLoader(width: 60, height: 14),
-              const SizedBox(height: 6),
-              const SkeletonLoader(width: 80, height: 12),
-              const Spacer(),
-              const SkeletonLoader(height: 6, borderRadius: 3),
+              SkeletonLoader(width: 80, height: 80, borderRadius: 8),
+              SizedBox(height: AppSpacing.sm),
+              SkeletonLoader(width: 60, height: 14),
+              SizedBox(height: 6),
+              SkeletonLoader(width: 80, height: 12),
+              Spacer(),
+              SkeletonLoader(height: 6, borderRadius: 3),
             ],
           ),
         ),

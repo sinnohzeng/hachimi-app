@@ -13,6 +13,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -69,7 +70,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
             children: [
               const Icon(Icons.monetization_on,
                   color: Color(0xFFFFD700), size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(child: Text(message)),
             ],
           ),
@@ -118,7 +119,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: AppSpacing.md),
               Text('Loading check-in status...'),
             ],
           ),
@@ -143,7 +144,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
             children: [
               Icon(Icons.calendar_today,
                   color: colorScheme.onTertiaryContainer, size: 20),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
                   'Check in for +$coins coins',
@@ -191,7 +192,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
               children: [
                 Icon(Icons.calendar_month,
                     color: colorScheme.onSecondaryContainer, size: 20),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     '$checkedCount/$daysInMonth days  ·  +$todayCoins today',

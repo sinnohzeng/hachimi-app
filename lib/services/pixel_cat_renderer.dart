@@ -100,6 +100,7 @@ class PixelCatRenderer {
     // Parse spritesOffsetMap
     final offsetList = json.decode(offsetJson) as List<dynamic>;
     _offsetMap = offsetList
+        .cast<Map<String, dynamic>>()
         .map((e) => _GridPos(
               (e['x'] as num).toInt(),
               (e['y'] as num).toInt(),

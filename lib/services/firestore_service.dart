@@ -42,7 +42,7 @@ class FirestoreService {
         .orderBy('createdAt', descending: false)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => Habit.fromFirestore(doc)).toList());
+            snapshot.docs.map(Habit.fromFirestore).toList());
   }
 
   Future<Habit?> getHabit(String uid, String habitId) async {
@@ -274,7 +274,7 @@ class FirestoreService {
         .orderBy('completedAt', descending: true)
         .snapshots()
         .map((snapshot) =>
-            snapshot.docs.map((doc) => CheckInEntry.fromFirestore(doc)).toList());
+            snapshot.docs.map(CheckInEntry.fromFirestore).toList());
   }
 
   Future<void> logCheckIn({

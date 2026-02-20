@@ -19,6 +19,7 @@ hachimi-app/
 │   │   ├── state-management.md             # Riverpod provider graph (SSOT)
 │   │   ├── folder-structure.md             # This file
 │   │   ├── atomic-island.md               # vivo Atomic Island notification spec
+│   │   ├── focus-completion.md            # Focus completion celebration spec
 │   │   └── localization.md                 # i18n approach + ARB workflow
 │   ├── product/
 │   │   ├── prd.md                          # PRD v3.0 (SSOT)
@@ -90,6 +91,7 @@ hachimi-app/
 │   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
+│   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
 │   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
@@ -124,7 +126,8 @@ hachimi-app/
 │   │   ├── profile/
 │   │   │   └── profile_screen.dart         # Stats, cat album, settings entry
 │   │   ├── settings/
-│   │   │   └── settings_screen.dart        # Notifications, language, about, account actions
+│   │   │   ├── settings_screen.dart        # Notifications, language, about, account actions
+│   │   │   └── model_test_chat_screen.dart # AI model test chat (verify LLM works)
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # Activity heatmap + per-habit progress
 │   │   └── timer/

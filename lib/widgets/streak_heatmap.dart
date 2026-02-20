@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// GitHub-style streak heatmap — shows 90 days of focus activity.
 /// Each cell represents a day, colored by intensity of focus minutes.
@@ -95,7 +96,7 @@ class StreakHeatmap extends StatelessWidget {
           ),
         ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
 
         // Stats row
         Row(
@@ -119,7 +120,7 @@ class StreakHeatmap extends StatelessWidget {
         ),
 
         // Legend
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -129,7 +130,7 @@ class StreakHeatmap extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
             ...List.generate(4, (i) {
               final alpha = [0.0, 0.3, 0.6, 1.0][i];
               return Container(
@@ -144,7 +145,7 @@ class StreakHeatmap extends StatelessWidget {
                 ),
               );
             }),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
             Text(
               'More',
               style: textTheme.labelSmall?.copyWith(

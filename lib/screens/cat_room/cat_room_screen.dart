@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
@@ -28,13 +30,13 @@ class CatRoomScreen extends ConsumerWidget {
         actions: [
           // Coin balance
           Padding(
-            padding: const EdgeInsets.only(right: 4),
+            padding: const EdgeInsetsDirectional.only(end: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.monetization_on,
                     size: 20, color: theme.colorScheme.tertiary),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.xs),
                 Text(
                   '${ref.watch(coinBalanceProvider).value ?? 0}',
                   style: theme.textTheme.labelLarge?.copyWith(
@@ -82,7 +84,7 @@ class CatRoomScreen extends ConsumerWidget {
     );
   }
 
-  void _showCatActions(BuildContext context, WidgetRef ref, Cat cat, dynamic habit) {
+  void _showCatActions(BuildContext context, WidgetRef ref, Cat cat, Habit? habit) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -91,7 +93,7 @@ class CatRoomScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.paddingBase,
               child: Text(
                 cat.name,
                 style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
@@ -107,7 +109,7 @@ class CatRoomScreen extends ConsumerWidget {
                   Navigator.of(ctx).pop();
                   Navigator.of(context).pushNamed(
                     AppRouter.habitDetail,
-                    arguments: habit.id as String,
+                    arguments: habit.id,
                   );
                 },
               ),
@@ -131,7 +133,7 @@ class CatRoomScreen extends ConsumerWidget {
                 _confirmArchive(context, ref, cat);
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
           ],
         ),
       ),
@@ -219,7 +221,7 @@ class CatRoomScreen extends ConsumerWidget {
 
   Widget _buildGrid(BuildContext context, WidgetRef ref, List<Cat> cats) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: AppSpacing.paddingMd,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.78,
@@ -280,7 +282,7 @@ class _CatHouseCard extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: AppSpacing.paddingMd,
           child: Column(
             children: [
               // Pixel cat sprite
@@ -288,7 +290,7 @@ class _CatHouseCard extends StatelessWidget {
                 tag: 'cat-${cat.id}',
                 child: TappableCatSprite(cat: cat, size: 80),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               // Name + habit (flexible to prevent overflow)
               Flexible(
@@ -318,7 +320,7 @@ class _CatHouseCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               // Growth progress bar
               ClipRRect(
@@ -330,7 +332,7 @@ class _CatHouseCard extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation(stageClr),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               // Stage label
               Text(

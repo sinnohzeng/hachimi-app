@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
@@ -67,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: AppSpacing.paddingHLg,
             child: Column(
               children: [
                 const Spacer(flex: 3),
@@ -78,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   size: 80,
                   color: colorScheme.onPrimary,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.base),
 
                 // App name
                 Text(
@@ -88,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: colorScheme.onPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
 
                 // Tagline
                 Text(
@@ -129,7 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     label: const Text('Continue with Google'),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
 
                 // Email sign-in button
                 SizedBox(
@@ -148,7 +149,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     label: const Text('Continue with Email'),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.base),
 
                 // Login link
                 Row(
@@ -182,7 +183,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
               ],
             ),
           ),
@@ -291,7 +292,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
             children: [
               // App bar
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
                   onPressed: () => Navigator.of(context).pop(),
@@ -300,12 +301,12 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
 
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: AppSpacing.paddingHLg,
                   child: Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.base),
 
                         // App icon
                         Icon(
@@ -313,7 +314,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           size: 56,
                           color: colorScheme.onPrimary,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         Text(
                           'Hachimi',
                           style: textTheme.headlineMedium?.copyWith(
@@ -321,7 +322,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             color: colorScheme.onPrimary,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
 
                         // Toggle hint
                         Text(
@@ -330,7 +331,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xl),
 
                         // Email field
                         TextFormField(
@@ -352,7 +353,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.base),
 
                         // Password field
                         TextFormField(
@@ -387,7 +388,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
 
                         // Confirm password (register only)
                         if (!_isLogin) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.base),
                           TextFormField(
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
@@ -416,7 +417,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             },
                           ),
                         ],
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xl),
 
                         // Submit button
                         SizedBox(
@@ -447,7 +448,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.lg),
 
                         // Toggle login/register
                         Row(
@@ -476,7 +477,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xl),
                       ],
                     ),
                   ),

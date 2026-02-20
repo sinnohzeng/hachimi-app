@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// Categorized emoji picker for habit icon selection.
 /// Shows quick-pick habit emojis at top, with tabbed categories below.
@@ -83,7 +84,7 @@ class EmojiPicker extends StatelessWidget {
             return _buildEmojiTile(emoji, colorScheme);
           }).toList(),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.base),
 
         // "More" expandable section with tabs
         Text(
@@ -92,7 +93,7 @@ class EmojiPicker extends StatelessWidget {
             color: colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         SizedBox(
           height: 240,
           child: DefaultTabController(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -44,15 +46,8 @@ class HachimiApp extends ConsumerWidget {
           themeMode: themeSettings.mode,
           locale: locale,
           // i18n support
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('zh'),
-          ],
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           home: const AuthGate(),
           onGenerateRoute: AppRouter.onGenerateRoute,
           navigatorObservers: [analyticsService.observer],
@@ -190,7 +185,7 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
       return Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: AppSpacing.paddingXl,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -198,30 +193,28 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
                   '🐱',
                   style: TextStyle(fontSize: 64),
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Data Update Required',
-                  style: TextStyle(
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  context.l10n.migrationTitle,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Hachimi has been updated with a new pixel cat system! '
-                  'Your old cat data is no longer compatible. '
-                  'Please reset to start fresh with the new experience.',
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  context.l10n.migrationMessage,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, color: Colors.grey),
+                  style: const TextStyle(fontSize: 15, color: Colors.grey),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xl),
                 if (_clearing)
                   const CircularProgressIndicator()
                 else
                   FilledButton.icon(
                     onPressed: _clearData,
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Reset & Start Fresh'),
+                    label: Text(context.l10n.migrationResetButton),
                   ),
               ],
             ),
@@ -270,23 +263,23 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
+        final l10n = context.l10n;
         showDialog<bool>(
           context: context,
           barrierDismissible: false,
           builder: (ctx) => AlertDialog(
-            title: const Text('Resume session?'),
+            title: Text(l10n.sessionResumeTitle),
             content: Text(
-              'You had an active focus session ($habitName, '
-              '${mins}m ${secs}s). Resume?',
+              l10n.sessionResumeMessage(habitName, '${mins}m ${secs}s'),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('Discard'),
+                child: Text(l10n.sessionDiscard),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text('Resume'),
+                child: Text(l10n.sessionResumeButton),
               ),
             ],
           ),

@@ -2,11 +2,12 @@
 // 📘 文件说明：
 // 专注完成庆祝页面 — 展示本次专注的时长、XP 奖励明细、猫猫阶段跃迁提示。
 // 带入场动画：emoji scale-up、标题/副标题 fade-in、stats 卡片 slide-up。
+// 完成时：撒花特效（confetti_widget）+ 自定义震动模式（vibration）。
 //
 // 📋 程序整体伪代码（中文）：
 // 1. 接收 habitId、分钟数、XpResult、StageUpResult 参数；
 // 2. 从 Provider 加载关联的 habit 和 cat 数据；
-// 3. initState 中启动 staggered 入场动画；
+// 3. initState 中启动 staggered 入场动画 + 撒花 + 震动；
 // 4. 显示像素猫 sprite + 阶段跃迁标签（若有）；
 // 5. XP 明细卡片（slide-up + fade-in）；
 // 6. Done 按钮返回首页；
@@ -16,20 +17,22 @@
 // - _StatRow：XP 明细行组件；
 // ---
 
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/llm_provider.dart';
 import 'package:hachimi_app/services/diary_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
+import 'package:vibration/vibration.dart';
 
 /// Focus complete celebration screen.
-/// Shows minutes earned, XP breakdown, stage-up animation, and session stats.
+/// Shows minutes earned, XP breakdown, stage-up animation, confetti, and haptic feedback.
 class FocusCompleteScreen extends ConsumerStatefulWidget {
   final String habitId;
   final int minutes;
@@ -64,11 +67,20 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   late final Animation<Offset> _statsSlide;
   late final Animation<double> _statsOpacity;
 
+  late final ConfettiController _confettiController;
+
   bool _diaryTriggered = false;
+  bool _diarySuccess = false;
+  bool _diaryGenerating = false;
 
   @override
   void initState() {
     super.initState();
+
+    // Confetti controller (2s blast, only plays on success)
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
 
     // Emoji scale-up: 0 → 1 with overshoot
     _emojiController = AnimationController(
@@ -116,10 +128,30 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
       if (mounted) _statsController.forward();
     });
 
-    // Haptic feedback
+    // Haptic feedback + confetti
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      HapticFeedback.heavyImpact();
+      _triggerCelebration();
     });
+  }
+
+  /// Trigger vibration pattern + confetti based on completion status.
+  Future<void> _triggerCelebration() async {
+    final hasVibrator = await Vibration.hasVibrator();
+    if (!widget.isAbandoned) {
+      // Completion: strong double-pulse vibration + confetti
+      if (hasVibrator) {
+        Vibration.vibrate(
+          pattern: [0, 200, 100, 300],
+          intensities: [0, 255, 0, 255],
+        );
+      }
+      _confettiController.play();
+    } else {
+      // Abandoned: single light vibration, no confetti
+      if (hasVibrator) {
+        Vibration.vibrate(duration: 100, amplitude: 128);
+      }
+    }
   }
 
   @override
@@ -127,6 +159,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     _emojiController.dispose();
     _contentController.dispose();
     _statsController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -141,15 +174,29 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     final availability = ref.read(llmAvailabilityProvider);
     if (availability != LlmAvailability.ready) return;
 
+    final locale = Localizations.localeOf(context);
     final diaryService = ref.read(diaryServiceProvider);
     final ctx = DiaryGenerationContext(
       cat: cat,
       habit: habit,
       todayMinutes: widget.minutes,
-      isZhLocale: false,
+      isZhLocale: locale.languageCode == 'zh',
     );
 
-    diaryService.generateTodayDiary(ctx);
+    setState(() => _diaryGenerating = true);
+    diaryService.generateTodayDiary(ctx).then((_) {
+      if (mounted) {
+        setState(() {
+          _diaryGenerating = false;
+          _diarySuccess = true;
+        });
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) setState(() => _diarySuccess = false);
+        });
+      }
+    }).catchError((_) {
+      if (mounted) setState(() => _diaryGenerating = false);
+    });
   }
 
   @override
@@ -157,15 +204,16 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = context.l10n;
 
     final habits = ref.watch(habitsProvider).value ?? [];
-    final habit =
-        habits.where((h) => h.id == widget.habitId).firstOrNull;
+    final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
     final cat = habit?.catId != null
         ? ref.watch(catByIdProvider(habit!.catId!))
         : null;
 
     final didStageUp = widget.stageUp?.didStageUp ?? false;
+    final catName = cat?.name ?? l10n.focusCompleteYourCat;
 
     // Trigger diary generation once
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -173,203 +221,266 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     });
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(),
 
-                // Status emoji with scale-up animation
-                ScaleTransition(
-                  scale: _emojiScale,
-                  child: Text(
-                    widget.isAbandoned
-                        ? '🤗'
-                        : (didStageUp ? '🎉' : '✨'),
-                    style: const TextStyle(fontSize: 48),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Title + subtitle with fade-in
-                FadeTransition(
-                  opacity: _contentOpacity,
-                  child: Column(
-                    children: [
-                      Text(
+                    // Status emoji with scale-up animation
+                    ScaleTransition(
+                      scale: _emojiScale,
+                      child: Text(
                         widget.isAbandoned
-                            ? "It's okay!"
-                            : (didStageUp
-                                ? '${cat?.name ?? "Your cat"} evolved!'
-                                : 'Great job!'),
-                        style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                            ? '🤗'
+                            : (didStageUp ? '🎉' : '✨'),
+                        style: const TextStyle(fontSize: 48),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        widget.isAbandoned
-                            ? "${cat?.name ?? 'Your cat'} says: \"We'll try again!\""
-                            : 'You focused for ${widget.minutes} minutes',
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
+                    ),
+                    const SizedBox(height: 16),
 
-                // Cat display
-                FadeTransition(
-                  opacity: _contentOpacity,
-                  child: Column(
-                    children: [
-                      if (cat != null) ...[
-                        TappableCatSprite(cat: cat, size: 120),
-                        const SizedBox(height: 12),
-                        Text(
-                          cat.name,
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    // Title + subtitle with fade-in
+                    FadeTransition(
+                      opacity: _contentOpacity,
+                      child: Column(
+                        children: [
+                          Text(
+                            widget.isAbandoned
+                                ? l10n.focusCompleteItsOkay
+                                : (didStageUp
+                                    ? l10n.focusCompleteEvolved(catName)
+                                    : l10n.focusCompleteGreatJob),
+                            style: textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        if (didStageUp)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.isAbandoned
+                                ? l10n.focusCompleteAbandonedMessage(catName)
+                                : l10n.focusCompleteFocusedFor(widget.minutes),
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Cat display
+                    FadeTransition(
+                      opacity: _contentOpacity,
+                      child: Column(
+                        children: [
+                          if (cat != null) ...[
+                            TappableCatSprite(cat: cat, size: 120),
+                            const SizedBox(height: 12),
+                            Text(
+                              cat.name,
+                              style: textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              decoration: BoxDecoration(
-                                color: stageColor(widget.stageUp!.newStage)
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                'Evolved to ${widget.stageUp!.newStage[0].toUpperCase()}${widget.stageUp!.newStage.substring(1)}!',
-                                style: textTheme.labelLarge?.copyWith(
-                                  color:
-                                      stageColor(widget.stageUp!.newStage),
-                                  fontWeight: FontWeight.bold,
+                            ),
+                            if (didStageUp)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: stageColor(widget.stageUp!.newStage)
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    l10n.focusCompleteEvolvedTo(
+                                      widget.stageUp!.newStage[0].toUpperCase() +
+                                          widget.stageUp!.newStage.substring(1),
+                                    ),
+                                    style: textTheme.labelLarge?.copyWith(
+                                      color: stageColor(widget.stageUp!.newStage),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Session stats breakdown
+                    SlideTransition(
+                      position: _statsSlide,
+                      child: FadeTransition(
+                        opacity: _statsOpacity,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                _StatRow(
+                                  label: l10n.focusCompleteFocusTime,
+                                  value: '+${widget.minutes} min',
+                                  icon: Icons.timer_outlined,
+                                ),
+                                if (widget.coinsEarned > 0) ...[
+                                  const Divider(height: 16),
+                                  _StatRow(
+                                    label: l10n.focusCompleteCoinsEarned,
+                                    value: '+${widget.coinsEarned}',
+                                    icon: Icons.monetization_on,
+                                  ),
+                                ],
+                                const Divider(height: 16),
+                                _StatRow(
+                                  label: l10n.focusCompleteBaseXp,
+                                  value: '+${widget.xpResult.baseXp} XP',
+                                  icon: Icons.star_outline,
+                                ),
+                                if (widget.xpResult.streakBonus > 0) ...[
+                                  const Divider(height: 16),
+                                  _StatRow(
+                                    label: l10n.focusCompleteStreakBonus,
+                                    value: '+${widget.xpResult.streakBonus} XP',
+                                    icon: Icons.local_fire_department,
+                                  ),
+                                ],
+                                if (widget.xpResult.milestoneBonus > 0) ...[
+                                  const Divider(height: 16),
+                                  _StatRow(
+                                    label: l10n.focusCompleteMilestoneBonus,
+                                    value: '+${widget.xpResult.milestoneBonus} XP',
+                                    icon: Icons.emoji_events,
+                                  ),
+                                ],
+                                if (widget.xpResult.fullHouseBonus > 0) ...[
+                                  const Divider(height: 16),
+                                  _StatRow(
+                                    label: l10n.focusCompleteFullHouseBonus,
+                                    value: '+${widget.xpResult.fullHouseBonus} XP',
+                                    icon: Icons.home,
+                                  ),
+                                ],
+                                const Divider(height: 16),
+                                _StatRow(
+                                  label: l10n.focusCompleteTotal,
+                                  value: '+${widget.xpResult.totalXp} XP',
+                                  icon: Icons.star,
+                                  isBold: true,
+                                ),
+                              ],
                             ),
                           ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
+                        ),
+                      ),
+                    ),
 
-                // Session stats breakdown with slide-up + fade-in
-                SlideTransition(
-                  position: _statsSlide,
-                  child: FadeTransition(
-                    opacity: _statsOpacity,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
+                    // Diary generation feedback
+                    if (_diaryGenerating)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _StatRow(
-                              label: 'Focus time',
-                              value: '+${widget.minutes} min',
-                              icon: Icons.timer_outlined,
+                            SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
-                            if (widget.coinsEarned > 0) ...[
-                              const Divider(height: 16),
-                              _StatRow(
-                                label: 'Coins earned',
-                                value: '+${widget.coinsEarned}',
-                                icon: Icons.monetization_on,
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.focusCompleteDiaryWriting,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
-                            ],
-                            const Divider(height: 16),
-                            _StatRow(
-                              label: 'Base XP',
-                              value:
-                                  '+${widget.xpResult.baseXp} XP',
-                              icon: Icons.star_outline,
-                            ),
-                            if (widget.xpResult.streakBonus > 0) ...[
-                              const Divider(height: 16),
-                              _StatRow(
-                                label: 'Streak bonus',
-                                value:
-                                    '+${widget.xpResult.streakBonus} XP',
-                                icon: Icons.local_fire_department,
-                              ),
-                            ],
-                            if (widget.xpResult.milestoneBonus >
-                                0) ...[
-                              const Divider(height: 16),
-                              _StatRow(
-                                label: 'Milestone bonus',
-                                value:
-                                    '+${widget.xpResult.milestoneBonus} XP',
-                                icon: Icons.emoji_events,
-                              ),
-                            ],
-                            if (widget.xpResult.fullHouseBonus >
-                                0) ...[
-                              const Divider(height: 16),
-                              _StatRow(
-                                label: 'Full house bonus',
-                                value:
-                                    '+${widget.xpResult.fullHouseBonus} XP',
-                                icon: Icons.home,
-                              ),
-                            ],
-                            const Divider(height: 16),
-                            _StatRow(
-                              label: 'Total',
-                              value:
-                                  '+${widget.xpResult.totalXp} XP',
-                              icon: Icons.star,
-                              isBold: true,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                ),
+                    if (_diarySuccess)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: AnimatedOpacity(
+                          opacity: _diarySuccess ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 500),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n.focusCompleteDiaryWritten,
+                                style: textTheme.bodySmall?.copyWith(color: Colors.green),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-                const Spacer(),
+                    const Spacer(),
 
-                // Done button
-                SlideTransition(
-                  position: _statsSlide,
-                  child: FadeTransition(
-                    opacity: _statsOpacity,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: FilledButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .popUntil((route) => route.isFirst);
-                        },
-                        child: Text(
-                          'Done',
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
+                    // Done button
+                    SlideTransition(
+                      position: _statsSlide,
+                      child: FadeTransition(
+                        opacity: _statsOpacity,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton(
+                            onPressed: () {
+                              Navigator.of(context).popUntil((route) => route.isFirst);
+                            },
+                            child: Text(
+                              l10n.focusCompleteDone,
+                              style: textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
+            ),
+          ),
+
+          // Confetti overlay
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              numberOfParticles: 30,
+              maxBlastForce: 20,
+              minBlastForce: 8,
+              gravity: 0.1,
+              colors: [
+                colorScheme.primary,
+                colorScheme.tertiary,
+                colorScheme.secondary,
+                Colors.amber,
+                Colors.pink,
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -399,16 +510,14 @@ class _StatRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
-              ?.copyWith(
+          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)?.copyWith(
             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
-              ?.copyWith(
+          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)?.copyWith(
             color: colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),

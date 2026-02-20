@@ -321,6 +321,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 |------|------|------|
 | `mode` | ThemeMode | `system`（跟随系统）、`light`（浅色）、`dark`（深色） |
 | `seedColor` | Color | Material Design 3 种子色（默认：Google Blue `0xFF4285F4`） |
+| `useDynamicColor` | bool | 是否在可用时使用系统动态色彩（Material You）（默认：`true`） |
 
 **`ThemeNotifier` 方法：**
 
@@ -328,6 +329,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 |------|------|
 | `setMode(ThemeMode)` | 切换主题模式 |
 | `setSeedColor(Color)` | 从 8 色预设色板选择种子色 |
+| `setUseDynamicColor(bool)` | 切换 Material You 动态色彩 |
 
 ---
 
@@ -344,6 +346,15 @@ Firebase Auth 流 ──────────────► authStateProvide
 | 方法 | 说明 |
 |------|------|
 | `setLocale(Locale?)` | 设置语言；null 表示跟随系统 |
+
+**本地化系统（l10n）：**
+
+- 通过 `flutter gen-l10n` 生成，配置 `output-class: S`、`nullable-getter: false`（见 `l10n.yaml`）
+- ARB 文件：`lib/l10n/app_en.arb`（模板）、`lib/l10n/app_zh.arb`
+- 生成输出：`lib/l10n/app_localizations.dart`（类名 `S`）
+- 便捷扩展：`context.l10n` 返回 `S.of(context)`（定义在 `lib/l10n/l10n_ext.dart`）
+- 代理通过 `S.localizationsDelegates` 和 `S.supportedLocales` 注册到 `MaterialApp`
+- 所有 UI 字符串使用 `context.l10n.keyName` —— 界面中无硬编码字符串
 
 ---
 
@@ -418,6 +429,16 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **来源**：`ChatService`（SQLite 历史 + LLM 流）
 - **消费者**：`CatChatScreen`
 - **SSOT**：特定猫咪的聊天状态 — 消息列表、生成状态、部分回复
+
+---
+
+### `appInfoProvider`
+
+- **类型**：`FutureProvider<PackageInfo>`
+- **文件**：`lib/providers/app_info_provider.dart`
+- **数据源**：`PackageInfo.fromPlatform()`（来自 `package_info_plus`）
+- **消费者**：`SettingsScreen`（版本显示 + 许可证页面）
+- **SSOT**：运行时应用版本信息（version、buildNumber、packageName）—— 消除硬编码版本号
 
 ---
 

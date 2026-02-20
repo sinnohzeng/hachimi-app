@@ -100,7 +100,7 @@ class LocalDatabaseService {
       whereArgs: [catId],
       orderBy: 'date DESC',
     );
-    return maps.map((m) => DiaryEntry.fromMap(m)).toList();
+    return maps.map(DiaryEntry.fromMap).toList();
   }
 
   /// 获取指定猫猫当天的日记。
@@ -138,7 +138,7 @@ class LocalDatabaseService {
       orderBy: 'created_at DESC',
       limit: limit,
     );
-    return maps.map((m) => ChatMessage.fromMap(m)).toList().reversed.toList();
+    return maps.map(ChatMessage.fromMap).toList().reversed.toList();
   }
 
   /// 获取指定猫猫的所有聊天消息数量。

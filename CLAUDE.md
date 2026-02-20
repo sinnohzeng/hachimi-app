@@ -60,10 +60,18 @@ Screens → Providers → Services → Firebase SDK
 
 - Resolve deps: `flutter pub get`
 - Analyze: `dart analyze lib/`
-- Build APK: `flutter build apk --debug`
-- Install on vivo: `adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk`
+- Auto-fix lint: `dart fix --apply`
+- Run tests: `flutter test`
+- Update goldens: `flutter test --update-goldens`
+- Build debug APK: `flutter build apk --debug`
+- Build release APK: `flutter build apk --release`
+- Clean build cache: `rm -rf build && flutter clean && flutter pub get`
+- Install on vivo (debug): `adb shell settings put global package_verifier_enable 0 && adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk`
+- Install on vivo (release): `adb shell settings put global package_verifier_enable 0 && adb install -r -t -d build/app/outputs/flutter-apk/app-release.apk`
 - Deploy Firestore rules: `firebase deploy --only firestore:rules --project hachimi-ai`
 - Deploy indexes: `firebase deploy --only firestore:indexes --project hachimi-ai`
+- Setup LLM vendor: `bash scripts/setup_llm_vendor.sh`
+- Tag release: `git tag -a v<VERSION> -m "v<VERSION>: <description>" && git push origin main --tags`
 
 ## Key Gotchas
 
@@ -73,3 +81,4 @@ Screens → Providers → Services → Firebase SDK
 - vivo USB install: use `adb install -r -t -d` when `flutter run` fails with `INSTALL_FAILED_ABORTED`
 - `StateNotifierProvider.autoDispose` auto-disposes the notifier — do NOT add manual `ref.onDispose(() => notifier.dispose())`
 - Firestore security rules must be deployed before the app can read/write data
+- Pre-commit version check: `scripts/pre-commit-version-check.sh` warns if pubspec version matches latest tag (forgot to bump)

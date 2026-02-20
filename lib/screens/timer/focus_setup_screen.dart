@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -118,7 +119,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                       ),
                     ),
                     const Spacer(),
-                    const SizedBox(width: 48), // Balance close button
+                    const SizedBox(width: AppSpacing.xxl), // Balance close button
                   ],
                 ),
               ),
@@ -128,7 +129,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
               // Cat display
               if (cat != null) ...[
                 TappableCatSprite(cat: cat, size: 120),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   cat.name,
                   style: textTheme.titleLarge?.copyWith(
@@ -158,11 +159,11 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   _selectedMinutes = min;
                 }),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.base),
 
               // Preset chips
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: AppSpacing.paddingHLg,
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
@@ -179,11 +180,11 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Mode toggle
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: AppSpacing.paddingHLg,
                 child: SegmentedButton<TimerMode>(
                   segments: const [
                     ButtonSegment(

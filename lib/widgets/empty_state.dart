@@ -7,6 +7,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// EmptyState — Material 3 style empty state with icon, title, subtitle, and optional action.
 ///
@@ -41,7 +42,7 @@ class EmptyState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: AppSpacing.paddingXl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -50,7 +51,7 @@ class EmptyState extends StatelessWidget {
               size: 64,
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.base),
             Text(
               title,
               style: textTheme.titleLarge?.copyWith(
@@ -59,7 +60,7 @@ class EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 subtitle!,
                 style: textTheme.bodyMedium?.copyWith(
@@ -69,7 +70,7 @@ class EmptyState extends StatelessWidget {
               ),
             ],
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
               FilledButton.tonal(
                 onPressed: onAction,
                 child: Text(actionLabel!),

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animations/animations.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -59,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? FloatingActionButton(
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRouter.adoption),
-              tooltip: 'New quest',
+              tooltip: context.l10n.todayNewQuest,
               child: const Icon(Icons.add),
             )
           : null,
@@ -67,26 +70,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) =>
             setState(() => _selectedIndex = index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.today_outlined),
-            selectedIcon: Icon(Icons.today),
-            label: 'Today',
+            icon: const Icon(Icons.today_outlined),
+            selectedIcon: const Icon(Icons.today),
+            label: context.l10n.homeTabToday,
           ),
           NavigationDestination(
-            icon: Icon(Icons.pets_outlined),
-            selectedIcon: Icon(Icons.pets),
-            label: 'CatHouse',
+            icon: const Icon(Icons.pets_outlined),
+            selectedIcon: const Icon(Icons.pets),
+            label: context.l10n.homeTabCatHouse,
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Stats',
+            icon: const Icon(Icons.bar_chart_outlined),
+            selectedIcon: const Icon(Icons.bar_chart),
+            label: context.l10n.homeTabStats,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: context.l10n.homeTabProfile,
           ),
         ],
       ),
@@ -108,11 +111,13 @@ class _TodayTab extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final l10n = context.l10n;
+
     return CustomScrollView(
       slivers: [
         SliverAppBar(
           floating: true,
-          title: const Text('Hachimi'),
+          title: Text(l10n.appTitle),
         ),
 
         // Daily check-in trigger
@@ -128,23 +133,23 @@ class _TodayTab extends ConsumerWidget {
             child: Card(
               color: colorScheme.primaryContainer,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppSpacing.paddingBase,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _SummaryItem(
-                      label: 'Today',
+                      label: l10n.todaySummaryMinutes,
                       value:
                           '${todayMinutes.values.fold(0, (a, b) => a + b)}min',
                       icon: Icons.timer_outlined,
                     ),
                     _SummaryItem(
-                      label: 'Total',
+                      label: l10n.todaySummaryTotal,
                       value: '${stats.totalHoursLogged}h',
                       icon: Icons.hourglass_bottom,
                     ),
                     _SummaryItem(
-                      label: 'Cats',
+                      label: l10n.todaySummaryCats,
                       value: '${catsAsync.value?.length ?? 0}',
                       icon: Icons.pets,
                     ),
@@ -178,7 +183,7 @@ class _TodayTab extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Your Quests',
+              l10n.todayYourQuests,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -196,17 +201,17 @@ class _TodayTab extends ConsumerWidget {
           ),
           error: (error, _) => SliverFillRemaining(
             child: ErrorState(
-              message: 'Failed to load quests',
+              message: l10n.todayFailedToLoad,
               onRetry: () => ref.invalidate(habitsProvider),
             ),
           ),
           data: (habits) {
             if (habits.isEmpty) {
-              return const SliverFillRemaining(
+              return SliverFillRemaining(
                 child: EmptyState(
                   icon: Icons.add_task,
-                  title: 'No quests yet',
-                  subtitle: 'Tap + to start a quest and adopt a cat!',
+                  title: l10n.todayNoQuests,
+                  subtitle: l10n.todayNoQuestsHint,
                 ),
               );
             }
@@ -265,18 +270,16 @@ class _TodayTab extends ConsumerWidget {
 
   void _confirmDelete(
       BuildContext context, WidgetRef ref, String habitId, String habitName) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete quest?'),
-        content: Text(
-          'Are you sure you want to delete "$habitName"? '
-          'The cat will be graduated to your album.',
-        ),
+        title: Text(l10n.todayDeleteQuestTitle),
+        content: Text(l10n.todayDeleteQuestMessage(habitName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -294,13 +297,13 @@ class _TodayTab extends ConsumerWidget {
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   SnackBar(
-                    content: Text('$habitName completed'),
+                    content: Text(l10n.todayQuestCompleted(habitName)),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
               }
             },
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -344,14 +347,14 @@ class _FeaturedCatCard extends ConsumerWidget {
                 ],
               ),
             ),
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingBase,
             child: Row(
               children: [
                 Hero(
                   tag: 'cat-${cat.id}',
                   child: TappableCatSprite(cat: cat, size: 72),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.base),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,7 +365,7 @@ class _FeaturedCatCard extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       if (habit != null)
                         Text(
                           '${habit.icon} ${habit.name}',
@@ -370,7 +373,7 @@ class _FeaturedCatCard extends ConsumerWidget {
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
@@ -381,7 +384,7 @@ class _FeaturedCatCard extends ConsumerWidget {
                           valueColor: AlwaysStoppedAnimation(stageClr),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m  •  ${cat.stageName}',
                         style: textTheme.labelSmall?.copyWith(
@@ -391,14 +394,14 @@ class _FeaturedCatCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 FilledButton(
                   onPressed: habit != null
                       ? () => Navigator.of(context).pushNamed(
                           AppRouter.focusSetup,
                           arguments: habit.id)
                       : null,
-                  child: const Text('Focus'),
+                  child: Text(context.l10n.todayFocus),
                 ),
               ],
             ),
@@ -410,7 +413,7 @@ class _FeaturedCatCard extends ConsumerWidget {
 }
 
 class _HabitRow extends StatelessWidget {
-  final dynamic habit;
+  final Habit habit;
   final Cat? cat;
   final int todayMinutes;
   final VoidCallback onTap;
@@ -436,7 +439,7 @@ class _HabitRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: AppSpacing.paddingMd,
           child: Row(
             children: [
               // Cat avatar or habit emoji
@@ -457,7 +460,7 @@ class _HabitRow extends StatelessWidget {
                     ),
                   ),
                 ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
 
               // Habit info
               Expanded(
@@ -475,7 +478,7 @@ class _HabitRow extends StatelessWidget {
                       children: [
                         if (todayMinutes > 0) ...[
                           Text(
-                            '${todayMinutes}min today',
+                            context.l10n.todayMinToday(todayMinutes),
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.w500,
@@ -489,7 +492,7 @@ class _HabitRow extends StatelessWidget {
                           ),
                         ] else
                           Text(
-                            'Goal: ${habit.goalMinutes}min/day',
+                            context.l10n.todayGoalMinPerDay(habit.goalMinutes),
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -503,7 +506,7 @@ class _HabitRow extends StatelessWidget {
               // Streak badge
               if (habit.currentStreak > 0) ...[
                 StreakIndicator(streak: habit.currentStreak),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
               ],
 
               // Start button
@@ -511,7 +514,7 @@ class _HabitRow extends StatelessWidget {
                 icon: Icon(Icons.play_circle_filled,
                     color: colorScheme.primary, size: 32),
                 onPressed: onTap,
-                tooltip: 'Start focus',
+                tooltip: context.l10n.todayStartFocus,
               ),
             ],
           ),
@@ -540,7 +543,7 @@ class _SummaryItem extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: colorScheme.onPrimaryContainer, size: 24),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: textTheme.titleMedium?.copyWith(

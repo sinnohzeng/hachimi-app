@@ -8,14 +8,19 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/llm_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
+import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -29,23 +34,25 @@ class SettingsScreen extends ConsumerWidget {
     final themeSettings = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
 
+    final l10n = context.l10n;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
           // General section
-          _SectionHeader(title: 'General', colorScheme: colorScheme),
+          _SectionHeader(title: l10n.settingsGeneral, colorScheme: colorScheme),
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
-            title: const Text('Notifications'),
+            title: Text(l10n.settingsNotifications),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showNotificationSettings(context),
           ),
           ListTile(
             leading: const Icon(Icons.language),
-            title: const Text('Language'),
+            title: Text(l10n.settingsLanguage),
             subtitle: Text(
-              _localeName(locale),
+              _localeName(locale, l10n),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -54,16 +61,16 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _showLanguageSettings(context, ref),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           const Divider(),
 
           // Appearance section
-          _SectionHeader(title: 'Appearance', colorScheme: colorScheme),
+          _SectionHeader(title: l10n.settingsAppearance, colorScheme: colorScheme),
           ListTile(
             leading: const Icon(Icons.dark_mode_outlined),
-            title: const Text('Theme Mode'),
+            title: Text(l10n.settingsThemeMode),
             subtitle: Text(
-              _themeModeName(themeSettings.mode),
+              _themeModeName(themeSettings.mode, l10n),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -73,9 +80,9 @@ class SettingsScreen extends ConsumerWidget {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.wallpaper_outlined),
-            title: const Text('Material You'),
+            title: Text(l10n.settingsMaterialYou),
             subtitle: Text(
-              'Use wallpaper colors for theme',
+              l10n.settingsMaterialYouSubtitle,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -87,7 +94,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.palette_outlined),
-            title: const Text('Theme Color'),
+            title: Text(l10n.settingsThemeColor),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -99,33 +106,37 @@ class SettingsScreen extends ConsumerWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 const Icon(Icons.chevron_right),
               ],
             ),
             onTap: () => _showThemeColorSettings(context, ref),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           const Divider(),
 
           // AI Model section
-          _SectionHeader(title: 'AI Model', colorScheme: colorScheme),
+          _SectionHeader(title: l10n.settingsAiModel, colorScheme: colorScheme),
           _AiModelSection(colorScheme: colorScheme, textTheme: textTheme),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           const Divider(),
 
           // About section
-          _SectionHeader(title: 'About', colorScheme: colorScheme),
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('Version'),
-            subtitle: Text('1.8.0'),
+          _SectionHeader(title: l10n.settingsAbout, colorScheme: colorScheme),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l10n.settingsVersion),
+            subtitle: ref.watch(appInfoProvider).when(
+              data: (info) => Text(info.version),
+              loading: () => const Text('...'),
+              error: (_, __) => const Text('?'),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.pets_outlined),
-            title: const Text('Pixel Cat Sprites'),
+            title: Text(l10n.settingsPixelCatSprites),
             subtitle: Text(
               'by pixel-cat-maker (CC BY-NC 4.0)',
               style: textTheme.bodySmall?.copyWith(
@@ -135,27 +146,28 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Licenses'),
+            title: Text(l10n.settingsLicenses),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
+              final version = ref.read(appInfoProvider).value?.version ?? '';
               showLicensePage(
                 context: context,
                 applicationName: 'Hachimi',
-                applicationVersion: '1.8.0',
+                applicationVersion: version,
               );
             },
           ),
 
           // Spacing to push account section to bottom
-          const SizedBox(height: 48),
+          const SizedBox(height: AppSpacing.xxl),
           const Divider(),
 
           // Account section (danger zone)
-          _SectionHeader(title: 'Account', colorScheme: colorScheme),
+          _SectionHeader(title: l10n.settingsAccount, colorScheme: colorScheme),
           ListTile(
             leading: Icon(Icons.logout, color: colorScheme.error),
             title: Text(
-              'Log Out',
+              l10n.commonLogOut,
               style: TextStyle(color: colorScheme.error),
             ),
             onTap: () => _confirmLogout(context, ref),
@@ -163,18 +175,18 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: Icon(Icons.delete_forever, color: colorScheme.error),
             title: Text(
-              'Delete Account',
+              l10n.commonDeleteAccount,
               style: TextStyle(color: colorScheme.error),
             ),
             subtitle: Text(
-              'This action cannot be undone',
+              l10n.deleteAccountWarning,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             onTap: () => _confirmDeleteAccount(context, ref),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xl),
         ],
       ),
     );
@@ -191,13 +203,13 @@ class SettingsScreen extends ConsumerWidget {
 
   // --- Language Settings ---
 
-  String _localeName(Locale? locale) {
-    if (locale == null) return 'System default';
+  String _localeName(Locale? locale, S l10n) {
+    if (locale == null) return l10n.settingsLanguageSystem;
     switch (locale.languageCode) {
       case 'en':
-        return 'English';
+        return l10n.settingsLanguageEnglish;
       case 'zh':
-        return 'Chinese';
+        return l10n.settingsLanguageChinese;
       default:
         return locale.languageCode;
     }
@@ -221,14 +233,14 @@ class SettingsScreen extends ConsumerWidget {
 
   // --- Theme Mode Settings ---
 
-  String _themeModeName(ThemeMode mode) {
+  String _themeModeName(ThemeMode mode, S l10n) {
     switch (mode) {
       case ThemeMode.system:
-        return 'System';
+        return l10n.settingsThemeModeSystem;
       case ThemeMode.light:
-        return 'Light';
+        return l10n.settingsThemeModeLight;
       case ThemeMode.dark:
-        return 'Dark';
+        return l10n.settingsThemeModeDark;
     }
   }
 
@@ -261,22 +273,23 @@ class SettingsScreen extends ConsumerWidget {
   // --- Account Actions ---
 
   void _confirmLogout(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('Are you sure you want to log out?'),
+        title: Text(l10n.logoutTitle),
+        content: Text(l10n.logoutMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
               await ref.read(authServiceProvider).signOut();
             },
-            child: const Text('Log Out'),
+            child: Text(l10n.commonLogOut),
           ),
         ],
       ),
@@ -284,18 +297,16 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _confirmDeleteAccount(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete account?'),
-        content: const Text(
-          'This will permanently delete your account and all your data. '
-          'This action cannot be undone.',
-        ),
+        title: Text(l10n.deleteAccountTitle),
+        content: Text(l10n.deleteAccountMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -313,7 +324,7 @@ class SettingsScreen extends ConsumerWidget {
                 }
               }
             },
-            child: const Text('Delete Account'),
+            child: Text(l10n.commonDeleteAccount),
           ),
         ],
       ),
@@ -364,17 +375,16 @@ class _NotificationSettingsDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Notifications'),
+      title: Text(l10n.settingsNotifications),
       content: _loaded
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SwitchListTile(
-                  title: const Text('Focus Reminders'),
-                  subtitle: const Text(
-                    'Receive daily reminders to stay on track',
-                  ),
+                  title: Text(l10n.settingsNotificationFocusReminders),
+                  subtitle: Text(l10n.settingsNotificationSubtitle),
                   value: _enabled,
                   onChanged: _toggle,
                 ),
@@ -387,7 +397,7 @@ class _NotificationSettingsDialogState
       actions: [
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Done'),
+          child: Text(l10n.commonDone),
         ),
       ],
     );
@@ -403,8 +413,9 @@ class _LanguageDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentCode = currentLocale?.languageCode ?? 'system';
 
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Language'),
+      title: Text(l10n.settingsLanguage),
       contentPadding: const EdgeInsets.only(top: 12),
       content: RadioGroup<String>(
         groupValue: currentCode,
@@ -413,15 +424,15 @@ class _LanguageDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: const Text('System default'),
+              title: Text(l10n.settingsLanguageSystem),
               value: 'system',
             ),
             RadioListTile<String>(
-              title: const Text('English'),
+              title: Text(l10n.settingsLanguageEnglish),
               value: 'en',
             ),
             RadioListTile<String>(
-              title: const Text('Chinese'),
+              title: Text(l10n.settingsLanguageChinese),
               value: 'zh',
             ),
           ],
@@ -430,7 +441,7 @@ class _LanguageDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
       ],
     );
@@ -444,8 +455,9 @@ class _ThemeModeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Theme Mode'),
+      title: Text(l10n.settingsThemeMode),
       contentPadding: const EdgeInsets.only(top: 12),
       content: RadioGroup<ThemeMode>(
         groupValue: currentMode,
@@ -454,15 +466,15 @@ class _ThemeModeDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<ThemeMode>(
-              title: const Text('System'),
+              title: Text(l10n.settingsThemeModeSystem),
               value: ThemeMode.system,
             ),
             RadioListTile<ThemeMode>(
-              title: const Text('Light'),
+              title: Text(l10n.settingsThemeModeLight),
               value: ThemeMode.light,
             ),
             RadioListTile<ThemeMode>(
-              title: const Text('Dark'),
+              title: Text(l10n.settingsThemeModeDark),
               value: ThemeMode.dark,
             ),
           ],
@@ -471,7 +483,7 @@ class _ThemeModeDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
       ],
     );
@@ -488,7 +500,7 @@ class _ThemeColorDialog extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      title: const Text('Theme Color'),
+      title: Text(context.l10n.settingsThemeColor),
       content: Wrap(
         spacing: 12,
         runSpacing: 12,
@@ -507,7 +519,7 @@ class _ThemeColorDialog extends StatelessWidget {
                     : null,
               ),
               child: isSelected
-                  ? Icon(Icons.check, color: Colors.white, size: 24)
+                  ? const Icon(Icons.check, color: Colors.white, size: 24)
                   : null,
             ),
           );
@@ -516,14 +528,14 @@ class _ThemeColorDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
       ],
     );
   }
 }
 
-/// AI Model 设置区块 — 功能开关 + 模型下载/删除。
+/// AI Model 设置区块 — 功能开关 + 隐私徽章 + 模型信息 + 下载/删除/测试。
 class _AiModelSection extends ConsumerWidget {
   final ColorScheme colorScheme;
   final TextTheme textTheme;
@@ -544,9 +556,9 @@ class _AiModelSection extends ConsumerWidget {
         // AI 功能总开关
         SwitchListTile(
           secondary: const Icon(Icons.smart_toy_outlined),
-          title: const Text('AI Features'),
+          title: Text(context.l10n.settingsAiFeatures),
           subtitle: Text(
-            'Enable cat diary and chat powered by on-device AI',
+            context.l10n.settingsAiSubtitle,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -559,22 +571,108 @@ class _AiModelSection extends ConsumerWidget {
         ),
 
         if (aiEnabled) ...[
-          // 模型信息
-          ListTile(
-            leading: const Icon(Icons.memory),
-            title: const Text(LlmConstants.modelDisplayName),
-            subtitle: Text(
-              _statusText(availability, downloadState),
-              style: textTheme.bodySmall?.copyWith(
-                color: _statusColor(availability, colorScheme),
-              ),
+          // 隐私徽章
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.security,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    context.l10n.settingsAiPrivacyBadge,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // 功能说明卡片 — 模型未下载时显示
+          if (availability == LlmAvailability.modelNotDownloaded)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Card(
+                color: colorScheme.secondaryContainer,
+                child: Padding(
+                  padding: AppSpacing.paddingMd,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.l10n.settingsAiWhatYouGet,
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _FeatureRow(
+                        emoji: '\u{1F4D6}',
+                        text: context.l10n.settingsAiFeatureDiary,
+                        textTheme: textTheme,
+                        color: colorScheme.onSecondaryContainer,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      _FeatureRow(
+                        emoji: '\u{1F4AC}',
+                        text: context.l10n.settingsAiFeatureChat,
+                        textTheme: textTheme,
+                        color: colorScheme.onSecondaryContainer,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+          // 增强模型信息行 — 带状态 Chip
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: [
+                const Icon(Icons.memory, size: 20),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        LlmConstants.modelDisplayName,
+                        style: textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '1.2 GB \u00B7 Q4_K_M',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _StatusChip(
+                  availability: availability,
+                  isDownloading: downloadState.isDownloading,
+                  colorScheme: colorScheme,
+                  textTheme: textTheme,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
 
           // 下载进度条
           if (downloadState.isDownloading) ...[
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: AppSpacing.paddingHBase,
               child: Column(
                 children: [
                   LinearProgressIndicator(
@@ -582,7 +680,7 @@ class _AiModelSection extends ConsumerWidget {
                         ? downloadState.progress
                         : null,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -601,9 +699,8 @@ class _AiModelSection extends ConsumerWidget {
                 ],
               ),
             ),
-            // 暂停/恢复/取消按钮
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: AppSpacing.paddingHBase,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -618,14 +715,14 @@ class _AiModelSection extends ConsumerWidget {
                       }
                     },
                     child: Text(
-                        downloadState.isPaused ? 'Resume' : 'Pause'),
+                        downloadState.isPaused ? context.l10n.commonResume : context.l10n.commonPause),
                   ),
                   TextButton(
                     onPressed: () {
                       ref.read(modelDownloadProvider.notifier).cancel();
                     },
                     child: Text(
-                      'Cancel',
+                      context.l10n.commonCancel,
                       style: TextStyle(color: colorScheme.error),
                     ),
                   ),
@@ -634,40 +731,106 @@ class _AiModelSection extends ConsumerWidget {
             ),
           ],
 
-          // 下载/删除按钮
+          // 操作按钮区域
           if (!downloadState.isDownloading)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: availability == LlmAvailability.modelNotDownloaded ||
-                        availability == LlmAvailability.error
-                    ? FilledButton.tonalIcon(
+              padding: AppSpacing.paddingHBase,
+              child: Column(
+                children: [
+                  // 错误恢复 — error 且模型已下载时显示 Retry
+                  if (availability == LlmAvailability.error) ...[
+                    if (downloadState.error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          downloadState.error!,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.tonalIcon(
+                              onPressed: () {
+                                ref
+                                    .read(llmAvailabilityProvider.notifier)
+                                    .refresh();
+                              },
+                              icon: const Icon(Icons.refresh),
+                              label: Text(context.l10n.commonRetry),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: FilledButton.tonalIcon(
+                              onPressed: () {
+                                ref
+                                    .read(modelDownloadProvider.notifier)
+                                    .startDownload();
+                              },
+                              icon: const Icon(Icons.download),
+                              label: Text(context.l10n.settingsRedownload),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  // 下载按钮
+                  if (availability == LlmAvailability.modelNotDownloaded)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
                         onPressed: () {
                           ref
                               .read(modelDownloadProvider.notifier)
                               .startDownload();
                         },
                         icon: const Icon(Icons.download),
-                        label: const Text('Download Model (1.2 GB)'),
-                      )
-                    : availability == LlmAvailability.ready
-                        ? OutlinedButton.icon(
-                            onPressed: () =>
-                                _confirmDeleteModel(context, ref),
-                            icon: Icon(Icons.delete_outline,
-                                color: colorScheme.error),
-                            label: Text(
-                              'Delete Model',
-                              style: TextStyle(color: colorScheme.error),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                        label: Text(context.l10n.settingsDownloadModel),
+                      ),
+                    ),
+
+                  // Ready 状态 — 测试 + 删除按钮
+                  if (availability == LlmAvailability.ready) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(AppRouter.modelTestChat);
+                        },
+                        icon: const Icon(Icons.chat_outlined),
+                        label: Text(context.l10n.settingsTestModel),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            _confirmDeleteModel(context, ref),
+                        icon: Icon(Icons.delete_outline,
+                            color: colorScheme.error),
+                        label: Text(
+                          context.l10n.settingsDeleteModel,
+                          style: TextStyle(color: colorScheme.error),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
 
-          // 错误信息
-          if (downloadState.error != null)
+          // 下载错误信息（非 availability error 时）
+          if (downloadState.error != null &&
+              availability != LlmAvailability.error)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
@@ -677,39 +840,10 @@ class _AiModelSection extends ConsumerWidget {
                 ),
               ),
             ),
+          const SizedBox(height: AppSpacing.xs),
         ],
       ],
     );
-  }
-
-  String _statusText(
-    LlmAvailability availability,
-    ModelDownloadState downloadState,
-  ) {
-    if (downloadState.isDownloading) return 'Downloading...';
-    switch (availability) {
-      case LlmAvailability.featureDisabled:
-        return 'Disabled';
-      case LlmAvailability.modelNotDownloaded:
-        return 'Not downloaded';
-      case LlmAvailability.modelLoading:
-        return 'Loading model...';
-      case LlmAvailability.ready:
-        return 'Ready';
-      case LlmAvailability.error:
-        return 'Error';
-    }
-  }
-
-  Color _statusColor(LlmAvailability availability, ColorScheme colorScheme) {
-    switch (availability) {
-      case LlmAvailability.ready:
-        return Colors.green;
-      case LlmAvailability.error:
-        return colorScheme.error;
-      default:
-        return colorScheme.onSurfaceVariant;
-    }
   }
 
   String _formatBytes(int bytes) {
@@ -722,18 +856,16 @@ class _AiModelSection extends ConsumerWidget {
   }
 
   void _confirmDeleteModel(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete model?'),
-        content: const Text(
-          'This will delete the downloaded AI model (1.2 GB). '
-          'You can download it again later.',
-        ),
+        title: Text(l10n.settingsDeleteModelTitle),
+        content: Text(l10n.settingsDeleteModelMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -741,10 +873,120 @@ class _AiModelSection extends ConsumerWidget {
               await ref.read(modelManagerProvider).deleteModel();
               ref.read(llmAvailabilityProvider.notifier).refresh();
             },
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 状态 Chip — 模型可用性的彩色标签。
+class _StatusChip extends StatelessWidget {
+  final LlmAvailability availability;
+  final bool isDownloading;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  const _StatusChip({
+    required this.availability,
+    required this.isDownloading,
+    required this.colorScheme,
+    required this.textTheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final (String label, Color bg, Color fg) = _chipData(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: textTheme.labelSmall?.copyWith(
+          color: fg,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  (String, Color, Color) _chipData(BuildContext context) {
+    final l10n = context.l10n;
+    if (isDownloading) {
+      return (
+        l10n.settingsStatusDownloading,
+        colorScheme.primaryContainer,
+        colorScheme.onPrimaryContainer,
+      );
+    }
+    switch (availability) {
+      case LlmAvailability.ready:
+        return (
+          l10n.settingsStatusReady,
+          Colors.green.withValues(alpha: 0.15),
+          Colors.green,
+        );
+      case LlmAvailability.error:
+        return (
+          l10n.settingsStatusError,
+          colorScheme.errorContainer,
+          colorScheme.onErrorContainer,
+        );
+      case LlmAvailability.modelLoading:
+        return (
+          l10n.settingsStatusLoading,
+          colorScheme.primaryContainer,
+          colorScheme.onPrimaryContainer,
+        );
+      case LlmAvailability.modelNotDownloaded:
+        return (
+          l10n.settingsStatusNotDownloaded,
+          colorScheme.surfaceContainerHighest,
+          colorScheme.onSurfaceVariant,
+        );
+      case LlmAvailability.featureDisabled:
+        return (
+          l10n.settingsStatusDisabled,
+          colorScheme.surfaceContainerHighest,
+          colorScheme.onSurfaceVariant,
+        );
+    }
+  }
+}
+
+/// 功能说明行。
+class _FeatureRow extends StatelessWidget {
+  final String emoji;
+  final String text;
+  final TextTheme textTheme;
+  final Color color;
+
+  const _FeatureRow({
+    required this.emoji,
+    required this.text,
+    required this.textTheme,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Text(
+            text,
+            style: textTheme.bodySmall?.copyWith(color: color),
+          ),
+        ),
+      ],
     );
   }
 }

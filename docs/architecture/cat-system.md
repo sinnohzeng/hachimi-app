@@ -488,6 +488,44 @@ Uses ChatML format with personality, mood, stage, and habit context. Rules: stay
 
 ---
 
+## Model Test Chat
+
+A lightweight chat screen accessible from **Settings → AI Model → "Test Model"** that lets users verify the local LLM is working correctly after download — without needing to navigate to a specific cat.
+
+### Purpose
+
+After downloading the 1.2 GB model, users need a quick way to confirm everything works. The test chat provides this with zero friction.
+
+### Differences from Cat Chat
+
+| Aspect | Cat Chat | Model Test Chat |
+|--------|----------|-----------------|
+| Entry point | CatDetailScreen AppBar | Settings → AI Model section |
+| Persona | Cat personality role-play | Generic helpful AI assistant |
+| Message persistence | SQLite (survives app restart) | In-memory only (lost on exit) |
+| System prompt | Personality + mood + habit context | Simple "helpful assistant" prompt |
+| Service layer | ChatService (with history) | Direct LlmService.generateStream() |
+
+### Entry Point
+
+The "Test Model" button appears in the AI Model settings section only when `LlmAvailability == ready`. It navigates to `/model-test-chat`.
+
+### System Prompt
+
+Uses a minimal ChatML prompt via `TestPrompt.buildPrompt()`:
+```
+<|im_start|>system
+You are a helpful AI assistant. Respond concisely in 1-2 sentences.
+<|im_end|>
+<|im_start|>user
+{message}<|im_end|>
+<|im_start|>assistant
+```
+
+**Constants:** `lib/core/constants/llm_constants.dart` -> `class TestPrompt`
+
+---
+
 ## Cat States
 
 | State | Meaning | Visibility |

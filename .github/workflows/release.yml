@@ -78,8 +78,20 @@ jobs:
       - name: Setup llama_cpp_dart vendor
         run: bash scripts/setup_llm_vendor.sh
 
+      - name: Verify version consistency
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "::error::Tag version ($TAG_VERSION) != pubspec version ($PUBSPEC_VERSION)"
+            exit 1
+          fi
+
       - name: Static analysis
         run: dart analyze lib/
+
+      - name: Run tests
+        run: flutter test
 
       - name: Build release APK
         run: flutter build apk --release

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
@@ -84,7 +85,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
         title: const Text('New Quest'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: AppSpacing.paddingLg,
         child: Form(
           key: _formKey,
           child: Column(
@@ -105,14 +106,14 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Icon selector
               Text(
                 'Choose an icon',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -131,11 +132,11 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                     ),
                     label: const SizedBox.shrink(),
                     showCheckmark: false,
-                    padding: const EdgeInsets.all(8),
+                    padding: AppSpacing.paddingSm,
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
 
               // Target hours
               TextFormField(
@@ -158,7 +159,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xl),
 
               // Create button
               SizedBox(

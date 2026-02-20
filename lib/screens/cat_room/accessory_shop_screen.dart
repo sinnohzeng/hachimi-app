@@ -15,6 +15,7 @@
 // ---
 
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -84,7 +85,7 @@ class AccessoryShopScreen extends ConsumerWidget {
           title: const Text('Accessory Shop'),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsetsDirectional.only(end: 12),
               child: Chip(
                 avatar: Icon(
                   Icons.monetization_on,
@@ -146,7 +147,7 @@ class _AccessoryGrid extends ConsumerWidget {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
+      padding: AppSpacing.paddingSm,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 0.75,
@@ -181,7 +182,7 @@ class _AccessoryGrid extends ConsumerWidget {
           children: [
             Icon(Icons.monetization_on,
                 size: 18, color: Theme.of(ctx).colorScheme.primary),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
             Text('${item.price} coins'),
           ],
         ),
@@ -226,7 +227,7 @@ class _AccessoryGrid extends ConsumerWidget {
           children: [
             if (success)
               const Icon(Icons.check_circle, color: Colors.white, size: 20),
-            if (success) const SizedBox(width: 8),
+            if (success) const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(success
                   ? 'Purchased! ${item.displayName} added to inventory'

@@ -5,8 +5,8 @@ import 'app_localizations.dart';
 // ignore_for_file: type=lint
 
 /// The translations for English (`en`).
-class AppLocalizationsEn extends AppLocalizations {
-  AppLocalizationsEn([String locale = 'en']) : super(locale);
+class SEn extends S {
+  SEn([String locale = 'en']) : super(locale);
 
   @override
   String get appTitle => 'Hachimi';
@@ -162,32 +162,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusCompleteDone => 'Done';
 
   @override
-  String get timerGiveUp => 'Give Up';
+  String get focusCompleteItsOkay => 'It\'s okay!';
 
   @override
-  String get timerPause => 'Pause';
+  String focusCompleteEvolved(String catName) {
+    return '$catName evolved!';
+  }
 
   @override
-  String get timerResume => 'Resume';
+  String focusCompleteFocusedFor(int minutes) {
+    return 'You focused for $minutes minutes';
+  }
 
   @override
-  String get timerDone => 'Done';
+  String focusCompleteAbandonedMessage(String catName) {
+    return '$catName says: \"We\'ll try again!\"';
+  }
 
   @override
-  String get profileLanguage => 'Language';
+  String get focusCompleteFocusTime => 'Focus time';
 
   @override
-  String get profileAbout => 'About';
+  String get focusCompleteCoinsEarned => 'Coins earned';
 
   @override
-  String get profileAboutAttribution =>
-      'Pixel cat sprites based on pixel-cat-maker (CC BY-NC 4.0)';
+  String get focusCompleteBaseXp => 'Base XP';
 
   @override
-  String get profileLogout => 'Log Out';
+  String get focusCompleteStreakBonus => 'Streak bonus';
 
   @override
-  String get profileDeleteAccount => 'Delete Account';
+  String get focusCompleteMilestoneBonus => 'Milestone bonus';
+
+  @override
+  String get focusCompleteFullHouseBonus => 'Full house bonus';
+
+  @override
+  String get focusCompleteTotal => 'Total';
+
+  @override
+  String focusCompleteEvolvedTo(String stage) {
+    return 'Evolved to $stage!';
+  }
+
+  @override
+  String get focusCompleteYourCat => 'Your cat';
+
+  @override
+  String get focusCompleteDiaryWriting => 'Writing diary...';
+
+  @override
+  String get focusCompleteDiaryWritten => 'Diary written!';
+
+  @override
+  String get focusCompleteNotifTitle => 'Quest complete!';
+
+  @override
+  String focusCompleteNotifBody(String catName, int xp, int minutes) {
+    return '$catName earned +$xp XP from ${minutes}min of focus';
+  }
 
   @override
   String get stageKitten => 'Kitten';
@@ -206,13 +239,290 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get migrationMessage =>
-      'This version uses a new cat system. Your existing data needs to be cleared to continue.';
+      'Hachimi has been updated with a new pixel cat system! Your old cat data is no longer compatible. Please reset to start fresh with the new experience.';
 
   @override
-  String get migrationConfirm => 'Clear Data & Continue';
+  String get migrationResetButton => 'Reset & Start Fresh';
 
   @override
-  String get migrationCancel => 'Cancel';
+  String get sessionResumeTitle => 'Resume session?';
+
+  @override
+  String sessionResumeMessage(String habitName, String elapsed) {
+    return 'You had an active focus session ($habitName, $elapsed). Resume?';
+  }
+
+  @override
+  String get sessionResumeButton => 'Resume';
+
+  @override
+  String get sessionDiscard => 'Discard';
+
+  @override
+  String get todaySummaryMinutes => 'Today';
+
+  @override
+  String get todaySummaryTotal => 'Total';
+
+  @override
+  String get todaySummaryCats => 'Cats';
+
+  @override
+  String get todayYourQuests => 'Your Quests';
+
+  @override
+  String get todayNoQuests => 'No quests yet';
+
+  @override
+  String get todayNoQuestsHint => 'Tap + to start a quest and adopt a cat!';
+
+  @override
+  String get todayFocus => 'Focus';
+
+  @override
+  String get todayDeleteQuestTitle => 'Delete quest?';
+
+  @override
+  String todayDeleteQuestMessage(String name) {
+    return 'Are you sure you want to delete \"$name\"? The cat will be graduated to your album.';
+  }
+
+  @override
+  String todayQuestCompleted(String name) {
+    return '$name completed';
+  }
+
+  @override
+  String get todayFailedToLoad => 'Failed to load quests';
+
+  @override
+  String todayMinToday(int count) {
+    return '${count}min today';
+  }
+
+  @override
+  String todayGoalMinPerDay(int count) {
+    return 'Goal: ${count}min/day';
+  }
+
+  @override
+  String get todayFeaturedCat => 'Featured Cat';
+
+  @override
+  String get todayAddHabit => 'Add Habit';
+
+  @override
+  String get todayNoHabits => 'Create your first habit to get started!';
+
+  @override
+  String get todayNewQuest => 'New quest';
+
+  @override
+  String get todayStartFocus => 'Start focus';
+
+  @override
+  String get timerStart => 'Start';
+
+  @override
+  String get timerPause => 'Pause';
+
+  @override
+  String get timerResume => 'Resume';
+
+  @override
+  String get timerDone => 'Done';
+
+  @override
+  String get timerGiveUp => 'Give Up';
+
+  @override
+  String get timerRemaining => 'remaining';
+
+  @override
+  String get timerElapsed => 'elapsed';
+
+  @override
+  String get timerPaused => 'PAUSED';
+
+  @override
+  String get timerQuestNotFound => 'Quest not found';
+
+  @override
+  String get timerNotificationBanner =>
+      'Enable notifications to see timer progress when the app is in the background';
+
+  @override
+  String get timerNotificationDismiss => 'Dismiss';
+
+  @override
+  String get timerNotificationEnable => 'Enable';
+
+  @override
+  String timerGraceBack(int seconds) {
+    return 'Back (${seconds}s)';
+  }
+
+  @override
+  String get giveUpTitle => 'Give up?';
+
+  @override
+  String get giveUpMessage =>
+      'If you focused for at least 5 minutes, the time still counts towards your cat\'s growth. Your cat will understand!';
+
+  @override
+  String get giveUpKeepGoing => 'Keep Going';
+
+  @override
+  String get giveUpConfirm => 'Give Up';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get settingsNotificationFocusReminders => 'Focus Reminders';
+
+  @override
+  String get settingsNotificationSubtitle =>
+      'Receive daily reminders to stay on track';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageSystem => 'System default';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageChinese => 'Chinese';
+
+  @override
+  String get settingsThemeMode => 'Theme Mode';
+
+  @override
+  String get settingsThemeModeSystem => 'System';
+
+  @override
+  String get settingsThemeModeLight => 'Light';
+
+  @override
+  String get settingsThemeModeDark => 'Dark';
+
+  @override
+  String get settingsMaterialYou => 'Material You';
+
+  @override
+  String get settingsMaterialYouSubtitle => 'Use wallpaper colors for theme';
+
+  @override
+  String get settingsThemeColor => 'Theme Color';
+
+  @override
+  String get settingsAiModel => 'AI Model';
+
+  @override
+  String get settingsAiFeatures => 'AI Features';
+
+  @override
+  String get settingsAiSubtitle =>
+      'Enable cat diary and chat powered by on-device AI';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get settingsVersion => 'Version';
+
+  @override
+  String get settingsPixelCatSprites => 'Pixel Cat Sprites';
+
+  @override
+  String get settingsLicenses => 'Licenses';
+
+  @override
+  String get settingsAccount => 'Account';
+
+  @override
+  String get settingsDownloadModel => 'Download Model (1.2 GB)';
+
+  @override
+  String get settingsDeleteModel => 'Delete Model';
+
+  @override
+  String get settingsDeleteModelTitle => 'Delete model?';
+
+  @override
+  String get settingsDeleteModelMessage =>
+      'This will delete the downloaded AI model (1.2 GB). You can download it again later.';
+
+  @override
+  String get logoutTitle => 'Log out?';
+
+  @override
+  String get logoutMessage => 'Are you sure you want to log out?';
+
+  @override
+  String get deleteAccountTitle => 'Delete account?';
+
+  @override
+  String get deleteAccountMessage =>
+      'This will permanently delete your account and all your data. This action cannot be undone.';
+
+  @override
+  String get deleteAccountWarning => 'This action cannot be undone';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileYourJourney => 'Your Journey';
+
+  @override
+  String get profileTotalFocus => 'Total Focus';
+
+  @override
+  String get profileTotalCats => 'Total Cats';
+
+  @override
+  String get profileBestStreak => 'Best Streak';
+
+  @override
+  String get profileCatAlbum => 'Cat Album';
+
+  @override
+  String profileCatAlbumCount(int count) {
+    return '$count cats';
+  }
+
+  @override
+  String profileSeeAll(int count) {
+    return 'See all $count cats';
+  }
+
+  @override
+  String get profileGraduated => 'Graduated';
+
+  @override
+  String get profileSettings => 'Settings';
+
+  @override
+  String get habitDetailStreak => 'Streak';
+
+  @override
+  String get habitDetailBestStreak => 'Best';
+
+  @override
+  String get habitDetailTotalMinutes => 'Total';
 
   @override
   String get commonCancel => 'Cancel';
@@ -230,6 +540,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonEdit => 'Edit';
 
   @override
+  String get commonDone => 'Done';
+
+  @override
+  String get commonDismiss => 'Dismiss';
+
+  @override
+  String get commonEnable => 'Enable';
+
+  @override
   String get commonLoading => 'Loading...';
 
   @override
@@ -239,35 +558,299 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonRetry => 'Retry';
 
   @override
-  String get todaySummaryMinutes => 'Today';
+  String get commonResume => 'Resume';
 
   @override
-  String get todaySummaryTotal => 'Total';
+  String get commonPause => 'Pause';
 
   @override
-  String get todaySummaryCats => 'Cats';
+  String get commonLogOut => 'Log Out';
 
   @override
-  String get todayFeaturedCat => 'Featured Cat';
+  String get commonDeleteAccount => 'Delete Account';
 
   @override
-  String get todayAddHabit => 'Add Habit';
+  String get testChatTitle => 'Test AI Model';
 
   @override
-  String get todayNoHabits => 'Create your first habit to get started!';
+  String get testChatLoadingModel => 'Loading model...';
 
   @override
-  String get habitDetailStreak => 'Streak';
+  String get testChatModelLoaded => 'Model loaded';
 
   @override
-  String get habitDetailBestStreak => 'Best';
+  String get testChatErrorLoading => 'Error loading model';
 
   @override
-  String get habitDetailTotalMinutes => 'Total';
+  String get testChatCouldNotLoad => 'Could not load model';
 
   @override
-  String get settingsNotifications => 'Notifications';
+  String get testChatFailedToLoad => 'Failed to load model';
 
   @override
-  String get settingsVersion => 'Version';
+  String get testChatUnknownError => 'Unknown error';
+
+  @override
+  String get testChatModelReady => 'Model ready';
+
+  @override
+  String get testChatSendToTest => 'Send a message to test the AI model.';
+
+  @override
+  String get testChatGenerating => 'Generating...';
+
+  @override
+  String get testChatTypeMessage => 'Type a message...';
+
+  @override
+  String get settingsAiPrivacyBadge =>
+      'Powered by on-device AI — all processing runs locally';
+
+  @override
+  String get settingsAiWhatYouGet => 'What you get:';
+
+  @override
+  String get settingsAiFeatureDiary =>
+      'Hachimi Diary — Your cat writes daily diary entries';
+
+  @override
+  String get settingsAiFeatureChat =>
+      'Cat Chat — Have conversations with your cat';
+
+  @override
+  String get settingsRedownload => 'Redownload';
+
+  @override
+  String get settingsTestModel => 'Test Model';
+
+  @override
+  String get settingsStatusDownloading => 'Downloading';
+
+  @override
+  String get settingsStatusReady => 'Ready';
+
+  @override
+  String get settingsStatusError => 'Error';
+
+  @override
+  String get settingsStatusLoading => 'Loading';
+
+  @override
+  String get settingsStatusNotDownloaded => 'Not downloaded';
+
+  @override
+  String get settingsStatusDisabled => 'Disabled';
+
+  @override
+  String get catDetailNotFound => 'Cat not found';
+
+  @override
+  String get catDetailChatTooltip => 'Chat';
+
+  @override
+  String get catDetailRenameTooltip => 'Rename';
+
+  @override
+  String get catDetailGrowthTitle => 'Growth Progress';
+
+  @override
+  String catDetailTarget(int hours) {
+    return 'Target: ${hours}h';
+  }
+
+  @override
+  String get catDetailRenameTitle => 'Rename Cat';
+
+  @override
+  String get catDetailNewName => 'New name';
+
+  @override
+  String get catDetailRenamed => 'Cat renamed!';
+
+  @override
+  String get catDetailQuestBadge => 'Quest';
+
+  @override
+  String get catDetailEditQuest => 'Edit quest';
+
+  @override
+  String get catDetailDailyGoal => 'Daily goal';
+
+  @override
+  String get catDetailTodaysFocus => 'Today\'s focus';
+
+  @override
+  String get catDetailTotalFocus => 'Total focus';
+
+  @override
+  String get catDetailTargetLabel => 'Target';
+
+  @override
+  String get catDetailCompletion => 'Completion';
+
+  @override
+  String get catDetailCurrentStreak => 'Current streak';
+
+  @override
+  String get catDetailBestStreakLabel => 'Best streak';
+
+  @override
+  String get catDetailAvgDaily => 'Avg daily';
+
+  @override
+  String get catDetailDaysActive => 'Days active';
+
+  @override
+  String get catDetailEditQuestTitle => 'Edit Quest';
+
+  @override
+  String get catDetailIconEmoji => 'Icon (emoji)';
+
+  @override
+  String get catDetailQuestName => 'Quest name';
+
+  @override
+  String get catDetailDailyGoalMinutes => 'Daily goal (minutes)';
+
+  @override
+  String get catDetailTargetTotalHours => 'Target total (hours)';
+
+  @override
+  String get catDetailQuestUpdated => 'Quest updated!';
+
+  @override
+  String get catDetailDailyReminder => 'Daily Reminder';
+
+  @override
+  String catDetailEveryDay(String time) {
+    return '$time every day';
+  }
+
+  @override
+  String get catDetailNoReminder => 'No reminder set';
+
+  @override
+  String get catDetailChange => 'Change';
+
+  @override
+  String get catDetailRemoveReminder => 'Remove reminder';
+
+  @override
+  String get catDetailSet => 'Set';
+
+  @override
+  String catDetailReminderSet(String time) {
+    return 'Reminder set for $time';
+  }
+
+  @override
+  String get catDetailReminderRemoved => 'Reminder removed';
+
+  @override
+  String get catDetailDiaryTitle => 'Hachimi Diary';
+
+  @override
+  String get catDetailDiaryLoading => 'Loading...';
+
+  @override
+  String get catDetailDiaryError => 'Could not load diary';
+
+  @override
+  String get catDetailDiaryEmpty =>
+      'No diary entry today yet. Complete a focus session!';
+
+  @override
+  String catDetailChatWith(String name) {
+    return 'Chat with $name';
+  }
+
+  @override
+  String get catDetailChatSubtitle => 'Have a conversation with your cat';
+
+  @override
+  String get catDetailActivity => 'Activity';
+
+  @override
+  String get catDetailActivityError => 'Failed to load activity data';
+
+  @override
+  String get catDetailAccessoriesTitle => 'Accessories';
+
+  @override
+  String get catDetailEquipped => 'Equipped: ';
+
+  @override
+  String get catDetailNone => 'None';
+
+  @override
+  String get catDetailUnequip => 'Unequip';
+
+  @override
+  String catDetailFromInventory(int count) {
+    return 'From Inventory ($count)';
+  }
+
+  @override
+  String get catDetailNoAccessories => 'No accessories yet. Visit the shop!';
+
+  @override
+  String catDetailEquippedItem(String name) {
+    return 'Equipped $name';
+  }
+
+  @override
+  String get catDetailUnequipped => 'Unequipped';
+
+  @override
+  String catDetailAbout(String name) {
+    return 'About $name';
+  }
+
+  @override
+  String get catDetailAppearanceDetails => 'Appearance details';
+
+  @override
+  String get catDetailStatus => 'Status';
+
+  @override
+  String get catDetailAdopted => 'Adopted';
+
+  @override
+  String get catDetailFurPattern => 'Fur pattern';
+
+  @override
+  String get catDetailFurColor => 'Fur color';
+
+  @override
+  String get catDetailFurLength => 'Fur length';
+
+  @override
+  String get catDetailEyes => 'Eyes';
+
+  @override
+  String get catDetailWhitePatches => 'White patches';
+
+  @override
+  String get catDetailPatchesTint => 'Patches tint';
+
+  @override
+  String get catDetailTint => 'Tint';
+
+  @override
+  String get catDetailPoints => 'Points';
+
+  @override
+  String get catDetailVitiligo => 'Vitiligo';
+
+  @override
+  String get catDetailTortoiseshell => 'Tortoiseshell';
+
+  @override
+  String get catDetailTortiePattern => 'Tortie pattern';
+
+  @override
+  String get catDetailTortieColor => 'Tortie color';
+
+  @override
+  String get catDetailSkin => 'Skin';
 }

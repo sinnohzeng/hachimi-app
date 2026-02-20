@@ -19,6 +19,7 @@ hachimi-app/
 │   │   ├── state-management.md             # Riverpod Provider 图谱（SSOT）
 │   │   ├── folder-structure.md             # 本文件
 │   │   ├── atomic-island.md               # vivo 原子岛通知规格说明
+│   │   ├── focus-completion.md            # 专注完成庆祝流程规格说明
 │   │   └── localization.md                 # i18n 方案 + ARB 工作流
 │   ├── product/
 │   │   ├── prd.md                          # PRD v3.0（SSOT）
@@ -90,6 +91,7 @@ hachimi-app/
 │   │   └── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
+│   │   ├── app_info_provider.dart           # appInfoProvider（运行时从 package_info_plus 读取版本）
 │   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider、catSpriteImageProvider (family)
@@ -124,7 +126,8 @@ hachimi-app/
 │   │   ├── profile/
 │   │   │   └── profile_screen.dart         # 统计数据、猫咪相册、设置入口
 │   │   ├── settings/
-│   │   │   └── settings_screen.dart        # 通知、语言、关于、账号操作
+│   │   │   ├── settings_screen.dart        # 通知、语言、关于、账号操作
+│   │   │   └── model_test_chat_screen.dart # AI 模型测试聊天（验证 LLM 是否正常）
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # 活动热力图 + 各习惯进度
 │   │   └── timer/

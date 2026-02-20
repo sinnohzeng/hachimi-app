@@ -321,6 +321,7 @@ Device connectivity (independent of auth):
 |-------|------|-------------|
 | `mode` | ThemeMode | `system`, `light`, `dark` |
 | `seedColor` | Color | Material Design 3 seed color (default: Google Blue `0xFF4285F4`) |
+| `useDynamicColor` | bool | Whether to use system dynamic color (Material You) when available (default: `true`) |
 
 **`ThemeNotifier` methods:**
 
@@ -328,6 +329,7 @@ Device connectivity (independent of auth):
 |--------|-------------|
 | `setMode(ThemeMode)` | Switch theme mode |
 | `setSeedColor(Color)` | Set seed color from 8-color preset palette |
+| `setUseDynamicColor(bool)` | Toggle Material You dynamic color |
 
 ---
 
@@ -344,6 +346,15 @@ Device connectivity (independent of auth):
 | Method | Description |
 |--------|-------------|
 | `setLocale(Locale?)` | Set locale; null to follow system |
+
+**Localization system (l10n):**
+
+- Generated via `flutter gen-l10n` with `output-class: S` and `nullable-getter: false` (see `l10n.yaml`)
+- ARB files: `lib/l10n/app_en.arb` (template), `lib/l10n/app_zh.arb`
+- Generated output: `lib/l10n/app_localizations.dart` (class `S`)
+- Convenience extension: `context.l10n` returns `S.of(context)` (defined in `lib/l10n/l10n_ext.dart`)
+- Delegates registered in `MaterialApp` via `S.localizationsDelegates` and `S.supportedLocales`
+- All UI strings use `context.l10n.keyName` — no hardcoded strings in screens
 
 ---
 
@@ -418,6 +429,16 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **Source**: `ChatService` (SQLite history + LLM stream)
 - **Consumers**: `CatChatScreen`
 - **SSOT for**: Chat state for a specific cat — messages, generation status, partial response
+
+---
+
+### `appInfoProvider`
+
+- **Type**: `FutureProvider<PackageInfo>`
+- **File**: `lib/providers/app_info_provider.dart`
+- **Source**: `PackageInfo.fromPlatform()` (from `package_info_plus`)
+- **Consumers**: `SettingsScreen` (version display + license page)
+- **SSOT for**: Runtime app version info (version, buildNumber, packageName) — eliminates hardcoded version strings
 
 ---
 
