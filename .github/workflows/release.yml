@@ -69,7 +69,7 @@ jobs:
 
       # Accept Android SDK licenses (needed for NDK 29 used by llama_cpp_dart)
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
 
       # Create empty asset directories (git doesn't track empty dirs)
       - name: Create empty asset directories
