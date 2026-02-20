@@ -120,7 +120,6 @@ class DiaryPrompt {
     required int hoursSinceLastSession,
     required String stageId,
     required int progressPercent,
-    required String habitIcon,
     required String habitName,
     required int todayMinutes,
     required int goalMinutes,
@@ -142,7 +141,7 @@ class DiaryPrompt {
           '- 性格：$pName — $pFlavor\n'
           '- 当前心情：$mName（距离上次见到主人已经$hoursSinceLastSession小时）\n'
           '- 成长阶段：$sName（成长进度 $progressPercent%）\n'
-          '- 主人的目标：$habitIcon $habitName\n'
+          '- 主人的目标：$habitName\n'
           '- 今天的专注：$todayMinutes分钟（目标$goalMinutes分钟）\n'
           '- 连续打卡：$currentStreak天\n'
           '- 总进度：$totalHours小时$totalMins分 / $targetHours小时\n'
@@ -165,7 +164,7 @@ class DiaryPrompt {
         '- Personality: $pName — $pFlavor\n'
         '- Current mood: $mName (last saw your owner ${hoursSinceLastSession}h ago)\n'
         '- Growth stage: $sName ($progressPercent% progress)\n'
-        '- Owner\'s quest: $habitIcon $habitName\n'
+        '- Owner\'s quest: $habitName\n'
         '- Today\'s focus: ${todayMinutes}min (goal: ${goalMinutes}min)\n'
         '- Current streak: ${currentStreak}d\n'
         '- Total progress: ${totalHours}h${totalMins}m / ${targetHours}h\n'

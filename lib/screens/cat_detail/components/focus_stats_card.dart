@@ -6,7 +6,7 @@
 // 📋 程序整体伪代码（中文）：
 // 1. 接收 Habit 和 Cat 数据；
 // 2. 计算今日专注分钟数、活跃天数、日均时长；
-// 3. 渲染 Header（图标 + 名称 + Quest 徽章 + 编辑按钮）；
+// 3. 渲染 Header（名称 + Quest 徽章）；
 // 4. 渲染 2 列 Table 统计网格；
 // 5. 渲染 "Start Focus" 按钮；
 //
@@ -54,21 +54,21 @@ class FocusStatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: icon + name + Quest badge + edit button
+            // Header: name (2 lines) + Quest badge
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(habit.icon, style: const TextStyle(fontSize: 24)),
-                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     habit.name,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: AppSpacing.sm),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -83,13 +83,6 @@ class FocusStatsCard extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                  onPressed: () => _showEditQuestSheet(context),
-                  tooltip: context.l10n.catDetailEditQuest,
-                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -147,19 +140,31 @@ class FocusStatsCard extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.base),
 
-            // Start Focus button
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonalIcon(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    AppRouter.focusSetup,
-                    arguments: habit.id,
-                  );
-                },
-                icon: const Icon(Icons.play_arrow),
-                label: Text(context.l10n.catDetailStartFocus),
-              ),
+            // Action buttons: Edit + Start Focus
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _showEditQuestSheet(context),
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  label: Text(context.l10n.catDetailEditQuest),
+                  style: OutlinedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        AppRouter.focusSetup,
+                        arguments: habit.id,
+                      );
+                    },
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(context.l10n.catDetailStartFocus),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

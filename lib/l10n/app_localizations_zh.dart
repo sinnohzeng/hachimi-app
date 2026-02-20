@@ -705,9 +705,6 @@ class SZh extends S {
   String get catDetailEditQuestTitle => '编辑任务';
 
   @override
-  String get catDetailIconEmoji => '图标（emoji）';
-
-  @override
   String get catDetailQuestName => '任务名称';
 
   @override

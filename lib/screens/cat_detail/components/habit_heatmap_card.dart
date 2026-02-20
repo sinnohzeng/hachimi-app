@@ -161,7 +161,7 @@ class StageMilestone extends StatelessWidget {
           height: 28,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isReached ? color : colorScheme.surfaceContainerHighest,
+            color: isReached ? color : colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
           child: isReached
               ? const Icon(Icons.check, size: 14, color: Colors.white)

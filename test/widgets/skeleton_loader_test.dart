@@ -34,7 +34,8 @@ void main() {
       expect(find.byType(SkeletonLoader), findsOneWidget);
     });
 
-    testWidgets('golden — SkeletonLoader default', (tester) async {
+    testWidgets('golden — SkeletonLoader default', tags: ['golden'],
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
@@ -75,7 +76,8 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
     });
 
-    testWidgets('golden — SkeletonCard', (tester) async {
+    testWidgets('golden — SkeletonCard', tags: ['golden'],
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),

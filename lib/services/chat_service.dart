@@ -160,7 +160,7 @@ class ChatService {
       personalityId: personality?.id ?? 'playful',
       moodId: moodData.id,
       stageId: cat.computedStage,
-      habitName: '${habit.icon} ${habit.name}',
+      habitName: habit.name,
       isZhLocale: chatCtx.isZhLocale,
     );
 

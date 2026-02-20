@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Habit {
   final String id;
   final String name;
-  final String icon; // emoji string (e.g. '📚') or Material icon key for legacy
   final int targetHours; // long-term cumulative target
   final int goalMinutes; // daily focus goal (default: 25)
   final String? reminderTime; // 'HH:mm' or null
@@ -20,7 +19,6 @@ class Habit {
   const Habit({
     required this.id,
     required this.name,
-    required this.icon,
     required this.targetHours,
     this.goalMinutes = 25,
     this.reminderTime,
@@ -53,7 +51,6 @@ class Habit {
     return Habit(
       id: doc.id,
       name: data['name'] as String? ?? '',
-      icon: data['icon'] as String? ?? '📝',
       targetHours: data['targetHours'] as int? ?? 0,
       goalMinutes: data['goalMinutes'] as int? ?? 25,
       reminderTime: data['reminderTime'] as String?,
@@ -70,7 +67,6 @@ class Habit {
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
-      'icon': icon,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
@@ -87,7 +83,6 @@ class Habit {
   Habit copyWith({
     String? id,
     String? name,
-    String? icon,
     int? targetHours,
     int? goalMinutes,
     String? reminderTime,
@@ -102,7 +97,6 @@ class Habit {
     return Habit(
       id: id ?? this.id,
       name: name ?? this.name,
-      icon: icon ?? this.icon,
       targetHours: targetHours ?? this.targetHours,
       goalMinutes: goalMinutes ?? this.goalMinutes,
       reminderTime: reminderTime ?? this.reminderTime,

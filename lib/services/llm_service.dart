@@ -115,6 +115,12 @@ class LlmService {
             completer.completeError(e);
           }
         },
+        onDone: () {
+          // stream 意外关闭（Isolate 崩溃等），防止 completer 悬空
+          if (!completer.isCompleted) {
+            completer.complete(buffer.toString());
+          }
+        },
       );
 
       // 监听完成事件

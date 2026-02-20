@@ -202,6 +202,7 @@ class ModelDownloadState {
 /// 模型下载控制器。
 class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
   final Ref _ref;
+  StreamSubscription<TaskUpdate>? _updatesSub;
 
   ModelDownloadNotifier(this._ref) : super(const ModelDownloadState());
 
@@ -222,10 +223,9 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
         task: task,
       );
 
-      // 监听下载进度
-      FileDownloader().updates.listen((update) {
-        if (!mounted) return;
-
+      // 监听下载进度（取消旧订阅，避免泄漏）
+      await _updatesSub?.cancel();
+      _updatesSub = FileDownloader().updates.listen((update) {
         if (update is TaskStatusUpdate) {
           _handleStatusUpdate(update);
         } else if (update is TaskProgressUpdate) {
@@ -261,7 +261,6 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
   }
 
   void _handleProgressUpdate(TaskProgressUpdate update) {
-    if (!mounted) return;
     final expectedSize = update.expectedFileSize;
     final downloaded = expectedSize > 0
         ? (update.progress * expectedSize).round()
@@ -314,6 +313,12 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
     if (task == null) return;
     await _ref.read(modelManagerProvider).cancelDownload(task);
     state = const ModelDownloadState();
+  }
+
+  @override
+  void dispose() {
+    _updatesSub?.cancel();
+    super.dispose();
   }
 }
 

@@ -20,27 +20,11 @@ class HabitCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  static const Map<String, IconData> iconMap = {
-    'code': Icons.code,
-    'book': Icons.book,
-    'school': Icons.school,
-    'psychology': Icons.psychology,
-    'work': Icons.work,
-    'fitness_center': Icons.fitness_center,
-    'brush': Icons.brush,
-    'music_note': Icons.music_note,
-    'language': Icons.language,
-    'check_circle': Icons.check_circle,
-    'star': Icons.star,
-    'rocket_launch': Icons.rocket_launch,
-  };
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final icon = iconMap[habit.icon] ?? Icons.check_circle;
 
     return Semantics(
       label: '${habit.name}, ${habit.progressText}',
@@ -58,7 +42,7 @@ class HabitCard extends StatelessWidget {
               ProgressRing(
                 progress: habit.progressPercent,
                 size: 56,
-                child: Icon(icon, color: colorScheme.primary, size: 28),
+                child: Icon(Icons.check_circle, color: colorScheme.primary, size: 28),
               ),
               const SizedBox(width: AppSpacing.base),
 

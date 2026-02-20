@@ -47,7 +47,6 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `name` | string | yes | — | Habit display name, e.g. "Daily Reading" |
-| `icon` | string | yes | — | Emoji character used as the habit icon, e.g. "📚" |
 | `catId` | string | yes | — | Reference to the bound cat document ID in `users/{uid}/cats/` |
 | `goalMinutes` | int | yes | 25 | Daily focus goal in minutes (used for progress display) |
 | `targetHours` | int | yes | — | Cumulative long-term target in hours (required, used for cat growth calculation) |
@@ -206,10 +205,10 @@ Batch includes:
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
 ### 4. Habit Update (Edit)
-**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, icon?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
 
 Single or multi-document update:
-1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `icon`, `goalMinutes`, `targetHours`, `reminderTime`; if `clearReminder == true`, set `reminderTime` to `null`)
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `reminderTime`; if `clearReminder == true`, set `reminderTime` to `null`)
 2. If `targetHours` changed: `UPDATE users/{uid}/cats/{catId}.targetMinutes` — sync to `targetHours × 60` (reads habit's `catId` to find bound cat)
 
 **Validation**: At least one field must be non-null or `clearReminder` must be true. Empty strings are rejected.

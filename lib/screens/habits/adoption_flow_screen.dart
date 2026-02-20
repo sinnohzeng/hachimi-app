@@ -8,7 +8,6 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/services/notification_service.dart';
-import 'package:hachimi_app/widgets/emoji_picker.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
@@ -31,7 +30,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
   // Step 1: Habit definition
   final _nameController = TextEditingController();
-  String _selectedEmoji = '📚';
   int _goalMinutes = 25;
   int _targetHours = 100;
   bool _isCustomGoal = false;
@@ -140,7 +138,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       final result = await ref.read(firestoreServiceProvider).createHabitWithCat(
             uid: uid,
             name: _nameController.text.trim(),
-            icon: _selectedEmoji,
             targetHours: _targetHours,
             goalMinutes: _goalMinutes,
             reminderTime: _reminderTime,
@@ -290,15 +287,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               prefixIcon: Icon(Icons.edit_outlined),
             ),
             textInputAction: TextInputAction.done,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Emoji picker
-          Text('Choose an icon', style: textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.md),
-          EmojiPicker(
-            selected: _selectedEmoji,
-            onSelected: (emoji) => setState(() => _selectedEmoji = emoji),
           ),
           const SizedBox(height: AppSpacing.lg),
 

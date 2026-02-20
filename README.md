@@ -133,7 +133,6 @@ lib/
 └── widgets/
     ├── cat_preview_card.dart   # Adoption draft candidate card
     ├── cat_sprite.dart         # Cat display with breed color tinting
-    ├── emoji_picker.dart       # Curated emoji grid for habit icons
     ├── progress_ring.dart      # Circular progress indicator for timer
     ├── streak_heatmap.dart     # 91-day GitHub-style activity heatmap
     └── streak_indicator.dart   # Fire badge for current streak

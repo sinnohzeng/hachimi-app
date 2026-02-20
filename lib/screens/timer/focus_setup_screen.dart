@@ -146,10 +146,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   ),
                 ),
               ] else ...[
-                Text(
-                  habit.icon,
-                  style: const TextStyle(fontSize: 64),
-                ),
+                Icon(Icons.self_improvement,
+                    size: 64,
+                    color: colorScheme.onSurfaceVariant),
               ],
 
               const Spacer(flex: 1),

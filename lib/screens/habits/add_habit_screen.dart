@@ -14,23 +14,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _hoursController = TextEditingController(text: '100');
-  String _selectedIcon = 'code';
   bool _isLoading = false;
-
-  static const Map<String, IconData> iconOptions = {
-    'code': Icons.code,
-    'book': Icons.book,
-    'school': Icons.school,
-    'psychology': Icons.psychology,
-    'work': Icons.work,
-    'fitness_center': Icons.fitness_center,
-    'brush': Icons.brush,
-    'music_note': Icons.music_note,
-    'language': Icons.language,
-    'star': Icons.star,
-    'rocket_launch': Icons.rocket_launch,
-    'check_circle': Icons.check_circle,
-  };
 
   @override
   void dispose() {
@@ -54,7 +38,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       await ref.read(firestoreServiceProvider).createHabit(
             uid: uid,
             name: name,
-            icon: _selectedIcon,
             targetHours: targetHours,
           );
 
@@ -78,8 +61,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Quest'),
@@ -105,36 +86,6 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   }
                   return null;
                 },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Icon selector
-              Text(
-                'Choose an icon',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: iconOptions.entries.map((entry) {
-                  final isSelected = _selectedIcon == entry.key;
-                  return FilterChip(
-                    selected: isSelected,
-                    onSelected: (_) =>
-                        setState(() => _selectedIcon = entry.key),
-                    avatar: Icon(
-                      entry.value,
-                      size: 20,
-                      color: isSelected
-                          ? colorScheme.onSecondaryContainer
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                    label: const SizedBox.shrink(),
-                    showCheckmark: false,
-                    padding: AppSpacing.paddingSm,
-                  );
-                }).toList(),
               ),
               const SizedBox(height: AppSpacing.lg),
 

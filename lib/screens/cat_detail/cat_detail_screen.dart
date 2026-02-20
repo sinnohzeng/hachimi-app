@@ -279,7 +279,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               child: LinearProgressIndicator(
                 value: cat.growthProgress,
                 minHeight: 12,
-                backgroundColor: colorScheme.surfaceContainerHighest,
+                backgroundColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
                 valueColor: AlwaysStoppedAnimation(stageClr),
               ),
             ),

@@ -117,7 +117,6 @@ class DiaryService {
       hoursSinceLastSession: hoursSince,
       stageId: cat.computedStage,
       progressPercent: (cat.growthProgress * 100).round(),
-      habitIcon: habit.icon,
       habitName: habit.name,
       todayMinutes: ctx.todayMinutes,
       goalMinutes: habit.goalMinutes,

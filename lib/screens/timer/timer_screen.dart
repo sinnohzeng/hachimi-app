@@ -365,11 +365,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      habit.icon,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
                       habit.name,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
@@ -425,8 +420,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     if (cat != null)
                       TappableCatSprite(cat: cat, size: 100)
                     else
-                      Text(habit.icon,
-                          style: const TextStyle(fontSize: 64)),
+                      Icon(Icons.self_improvement,
+                          size: 64,
+                          color: colorScheme.onSurfaceVariant),
                   ],
                 ),
               ),

@@ -1,11 +1,11 @@
 // ---
 // 📘 文件说明：
 // Edit Quest Sheet — 编辑任务 BottomSheet 组件。
-// 支持修改任务的 emoji、名称、每日目标和总目标。
+// 支持修改任务的名称、每日目标和总目标。
 //
 // 📋 程序整体伪代码（中文）：
 // 1. 接收 Habit 数据，初始化表单状态；
-// 2. 渲染 emoji、名称输入框；
+// 2. 渲染名称输入框；
 // 3. 渲染每日目标和总目标 ChoiceChip 组；
 // 4. 保存时调用 Firestore 更新任务；
 //
@@ -23,7 +23,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
-/// Modal bottom sheet for editing quest: emoji, name, goal, target.
+/// Modal bottom sheet for editing quest: name, goal, target.
 class EditQuestSheet extends ConsumerStatefulWidget {
   final Habit habit;
 
@@ -35,7 +35,6 @@ class EditQuestSheet extends ConsumerStatefulWidget {
 
 class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   late final TextEditingController _nameController;
-  late final TextEditingController _iconController;
   late int _selectedGoal;
   late int _selectedTarget;
   bool _isSaving = false;
@@ -47,7 +46,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.habit.name);
-    _iconController = TextEditingController(text: widget.habit.icon);
     _selectedGoal = widget.habit.goalMinutes;
     _selectedTarget = widget.habit.targetHours;
   }
@@ -55,7 +53,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   @override
   void dispose() {
     _nameController.dispose();
-    _iconController.dispose();
     super.dispose();
   }
 
@@ -96,18 +93,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-
-            // Emoji field
-            TextField(
-              controller: _iconController,
-              decoration: InputDecoration(
-                labelText: context.l10n.catDetailIconEmoji,
-                prefixIcon: const Icon(Icons.emoji_emotions_outlined),
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 24),
-            ),
-            const SizedBox(height: AppSpacing.base),
 
             // Name field
             TextField(
@@ -181,7 +166,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
 
   Future<void> _save() async {
     final name = _nameController.text.trim();
-    final icon = _iconController.text.trim();
     if (name.isEmpty) return;
 
     setState(() => _isSaving = true);
@@ -194,7 +178,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           uid: uid,
           habitId: widget.habit.id,
           name: name != widget.habit.name ? name : null,
-          icon: icon.isNotEmpty && icon != widget.habit.icon ? icon : null,
           goalMinutes: _selectedGoal != widget.habit.goalMinutes
               ? _selectedGoal
               : null,

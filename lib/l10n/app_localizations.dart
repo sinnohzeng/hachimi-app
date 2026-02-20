@@ -1393,12 +1393,6 @@ abstract class S {
   /// **'Edit Quest'**
   String get catDetailEditQuestTitle;
 
-  /// No description provided for @catDetailIconEmoji.
-  ///
-  /// In en, this message translates to:
-  /// **'Icon (emoji)'**
-  String get catDetailIconEmoji;
-
   /// No description provided for @catDetailQuestName.
   ///
   /// In en, this message translates to:

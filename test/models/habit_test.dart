@@ -22,7 +22,6 @@ Habit _createTestHabit({
   return Habit(
     id: 'test-habit-id',
     name: 'Reading',
-    icon: '📚',
     targetHours: targetHours,
     totalMinutes: totalMinutes,
     isActive: isActive,

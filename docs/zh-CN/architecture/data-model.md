@@ -47,7 +47,6 @@ users/{uid}                          <- 用户基本信息文档
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
 | `name` | string | 是 | — | 习惯显示名称，如「每日阅读」 |
-| `icon` | string | 是 | — | 习惯图标 Emoji，如 "📚" |
 | `catId` | string | 是 | — | 绑定猫咪文档 ID（位于 `users/{uid}/cats/`） |
 | `goalMinutes` | int | 是 | 25 | 每日专注目标分钟数（用于进度显示） |
 | `targetHours` | int | 是 | — | 累计长期目标小时数（必填，用于猫咪成长计算） |
@@ -204,10 +203,10 @@ dormant --[习惯重新激活]--> active（未来功能）
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
 ### 4. 习惯更新（编辑）
-**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, icon?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
+**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
 
 单文档或多文档更新：
-1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`icon`、`goalMinutes`、`targetHours`、`reminderTime`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`）
+1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`goalMinutes`、`targetHours`、`reminderTime`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`）
 2. 若 `targetHours` 发生变更：`UPDATE users/{uid}/cats/{catId}.targetMinutes` — 同步为 `targetHours × 60`（通过读取 habit 的 `catId` 找到绑定的猫咪）
 
 **验证**：至少一个字段不为 null 或 `clearReminder` 必须为 true，空字符串将被拒绝。

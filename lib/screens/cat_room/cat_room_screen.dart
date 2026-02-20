@@ -240,7 +240,6 @@ class CatRoomScreen extends ConsumerWidget {
         return _CatHouseCard(
           cat: cat,
           habitName: habit?.name,
-          habitIcon: habit?.icon,
           habitId: habit?.id,
           onTap: () => Navigator.of(context).pushNamed(
             AppRouter.catDetail,
@@ -257,7 +256,6 @@ class CatRoomScreen extends ConsumerWidget {
 class _CatHouseCard extends StatelessWidget {
   final Cat cat;
   final String? habitName;
-  final String? habitIcon;
   final String? habitId;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
@@ -265,7 +263,6 @@ class _CatHouseCard extends StatelessWidget {
   const _CatHouseCard({
     required this.cat,
     this.habitName,
-    this.habitIcon,
     this.habitId,
     required this.onTap,
     this.onLongPress,
@@ -311,7 +308,7 @@ class _CatHouseCard extends StatelessWidget {
                     if (habitName != null)
                       Flexible(
                         child: Text(
-                          '${habitIcon ?? ""} $habitName',
+                          habitName!,
                           style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

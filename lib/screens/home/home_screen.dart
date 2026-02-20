@@ -369,7 +369,7 @@ class _FeaturedCatCard extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.xs),
                       if (habit != null)
                         Text(
-                          '${habit.icon} ${habit.name}',
+                          habit.name,
                           style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -454,12 +454,8 @@ class _HabitRow extends StatelessWidget {
                     color: colorScheme.surfaceContainerHighest,
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Text(
-                      habit.icon,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
+                  child: Icon(Icons.flag_outlined,
+                      size: 24, color: colorScheme.primary),
                 ),
               const SizedBox(width: AppSpacing.md),
 

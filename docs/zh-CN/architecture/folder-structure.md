@@ -162,7 +162,6 @@ hachimi-app/
 │       ├── accessory_shop_section.dart     # CatDetailScreen 中的配饰网格 + 购买流程
 │       ├── cat_house_card.dart             # CatHouse 2 列网格中的单只猫咪卡片
 │       ├── check_in_banner.dart            # HomeScreen 上的每日签到金币横幅
-│       ├── emoji_picker.dart               # 分类 Emoji 选择器（约 200 个 Emoji，7 个分类标签 + 快速选择）
 │       ├── offline_banner.dart             # 离线指示器：cloud_off 图标 + 同步提示
 │       ├── pixel_cat_sprite.dart           # 像素风猫咪显示组件（从 Provider 渲染 ui.Image）
 │       ├── tappable_cat_sprite.dart       # 点击切换姿势封装组件（弹跳 + 触觉 + 本地变体）

@@ -163,7 +163,6 @@ hachimi-app/
 │       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
 │       ├── cat_house_card.dart             # Single cat card in CatHouse 2-column grid
 │       ├── check_in_banner.dart            # Daily check-in coin bonus banner on HomeScreen
-│       ├── emoji_picker.dart               # Categorized emoji picker (~200 emojis in 7 tabs + quick pick)
 │       ├── offline_banner.dart             # Offline indicator: cloud_off + sync message
 │       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
 │       ├── tappable_cat_sprite.dart       # Tap-to-cycle pose wrapper (bounce + haptic + local variant)

@@ -56,7 +56,6 @@ class FirestoreService {
   Future<String> createHabit({
     required String uid,
     required String name,
-    required String icon,
     required int targetHours,
     int goalMinutes = 25,
     String? reminderTime,
@@ -64,7 +63,6 @@ class FirestoreService {
   }) async {
     final docRef = await _habitsRef(uid).add({
       'name': name,
-      'icon': icon,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
@@ -84,7 +82,6 @@ class FirestoreService {
   Future<({String habitId, String catId})> createHabitWithCat({
     required String uid,
     required String name,
-    required String icon,
     required int targetHours,
     required int goalMinutes,
     String? reminderTime,
@@ -96,7 +93,6 @@ class FirestoreService {
     final habitRef = _habitsRef(uid).doc();
     batch.set(habitRef, {
       'name': name,
-      'icon': icon,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
@@ -133,7 +129,6 @@ class FirestoreService {
     required String uid,
     required String habitId,
     String? name,
-    String? icon,
     int? goalMinutes,
     int? targetHours,
     String? reminderTime,
@@ -141,7 +136,6 @@ class FirestoreService {
   }) async {
     final updates = <String, dynamic>{};
     if (name != null && name.trim().isNotEmpty) updates['name'] = name.trim();
-    if (icon != null && icon.trim().isNotEmpty) updates['icon'] = icon.trim();
     if (goalMinutes != null) updates['goalMinutes'] = goalMinutes;
     if (targetHours != null) updates['targetHours'] = targetHours;
     if (reminderTime != null) updates['reminderTime'] = reminderTime;

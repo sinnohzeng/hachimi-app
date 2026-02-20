@@ -90,7 +90,7 @@ void main() {
     });
 
     testWidgets('golden — EmptyState with subtitle and action',
-        (tester) async {
+        tags: ['golden'], (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
@@ -112,7 +112,8 @@ void main() {
       );
     });
 
-    testWidgets('golden — EmptyState minimal', (tester) async {
+    testWidgets('golden — EmptyState minimal', tags: ['golden'],
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),

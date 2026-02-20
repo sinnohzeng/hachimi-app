@@ -48,7 +48,8 @@ void main() {
       expect(find.text('Retry'), findsNothing);
     });
 
-    testWidgets('golden — ErrorState with retry', (tester) async {
+    testWidgets('golden — ErrorState with retry', tags: ['golden'],
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
@@ -67,7 +68,8 @@ void main() {
       );
     });
 
-    testWidgets('golden — ErrorState without retry', (tester) async {
+    testWidgets('golden — ErrorState without retry', tags: ['golden'],
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),

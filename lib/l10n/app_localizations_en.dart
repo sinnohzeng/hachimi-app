@@ -716,9 +716,6 @@ class SEn extends S {
   String get catDetailEditQuestTitle => 'Edit Quest';
 
   @override
-  String get catDetailIconEmoji => 'Icon (emoji)';
-
-  @override
   String get catDetailQuestName => 'Quest name';
 
   @override

@@ -232,7 +232,7 @@ The Cat Detail Page (`CatDetailScreen`) is the **information hub** for a cat and
 │ Growth Progress Card                │
 ├─────────────────────────────────────┤
 │ Focus Statistics Card               │
-│   habit.icon + name + [Edit]        │
+│   name + [Edit]                     │
 │   2-column stats grid (9 metrics)   │
 │   [Start Focus] button              │
 ├─────────────────────────────────────┤
