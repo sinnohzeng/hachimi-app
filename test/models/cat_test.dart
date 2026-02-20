@@ -6,7 +6,7 @@
 // 🧩 文件结构：
 // - toFirestore() 输出格式验证；
 // - growthProgress 计算属性；
-// - stageName / computedStage 阶段判定；
+// - computedStage 阶段判定；
 // - copyWith() 字段覆盖；
 //
 // 🕒 创建时间：2026-02-19
@@ -114,32 +114,28 @@ void main() {
     });
   });
 
-  group('Cat.stageName', () {
+  group('Cat.computedStage', () {
     test('kitten stage: progress < 0.20', () {
       // 100 / 1000 = 0.10 -> kitten
       final cat = _createTestCat(totalMinutes: 100, targetMinutes: 1000);
-      expect(cat.stageName, equals('Kitten'));
       expect(cat.computedStage, equals('kitten'));
     });
 
     test('adolescent stage: 0.20 <= progress < 0.45', () {
       // 300 / 1000 = 0.30 -> adolescent
       final cat = _createTestCat(totalMinutes: 300, targetMinutes: 1000);
-      expect(cat.stageName, equals('Adolescent'));
       expect(cat.computedStage, equals('adolescent'));
     });
 
     test('adult stage: 0.45 <= progress < 0.75', () {
       // 500 / 1000 = 0.50 -> adult
       final cat = _createTestCat(totalMinutes: 500, targetMinutes: 1000);
-      expect(cat.stageName, equals('Adult'));
       expect(cat.computedStage, equals('adult'));
     });
 
     test('senior stage: progress >= 0.75', () {
       // 800 / 1000 = 0.80 -> senior
       final cat = _createTestCat(totalMinutes: 800, targetMinutes: 1000);
-      expect(cat.stageName, equals('Senior'));
       expect(cat.computedStage, equals('senior'));
     });
 
@@ -161,9 +157,9 @@ void main() {
       expect(cat.computedStage, equals('senior'));
     });
 
-    test('targetMinutes == 0 -> defaults to Kitten (progress = 0.0)', () {
+    test('targetMinutes == 0 -> defaults to kitten (progress = 0.0)', () {
       final cat = _createTestCat(totalMinutes: 500, targetMinutes: 0);
-      expect(cat.stageName, equals('Kitten'));
+      expect(cat.computedStage, equals('kitten'));
     });
   });
 
