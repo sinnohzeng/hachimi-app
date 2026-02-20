@@ -1,10 +1,10 @@
 // ---
 // 📘 文件说明：
-// 聊天 Provider — 管理猫猫聊天状态（StateNotifier）。
+// 聊天 Provider — 管理猫猫聊天状态（Notifier）。
 // 状态机：idle → generating → complete | error
 //
 // 📋 Provider Graph:
-// - chatNotifierProvider(catId)：聊天状态 StateNotifier
+// - chatNotifierProvider(catId)：聊天状态 Notifier
 //
 // 🕒 创建时间：2026-02-19
 // ---
@@ -56,18 +56,23 @@ class ChatState {
 }
 
 /// 聊天状态管理器。
-class ChatNotifier extends StateNotifier<ChatState> {
-  final ChatService _chatService;
+class ChatNotifier extends Notifier<ChatState> {
   final String _catId;
+  late final ChatService _chatService;
   StreamSubscription<String>? _tokenSub;
 
-  ChatNotifier({
-    required ChatService chatService,
-    required String catId,
-  })  : _chatService = chatService,
-        _catId = catId,
-        super(const ChatState(status: ChatStatus.loading)) {
+  ChatNotifier(this._catId);
+
+  @override
+  ChatState build() {
+    _chatService = ref.watch(chatServiceProvider);
+
+    ref.onDispose(() {
+      _tokenSub?.cancel();
+    });
+
     _loadHistory();
+    return const ChatState(status: ChatStatus.loading);
   }
 
   Future<void> _loadHistory() async {
@@ -113,7 +118,6 @@ class ChatNotifier extends StateNotifier<ChatState> {
     _tokenSub?.cancel();
     _tokenSub = _chatService.tokenStream.listen(
       (token) {
-        if (!mounted) return;
         state = state.copyWith(
           partialResponse: state.partialResponse + token,
         );
@@ -172,22 +176,10 @@ class ChatNotifier extends StateNotifier<ChatState> {
     await _chatService.clearHistory(_catId);
     state = const ChatState(status: ChatStatus.idle);
   }
-
-  @override
-  void dispose() {
-    _tokenSub?.cancel();
-    super.dispose();
-  }
 }
 
 /// 聊天状态 Provider — 按 catId 分家族。
 final chatNotifierProvider =
-    StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>(
-  (ref, catId) {
-    final chatService = ref.watch(chatServiceProvider);
-    return ChatNotifier(
-      chatService: chatService,
-      catId: catId,
-    );
-  },
+    NotifierProvider.family<ChatNotifier, ChatState, String>(
+  (catId) => ChatNotifier(catId),
 );

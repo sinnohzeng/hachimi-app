@@ -71,7 +71,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
@@ -177,10 +177,10 @@ class NotificationService {
     final notification = message.notification;
     if (notification != null) {
       _localNotifications.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        const NotificationDetails(
+        id: notification.hashCode,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             _channelId,
             _channelName,
@@ -209,11 +209,9 @@ class NotificationService {
     final id = habitId.hashCode.abs() % 100000;
 
     await _localNotifications.zonedSchedule(
-      id,
-      '$catName misses you!',
-      "Time for $habitName — your cat is waiting!",
-      _nextInstanceOfTime(hour, minute),
-      const NotificationDetails(
+      id: id,
+      scheduledDate: _nextInstanceOfTime(hour, minute),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -221,9 +219,9 @@ class NotificationService {
           largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      title: '$catName misses you!',
+      body: "Time for $habitName — your cat is waiting!",
       matchDateTimeComponents: DateTimeComponents.time,
       payload: 'habit:$habitId',
     );
@@ -232,7 +230,7 @@ class NotificationService {
   /// Cancel a habit's daily reminder.
   Future<void> cancelDailyReminder(String habitId) async {
     final id = habitId.hashCode.abs() % 100000;
-    await _localNotifications.cancel(id);
+    await _localNotifications.cancel(id: id);
   }
 
   /// Schedule a streak-at-risk notification for 20:00 today.
@@ -256,11 +254,9 @@ class NotificationService {
     if (scheduledDate.isBefore(now)) return;
 
     await _localNotifications.zonedSchedule(
-      id,
-      '$catName is worried!',
-      "Your $streak-day streak is at risk. A quick session will save it!",
-      scheduledDate,
-      const NotificationDetails(
+      id: id,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -268,9 +264,9 @@ class NotificationService {
           largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      title: '$catName is worried!',
+      body: "Your $streak-day streak is at risk. A quick session will save it!",
       payload: 'streak:$habitId',
     );
   }
@@ -281,10 +277,10 @@ class NotificationService {
     required String newStageName,
   }) async {
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch % 100000 + 200000,
-      '$catName evolved!',
-      '$catName grew into a $newStageName! Keep up the great work!',
-      const NotificationDetails(
+      id: DateTime.now().millisecondsSinceEpoch % 100000 + 200000,
+      title: '$catName evolved!',
+      body: '$catName grew into a $newStageName! Keep up the great work!',
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,

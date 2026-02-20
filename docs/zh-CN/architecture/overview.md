@@ -22,6 +22,7 @@
 | 崩溃报告 | Firebase Crashlytics | 4.x | 生产环境错误监控 |
 | 网络连接 | connectivity_plus | 6.x | 设备网络状态监测 |
 | 国际化 | flutter_localizations + gen-l10n | — | 通过 ARB 文件进行编译期本地化 |
+| 本地 LLM | llama_cpp_dart | 0.2.x | 端侧 GGUF 推理（Isolate + dart:ffi） |
 
 ---
 

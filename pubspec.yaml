@@ -2,7 +2,7 @@ name: hachimi_app
 description: "Cat-parenting habit app. Adopt cats, build habits, earn XP. Built with Flutter + Firebase + Material Design 3."
 publish_to: 'none'
 
-version: 1.5.1+6
+version: 1.7.0+7
 
 environment:
   sdk: ^3.6.2
@@ -16,19 +16,19 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Firebase
-  firebase_core: ^3.12.1
-  firebase_auth: ^5.5.1
-  cloud_firestore: ^5.6.5
-  firebase_analytics: ^11.4.5
-  firebase_messaging: ^15.2.5
-  firebase_remote_config: ^5.3.5
-  firebase_crashlytics: ^4.3.5
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4
+  cloud_firestore: ^6.1.2
+  firebase_analytics: ^12.1.2
+  firebase_messaging: ^16.1.1
+  firebase_remote_config: ^6.1.4
+  firebase_crashlytics: ^5.0.7
 
   # State Management
-  flutter_riverpod: ^2.6.1
+  flutter_riverpod: ^3.2.1
 
   # UI
-  google_fonts: ^8.0.1
+  google_fonts: ^8.0.2
 
   # Utils
   intl: ^0.20.2
@@ -37,19 +37,20 @@ dependencies:
   shared_preferences: ^2.5.4
 
   # Notifications
-  flutter_local_notifications: ^18.0.1
+  flutter_local_notifications: ^20.1.0
 
   # Background timer
-  flutter_foreground_task: ^8.12.0
+  flutter_foreground_task: ^9.2.0
 
   # Connectivity
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^7.0.0
 
   # Timezone (for local notification scheduling)
   timezone: ^0.10.0
 
-  # Local LLM inference
-  flutter_llama: ^1.1.2
+  # Local LLM inference (vendored — see scripts/setup_llm_vendor.sh)
+  llama_cpp_dart:
+    path: packages/llama_cpp_dart
   path_provider: ^2.1.5
 
   # Local database (AI diary + chat storage)
@@ -57,7 +58,7 @@ dependencies:
   path: ^1.9.1
 
   # Model download with background support
-  background_downloader: ^8.6.5
+  background_downloader: ^9.5.2
 
   # SHA-256 model file verification
   crypto: ^3.0.6
@@ -65,7 +66,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
 
 flutter_launcher_icons:

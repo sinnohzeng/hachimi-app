@@ -80,7 +80,7 @@ class _TimerTaskHandler extends TaskHandler {
   }
 
   @override
-  Future<void> onDestroy(DateTime timestamp) async {
+  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
     // Cleanup when service is stopped
   }
 

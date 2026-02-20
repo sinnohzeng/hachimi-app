@@ -1,13 +1,14 @@
 // ---
 // 📘 文件说明：
-// LLM 推理服务 — 封装 flutter_llama 的推理引擎。
-// 推理在 native 单线程 executor 运行，不阻塞 Dart UI 线程。
+// LLM 推理服务 — 封装 llama_cpp_dart 的 Isolate 推理引擎。
+// 推理在独立 Isolate 运行（dart:ffi），不阻塞 Dart UI 线程。
 //
 // 📋 程序整体伪代码（中文）：
-// 1. 使用 FlutterLlama.instance 单例加载 GGUF 模型；
+// 1. 使用 LlamaParent 创建独立 Isolate 加载 GGUF 模型；
 // 2. 暴露 generate() 用于一次性文本生成（日记）；
 // 3. 暴露 generateStream() 用于流式 token 输出（聊天）；
 // 4. 管理模型加载/卸载生命周期；
+// 5. Isolate 崩溃时自动重置状态，允许重新加载；
 //
 // 🧩 文件结构：
 // - LlmService：推理引擎封装；
@@ -17,8 +18,9 @@
 // ---
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
-import 'package:flutter_llama/flutter_llama.dart';
+import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 
 /// LLM 引擎状态。
@@ -30,9 +32,9 @@ enum LlmEngineStatus {
   error,
 }
 
-/// LLM 推理服务 — native 层单线程推理，不阻塞 UI。
+/// LLM 推理服务 — Isolate 隔离推理，不阻塞 UI。
 class LlmService {
-  final FlutterLlama _llama = FlutterLlama.instance;
+  LlamaParent? _parent;
   LlmEngineStatus _status = LlmEngineStatus.unloaded;
   String? _lastError;
 
@@ -53,30 +55,39 @@ class LlmService {
     if (_status == LlmEngineStatus.loading) return;
     if (_status == LlmEngineStatus.ready) return;
 
+    // iOS 暂不支持（llama_cpp_dart 无预编译 xcframework）
+    if (Platform.isIOS) {
+      _status = LlmEngineStatus.error;
+      _lastError = 'AI features coming soon on iOS';
+      return;
+    }
+
     _status = LlmEngineStatus.loading;
     _lastError = null;
 
     try {
-      final config = LlamaConfig(
-        modelPath: modelPath,
-        nThreads: 4,
-        nGpuLayers: 0, // CPU only — 安全兼容所有设备
-        contextSize: LlmConstants.contextSize,
-        batchSize: 512,
-        useGpu: false,
+      final loadCommand = LlamaLoad(
+        path: modelPath,
+        modelParams: ModelParams()..nGpuLayers = 0, // CPU only
+        contextParams: ContextParams()
+          ..nCtx = LlmConstants.contextSize
+          ..nBatch = 512
+          ..nThreads = 4
+          ..nPredict = LlmConstants.diaryMaxTokens,
+        samplingParams: SamplerParams()
+          ..temp = LlmConstants.temperature
+          ..topP = LlmConstants.topP
+          ..penaltyRepeat = LlmConstants.repeatPenalty,
         verbose: false,
       );
 
-      final success = await _llama.loadModel(config);
-      if (success) {
-        _status = LlmEngineStatus.ready;
-      } else {
-        _status = LlmEngineStatus.error;
-        _lastError = 'Failed to load model';
-      }
+      _parent = LlamaParent(loadCommand);
+      await _parent!.init();
+      _status = LlmEngineStatus.ready;
     } catch (e) {
       _status = LlmEngineStatus.error;
       _lastError = e.toString();
+      _parent = null;
       rethrow;
     }
   }
@@ -84,27 +95,48 @@ class LlmService {
   /// 一次性文本生成（用于日记）。
   /// 返回完整生成文本。
   Future<String> generate(String prompt) async {
-    if (!_llama.isModelLoaded || _status != LlmEngineStatus.ready) {
+    final parent = _parent;
+    if (parent == null || _status != LlmEngineStatus.ready) {
       throw StateError('LLM engine not ready. Current status: $_status');
     }
 
     _status = LlmEngineStatus.generating;
     try {
-      final params = GenerationParams(
-        prompt: prompt,
-        temperature: LlmConstants.temperature,
-        topP: LlmConstants.topP,
-        maxTokens: LlmConstants.diaryMaxTokens,
-        repeatPenalty: LlmConstants.repeatPenalty,
-        stopSequences: const ['<|im_end|>', '<|endoftext|>'],
+      final buffer = StringBuffer();
+      StreamSubscription<String>? streamSub;
+
+      final completer = Completer<String>();
+
+      streamSub = parent.stream.listen(
+        (token) {
+          buffer.write(token);
+        },
+        onError: (e) {
+          if (!completer.isCompleted) {
+            completer.completeError(e);
+          }
+        },
       );
 
-      final response = await _llama.generate(params);
+      // 监听完成事件
+      StreamSubscription<CompletionEvent>? completionSub;
+      completionSub = parent.completions.listen((event) {
+        if (!completer.isCompleted) {
+          completer.complete(buffer.toString());
+        }
+        completionSub?.cancel();
+      });
+
+      await parent.sendPrompt(prompt);
+
+      final result = await completer.future;
+      await streamSub.cancel();
+      await completionSub.cancel();
+
       _status = LlmEngineStatus.ready;
-      return _cleanResponse(response.text);
+      return _cleanResponse(result);
     } catch (e) {
-      _status = LlmEngineStatus.ready;
-      _lastError = e.toString();
+      _resetOnError(e);
       rethrow;
     }
   }
@@ -113,7 +145,8 @@ class LlmService {
   /// 返回 token stream，每个事件是一个 token。
   /// 调用方需自行收集 token 拼接完整回复。
   Stream<String> generateStream(String prompt) {
-    if (!_llama.isModelLoaded || _status != LlmEngineStatus.ready) {
+    final parent = _parent;
+    if (parent == null || _status != LlmEngineStatus.ready) {
       return Stream.error(
         StateError('LLM engine not ready. Current status: $_status'),
       );
@@ -121,31 +154,43 @@ class LlmService {
 
     _status = LlmEngineStatus.generating;
 
-    final params = GenerationParams(
-      prompt: prompt,
-      temperature: LlmConstants.temperature,
-      topP: LlmConstants.topP,
-      maxTokens: LlmConstants.chatMaxTokens,
-      repeatPenalty: LlmConstants.repeatPenalty,
-      stopSequences: const ['<|im_end|>', '<|endoftext|>'],
-    );
-
-    // 将原始 stream 包装以管理状态
     final controller = StreamController<String>();
-    _llama.generateStream(params).listen(
+
+    // 监听 token stream
+    StreamSubscription<String>? streamSub;
+    StreamSubscription<CompletionEvent>? completionSub;
+
+    streamSub = parent.stream.listen(
       (token) {
         controller.add(token);
       },
       onError: (e) {
-        _status = LlmEngineStatus.ready;
-        _lastError = e.toString();
+        _resetOnError(e);
         controller.addError(e);
       },
-      onDone: () {
-        _status = LlmEngineStatus.ready;
-        controller.close();
-      },
     );
+
+    completionSub = parent.completions.listen((event) {
+      _status = LlmEngineStatus.ready;
+      streamSub?.cancel();
+      completionSub?.cancel();
+      controller.close();
+    });
+
+    // 发送 prompt
+    parent.sendPrompt(prompt).catchError((Object e) {
+      _resetOnError(e);
+      controller.addError(e);
+      streamSub?.cancel();
+      completionSub?.cancel();
+      controller.close();
+      return ''; // satisfy return type
+    });
+
+    controller.onCancel = () {
+      streamSub?.cancel();
+      completionSub?.cancel();
+    };
 
     return controller.stream;
   }
@@ -153,7 +198,7 @@ class LlmService {
   /// 停止当前推理。
   Future<void> stopGeneration() async {
     try {
-      await _llama.stopGeneration();
+      await _parent?.stop();
     } catch (_) {
       // ignore stop errors
     }
@@ -165,11 +210,20 @@ class LlmService {
   /// 卸载模型，释放内存。
   Future<void> unloadModel() async {
     try {
-      await _llama.unloadModel();
+      await _parent?.dispose();
     } catch (_) {
-      // ignore unload errors
+      // ignore dispose errors
     }
+    _parent = null;
     _status = LlmEngineStatus.unloaded;
+  }
+
+  /// Isolate 崩溃或异常时重置状态，允许重新 loadModel()。
+  void _resetOnError(Object e) {
+    _status = LlmEngineStatus.error;
+    _lastError = e.toString();
+    // Isolate 可能已死，置空允许重新加载
+    _parent = null;
   }
 
   /// 清理生成文本中的特殊 token 标记。

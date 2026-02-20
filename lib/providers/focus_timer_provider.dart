@@ -14,8 +14,8 @@
 // 🧩 文件结构：
 // - TimerStatus/TimerMode：枚举；
 // - FocusTimerState：状态值对象；
-// - FocusTimerNotifier：StateNotifier + 持久化逻辑；
-// - focusTimerProvider：全局 Provider（非 autoDispose）；
+// - FocusTimerNotifier：Notifier + 持久化逻辑；
+// - focusTimerProvider：全局 Provider（keepAlive）；
 // ---
 
 import 'dart:async';
@@ -116,7 +116,7 @@ class FocusTimerState {
 
 /// Focus timer notifier — manages the timer lifecycle, notification updates,
 /// and SharedPreferences persistence for crash recovery.
-class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
+class FocusTimerNotifier extends Notifier<FocusTimerState> {
   Timer? _ticker;
   int _ticksSinceSave = 0;
 
@@ -132,7 +132,14 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   static const _keyTotalPausedSeconds = '${_prefix}totalPausedSeconds';
   static const _keyPausedAt = '${_prefix}pausedAt';
 
-  FocusTimerNotifier() : super(const FocusTimerState());
+  @override
+  FocusTimerState build() {
+    ref.keepAlive();
+    ref.onDispose(() {
+      _ticker?.cancel();
+    });
+    return const FocusTimerState();
+  }
 
   /// Check if there's an interrupted session saved in SharedPreferences.
   static Future<bool> hasInterruptedSession() async {
@@ -473,19 +480,11 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   Future<void> _clearSavedState() async {
     await FocusTimerNotifier.clearSavedState();
   }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
-  }
 }
 
-/// Focus timer provider — global singleton (NOT autoDispose).
+/// Focus timer provider — global singleton (keepAlive).
 /// Timer is a cross-screen concern that must survive navigation.
 final focusTimerProvider =
-    StateNotifierProvider<FocusTimerNotifier, FocusTimerState>(
-  (ref) {
-    return FocusTimerNotifier();
-  },
+    NotifierProvider<FocusTimerNotifier, FocusTimerState>(
+  FocusTimerNotifier.new,
 );

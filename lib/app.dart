@@ -305,7 +305,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     if (!hasPermission) return;
 
     final catsAsync = ref.read(catsProvider);
-    final cats = catsAsync.valueOrNull ?? [];
+    final cats = catsAsync.value ?? [];
 
     for (final habit in habits) {
       if (habit.isActive && habit.reminderTime != null) {

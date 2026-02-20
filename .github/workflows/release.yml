@@ -74,50 +74,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      # Patch flutter_llama: pub.dev release excludes llama.cpp source and
-      # has wrong CMake version. See MEMORY.md for full context.
-      - name: Patch flutter_llama plugin
-        run: |
-          LLAMA_PLUGIN="$HOME/.pub-cache/hosted/pub.dev/flutter_llama-1.1.2"
-
-          # 1. Clone llama.cpp source (missing from pub.dev release)
-          git clone --depth 1 --branch b4604 \
-            https://github.com/ggerganov/llama.cpp.git \
-            "$LLAMA_PLUGIN/llama.cpp"
-
-          # 2. Fix CMake version: 3.18.1 -> 3.22.1 in build.gradle
-          sed -i "s/version = '3.18.1'/version = '3.22.1'/" \
-            "$LLAMA_PLUGIN/android/build.gradle"
-
-          # 3. Overwrite CMakeLists.txt with known-good patched version
-          #    (disables Vulkan/OpenCL, CPU-only build)
-          cat > "$LLAMA_PLUGIN/android/src/main/cpp/CMakeLists.txt" <<'CMAKELISTS'
-          cmake_minimum_required(VERSION 3.10.2)
-          project(flutter_llama)
-          set(CMAKE_CXX_STANDARD 17)
-          set(CMAKE_CXX_STANDARD_REQUIRED ON)
-          set(CMAKE_C_STANDARD 11)
-          find_library(log-lib log)
-          find_library(android-lib android)
-          set(LLAMA_CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../llama.cpp")
-          set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-          set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-          set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
-          set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
-          set(GGML_USE_LLAMAFILE OFF CACHE BOOL "" FORCE)
-          set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
-          set(GGML_AMX OFF CACHE BOOL "" FORCE)
-          set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
-          set(GGML_OPENCL OFF CACHE BOOL "" FORCE)
-          add_subdirectory(${LLAMA_CPP_DIR} build-llama)
-          add_library(flutter_llama_bridge SHARED flutter_llama_bridge.cpp)
-          target_include_directories(flutter_llama_bridge PRIVATE
-              ${LLAMA_CPP_DIR}/include
-              ${LLAMA_CPP_DIR}/src
-              ${LLAMA_CPP_DIR}/ggml/include
-              ${LLAMA_CPP_DIR}/common)
-          target_link_libraries(flutter_llama_bridge llama ${log-lib} ${android-lib})
-          CMAKELISTS
+      # Setup llama_cpp_dart vendor (clone source + llama.cpp submodule)
+      - name: Setup llama_cpp_dart vendor
+        run: bash scripts/setup_llm_vendor.sh
 
       - name: Static analysis
         run: dart analyze lib/

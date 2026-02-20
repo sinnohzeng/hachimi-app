@@ -15,6 +15,7 @@ import 'dart:async';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/services/llm_service.dart';

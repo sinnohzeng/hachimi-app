@@ -79,7 +79,7 @@ hachimi-app/
 │   │   ├── pixel_cat_renderer.dart         # 13 层精灵图合成器（pixel-cat-maker 引擎）
 │   │   ├── remote_config_service.dart      # Remote Config（远程配置）—— 类型化 getter + 默认值
 │   │   ├── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
-│   │   ├── llm_service.dart               # LLM 引擎封装（flutter_llama）
+│   │   ├── llm_service.dart               # LLM 引擎封装（llama_cpp_dart Isolate API）
 │   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
 │   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
 │   │   ├── model_manager_service.dart     # GGUF 模型下载、校验、删除
@@ -177,8 +177,12 @@ hachimi-app/
 │   └── workflows/
 │       └── release.yml                    # CI/CD：tag 触发的 release APK 构建 + GitHub Release
 │
+├── packages/                              # 本地化 native 包（gitignore 排除，参见 scripts/）
+│   └── llama_cpp_dart/                    # llama_cpp_dart + llama.cpp 源码（脚本安装）
+│
 ├── scripts/
-│   └── setup-release-signing.sh           # 交互式配置：keystore 生成 + GitHub Secrets 输出
+│   ├── setup-release-signing.sh           # 交互式配置：keystore 生成 + GitHub Secrets 输出
+│   └── setup_llm_vendor.sh               # 克隆 llama_cpp_dart 并 pin llama.cpp commit
 │
 ├── firestore.rules                         # 已部署的 Firestore 安全规则
 ├── firebase.json                           # Firebase 项目配置

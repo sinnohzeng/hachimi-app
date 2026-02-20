@@ -79,7 +79,7 @@ hachimi-app/
 │   │   ├── pixel_cat_renderer.dart         # 13-layer sprite compositor (pixel-cat-maker engine)
 │   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
 │   │   ├── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
-│   │   ├── llm_service.dart               # LLM engine wrapper (flutter_llama)
+│   │   ├── llm_service.dart               # LLM engine wrapper (llama_cpp_dart Isolate API)
 │   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
 │   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
 │   │   ├── model_manager_service.dart     # GGUF model download, verify, delete
@@ -177,8 +177,12 @@ hachimi-app/
 │   └── workflows/
 │       └── release.yml                    # CI/CD: tag-triggered release APK build + GitHub Release
 │
+├── packages/                              # Vendored native packages (gitignored, see scripts/)
+│   └── llama_cpp_dart/                    # llama_cpp_dart + llama.cpp source (setup by script)
+│
 ├── scripts/
-│   └── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
+│   ├── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
+│   └── setup_llm_vendor.sh               # Clone llama_cpp_dart with pinned llama.cpp commit
 │
 ├── firestore.rules                         # Deployed Firestore security rules
 ├── firebase.json                           # Firebase project configuration

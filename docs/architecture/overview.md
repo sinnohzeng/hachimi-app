@@ -22,6 +22,7 @@
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
 | Connectivity | connectivity_plus | 6.x | Device network status monitoring |
 | i18n | flutter_localizations + gen-l10n | — | Compile-time localization via ARB files |
+| Local LLM | llama_cpp_dart | 0.2.x | On-device GGUF inference (Isolate + dart:ffi) |
 
 ---
 

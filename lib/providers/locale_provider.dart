@@ -9,7 +9,7 @@
 // 3. 提供 setLocale 方法修改并持久化偏好；
 //
 // 🧩 文件结构：
-// - LocaleNotifier：StateNotifier，管理 Locale 状态 + 持久化；
+// - LocaleNotifier：Notifier，管理 Locale 状态 + 持久化；
 // - localeProvider：全局 Provider 定义；
 // ---
 
@@ -19,11 +19,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Locale notifier — manages app locale with SharedPreferences persistence.
 /// State is `null` when following system locale.
-class LocaleNotifier extends StateNotifier<Locale?> {
+class LocaleNotifier extends Notifier<Locale?> {
   static const _keyLocale = 'app_locale';
 
-  LocaleNotifier() : super(null) {
+  @override
+  Locale? build() {
+    ref.keepAlive();
     _load();
+    return null;
   }
 
   /// Set locale. Pass null to follow system.
@@ -53,6 +56,4 @@ class LocaleNotifier extends StateNotifier<Locale?> {
 /// Locale provider — SSOT for app language setting.
 /// null = follow system; Locale('en') or Locale('zh') = user override.
 final localeProvider =
-    StateNotifierProvider<LocaleNotifier, Locale?>((ref) {
-  return LocaleNotifier();
-});
+    NotifierProvider<LocaleNotifier, Locale?>(LocaleNotifier.new);

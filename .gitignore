@@ -58,3 +58,6 @@ ios/Runner/GoogleService-Info.plist
 
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
+
+# Vendored native packages (cloned by scripts/setup_llm_vendor.sh)
+packages/

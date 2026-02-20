@@ -10,7 +10,7 @@
 //
 // 🧩 文件结构：
 // - ThemeSettings：主题设置值对象；
-// - ThemeNotifier：StateNotifier，管理主题状态 + 持久化；
+// - ThemeNotifier：Notifier，管理主题状态 + 持久化；
 // - themeProvider：全局 Provider 定义；
 // ---
 
@@ -38,12 +38,15 @@ class ThemeSettings {
 }
 
 /// Theme notifier — manages theme mode + seed color with SharedPreferences persistence.
-class ThemeNotifier extends StateNotifier<ThemeSettings> {
+class ThemeNotifier extends Notifier<ThemeSettings> {
   static const _keyThemeMode = 'theme_mode';
   static const _keySeedColor = 'theme_seed_color';
 
-  ThemeNotifier() : super(const ThemeSettings()) {
+  @override
+  ThemeSettings build() {
+    ref.keepAlive();
     _load();
+    return const ThemeSettings();
   }
 
   /// Switch theme mode (system / light / dark).
@@ -80,6 +83,4 @@ class ThemeNotifier extends StateNotifier<ThemeSettings> {
 
 /// Theme settings provider — SSOT for app theme mode + seed color.
 final themeProvider =
-    StateNotifierProvider<ThemeNotifier, ThemeSettings>((ref) {
-  return ThemeNotifier();
-});
+    NotifierProvider<ThemeNotifier, ThemeSettings>(ThemeNotifier.new);
