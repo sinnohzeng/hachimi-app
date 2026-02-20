@@ -270,6 +270,7 @@ Device connectivity (independent of auth):
 | `habitId` | String | Active habit |
 | `catId` | String | Cat earning XP |
 | `habitName` | String | Habit display name (for notification + recovery dialog) |
+| `catName` | String | Cat display name (for Atomic Island notification title) |
 | `totalSeconds` | int | Target duration (countdown) or 0 (stopwatch) |
 | `remainingSeconds` | int | Seconds left (countdown mode, computed) |
 | `elapsedSeconds` | int | Seconds elapsed (both modes) |
@@ -283,7 +284,7 @@ Device connectivity (independent of auth):
 
 | Method | Description |
 |--------|-------------|
-| `configure(habitId, catId, habitName, seconds, mode)` | Initialize timer parameters |
+| `configure(habitId, catId, catName, habitName, seconds, mode)` | Initialize timer parameters |
 | `start()` | Start the timer tick |
 | `pause()` | Pause the timer (record `pausedAt`) |
 | `resume()` | Resume from paused state (accumulate pause duration into `totalPausedSeconds`) |
@@ -300,7 +301,7 @@ Device connectivity (independent of auth):
 
 **Persistence:** Every 5 seconds + on state changes, the timer state (including `totalPausedSeconds`) is saved to SharedPreferences (keys prefixed `focus_timer_`). On `complete()`, `abandon()`, and `reset()`, saved state is cleared.
 
-**Notification updates:** `_onTick()` directly calls `FocusTimerService.updateNotification()` so the foreground notification stays current even when the app is in the background.
+**Notification updates:** `_onTick()` calls both `FocusTimerService.updateNotification()` (fallback) and `AtomicIslandService.updateNotification()` (rich notification for vivo Atomic Island + Android 16 ProgressStyle). See `docs/architecture/atomic-island.md` for the full specification.
 
 **Timer tick:** `Timer.periodic(const Duration(seconds: 1), _onTick)` — cancelled in `dispose()`.
 

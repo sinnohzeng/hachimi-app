@@ -76,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Icon(
                   Icons.local_fire_department,
                   size: 80,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                 ),
                 const SizedBox(height: 16),
 
@@ -85,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'Hachimi',
                   style: textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Raise cats. Complete quests.',
                   style: textTheme.bodyLarge?.copyWith(
-                    color: Colors.white70,
+                    color: colorScheme.onPrimary.withValues(alpha: 0.7),
                   ),
                 ),
 
@@ -107,8 +107,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: FilledButton.icon(
                     onPressed: _isGoogleLoading ? null : _signInWithGoogle,
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: colorScheme.onSurface,
+                      backgroundColor: colorScheme.onPrimary,
+                      foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -138,8 +138,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: FilledButton.icon(
                     onPressed: _navigateToEmailAuth,
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: colorScheme.onSurface,
+                      backgroundColor: colorScheme.onPrimary,
+                      foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -157,7 +157,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Text(
                       'Already have an account? ',
                       style: textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
+                        color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       ),
                     ),
                     GestureDetector(
@@ -172,10 +172,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(
                         'Log In',
                         style: textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colors.white,
+                          decorationColor: colorScheme.onPrimary,
                         ),
                       ),
                     ),
@@ -293,7 +293,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
@@ -311,14 +311,14 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                         Icon(
                           Icons.local_fire_department,
                           size: 56,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Hachimi',
                           style: textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -327,7 +327,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                         Text(
                           _isLogin ? 'Welcome back!' : 'Create your account',
                           style: textTheme.bodyLarge?.copyWith(
-                            color: Colors.white70,
+                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
                         ),
                         const SizedBox(height: 32),
@@ -336,8 +336,9 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: colorScheme.onPrimary),
                           decoration: _inputDecoration(
+                            colorScheme: colorScheme,
                             label: 'Email',
                             icon: Icons.email_outlined,
                           ),
@@ -357,8 +358,9 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: colorScheme.onPrimary),
                           decoration: _inputDecoration(
+                            colorScheme: colorScheme,
                             label: 'Password',
                             icon: Icons.lock_outlined,
                             suffixIcon: IconButton(
@@ -366,7 +368,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.white54,
+                                color: colorScheme.onPrimary.withValues(alpha: 0.54),
                               ),
                               onPressed: () => setState(
                                   () => _obscurePassword = !_obscurePassword),
@@ -389,8 +391,9 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           TextFormField(
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirmPassword,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: colorScheme.onPrimary),
                             decoration: _inputDecoration(
+                              colorScheme: colorScheme,
                               label: 'Confirm Password',
                               icon: Icons.lock_outlined,
                               suffixIcon: IconButton(
@@ -398,7 +401,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                   _obscureConfirmPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: Colors.white54,
+                                  color: colorScheme.onPrimary.withValues(alpha: 0.54),
                                 ),
                                 onPressed: () => setState(() =>
                                     _obscureConfirmPassword =
@@ -422,7 +425,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                           child: FilledButton(
                             onPressed: _isLoading ? null : _submit,
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.white,
+                              backgroundColor: colorScheme.onPrimary,
                               foregroundColor: colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -455,7 +458,7 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                   ? "Don't have an account? "
                                   : 'Already have an account? ',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: Colors.white70,
+                                color: colorScheme.onPrimary.withValues(alpha: 0.7),
                               ),
                             ),
                             GestureDetector(
@@ -464,10 +467,10 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                               child: Text(
                                 _isLogin ? 'Register' : 'Log In',
                                 style: textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
+                                  color: colorScheme.onPrimary,
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white,
+                                  decorationColor: colorScheme.onPrimary,
                                 ),
                               ),
                             ),
@@ -487,33 +490,35 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
   }
 
   InputDecoration _inputDecoration({
+    required ColorScheme colorScheme,
     required String label,
     required IconData icon,
     Widget? suffixIcon,
   }) {
+    final onPrimary = colorScheme.onPrimary;
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white70),
-      prefixIcon: Icon(icon, color: Colors.white70),
+      labelStyle: TextStyle(color: onPrimary.withValues(alpha: 0.7)),
+      prefixIcon: Icon(icon, color: onPrimary.withValues(alpha: 0.7)),
       suffixIcon: suffixIcon,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.white30),
+        borderSide: BorderSide(color: onPrimary.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.white),
+        borderSide: BorderSide(color: onPrimary),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.red.shade300),
+        borderSide: BorderSide(color: colorScheme.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.red.shade300),
+        borderSide: BorderSide(color: colorScheme.error),
       ),
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.1),
+      fillColor: onPrimary.withValues(alpha: 0.1),
     );
   }
 }

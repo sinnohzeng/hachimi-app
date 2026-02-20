@@ -87,17 +87,20 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return checkedInAsync.when(
-      loading: () => _buildLoadingCard(colorScheme),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (hasCheckedIn) {
-        final monthly = monthlyAsync.value;
-        if (hasCheckedIn) {
-          return _buildCheckedInCard(context, colorScheme, theme, monthly);
-        } else {
-          return _buildNotCheckedInCard(colorScheme, theme);
-        }
-      },
+    return Semantics(
+      label: 'Daily check-in',
+      child: checkedInAsync.when(
+        loading: () => _buildLoadingCard(colorScheme),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (hasCheckedIn) {
+          final monthly = monthlyAsync.value;
+          if (hasCheckedIn) {
+            return _buildCheckedInCard(context, colorScheme, theme, monthly);
+          } else {
+            return _buildNotCheckedInCard(colorScheme, theme);
+          }
+        },
+      ),
     );
   }
 

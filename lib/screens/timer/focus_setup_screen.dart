@@ -33,11 +33,16 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     if (habit == null) return;
 
     final catId = habit.catId ?? '';
+    final cat = catId.isNotEmpty
+        ? ref.read(catByIdProvider(catId))
+        : null;
+    final catName = cat?.name ?? 'Your cat';
 
     // Configure the timer
     ref.read(focusTimerProvider.notifier).configure(
           habitId: widget.habitId,
           catId: catId,
+          catName: catName,
           habitName: habit.name,
           durationSeconds: _selectedMinutes * 60,
           mode: _selectedMode,

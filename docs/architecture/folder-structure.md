@@ -18,6 +18,7 @@ hachimi-app/
 │   │   ├── cat-system.md                   # Cat game design (SSOT)
 │   │   ├── state-management.md             # Riverpod provider graph (SSOT)
 │   │   ├── folder-structure.md             # This file
+│   │   ├── atomic-island.md               # vivo Atomic Island notification spec
 │   │   └── localization.md                 # i18n approach + ARB workflow
 │   ├── product/
 │   │   ├── prd.md                          # PRD v3.0 (SSOT)
@@ -51,7 +52,9 @@ hachimi-app/
 │   │   ├── router/
 │   │   │   └── app_router.dart             # Named route registry + route constants
 │   │   └── theme/
-│   │       └── app_theme.dart              # SSOT: Material 3 theme (seed color, typography)
+│   │       ├── app_theme.dart              # SSOT: Material 3 theme (seed color, typography)
+│   │       ├── app_spacing.dart            # M3 spacing tokens (xs/sm/md/base/lg/xl/xxl)
+│   │       └── app_motion.dart             # M3 motion tokens (durations + easing curves)
 │   │
 │   ├── l10n/                               # Localization ARB source files
 │   │   ├── app_en.arb                      # English strings (primary)
@@ -72,6 +75,7 @@ hachimi-app/
 │   │   ├── cat_firestore_service.dart      # Cat-specific Firestore CRUD (watchCats, watchAllCats)
 │   │   ├── coin_service.dart               # Coin balance + accessory purchase operations
 │   │   ├── firestore_service.dart          # General Firestore CRUD + atomic batch operations
+│   │   ├── atomic_island_service.dart      # vivo Atomic Island rich notification (MethodChannel)
 │   │   ├── focus_timer_service.dart        # Android foreground service wrapper
 │   │   ├── migration_service.dart          # Data migration for schema evolution (e.g. breed -> appearance)
 │   │   ├── notification_service.dart       # FCM + flutter_local_notifications
@@ -141,6 +145,9 @@ hachimi-app/
 │       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
 │       ├── tappable_cat_sprite.dart       # Tap-to-cycle pose wrapper (bounce + haptic + local variant)
 │       ├── progress_ring.dart              # Circular progress indicator (timer ring)
+│       ├── skeleton_loader.dart            # M3 shimmer skeleton loaders (SkeletonLoader, SkeletonCard, SkeletonGrid)
+│       ├── empty_state.dart               # Unified empty state (icon + title + subtitle + optional CTA)
+│       ├── error_state.dart               # Unified error state (icon + message + retry button)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
 │       └── streak_indicator.dart           # Fire badge showing current streak count
 │
@@ -170,7 +177,10 @@ hachimi-app/
 │   ├── app/
 │   │   ├── google-services.json            # Firebase config (gitignored)
 │   │   └── src/main/
-│   │       └── AndroidManifest.xml         # Permissions + service declarations
+│   │       ├── AndroidManifest.xml         # Permissions + service declarations
+│   │       └── kotlin/com/hachimi/hachimi_app/
+│   │           ├── MainActivity.kt        # Flutter Activity + MethodChannel registration
+│   │           └── FocusNotificationHelper.kt # Rich notification builder (Atomic Island)
 │   └── ...
 │
 ├── .github/

@@ -74,16 +74,19 @@ class StreakHeatmap extends StatelessWidget {
                   final intensity =
                       minutes > 0 ? (minutes / maxMinutes).clamp(0.2, 1.0) : 0.0;
 
-                  return Container(
-                    width: 14,
-                    height: 14,
-                    margin: const EdgeInsets.all(1),
-                    decoration: BoxDecoration(
-                      color: intensity > 0
-                          ? colorScheme.primary
-                              .withValues(alpha: intensity)
-                          : colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(3),
+                  return Semantics(
+                    label: '${date.month}/${date.day}, $minutes minutes',
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      margin: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: intensity > 0
+                            ? colorScheme.primary
+                                .withValues(alpha: intensity)
+                            : colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
                   );
                 }),

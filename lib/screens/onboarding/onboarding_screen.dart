@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: 'Every quest you start comes with a kitten.\n'
           'Focus on your goals and watch them grow\n'
           'from tiny kittens into shiny cats!',
-      gradientColors: [Color(0xFF6C63FF), Color(0xFF3F3D9E)],
+      colorRole: _ColorRole.primary,
     ),
     _OnboardingPageData(
       emoji: '⏱️',
@@ -32,7 +32,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: 'Start a focus session and your cat earns XP.\n'
           'Build streaks for bonus rewards.\n'
           'Every minute counts toward evolution!',
-      gradientColors: [Color(0xFF42A5F5), Color(0xFF1565C0)],
+      colorRole: _ColorRole.secondary,
     ),
     _OnboardingPageData(
       emoji: '✨',
@@ -41,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: 'Cats evolve through 4 stages as they grow.\n'
           'Collect different breeds, unlock rare cats,\n'
           'and fill your cozy cat room!',
-      gradientColors: [Color(0xFFEF5350), Color(0xFFC62828)],
+      colorRole: _ColorRole.tertiary,
     ),
   ];
 
@@ -72,7 +72,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final pageData = _pages[_currentPage];
+    final onColor = pageData.onColor(colorScheme);
 
     return Scaffold(
       body: Stack(
@@ -96,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Text(
                   'Skip',
                   style: textTheme.bodyLarge?.copyWith(
-                    color: Colors.white70,
+                    color: onColor.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -125,8 +129,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           height: 8,
                           decoration: BoxDecoration(
                             color: _currentPage == index
-                                ? Colors.white
-                                : Colors.white38,
+                                ? onColor
+                                : onColor.withValues(alpha: 0.38),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -141,9 +145,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: FilledButton(
                         onPressed: _next,
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: _pages[_currentPage]
-                              .gradientColors
+                          backgroundColor: onColor,
+                          foregroundColor: pageData
+                              .gradientColors(colorScheme)
                               .first,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -155,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               : 'Next',
                           style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: _pages[_currentPage].gradientColors.first,
+                            color: pageData.gradientColors(colorScheme).first,
                           ),
                         ),
                       ),
@@ -171,20 +175,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 }
 
+enum _ColorRole { primary, secondary, tertiary }
+
 class _OnboardingPageData {
   final String emoji;
   final String title;
   final String subtitle;
   final String body;
-  final List<Color> gradientColors;
+  final _ColorRole colorRole;
 
   const _OnboardingPageData({
     required this.emoji,
     required this.title,
     required this.subtitle,
     required this.body,
-    required this.gradientColors,
+    required this.colorRole,
   });
+
+  List<Color> gradientColors(ColorScheme colorScheme) {
+    return switch (colorRole) {
+      _ColorRole.primary => [
+          colorScheme.primary,
+          colorScheme.primary.withValues(alpha: 0.7),
+        ],
+      _ColorRole.secondary => [
+          colorScheme.secondary,
+          colorScheme.secondary.withValues(alpha: 0.7),
+        ],
+      _ColorRole.tertiary => [
+          colorScheme.tertiary,
+          colorScheme.tertiary.withValues(alpha: 0.7),
+        ],
+    };
+  }
+
+  Color onColor(ColorScheme colorScheme) {
+    return switch (colorRole) {
+      _ColorRole.primary => colorScheme.onPrimary,
+      _ColorRole.secondary => colorScheme.onSecondary,
+      _ColorRole.tertiary => colorScheme.onTertiary,
+    };
+  }
 }
 
 class _OnboardingPage extends StatelessWidget {
@@ -194,14 +225,17 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final onColor = data.onColor(colorScheme);
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: data.gradientColors,
+          colors: data.gradientColors(colorScheme),
         ),
       ),
       child: SafeArea(
@@ -216,7 +250,7 @@ class _OnboardingPage extends StatelessWidget {
               Text(
                 data.subtitle,
                 style: textTheme.titleMedium?.copyWith(
-                  color: Colors.white70,
+                  color: onColor.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 8),
@@ -226,7 +260,7 @@ class _OnboardingPage extends StatelessWidget {
                 data.title,
                 style: textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: onColor,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -243,7 +277,7 @@ class _OnboardingPage extends StatelessWidget {
               Text(
                 data.body,
                 style: textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.85),
+                  color: onColor.withValues(alpha: 0.85),
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,

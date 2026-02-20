@@ -97,17 +97,27 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
       size: widget.size,
     );
 
-    if (!widget.enableTap) return sprite;
-
-    return GestureDetector(
-      onTap: _cyclePose,
-      child: AnimatedBuilder(
-        animation: _bounceAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _bounceAnimation.value,
-          child: child,
-        ),
+    if (!widget.enableTap) {
+      return Semantics(
+        label: '${cat.name} cat',
+        image: true,
         child: sprite,
+      );
+    }
+
+    return Semantics(
+      label: '${cat.name}, tap to interact',
+      button: true,
+      child: GestureDetector(
+        onTap: _cyclePose,
+        child: AnimatedBuilder(
+          animation: _bounceAnimation,
+          builder: (context, child) => Transform.scale(
+            scale: _bounceAnimation.value,
+            child: child,
+          ),
+          child: sprite,
+        ),
       ),
     );
   }

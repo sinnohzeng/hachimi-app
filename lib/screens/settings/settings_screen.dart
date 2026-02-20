@@ -71,6 +71,20 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showThemeModeSettings(context, ref),
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.wallpaper_outlined),
+            title: const Text('Material You'),
+            subtitle: Text(
+              'Use wallpaper colors for theme',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            value: themeSettings.useDynamicColor,
+            onChanged: (value) {
+              ref.read(themeProvider.notifier).setDynamicColor(value);
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.palette_outlined),
             title: const Text('Theme Color'),
@@ -107,7 +121,7 @@ class SettingsScreen extends ConsumerWidget {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Version'),
-            subtitle: Text('1.2.0'),
+            subtitle: Text('1.8.0'),
           ),
           ListTile(
             leading: const Icon(Icons.pets_outlined),
@@ -127,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
               showLicensePage(
                 context: context,
                 applicationName: 'Hachimi',
-                applicationVersion: '1.2.0',
+                applicationVersion: '1.8.0',
               );
             },
           ),

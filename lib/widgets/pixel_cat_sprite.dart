@@ -59,26 +59,30 @@ class PixelCatSprite extends ConsumerWidget {
     );
     final imageAsync = ref.watch(catSpriteImageProvider(params));
 
-    return RepaintBoundary(
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: imageAsync.when(
-          data: (image) => CustomPaint(
-            size: Size(size, size),
-            painter: _PixelCatPainter(image),
-          ),
-          loading: () => const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+    return Semantics(
+      label: '${appearance.peltColor} ${appearance.peltType} cat',
+      image: true,
+      child: RepaintBoundary(
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: imageAsync.when(
+            data: (image) => CustomPaint(
+              size: Size(size, size),
+              painter: _PixelCatPainter(image),
             ),
-          ),
-          error: (e, _) => Center(
-            child: Text(
-              '🐱',
-              style: TextStyle(fontSize: size * 0.5),
+            loading: () => const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (e, _) => Center(
+              child: Text(
+                '🐱',
+                style: TextStyle(fontSize: size * 0.5),
+              ),
             ),
           ),
         ),

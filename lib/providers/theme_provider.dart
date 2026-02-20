@@ -23,16 +23,23 @@ import 'package:hachimi_app/core/theme/app_theme.dart';
 class ThemeSettings {
   final ThemeMode mode;
   final Color seedColor;
+  final bool useDynamicColor;
 
   const ThemeSettings({
     this.mode = ThemeMode.system,
     this.seedColor = const Color(0xFF4285F4),
+    this.useDynamicColor = true,
   });
 
-  ThemeSettings copyWith({ThemeMode? mode, Color? seedColor}) {
+  ThemeSettings copyWith({
+    ThemeMode? mode,
+    Color? seedColor,
+    bool? useDynamicColor,
+  }) {
     return ThemeSettings(
       mode: mode ?? this.mode,
       seedColor: seedColor ?? this.seedColor,
+      useDynamicColor: useDynamicColor ?? this.useDynamicColor,
     );
   }
 }
@@ -41,6 +48,7 @@ class ThemeSettings {
 class ThemeNotifier extends Notifier<ThemeSettings> {
   static const _keyThemeMode = 'theme_mode';
   static const _keySeedColor = 'theme_seed_color';
+  static const _keyDynamicColor = 'theme_dynamic_color';
 
   @override
   ThemeSettings build() {
@@ -61,22 +69,31 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     _persist();
   }
 
+  /// Toggle dynamic color (Material You wallpaper-based theming).
+  void setDynamicColor(bool enabled) {
+    state = state.copyWith(useDynamicColor: enabled);
+    _persist();
+  }
+
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyThemeMode, state.mode.index);
     await prefs.setInt(_keySeedColor, state.seedColor.toARGB32());
+    await prefs.setBool(_keyDynamicColor, state.useDynamicColor);
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final modeIndex = prefs.getInt(_keyThemeMode);
     final colorValue = prefs.getInt(_keySeedColor);
+    final dynamicColor = prefs.getBool(_keyDynamicColor);
 
     state = ThemeSettings(
       mode: modeIndex != null ? ThemeMode.values[modeIndex] : ThemeMode.system,
       seedColor: colorValue != null
           ? Color(colorValue)
           : AppTheme.defaultSeedColor,
+      useDynamicColor: dynamicColor ?? true,
     );
   }
 }

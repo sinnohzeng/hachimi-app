@@ -141,25 +141,30 @@ class EmojiPicker extends StatelessWidget {
 
   Widget _buildEmojiTile(String emoji, ColorScheme colorScheme) {
     final isSelected = selected == emoji;
-    return GestureDetector(
-      onTap: () => onSelected(emoji),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: colorScheme.primary, width: 2)
-              : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          emoji,
-          style: const TextStyle(fontSize: 24),
+    return Semantics(
+      label: emoji,
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: () => onSelected(emoji),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colorScheme.primaryContainer
+                : colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(12),
+            border: isSelected
+                ? Border.all(color: colorScheme.primary, width: 2)
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            emoji,
+            style: const TextStyle(fontSize: 24),
+          ),
         ),
       ),
     );

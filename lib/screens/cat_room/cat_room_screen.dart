@@ -9,6 +9,9 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
+import 'package:hachimi_app/widgets/skeleton_loader.dart';
+import 'package:hachimi_app/widgets/empty_state.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
 
 /// CatHouse — 2-column grid layout showing all active cats.
 class CatRoomScreen extends ConsumerWidget {
@@ -29,8 +32,8 @@ class CatRoomScreen extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.monetization_on,
-                    size: 20, color: Color(0xFFFFD700)),
+                Icon(Icons.monetization_on,
+                    size: 20, color: theme.colorScheme.tertiary),
                 const SizedBox(width: 4),
                 Text(
                   '${ref.watch(coinBalanceProvider).value ?? 0}',
@@ -58,8 +61,11 @@ class CatRoomScreen extends ConsumerWidget {
         ],
       ),
       body: catsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const SkeletonGrid(),
+        error: (e, _) => ErrorState(
+          message: 'Failed to load cats',
+          onRetry: () => ref.invalidate(catsProvider),
+        ),
         data: (cats) {
           if (cats.isEmpty) return _buildEmpty(theme);
           return _buildGrid(context, ref, cats);
@@ -69,27 +75,10 @@ class CatRoomScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('🏠', style: TextStyle(fontSize: 64)),
-          const SizedBox(height: 16),
-          Text(
-            'Your CatHouse is empty',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Start a quest to adopt your first cat!',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyState(
+      icon: Icons.home_outlined,
+      title: 'Your CatHouse is empty',
+      subtitle: 'Start a quest to adopt your first cat!',
     );
   }
 
@@ -295,7 +284,10 @@ class _CatHouseCard extends StatelessWidget {
           child: Column(
             children: [
               // Pixel cat sprite
-              TappableCatSprite(cat: cat, size: 80),
+              Hero(
+                tag: 'cat-${cat.id}',
+                child: TappableCatSprite(cat: cat, size: 80),
+              ),
               const SizedBox(height: 4),
 
               // Name + habit (flexible to prevent overflow)

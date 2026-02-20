@@ -33,6 +33,16 @@ class AppTheme {
     return _buildTheme(colorScheme, textTheme);
   }
 
+  /// Build theme from a pre-built ColorScheme (used for dynamic color).
+  static ThemeData lightThemeFromScheme(ColorScheme scheme) {
+    final textTheme = GoogleFonts.robotoTextTheme(
+      scheme.brightness == Brightness.dark
+          ? ThemeData.dark().textTheme
+          : ThemeData.light().textTheme,
+    );
+    return _buildTheme(scheme, textTheme);
+  }
+
   static ThemeData darkTheme([Color? seed]) {
     final seedColor = seed ?? defaultSeedColor;
     final colorScheme = ColorScheme.fromSeed(
@@ -50,6 +60,12 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: textTheme,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
         backgroundColor: colorScheme.surface,

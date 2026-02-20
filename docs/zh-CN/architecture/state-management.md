@@ -270,6 +270,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 | `habitId` | String | 当前活跃习惯 |
 | `catId` | String | 正在获得 XP 的猫咪 |
 | `habitName` | String | 习惯显示名称（用于通知 + 恢复对话框） |
+| `catName` | String | 猫咪显示名称（用于原子岛通知标题） |
 | `totalSeconds` | int | 目标时长（倒计时模式）或 0（正计时模式） |
 | `remainingSeconds` | int | 剩余秒数（倒计时模式，计算属性） |
 | `elapsedSeconds` | int | 已用秒数（两种模式均记录） |
@@ -283,7 +284,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 | 方法 | 说明 |
 |------|------|
-| `configure(habitId, catId, habitName, seconds, mode)` | 初始化计时器参数 |
+| `configure(habitId, catId, catName, habitName, seconds, mode)` | 初始化计时器参数 |
 | `start()` | 启动计时器心跳 |
 | `pause()` | 暂停计时器（记录 `pausedAt`） |
 | `resume()` | 从暂停状态恢复（将暂停时长累加到 `totalPausedSeconds`） |
@@ -300,7 +301,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 **持久化**：每 5 秒 + 状态变更时，计时器状态（含 `totalPausedSeconds`）保存到 SharedPreferences（键前缀 `focus_timer_`）。`complete()`、`abandon()` 和 `reset()` 时清除。
 
-**通知更新**：`_onTick()` 直接调用 `FocusTimerService.updateNotification()`，确保前台通知在 App 后台时也能实时更新。
+**通知更新**：`_onTick()` 同时调用 `FocusTimerService.updateNotification()`（降级兜底）和 `AtomicIslandService.updateNotification()`（用于 vivo 原子岛 + Android 16 ProgressStyle 的富通知）。完整规格说明见 `docs/zh-CN/architecture/atomic-island.md`。
 
 **计时器心跳**：`Timer.periodic(const Duration(seconds: 1), _onTick)` —— 在 `dispose()` 中取消。
 

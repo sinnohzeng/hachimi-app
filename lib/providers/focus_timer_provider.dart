@@ -21,6 +21,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hachimi_app/services/atomic_island_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 
 /// Timer status for focus sessions.
@@ -33,6 +34,7 @@ enum TimerMode { countdown, stopwatch }
 class FocusTimerState {
   final String habitId;
   final String catId;
+  final String catName;
   final String habitName;
   final int totalSeconds; // Target duration (countdown mode)
   final int elapsedSeconds; // Actual focused time
@@ -45,6 +47,7 @@ class FocusTimerState {
   const FocusTimerState({
     this.habitId = '',
     this.catId = '',
+    this.catName = '',
     this.habitName = '',
     this.totalSeconds = 1500, // 25 min default
     this.elapsedSeconds = 0,
@@ -89,6 +92,7 @@ class FocusTimerState {
   FocusTimerState copyWith({
     String? habitId,
     String? catId,
+    String? catName,
     String? habitName,
     int? totalSeconds,
     int? elapsedSeconds,
@@ -102,6 +106,7 @@ class FocusTimerState {
     return FocusTimerState(
       habitId: habitId ?? this.habitId,
       catId: catId ?? this.catId,
+      catName: catName ?? this.catName,
       habitName: habitName ?? this.habitName,
       totalSeconds: totalSeconds ?? this.totalSeconds,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
@@ -124,6 +129,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   static const _prefix = 'focus_timer_';
   static const _keyHabitId = '${_prefix}habitId';
   static const _keyCatId = '${_prefix}catId';
+  static const _keyCatName = '${_prefix}catName';
   static const _keyHabitName = '${_prefix}habitName';
   static const _keyTotalSeconds = '${_prefix}totalSeconds';
   static const _keyElapsedSeconds = '${_prefix}elapsedSeconds';
@@ -191,6 +197,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyHabitId);
     await prefs.remove(_keyCatId);
+    await prefs.remove(_keyCatName);
     await prefs.remove(_keyHabitName);
     await prefs.remove(_keyTotalSeconds);
     await prefs.remove(_keyElapsedSeconds);
@@ -204,6 +211,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void configure({
     required String habitId,
     required String catId,
+    required String catName,
     required String habitName,
     required int durationSeconds,
     required TimerMode mode,
@@ -212,6 +220,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = FocusTimerState(
       habitId: habitId,
       catId: catId,
+      catName: catName,
       habitName: habitName,
       totalSeconds: durationSeconds,
       elapsedSeconds: 0,
@@ -232,6 +241,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     final habitId = prefs.getString(_keyHabitId) ?? '';
     final catId = prefs.getString(_keyCatId) ?? '';
+    final catName = prefs.getString(_keyCatName) ?? '';
     final habitName = prefs.getString(_keyHabitName) ?? '';
     final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? 1500;
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
@@ -256,6 +266,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       state = FocusTimerState(
         habitId: habitId,
         catId: catId,
+        catName: catName,
         habitName: habitName,
         totalSeconds: totalSeconds,
         elapsedSeconds: totalSeconds,
@@ -272,6 +283,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = FocusTimerState(
       habitId: habitId,
       catId: catId,
+      catName: catName,
       habitName: habitName,
       totalSeconds: totalSeconds,
       elapsedSeconds: effectiveElapsed,
@@ -314,6 +326,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         status: TimerStatus.completed,
       );
       _clearSavedState();
+      AtomicIslandService.cancel();
       return;
     }
 
@@ -332,10 +345,31 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
   void _updateNotification() {
     final label = state.mode == TimerMode.countdown ? 'remaining' : 'elapsed';
+    final catDisplayName = state.catName.isNotEmpty ? state.catName : 'Your cat';
+
+    // 基础通知（fallback）
     FocusTimerService.updateNotification(
-      title: '\u{1F431} ${state.habitName.isNotEmpty ? state.habitName : "Focus"}',
-      text: '${state.displayTime} $label',
+      title: '$catDisplayName focusing...',
+      text: '${state.habitName} \u{00B7} ${state.displayTime} $label',
     );
+
+    // 富通知（触发 vivo 原子岛 + Android 16 ProgressStyle）
+    if (state.startedAt != null) {
+      final isCountdown = state.mode == TimerMode.countdown;
+      AtomicIslandService.updateNotification(
+        title: '$catDisplayName focusing...',
+        text: state.habitName,
+        isCountdown: isCountdown,
+        isPaused: state.status == TimerStatus.paused,
+        endTimeMs: isCountdown
+            ? state.startedAt!
+                .add(Duration(
+                    seconds: state.totalSeconds + state.totalPausedSeconds))
+                .millisecondsSinceEpoch
+            : null,
+        startTimeMs: state.startedAt!.millisecondsSinceEpoch,
+      );
+    }
   }
 
   /// Pause the timer.
@@ -374,6 +408,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.completed);
     _clearSavedState();
+    AtomicIslandService.cancel();
   }
 
   /// Abandon the session.
@@ -381,6 +416,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     _ticker?.cancel();
     state = state.copyWith(status: TimerStatus.abandoned);
     _clearSavedState();
+    AtomicIslandService.cancel();
   }
 
   /// Handle app going to background.
@@ -391,8 +427,10 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     if (state.status == TimerStatus.running) {
       state = state.copyWith(pausedAt: DateTime.now());
       _saveState();
+      final catDisplayName =
+          state.catName.isNotEmpty ? state.catName : 'Your cat';
       FocusTimerService.updateNotification(
-        title: '\u{1F431} ${state.habitName.isNotEmpty ? state.habitName : "Focus"}',
+        title: '$catDisplayName focusing...',
         text: 'Focus session in progress',
       );
     }
@@ -453,6 +491,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void reset() {
     _ticker?.cancel();
     _clearSavedState();
+    AtomicIslandService.cancel();
     state = const FocusTimerState();
   }
 
@@ -461,6 +500,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyHabitId, state.habitId);
     await prefs.setString(_keyCatId, state.catId);
+    await prefs.setString(_keyCatName, state.catName);
     await prefs.setString(_keyHabitName, state.habitName);
     await prefs.setInt(_keyTotalSeconds, state.totalSeconds);
     await prefs.setInt(_keyElapsedSeconds, state.elapsedSeconds);

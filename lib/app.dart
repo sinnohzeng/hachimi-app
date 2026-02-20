@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -25,26 +26,38 @@ class HachimiApp extends ConsumerWidget {
     final themeSettings = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
 
-    return MaterialApp(
-      title: 'Hachimi',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme(themeSettings.seedColor),
-      darkTheme: AppTheme.darkTheme(themeSettings.seedColor),
-      themeMode: themeSettings.mode,
-      locale: locale,
-      // i18n support
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('zh'),
-      ],
-      home: const AuthGate(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      navigatorObservers: [analyticsService.observer],
+    return DynamicColorBuilder(
+      builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        // Use system dynamic color when available and enabled by user
+        final useDynamic =
+            themeSettings.useDynamicColor && lightDynamic != null;
+
+        return MaterialApp(
+          title: 'Hachimi',
+          debugShowCheckedModeBanner: false,
+          theme: useDynamic
+              ? AppTheme.lightThemeFromScheme(lightDynamic)
+              : AppTheme.lightTheme(themeSettings.seedColor),
+          darkTheme: useDynamic
+              ? AppTheme.lightThemeFromScheme(darkDynamic!)
+              : AppTheme.darkTheme(themeSettings.seedColor),
+          themeMode: themeSettings.mode,
+          locale: locale,
+          // i18n support
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('zh'),
+          ],
+          home: const AuthGate(),
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          navigatorObservers: [analyticsService.observer],
+        );
+      },
     );
   }
 }

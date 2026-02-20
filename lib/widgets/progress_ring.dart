@@ -20,23 +20,27 @@ class ProgressRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: _RingPainter(
-              progress: progress,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              foregroundColor: colorScheme.primary,
-              strokeWidth: strokeWidth,
+    return Semantics(
+      label: '${(progress * 100).round()}% progress',
+      value: '${(progress * 100).round()}%',
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: Size(size, size),
+              painter: _RingPainter(
+                progress: progress,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                foregroundColor: colorScheme.primary,
+                strokeWidth: strokeWidth,
+              ),
             ),
-          ),
-          child,
-        ],
+            child,
+          ],
+        ),
       ),
     );
   }

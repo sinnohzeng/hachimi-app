@@ -18,6 +18,7 @@ hachimi-app/
 │   │   ├── cat-system.md                   # 猫咪游戏设计（SSOT）
 │   │   ├── state-management.md             # Riverpod Provider 图谱（SSOT）
 │   │   ├── folder-structure.md             # 本文件
+│   │   ├── atomic-island.md               # vivo 原子岛通知规格说明
 │   │   └── localization.md                 # i18n 方案 + ARB 工作流
 │   ├── product/
 │   │   ├── prd.md                          # PRD v3.0（SSOT）
@@ -51,7 +52,9 @@ hachimi-app/
 │   │   ├── router/
 │   │   │   └── app_router.dart             # 命名路由注册表 + 路由常量
 │   │   └── theme/
-│   │       └── app_theme.dart              # SSOT：Material 3 主题（种子色、排版）
+│   │       ├── app_theme.dart              # SSOT：Material 3 主题（种子色、排版）
+│   │       ├── app_spacing.dart            # M3 间距 Token（xs/sm/md/base/lg/xl/xxl）
+│   │       └── app_motion.dart             # M3 动效 Token（时长 + 缓动曲线）
 │   │
 │   ├── l10n/                               # 本地化 ARB 源文件
 │   │   ├── app_en.arb                      # 英文字符串（主要）
@@ -72,6 +75,7 @@ hachimi-app/
 │   │   ├── cat_firestore_service.dart      # 猫咪专属 Firestore CRUD（watchCats、watchAllCats）
 │   │   ├── coin_service.dart               # 金币余额 + 配饰购买操作
 │   │   ├── firestore_service.dart          # 通用 Firestore CRUD + 原子批量操作
+│   │   ├── atomic_island_service.dart      # vivo 原子岛富通知（MethodChannel 封装）
 │   │   ├── focus_timer_service.dart        # Android 前台服务封装
 │   │   ├── migration_service.dart          # 模式演进的数据迁移（如 breed -> appearance）
 │   │   ├── notification_service.dart       # FCM + flutter_local_notifications
@@ -141,6 +145,9 @@ hachimi-app/
 │       ├── pixel_cat_sprite.dart           # 像素风猫咪显示组件（从 Provider 渲染 ui.Image）
 │       ├── tappable_cat_sprite.dart       # 点击切换姿势封装组件（弹跳 + 触觉 + 本地变体）
 │       ├── progress_ring.dart              # 圆形进度指示器（计时器圆环）
+│       ├── skeleton_loader.dart            # M3 微光骨架屏（SkeletonLoader、SkeletonCard、SkeletonGrid）
+│       ├── empty_state.dart               # 统一空状态（图标 + 标题 + 副标题 + 可选 CTA）
+│       ├── error_state.dart               # 统一错误状态（图标 + 消息 + 重试按钮）
 │       ├── streak_heatmap.dart             # 91 天 GitHub 风格活动热力图
 │       └── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章
 │
@@ -170,7 +177,10 @@ hachimi-app/
 │   ├── app/
 │   │   ├── google-services.json            # Firebase 配置（已 gitignore）
 │   │   └── src/main/
-│   │       └── AndroidManifest.xml         # 权限 + 服务声明
+│   │       ├── AndroidManifest.xml         # 权限 + 服务声明
+│   │       └── kotlin/com/hachimi/hachimi_app/
+│   │           ├── MainActivity.kt        # Flutter Activity + MethodChannel 注册
+│   │           └── FocusNotificationHelper.kt # 富通知构建器（原子岛适配）
 │   └── ...
 │
 ├── .github/

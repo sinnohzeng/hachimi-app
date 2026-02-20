@@ -51,6 +51,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Auto-start timer on entry — user already expressed intent on FocusSetupScreen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _startTimer();
+    });
   }
 
   @override
@@ -104,6 +108,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
   void _completeTimer() {
     ref.read(focusTimerProvider.notifier).complete();
+  }
+
+  /// Grace-period back: stop service, reset state, pop without confirmation.
+  void _goBack() {
+    FocusTimerService.stop();
+    ref.read(focusTimerProvider.notifier).reset();
+    Navigator.of(context).pop();
   }
 
   Future<void> _giveUp() async {
@@ -237,7 +248,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             timerState.status == TimerStatus.abandoned)) {
       _sessionSaved = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _saveSession(timerState);
+        if (mounted) {
+          if (timerState.status == TimerStatus.completed) {
+            HapticFeedback.heavyImpact();
+          }
+          _saveSession(timerState);
+        }
       });
     }
 
@@ -253,7 +269,29 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? stageColor(cat.computedStage)
         : colorScheme.primary;
 
-    return Scaffold(
+    // Grace period: first 10 seconds allow free exit
+    final isRunningOrPaused = timerState.status == TimerStatus.running ||
+        timerState.status == TimerStatus.paused;
+    final inGracePeriod =
+        isRunningOrPaused && timerState.elapsedSeconds <= 10;
+    // Allow pop freely when idle/completed/abandoned or during grace period
+    final allowPop = !isRunningOrPaused || inGracePeriod;
+
+    return PopScope(
+      canPop: allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) {
+          // Pop already happened — clean up if in grace period
+          if (inGracePeriod) {
+            FocusTimerService.stop();
+            ref.read(focusTimerProvider.notifier).reset();
+          }
+          return;
+        }
+        // didPop == false means canPop was false → past grace period
+        _giveUp();
+      },
+      child: Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -373,11 +411,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
               const SizedBox(height: 24),
 
               // Timer display
-              Text(
-                timerState.displayTime,
-                style: textTheme.displayLarge?.copyWith(
-                  fontWeight: FontWeight.w300,
-                  letterSpacing: 2,
+              Semantics(
+                label: 'Timer: ${timerState.displayTime}',
+                liveRegion: true,
+                child: Text(
+                  timerState.displayTime,
+                  style: textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -420,27 +462,37 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 child: _buildControls(timerState, theme),
               ),
 
-              // Give up button (small, at bottom)
+              // Bottom button: grace-period "返回" or "Give Up"
               if (_hasStarted &&
                   timerState.status != TimerStatus.completed &&
                   timerState.status != TimerStatus.abandoned)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: TextButton(
-                    onPressed: _giveUp,
-                    child: Text(
-                      'Give Up',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+                  child: inGracePeriod
+                      ? TextButton(
+                          onPressed: _goBack,
+                          child: Text(
+                            '返回 (${10 - timerState.elapsedSeconds}s)',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : TextButton(
+                          onPressed: _giveUp,
+                          child: Text(
+                            'Give Up',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
                 ),
             ],
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildControls(FocusTimerState timerState, ThemeData theme) {

@@ -123,8 +123,11 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 48),
-                      // Tappable cat sprite with bounce animation
-                      TappableCatSprite(cat: cat, size: 120),
+                      // Tappable cat sprite with bounce animation + Hero
+                      Hero(
+                        tag: 'cat-${cat.id}',
+                        child: TappableCatSprite(cat: cat, size: 120),
+                      ),
                       const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

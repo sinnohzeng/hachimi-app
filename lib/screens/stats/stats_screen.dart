@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
+import 'package:hachimi_app/widgets/skeleton_loader.dart';
+import 'package:hachimi_app/widgets/empty_state.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -93,25 +96,25 @@ class StatsScreen extends ConsumerWidget {
         ),
 
         habitsAsync.when(
-          loading: () => const SliverToBoxAdapter(
-            child: Center(child: CircularProgressIndicator()),
+          loading: () => SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (_, __) => const SkeletonCard(),
+              childCount: 3,
+            ),
           ),
-          error: (e, _) => SliverToBoxAdapter(
-            child: Center(child: Text('Error: $e')),
+          error: (e, _) => SliverFillRemaining(
+            child: ErrorState(
+              message: 'Failed to load quest stats',
+              onRetry: () => ref.invalidate(habitsProvider),
+            ),
           ),
           data: (habits) {
             if (habits.isEmpty) {
-              return SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Center(
-                    child: Text(
-                      'No quests yet',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+              return const SliverFillRemaining(
+                child: EmptyState(
+                  icon: Icons.bar_chart_outlined,
+                  title: 'No quest data yet',
+                  subtitle: 'Start a quest to see your progress here!',
                 ),
               );
             }

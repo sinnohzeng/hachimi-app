@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:animations/animations.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -13,6 +14,9 @@ import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/streak_indicator.dart';
 import 'package:hachimi_app/widgets/check_in_banner.dart';
+import 'package:hachimi_app/widgets/skeleton_loader.dart';
+import 'package:hachimi_app/widgets/empty_state.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/stats/stats_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
@@ -37,7 +41,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: PageTransitionSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+          return FadeThroughTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          );
+        },
+        child: KeyedSubtree(
+          key: ValueKey<int>(_selectedIndex),
+          child: _screens[_selectedIndex],
+        ),
+      ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () =>
@@ -171,36 +188,25 @@ class _TodayTab extends ConsumerWidget {
 
         // Habit list
         habitsAsync.when(
-          loading: () => const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
+          loading: () => SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (_, __) => const SkeletonCard(),
+              childCount: 3,
+            ),
           ),
           error: (error, _) => SliverFillRemaining(
-            child: Center(child: Text('Error: $error')),
+            child: ErrorState(
+              message: 'Failed to load quests',
+              onRetry: () => ref.invalidate(habitsProvider),
+            ),
           ),
           data: (habits) {
             if (habits.isEmpty) {
-              return SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('🐱', style: TextStyle(fontSize: 64)),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No quests yet',
-                        style: textTheme.titleLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Tap + to start a quest and adopt a cat!',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+              return const SliverFillRemaining(
+                child: EmptyState(
+                  icon: Icons.add_task,
+                  title: 'No quests yet',
+                  subtitle: 'Tap + to start a quest and adopt a cat!',
                 ),
               );
             }
@@ -341,7 +347,10 @@ class _FeaturedCatCard extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                TappableCatSprite(cat: cat, size: 72),
+                Hero(
+                  tag: 'cat-${cat.id}',
+                  child: TappableCatSprite(cat: cat, size: 72),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

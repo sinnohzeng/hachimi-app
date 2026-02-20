@@ -7,11 +7,13 @@ class FocusTimerService {
   static void init() {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'hachimi_focus_timer',
+        channelId: 'hachimi_focus_timer_v2',
         channelName: 'Focus Timer',
         channelDescription: 'Shows focus timer progress',
-        channelImportance: NotificationChannelImportance.DEFAULT,
-        priority: NotificationPriority.DEFAULT,
+        channelImportance: NotificationChannelImportance.HIGH,
+        priority: NotificationPriority.HIGH,
+        onlyAlertOnce: true,
+        showWhen: true,
       ),
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: false,
