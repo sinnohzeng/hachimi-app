@@ -27,6 +27,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.packages
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
@@ -43,6 +44,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/build/
 
 # Firebase configuration (contains project-specific API keys)
 # Run `flutterfire configure` to generate your own
@@ -61,4 +63,6 @@ ios/Runner/GoogleService-Info.plist
 
 # Vendored native packages (cloned by scripts/setup_llm_vendor.sh)
 packages/
-android/build/.last_build_id
+
+# Android Gradle build artifacts
+/android/build/
