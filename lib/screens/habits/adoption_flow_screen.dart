@@ -565,7 +565,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  '${cat.personalityData!.emoji} ${cat.personalityData!.name}',
+                  '${cat.personalityData!.emoji} ${context.l10n.personalityName(cat.personalityData!.id)}',
                   style: textTheme.labelLarge?.copyWith(
                     color: colorScheme.onTertiaryContainer,
                   ),
@@ -574,7 +574,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             if (cat.personalityData != null) ...[
               const SizedBox(height: AppSpacing.sm),
               Text(
-                cat.personalityData!.flavorText,
+                context.l10n.personalityFlavor(cat.personalityData!.id),
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
