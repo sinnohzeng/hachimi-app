@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/app.dart';
 import 'package:hachimi_app/services/auth_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -30,6 +31,9 @@ void main() async {
 
   // Initialize foreground task for focus timer
   FocusTimerService.init();
+
+  // Initialize notification plugins and channels (no permission request)
+  await NotificationService().initializePlugins();
 
   runApp(
     const ProviderScope(

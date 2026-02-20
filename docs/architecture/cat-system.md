@@ -412,6 +412,82 @@ The `CheckInScreen` (`/check-in` route) displays full monthly check-in details:
 
 ---
 
+## Hachimi Diary (AI Cat Diary)
+
+The Hachimi Diary gives each cat the ability to write daily diary entries based on the user's habit completion, the cat's personality, and mood. Diary generation requires the local LLM model to be downloaded and AI features enabled.
+
+### Generation Trigger
+
+1. **Primary**: After completing a focus session (`FocusCompleteScreen`), a background diary generation is triggered
+2. **Secondary**: Opening `CatDetailScreen` when today's diary doesn't exist yet
+3. **Frequency**: One diary per cat per day (`UNIQUE(cat_id, date)` constraint)
+
+### Prompt Design
+
+The diary prompt uses ChatML format (`<|im_start|>system/assistant<|im_end|>`) and includes:
+- Cat name, personality, and flavor text
+- Current mood and hours since last session
+- Growth stage and progress percentage
+- Habit details (today's focus, streak, total progress)
+- Instruction: 2-4 sentences, first person, personality-adjusted tone
+- Bilingual templates (English and Chinese based on app locale)
+
+**Constants:** `lib/core/constants/llm_constants.dart` -> `class DiaryPrompt`
+
+### Cat Detail Page Integration
+
+A **Diary Preview Card** is inserted between the Focus Statistics Card and the Reminder Card:
+
+```
+Growth Progress Card
+Focus Statistics Card
+─────────────────────
+Hachimi Diary Card
+   Today's diary preview (2 lines)
+   [View all diaries] ->
+─────────────────────
+Reminder Card
+```
+
+Tapping "View all" navigates to `CatDiaryScreen` (`/cat-diary` route).
+
+---
+
+## Cat Chat (AI Chat)
+
+Users can have text conversations with their cat. The cat responds in character based on its personality. Chat requires the local LLM model to be downloaded and AI features enabled.
+
+### Entry Point
+
+Chat icon button in `CatDetailScreen` AppBar (only visible when `LlmAvailability.ready`).
+
+### Chat UI
+
+Standard message list layout:
+- Cat messages on the left (with cat sprite avatar)
+- User messages on the right
+- Bottom text input + send button
+- Typing indicator during generation
+- Token-by-token streaming display
+
+### Context Window Management
+
+To maintain inference speed, the prompt budget is limited:
+- System prompt: ~300 tokens
+- Recent 10 rounds (20 messages): ~1500 tokens
+- User new message: ~100 tokens
+- Generation budget: 150 tokens max
+
+Messages beyond 20 are excluded via sliding window.
+
+### System Prompt
+
+Uses ChatML format with personality, mood, stage, and habit context. Rules: stay in cat character, keep replies short (1-3 sentences), use cat sounds occasionally, encourage habit completion, never mention being AI.
+
+**Constants:** `lib/core/constants/llm_constants.dart` -> `class ChatPrompt`
+
+---
+
 ## Cat States
 
 | State | Meaning | Visibility |

@@ -39,8 +39,10 @@ import 'package:hachimi_app/models/cat_appearance.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/providers/diary_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
+import 'package:hachimi_app/providers/llm_provider.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
@@ -89,6 +91,21 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
+            actions: [
+              // 聊天入口 — 仅当 AI 功能就绪时显示
+              if (ref.watch(llmAvailabilityProvider) ==
+                  LlmAvailability.ready)
+                IconButton(
+                  icon: const Icon(Icons.chat_bubble_outline),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRouter.catChat,
+                      arguments: widget.catId,
+                    );
+                  },
+                  tooltip: 'Chat',
+                ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -176,6 +193,14 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                   _FocusStatsCard(habit: habit, cat: cat),
                   const SizedBox(height: 16),
                 ],
+
+                // Hachimi Diary card — AI 日记预览
+                if (ref.watch(llmAvailabilityProvider) ==
+                    LlmAvailability.ready)
+                  _DiaryPreviewCard(catId: cat.id),
+                if (ref.watch(llmAvailabilityProvider) ==
+                    LlmAvailability.ready)
+                  const SizedBox(height: 16),
 
                 // Reminder card
                 if (habit != null) ...[
@@ -1001,6 +1026,94 @@ class _EnhancedCatInfoCard extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
+  }
+}
+
+// ─── Diary Preview Card ───
+
+/// 日记预览卡片 — 展示今日日记摘要，点击进入日记列表。
+class _DiaryPreviewCard extends ConsumerWidget {
+  final String catId;
+
+  const _DiaryPreviewCard({required this.catId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+    final todayDiary = ref.watch(todayDiaryProvider(catId));
+
+    return Card(
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pushNamed(
+            AppRouter.catDiary,
+            arguments: catId,
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text('📖', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Hachimi Diary',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.chevron_right,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              todayDiary.when(
+                loading: () => Text(
+                  'Loading...',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                error: (_, __) => Text(
+                  'Could not load diary',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                data: (entry) {
+                  if (entry == null) {
+                    return Text(
+                      'No diary entry today yet. Complete a focus session!',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    );
+                  }
+                  return Text(
+                    entry.content,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyMedium?.copyWith(
+                      height: 1.4,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

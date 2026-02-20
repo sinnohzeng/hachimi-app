@@ -1,17 +1,41 @@
+// ---
+// 📘 文件说明：
+// NotificationService — 封装 FCM 和 flutter_local_notifications，
+// 支持每日提醒、连续打卡风险提醒、庆祝通知和权限管理。
+//
+// 📋 程序整体伪代码（中文）：
+// 1. initializePlugins() 初始化插件和通知渠道（不请求权限）；
+// 2. setupFCM() 注册 FCM token 和监听前台消息（需权限）；
+// 3. requestPermission() 请求 Android POST_NOTIFICATIONS / iOS 通知权限；
+// 4. isPermissionGranted() 检查当前权限状态；
+// 5. scheduleDailyReminder() / cancelDailyReminder() 调度/取消提醒；
+//
+// 🧩 文件结构：
+// - NotificationService：单例服务；
+// - 权限管理方法；
+// - 调度方法；
+// ---
+
+import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
-/// NotificationService — wraps Firebase Cloud Messaging (FCM) and
+/// NotificationService — singleton wrapping Firebase Cloud Messaging (FCM) and
 /// flutter_local_notifications for scheduled local notifications.
 ///
 /// Notification types (per PRD Section 3.5):
 /// 1. Scheduled daily — at user-set reminder time per habit
-/// 2. Streak-at-risk — at 20:00 if no session today and streak ≥ 3
+/// 2. Streak-at-risk — at 20:00 if no session today and streak >= 3
 /// 3. Win-back — 48h with no session (server-triggered via FCM)
 /// 4. Celebration — after level-up
 class NotificationService {
+  // Singleton
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
+
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -24,16 +48,22 @@ class NotificationService {
   static const String _focusChannelName = 'Focus Timer';
   static const String _focusChannelDesc = 'Focus session notifications';
 
-  Future<void> initialize() async {
+  bool _pluginsInitialized = false;
+
+  /// Initialize plugins and notification channels WITHOUT requesting permissions.
+  /// Safe to call at app startup.
+  Future<void> initializePlugins() async {
+    if (_pluginsInitialized) return;
+
     // Initialize timezone data
     tz.initializeTimeZones();
 
-    // Initialize local notifications
+    // Initialize local notifications — do NOT request permissions on iOS here
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
     const initSettings = InitializationSettings(
       android: androidInit,
@@ -68,7 +98,12 @@ class NotificationService {
       );
     }
 
-    // Request FCM permission
+    _pluginsInitialized = true;
+  }
+
+  /// Set up FCM — registers token and listens for foreground messages.
+  /// Call this AFTER permissions have been granted.
+  Future<void> setupFCM() async {
     final settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -89,6 +124,50 @@ class NotificationService {
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
   }
 
+  // ─── Permission Management ───
+
+  /// Check if notification permission is currently granted.
+  Future<bool> isPermissionGranted() async {
+    if (Platform.isAndroid) {
+      final androidPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        final granted = await androidPlugin.areNotificationsEnabled();
+        return granted ?? false;
+      }
+      return false;
+    } else if (Platform.isIOS) {
+      final settings = await _messaging.getNotificationSettings();
+      return settings.authorizationStatus == AuthorizationStatus.authorized;
+    }
+    return false;
+  }
+
+  /// Request notification permission. Returns true if granted.
+  Future<bool> requestPermission() async {
+    if (Platform.isAndroid) {
+      final androidPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        final granted = await androidPlugin.requestNotificationsPermission();
+        return granted ?? false;
+      }
+      return false;
+    } else if (Platform.isIOS) {
+      final settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      return settings.authorizationStatus == AuthorizationStatus.authorized;
+    }
+    return false;
+  }
+
+  // ─── Notification Handlers ───
+
   void _onNotificationTapped(NotificationResponse response) {
     // Handle local notification taps — navigate based on payload
   }
@@ -106,6 +185,7 @@ class NotificationService {
             _channelId,
             _channelName,
             channelDescription: _channelDesc,
+            largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           ),
         ),
       );
@@ -115,6 +195,8 @@ class NotificationService {
   void _handleMessageOpenedApp(RemoteMessage message) {
     // Navigate to relevant screen based on message data
   }
+
+  // ─── Scheduling ───
 
   /// Schedule a daily reminder for a habit.
   Future<void> scheduleDailyReminder({
@@ -136,6 +218,7 @@ class NotificationService {
           _channelId,
           _channelName,
           channelDescription: _channelDesc,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
       uiLocalNotificationDateInterpretation:
@@ -182,6 +265,7 @@ class NotificationService {
           _channelId,
           _channelName,
           channelDescription: _channelDesc,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
       uiLocalNotificationDateInterpretation:
@@ -205,6 +289,7 @@ class NotificationService {
           _channelId,
           _channelName,
           channelDescription: _channelDesc,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
     );

@@ -10,8 +10,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/llm_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/services/notification_service.dart';
@@ -89,6 +91,13 @@ class SettingsScreen extends ConsumerWidget {
             ),
             onTap: () => _showThemeColorSettings(context, ref),
           ),
+
+          const SizedBox(height: 8),
+          const Divider(),
+
+          // AI Model section
+          _SectionHeader(title: 'AI Model', colorScheme: colorScheme),
+          _AiModelSection(colorScheme: colorScheme, textTheme: textTheme),
 
           const SizedBox(height: 8),
           const Divider(),
@@ -496,6 +505,232 @@ class _ThemeColorDialog extends StatelessWidget {
           child: const Text('Cancel'),
         ),
       ],
+    );
+  }
+}
+
+/// AI Model 设置区块 — 功能开关 + 模型下载/删除。
+class _AiModelSection extends ConsumerWidget {
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  const _AiModelSection({
+    required this.colorScheme,
+    required this.textTheme,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final aiEnabled = ref.watch(aiFeatureEnabledProvider);
+    final availability = ref.watch(llmAvailabilityProvider);
+    final downloadState = ref.watch(modelDownloadProvider);
+
+    return Column(
+      children: [
+        // AI 功能总开关
+        SwitchListTile(
+          secondary: const Icon(Icons.smart_toy_outlined),
+          title: const Text('AI Features'),
+          subtitle: Text(
+            'Enable cat diary and chat powered by on-device AI',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          value: aiEnabled,
+          onChanged: (value) {
+            ref.read(aiFeatureEnabledProvider.notifier).setEnabled(value);
+            ref.read(llmAvailabilityProvider.notifier).refresh();
+          },
+        ),
+
+        if (aiEnabled) ...[
+          // 模型信息
+          ListTile(
+            leading: const Icon(Icons.memory),
+            title: const Text(LlmConstants.modelDisplayName),
+            subtitle: Text(
+              _statusText(availability, downloadState),
+              style: textTheme.bodySmall?.copyWith(
+                color: _statusColor(availability, colorScheme),
+              ),
+            ),
+          ),
+
+          // 下载进度条
+          if (downloadState.isDownloading) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  LinearProgressIndicator(
+                    value: downloadState.progress > 0
+                        ? downloadState.progress
+                        : null,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${(downloadState.progress * 100).toStringAsFixed(0)}%',
+                        style: textTheme.labelSmall,
+                      ),
+                      Text(
+                        _formatBytes(downloadState.downloadedBytes),
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // 暂停/恢复/取消按钮
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      final notifier =
+                          ref.read(modelDownloadProvider.notifier);
+                      if (downloadState.isPaused) {
+                        notifier.resume();
+                      } else {
+                        notifier.pause();
+                      }
+                    },
+                    child: Text(
+                        downloadState.isPaused ? 'Resume' : 'Pause'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      ref.read(modelDownloadProvider.notifier).cancel();
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: colorScheme.error),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // 下载/删除按钮
+          if (!downloadState.isDownloading)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: availability == LlmAvailability.modelNotDownloaded ||
+                        availability == LlmAvailability.error
+                    ? FilledButton.tonalIcon(
+                        onPressed: () {
+                          ref
+                              .read(modelDownloadProvider.notifier)
+                              .startDownload();
+                        },
+                        icon: const Icon(Icons.download),
+                        label: const Text('Download Model (1.2 GB)'),
+                      )
+                    : availability == LlmAvailability.ready
+                        ? OutlinedButton.icon(
+                            onPressed: () =>
+                                _confirmDeleteModel(context, ref),
+                            icon: Icon(Icons.delete_outline,
+                                color: colorScheme.error),
+                            label: Text(
+                              'Delete Model',
+                              style: TextStyle(color: colorScheme.error),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+              ),
+            ),
+
+          // 错误信息
+          if (downloadState.error != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                downloadState.error!,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.error,
+                ),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
+  String _statusText(
+    LlmAvailability availability,
+    ModelDownloadState downloadState,
+  ) {
+    if (downloadState.isDownloading) return 'Downloading...';
+    switch (availability) {
+      case LlmAvailability.featureDisabled:
+        return 'Disabled';
+      case LlmAvailability.modelNotDownloaded:
+        return 'Not downloaded';
+      case LlmAvailability.modelLoading:
+        return 'Loading model...';
+      case LlmAvailability.ready:
+        return 'Ready';
+      case LlmAvailability.error:
+        return 'Error';
+    }
+  }
+
+  Color _statusColor(LlmAvailability availability, ColorScheme colorScheme) {
+    switch (availability) {
+      case LlmAvailability.ready:
+        return Colors.green;
+      case LlmAvailability.error:
+        return colorScheme.error;
+      default:
+        return colorScheme.onSurfaceVariant;
+    }
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+  }
+
+  void _confirmDeleteModel(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete model?'),
+        content: const Text(
+          'This will delete the downloaded AI model (1.2 GB). '
+          'You can download it again later.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(modelManagerProvider).deleteModel();
+              ref.read(llmAvailabilityProvider.notifier).refresh();
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
   }
 }

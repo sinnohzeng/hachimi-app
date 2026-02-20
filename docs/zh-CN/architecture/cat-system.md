@@ -416,6 +416,82 @@ CatHouse 用 **2 列 GridView** 布局替代了之前的房间场景。每只活
 
 ---
 
+## Hachimi 日记（AI 猫猫日记）
+
+Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用户的习惯完成情况、猫咪的性格和心情。日记生成需要下载本地 LLM 模型并启用 AI 功能。
+
+### 生成时机
+
+1. **主触发**：完成专注会话后（`FocusCompleteScreen`），后台触发日记生成
+2. **次触发**：打开 `CatDetailScreen` 时，若当天尚无日记则后台触发
+3. **频率限制**：每只猫每天最多一条（`UNIQUE(cat_id, date)` 约束）
+
+### Prompt 设计
+
+日记 prompt 使用 ChatML 格式（`<|im_start|>system/assistant<|im_end|>`），包含：
+- 猫咪名称、性格及性格描述
+- 当前心情及距上次会话的小时数
+- 成长阶段及进度百分比
+- 习惯详情（今日专注、连续天数、总进度）
+- 指令：2-4 句话、第一人称、根据性格调整语气
+- 双语模板（根据 app locale 选择中文或英文）
+
+**常量定义：** `lib/core/constants/llm_constants.dart` -> `class DiaryPrompt`
+
+### 猫咪详情页集成
+
+**日记预览卡** 插入在专注统计卡和提醒卡之间：
+
+```
+成长进度卡
+专注统计卡
+─────────────────────
+🆕 Hachimi 日记卡
+   📖 今日日记预览（2 行）
+   [查看全部日记] →
+─────────────────────
+提醒卡
+```
+
+点击「查看全部」导航至 `CatDiaryScreen`（`/cat-diary` 路由）。
+
+---
+
+## 猫猫聊天（AI Chat）
+
+用户可以与猫咪进行文字对话。猫咪根据其性格特征进行角色扮演式回复。聊天需要下载本地 LLM 模型并启用 AI 功能。
+
+### 入口
+
+`CatDetailScreen` AppBar 中的聊天图标按钮（仅在 `LlmAvailability.ready` 时可见）。
+
+### 聊天 UI
+
+标准消息列表布局：
+- 猫猫消息在左侧（猫猫 sprite 头像）
+- 用户消息在右侧
+- 底部文本输入框 + 发送按钮
+- 生成中显示 typing indicator
+- Token-by-token 流式显示
+
+### 上下文窗口管理
+
+为保持推理速度，限制 prompt 的 token 预算：
+- System prompt：~300 tokens
+- 最近 10 轮对话（20 条消息）：~1500 tokens
+- 用户新消息：~100 tokens
+- 生成预算：最多 150 tokens
+
+超出 20 条时，滑动窗口截断最早的消息。
+
+### System Prompt
+
+使用 ChatML 格式，包含性格、心情、成长阶段和习惯上下文。规则：保持猫猫角色、回复简短（1-3 句话）、偶尔使用猫咪拟声词、鼓励习惯完成、不提及 AI 身份。
+
+**常量定义：** `lib/core/constants/llm_constants.dart` -> `class ChatPrompt`
+
+---
+
 ## 猫咪状态
 
 | 状态 | 含义 | 显示 |

@@ -364,6 +364,62 @@ Device connectivity (independent of auth):
 
 ---
 
+### Local LLM Providers
+
+```
+Model management + LLM engine (independent of auth — local-only):
+
+modelManagerProvider (Provider<ModelManagerService>)
+localDatabaseProvider (Provider<LocalDatabaseService>)
+llmServiceInstanceProvider (Provider<LlmService>)
+
+diaryServiceProvider (Provider<DiaryService>)
+chatServiceProvider (Provider<ChatService>)
+
+aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
+  Source: SharedPreferences 'ai_features_enabled'
+
+llmAvailabilityProvider (StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>)
+  enum: featureDisabled | modelNotDownloaded | modelLoading | ready | error
+  Depends on: aiFeatureEnabledProvider, modelManagerProvider
+
+modelDownloadProvider (StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>)
+  Tracks download progress, status (idle/downloading/paused/completed/error)
+
+diaryEntriesProvider(catId) — FutureProvider.family<List<DiaryEntry>, String>
+todayDiaryProvider(catId) — FutureProvider.family<DiaryEntry?, String>
+
+chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>
+  ChatState: { messages, status, partialResponse, error }
+  ChatStatus: idle | loading | generating | error
+```
+
+### `aiFeatureEnabledProvider`
+
+- **Type**: `StateNotifierProvider<AiFeatureNotifier, bool>`
+- **File**: `lib/providers/llm_provider.dart`
+- **Source**: SharedPreferences `ai_features_enabled`
+- **Consumers**: `SettingsScreen` (AI toggle), `llmAvailabilityProvider`
+- **SSOT for**: Whether AI features are enabled by the user
+
+### `llmAvailabilityProvider`
+
+- **Type**: `StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>`
+- **File**: `lib/providers/llm_provider.dart`
+- **Source**: Combines `aiFeatureEnabledProvider` + model download status
+- **Consumers**: `CatDetailScreen` (diary card, chat button), `FocusCompleteScreen` (diary trigger)
+- **SSOT for**: Whether the LLM engine is ready for inference
+
+### `chatNotifierProvider`
+
+- **Type**: `StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>`
+- **File**: `lib/providers/chat_provider.dart`
+- **Source**: `ChatService` (SQLite history + LLM stream)
+- **Consumers**: `CatChatScreen`
+- **SSOT for**: Chat state for a specific cat — messages, generation status, partial response
+
+---
+
 ## Key Patterns
 
 | Pattern | When To Use | Example |

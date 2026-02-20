@@ -36,6 +36,7 @@ class FocusTimerState {
   final String habitName;
   final int totalSeconds; // Target duration (countdown mode)
   final int elapsedSeconds; // Actual focused time
+  final int totalPausedSeconds; // Cumulative paused seconds for wall-clock calc
   final TimerStatus status;
   final TimerMode mode;
   final DateTime? startedAt;
@@ -47,6 +48,7 @@ class FocusTimerState {
     this.habitName = '',
     this.totalSeconds = 1500, // 25 min default
     this.elapsedSeconds = 0,
+    this.totalPausedSeconds = 0,
     this.status = TimerStatus.idle,
     this.mode = TimerMode.countdown,
     this.startedAt,
@@ -90,10 +92,12 @@ class FocusTimerState {
     String? habitName,
     int? totalSeconds,
     int? elapsedSeconds,
+    int? totalPausedSeconds,
     TimerStatus? status,
     TimerMode? mode,
     DateTime? startedAt,
     DateTime? pausedAt,
+    bool clearPausedAt = false,
   }) {
     return FocusTimerState(
       habitId: habitId ?? this.habitId,
@@ -101,10 +105,11 @@ class FocusTimerState {
       habitName: habitName ?? this.habitName,
       totalSeconds: totalSeconds ?? this.totalSeconds,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
+      totalPausedSeconds: totalPausedSeconds ?? this.totalPausedSeconds,
       status: status ?? this.status,
       mode: mode ?? this.mode,
       startedAt: startedAt ?? this.startedAt,
-      pausedAt: pausedAt ?? this.pausedAt,
+      pausedAt: clearPausedAt ? null : (pausedAt ?? this.pausedAt),
     );
   }
 }
@@ -124,6 +129,8 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   static const _keyElapsedSeconds = '${_prefix}elapsedSeconds';
   static const _keyMode = '${_prefix}mode';
   static const _keyStartedAt = '${_prefix}startedAt';
+  static const _keyTotalPausedSeconds = '${_prefix}totalPausedSeconds';
+  static const _keyPausedAt = '${_prefix}pausedAt';
 
   FocusTimerNotifier() : super(const FocusTimerState());
 
@@ -144,18 +151,29 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
 
     final habitName = prefs.getString(_keyHabitName) ?? 'Focus';
     final habitId = prefs.getString(_keyHabitId) ?? '';
-    final elapsed = prefs.getInt(_keyElapsedSeconds) ?? 0;
     final total = prefs.getInt(_keyTotalSeconds) ?? 0;
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
+    final totalPausedSeconds = prefs.getInt(_keyTotalPausedSeconds) ?? 0;
 
-    // Calculate wall-clock elapsed since startedAt
-    final wallClockElapsed = DateTime.now().difference(startedAt).inSeconds;
+    // Account for pending pause time if app was killed while paused/backgrounded
+    final pausedAtStr = prefs.getString(_keyPausedAt);
+    int pendingPause = 0;
+    if (pausedAtStr != null) {
+      final pausedAt = DateTime.tryParse(pausedAtStr);
+      if (pausedAt != null) {
+        pendingPause = DateTime.now().difference(pausedAt).inSeconds;
+      }
+    }
+
+    // Wall-clock elapsed minus all paused time
+    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
+    final effectiveElapsed = (wallTotal - totalPausedSeconds - pendingPause)
+        .clamp(0, wallTotal);
 
     return {
       'habitId': habitId,
       'habitName': habitName,
-      'elapsed': elapsed,
-      'wallClockElapsed': wallClockElapsed,
+      'wallClockElapsed': effectiveElapsed,
       'totalSeconds': total,
       'mode': TimerMode.values[modeIndex],
     };
@@ -171,6 +189,8 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
     await prefs.remove(_keyElapsedSeconds);
     await prefs.remove(_keyMode);
     await prefs.remove(_keyStartedAt);
+    await prefs.remove(_keyTotalPausedSeconds);
+    await prefs.remove(_keyPausedAt);
   }
 
   /// Initialize the timer with habit/cat info and duration.
@@ -207,15 +227,22 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
     final catId = prefs.getString(_keyCatId) ?? '';
     final habitName = prefs.getString(_keyHabitName) ?? '';
     final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? 1500;
-    final savedElapsed = prefs.getInt(_keyElapsedSeconds) ?? 0;
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
     final mode = TimerMode.values[modeIndex];
+    var totalPausedSeconds = prefs.getInt(_keyTotalPausedSeconds) ?? 0;
 
-    // Use wall-clock time for better accuracy
-    final wallClockElapsed = DateTime.now().difference(startedAt).inSeconds;
-    final effectiveElapsed = wallClockElapsed > savedElapsed
-        ? wallClockElapsed
-        : savedElapsed;
+    // Account for pending pause (app was killed while paused/backgrounded)
+    final pausedAtStr = prefs.getString(_keyPausedAt);
+    if (pausedAtStr != null) {
+      final pausedAt = DateTime.tryParse(pausedAtStr);
+      if (pausedAt != null) {
+        totalPausedSeconds += DateTime.now().difference(pausedAt).inSeconds;
+      }
+    }
+
+    // Wall-clock elapsed minus paused time
+    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
+    final effectiveElapsed = (wallTotal - totalPausedSeconds).clamp(0, wallTotal);
 
     // Countdown mode: check if would have completed
     if (mode == TimerMode.countdown && effectiveElapsed >= totalSeconds) {
@@ -225,6 +252,7 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
         habitName: habitName,
         totalSeconds: totalSeconds,
         elapsedSeconds: totalSeconds,
+        totalPausedSeconds: totalPausedSeconds,
         status: TimerStatus.completed,
         mode: mode,
         startedAt: startedAt,
@@ -233,16 +261,18 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
       return;
     }
 
-    // Otherwise restore as paused
+    // Otherwise restore as paused (add current time to paused total)
     state = FocusTimerState(
       habitId: habitId,
       catId: catId,
       habitName: habitName,
       totalSeconds: totalSeconds,
-      elapsedSeconds: effectiveElapsed.clamp(0, totalSeconds),
+      elapsedSeconds: effectiveElapsed,
+      totalPausedSeconds: totalPausedSeconds,
       status: TimerStatus.paused,
       mode: mode,
       startedAt: startedAt,
+      pausedAt: DateTime.now(),
     );
   }
 
@@ -263,7 +293,11 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   }
 
   void _onTick() {
-    final newElapsed = state.elapsedSeconds + 1;
+    if (state.startedAt == null) return;
+
+    // Wall-clock calculation: elapsed = (now - startedAt) - totalPausedSeconds
+    final wallTotal = DateTime.now().difference(state.startedAt!).inSeconds;
+    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(0, wallTotal);
 
     // Countdown: check if time is up
     if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
@@ -307,10 +341,25 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
     _saveState();
   }
 
-  /// Resume from pause.
+  /// Resume from pause — accumulate pause duration into totalPausedSeconds.
   void resume() {
-    state = state.copyWith(status: TimerStatus.running);
-    start();
+    if (state.pausedAt != null) {
+      final pauseDuration = DateTime.now().difference(state.pausedAt!).inSeconds;
+      state = state.copyWith(
+        totalPausedSeconds: state.totalPausedSeconds + pauseDuration,
+        status: TimerStatus.running,
+        clearPausedAt: true,
+      );
+    } else {
+      state = state.copyWith(
+        status: TimerStatus.running,
+        clearPausedAt: true,
+      );
+    }
+    _ticker?.cancel();
+    _ticksSinceSave = 0;
+    _saveState();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
 
   /// Complete the session (stopwatch mode: user presses done).
@@ -328,66 +377,69 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
   }
 
   /// Handle app going to background.
+  /// Records pausedAt for tracking background time, saves state, and updates
+  /// the foreground notification to static text. The timer state stays
+  /// "running" — wall-clock anchoring will catch up on resume.
   void onAppBackgrounded() {
     if (state.status == TimerStatus.running) {
       state = state.copyWith(pausedAt: DateTime.now());
+      _saveState();
+      FocusTimerService.updateNotification(
+        title: '\u{1F431} ${state.habitName.isNotEmpty ? state.habitName : "Focus"}',
+        text: 'Focus session in progress',
+      );
     }
   }
 
   /// Handle app coming back to foreground.
+  /// Uses wall-clock anchoring to compute the real elapsed time. The timer
+  /// continues seamlessly — no time is ever lost.
   void onAppResumed() {
     if (state.status != TimerStatus.running || state.pausedAt == null) return;
+    if (state.startedAt == null) return;
 
+    // Wall-clock total elapsed minus paused time
+    final wallTotal = DateTime.now().difference(state.startedAt!).inSeconds;
+    final newElapsed = (wallTotal - state.totalPausedSeconds)
+        .clamp(0, wallTotal);
+
+    // Auto-complete if away > 30 minutes (user forgot about it)
     final awayDuration = DateTime.now().difference(state.pausedAt!);
-
-    // If away > 5 minutes, auto-complete/abandon
-    if (awayDuration.inMinutes > 5) {
+    if (awayDuration.inMinutes > 30) {
       _ticker?.cancel();
-      final finalElapsed = state.elapsedSeconds + awayDuration.inSeconds;
-      if (state.mode == TimerMode.countdown &&
-          finalElapsed >= state.totalSeconds) {
-        state = state.copyWith(
-          elapsedSeconds: state.totalSeconds,
-          status: TimerStatus.completed,
-          pausedAt: null,
-        );
-      } else {
-        state = state.copyWith(
-          elapsedSeconds: state.elapsedSeconds + awayDuration.inSeconds,
-          status: TimerStatus.completed,
-          pausedAt: null,
-        );
-      }
+      final cappedElapsed = state.mode == TimerMode.countdown
+          ? newElapsed.clamp(0, state.totalSeconds)
+          : newElapsed;
+      state = state.copyWith(
+        elapsedSeconds: cappedElapsed,
+        status: TimerStatus.completed,
+        clearPausedAt: true,
+      );
       _clearSavedState();
       return;
     }
 
-    // If away > 15 seconds, auto-pause
-    if (awayDuration.inSeconds > 15) {
-      _ticker?.cancel();
-      state = state.copyWith(
-        status: TimerStatus.paused,
-        pausedAt: null,
-      );
-      return;
-    }
-
-    // Brief absence: add elapsed time and continue
-    final newElapsed = state.elapsedSeconds + awayDuration.inSeconds;
+    // Countdown completed while in background
     if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
       _ticker?.cancel();
       state = state.copyWith(
         elapsedSeconds: state.totalSeconds,
         status: TimerStatus.completed,
-        pausedAt: null,
+        clearPausedAt: true,
       );
       _clearSavedState();
-    } else {
-      state = state.copyWith(
-        elapsedSeconds: newElapsed,
-        pausedAt: null,
-      );
+      return;
     }
+
+    // Normal resume — clear pausedAt, restart ticker, refresh display
+    state = state.copyWith(
+      elapsedSeconds: newElapsed,
+      clearPausedAt: true,
+    );
+    _ticker?.cancel();
+    _ticksSinceSave = 0;
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
+    _updateNotification();
   }
 
   /// Reset to idle state.
@@ -405,9 +457,15 @@ class FocusTimerNotifier extends StateNotifier<FocusTimerState> {
     await prefs.setString(_keyHabitName, state.habitName);
     await prefs.setInt(_keyTotalSeconds, state.totalSeconds);
     await prefs.setInt(_keyElapsedSeconds, state.elapsedSeconds);
+    await prefs.setInt(_keyTotalPausedSeconds, state.totalPausedSeconds);
     await prefs.setInt(_keyMode, state.mode.index);
     if (state.startedAt != null) {
       await prefs.setString(_keyStartedAt, state.startedAt!.toIso8601String());
+    }
+    if (state.pausedAt != null) {
+      await prefs.setString(_keyPausedAt, state.pausedAt!.toIso8601String());
+    } else {
+      await prefs.remove(_keyPausedAt);
     }
   }
 

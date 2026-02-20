@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/emoji_picker.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -133,7 +134,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         name: _catNameController.text.trim(),
       );
 
-      await ref.read(firestoreServiceProvider).createHabitWithCat(
+      final result = await ref.read(firestoreServiceProvider).createHabitWithCat(
             uid: uid,
             name: _nameController.text.trim(),
             icon: _selectedEmoji,
@@ -147,6 +148,27 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             habitName: _nameController.text.trim(),
             targetHours: _targetHours,
           );
+
+      // Schedule daily reminder if user set a reminder time
+      if (_reminderTime != null) {
+        final notifService = NotificationService();
+        var hasPermission = await notifService.isPermissionGranted();
+        if (!hasPermission) {
+          hasPermission = await notifService.requestPermission();
+        }
+        if (hasPermission) {
+          final parts = _reminderTime!.split(':');
+          final hour = int.parse(parts[0]);
+          final minute = int.parse(parts[1]);
+          await notifService.scheduleDailyReminder(
+            habitId: result.habitId,
+            habitName: _nameController.text.trim(),
+            catName: _catNameController.text.trim(),
+            hour: hour,
+            minute: minute,
+          );
+        }
+      }
 
       if (mounted) {
         Navigator.of(context).pop(true);

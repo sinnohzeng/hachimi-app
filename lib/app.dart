@@ -7,11 +7,14 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
+import 'package:hachimi_app/services/notification_service.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
 
 class HachimiApp extends ConsumerWidget {
   const HachimiApp({super.key});
@@ -230,6 +233,7 @@ class _FirstHabitGate extends ConsumerStatefulWidget {
 
 class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   bool _checkedFirstHabit = false;
+  bool _remindersScheduled = false;
 
   @override
   void initState() {
@@ -293,6 +297,41 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     // Session check complete — no state tracking needed
   }
 
+  /// Reschedule daily reminders for all active habits with reminderTime set.
+  /// Only runs if notification permission is already granted.
+  Future<void> _rescheduleReminders(List<Habit> habits) async {
+    final notifService = NotificationService();
+    final hasPermission = await notifService.isPermissionGranted();
+    if (!hasPermission) return;
+
+    final catsAsync = ref.read(catsProvider);
+    final cats = catsAsync.valueOrNull ?? [];
+
+    for (final habit in habits) {
+      if (habit.isActive && habit.reminderTime != null) {
+        final parts = habit.reminderTime!.split(':');
+        if (parts.length != 2) continue;
+        final hour = int.tryParse(parts[0]);
+        final minute = int.tryParse(parts[1]);
+        if (hour == null || minute == null) continue;
+
+        // Find the cat name for the notification
+        final cat = habit.catId != null
+            ? cats.where((c) => c.id == habit.catId).firstOrNull
+            : null;
+        final catName = cat?.name ?? 'Your cat';
+
+        await notifService.scheduleDailyReminder(
+          habitId: habit.id,
+          habitName: habit.name,
+          catName: catName,
+          hour: hour,
+          minute: minute,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final habitsAsync = ref.watch(habitsProvider);
@@ -313,6 +352,11 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
           });
         } else {
           _checkedFirstHabit = true;
+          // Reschedule reminders for all active habits on app startup
+          if (!_remindersScheduled) {
+            _remindersScheduled = true;
+            _rescheduleReminders(habits);
+          }
         }
       });
     }

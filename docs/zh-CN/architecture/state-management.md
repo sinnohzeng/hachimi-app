@@ -364,6 +364,62 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 ---
 
+### 本地 LLM Provider
+
+```
+模型管理 + LLM 引擎（独立于认证 — 仅本地）：
+
+modelManagerProvider (Provider<ModelManagerService>)
+localDatabaseProvider (Provider<LocalDatabaseService>)
+llmServiceInstanceProvider (Provider<LlmService>)
+
+diaryServiceProvider (Provider<DiaryService>)
+chatServiceProvider (Provider<ChatService>)
+
+aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
+  来源：SharedPreferences 'ai_features_enabled'
+
+llmAvailabilityProvider (StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>)
+  枚举：featureDisabled | modelNotDownloaded | modelLoading | ready | error
+  依赖：aiFeatureEnabledProvider, modelManagerProvider
+
+modelDownloadProvider (StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>)
+  追踪下载进度、状态（idle/downloading/paused/completed/error）
+
+diaryEntriesProvider(catId) — FutureProvider.family<List<DiaryEntry>, String>
+todayDiaryProvider(catId) — FutureProvider.family<DiaryEntry?, String>
+
+chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>
+  ChatState：{ messages, status, partialResponse, error }
+  ChatStatus：idle | loading | generating | error
+```
+
+### `aiFeatureEnabledProvider`
+
+- **类型**：`StateNotifierProvider<AiFeatureNotifier, bool>`
+- **文件**：`lib/providers/llm_provider.dart`
+- **来源**：SharedPreferences `ai_features_enabled`
+- **消费者**：`SettingsScreen`（AI 开关）、`llmAvailabilityProvider`
+- **SSOT**：用户是否启用了 AI 功能
+
+### `llmAvailabilityProvider`
+
+- **类型**：`StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>`
+- **文件**：`lib/providers/llm_provider.dart`
+- **来源**：组合 `aiFeatureEnabledProvider` + 模型下载状态
+- **消费者**：`CatDetailScreen`（日记卡片、聊天按钮）、`FocusCompleteScreen`（日记触发）
+- **SSOT**：LLM 引擎是否就绪可推理
+
+### `chatNotifierProvider`
+
+- **类型**：`StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>`
+- **文件**：`lib/providers/chat_provider.dart`
+- **来源**：`ChatService`（SQLite 历史 + LLM 流）
+- **消费者**：`CatChatScreen`
+- **SSOT**：特定猫咪的聊天状态 — 消息列表、生成状态、部分回复
+
+---
+
 ## 核心模式
 
 | 模式 | 使用场景 | 示例 |

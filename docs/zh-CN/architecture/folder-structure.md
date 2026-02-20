@@ -46,7 +46,8 @@ hachimi-app/
 │   │   ├── constants/
 │   │   │   ├── analytics_events.dart       # SSOT：所有 GA4 事件名 + 参数
 │   │   │   ├── cat_constants.dart          # SSOT：阶段、心情、性格
-│   │   │   └── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
+│   │   │   ├── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
+│   │   │   └── llm_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
 │   │   ├── router/
 │   │   │   └── app_router.dart             # 命名路由注册表 + 路由常量
 │   │   └── theme/
@@ -61,7 +62,9 @@ hachimi-app/
 │   │   ├── cat_appearance.dart             # CatAppearance —— pixel-cat-maker 参数值对象
 │   │   ├── habit.dart                      # 习惯 —— Firestore 模型
 │   │   ├── focus_session.dart              # FocusSession（专注会话）—— 会话历史记录
-│   │   └── check_in.dart                   # CheckInEntry（打卡条目）—— 向后兼容
+│   │   ├── check_in.dart                   # CheckInEntry（打卡条目）—— 向后兼容
+│   │   ├── diary_entry.dart                # DiaryEntry — 本地 SQLite 模型（AI 日记）
+│   │   └── chat_message.dart               # ChatMessage — 本地 SQLite 模型（AI 聊天）
 │   │
 │   ├── services/                           # Firebase SDK 封装层（无 UI，无 BuildContext）
 │   │   ├── analytics_service.dart          # Firebase Analytics（分析）封装 —— 记录事件
@@ -75,7 +78,12 @@ hachimi-app/
 │   │   ├── pixel_cat_generation_service.dart # 随机猫咪生成 —— 外观 + 性格
 │   │   ├── pixel_cat_renderer.dart         # 13 层精灵图合成器（pixel-cat-maker 引擎）
 │   │   ├── remote_config_service.dart      # Remote Config（远程配置）—— 类型化 getter + 默认值
-│   │   └── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
+│   │   ├── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
+│   │   ├── llm_service.dart               # LLM 引擎封装（flutter_llama）
+│   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
+│   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
+│   │   ├── model_manager_service.dart     # GGUF 模型下载、校验、删除
+│   │   └── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
 │   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider
@@ -88,13 +96,18 @@ hachimi-app/
 │   │   ├── habits_provider.dart            # habitsProvider、todayCheckInsProvider
 │   │   ├── locale_provider.dart            # localeProvider（应用语言覆盖）
 │   │   ├── stats_provider.dart             # statsProvider（计算型 HabitStats）
-│   │   └── theme_provider.dart             # themeProvider（主题模式 + 种子色）
+│   │   ├── theme_provider.dart             # themeProvider（主题模式 + 种子色）
+│   │   ├── llm_provider.dart              # AI 功能开关、LLM 可用性、模型下载
+│   │   ├── diary_provider.dart            # diaryEntriesProvider、todayDiaryProvider（family）
+│   │   └── chat_provider.dart             # chatNotifierProvider（StateNotifier family）
 │   │
 │   ├── screens/                            # 全页界面（消费 Provider，无业务逻辑）
 │   │   ├── auth/
 │   │   │   └── login_screen.dart           # 登录 + 注册（邮箱/密码 + Google）
 │   │   ├── cat_detail/
-│   │   │   └── cat_detail_screen.dart      # 猫咪信息、进度条、热力图、配饰
+│   │   │   ├── cat_detail_screen.dart      # 猫咪信息、进度条、热力图、配饰
+│   │   │   ├── cat_diary_screen.dart     # AI 生成日记列表页
+│   │   │   └── cat_chat_screen.dart      # 猫猫聊天页（流式回复）
 │   │   ├── cat_room/
 │   │   │   ├── cat_room_screen.dart        # 2 列 CatHouse 网格，像素风猫咪
 │   │   │   └── accessory_shop_screen.dart  # 饰品商店：3 标签网格 + 购买流程
@@ -159,6 +172,13 @@ hachimi-app/
 │   │   └── src/main/
 │   │       └── AndroidManifest.xml         # 权限 + 服务声明
 │   └── ...
+│
+├── .github/
+│   └── workflows/
+│       └── release.yml                    # CI/CD：tag 触发的 release APK 构建 + GitHub Release
+│
+├── scripts/
+│   └── setup-release-signing.sh           # 交互式配置：keystore 生成 + GitHub Secrets 输出
 │
 ├── firestore.rules                         # 已部署的 Firestore 安全规则
 ├── firebase.json                           # Firebase 项目配置

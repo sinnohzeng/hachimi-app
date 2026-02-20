@@ -7,7 +7,9 @@
 | 关注点 | 值 |
 |--------|-----|
 | 发布平台 | GitHub Releases（`sinnohzeng/hachimi-app`） |
-| APK 类型 | Debug APK（用于直接分发 / 侧载安装） |
+| APK 类型 | Release 签名 APK（AOT 编译、代码压缩） |
+| 构建方式 | GitHub Actions 自动化（tag 触发） |
+| 签名方式 | 生产级 keystore（`hachimi-release.jks`） |
 | 版本格式 | `pubspec.yaml` version 字段（`主版本.次版本.补丁版本+构建号`） |
 | 发布页面 | https://github.com/sinnohzeng/hachimi-app/releases |
 
@@ -15,7 +17,7 @@
 
 ## 版本命名规范
 
-遵循[语义化版本](https://semver.org/lang/zh-CN/)：
+遵循 [语义化版本](https://semver.org/lang/zh-CN/)：
 
 | 组成部分 | 含义 |
 |----------|------|
@@ -38,72 +40,80 @@
 version: 1.1.0+2   # 同时更新语义版本号和构建号
 ```
 
-构建前先提交版本号变更：
+提交版本号变更：
 
 ```bash
 git add pubspec.yaml
 git commit -m "chore: bump version to 1.1.0+2"
 ```
 
-### 第二步 — 构建 APK
+### 第二步 — 创建 git tag 并推送
 
 ```bash
-flutter build apk --debug
+git tag v1.1.0
+git push && git push --tags
 ```
 
-输出 APK 路径：
-```
-build/app/outputs/flutter-apk/app-debug.apk
-```
+> **重要**：tag 版本号必须与 `pubspec.yaml` 中的语义版本号一致（不含 `+构建号`）。
 
-### 第三步 — 创建 GitHub Release
+### 第三步 — CI 自动接管
 
-使用 `gh` CLI 一次性创建 Release 并附上 APK：
+GitHub Actions（`.github/workflows/release.yml`）将自动执行：
 
-```bash
-gh release create v1.0.0 \
-  build/app/outputs/flutter-apk/app-debug.apk \
-  --title "Hachimi v1.0.0" \
-  --notes "$(cat <<'EOF'
-## 新增内容
-
-- 首次公开发布
-- 猫咪养成游戏化系统
-- 专注计时器 + XP 奖励
-- Firebase 同步 + 离线支持
-- Google 一键登录
-
-## 安装方法
-
-1. 下载 `app-debug.apk`
-2. 在 Android 上：**设置 → 安全 → 安装未知应用** → 为浏览器/文件管理器开启权限
-3. 点击下载的 APK 文件进行安装
-
-> 这是用于直接侧载安装的 Debug 构建版本。Google Play 正式发布计划中。
-EOF
-)"
-```
+1. 检出 tag 对应的代码
+2. 配置 JDK 17 + Flutter 3.41.1
+3. 从 GitHub Secrets 恢复 Firebase 配置文件和签名 keystore
+4. 运行 `dart analyze lib/`
+5. 构建 release 签名 APK（`flutter build apk --release`）
+6. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
+7. 创建 GitHub Release，自动生成 release notes 并附上 APK
 
 ### 第四步 — 验证
 
 1. 打开 https://github.com/sinnohzeng/hachimi-app/releases
 2. 确认 Release 标签、标题和 APK 附件显示正确
-3. 下载并安装 APK，验证其有效性
-
-### 第五步 — 推送剩余提交
-
-```bash
-git push
-```
+3. 下载并安装 APK，验证功能正常
 
 ## 发布前检查清单
 
 - [ ] `pubspec.yaml` 版本号已更新
 - [ ] 版本号变更已提交
-- [ ] `flutter build apk --debug` 成功完成
-- [ ] `gh release create` 已运行并附上 APK
+- [ ] Git tag 已创建（如 `v1.1.0`）
+- [ ] Tag 已推送到远程（`git push --tags`）
+- [ ] GitHub Actions workflow 运行成功
 - [ ] https://github.com/sinnohzeng/hachimi-app/releases 页面显示新 Release
 - [ ] APK 可在测试设备上正常安装和运行
+
+## Release 签名
+
+### Keystore
+
+生产级 keystore（`hachimi-release.jks`）存储在项目仓库外部，绝不可提交到 git。通过 `android/key.properties`（已 gitignore）进行配置。
+
+### 本地构建（可选）
+
+本地构建 release APK：
+
+```bash
+flutter build apk --release
+```
+
+需要 `android/key.properties` 文件存在。初次配置请运行 `scripts/setup-release-signing.sh`。
+
+### GitHub Secrets
+
+CI workflow 需要在仓库中配置以下 Secrets：
+
+| Secret | 用途 |
+|--------|------|
+| `KEYSTORE_BASE64` | Base64 编码的生产级 keystore |
+| `KEYSTORE_PASSWORD` | Keystore 密码 |
+| `KEY_ALIAS` | 签名密钥别名 |
+| `KEY_PASSWORD` | 密钥密码 |
+| `GOOGLE_SERVICES_JSON` | Base64 编码的 `google-services.json` |
+| `FIREBASE_OPTIONS_DART` | Base64 编码的 `firebase_options.dart` |
+
+运行 `scripts/setup-release-signing.sh` 可自动生成这些值。
 
 ## 与官网的关系
 

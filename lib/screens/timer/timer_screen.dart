@@ -26,6 +26,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
@@ -44,6 +45,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     with WidgetsBindingObserver {
   bool _hasStarted = false;
   bool _sessionSaved = false;
+  bool _showPermissionBanner = false;
 
   @override
   void initState() {
@@ -68,10 +70,17 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     }
   }
 
-  void _startTimer() {
+  void _startTimer() async {
     final timerState = ref.read(focusTimerProvider);
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
+
+    // Check notification permission — show banner if not granted
+    final notifService = NotificationService();
+    final hasPermission = await notifService.isPermissionGranted();
+    if (!hasPermission && mounted) {
+      setState(() => _showPermissionBanner = true);
+    }
 
     ref.read(focusTimerProvider.notifier).start();
     setState(() => _hasStarted = true);
@@ -260,6 +269,35 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         child: SafeArea(
           child: Column(
             children: [
+              // Notification permission banner
+              if (_showPermissionBanner)
+                MaterialBanner(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  content: const Text(
+                    'Enable notifications to see timer progress when the app is in the background',
+                  ),
+                  leading: const Icon(Icons.notifications_off_outlined),
+                  actions: [
+                    TextButton(
+                      onPressed: () =>
+                          setState(() => _showPermissionBanner = false),
+                      child: const Text('Dismiss'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final granted =
+                            await NotificationService().requestPermission();
+                        if (mounted) {
+                          setState(() =>
+                              _showPermissionBanner = !granted);
+                        }
+                      },
+                      child: const Text('Enable'),
+                    ),
+                  ],
+                ),
+
               // Top bar: habit name + streak
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -427,6 +465,46 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         );
 
       case TimerStatus.running:
+        // Stopwatch mode: show Pause + Done side-by-side
+        if (timerState.mode == TimerMode.stopwatch) {
+          return Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 56,
+                  child: FilledButton.tonalIcon(
+                    onPressed: _pauseTimer,
+                    icon: const Icon(Icons.pause, size: 28),
+                    label: Text(
+                      'Pause',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 56,
+                  child: FilledButton.icon(
+                    onPressed: _completeTimer,
+                    icon: const Icon(Icons.check, size: 28),
+                    label: Text(
+                      'Done',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        // Countdown mode: only Pause
         return SizedBox(
           width: double.infinity,
           height: 56,

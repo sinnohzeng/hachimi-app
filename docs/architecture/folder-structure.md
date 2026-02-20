@@ -46,7 +46,8 @@ hachimi-app/
 │   │   ├── constants/
 │   │   │   ├── analytics_events.dart       # SSOT: all GA4 event names + params
 │   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
-│   │   │   └── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
+│   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
+│   │   │   └── llm_constants.dart          # SSOT: LLM model metadata, prompts, inference params
 │   │   ├── router/
 │   │   │   └── app_router.dart             # Named route registry + route constants
 │   │   └── theme/
@@ -61,7 +62,9 @@ hachimi-app/
 │   │   ├── cat_appearance.dart             # CatAppearance — pixel-cat-maker parameter value object
 │   │   ├── habit.dart                      # Habit — Firestore model
 │   │   ├── focus_session.dart              # FocusSession — session history record
-│   │   └── check_in.dart                   # CheckInEntry — daily check-in entry (legacy compat)
+│   │   ├── check_in.dart                   # CheckInEntry — daily check-in entry (legacy compat)
+│   │   ├── diary_entry.dart                # DiaryEntry — local SQLite model (AI diary)
+│   │   └── chat_message.dart               # ChatMessage — local SQLite model (AI chat)
 │   │
 │   ├── services/                           # Firebase SDK isolation layer (no UI, no BuildContext)
 │   │   ├── analytics_service.dart          # Firebase Analytics wrapper — log events
@@ -75,7 +78,12 @@ hachimi-app/
 │   │   ├── pixel_cat_generation_service.dart # Random cat generation — appearance + personality
 │   │   ├── pixel_cat_renderer.dart         # 13-layer sprite compositor (pixel-cat-maker engine)
 │   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
-│   │   └── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
+│   │   ├── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
+│   │   ├── llm_service.dart               # LLM engine wrapper (flutter_llama)
+│   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
+│   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
+│   │   ├── model_manager_service.dart     # GGUF model download, verify, delete
+│   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider
@@ -88,13 +96,18 @@ hachimi-app/
 │   │   ├── habits_provider.dart            # habitsProvider, todayCheckInsProvider
 │   │   ├── locale_provider.dart            # localeProvider (app language override)
 │   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
-│   │   └── theme_provider.dart             # themeProvider (theme mode + seed color)
+│   │   ├── theme_provider.dart             # themeProvider (theme mode + seed color)
+│   │   ├── llm_provider.dart              # AI feature toggle, LLM availability, model download
+│   │   ├── diary_provider.dart            # diaryEntriesProvider, todayDiaryProvider (family)
+│   │   └── chat_provider.dart             # chatNotifierProvider (StateNotifier family)
 │   │
 │   ├── screens/                            # Full-page widgets (consume providers, no business logic)
 │   │   ├── auth/
 │   │   │   └── login_screen.dart           # Login + Register (email/password + Google)
 │   │   ├── cat_detail/
-│   │   │   └── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
+│   │   │   ├── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
+│   │   │   ├── cat_diary_screen.dart     # AI-generated diary list page
+│   │   │   └── cat_chat_screen.dart      # Cat chat page with streaming responses
 │   │   ├── cat_room/
 │   │   │   ├── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
 │   │   │   └── accessory_shop_screen.dart  # Accessory shop: 3-tab grid + purchase flow
@@ -159,6 +172,13 @@ hachimi-app/
 │   │   └── src/main/
 │   │       └── AndroidManifest.xml         # Permissions + service declarations
 │   └── ...
+│
+├── .github/
+│   └── workflows/
+│       └── release.yml                    # CI/CD: tag-triggered release APK build + GitHub Release
+│
+├── scripts/
+│   └── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
 │
 ├── firestore.rules                         # Deployed Firestore security rules
 ├── firebase.json                           # Firebase project configuration

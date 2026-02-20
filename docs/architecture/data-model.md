@@ -293,3 +293,57 @@ All documents are fully isolated per `uid`. See [Security Rules](../firebase/sec
 - No cross-user data access.
 - No public collections.
 - Anonymous access is denied for all paths.
+
+---
+
+## Local Storage — SQLite + SharedPreferences
+
+In addition to Firestore, the app uses local-only storage for AI-generated content. This data is not synced to the cloud and is deleted when the app is uninstalled.
+
+### SQLite Database: `hachimi_local.db`
+
+**Service:** `lib/services/local_database_service.dart`
+
+#### Table: `diary_entries`
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `cat_id` | TEXT | NOT NULL | Reference to cat |
+| `habit_id` | TEXT | NOT NULL | Reference to habit |
+| `content` | TEXT | NOT NULL | Generated diary text (2-4 sentences) |
+| `date` | TEXT | NOT NULL | ISO date "YYYY-MM-DD" |
+| `personality` | TEXT | NOT NULL | Personality snapshot at generation time |
+| `mood` | TEXT | NOT NULL | Mood snapshot at generation time |
+| `stage` | TEXT | NOT NULL | Stage snapshot at generation time |
+| `total_minutes` | INTEGER | NOT NULL | Total minutes snapshot |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp |
+
+**Unique constraint:** `UNIQUE(cat_id, date)` — one diary entry per cat per day.
+
+**Dart Model:** `lib/models/diary_entry.dart` -> `class DiaryEntry`
+
+#### Table: `chat_messages`
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `cat_id` | TEXT | NOT NULL | Reference to cat |
+| `role` | TEXT | NOT NULL | `'user'` or `'assistant'` |
+| `content` | TEXT | NOT NULL | Message text |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp |
+
+**Index:** `idx_chat_cat_created` on `(cat_id, created_at)` for efficient recent message queries.
+
+**Dart Model:** `lib/models/chat_message.dart` -> `class ChatMessage`
+
+### SharedPreferences Keys (AI Features)
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `ai_features_enabled` | bool | false | Master toggle for AI features |
+| `ai_model_downloaded` | bool | false | Whether the GGUF model file exists locally |
+| `ai_model_file_path` | String | "" | Absolute path to the downloaded model file |
+| `ai_model_version` | String | "" | Version identifier for model upgrade detection |
+
+**Constants:** `lib/core/constants/llm_constants.dart` -> `class LlmConstants`

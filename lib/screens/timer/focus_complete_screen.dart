@@ -20,6 +20,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/services/diary_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
@@ -43,6 +45,31 @@ class FocusCompleteScreen extends ConsumerWidget {
     this.coinsEarned = 0,
   });
 
+  /// 异步触发日记生成 — fire-and-forget，不影响 UI。
+  void _triggerDiaryGeneration(
+    WidgetRef ref,
+    dynamic cat,
+    dynamic habit,
+    int todayMinutes,
+  ) {
+    if (cat == null || habit == null) return;
+    if (isAbandoned) return;
+
+    final availability = ref.read(llmAvailabilityProvider);
+    if (availability != LlmAvailability.ready) return;
+
+    final diaryService = ref.read(diaryServiceProvider);
+    final ctx = DiaryGenerationContext(
+      cat: cat,
+      habit: habit,
+      todayMinutes: todayMinutes,
+      isZhLocale: false, // 将在后续版本中根据 locale 动态设置
+    );
+
+    // fire-and-forget
+    diaryService.generateTodayDiary(ctx);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -60,6 +87,9 @@ class FocusCompleteScreen extends ConsumerWidget {
     // Trigger haptic feedback on screen build (celebration moment)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       HapticFeedback.heavyImpact();
+
+      // 异步触发日记生成（不阻塞 UI）
+      _triggerDiaryGeneration(ref, cat, habit, minutes);
     });
 
     return Scaffold(

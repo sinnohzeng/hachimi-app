@@ -292,3 +292,57 @@ dormant --[习惯重新激活]--> active（未来功能）
 - 无跨用户数据访问。
 - 无公共集合。
 - 匿名访问对所有路径均被拒绝。
+
+---
+
+## 本地存储 — SQLite + SharedPreferences
+
+除 Firestore 外，应用还使用本地存储来保存 AI 生成的内容。这些数据不同步到云端，卸载应用时自动删除。
+
+### SQLite 数据库：`hachimi_local.db`
+
+**服务：** `lib/services/local_database_service.dart`
+
+#### 表：`diary_entries`
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `cat_id` | TEXT | NOT NULL | 关联猫咪 |
+| `habit_id` | TEXT | NOT NULL | 关联习惯 |
+| `content` | TEXT | NOT NULL | 生成的日记文本（2-4 句话） |
+| `date` | TEXT | NOT NULL | ISO 日期 "YYYY-MM-DD" |
+| `personality` | TEXT | NOT NULL | 生成时的性格快照 |
+| `mood` | TEXT | NOT NULL | 生成时的心情快照 |
+| `stage` | TEXT | NOT NULL | 生成时的阶段快照 |
+| `total_minutes` | INTEGER | NOT NULL | 总分钟数快照 |
+| `created_at` | INTEGER | NOT NULL | Unix 时间戳 |
+
+**唯一约束：** `UNIQUE(cat_id, date)` — 每只猫每天最多一条日记。
+
+**Dart 模型：** `lib/models/diary_entry.dart` -> `class DiaryEntry`
+
+#### 表：`chat_messages`
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `cat_id` | TEXT | NOT NULL | 关联猫咪 |
+| `role` | TEXT | NOT NULL | `'user'` 或 `'assistant'` |
+| `content` | TEXT | NOT NULL | 消息文本 |
+| `created_at` | INTEGER | NOT NULL | Unix 时间戳 |
+
+**索引：** `idx_chat_cat_created`（`cat_id, created_at`）用于高效查询最近消息。
+
+**Dart 模型：** `lib/models/chat_message.dart` -> `class ChatMessage`
+
+### SharedPreferences 键（AI 功能）
+
+| 键名 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `ai_features_enabled` | bool | false | AI 功能总开关 |
+| `ai_model_downloaded` | bool | false | GGUF 模型文件是否已下载 |
+| `ai_model_file_path` | String | "" | 模型文件的绝对路径 |
+| `ai_model_version` | String | "" | 模型版本标识（用于升级检测） |
+
+**常量定义：** `lib/core/constants/llm_constants.dart` -> `class LlmConstants`

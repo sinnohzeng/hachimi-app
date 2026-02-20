@@ -7,6 +7,8 @@ import 'package:hachimi_app/screens/timer/timer_screen.dart';
 import 'package:hachimi_app/screens/timer/focus_complete_screen.dart';
 import 'package:hachimi_app/screens/habits/habit_detail_screen.dart';
 import 'package:hachimi_app/screens/cat_detail/cat_detail_screen.dart';
+import 'package:hachimi_app/screens/cat_detail/cat_diary_screen.dart';
+import 'package:hachimi_app/screens/cat_detail/cat_chat_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 import 'package:hachimi_app/screens/settings/settings_screen.dart';
 import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
@@ -31,6 +33,8 @@ class AppRouter {
   static const String accessoryShop = '/accessory-shop';
   static const String inventory = '/inventory';
   static const String checkIn = '/check-in';
+  static const String catDiary = '/cat-diary';
+  static const String catChat = '/cat-chat';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -92,6 +96,16 @@ class AppRouter {
       case checkIn:
         return MaterialPageRoute(
             builder: (_) => const CheckInScreen());
+      case catDiary:
+        final catId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => CatDiaryScreen(catId: catId),
+        );
+      case catChat:
+        final catId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => CatChatScreen(catId: catId),
+        );
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
