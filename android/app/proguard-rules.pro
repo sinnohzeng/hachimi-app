@@ -21,5 +21,10 @@
 # ─── Dart FFI ───
 -keep class dart.** { *; }
 
+# ─── Google Play Core (referenced by Flutter deferred components) ───
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+
 # ─── Shared libraries ───
 -keepnames class * implements java.io.Serializable
