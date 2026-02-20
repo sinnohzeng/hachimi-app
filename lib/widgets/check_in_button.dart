@@ -18,12 +18,12 @@ class CheckInButton extends StatelessWidget {
 
     return FilledButton.icon(
       onPressed: onPressed,
-      icon: Icon(
-        hasCheckedInToday ? Icons.add : Icons.play_arrow,
+      icon: Icon(hasCheckedInToday ? Icons.add : Icons.play_arrow),
+      label: Text(
+        hasCheckedInToday
+            ? context.l10n.checkInButtonLogMore
+            : context.l10n.checkInButtonStart,
       ),
-      label: Text(hasCheckedInToday
-          ? context.l10n.checkInButtonLogMore
-          : context.l10n.checkInButtonStart),
       style: FilledButton.styleFrom(
         backgroundColor: hasCheckedInToday
             ? colorScheme.secondaryContainer

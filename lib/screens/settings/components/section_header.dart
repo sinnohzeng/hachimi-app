@@ -27,9 +27,9 @@ class SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: colorScheme.onSurfaceVariant),
       ),
     );
   }

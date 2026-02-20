@@ -42,11 +42,7 @@ void main() async {
     return;
   }
 
-  runApp(
-    const ProviderScope(
-      child: HachimiApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: HachimiApp()));
 }
 
 /// 初始化失败时显示的错误页面。

@@ -41,8 +41,9 @@ class MonthlyCheckIn {
       month: doc.id,
       checkedDays: List<int>.from(data['checkedDays'] as List<dynamic>? ?? []),
       totalCoins: data['totalCoins'] as int? ?? 0,
-      milestonesClaimed:
-          List<int>.from(data['milestonesClaimed'] as List<dynamic>? ?? []),
+      milestonesClaimed: List<int>.from(
+        data['milestonesClaimed'] as List<dynamic>? ?? [],
+      ),
     );
   }
 

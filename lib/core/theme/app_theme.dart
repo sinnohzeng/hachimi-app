@@ -74,9 +74,7 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primaryContainer,
@@ -93,9 +91,7 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

@@ -36,8 +36,11 @@ class CatRoomScreen extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.monetization_on,
-                    size: 20, color: theme.colorScheme.tertiary),
+                Icon(
+                  Icons.monetization_on,
+                  size: 20,
+                  color: theme.colorScheme.tertiary,
+                ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   '${ref.watch(coinBalanceProvider).value ?? 0}',
@@ -51,16 +54,14 @@ class CatRoomScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.inventory_2),
             tooltip: context.l10n.catRoomInventory,
-            onPressed: () => Navigator.of(context).pushNamed(
-              AppRouter.inventory,
-            ),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRouter.inventory),
           ),
           IconButton(
             icon: const Icon(Icons.storefront),
             tooltip: context.l10n.catRoomShop,
-            onPressed: () => Navigator.of(context).pushNamed(
-              AppRouter.accessoryShop,
-            ),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRouter.accessoryShop),
           ),
         ],
       ),
@@ -86,7 +87,12 @@ class CatRoomScreen extends ConsumerWidget {
     );
   }
 
-  void _showCatActions(BuildContext context, WidgetRef ref, Cat cat, Habit? habit) {
+  void _showCatActions(
+    BuildContext context,
+    WidgetRef ref,
+    Cat cat,
+    Habit? habit,
+  ) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -98,9 +104,9 @@ class CatRoomScreen extends ConsumerWidget {
               padding: AppSpacing.paddingBase,
               child: Text(
                 cat.name,
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
             if (habit != null)
@@ -109,10 +115,9 @@ class CatRoomScreen extends ConsumerWidget {
                 title: Text(context.l10n.catRoomEditQuest),
                 onTap: () {
                   Navigator.of(ctx).pop();
-                  Navigator.of(context).pushNamed(
-                    AppRouter.habitDetail,
-                    arguments: habit.id,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRouter.habitDetail, arguments: habit.id);
                 },
               ),
             ListTile(
@@ -124,8 +129,10 @@ class CatRoomScreen extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.archive_outlined,
-                  color: Theme.of(ctx).colorScheme.error),
+              leading: Icon(
+                Icons.archive_outlined,
+                color: Theme.of(ctx).colorScheme.error,
+              ),
               title: Text(
                 context.l10n.catRoomArchiveCat,
                 style: TextStyle(color: Theme.of(ctx).colorScheme.error),
@@ -167,11 +174,9 @@ class CatRoomScreen extends ConsumerWidget {
               if (newName.isEmpty) return;
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
-              await ref.read(catFirestoreServiceProvider).renameCat(
-                    uid: uid,
-                    catId: cat.id,
-                    newName: newName,
-                  );
+              await ref
+                  .read(catFirestoreServiceProvider)
+                  .renameCat(uid: uid, catId: cat.id, newName: newName);
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
             child: Text(context.l10n.catRoomRename),
@@ -186,9 +191,7 @@ class CatRoomScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.l10n.catRoomArchiveTitle),
-        content: Text(
-          context.l10n.catRoomArchiveMessage(cat.name),
-        ),
+        content: Text(context.l10n.catRoomArchiveMessage(cat.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -202,15 +205,13 @@ class CatRoomScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
-              await ref.read(catFirestoreServiceProvider).archiveCat(
-                    uid: uid,
-                    catId: cat.id,
-                  );
+              await ref
+                  .read(catFirestoreServiceProvider)
+                  .archiveCat(uid: uid, catId: cat.id);
               if (cat.boundHabitId.isNotEmpty) {
-                await ref.read(firestoreServiceProvider).deleteHabit(
-                      uid: uid,
-                      habitId: cat.boundHabitId,
-                    );
+                await ref
+                    .read(firestoreServiceProvider)
+                    .deleteHabit(uid: uid, habitId: cat.boundHabitId);
               }
             },
             child: Text(context.l10n.catRoomArchive),
@@ -233,17 +234,15 @@ class CatRoomScreen extends ConsumerWidget {
       itemBuilder: (context, index) {
         final cat = cats[index];
         final habits = ref.watch(habitsProvider).value ?? [];
-        final habit =
-            habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
+        final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
 
         return _CatHouseCard(
           cat: cat,
           habitName: habit?.name,
           habitId: habit?.id,
-          onTap: () => Navigator.of(context).pushNamed(
-            AppRouter.catDetail,
-            arguments: cat.id,
-          ),
+          onTap: () => Navigator.of(
+            context,
+          ).pushNamed(AppRouter.catDetail, arguments: cat.id),
           onLongPress: () => _showCatActions(context, ref, cat, habit),
         );
       },

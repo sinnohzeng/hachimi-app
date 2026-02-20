@@ -79,8 +79,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Future<void> _loadOnboardingState() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _onboardingComplete =
-          prefs.getBool(kOnboardingCompleteKey) ?? false;
+      _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
     });
   }
 
@@ -92,9 +91,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Widget build(BuildContext context) {
     // Still loading onboarding state
     if (_onboardingComplete == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // Show onboarding if not completed
@@ -113,9 +110,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       },
       loading: () {
         debugPrint('[APP] authState: loading');
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
       error: (e, __) {
         debugPrint('[APP] authState: error=$e');
@@ -187,9 +182,7 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
   @override
   Widget build(BuildContext context) {
     if (!_checked) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_needsMigration) {
@@ -200,10 +193,7 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  '🐱',
-                  style: TextStyle(fontSize: 64),
-                ),
+                const Text('🐱', style: TextStyle(fontSize: 64)),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   context.l10n.migrationTitle,
@@ -299,10 +289,9 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
           if (resume == true) {
             await ref.read(focusTimerProvider.notifier).restoreSession();
             if (mounted && habitId.isNotEmpty) {
-              Navigator.of(context).pushNamed(
-                AppRouter.timer,
-                arguments: habitId,
-              );
+              Navigator.of(
+                context,
+              ).pushNamed(AppRouter.timer, arguments: habitId);
             }
           } else {
             await FocusTimerNotifier.clearSavedState();

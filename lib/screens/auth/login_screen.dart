@@ -25,7 +25,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (result != null && result.additionalUserInfo?.isNewUser == true) {
         await analyticsService.logSignUp(method: 'google');
         final uid = result.user!.uid;
-        await ref.read(firestoreServiceProvider).createUserProfile(
+        await ref
+            .read(firestoreServiceProvider)
+            .createUserProfile(
               uid: uid,
               email: result.user!.email ?? '',
               displayName: result.user!.displayName,
@@ -34,9 +36,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // AuthGate will automatically navigate to HomeScreen
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) setState(() => _isGoogleLoading = false);
@@ -44,9 +46,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToEmailAuth() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const _EmailAuthScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const _EmailAuthScreen()));
   }
 
   @override
@@ -251,19 +253,18 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
         await analyticsService.logSignUp();
 
         final uid = authService.currentUser!.uid;
-        await ref.read(firestoreServiceProvider).createUserProfile(
-              uid: uid,
-              email: _emailController.text.trim(),
-            );
+        await ref
+            .read(firestoreServiceProvider)
+            .createUserProfile(uid: uid, email: _emailController.text.trim());
       }
       // AuthGate will automatically navigate to HomeScreen.
       // Pop this screen so we don't leave it on the stack.
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -327,7 +328,9 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
 
                         // Toggle hint
                         Text(
-                          _isLogin ? context.l10n.loginWelcomeBack : context.l10n.loginCreateAccount,
+                          _isLogin
+                              ? context.l10n.loginWelcomeBack
+                              : context.l10n.loginCreateAccount,
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
@@ -370,10 +373,13 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: colorScheme.onPrimary.withValues(alpha: 0.54),
+                                color: colorScheme.onPrimary.withValues(
+                                  alpha: 0.54,
+                                ),
                               ),
                               onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
                             ),
                           ),
                           validator: (value) {
@@ -403,11 +409,14 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                   _obscureConfirmPassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: colorScheme.onPrimary.withValues(alpha: 0.54),
+                                  color: colorScheme.onPrimary.withValues(
+                                    alpha: 0.54,
+                                  ),
                                 ),
-                                onPressed: () => setState(() =>
-                                    _obscureConfirmPassword =
-                                        !_obscureConfirmPassword),
+                                onPressed: () => setState(
+                                  () => _obscureConfirmPassword =
+                                      !_obscureConfirmPassword,
+                                ),
                               ),
                             ),
                             validator: (value) {
@@ -438,10 +447,13 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                     height: 20,
                                     width: 20,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : Text(
-                                    _isLogin ? context.l10n.loginLogIn : context.l10n.loginCreateAccountButton,
+                                    _isLogin
+                                        ? context.l10n.loginLogIn
+                                        : context.l10n.loginCreateAccountButton,
                                     style: textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: colorScheme.primary,
@@ -460,14 +472,17 @@ class _EmailAuthScreenState extends ConsumerState<_EmailAuthScreen> {
                                   ? context.l10n.loginNoAccount
                                   : context.l10n.loginAlreadyHaveAccount,
                               style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                                color: colorScheme.onPrimary.withValues(
+                                  alpha: 0.7,
+                                ),
                               ),
                             ),
                             GestureDetector(
-                              onTap: () =>
-                                  setState(() => _isLogin = !_isLogin),
+                              onTap: () => setState(() => _isLogin = !_isLogin),
                               child: Text(
-                                _isLogin ? context.l10n.loginRegister : context.l10n.loginLogIn,
+                                _isLogin
+                                    ? context.l10n.loginRegister
+                                    : context.l10n.loginLogIn,
                                 style: textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onPrimary,
                                   fontWeight: FontWeight.bold,

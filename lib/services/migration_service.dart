@@ -52,7 +52,8 @@ class MigrationService {
     for (final doc in catsSnapshot.docs) {
       final data = doc.data();
       final accessories = List<String>.from(
-          data['accessories'] as List<dynamic>? ?? []);
+        data['accessories'] as List<dynamic>? ?? [],
+      );
       if (accessories.isEmpty) continue;
 
       final equipped = data['equippedAccessory'] as String?;
@@ -85,9 +86,7 @@ class MigrationService {
           .doc(uid)
           .collection('cats')
           .doc(catId);
-      batch.update(catRef, {
-        'accessories': <String>[],
-      });
+      batch.update(catRef, {'accessories': <String>[]});
     }
 
     await batch.commit();
@@ -112,10 +111,7 @@ class MigrationService {
       }
 
       // 重置用户 profile 字段（保留账号）
-      await userRef.update({
-        'coins': 0,
-        'lastCheckInDate': null,
-      });
+      await userRef.update({'coins': 0, 'lastCheckInDate': null});
     } catch (e) {
       debugPrint('[MigrationService] clearAllUserData failed: $e');
       rethrow;

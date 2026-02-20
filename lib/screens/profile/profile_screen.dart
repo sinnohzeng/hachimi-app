@@ -229,7 +229,8 @@ class ProfileScreen extends ConsumerWidget {
             leading: const Icon(Icons.settings_outlined),
             title: Text(l10n.profileSettings),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).pushNamed(AppRouter.settingsPage),
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRouter.settingsPage),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
@@ -264,8 +265,8 @@ class ProfileScreen extends ConsumerWidget {
                   Text(
                     ctx.l10n.profileCatAlbum,
                     style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const Spacer(),
                   IconButton(
@@ -297,7 +298,6 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 class _StatBadge extends StatelessWidget {
@@ -323,9 +323,7 @@ class _StatBadge extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         Text(
           label,
@@ -369,9 +367,9 @@ class _StageChip extends StatelessWidget {
           Text(
             '$count',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -412,10 +410,7 @@ class _CatAlbumTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRouter.catDetail,
-          arguments: cat.id,
-        );
+        Navigator.of(context).pushNamed(AppRouter.catDetail, arguments: cat.id);
       },
       child: Opacity(
         opacity: isGraduated ? 0.5 : (isActive ? 1.0 : 0.7),
@@ -427,9 +422,7 @@ class _CatAlbumTile extends StatelessWidget {
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(
-                  child: TappableCatSprite(cat: cat, size: 48),
-                ),
+                child: Center(child: TappableCatSprite(cat: cat, size: 48)),
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -453,4 +446,3 @@ class _CatAlbumTile extends StatelessWidget {
     );
   }
 }
-

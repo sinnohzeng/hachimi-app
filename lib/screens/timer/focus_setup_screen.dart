@@ -36,13 +36,13 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     if (habit == null) return;
 
     final catId = habit.catId ?? '';
-    final cat = catId.isNotEmpty
-        ? ref.read(catByIdProvider(catId))
-        : null;
+    final cat = catId.isNotEmpty ? ref.read(catByIdProvider(catId)) : null;
     final catName = cat?.name ?? 'Your cat';
 
     // Configure the timer
-    ref.read(focusTimerProvider.notifier).configure(
+    ref
+        .read(focusTimerProvider.notifier)
+        .configure(
           habitId: widget.habitId,
           catId: catId,
           catName: catName,
@@ -54,10 +54,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     HapticFeedback.lightImpact();
 
     // Navigate to focus timer screen
-    Navigator.of(context).pushReplacementNamed(
-      AppRouter.timer,
-      arguments: widget.habitId,
-    );
+    Navigator.of(
+      context,
+    ).pushReplacementNamed(AppRouter.timer, arguments: widget.habitId);
   }
 
   @override
@@ -95,10 +94,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              bgColor.withValues(alpha: 0.1),
-              colorScheme.surface,
-            ],
+            colors: [bgColor.withValues(alpha: 0.1), colorScheme.surface],
           ),
         ),
         child: SafeArea(
@@ -121,7 +117,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                       ),
                     ),
                     const Spacer(),
-                    const SizedBox(width: AppSpacing.xxl), // Balance close button
+                    const SizedBox(
+                      width: AppSpacing.xxl,
+                    ), // Balance close button
                   ],
                 ),
               ),
@@ -146,9 +144,11 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                   ),
                 ),
               ] else ...[
-                Icon(Icons.self_improvement,
-                    size: 64,
-                    color: colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.self_improvement,
+                  size: 64,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ],
 
               const Spacer(flex: 1),
@@ -232,5 +232,4 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
       ),
     );
   }
-
 }

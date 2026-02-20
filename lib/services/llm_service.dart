@@ -25,13 +25,7 @@ import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 
 /// LLM 引擎状态。
-enum LlmEngineStatus {
-  unloaded,
-  loading,
-  ready,
-  generating,
-  error,
-}
+enum LlmEngineStatus { unloaded, loading, ready, generating, error }
 
 /// LLM 推理服务 — Isolate 隔离推理，不阻塞 UI。
 class LlmService {

@@ -55,5 +55,6 @@ class LocaleNotifier extends Notifier<Locale?> {
 
 /// Locale provider — SSOT for app language setting.
 /// null = follow system; Locale('en') or Locale('zh') = user override.
-final localeProvider =
-    NotifierProvider<LocaleNotifier, Locale?>(LocaleNotifier.new);
+final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(
+  LocaleNotifier.new,
+);

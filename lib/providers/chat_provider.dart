@@ -78,15 +78,9 @@ class ChatNotifier extends Notifier<ChatState> {
   Future<void> _loadHistory() async {
     try {
       final messages = await _chatService.getRecentMessages(_catId);
-      state = state.copyWith(
-        messages: messages,
-        status: ChatStatus.idle,
-      );
+      state = state.copyWith(messages: messages, status: ChatStatus.idle);
     } catch (e) {
-      state = state.copyWith(
-        status: ChatStatus.error,
-        error: e.toString(),
-      );
+      state = state.copyWith(status: ChatStatus.error, error: e.toString());
     }
   }
 
@@ -118,15 +112,10 @@ class ChatNotifier extends Notifier<ChatState> {
     _tokenSub?.cancel();
     _tokenSub = _chatService.tokenStream.listen(
       (token) {
-        state = state.copyWith(
-          partialResponse: state.partialResponse + token,
-        );
+        state = state.copyWith(partialResponse: state.partialResponse + token);
       },
       onError: (e) {
-        state = state.copyWith(
-          status: ChatStatus.error,
-          error: e.toString(),
-        );
+        state = state.copyWith(status: ChatStatus.error, error: e.toString());
       },
     );
 
@@ -185,6 +174,4 @@ class ChatNotifier extends Notifier<ChatState> {
 
 /// 聊天状态 Provider — 按 catId 分家族。
 final chatNotifierProvider =
-    NotifierProvider.family<ChatNotifier, ChatState, String>(
-  ChatNotifier.new,
-);
+    NotifierProvider.family<ChatNotifier, ChatState, String>(ChatNotifier.new);

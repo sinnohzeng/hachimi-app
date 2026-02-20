@@ -19,8 +19,7 @@ import 'package:flutter/foundation.dart';
 class InventoryService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  DocumentReference _userRef(String uid) =>
-      _db.collection('users').doc(uid);
+  DocumentReference _userRef(String uid) => _db.collection('users').doc(uid);
 
   DocumentReference _catRef(String uid, String catId) =>
       _db.collection('users').doc(uid).collection('cats').doc(catId);
@@ -68,9 +67,7 @@ class InventoryService {
         }
 
         // 设置新装备
-        tx.update(catRef, {
-          'equippedAccessory': accessoryId,
-        });
+        tx.update(catRef, {'equippedAccessory': accessoryId});
       });
     } catch (e) {
       debugPrint('[InventoryService] equipAccessory failed: $e');
@@ -104,9 +101,7 @@ class InventoryService {
         });
 
         // 清除装备
-        tx.update(catRef, {
-          'equippedAccessory': null,
-        });
+        tx.update(catRef, {'equippedAccessory': null});
       });
     } catch (e) {
       debugPrint('[InventoryService] unequipAccessory failed: $e');

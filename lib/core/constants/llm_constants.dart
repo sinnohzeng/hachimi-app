@@ -72,12 +72,20 @@ class LlmConstants {
 // because prompts are a technical concern (not UI l10n) and services lack BuildContext.
 
 const _personalityNameEn = {
-  'lazy': 'Lazy', 'curious': 'Curious', 'playful': 'Playful',
-  'shy': 'Shy', 'brave': 'Brave', 'clingy': 'Clingy',
+  'lazy': 'Lazy',
+  'curious': 'Curious',
+  'playful': 'Playful',
+  'shy': 'Shy',
+  'brave': 'Brave',
+  'clingy': 'Clingy',
 };
 const _personalityNameZh = {
-  'lazy': '慵懒', 'curious': '好奇', 'playful': '活泼',
-  'shy': '害羞', 'brave': '勇敢', 'clingy': '粘人',
+  'lazy': '慵懒',
+  'curious': '好奇',
+  'playful': '活泼',
+  'shy': '害羞',
+  'brave': '勇敢',
+  'clingy': '粘人',
 };
 const _personalityFlavorEn = {
   'lazy': 'Will nap 23 hours a day.',
@@ -96,16 +104,28 @@ const _personalityFlavorZh = {
   'clingy': '马上开始呼噜，死活不撒手。',
 };
 const _moodNameEn = {
-  'happy': 'Happy', 'neutral': 'Neutral', 'lonely': 'Lonely', 'missing': 'Missing You',
+  'happy': 'Happy',
+  'neutral': 'Neutral',
+  'lonely': 'Lonely',
+  'missing': 'Missing You',
 };
 const _moodNameZh = {
-  'happy': '开心', 'neutral': '平静', 'lonely': '孤单', 'missing': '想你了',
+  'happy': '开心',
+  'neutral': '平静',
+  'lonely': '孤单',
+  'missing': '想你了',
 };
 const _stageNameEn = {
-  'kitten': 'Kitten', 'adolescent': 'Adolescent', 'adult': 'Adult', 'senior': 'Senior',
+  'kitten': 'Kitten',
+  'adolescent': 'Adolescent',
+  'adult': 'Adult',
+  'senior': 'Senior',
 };
 const _stageNameZh = {
-  'kitten': '幼猫', 'adolescent': '少年猫', 'adult': '成年猫', 'senior': '长老猫',
+  'kitten': '幼猫',
+  'adolescent': '少年猫',
+  'adult': '成年猫',
+  'senior': '长老猫',
 };
 
 /// 日记 prompt 构建器。

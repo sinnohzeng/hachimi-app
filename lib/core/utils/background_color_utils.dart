@@ -40,10 +40,7 @@ List<Color> catMeshColors(
 /// 为计时页生成 4 色 mesh 渐变色列表。
 ///
 /// 色彩策略：极低饱和度，不分散注意力，仅提供微妙的环境感。
-List<Color> timerMeshColors(
-  Color stageClr,
-  ColorScheme colorScheme,
-) {
+List<Color> timerMeshColors(Color stageClr, ColorScheme colorScheme) {
   return [
     Color.lerp(stageClr, colorScheme.surface, 0.85)!,
     Color.lerp(stageClr, colorScheme.surface, 0.90)!,

@@ -27,10 +27,7 @@ class CatPersonality {
   final String id;
   final String emoji;
 
-  const CatPersonality({
-    required this.id,
-    required this.emoji,
-  });
+  const CatPersonality({required this.id, required this.emoji});
 }
 
 const List<CatPersonality> catPersonalities = [
@@ -62,9 +59,17 @@ class CatMood {
 }
 
 const CatMood moodHappy = CatMood(id: 'happy', emoji: '😸', spriteKey: 'happy');
-const CatMood moodNeutral = CatMood(id: 'neutral', emoji: '😺', spriteKey: 'neutral');
+const CatMood moodNeutral = CatMood(
+  id: 'neutral',
+  emoji: '😺',
+  spriteKey: 'neutral',
+);
 const CatMood moodLonely = CatMood(id: 'lonely', emoji: '🥺', spriteKey: 'sad');
-const CatMood moodMissing = CatMood(id: 'missing', emoji: '😿', spriteKey: 'sad');
+const CatMood moodMissing = CatMood(
+  id: 'missing',
+  emoji: '😿',
+  spriteKey: 'sad',
+);
 
 /// 根据最近一次专注时间计算心情
 String calculateMood(DateTime? lastSessionAt) {
@@ -114,27 +119,107 @@ Color stageColor(String stage) {
 // ─── Random Cat Names ───
 
 const List<String> randomCatNames = [
-  'Mochi', 'Luna', 'Milo', 'Nori', 'Tofu',
-  'Boba', 'Kiki', 'Suki', 'Taro', 'Yuki',
-  'Coco', 'Mango', 'Peach', 'Daisy', 'Olive',
-  'Pumpkin', 'Ginger', 'Pepper', 'Maple', 'Willow',
-  'Clover', 'Hazel', 'Jasper', 'Felix', 'Oscar',
-  'Simba', 'Nala', 'Bella', 'Chloe', 'Leo',
-  'Loki', 'Thor', 'Miso', 'Ramen', 'Soba',
-  'Pudding', 'Cookie', 'Waffle', 'Mocha', 'Latte',
-  'Caramel', 'Biscuit', 'Sesame', 'Matcha', 'Azuki',
-  'Hachi', 'Sakura', 'Hinata', 'Sora', 'Ren',
+  'Mochi',
+  'Luna',
+  'Milo',
+  'Nori',
+  'Tofu',
+  'Boba',
+  'Kiki',
+  'Suki',
+  'Taro',
+  'Yuki',
+  'Coco',
+  'Mango',
+  'Peach',
+  'Daisy',
+  'Olive',
+  'Pumpkin',
+  'Ginger',
+  'Pepper',
+  'Maple',
+  'Willow',
+  'Clover',
+  'Hazel',
+  'Jasper',
+  'Felix',
+  'Oscar',
+  'Simba',
+  'Nala',
+  'Bella',
+  'Chloe',
+  'Leo',
+  'Loki',
+  'Thor',
+  'Miso',
+  'Ramen',
+  'Soba',
+  'Pudding',
+  'Cookie',
+  'Waffle',
+  'Mocha',
+  'Latte',
+  'Caramel',
+  'Biscuit',
+  'Sesame',
+  'Matcha',
+  'Azuki',
+  'Hachi',
+  'Sakura',
+  'Hinata',
+  'Sora',
+  'Ren',
 ];
 
 const List<String> randomCatNamesZh = [
-  '年糕', '团子', '豆沙', '芋圆', '汤圆',
-  '布丁', '麻薯', '糯米', '奶茶', '可可',
-  '小橘', '花卷', '饺子', '包子', '馒头',
-  '芒果', '桃子', '柿子', '栗子', '橙子',
-  '小黑', '小白', '大橘', '狸花', '三花',
-  '豆豆', '球球', '咪咪', '喵喵', '毛毛',
-  '蛋挞', '曲奇', '芝士', '抹茶', '红豆',
-  '小鱼', '虎斑', '雪球', '棉花', '云朵',
-  '饭团', '薯条', '甜甜', '乖乖', '萌萌',
-  '七七', '八八', '小樱', '小星', '月月',
+  '年糕',
+  '团子',
+  '豆沙',
+  '芋圆',
+  '汤圆',
+  '布丁',
+  '麻薯',
+  '糯米',
+  '奶茶',
+  '可可',
+  '小橘',
+  '花卷',
+  '饺子',
+  '包子',
+  '馒头',
+  '芒果',
+  '桃子',
+  '柿子',
+  '栗子',
+  '橙子',
+  '小黑',
+  '小白',
+  '大橘',
+  '狸花',
+  '三花',
+  '豆豆',
+  '球球',
+  '咪咪',
+  '喵喵',
+  '毛毛',
+  '蛋挞',
+  '曲奇',
+  '芝士',
+  '抹茶',
+  '红豆',
+  '小鱼',
+  '虎斑',
+  '雪球',
+  '棉花',
+  '云朵',
+  '饭团',
+  '薯条',
+  '甜甜',
+  '乖乖',
+  '萌萌',
+  '七七',
+  '八八',
+  '小樱',
+  '小星',
+  '月月',
 ];

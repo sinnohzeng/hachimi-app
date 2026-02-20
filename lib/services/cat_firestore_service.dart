@@ -31,8 +31,7 @@ class CatFirestoreService {
         .where('state', isEqualTo: CatState.active)
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(Cat.fromFirestore).toList());
+        .map((snapshot) => snapshot.docs.map(Cat.fromFirestore).toList());
   }
 
   /// 监听所有猫（含 graduated / dormant），用于猫图鉴。
@@ -40,8 +39,7 @@ class CatFirestoreService {
     return _catsRef(uid)
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(Cat.fromFirestore).toList());
+        .map((snapshot) => snapshot.docs.map(Cat.fromFirestore).toList());
   }
 
   /// 获取单只猫。
@@ -97,9 +95,7 @@ class CatFirestoreService {
     required String catId,
     required String accessoryId,
   }) async {
-    await _catsRef(uid).doc(catId).update({
-      'equippedAccessory': accessoryId,
-    });
+    await _catsRef(uid).doc(catId).update({'equippedAccessory': accessoryId});
   }
 
   /// 卸下猫的饰品。
@@ -107,16 +103,11 @@ class CatFirestoreService {
     required String uid,
     required String catId,
   }) async {
-    await _catsRef(uid).doc(catId).update({
-      'equippedAccessory': null,
-    });
+    await _catsRef(uid).doc(catId).update({'equippedAccessory': null});
   }
 
   /// 毕业（习惯完成或删除时调用）。
-  Future<void> graduateCat({
-    required String uid,
-    required String catId,
-  }) async {
+  Future<void> graduateCat({required String uid, required String catId}) async {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.graduated});
     } catch (e) {
@@ -126,10 +117,7 @@ class CatFirestoreService {
   }
 
   /// 休眠（手动归档）。
-  Future<void> archiveCat({
-    required String uid,
-    required String catId,
-  }) async {
+  Future<void> archiveCat({required String uid, required String catId}) async {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.dormant});
     } catch (e) {

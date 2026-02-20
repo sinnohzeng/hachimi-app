@@ -11,11 +11,7 @@ class StreakHeatmap extends StatelessWidget {
   /// Number of days to display (default 91 = 13 weeks).
   final int days;
 
-  const StreakHeatmap({
-    super.key,
-    required this.dailyMinutes,
-    this.days = 91,
-  });
+  const StreakHeatmap({super.key, required this.dailyMinutes, this.days = 91});
 
   @override
   Widget build(BuildContext context) {
@@ -55,47 +51,49 @@ class StreakHeatmap extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: List.generate(totalWeeks, (weekIndex) {
-              return Column(
-                children: List.generate(7, (dayIndex) {
-                  final dayOffset = weekIndex * 7 + dayIndex -
-                      (startDate.weekday % 7);
-                  final date = startDate.add(Duration(days: dayOffset));
+                return Column(
+                  children: List.generate(7, (dayIndex) {
+                    final dayOffset =
+                        weekIndex * 7 + dayIndex - (startDate.weekday % 7);
+                    final date = startDate.add(Duration(days: dayOffset));
 
-                  // Skip cells outside our range
-                  if (dayOffset < 0 || date.isAfter(today)) {
-                    return Container(
-                      width: 14,
-                      height: 14,
-                      margin: const EdgeInsets.all(1),
-                    );
-                  }
+                    // Skip cells outside our range
+                    if (dayOffset < 0 || date.isAfter(today)) {
+                      return Container(
+                        width: 14,
+                        height: 14,
+                        margin: const EdgeInsets.all(1),
+                      );
+                    }
 
-                  final key =
-                      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-                  final minutes = dailyMinutes[key] ?? 0;
-                  final intensity =
-                      minutes > 0 ? (minutes / maxMinutes).clamp(0.2, 1.0) : 0.0;
+                    final key =
+                        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                    final minutes = dailyMinutes[key] ?? 0;
+                    final intensity = minutes > 0
+                        ? (minutes / maxMinutes).clamp(0.2, 1.0)
+                        : 0.0;
 
-                  return Semantics(
-                    label: '${date.month}/${date.day}, $minutes minutes',
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      margin: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        color: intensity > 0
-                            ? colorScheme.primary
-                                .withValues(alpha: intensity)
-                            : colorScheme.outlineVariant.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(3),
+                    return Semantics(
+                      label: '${date.month}/${date.day}, $minutes minutes',
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        margin: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: intensity > 0
+                              ? colorScheme.primary.withValues(alpha: intensity)
+                              : colorScheme.outlineVariant.withValues(
+                                  alpha: 0.3,
+                                ),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
                       ),
-                    ),
-                  );
-                }),
-              );
-            }),
+                    );
+                  }),
+                );
+              }),
+            ),
           ),
-        ),
         ),
         const SizedBox(height: AppSpacing.sm),
 
@@ -113,9 +111,7 @@ class StreakHeatmap extends StatelessWidget {
             ),
             _HeatmapStat(
               label: context.l10n.heatmapRate,
-              value: days > 0
-                  ? '${(totalDays / days * 100).round()}%'
-                  : '0%',
+              value: days > 0 ? '${(totalDays / days * 100).round()}%' : '0%',
             ),
           ],
         ),
@@ -175,9 +171,7 @@ class _HeatmapStat extends StatelessWidget {
       children: [
         Text(
           value,
-          style: textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         Text(
           label,

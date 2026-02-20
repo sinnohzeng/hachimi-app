@@ -19,8 +19,7 @@ class AdoptionFlowScreen extends ConsumerStatefulWidget {
   const AdoptionFlowScreen({super.key, this.isFirstHabit = false});
 
   @override
-  ConsumerState<AdoptionFlowScreen> createState() =>
-      _AdoptionFlowScreenState();
+  ConsumerState<AdoptionFlowScreen> createState() => _AdoptionFlowScreenState();
 }
 
 class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
@@ -135,7 +134,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         name: _catNameController.text.trim(),
       );
 
-      final result = await ref.read(firestoreServiceProvider).createHabitWithCat(
+      final result = await ref
+          .read(firestoreServiceProvider)
+          .createHabitWithCat(
             uid: uid,
             name: _nameController.text.trim(),
             targetHours: _targetHours,
@@ -144,7 +145,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             cat: selectedCat,
           );
 
-      await ref.read(analyticsServiceProvider).logHabitCreated(
+      await ref
+          .read(analyticsServiceProvider)
+          .logHabitCreated(
             habitName: _nameController.text.trim(),
             targetHours: _targetHours,
           );
@@ -191,9 +194,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isFirstHabit
-            ? context.l10n.adoptionTitleFirst
-            : context.l10n.adoptionTitleNew),
+        title: Text(
+          widget.isFirstHabit
+              ? context.l10n.adoptionTitleFirst
+              : context.l10n.adoptionTitleNew,
+        ),
         leading: _currentStep > 0
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -205,7 +210,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           _StepIndicator(
             currentStep: _currentStep,
-            steps: [context.l10n.adoptionStepDefineQuest, context.l10n.adoptionStepAdoptCat2, context.l10n.adoptionStepNameCat2],
+            steps: [
+              context.l10n.adoptionStepDefineQuest,
+              context.l10n.adoptionStepAdoptCat2,
+              context.l10n.adoptionStepNameCat2,
+            ],
           ),
           Expanded(
             child: PageView(
@@ -235,7 +244,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          _currentStep == 2 ? context.l10n.adoptionAdopt : context.l10n.adoptionNext,
+                          _currentStep == 2
+                              ? context.l10n.adoptionAdopt
+                              : context.l10n.adoptionNext,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
@@ -331,7 +342,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Daily goal time with custom option
-          Text(context.l10n.adoptionDailyGoalLabel, style: textTheme.titleMedium),
+          Text(
+            context.l10n.adoptionDailyGoalLabel,
+            style: textTheme.titleMedium,
+          ),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
@@ -364,7 +378,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Reminder time
-          Text(context.l10n.adoptionReminderLabel, style: textTheme.titleMedium),
+          Text(
+            context.l10n.adoptionReminderLabel,
+            style: textTheme.titleMedium,
+          ),
           const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 8,
@@ -474,8 +491,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               final value = int.tryParse(controller.text.trim());
               if (value == null || value < 10 || value > 2000) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(context.l10n.adoptionValidHours)),
+                  SnackBar(content: Text(context.l10n.adoptionValidHours)),
                 );
                 return;
               }
@@ -518,9 +534,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         children: [
           Text(
             context.l10n.adoptionChooseKitten,
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -546,8 +560,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             const SizedBox(height: AppSpacing.xs),
             if (cat.personalityData != null)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.tertiaryContainer,
                   borderRadius: BorderRadius.circular(16),
@@ -599,15 +615,13 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                               : colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected
-                              ? Border.all(
-                                  color: colorScheme.primary, width: 2)
+                              ? Border.all(color: colorScheme.primary, width: 2)
                               : null,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            PixelCatSprite.fromCat(
-                                cat: previewCat, size: 56),
+                            PixelCatSprite.fromCat(cat: previewCat, size: 56),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               previewCat.name,
@@ -692,9 +706,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           // Name input
           Text(
             context.l10n.adoptionNameYourCat2,
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.base),
           TextFormField(
@@ -720,7 +732,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.base),
 
           Text(
-            context.l10n.adoptionGrowthTarget(_nameController.text.trim(), _targetHours),
+            context.l10n.adoptionGrowthTarget(
+              _nameController.text.trim(),
+              _targetHours,
+            ),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -781,8 +796,11 @@ class _StepIndicator extends StatelessWidget {
                 ),
                 child: Center(
                   child: stepIndex < currentStep
-                      ? Icon(Icons.check,
-                          size: 16, color: colorScheme.onPrimary)
+                      ? Icon(
+                          Icons.check,
+                          size: 16,
+                          color: colorScheme.onPrimary,
+                        )
                       : Text(
                           '${stepIndex + 1}',
                           style: textTheme.labelSmall?.copyWith(

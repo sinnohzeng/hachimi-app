@@ -30,65 +30,71 @@ class HabitCard extends StatelessWidget {
       label: '${habit.name}, ${habit.progressText}',
       button: true,
       child: Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: AppSpacing.paddingBase,
-          child: Row(
-            children: [
-              // Icon + Progress ring
-              ProgressRing(
-                progress: habit.progressPercent,
-                size: 56,
-                child: Icon(Icons.check_circle, color: colorScheme.primary, size: 28),
-              ),
-              const SizedBox(width: AppSpacing.base),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: AppSpacing.paddingBase,
+            child: Row(
+              children: [
+                // Icon + Progress ring
+                ProgressRing(
+                  progress: habit.progressPercent,
+                  size: 56,
+                  child: Icon(
+                    Icons.check_circle,
+                    color: colorScheme.primary,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.base),
 
-              // Name + progress text + today
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(habit.name, style: textTheme.titleMedium),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      habit.progressText,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (todayMinutes > 0) ...[
+                // Name + progress text + today
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(habit.name, style: textTheme.titleMedium),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        context.l10n.habitTodayMinutes(todayMinutes),
+                        habit.progressText,
                         style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
+                      if (todayMinutes > 0) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          context.l10n.habitTodayMinutes(todayMinutes),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
-              // Streak badge
-              if (habit.currentStreak > 0)
-                StreakIndicator(streak: habit.currentStreak),
+                // Streak badge
+                if (habit.currentStreak > 0)
+                  StreakIndicator(streak: habit.currentStreak),
 
-              // Delete button
-              IconButton(
-                icon: Icon(Icons.delete_outline,
-                    color: colorScheme.onSurfaceVariant),
-                onPressed: onDelete,
-                tooltip: context.l10n.habitDeleteTooltip,
-              ),
-            ],
+                // Delete button
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  onPressed: onDelete,
+                  tooltip: context.l10n.habitDeleteTooltip,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

@@ -53,8 +53,7 @@ class ChatMessage {
       catId: map['cat_id'] as String,
       role: ChatRole.fromString(map['role'] as String),
       content: map['content'] as String,
-      createdAt:
-          DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
     );
   }
 

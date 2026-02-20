@@ -38,10 +38,7 @@ class DiaryPreviewCard extends ConsumerWidget {
     return Card(
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(
-            AppRouter.catDiary,
-            arguments: catId,
-          );
+          Navigator.of(context).pushNamed(AppRouter.catDiary, arguments: catId);
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -94,9 +91,7 @@ class DiaryPreviewCard extends ConsumerWidget {
                     entry.content,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      height: 1.4,
-                    ),
+                    style: textTheme.bodyMedium?.copyWith(height: 1.4),
                   );
                 },
               ),

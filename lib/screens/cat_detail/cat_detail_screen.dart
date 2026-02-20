@@ -74,8 +74,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     }
 
     final habits = ref.watch(habitsProvider).value ?? [];
-    final habit =
-        habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
+    final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
     final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
     final stageClr = stageColor(cat.computedStage);
@@ -103,10 +102,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                     IconButton(
                       icon: const Icon(Icons.chat_bubble_outline),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          AppRouter.catChat,
-                          arguments: widget.catId,
-                        );
+                        Navigator.of(
+                          context,
+                        ).pushNamed(AppRouter.catChat, arguments: widget.catId);
                       },
                       tooltip: context.l10n.catDetailChatTooltip,
                     ),
@@ -138,7 +136,8 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                               const SizedBox(width: AppSpacing.xs),
                               IconButton(
                                 icon: const Icon(Icons.edit, size: 18),
-                                onPressed: () => _showRenameDialog(context, cat),
+                                onPressed: () =>
+                                    _showRenameDialog(context, cat),
                                 tooltip: context.l10n.catDetailRenameTooltip,
                                 visualDensity: VisualDensity.compact,
                               ),
@@ -159,87 +158,87 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 ),
               ),
 
-          SliverPadding(
-            padding: AppSpacing.paddingBase,
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                // Mood badge
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiaryContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-                      style: textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onTertiaryContainer,
+              SliverPadding(
+                padding: AppSpacing.paddingBase,
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    // Mood badge
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.tertiaryContainer,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onTertiaryContainer,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Growth progress (time-based)
+                    _buildGrowthCard(context, cat, stageClr),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // Focus statistics card (replaces old "Bound Habit" card)
+                    if (habit != null) ...[
+                      FocusStatsCard(habit: habit, cat: cat),
+                      const SizedBox(height: AppSpacing.base),
+                    ],
+
+                    // Hachimi Diary card — AI 日记预览
+                    if (ref.watch(llmAvailabilityProvider) ==
+                        LlmAvailability.ready) ...[
+                      DiaryPreviewCard(catId: cat.id),
+                      const SizedBox(height: AppSpacing.base),
+
+                      // 聊天入口卡片 — 提升可发现性
+                      ChatEntryCard(catId: cat.id, catName: cat.name),
+                      const SizedBox(height: AppSpacing.base),
+                    ],
+
+                    // Reminder card
+                    if (habit != null) ...[
+                      ReminderCard(habit: habit, cat: cat),
+                      const SizedBox(height: AppSpacing.base),
+                    ],
+
+                    // Streak heatmap
+                    if (habit != null) HabitHeatmapCard(habitId: habit.id),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // Accessories card
+                    AccessoriesCard(cat: cat),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // Enhanced cat info card
+                    EnhancedCatInfoCard(cat: cat),
+                    const SizedBox(height: AppSpacing.xl),
+                  ]),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // Growth progress (time-based)
-                _buildGrowthCard(context, cat, stageClr),
-                const SizedBox(height: AppSpacing.base),
-
-                // Focus statistics card (replaces old "Bound Habit" card)
-                if (habit != null) ...[
-                  FocusStatsCard(habit: habit, cat: cat),
-                  const SizedBox(height: AppSpacing.base),
-                ],
-
-                // Hachimi Diary card — AI 日记预览
-                if (ref.watch(llmAvailabilityProvider) ==
-                    LlmAvailability.ready) ...[
-                  DiaryPreviewCard(catId: cat.id),
-                  const SizedBox(height: AppSpacing.base),
-
-                  // 聊天入口卡片 — 提升可发现性
-                  ChatEntryCard(catId: cat.id, catName: cat.name),
-                  const SizedBox(height: AppSpacing.base),
-                ],
-
-                // Reminder card
-                if (habit != null) ...[
-                  ReminderCard(habit: habit, cat: cat),
-                  const SizedBox(height: AppSpacing.base),
-                ],
-
-                // Streak heatmap
-                if (habit != null) HabitHeatmapCard(habitId: habit.id),
-                const SizedBox(height: AppSpacing.base),
-
-                // Accessories card
-                AccessoriesCard(cat: cat),
-                const SizedBox(height: AppSpacing.base),
-
-                // Enhanced cat info card
-                EnhancedCatInfoCard(cat: cat),
-                const SizedBox(height: AppSpacing.xl),
-              ]),
+              ),
+            ],
+          ),
+          // Particle overlay — covers header area only
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 280,
+            child: IgnorePointer(
+              child: ParticleOverlay(
+                mode: ParticleMode.firefly,
+                child: SizedBox.expand(),
+              ),
             ),
           ),
-          ],
-        ),
-        // Particle overlay — covers header area only
-        const Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 280,
-          child: IgnorePointer(
-            child: ParticleOverlay(
-              mode: ParticleMode.firefly,
-              child: SizedBox.expand(),
-            ),
-          ),
-        ),
         ],
       ),
     );
@@ -279,7 +278,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               child: LinearProgressIndicator(
                 value: cat.growthProgress,
                 minHeight: 12,
-                backgroundColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                backgroundColor: colorScheme.outlineVariant.withValues(
+                  alpha: 0.5,
+                ),
                 valueColor: AlwaysStoppedAnimation(stageClr),
               ),
             ),
@@ -360,11 +361,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
               HapticFeedback.mediumImpact();
-              await ref.read(catFirestoreServiceProvider).renameCat(
-                    uid: uid,
-                    catId: cat.id,
-                    newName: newName,
-                  );
+              await ref
+                  .read(catFirestoreServiceProvider)
+                  .renameCat(uid: uid, catId: cat.id, newName: newName);
               if (ctx.mounted) {
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(ctx).showSnackBar(

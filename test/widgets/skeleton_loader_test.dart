@@ -8,9 +8,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: Center(
-              child: SkeletonLoader(width: 120, height: 20),
-            ),
+            body: Center(child: SkeletonLoader(width: 120, height: 20)),
           ),
         ),
       );
@@ -23,19 +21,16 @@ void main() {
     testWidgets('renders with default height', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: SkeletonLoader(),
-            ),
-          ),
+          home: Scaffold(body: Center(child: SkeletonLoader())),
         ),
       );
 
       expect(find.byType(SkeletonLoader), findsOneWidget);
     });
 
-    testWidgets('golden — SkeletonLoader default', tags: ['golden'],
-        (tester) async {
+    testWidgets('golden — SkeletonLoader default', tags: ['golden'], (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
@@ -65,9 +60,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: const Scaffold(
-            body: SkeletonCard(),
-          ),
+          home: const Scaffold(body: SkeletonCard()),
         ),
       );
 
@@ -76,14 +69,11 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
     });
 
-    testWidgets('golden — SkeletonCard', tags: ['golden'],
-        (tester) async {
+    testWidgets('golden — SkeletonCard', tags: ['golden'], (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: const Scaffold(
-            body: Center(child: SkeletonCard()),
-          ),
+          home: const Scaffold(body: Center(child: SkeletonCard())),
         ),
       );
 
@@ -101,9 +91,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: const Scaffold(
-            body: SkeletonGrid(),
-          ),
+          home: const Scaffold(body: SkeletonGrid()),
         ),
       );
 
@@ -115,9 +103,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: const Scaffold(
-            body: SkeletonGrid(count: 2),
-          ),
+          home: const Scaffold(body: SkeletonGrid(count: 2)),
         ),
       );
 

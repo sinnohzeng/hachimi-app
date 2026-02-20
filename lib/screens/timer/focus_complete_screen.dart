@@ -107,13 +107,13 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
       vsync: this,
       duration: AppMotion.durationMedium4,
     );
-    _statsSlide = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _statsController,
-      curve: AppMotion.emphasized,
-    ));
+    _statsSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _statsController,
+            curve: AppMotion.emphasized,
+          ),
+        );
     _statsOpacity = CurvedAnimation(
       parent: _statsController,
       curve: AppMotion.standardDecelerate,
@@ -184,19 +184,22 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     );
 
     setState(() => _diaryGenerating = true);
-    diaryService.generateTodayDiary(ctx).then((_) {
-      if (mounted) {
-        setState(() {
-          _diaryGenerating = false;
-          _diarySuccess = true;
+    diaryService
+        .generateTodayDiary(ctx)
+        .then((_) {
+          if (mounted) {
+            setState(() {
+              _diaryGenerating = false;
+              _diarySuccess = true;
+            });
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) setState(() => _diarySuccess = false);
+            });
+          }
+        })
+        .catchError((_) {
+          if (mounted) setState(() => _diaryGenerating = false);
         });
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) setState(() => _diarySuccess = false);
-        });
-      }
-    }).catchError((_) {
-      if (mounted) setState(() => _diaryGenerating = false);
-    });
   }
 
   @override
@@ -236,9 +239,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                     ScaleTransition(
                       scale: _emojiScale,
                       child: Text(
-                        widget.isAbandoned
-                            ? '🤗'
-                            : (didStageUp ? '🎉' : '✨'),
+                        widget.isAbandoned ? '🤗' : (didStageUp ? '🎉' : '✨'),
                         style: const TextStyle(fontSize: 48),
                       ),
                     ),
@@ -253,8 +254,8 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                             widget.isAbandoned
                                 ? l10n.focusCompleteItsOkay
                                 : (didStageUp
-                                    ? l10n.focusCompleteEvolved(catName)
-                                    : l10n.focusCompleteGreatJob),
+                                      ? l10n.focusCompleteEvolved(catName)
+                                      : l10n.focusCompleteGreatJob),
                             style: textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -296,17 +297,21 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: stageColor(widget.stageUp!.newStage)
-                                        .withValues(alpha: 0.15),
+                                    color: stageColor(
+                                      widget.stageUp!.newStage,
+                                    ).withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Text(
                                     l10n.focusCompleteEvolvedTo(
-                                      widget.stageUp!.newStage[0].toUpperCase() +
+                                      widget.stageUp!.newStage[0]
+                                              .toUpperCase() +
                                           widget.stageUp!.newStage.substring(1),
                                     ),
                                     style: textTheme.labelLarge?.copyWith(
-                                      color: stageColor(widget.stageUp!.newStage),
+                                      color: stageColor(
+                                        widget.stageUp!.newStage,
+                                      ),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -359,7 +364,8 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                   const Divider(height: 16),
                                   _StatRow(
                                     label: l10n.focusCompleteMilestoneBonus,
-                                    value: '+${widget.xpResult.milestoneBonus} XP',
+                                    value:
+                                        '+${widget.xpResult.milestoneBonus} XP',
                                     icon: Icons.emoji_events,
                                   ),
                                 ],
@@ -367,7 +373,8 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                   const Divider(height: 16),
                                   _StatRow(
                                     label: l10n.focusCompleteFullHouseBonus,
-                                    value: '+${widget.xpResult.fullHouseBonus} XP',
+                                    value:
+                                        '+${widget.xpResult.fullHouseBonus} XP',
                                     icon: Icons.home,
                                   ),
                                 ],
@@ -419,11 +426,17 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.check_circle, size: 14, color: Colors.green),
+                              const Icon(
+                                Icons.check_circle,
+                                size: 14,
+                                color: Colors.green,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 l10n.focusCompleteDiaryWritten,
-                                style: textTheme.bodySmall?.copyWith(color: Colors.green),
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: Colors.green,
+                                ),
                               ),
                             ],
                           ),
@@ -442,7 +455,9 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                           height: 52,
                           child: FilledButton(
                             onPressed: () {
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              Navigator.of(
+                                context,
+                              ).popUntil((route) => route.isFirst);
                             },
                             child: Text(
                               l10n.focusCompleteDone,
@@ -510,17 +525,19 @@ class _StatRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)?.copyWith(
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-          ),
+          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
+              ?.copyWith(
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
         ),
         const Spacer(),
         Text(
           value,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
+              ?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
         ),
       ],
     );

@@ -56,13 +56,13 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _bounceAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
-      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
-    ]).animate(CurvedAnimation(
-      parent: _bounceController,
-      curve: Curves.easeOut,
-    ));
+    _bounceAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
+          TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
+        ]).animate(
+          CurvedAnimation(parent: _bounceController, curve: Curves.easeOut),
+        );
   }
 
   @override
@@ -98,11 +98,7 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
     );
 
     if (!widget.enableTap) {
-      return Semantics(
-        label: '${cat.name} cat',
-        image: true,
-        child: sprite,
-      );
+      return Semantics(label: '${cat.name} cat', image: true, child: sprite);
     }
 
     return Semantics(
@@ -112,10 +108,8 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
         onTap: _cyclePose,
         child: AnimatedBuilder(
           animation: _bounceAnimation,
-          builder: (context, child) => Transform.scale(
-            scale: _bounceAnimation.value,
-            child: child,
-          ),
+          builder: (context, child) =>
+              Transform.scale(scale: _bounceAnimation.value, child: child),
           child: sprite,
         ),
       ),

@@ -35,18 +35,14 @@ class ParticleOverlay extends ConsumerWidget {
   final ParticleMode mode;
   final Widget? child;
 
-  const ParticleOverlay({
-    super.key,
-    required this.mode,
-    this.child,
-  });
+  const ParticleOverlay({super.key, required this.mode, this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final animationEnabled =
-        ref.watch(themeProvider.select((s) => s.enableBackgroundAnimation));
-    final disableAnimations =
-        MediaQuery.of(context).disableAnimations;
+    final animationEnabled = ref.watch(
+      themeProvider.select((s) => s.enableBackgroundAnimation),
+    );
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     if (!animationEnabled || disableAnimations) {
       return child ?? const SizedBox.shrink();

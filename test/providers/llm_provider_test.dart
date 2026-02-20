@@ -18,7 +18,9 @@ void main() {
       expect(LlmAvailability.values.length, equals(5));
       expect(LlmAvailability.values, contains(LlmAvailability.featureDisabled));
       expect(
-          LlmAvailability.values, contains(LlmAvailability.modelNotDownloaded));
+        LlmAvailability.values,
+        contains(LlmAvailability.modelNotDownloaded),
+      );
       expect(LlmAvailability.values, contains(LlmAvailability.modelLoading));
       expect(LlmAvailability.values, contains(LlmAvailability.ready));
       expect(LlmAvailability.values, contains(LlmAvailability.error));
@@ -61,9 +63,7 @@ void main() {
     });
 
     test('error clears on new copyWith without error', () {
-      final s = const ModelDownloadState().copyWith(
-        error: 'Download failed',
-      );
+      final s = const ModelDownloadState().copyWith(error: 'Download failed');
       expect(s.error, equals('Download failed'));
 
       // copyWith without error → error becomes null

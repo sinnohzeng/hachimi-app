@@ -46,8 +46,8 @@ class DiaryService {
   DiaryService({
     required LlmService llmService,
     required LocalDatabaseService dbService,
-  })  : _llmService = llmService,
-        _dbService = dbService;
+  }) : _llmService = llmService,
+       _dbService = dbService;
 
   /// 获取指定猫猫的所有日记条目。
   Future<List<DiaryEntry>> getDiaryEntries(String catId) {
@@ -138,5 +138,4 @@ class DiaryService {
     // 清理尾部空白和多余换行
     return text.trimRight();
   }
-
 }

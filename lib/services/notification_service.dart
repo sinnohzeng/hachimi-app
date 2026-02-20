@@ -86,9 +86,10 @@ class NotificationService {
     );
 
     // Create notification channels (Android)
-    final androidPlugin =
-        _localNotifications.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
@@ -108,8 +109,12 @@ class NotificationService {
       );
 
       // Clean up old channel IDs from previous versions
-      await androidPlugin.deleteNotificationChannel(channelId: 'hachimi_focus_timer');
-      await androidPlugin.deleteNotificationChannel(channelId: 'hachimi_focus_timer_v2');
+      await androidPlugin.deleteNotificationChannel(
+        channelId: 'hachimi_focus_timer',
+      );
+      await androidPlugin.deleteNotificationChannel(
+        channelId: 'hachimi_focus_timer_v2',
+      );
     }
 
     _pluginsInitialized = true;
@@ -143,9 +148,10 @@ class NotificationService {
   /// Check if notification permission is currently granted.
   Future<bool> isPermissionGranted() async {
     if (Platform.isAndroid) {
-      final androidPlugin =
-          _localNotifications.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       if (androidPlugin != null) {
         final granted = await androidPlugin.areNotificationsEnabled();
         return granted ?? false;
@@ -161,9 +167,10 @@ class NotificationService {
   /// Request notification permission. Returns true if granted.
   Future<bool> requestPermission() async {
     if (Platform.isAndroid) {
-      final androidPlugin =
-          _localNotifications.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _localNotifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       if (androidPlugin != null) {
         final granted = await androidPlugin.requestNotificationsPermission();
         return granted ?? false;

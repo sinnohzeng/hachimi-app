@@ -61,10 +61,10 @@ class Cat {
 
   /// 当前 sprite 索引（根据阶段 + 变体 + 长毛）
   int get spriteIndex => computeSpriteIndex(
-        stage: computedStage,
-        variant: appearance.spriteVariant,
-        isLonghair: appearance.isLonghair,
-      );
+    stage: computedStage,
+    variant: appearance.spriteVariant,
+    isLonghair: appearance.isLonghair,
+  );
 
   /// 心情（基于 lastSessionAt 计算）
   String get computedMood => calculateMood(lastSessionAt);
@@ -99,15 +99,15 @@ class Cat {
             ),
       totalMinutes: data['totalMinutes'] as int? ?? 0,
       targetMinutes: data['targetMinutes'] as int? ?? 6000,
-      accessories: (data['accessories'] as List<dynamic>?)
+      accessories:
+          (data['accessories'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
       equippedAccessory: data['equippedAccessory'] as String?,
       boundHabitId: data['boundHabitId'] as String? ?? '',
       state: data['state'] as String? ?? 'active',
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastSessionAt: (data['lastSessionAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -124,8 +124,9 @@ class Cat {
       'boundHabitId': boundHabitId,
       'state': state,
       'createdAt': Timestamp.fromDate(createdAt),
-      'lastSessionAt':
-          lastSessionAt != null ? Timestamp.fromDate(lastSessionAt!) : null,
+      'lastSessionAt': lastSessionAt != null
+          ? Timestamp.fromDate(lastSessionAt!)
+          : null,
     };
   }
 

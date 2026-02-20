@@ -39,8 +39,8 @@ class AccessoriesCard extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final hasEquipped = cat.equippedAccessory != null &&
-        cat.equippedAccessory!.isNotEmpty;
+    final hasEquipped =
+        cat.equippedAccessory != null && cat.equippedAccessory!.isNotEmpty;
     final inventory = ref.watch(inventoryProvider).value ?? [];
 
     return Card(
@@ -79,13 +79,14 @@ class AccessoriesCard extends ConsumerWidget {
                         const SizedBox(width: AppSpacing.sm),
                         TextButton.icon(
                           onPressed: () => _unequip(context, ref),
-                          icon: const Icon(Icons.remove_circle_outline,
-                              size: 16),
+                          icon: const Icon(
+                            Icons.remove_circle_outline,
+                            size: 16,
+                          ),
                           label: Text(context.l10n.catDetailUnequip),
                           style: TextButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
                         ),
                       ],
@@ -144,14 +145,14 @@ class AccessoriesCard extends ConsumerWidget {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
     HapticFeedback.selectionClick();
-    ref.read(inventoryServiceProvider).equipAccessory(
-          uid: uid,
-          catId: cat.id,
-          accessoryId: accessoryId,
-        );
+    ref
+        .read(inventoryServiceProvider)
+        .equipAccessory(uid: uid, catId: cat.id, accessoryId: accessoryId);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(context.l10n.catDetailEquippedItem(accessoryDisplayName(accessoryId))),
+        content: Text(
+          context.l10n.catDetailEquippedItem(accessoryDisplayName(accessoryId)),
+        ),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -161,10 +162,9 @@ class AccessoriesCard extends ConsumerWidget {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
     HapticFeedback.selectionClick();
-    ref.read(inventoryServiceProvider).unequipAccessory(
-          uid: uid,
-          catId: cat.id,
-        );
+    ref
+        .read(inventoryServiceProvider)
+        .unequipAccessory(uid: uid, catId: cat.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(context.l10n.catDetailUnequipped),

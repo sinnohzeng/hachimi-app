@@ -26,11 +26,13 @@ import 'package:hachimi_app/services/chat_service.dart';
 
 // ─── Service Providers ───
 
-final modelManagerProvider =
-    Provider<ModelManagerService>((ref) => ModelManagerService());
+final modelManagerProvider = Provider<ModelManagerService>(
+  (ref) => ModelManagerService(),
+);
 
-final localDatabaseProvider =
-    Provider<LocalDatabaseService>((ref) => LocalDatabaseService());
+final localDatabaseProvider = Provider<LocalDatabaseService>(
+  (ref) => LocalDatabaseService(),
+);
 
 final llmServiceInstanceProvider = Provider<LlmService>((ref) => LlmService());
 
@@ -76,8 +78,7 @@ class AiFeatureNotifier extends StateNotifier<bool> {
   }
 }
 
-final aiFeatureEnabledProvider =
-    StateNotifierProvider<AiFeatureNotifier, bool>(
+final aiFeatureEnabledProvider = StateNotifierProvider<AiFeatureNotifier, bool>(
   (ref) => AiFeatureNotifier(),
 );
 
@@ -155,8 +156,8 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
 
 final llmAvailabilityProvider =
     StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>(
-  LlmAvailabilityNotifier.new,
-);
+      LlmAvailabilityNotifier.new,
+    );
 
 // ─── Model Download Progress ───
 
@@ -235,10 +236,7 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
         }
       });
     } catch (e) {
-      state = state.copyWith(
-        isDownloading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isDownloading: false, error: e.toString());
     }
   }
 
@@ -247,10 +245,7 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
       case TaskStatus.complete:
         _onDownloadComplete(update.task as DownloadTask);
       case TaskStatus.failed:
-        state = state.copyWith(
-          isDownloading: false,
-          error: 'Download failed',
-        );
+        state = state.copyWith(isDownloading: false, error: 'Download failed');
       case TaskStatus.canceled:
         state = const ModelDownloadState();
       case TaskStatus.paused:
@@ -271,7 +266,9 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
     state = state.copyWith(
       progress: update.progress.clamp(0.0, 1.0),
       downloadedBytes: downloaded,
-      totalBytes: expectedSize > 0 ? expectedSize : LlmConstants.modelFileSizeBytes,
+      totalBytes: expectedSize > 0
+          ? expectedSize
+          : LlmConstants.modelFileSizeBytes,
     );
   }
 
@@ -281,10 +278,7 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
 
     final verified = await manager.verifyAndSaveModel(filePath);
     if (verified) {
-      state = state.copyWith(
-        isDownloading: false,
-        progress: 1.0,
-      );
+      state = state.copyWith(isDownloading: false, progress: 1.0);
       // 刷新 LLM 可用性
       _ref.read(llmAvailabilityProvider.notifier).refresh();
     } else {
@@ -326,5 +320,5 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
 
 final modelDownloadProvider =
     StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>(
-  ModelDownloadNotifier.new,
-);
+      ModelDownloadNotifier.new,
+    );

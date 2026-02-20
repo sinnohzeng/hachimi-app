@@ -76,54 +76,61 @@ class PixelCatRenderer {
     if (_spritesIndex != null) return;
 
     try {
-    final indexJson = await rootBundle.loadString(
-        'assets/pixel_cat/config/spritesIndex.json');
-    final offsetJson = await rootBundle.loadString(
-        'assets/pixel_cat/config/spritesOffsetMap.json');
-    final tintJson = await rootBundle.loadString(
-        'assets/pixel_cat/config/tints/tint.json');
-    final wpTintJson = await rootBundle.loadString(
-        'assets/pixel_cat/config/tints/white_patches_tint.json');
-    final peltInfoJson = await rootBundle.loadString(
-        'assets/pixel_cat/config/peltInfo.json');
-
-    final indexMap = json.decode(indexJson) as Map<String, dynamic>;
-    _spritesIndex = {};
-    for (final entry in indexMap.entries) {
-      final info = entry.value as Map<String, dynamic>;
-      _spritesIndex![entry.key] = _SpriteInfo(
-        info['spritesheet'] as String,
-        (info['xOffset'] as num).toDouble(),
-        (info['yOffset'] as num).toDouble(),
+      final indexJson = await rootBundle.loadString(
+        'assets/pixel_cat/config/spritesIndex.json',
       );
-    }
+      final offsetJson = await rootBundle.loadString(
+        'assets/pixel_cat/config/spritesOffsetMap.json',
+      );
+      final tintJson = await rootBundle.loadString(
+        'assets/pixel_cat/config/tints/tint.json',
+      );
+      final wpTintJson = await rootBundle.loadString(
+        'assets/pixel_cat/config/tints/white_patches_tint.json',
+      );
+      final peltInfoJson = await rootBundle.loadString(
+        'assets/pixel_cat/config/peltInfo.json',
+      );
 
-    final offsetList = json.decode(offsetJson) as List<dynamic>;
-    _offsetMap = offsetList
-        .cast<Map<String, dynamic>>()
-        .map((e) => _GridPos(
-              (e['x'] as num).toInt(),
-              (e['y'] as num).toInt(),
-            ))
-        .toList();
+      final indexMap = json.decode(indexJson) as Map<String, dynamic>;
+      _spritesIndex = {};
+      for (final entry in indexMap.entries) {
+        final info = entry.value as Map<String, dynamic>;
+        _spritesIndex![entry.key] = _SpriteInfo(
+          info['spritesheet'] as String,
+          (info['xOffset'] as num).toDouble(),
+          (info['yOffset'] as num).toDouble(),
+        );
+      }
 
-    final tintData = json.decode(tintJson) as Map<String, dynamic>;
-    _tintColors = _parseTintMap(
-        tintData['tint_colours'] as Map<String, dynamic>?);
-    _diluteTintColors = _parseTintMap(
-        tintData['dilute_tint_colours'] as Map<String, dynamic>?);
-
-    final wpTintData = json.decode(wpTintJson) as Map<String, dynamic>;
-    _whitePatchesTintColors = _parseTintMap(
-        wpTintData['tint_colours'] as Map<String, dynamic>?);
-
-    final peltData = json.decode(peltInfoJson) as Map<String, dynamic>;
-    _peltInfo = {};
-    for (final entry in peltData.entries) {
-      _peltInfo![entry.key] = (entry.value as List<dynamic>)
-          .map((e) => e as String)
+      final offsetList = json.decode(offsetJson) as List<dynamic>;
+      _offsetMap = offsetList
+          .cast<Map<String, dynamic>>()
+          .map(
+            (e) => _GridPos((e['x'] as num).toInt(), (e['y'] as num).toInt()),
+          )
           .toList();
-    }
+
+      final tintData = json.decode(tintJson) as Map<String, dynamic>;
+      _tintColors = _parseTintMap(
+        tintData['tint_colours'] as Map<String, dynamic>?,
+      );
+      _diluteTintColors = _parseTintMap(
+        tintData['dilute_tint_colours'] as Map<String, dynamic>?,
+      );
+
+      final wpTintData = json.decode(wpTintJson) as Map<String, dynamic>;
+      _whitePatchesTintColors = _parseTintMap(
+        wpTintData['tint_colours'] as Map<String, dynamic>?,
+      );
+
+      final peltData = json.decode(peltInfoJson) as Map<String, dynamic>;
+      _peltInfo = {};
+      for (final entry in peltData.entries) {
+        _peltInfo![entry.key] = (entry.value as List<dynamic>)
+            .map((e) => e as String)
+            .toList();
+      }
     } catch (e) {
       debugPrint('[PixelCatRenderer] _ensureConfigLoaded failed: $e');
       // 初始化空默认值防止重复尝试
@@ -158,7 +165,8 @@ class PixelCatRenderer {
     }
     try {
       final data = await rootBundle.load(
-          'assets/pixel_cat/spritesheets/$name.png');
+        'assets/pixel_cat/spritesheets/$name.png',
+      );
       final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
       final frame = await codec.getNextFrame();
       _spritesheetCache[name] = frame.image;
@@ -188,7 +196,10 @@ class PixelCatRenderer {
       spriteSize.toDouble(),
     );
     final dstRect = ui.Rect.fromLTWH(
-      0, 0, spriteSize.toDouble(), spriteSize.toDouble(),
+      0,
+      0,
+      spriteSize.toDouble(),
+      spriteSize.toDouble(),
     );
 
     canvas.drawImageRect(sheet, srcRect, dstRect, ui.Paint());
@@ -212,7 +223,12 @@ class PixelCatRenderer {
     List<int> tintRgb,
     ui.BlendMode blendMode,
   ) async {
-    final tintColor = ui.Color.fromARGB(255, tintRgb[0], tintRgb[1], tintRgb[2]);
+    final tintColor = ui.Color.fromARGB(
+      255,
+      tintRgb[0],
+      tintRgb[1],
+      tintRgb[2],
+    );
 
     final tintRecorder = ui.PictureRecorder();
     final tintCanvas = ui.Canvas(tintRecorder);
@@ -223,8 +239,10 @@ class PixelCatRenderer {
         ..color = tintColor
         ..blendMode = ui.BlendMode.srcIn,
     );
-    final tintOverlay = await tintRecorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    final tintOverlay = await tintRecorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
 
     final resultRecorder = ui.PictureRecorder();
     final resultCanvas = ui.Canvas(resultRecorder);
@@ -238,8 +256,10 @@ class PixelCatRenderer {
     // 用原图的 alpha 通道裁切结果（保持透明区域）
     final clipRecorder = ui.PictureRecorder();
     final clipCanvas = ui.Canvas(clipRecorder);
-    final tintedImage = await resultRecorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    final tintedImage = await resultRecorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
     clipCanvas.drawImage(tintedImage, ui.Offset.zero, ui.Paint());
     clipCanvas.drawImage(
       source,
@@ -296,11 +316,13 @@ class PixelCatRenderer {
     // ── Layer 1: 底层皮毛（base pelt）──
     if (!appearance.isTortie) {
       await _drawSprite(
-          '$spriteName${appearance.peltColor}', spriteIndex, canvas);
+        '$spriteName${appearance.peltColor}',
+        spriteIndex,
+        canvas,
+      );
     } else {
       final base = appearance.tortieBase ?? 'single';
-      await _drawSprite(
-          '$base${appearance.peltColor}', spriteIndex, canvas);
+      await _drawSprite('$base${appearance.peltColor}', spriteIndex, canvas);
     }
 
     // ── Layer 2: 玳瑁叠加 ──
@@ -327,8 +349,10 @@ class PixelCatRenderer {
       }
     }
 
-    var currentImage = await recorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    var currentImage = await recorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
 
     // ── Layer 3: 色调叠加（tint）──
     if (appearance.tint != 'none') {
@@ -336,7 +360,10 @@ class PixelCatRenderer {
         final tint = _tintColors![appearance.tint];
         if (tint != null) {
           currentImage = await _applyTint(
-              currentImage, tint, ui.BlendMode.multiply);
+            currentImage,
+            tint,
+            ui.BlendMode.multiply,
+          );
         }
       }
       if (_diluteTintColors != null &&
@@ -344,7 +371,10 @@ class PixelCatRenderer {
         final tint = _diluteTintColors![appearance.tint];
         if (tint != null) {
           currentImage = await _applyTint(
-              currentImage, tint, ui.BlendMode.plus);
+            currentImage,
+            tint,
+            ui.BlendMode.plus,
+          );
         }
       }
     }
@@ -358,9 +388,14 @@ class PixelCatRenderer {
       final wpRecorder = ui.PictureRecorder();
       final wpCanvas = ui.Canvas(wpRecorder);
       await _drawSprite(
-          'white${appearance.whitePatches}', spriteIndex, wpCanvas);
-      var wpImage = await wpRecorder.endRecording()
-          .toImage(spriteSize, spriteSize);
+        'white${appearance.whitePatches}',
+        spriteIndex,
+        wpCanvas,
+      );
+      var wpImage = await wpRecorder.endRecording().toImage(
+        spriteSize,
+        spriteSize,
+      );
 
       // ── Layer 5: 白色斑块色调 ──
       if (appearance.whitePatchesTint != 'none' &&
@@ -379,10 +414,11 @@ class PixelCatRenderer {
     if (appearance.points != null) {
       final ptRecorder = ui.PictureRecorder();
       final ptCanvas = ui.Canvas(ptRecorder);
-      await _drawSprite(
-          'white${appearance.points}', spriteIndex, ptCanvas);
-      var ptImage = await ptRecorder.endRecording()
-          .toImage(spriteSize, spriteSize);
+      await _drawSprite('white${appearance.points}', spriteIndex, ptCanvas);
+      var ptImage = await ptRecorder.endRecording().toImage(
+        spriteSize,
+        spriteSize,
+      );
 
       if (appearance.whitePatchesTint != 'none' &&
           _whitePatchesTintColors != null &&
@@ -398,22 +434,26 @@ class PixelCatRenderer {
 
     // ── Layer 7: 白斑病（vitiligo）──
     if (appearance.vitiligo != null) {
-      await _drawSprite(
-          'white${appearance.vitiligo}', spriteIndex, mainCanvas);
+      await _drawSprite('white${appearance.vitiligo}', spriteIndex, mainCanvas);
     }
 
     // ── Layer 8: 眼睛 ──
     await _drawSprite('eyes${appearance.eyeColor}', spriteIndex, mainCanvas);
     if (appearance.eyeColor2 != null) {
       await _drawSprite(
-          'eyes2${appearance.eyeColor2}', spriteIndex, mainCanvas);
+        'eyes2${appearance.eyeColor2}',
+        spriteIndex,
+        mainCanvas,
+      );
     }
 
     // ── Layer 9: 伤疤（跳过 — Hachimi 不使用伤疤系统）──
 
     // ── Layer 10-11: 明暗 + 线稿 ──
-    final preShadingImage = await mainRecorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    final preShadingImage = await mainRecorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
 
     final finalRecorder = ui.PictureRecorder();
     final finalCanvas = ui.Canvas(finalRecorder);
@@ -423,27 +463,26 @@ class PixelCatRenderer {
     await _drawSprite('lines', spriteIndex, finalCanvas);
 
     // ── Layer 12: 皮肤 ──
-    await _drawSprite(
-        'skin${appearance.skinColor}', spriteIndex, finalCanvas);
+    await _drawSprite('skin${appearance.skinColor}', spriteIndex, finalCanvas);
 
     // ── Layer 13: 饰品 ──
     if (accessoryId != null && _peltInfo != null) {
       if (_peltInfo!['plant_accessories']?.contains(accessoryId) == true) {
-        await _drawSprite(
-            'acc_herbs$accessoryId', spriteIndex, finalCanvas);
-      } else if (_peltInfo!['wild_accessories']?.contains(accessoryId) == true) {
-        await _drawSprite(
-            'acc_wild$accessoryId', spriteIndex, finalCanvas);
+        await _drawSprite('acc_herbs$accessoryId', spriteIndex, finalCanvas);
+      } else if (_peltInfo!['wild_accessories']?.contains(accessoryId) ==
+          true) {
+        await _drawSprite('acc_wild$accessoryId', spriteIndex, finalCanvas);
       } else if (_peltInfo!['collars']?.contains(accessoryId) == true) {
-        await _drawSprite(
-            'collars$accessoryId', spriteIndex, finalCanvas);
+        await _drawSprite('collars$accessoryId', spriteIndex, finalCanvas);
       }
     }
 
     final outRecorder = ui.PictureRecorder();
     final outCanvas = ui.Canvas(outRecorder);
-    final layeredImage = await finalRecorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    final layeredImage = await finalRecorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
 
     if (appearance.reverse) {
       outCanvas.scale(-1, 1);
@@ -456,8 +495,10 @@ class PixelCatRenderer {
       outCanvas.drawImage(layeredImage, ui.Offset.zero, ui.Paint());
     }
 
-    final result = await outRecorder.endRecording()
-        .toImage(spriteSize, spriteSize);
+    final result = await outRecorder.endRecording().toImage(
+      spriteSize,
+      spriteSize,
+    );
 
     _renderCache[cacheKey] = result;
     _renderCacheKeys.add(cacheKey);

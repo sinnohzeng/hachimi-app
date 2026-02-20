@@ -80,7 +80,10 @@ class _StatsCard extends StatelessWidget {
             ? checkInFullMonthBonus
             : checkInMilestones[threshold]!;
         final remaining = threshold - monthly.checkedCount;
-        nextMilestoneText = context.l10n.checkInMilestoneProgress(remaining, bonus);
+        nextMilestoneText = context.l10n.checkInMilestoneProgress(
+          remaining,
+          bonus,
+        );
         break;
       }
     }
@@ -159,9 +162,9 @@ class _StatItem extends StatelessWidget {
         Text(
           value,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
         Text(
           label,
@@ -198,7 +201,9 @@ class _CalendarGrid extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              DateFormat.yMMMM(Localizations.localeOf(context).toString()).format(DateTime(year, month)),
+              DateFormat.yMMMM(
+                Localizations.localeOf(context).toString(),
+              ).format(DateTime(year, month)),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -263,47 +268,48 @@ class _CalendarGrid extends StatelessWidget {
         final isPast = currentDay < today;
         final isWeekendCol = col >= 5;
 
-        cells.add(Expanded(
-          child: Container(
-            height: 40,
-            margin: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isChecked
-                  ? colorScheme.primary
-                  : isWeekendCol
-                      ? colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5)
-                      : null,
-              border: isToday && !isChecked
-                  ? Border.all(color: colorScheme.primary, width: 2)
-                  : null,
-            ),
-            child: Center(
-              child: isChecked
-                  ? Icon(Icons.check, size: 16, color: colorScheme.onPrimary)
-                  : Text(
-                      '$currentDay',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isPast
-                            ? colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.5)
-                            : isToday
-                                ? colorScheme.primary
-                                : colorScheme.onSurfaceVariant,
-                        fontWeight: isToday ? FontWeight.bold : null,
+        cells.add(
+          Expanded(
+            child: Container(
+              height: 40,
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isChecked
+                    ? colorScheme.primary
+                    : isWeekendCol
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                    : null,
+                border: isToday && !isChecked
+                    ? Border.all(color: colorScheme.primary, width: 2)
+                    : null,
+              ),
+              child: Center(
+                child: isChecked
+                    ? Icon(Icons.check, size: 16, color: colorScheme.onPrimary)
+                    : Text(
+                        '$currentDay',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isPast
+                              ? colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.5,
+                                )
+                              : isToday
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                          fontWeight: isToday ? FontWeight.bold : null,
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
-        ));
+        );
         day++;
       }
       weeks.add(Row(children: cells));
     }
     return weeks;
   }
-
 }
 
 /// 里程碑进度卡片。
@@ -392,8 +398,7 @@ class _MilestoneRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        (currentCount / milestone.threshold).clamp(0.0, 1.0);
+    final progress = (currentCount / milestone.threshold).clamp(0.0, 1.0);
     final label =
         milestone.label ?? context.l10n.checkInNDays(milestone.threshold);
 
@@ -447,8 +452,7 @@ class _MilestoneRow extends StatelessWidget {
                     value: progress,
                     minHeight: 4,
                     backgroundColor: colorScheme.surfaceContainerHighest,
-                    valueColor:
-                        AlwaysStoppedAnimation(colorScheme.primary),
+                    valueColor: AlwaysStoppedAnimation(colorScheme.primary),
                   ),
                 ),
               ],
@@ -526,9 +530,7 @@ class _RewardRow extends StatelessWidget {
       children: [
         Icon(icon, size: 20, color: color),
         const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Text(label, style: theme.textTheme.bodyMedium),
-        ),
+        Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(

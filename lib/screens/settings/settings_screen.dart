@@ -65,7 +65,10 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
 
           // Appearance section
-          SectionHeader(title: l10n.settingsAppearance, colorScheme: colorScheme),
+          SectionHeader(
+            title: l10n.settingsAppearance,
+            colorScheme: colorScheme,
+          ),
           ListTile(
             leading: const Icon(Icons.dark_mode_outlined),
             title: Text(l10n.settingsThemeMode),
@@ -142,11 +145,13 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.settingsVersion),
-            subtitle: ref.watch(appInfoProvider).when(
-              data: (info) => Text(info.version),
-              loading: () => const Text('...'),
-              error: (_, __) => const Text('?'),
-            ),
+            subtitle: ref
+                .watch(appInfoProvider)
+                .when(
+                  data: (info) => Text(info.version),
+                  loading: () => const Text('...'),
+                  error: (_, __) => const Text('?'),
+                ),
           ),
           ListTile(
             leading: const Icon(Icons.pets_outlined),
@@ -332,9 +337,9 @@ class SettingsScreen extends ConsumerWidget {
                 await ref.read(authServiceProvider).deleteAccount();
               } on Exception catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(e.toString())),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(e.toString())));
                 }
               }
             },

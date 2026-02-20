@@ -46,8 +46,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case addHabit:
         // Redirect to adoption flow
-        return MaterialPageRoute(
-            builder: (_) => const AdoptionFlowScreen());
+        return MaterialPageRoute(builder: (_) => const AdoptionFlowScreen());
       case adoption:
         final isFirst = settings.arguments as bool? ?? false;
         return MaterialPageRoute(
@@ -60,9 +59,7 @@ class AppRouter {
         );
       case timer:
         final habitId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => TimerScreen(habitId: habitId),
-        );
+        return MaterialPageRoute(builder: (_) => TimerScreen(habitId: habitId));
       case focusComplete:
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -82,36 +79,25 @@ class AppRouter {
         );
       case catDetail:
         final catId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => CatDetailScreen(catId: catId),
-        );
+        return MaterialPageRoute(builder: (_) => CatDetailScreen(catId: catId));
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case settingsPage:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       case accessoryShop:
-        return MaterialPageRoute(
-            builder: (_) => const AccessoryShopScreen());
+        return MaterialPageRoute(builder: (_) => const AccessoryShopScreen());
       case inventory:
-        return MaterialPageRoute(
-            builder: (_) => const InventoryScreen());
+        return MaterialPageRoute(builder: (_) => const InventoryScreen());
       case checkIn:
-        return MaterialPageRoute(
-            builder: (_) => const CheckInScreen());
+        return MaterialPageRoute(builder: (_) => const CheckInScreen());
       case catDiary:
         final catId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => CatDiaryScreen(catId: catId),
-        );
+        return MaterialPageRoute(builder: (_) => CatDiaryScreen(catId: catId));
       case catChat:
         final catId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => CatChatScreen(catId: catId),
-        );
+        return MaterialPageRoute(builder: (_) => CatChatScreen(catId: catId));
       case modelTestChat:
-        return MaterialPageRoute(
-          builder: (_) => const ModelTestChatScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const ModelTestChatScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }

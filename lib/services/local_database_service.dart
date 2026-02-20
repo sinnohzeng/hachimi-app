@@ -34,11 +34,7 @@ class LocalDatabaseService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
 
-    return openDatabase(
-      path,
-      version: _dbVersion,
-      onCreate: _onCreate,
-    );
+    return openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -157,11 +153,7 @@ class LocalDatabaseService {
   /// 删除指定猫猫的所有聊天记录。
   Future<void> clearChatHistory(String catId) async {
     final db = await database;
-    await db.delete(
-      'chat_messages',
-      where: 'cat_id = ?',
-      whereArgs: [catId],
-    );
+    await db.delete('chat_messages', where: 'cat_id = ?', whereArgs: [catId]);
   }
 
   /// 关闭数据库连接。

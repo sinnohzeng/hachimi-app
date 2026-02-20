@@ -30,20 +30,20 @@ class CatDiaryScreen extends ConsumerWidget {
     final diaryAsync = ref.watch(diaryEntriesProvider(catId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${cat?.name ?? "Cat"} Diary'),
-      ),
+      appBar: AppBar(title: Text('${cat?.name ?? "Cat"} Diary')),
       body: diaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline,
-                  size: 48, color: colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(height: AppSpacing.base),
-              Text('Failed to load diary',
-                  style: textTheme.bodyLarge),
+              Text('Failed to load diary', style: textTheme.bodyLarge),
               const SizedBox(height: AppSpacing.sm),
               TextButton.icon(
                 onPressed: () => ref.invalidate(diaryEntriesProvider(catId)),
@@ -140,9 +140,7 @@ class CatDiaryScreen extends ConsumerWidget {
                       // 日记正文
                       Text(
                         entry.content,
-                        style: textTheme.bodyMedium?.copyWith(
-                          height: 1.5,
-                        ),
+                        style: textTheme.bodyMedium?.copyWith(height: 1.5),
                       ),
                     ],
                   ),
@@ -161,8 +159,18 @@ class CatDiaryScreen extends ConsumerWidget {
       final month = int.parse(parts[1]);
       final day = int.parse(parts[2]);
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       return '${months[month - 1]} $day';
     } catch (_) {

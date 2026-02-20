@@ -219,7 +219,9 @@ String fullSummary(CatAppearance a) {
   final parts = <String>[];
 
   // Color + pattern
-  parts.add('${peltColorDescription(a.peltColor)} ${peltTypeDescription(a.peltType).toLowerCase()}');
+  parts.add(
+    '${peltColorDescription(a.peltColor)} ${peltTypeDescription(a.peltType).toLowerCase()}',
+  );
 
   // Eyes
   parts.add(eyeDescription(a.eyeColor, a.eyeColor2));

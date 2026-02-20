@@ -194,17 +194,17 @@ class _OnboardingPageData {
   List<Color> gradientColors(ColorScheme colorScheme) {
     return switch (colorRole) {
       _ColorRole.primary => [
-          colorScheme.primary,
-          colorScheme.primary.withValues(alpha: 0.7),
-        ],
+        colorScheme.primary,
+        colorScheme.primary.withValues(alpha: 0.7),
+      ],
       _ColorRole.secondary => [
-          colorScheme.secondary,
-          colorScheme.secondary.withValues(alpha: 0.7),
-        ],
+        colorScheme.secondary,
+        colorScheme.secondary.withValues(alpha: 0.7),
+      ],
       _ColorRole.tertiary => [
-          colorScheme.tertiary,
-          colorScheme.tertiary.withValues(alpha: 0.7),
-        ],
+        colorScheme.tertiary,
+        colorScheme.tertiary.withValues(alpha: 0.7),
+      ],
     };
   }
 
@@ -266,10 +266,7 @@ class _OnboardingPage extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Emoji
-              Text(
-                data.emoji,
-                style: const TextStyle(fontSize: 96),
-              ),
+              Text(data.emoji, style: const TextStyle(fontSize: 96)),
               const SizedBox(height: 40),
 
               // Body

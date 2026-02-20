@@ -37,16 +37,19 @@ class AnimatedMeshBackground extends ConsumerWidget {
     required this.colors,
     this.speed = 1.0,
     this.child,
-  }) : assert(colors.length == 4, 'AnimatedMeshBackground requires exactly 4 colors');
+  }) : assert(
+         colors.length == 4,
+         'AnimatedMeshBackground requires exactly 4 colors',
+       );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     assert(colors.length == 4);
 
-    final animationEnabled =
-        ref.watch(themeProvider.select((s) => s.enableBackgroundAnimation));
-    final disableAnimations =
-        MediaQuery.of(context).disableAnimations;
+    final animationEnabled = ref.watch(
+      themeProvider.select((s) => s.enableBackgroundAnimation),
+    );
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     if (!animationEnabled || disableAnimations) {
       return _StaticFallback(colors: colors, child: child);

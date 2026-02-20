@@ -59,7 +59,8 @@ class FocusTimerState {
   });
 
   /// Remaining seconds for countdown mode.
-  int get remainingSeconds => (totalSeconds - elapsedSeconds).clamp(0, totalSeconds);
+  int get remainingSeconds =>
+      (totalSeconds - elapsedSeconds).clamp(0, totalSeconds);
 
   /// Progress ratio (0.0 - 1.0).
   double get progress {
@@ -73,7 +74,9 @@ class FocusTimerState {
 
   /// Display time string (MM:SS or HH:MM:SS).
   String get displayTime {
-    final seconds = mode == TimerMode.countdown ? remainingSeconds : elapsedSeconds;
+    final seconds = mode == TimerMode.countdown
+        ? remainingSeconds
+        : elapsedSeconds;
     final hours = seconds ~/ 3600;
     final mins = (seconds % 3600) ~/ 60;
     final secs = seconds % 60;
@@ -259,7 +262,10 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     // Wall-clock elapsed minus paused time
     final wallTotal = DateTime.now().difference(startedAt).inSeconds;
-    final effectiveElapsed = (wallTotal - totalPausedSeconds).clamp(0, wallTotal);
+    final effectiveElapsed = (wallTotal - totalPausedSeconds).clamp(
+      0,
+      wallTotal,
+    );
 
     // Countdown mode: check if would have completed
     if (mode == TimerMode.countdown && effectiveElapsed >= totalSeconds) {
@@ -317,7 +323,10 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     // Wall-clock calculation: elapsed = (now - startedAt) - totalPausedSeconds
     final wallTotal = DateTime.now().difference(startedAt).inSeconds;
-    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(0, wallTotal);
+    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(
+      0,
+      wallTotal,
+    );
 
     // Countdown: check if time is up
     if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
@@ -349,7 +358,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   // Completion notification L10N is handled in timer_screen.dart (has context).
   void _updateNotification() {
     final label = state.mode == TimerMode.countdown ? 'remaining' : 'elapsed';
-    final catDisplayName = state.catName.isNotEmpty ? state.catName : 'Your cat';
+    final catDisplayName = state.catName.isNotEmpty
+        ? state.catName
+        : 'Your cat';
 
     // 基础通知（fallback）
     FocusTimerService.updateNotification(
@@ -367,9 +378,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         isPaused: state.status == TimerStatus.paused,
         endTimeMs: isCountdown
             ? state.startedAt!
-                .add(Duration(
-                    seconds: state.totalSeconds + state.totalPausedSeconds))
-                .millisecondsSinceEpoch
+                  .add(
+                    Duration(
+                      seconds: state.totalSeconds + state.totalPausedSeconds,
+                    ),
+                  )
+                  .millisecondsSinceEpoch
             : null,
         startTimeMs: state.startedAt!.millisecondsSinceEpoch,
       );
@@ -389,17 +403,16 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Resume from pause — accumulate pause duration into totalPausedSeconds.
   void resume() {
     if (state.pausedAt != null) {
-      final pauseDuration = DateTime.now().difference(state.pausedAt!).inSeconds;
+      final pauseDuration = DateTime.now()
+          .difference(state.pausedAt!)
+          .inSeconds;
       state = state.copyWith(
         totalPausedSeconds: state.totalPausedSeconds + pauseDuration,
         status: TimerStatus.running,
         clearPausedAt: true,
       );
     } else {
-      state = state.copyWith(
-        status: TimerStatus.running,
-        clearPausedAt: true,
-      );
+      state = state.copyWith(status: TimerStatus.running, clearPausedAt: true);
     }
     _ticker?.cancel();
     _ticksSinceSave = 0;
@@ -431,8 +444,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     if (state.status == TimerStatus.running) {
       state = state.copyWith(pausedAt: DateTime.now());
       _saveState();
-      final catDisplayName =
-          state.catName.isNotEmpty ? state.catName : 'Your cat';
+      final catDisplayName = state.catName.isNotEmpty
+          ? state.catName
+          : 'Your cat';
       FocusTimerService.updateNotification(
         title: '$catDisplayName focusing...',
         text: 'Focus session in progress',
@@ -449,8 +463,10 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     // Wall-clock total elapsed minus paused time
     final wallTotal = DateTime.now().difference(state.startedAt!).inSeconds;
-    final newElapsed = (wallTotal - state.totalPausedSeconds)
-        .clamp(0, wallTotal);
+    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(
+      0,
+      wallTotal,
+    );
 
     // Auto-complete if away > 30 minutes (user forgot about it)
     final awayDuration = DateTime.now().difference(state.pausedAt!);
@@ -481,10 +497,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     }
 
     // Normal resume — clear pausedAt, restart ticker, refresh display
-    state = state.copyWith(
-      elapsedSeconds: newElapsed,
-      clearPausedAt: true,
-    );
+    state = state.copyWith(elapsedSeconds: newElapsed, clearPausedAt: true);
     _ticker?.cancel();
     _ticksSinceSave = 0;
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
@@ -519,12 +532,11 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       await prefs.remove(_keyPausedAt);
     }
   }
-
 }
 
 /// Focus timer provider — global singleton (keepAlive).
 /// Timer is a cross-screen concern that must survive navigation.
 final focusTimerProvider =
     NotifierProvider<FocusTimerNotifier, FocusTimerState>(
-  FocusTimerNotifier.new,
-);
+      FocusTimerNotifier.new,
+    );

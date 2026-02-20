@@ -108,12 +108,12 @@ class ReminderCard extends ConsumerWidget {
     if (uid == null) return;
     final timeStr = _formatTimeOfDay(picked);
 
-    await ref.read(firestoreServiceProvider).updateHabit(
-          uid: uid,
-          habitId: habit.id,
-          reminderTime: timeStr,
-        );
-    await ref.read(notificationServiceProvider).scheduleDailyReminder(
+    await ref
+        .read(firestoreServiceProvider)
+        .updateHabit(uid: uid, habitId: habit.id, reminderTime: timeStr);
+    await ref
+        .read(notificationServiceProvider)
+        .scheduleDailyReminder(
           habitId: habit.id,
           habitName: habit.name,
           catName: cat.name,
@@ -135,11 +135,9 @@ class ReminderCard extends ConsumerWidget {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    await ref.read(firestoreServiceProvider).updateHabit(
-          uid: uid,
-          habitId: habit.id,
-          clearReminder: true,
-        );
+    await ref
+        .read(firestoreServiceProvider)
+        .updateHabit(uid: uid, habitId: habit.id, clearReminder: true);
     await ref.read(notificationServiceProvider).cancelDailyReminder(habit.id);
 
     if (context.mounted) {

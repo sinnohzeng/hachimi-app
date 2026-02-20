@@ -39,8 +39,8 @@ class OfflineBanner extends ConsumerWidget {
               child: Text(
                 context.l10n.offlineMessage,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onErrorContainer,
-                    ),
+                  color: colorScheme.onErrorContainer,
+                ),
               ),
             ),
           ],

@@ -186,8 +186,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
 
     // Check for stage-up (time-based growth)
-    final cat =
-        habit.catId != null ? ref.read(catByIdProvider(habit.catId!)) : null;
+    final cat = habit.catId != null
+        ? ref.read(catByIdProvider(habit.catId!))
+        : null;
     final stageUp = cat != null
         ? xpService.checkStageUp(
             oldTotalMinutes: cat.totalMinutes,
@@ -210,11 +211,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       coinsEarned: coinsEarned,
     );
 
-    await ref.read(firestoreServiceProvider).logFocusSession(
-          uid: uid,
-          session: session,
-          habitName: habit.name,
-        );
+    await ref
+        .read(firestoreServiceProvider)
+        .logFocusSession(uid: uid, session: session, habitName: habit.name);
 
     if (mounted) {
       // Send completion notification (only on successful completion)
@@ -222,7 +221,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
         NotificationService().showFocusComplete(
           title: context.l10n.focusCompleteNotifTitle,
-          body: context.l10n.focusCompleteNotifBody(catName, xpResult.totalXp, minutes),
+          body: context.l10n.focusCompleteNotifBody(
+            catName,
+            xpResult.totalXp,
+            minutes,
+          ),
         );
       }
 
@@ -287,10 +290,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final meshColors = timerMeshColors(bgColor, colorScheme);
 
     // Grace period: first 10 seconds allow free exit
-    final isRunningOrPaused = timerState.status == TimerStatus.running ||
+    final isRunningOrPaused =
+        timerState.status == TimerStatus.running ||
         timerState.status == TimerStatus.paused;
-    final inGracePeriod =
-        isRunningOrPaused && timerState.elapsedSeconds <= 10;
+    final inGracePeriod = isRunningOrPaused && timerState.elapsedSeconds <= 10;
     // Allow pop freely when idle/completed/abandoned or during grace period
     final allowPop = !isRunningOrPaused || inGracePeriod;
 
@@ -309,209 +312,217 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         _giveUp();
       },
       child: Scaffold(
-      body: Stack(
-        children: [
-          // Layer 1: Slow breathing mesh gradient
-          Positioned.fill(
-            child: AnimatedMeshBackground(
-              colors: meshColors,
-              speed: 0.3,
+        body: Stack(
+          children: [
+            // Layer 1: Slow breathing mesh gradient
+            Positioned.fill(
+              child: AnimatedMeshBackground(colors: meshColors, speed: 0.3),
             ),
-          ),
-          // Layer 2: Subtle floating dust particles
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: ParticleOverlay(
-                mode: ParticleMode.dust,
-                child: SizedBox.expand(),
+            // Layer 2: Subtle floating dust particles
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: ParticleOverlay(
+                  mode: ParticleMode.dust,
+                  child: SizedBox.expand(),
+                ),
               ),
             ),
-          ),
-          // Layer 3: Original content
-          SafeArea(
-          child: Column(
-            children: [
-              // Notification permission banner
-              if (_showPermissionBanner)
-                MaterialBanner(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
-                  content: Text(context.l10n.timerNotificationBanner),
-                  leading: const Icon(Icons.notifications_off_outlined),
-                  actions: [
-                    TextButton(
-                      onPressed: () =>
-                          setState(() => _showPermissionBanner = false),
-                      child: Text(context.l10n.timerNotificationDismiss),
+            // Layer 3: Original content
+            SafeArea(
+              child: Column(
+                children: [
+                  // Notification permission banner
+                  if (_showPermissionBanner)
+                    MaterialBanner(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      content: Text(context.l10n.timerNotificationBanner),
+                      leading: const Icon(Icons.notifications_off_outlined),
+                      actions: [
+                        TextButton(
+                          onPressed: () =>
+                              setState(() => _showPermissionBanner = false),
+                          child: Text(context.l10n.timerNotificationDismiss),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            final granted = await NotificationService()
+                                .requestPermission();
+                            if (mounted) {
+                              setState(() => _showPermissionBanner = !granted);
+                            }
+                          },
+                          child: Text(context.l10n.timerNotificationEnable),
+                        ),
+                      ],
                     ),
-                    TextButton(
-                      onPressed: () async {
-                        final granted =
-                            await NotificationService().requestPermission();
-                        if (mounted) {
-                          setState(() =>
-                              _showPermissionBanner = !granted);
-                        }
-                      },
-                      child: Text(context.l10n.timerNotificationEnable),
-                    ),
-                  ],
-                ),
 
-              // Top bar: habit name + streak
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      habit.name,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                  // Top bar: habit name + streak
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          habit.name,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (habit.currentStreak > 0) ...[
+                          const SizedBox(width: AppSpacing.md),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.tertiaryContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.local_fire_department,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '${habit.currentStreak}',
+                                  style: textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(flex: 2),
+
+                  // Cat + circular progress
+                  SizedBox(
+                    width: 240,
+                    height: 240,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Progress ring
+                        ProgressRing(
+                          progress: timerState.progress,
+                          size: 240,
+                          strokeWidth: 8,
+                          child: const SizedBox(),
+                        ),
+                        // Cat sprite
+                        if (cat != null)
+                          TappableCatSprite(cat: cat, size: 100)
+                        else
+                          Icon(
+                            Icons.self_improvement,
+                            size: 64,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Timer display
+                  Semantics(
+                    label: 'Timer: ${timerState.displayTime}',
+                    liveRegion: true,
+                    child: Text(
+                      timerState.displayTime,
+                      style: textTheme.displayLarge?.copyWith(
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 2,
                       ),
                     ),
-                    if (habit.currentStreak > 0) ...[
-                      const SizedBox(width: AppSpacing.md),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  // Mode indicator
+                  Text(
+                    timerState.mode == TimerMode.countdown
+                        ? context.l10n.timerRemaining
+                        : context.l10n.timerElapsed,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+
+                  // Paused indicator
+                  if (timerState.status == TimerStatus.paused) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        context.l10n.timerPaused,
+                        style: textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.bold,
                         ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.tertiaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.local_fire_department, size: 14),
-                            const SizedBox(width: 2),
-                            Text(
-                              '${habit.currentStreak}',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+
+                  const Spacer(flex: 3),
+
+                  // Controls
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                    child: _buildControls(timerState, theme),
+                  ),
+
+                  // Bottom button: grace-period "返回" or "Give Up"
+                  if (_hasStarted &&
+                      timerState.status != TimerStatus.completed &&
+                      timerState.status != TimerStatus.abandoned)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: inGracePeriod
+                          ? TextButton(
+                              onPressed: _goBack,
+                              child: Text(
+                                context.l10n.timerGraceBack(
+                                  10 - timerState.elapsedSeconds,
+                                ),
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            )
+                          : TextButton(
+                              onPressed: _giveUp,
+                              child: Text(
+                                context.l10n.timerGiveUp,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              const Spacer(flex: 2),
-
-              // Cat + circular progress
-              SizedBox(
-                width: 240,
-                height: 240,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Progress ring
-                    ProgressRing(
-                      progress: timerState.progress,
-                      size: 240,
-                      strokeWidth: 8,
-                      child: const SizedBox(),
                     ),
-                    // Cat sprite
-                    if (cat != null)
-                      TappableCatSprite(cat: cat, size: 100)
-                    else
-                      Icon(Icons.self_improvement,
-                          size: 64,
-                          color: colorScheme.onSurfaceVariant),
-                  ],
-                ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Timer display
-              Semantics(
-                label: 'Timer: ${timerState.displayTime}',
-                liveRegion: true,
-                child: Text(
-                  timerState.displayTime,
-                  style: textTheme.displayLarge?.copyWith(
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // Mode indicator
-              Text(
-                timerState.mode == TimerMode.countdown
-                    ? context.l10n.timerRemaining
-                    : context.l10n.timerElapsed,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-
-              // Paused indicator
-              if (timerState.status == TimerStatus.paused) ...[
-                const SizedBox(height: AppSpacing.sm),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: colorScheme.errorContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    context.l10n.timerPaused,
-                    style: textTheme.labelMedium?.copyWith(
-                      color: colorScheme.onErrorContainer,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-
-              const Spacer(flex: 3),
-
-              // Controls
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                child: _buildControls(timerState, theme),
-              ),
-
-              // Bottom button: grace-period "返回" or "Give Up"
-              if (_hasStarted &&
-                  timerState.status != TimerStatus.completed &&
-                  timerState.status != TimerStatus.abandoned)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: inGracePeriod
-                      ? TextButton(
-                          onPressed: _goBack,
-                          child: Text(
-                            context.l10n.timerGraceBack(10 - timerState.elapsedSeconds),
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        )
-                      : TextButton(
-                          onPressed: _giveUp,
-                          child: Text(
-                            context.l10n.timerGiveUp,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
-        ],
       ),
-    ));
+    );
   }
 
   Widget _buildControls(FocusTimerState timerState, ThemeData theme) {

@@ -11,8 +11,9 @@ import 'package:hachimi_app/models/cat_appearance.dart';
 import 'package:hachimi_app/services/pixel_cat_renderer.dart';
 
 /// 渲染器单例 — 全局共享 spritesheet 缓存。
-final pixelCatRendererProvider =
-    Provider<PixelCatRenderer>((ref) => PixelCatRenderer());
+final pixelCatRendererProvider = Provider<PixelCatRenderer>(
+  (ref) => PixelCatRenderer(),
+);
 
 /// Sprite 渲染参数。
 typedef CatSpriteParams = ({
@@ -22,12 +23,13 @@ typedef CatSpriteParams = ({
 });
 
 /// 渲染结果缓存 — 按 appearance + spriteIndex + accessoryId 组合 family。
-final catSpriteImageProvider =
-    FutureProvider.family<ui.Image, CatSpriteParams>((ref, params) {
-  final renderer = ref.watch(pixelCatRendererProvider);
-  return renderer.renderCat(
-    params.appearance,
-    params.spriteIndex,
-    accessoryId: params.accessoryId,
-  );
-});
+final catSpriteImageProvider = FutureProvider.family<ui.Image, CatSpriteParams>(
+  (ref, params) {
+    final renderer = ref.watch(pixelCatRendererProvider);
+    return renderer.renderCat(
+      params.appearance,
+      params.spriteIndex,
+      accessoryId: params.accessoryId,
+    );
+  },
+);

@@ -79,10 +79,7 @@ class PixelCatSprite extends ConsumerWidget {
               ),
             ),
             error: (e, _) => Center(
-              child: Text(
-                '🐱',
-                style: TextStyle(fontSize: size * 0.5),
-              ),
+              child: Text('🐱', style: TextStyle(fontSize: size * 0.5)),
             ),
           ),
         ),

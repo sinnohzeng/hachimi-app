@@ -114,14 +114,10 @@ class _DetailRow extends StatelessWidget {
         children: [
           Icon(icon, color: colorScheme.primary),
           const SizedBox(width: AppSpacing.base),
-          Expanded(
-            child: Text(label, style: textTheme.bodyLarge),
-          ),
+          Expanded(child: Text(label, style: textTheme.bodyLarge)),
           Text(
             value,
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
         ],
       ),

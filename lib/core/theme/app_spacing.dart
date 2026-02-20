@@ -58,10 +58,18 @@ class AppSpacing {
   static const EdgeInsets paddingBottomXl = EdgeInsets.only(bottom: xl);
 
   // --- Common mixed patterns ---
-  static const EdgeInsets paddingListTile =
-      EdgeInsets.symmetric(horizontal: base, vertical: xs);
-  static const EdgeInsets paddingSection =
-      EdgeInsets.fromLTRB(base, lg, base, sm);
-  static const EdgeInsets paddingCard =
-      EdgeInsets.symmetric(horizontal: base, vertical: xs);
+  static const EdgeInsets paddingListTile = EdgeInsets.symmetric(
+    horizontal: base,
+    vertical: xs,
+  );
+  static const EdgeInsets paddingSection = EdgeInsets.fromLTRB(
+    base,
+    lg,
+    base,
+    sm,
+  );
+  static const EdgeInsets paddingCard = EdgeInsets.symmetric(
+    horizontal: base,
+    vertical: xs,
+  );
 }

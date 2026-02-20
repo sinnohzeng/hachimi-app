@@ -54,12 +54,13 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
       final uid = ref.read(currentUidProvider);
       if (uid == null) return;
 
-      final data =
-          await ref.read(firestoreServiceProvider).getDailyMinutesForHabit(
-                uid: uid,
-                habitId: widget.habitId,
-                lastNDays: 91,
-              );
+      final data = await ref
+          .read(firestoreServiceProvider)
+          .getDailyMinutesForHabit(
+            uid: uid,
+            habitId: widget.habitId,
+            lastNDays: 91,
+          );
 
       if (mounted) {
         setState(() {
@@ -108,8 +109,11 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
                   padding: AppSpacing.paddingBase,
                   child: Column(
                     children: [
-                      Icon(Icons.cloud_off,
-                          color: colorScheme.onSurfaceVariant, size: 32),
+                      Icon(
+                        Icons.cloud_off,
+                        color: colorScheme.onSurfaceVariant,
+                        size: 32,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         context.l10n.catDetailActivityError,
@@ -161,7 +165,9 @@ class StageMilestone extends StatelessWidget {
           height: 28,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isReached ? color : colorScheme.outlineVariant.withValues(alpha: 0.4),
+            color: isReached
+                ? color
+                : colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
           child: isReached
               ? const Icon(Icons.check, size: 14, color: Colors.white)

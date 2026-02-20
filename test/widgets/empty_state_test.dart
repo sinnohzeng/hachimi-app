@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              icon: Icons.add_task,
-              title: 'No quests yet',
-            ),
+            body: EmptyState(icon: Icons.add_task, title: 'No quests yet'),
           ),
         ),
       );
@@ -40,10 +37,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              icon: Icons.add_task,
-              title: 'No quests yet',
-            ),
+            body: EmptyState(icon: Icons.add_task, title: 'No quests yet'),
           ),
         ),
       );
@@ -52,8 +46,9 @@ void main() {
       expect(find.byType(Text), findsOneWidget);
     });
 
-    testWidgets('renders CTA button when actionLabel and onAction provided',
-        (tester) async {
+    testWidgets('renders CTA button when actionLabel and onAction provided', (
+      tester,
+    ) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -78,10 +73,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              icon: Icons.add,
-              title: 'Empty',
-            ),
+            body: EmptyState(icon: Icons.add, title: 'Empty'),
           ),
         ),
       );
@@ -89,39 +81,40 @@ void main() {
       expect(find.byType(FilledButton), findsNothing);
     });
 
-    testWidgets('golden — EmptyState with subtitle and action',
-        tags: ['golden'], (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.pets_outlined,
-              title: 'No cats here',
-              subtitle: 'Adopt a cat to get started',
-              actionLabel: 'Adopt',
-              onAction: () {},
+    testWidgets(
+      'golden — EmptyState with subtitle and action',
+      tags: ['golden'],
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(colorSchemeSeed: Colors.blue),
+            home: Scaffold(
+              body: EmptyState(
+                icon: Icons.pets_outlined,
+                title: 'No cats here',
+                subtitle: 'Adopt a cat to get started',
+                actionLabel: 'Adopt',
+                onAction: () {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await expectLater(
-        find.byType(EmptyState),
-        matchesGoldenFile('goldens/empty_state_full.png'),
-      );
-    });
+        await expectLater(
+          find.byType(EmptyState),
+          matchesGoldenFile('goldens/empty_state_full.png'),
+        );
+      },
+    );
 
-    testWidgets('golden — EmptyState minimal', tags: ['golden'],
-        (tester) async {
+    testWidgets('golden — EmptyState minimal', tags: ['golden'], (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
           home: const Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox_outlined,
-              title: 'Nothing here',
-            ),
+            body: EmptyState(icon: Icons.inbox_outlined, title: 'Nothing here'),
           ),
         ),
       );

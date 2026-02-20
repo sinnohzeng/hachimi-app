@@ -217,7 +217,9 @@ extension AppearanceL10n on S {
   /// 一行概要：如 "Ginger tabby, golden eyes, longhair"
   String fullAppearanceSummary(CatAppearance a) {
     final parts = <String>[];
-    parts.add('${peltColorName(a.peltColor)} ${peltTypeName(a.peltType).toLowerCase()}');
+    parts.add(
+      '${peltColorName(a.peltColor)} ${peltTypeName(a.peltType).toLowerCase()}',
+    );
     parts.add(eyeDesc(a.eyeColor, a.eyeColor2));
     parts.add(furLength(a.isLonghair).toLowerCase());
     return parts.join(', ');

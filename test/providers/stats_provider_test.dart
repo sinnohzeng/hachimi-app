@@ -52,10 +52,7 @@ void main() {
 
   group('HabitStats — overallProgress', () {
     test('returns 0 when totalTargetHours is 0', () {
-      const stats = HabitStats(
-        totalMinutesLogged: 100,
-        totalTargetHours: 0,
-      );
+      const stats = HabitStats(totalMinutesLogged: 100, totalTargetHours: 0);
       expect(stats.overallProgress, equals(0.0));
     });
 
@@ -76,10 +73,7 @@ void main() {
     });
 
     test('exactly 100% progress', () {
-      const stats = HabitStats(
-        totalMinutesLogged: 600,
-        totalTargetHours: 10,
-      );
+      const stats = HabitStats(totalMinutesLogged: 600, totalTargetHours: 10);
       expect(stats.overallProgress, closeTo(1.0, 0.001));
     });
 

@@ -66,8 +66,11 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.monetization_on,
-                  color: Color(0xFFFFD700), size: 20),
+              const Icon(
+                Icons.monetization_on,
+                color: Color(0xFFFFD700),
+                size: 20,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(child: Text(message)),
             ],
@@ -140,8 +143,11 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Icon(Icons.calendar_today,
-                  color: colorScheme.onTertiaryContainer, size: 20),
+              Icon(
+                Icons.calendar_today,
+                color: colorScheme.onTertiaryContainer,
+                size: 20,
+              ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
@@ -167,8 +173,12 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     );
   }
 
-  Widget _buildCheckedInCard(BuildContext context, ColorScheme colorScheme,
-      ThemeData theme, MonthlyCheckIn? monthly) {
+  Widget _buildCheckedInCard(
+    BuildContext context,
+    ColorScheme colorScheme,
+    ThemeData theme,
+    MonthlyCheckIn? monthly,
+  ) {
     final now = DateTime.now();
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
     final checkedCount = monthly?.checkedCount ?? 0;
@@ -182,14 +192,16 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
         color: colorScheme.secondaryContainer,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () =>
-              Navigator.of(context).pushNamed(AppRouter.checkIn),
+          onTap: () => Navigator.of(context).pushNamed(AppRouter.checkIn),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(Icons.calendar_month,
-                    color: colorScheme.onSecondaryContainer, size: 20),
+                Icon(
+                  Icons.calendar_month,
+                  color: colorScheme.onSecondaryContainer,
+                  size: 20,
+                ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
@@ -200,8 +212,11 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
                     ),
                   ),
                 ),
-                Icon(Icons.chevron_right,
-                    color: colorScheme.onSecondaryContainer, size: 20),
+                Icon(
+                  Icons.chevron_right,
+                  color: colorScheme.onSecondaryContainer,
+                  size: 20,
+                ),
               ],
             ),
           ),

@@ -44,8 +44,10 @@ class FocusStatsCard extends ConsumerWidget {
 
     final todayMap = ref.watch(todayMinutesPerHabitProvider);
     final todayMinutes = todayMap[habit.id] ?? 0;
-    final daysActive =
-        max(1, DateTime.now().difference(habit.createdAt).inDays);
+    final daysActive = max(
+      1,
+      DateTime.now().difference(habit.createdAt).inDays,
+    );
     final avgDaily = habit.totalMinutes ~/ daysActive;
 
     return Card(
@@ -70,8 +72,10 @@ class FocusStatsCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(8),
@@ -155,10 +159,9 @@ class FocusStatsCard extends ConsumerWidget {
                 Expanded(
                   child: FilledButton.tonalIcon(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        AppRouter.focusSetup,
-                        arguments: habit.id,
-                      );
+                      Navigator.of(
+                        context,
+                      ).pushNamed(AppRouter.focusSetup, arguments: habit.id);
                     },
                     icon: const Icon(Icons.play_arrow),
                     label: Text(context.l10n.catDetailStartFocus),

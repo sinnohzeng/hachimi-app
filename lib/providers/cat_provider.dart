@@ -4,8 +4,9 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/services/pixel_cat_generation_service.dart';
 
 /// Pixel cat generation service — singleton.
-final pixelCatGenerationServiceProvider =
-    Provider<PixelCatGenerationService>((ref) => PixelCatGenerationService());
+final pixelCatGenerationServiceProvider = Provider<PixelCatGenerationService>(
+  (ref) => PixelCatGenerationService(),
+);
 
 /// Active cats — streams active cats from Firestore via CatFirestoreService.
 final catsProvider = StreamProvider<List<Cat>>((ref) {
@@ -22,8 +23,7 @@ final allCatsProvider = StreamProvider<List<Cat>>((ref) {
 });
 
 /// Cat by habit ID — family provider for quick lookups.
-final catByHabitProvider =
-    Provider.family<Cat?, String>((ref, habitId) {
+final catByHabitProvider = Provider.family<Cat?, String>((ref, habitId) {
   final cats = ref.watch(catsProvider).value ?? [];
   try {
     return cats.firstWhere((c) => c.boundHabitId == habitId);

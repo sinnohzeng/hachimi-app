@@ -144,7 +144,9 @@ class ModelManagerService {
     await prefs.setBool(LlmConstants.prefModelDownloaded, true);
     await prefs.setString(LlmConstants.prefModelFilePath, filePath);
     await prefs.setString(
-        LlmConstants.prefModelVersion, LlmConstants.modelVersion);
+      LlmConstants.prefModelVersion,
+      LlmConstants.modelVersion,
+    );
 
     return true;
   }

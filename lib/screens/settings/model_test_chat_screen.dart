@@ -257,16 +257,10 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
             SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: fgColor,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2, color: fgColor),
             ),
           if (_status == _TestChatStatus.error)
-            TextButton(
-              onPressed: _initModel,
-              child: Text(l10n.commonRetry),
-            ),
+            TextButton(onPressed: _initModel, child: Text(l10n.commonRetry)),
         ],
       ),
     );
@@ -285,11 +279,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: colorScheme.error,
-              ),
+              Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: AppSpacing.base),
               Text(
                 l10n.testChatCouldNotLoad,

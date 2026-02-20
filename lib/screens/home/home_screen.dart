@@ -116,10 +116,7 @@ class _TodayTab extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverAppBar(
-          floating: true,
-          title: Text(l10n.appTitle),
-        ),
+        SliverAppBar(floating: true, title: Text(l10n.appTitle)),
 
         // Daily check-in trigger
         const SliverToBoxAdapter(child: CheckInBanner()),
@@ -173,9 +170,7 @@ class _TodayTab extends ConsumerWidget {
             if (featured == null) {
               return const SliverToBoxAdapter(child: SizedBox.shrink());
             }
-            return SliverToBoxAdapter(
-              child: _FeaturedCatCard(cat: featured),
-            );
+            return SliverToBoxAdapter(child: _FeaturedCatCard(cat: featured));
           },
         ),
 
@@ -218,36 +213,30 @@ class _TodayTab extends ConsumerWidget {
             }
 
             return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final habit = habits[index];
-                  final cat = habit.catId != null
-                      ? ref.watch(catByIdProvider(habit.catId!))
-                      : null;
-                  final minutes = todayMinutes[habit.id] ?? 0;
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final habit = habits[index];
+                final cat = habit.catId != null
+                    ? ref.watch(catByIdProvider(habit.catId!))
+                    : null;
+                final minutes = todayMinutes[habit.id] ?? 0;
 
-                  return _HabitRow(
-                    habit: habit,
-                    cat: cat,
-                    todayMinutes: minutes,
-                    onTap: () => Navigator.of(context).pushNamed(
-                      AppRouter.focusSetup,
-                      arguments: habit.id,
-                    ),
-                    onDelete: () =>
-                        _confirmDelete(context, ref, habit.id, habit.name),
-                  );
-                },
-                childCount: habits.length,
-              ),
+                return _HabitRow(
+                  habit: habit,
+                  cat: cat,
+                  todayMinutes: minutes,
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(AppRouter.focusSetup, arguments: habit.id),
+                  onDelete: () =>
+                      _confirmDelete(context, ref, habit.id, habit.name),
+                );
+              }, childCount: habits.length),
             );
           },
         ),
 
         // Bottom breathing space for FAB + NavigationBar
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 100),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
     );
   }
@@ -270,7 +259,11 @@ class _TodayTab extends ConsumerWidget {
   }
 
   void _confirmDelete(
-      BuildContext context, WidgetRef ref, String habitId, String habitName) {
+    BuildContext context,
+    WidgetRef ref,
+    String habitId,
+    String habitName,
+  ) {
     final l10n = context.l10n;
     showDialog(
       context: context,
@@ -325,8 +318,7 @@ class _FeaturedCatCard extends ConsumerWidget {
     final textTheme = theme.textTheme;
 
     final habits = ref.watch(habitsProvider).value ?? [];
-    final habit =
-        habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
+    final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
     final stageClr = stageColor(cat.computedStage);
 
     return Padding(
@@ -335,8 +327,9 @@ class _FeaturedCatCard extends ConsumerWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: habit != null
-              ? () => Navigator.of(context)
-                  .pushNamed(AppRouter.focusSetup, arguments: habit.id)
+              ? () => Navigator.of(
+                  context,
+                ).pushNamed(AppRouter.focusSetup, arguments: habit.id)
               : null,
           child: Container(
             decoration: BoxDecoration(
@@ -380,8 +373,7 @@ class _FeaturedCatCard extends ConsumerWidget {
                         child: LinearProgressIndicator(
                           value: cat.growthProgress,
                           minHeight: 6,
-                          backgroundColor:
-                              colorScheme.surfaceContainerHighest,
+                          backgroundColor: colorScheme.surfaceContainerHighest,
                           valueColor: AlwaysStoppedAnimation(stageClr),
                         ),
                       ),
@@ -398,9 +390,9 @@ class _FeaturedCatCard extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.sm),
                 FilledButton(
                   onPressed: habit != null
-                      ? () => Navigator.of(context).pushNamed(
-                          AppRouter.focusSetup,
-                          arguments: habit.id)
+                      ? () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRouter.focusSetup, arguments: habit.id)
                       : null,
                   child: Text(context.l10n.todayFocus),
                 ),
@@ -454,8 +446,11 @@ class _HabitRow extends StatelessWidget {
                     color: colorScheme.surfaceContainerHighest,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.flag_outlined,
-                      size: 24, color: colorScheme.primary),
+                  child: Icon(
+                    Icons.flag_outlined,
+                    size: 24,
+                    color: colorScheme.primary,
+                  ),
                 ),
               const SizedBox(width: AppSpacing.md),
 
@@ -508,8 +503,11 @@ class _HabitRow extends StatelessWidget {
 
               // Start button
               IconButton(
-                icon: Icon(Icons.play_circle_filled,
-                    color: colorScheme.primary, size: 32),
+                icon: Icon(
+                  Icons.play_circle_filled,
+                  color: colorScheme.primary,
+                  size: 32,
+                ),
                 onPressed: onTap,
                 tooltip: context.l10n.todayStartFocus,
               ),

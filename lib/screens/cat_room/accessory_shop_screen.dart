@@ -48,33 +48,43 @@ class AccessoryShopScreen extends ConsumerWidget {
     final prices = accessoryPriceMap;
 
     // 构建 3 类饰品列表
-    final plantItems = plantAccessories.map((id) => AccessoryInfo(
-          id: id,
-          displayName: accessoryDisplayName(id),
-          price: prices[id] ?? 150,
-          category: 'plant',
-          isOwned: ownedSet.contains(id),
-        )).toList();
+    final plantItems = plantAccessories
+        .map(
+          (id) => AccessoryInfo(
+            id: id,
+            displayName: accessoryDisplayName(id),
+            price: prices[id] ?? 150,
+            category: 'plant',
+            isOwned: ownedSet.contains(id),
+          ),
+        )
+        .toList();
 
-    final wildItems = wildAccessories.map((id) => AccessoryInfo(
-          id: id,
-          displayName: accessoryDisplayName(id),
-          price: prices[id] ?? 250,
-          category: 'wild',
-          isOwned: ownedSet.contains(id),
-        )).toList();
+    final wildItems = wildAccessories
+        .map(
+          (id) => AccessoryInfo(
+            id: id,
+            displayName: accessoryDisplayName(id),
+            price: prices[id] ?? 250,
+            category: 'wild',
+            isOwned: ownedSet.contains(id),
+          ),
+        )
+        .toList();
 
     final collarItems = <AccessoryInfo>[];
     for (final style in collarStyles) {
       for (final color in collarColors) {
         final id = '$color$style';
-        collarItems.add(AccessoryInfo(
-          id: id,
-          displayName: accessoryDisplayName(id),
-          price: prices[id] ?? 100,
-          category: 'collar',
-          isOwned: ownedSet.contains(id),
-        ));
+        collarItems.add(
+          AccessoryInfo(
+            id: id,
+            displayName: accessoryDisplayName(id),
+            price: prices[id] ?? 100,
+            category: 'collar',
+            isOwned: ownedSet.contains(id),
+          ),
+        );
       }
     }
 
@@ -111,18 +121,9 @@ class AccessoryShopScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            _AccessoryGrid(
-              items: plantItems,
-              balance: balance,
-            ),
-            _AccessoryGrid(
-              items: wildItems,
-              balance: balance,
-            ),
-            _AccessoryGrid(
-              items: collarItems,
-              balance: balance,
-            ),
+            _AccessoryGrid(items: plantItems, balance: balance),
+            _AccessoryGrid(items: wildItems, balance: balance),
+            _AccessoryGrid(items: collarItems, balance: balance),
           ],
         ),
       ),
@@ -135,10 +136,7 @@ class _AccessoryGrid extends ConsumerWidget {
   final List<AccessoryInfo> items;
   final int balance;
 
-  const _AccessoryGrid({
-    required this.items,
-    required this.balance,
-  });
+  const _AccessoryGrid({required this.items, required this.balance});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -168,7 +166,10 @@ class _AccessoryGrid extends ConsumerWidget {
   }
 
   void _showPurchaseDialog(
-      BuildContext context, WidgetRef ref, AccessoryInfo item) {
+    BuildContext context,
+    WidgetRef ref,
+    AccessoryInfo item,
+  ) {
     HapticFeedback.mediumImpact();
 
     final canAfford = balance >= item.price;
@@ -180,8 +181,11 @@ class _AccessoryGrid extends ConsumerWidget {
         content: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.monetization_on,
-                size: 18, color: Theme.of(ctx).colorScheme.primary),
+            Icon(
+              Icons.monetization_on,
+              size: 18,
+              color: Theme.of(ctx).colorScheme.primary,
+            ),
             const SizedBox(width: AppSpacing.xs),
             Text('${item.price} coins'),
           ],
@@ -192,12 +196,8 @@ class _AccessoryGrid extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: canAfford
-                ? () => _purchase(ctx, ref, item)
-                : null,
-            child: Text(canAfford
-                ? 'Purchase'
-                : 'Not enough coins'),
+            onPressed: canAfford ? () => _purchase(ctx, ref, item) : null,
+            child: Text(canAfford ? 'Purchase' : 'Not enough coins'),
           ),
         ],
       ),
@@ -205,17 +205,18 @@ class _AccessoryGrid extends ConsumerWidget {
   }
 
   Future<void> _purchase(
-      BuildContext context, WidgetRef ref, AccessoryInfo item) async {
+    BuildContext context,
+    WidgetRef ref,
+    AccessoryInfo item,
+  ) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
     Navigator.of(context).pop();
 
-    final success = await ref.read(coinServiceProvider).purchaseAccessory(
-          uid: uid,
-          accessoryId: item.id,
-          price: item.price,
-        );
+    final success = await ref
+        .read(coinServiceProvider)
+        .purchaseAccessory(uid: uid, accessoryId: item.id, price: item.price);
 
     if (!context.mounted) return;
 
@@ -229,9 +230,11 @@ class _AccessoryGrid extends ConsumerWidget {
               const Icon(Icons.check_circle, color: Colors.white, size: 20),
             if (success) const SizedBox(width: AppSpacing.sm),
             Expanded(
-              child: Text(success
-                  ? 'Purchased! ${item.displayName} added to inventory'
-                  : 'Not enough coins (need ${item.price})'),
+              child: Text(
+                success
+                    ? 'Purchased! ${item.displayName} added to inventory'
+                    : 'Not enough coins (need ${item.price})',
+              ),
             ),
           ],
         ),

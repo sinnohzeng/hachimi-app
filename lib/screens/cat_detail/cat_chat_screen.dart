@@ -109,9 +109,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
             child: chatState.status == ChatStatus.loading
                 ? const Center(child: CircularProgressIndicator())
                 : chatState.messages.isEmpty &&
-                        chatState.status != ChatStatus.generating
-                    ? _buildEmptyState(textTheme, colorScheme, cat.name)
-                    : _buildMessageList(chatState, colorScheme, textTheme),
+                      chatState.status != ChatStatus.generating
+                ? _buildEmptyState(textTheme, colorScheme, cat.name)
+                : _buildMessageList(chatState, colorScheme, textTheme),
           ),
 
           // 输入区域
@@ -295,12 +295,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     final locale = Localizations.localeOf(context);
     final isZh = locale.languageCode == 'zh';
 
-    ref.read(chatNotifierProvider(widget.catId).notifier).sendMessage(
-          text: text,
-          cat: cat,
-          habit: habit,
-          isZhLocale: isZh,
-        );
+    ref
+        .read(chatNotifierProvider(widget.catId).notifier)
+        .sendMessage(text: text, cat: cat, habit: habit, isZhLocale: isZh);
   }
 
   void _confirmClearHistory(BuildContext context) {
@@ -308,7 +305,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Clear chat history?'),
-        content: const Text('This will delete all messages. This cannot be undone.'),
+        content: const Text(
+          'This will delete all messages. This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -346,7 +345,9 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: isUser ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
+      alignment: isUser
+          ? AlignmentDirectional.centerEnd
+          : AlignmentDirectional.centerStart,
       child: Container(
         margin: AppSpacing.paddingVXs,
         constraints: BoxConstraints(
@@ -367,9 +368,7 @@ class _MessageBubble extends StatelessWidget {
         child: Text(
           content,
           style: textTheme.bodyMedium?.copyWith(
-            color: isUser
-                ? colorScheme.onPrimary
-                : colorScheme.onSurface,
+            color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
             height: 1.4,
           ),
         ),

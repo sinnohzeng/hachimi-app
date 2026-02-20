@@ -251,11 +251,7 @@ class _DurationPickerPainter extends CustomPainter {
       _thumbRadius,
       Paint()..color = thumbColor.withValues(alpha: 0.3),
     );
-    canvas.drawCircle(
-      thumbCenter,
-      _thumbRadius,
-      Paint()..color = thumbColor,
-    );
+    canvas.drawCircle(thumbCenter, _thumbRadius, Paint()..color = thumbColor);
     canvas.drawCircle(
       thumbCenter,
       _thumbRadius - 4,
@@ -265,6 +261,5 @@ class _DurationPickerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DurationPickerPainter oldDelegate) =>
-      oldDelegate.value != value ||
-      oldDelegate.activeColor != activeColor;
+      oldDelegate.value != value || oldDelegate.activeColor != activeColor;
 }

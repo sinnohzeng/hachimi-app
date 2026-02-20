@@ -64,7 +64,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
 
     // Include current value in chips if non-standard
     final goalChips = _buildChipValues(_defaultGoalOptions, _selectedGoal);
-    final targetChips = _buildChipValues(_defaultTargetOptions, _selectedTarget);
+    final targetChips = _buildChipValues(
+      _defaultTargetOptions,
+      _selectedTarget,
+    );
 
     return SingleChildScrollView(
       child: Padding(
@@ -105,7 +108,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
             const SizedBox(height: AppSpacing.lg),
 
             // Daily goal chips
-            Text(context.l10n.catDetailDailyGoalMinutes, style: textTheme.labelLarge),
+            Text(
+              context.l10n.catDetailDailyGoalMinutes,
+              style: textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: 8,
@@ -120,7 +126,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
             const SizedBox(height: AppSpacing.lg),
 
             // Target hours chips
-            Text(context.l10n.catDetailTargetTotalHours, style: textTheme.labelLarge),
+            Text(
+              context.l10n.catDetailTargetTotalHours,
+              style: textTheme.labelLarge,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: 8,
@@ -174,7 +183,9 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     if (uid == null) return;
 
     HapticFeedback.mediumImpact();
-    await ref.read(firestoreServiceProvider).updateHabit(
+    await ref
+        .read(firestoreServiceProvider)
+        .updateHabit(
           uid: uid,
           habitId: widget.habit.id,
           name: name != widget.habit.name ? name : null,

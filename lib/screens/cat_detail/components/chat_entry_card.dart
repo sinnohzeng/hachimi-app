@@ -35,10 +35,7 @@ class ChatEntryCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(
-            AppRouter.catChat,
-            arguments: catId,
-          );
+          Navigator.of(context).pushNamed(AppRouter.catChat, arguments: catId);
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -66,10 +63,7 @@ class ChatEntryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),

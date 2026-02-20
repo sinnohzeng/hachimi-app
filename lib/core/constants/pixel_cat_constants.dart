@@ -19,28 +19,30 @@ import 'package:flutter/material.dart';
 
 /// 虎斑类图案
 const List<String> tabbies = [
-  'Tabby', 'Ticked', 'Mackerel', 'Classic', 'Sokoke', 'Agouti',
+  'Tabby',
+  'Ticked',
+  'Mackerel',
+  'Classic',
+  'Sokoke',
+  'Agouti',
 ];
 
 /// 斑点类图案
-const List<String> spotted = [
-  'Speckled', 'Rosette',
-];
+const List<String> spotted = ['Speckled', 'Rosette'];
 
 /// 纯色类图案
 const List<String> plain = [
-  'SingleColour', 'TwoColour', 'Smoke', 'Singlestripe',
+  'SingleColour',
+  'TwoColour',
+  'Smoke',
+  'Singlestripe',
 ];
 
 /// 特殊类图案
-const List<String> exotic = [
-  'Bengal', 'Marbled', 'Masked',
-];
+const List<String> exotic = ['Bengal', 'Marbled', 'Masked'];
 
 /// 所有皮毛图案类型
-const List<String> allPeltTypes = [
-  ...tabbies, ...spotted, ...plain, ...exotic,
-];
+const List<String> allPeltTypes = [...tabbies, ...spotted, ...plain, ...exotic];
 
 /// 皮毛类型 → sprite 名称映射
 const Map<String, String> peltTypeToSpriteName = {
@@ -66,135 +68,345 @@ const Map<String, String> peltTypeToSpriteName = {
 // ─── Pelt Colors（皮毛颜色）───
 
 const List<String> peltColors = [
-  'WHITE', 'PALEGREY', 'SILVER', 'GREY', 'DARKGREY',
-  'GHOST', 'BLACK',
-  'CREAM', 'PALEGINGER', 'GOLDEN', 'GINGER', 'DARKGINGER',
+  'WHITE',
+  'PALEGREY',
+  'SILVER',
+  'GREY',
+  'DARKGREY',
+  'GHOST',
+  'BLACK',
+  'CREAM',
+  'PALEGINGER',
+  'GOLDEN',
+  'GINGER',
+  'DARKGINGER',
   'SIENNA',
-  'LIGHTBROWN', 'LILAC', 'BROWN', 'GOLDEN-BROWN', 'DARKBROWN',
+  'LIGHTBROWN',
+  'LILAC',
+  'BROWN',
+  'GOLDEN-BROWN',
+  'DARKBROWN',
   'CHOCOLATE',
 ];
 
 /// 颜色分组 — 用于玳瑁生成时的互补色选择
 const List<String> gingerColors = [
-  'CREAM', 'PALEGINGER', 'GOLDEN', 'GINGER', 'DARKGINGER', 'SIENNA',
+  'CREAM',
+  'PALEGINGER',
+  'GOLDEN',
+  'GINGER',
+  'DARKGINGER',
+  'SIENNA',
 ];
 
-const List<String> blackColors = [
-  'GREY', 'DARKGREY', 'GHOST', 'BLACK',
-];
+const List<String> blackColors = ['GREY', 'DARKGREY', 'GHOST', 'BLACK'];
 
-const List<String> whiteColors = [
-  'WHITE', 'PALEGREY', 'SILVER',
-];
+const List<String> whiteColors = ['WHITE', 'PALEGREY', 'SILVER'];
 
 const List<String> brownColors = [
-  'LIGHTBROWN', 'LILAC', 'BROWN', 'GOLDEN-BROWN', 'DARKBROWN', 'CHOCOLATE',
+  'LIGHTBROWN',
+  'LILAC',
+  'BROWN',
+  'GOLDEN-BROWN',
+  'DARKBROWN',
+  'CHOCOLATE',
 ];
 
 // ─── Eye Colors（眼色）───
 
 const List<String> eyeColors = [
-  'YELLOW', 'AMBER', 'HAZEL',
-  'PALEGREEN', 'GREEN', 'BLUE', 'DARKBLUE', 'BLUEYELLOW', 'BLUEGREEN',
-  'GREY', 'CYAN', 'EMERALD', 'HEATHERBLUE', 'SUNLITICE',
-  'COPPER', 'SAGE', 'COBALT', 'PALEBLUE',
-  'BRONZE', 'SILVER', 'PALEYELLOW',
+  'YELLOW',
+  'AMBER',
+  'HAZEL',
+  'PALEGREEN',
+  'GREEN',
+  'BLUE',
+  'DARKBLUE',
+  'BLUEYELLOW',
+  'BLUEGREEN',
+  'GREY',
+  'CYAN',
+  'EMERALD',
+  'HEATHERBLUE',
+  'SUNLITICE',
+  'COPPER',
+  'SAGE',
+  'COBALT',
+  'PALEBLUE',
+  'BRONZE',
+  'SILVER',
+  'PALEYELLOW',
 ];
 
 const List<String> yellowEyes = ['YELLOW', 'AMBER', 'PALEYELLOW'];
-const List<String> blueEyes = ['BLUE', 'DARKBLUE', 'CYAN', 'PALEBLUE', 'COBALT', 'HEATHERBLUE', 'SUNLITICE'];
+const List<String> blueEyes = [
+  'BLUE',
+  'DARKBLUE',
+  'CYAN',
+  'PALEBLUE',
+  'COBALT',
+  'HEATHERBLUE',
+  'SUNLITICE',
+];
 const List<String> greenEyes = ['PALEGREEN', 'GREEN', 'EMERALD', 'SAGE'];
 
 // ─── Skin Colors（皮肤色）───
 
 const List<String> skinColors = [
-  'BLACK', 'RED', 'PINK', 'DARKBROWN', 'BROWN', 'LIGHTBROWN',
-  'DARK', 'DARKGREY', 'GREY', 'DARKSALMON', 'SALMON', 'PEACH',
-  'DARKMARBLED', 'MARBLED', 'LIGHTMARBLED',
-  'DARKBLUE', 'BLUE', 'LIGHTBLUE',
+  'BLACK',
+  'RED',
+  'PINK',
+  'DARKBROWN',
+  'BROWN',
+  'LIGHTBROWN',
+  'DARK',
+  'DARKGREY',
+  'GREY',
+  'DARKSALMON',
+  'SALMON',
+  'PEACH',
+  'DARKMARBLED',
+  'MARBLED',
+  'LIGHTMARBLED',
+  'DARKBLUE',
+  'BLUE',
+  'LIGHTBLUE',
 ];
 
 // ─── White Patches（白色斑块）───
 
 const List<String> littleWhite = [
-  'LITTLE', 'LIGHTTUXEDO', 'BUZZARDFANG', 'TIP', 'BLAZE', 'BIB',
-  'VEE', 'PAWS', 'BELLY', 'TAILTIP', 'TOES', 'BROKENBLAZE',
-  'LILTWO', 'SCOURGE', 'TOESTAIL', 'RAVENPAW', 'HONEY', 'LUNA',
-  'EXTRA', 'MUSTACHE', 'REVERSEHEART', 'SPARKLE', 'RIGHTEAR',
-  'LEFTEAR', 'ESTRELLA', 'REVERSEEYE', 'BACKSPOT',
-  'EYEBAGS', 'LOCKET', 'BLAZEMASK', 'TEARS',
+  'LITTLE',
+  'LIGHTTUXEDO',
+  'BUZZARDFANG',
+  'TIP',
+  'BLAZE',
+  'BIB',
+  'VEE',
+  'PAWS',
+  'BELLY',
+  'TAILTIP',
+  'TOES',
+  'BROKENBLAZE',
+  'LILTWO',
+  'SCOURGE',
+  'TOESTAIL',
+  'RAVENPAW',
+  'HONEY',
+  'LUNA',
+  'EXTRA',
+  'MUSTACHE',
+  'REVERSEHEART',
+  'SPARKLE',
+  'RIGHTEAR',
+  'LEFTEAR',
+  'ESTRELLA',
+  'REVERSEEYE',
+  'BACKSPOT',
+  'EYEBAGS',
+  'LOCKET',
+  'BLAZEMASK',
+  'TEARS',
 ];
 
 const List<String> midWhite = [
-  'TUXEDO', 'FANCY', 'UNDERS', 'DAMIEN', 'SKUNK',
-  'MITAINE', 'SQUEAKS', 'STAR',
-  'WINGS', 'DIVA', 'SAVANNAH', 'FADESPOTS', 'BEARD',
-  'DAPPLEPAW', 'TOPCOVER', 'WOODPECKER', 'MISS', 'BOWTIE',
-  'PRINCESS', 'MISTER', 'BRINDLE', 'CURVED', 'HEART',
-  'HALFWHITE', 'APPALOOSA', 'HALF', 'PETAL',
+  'TUXEDO',
+  'FANCY',
+  'UNDERS',
+  'DAMIEN',
+  'SKUNK',
+  'MITAINE',
+  'SQUEAKS',
+  'STAR',
+  'WINGS',
+  'DIVA',
+  'SAVANNAH',
+  'FADESPOTS',
+  'BEARD',
+  'DAPPLEPAW',
+  'TOPCOVER',
+  'WOODPECKER',
+  'MISS',
+  'BOWTIE',
+  'PRINCESS',
+  'MISTER',
+  'BRINDLE',
+  'CURVED',
+  'HEART',
+  'HALFWHITE',
+  'APPALOOSA',
+  'HALF',
+  'PETAL',
 ];
 
 const List<String> highWhite = [
-  'ANY', 'ANYTWO', 'BROKEN', 'FRECKLES', 'RINGTAIL',
-  'HALFFACE', 'PANTSTWO', 'GOATEE', 'PRINCE', 'FAROFA',
-  'MOUSTACHE', 'PANTS', 'REVERSEPANTS', 'SKUNK',
-  'KARPATI', 'PIEBALD', 'CURVED', 'GLASS',
-  'MASKMANTLE', 'MAO', 'PAINTED', 'SHIBAINU', 'OWL',
-  'BUB', 'SPARROW', 'TRIXIE', 'SAMMY', 'FRONT',
-  'BLOSSOMSTEP', 'BULLSEYE', 'FINN', 'SCAR', 'BUSTER',
+  'ANY',
+  'ANYTWO',
+  'BROKEN',
+  'FRECKLES',
+  'RINGTAIL',
+  'HALFFACE',
+  'PANTSTWO',
+  'GOATEE',
+  'PRINCE',
+  'FAROFA',
+  'MOUSTACHE',
+  'PANTS',
+  'REVERSEPANTS',
+  'SKUNK',
+  'KARPATI',
+  'PIEBALD',
+  'CURVED',
+  'GLASS',
+  'MASKMANTLE',
+  'MAO',
+  'PAINTED',
+  'SHIBAINU',
+  'OWL',
+  'BUB',
+  'SPARROW',
+  'TRIXIE',
+  'SAMMY',
+  'FRONT',
+  'BLOSSOMSTEP',
+  'BULLSEYE',
+  'FINN',
+  'SCAR',
+  'BUSTER',
 ];
 
 const List<String> mostlyWhite = [
-  'VAN', 'ONEEAR', 'LIGHTSONG', 'TAIL', 'HEART',
-  'MOORISH', 'APRON', 'CAPSADDLE', 'CHESTSPECK',
-  'BLACKSTAR', 'PETAL', 'HEARTTWO', 'WOODPECKER',
-  'BOOTS', 'COW', 'COWTWO', 'BUB', 'BOWTIE',
-  'EYEPATCH', 'PEBBLE', 'PEBBLETWO', 'PEBBBLETHREE',
+  'VAN',
+  'ONEEAR',
+  'LIGHTSONG',
+  'TAIL',
+  'HEART',
+  'MOORISH',
+  'APRON',
+  'CAPSADDLE',
+  'CHESTSPECK',
+  'BLACKSTAR',
+  'PETAL',
+  'HEARTTWO',
+  'WOODPECKER',
+  'BOOTS',
+  'COW',
+  'COWTWO',
+  'BUB',
+  'BOWTIE',
+  'EYEPATCH',
+  'PEBBLE',
+  'PEBBLETWO',
+  'PEBBBLETHREE',
 ];
 
 const List<String> allWhitePatches = [
-  'FULLWHITE', ...littleWhite, ...midWhite, ...highWhite, ...mostlyWhite,
+  'FULLWHITE',
+  ...littleWhite,
+  ...midWhite,
+  ...highWhite,
+  ...mostlyWhite,
 ];
 
 // ─── Points（重点色）───
 
 const List<String> pointMarkings = [
-  'COLOURPOINT', 'RAGDOLL', 'SEPIAPOINT', 'MINKPOINT', 'SEALPOINT',
+  'COLOURPOINT',
+  'RAGDOLL',
+  'SEPIAPOINT',
+  'MINKPOINT',
+  'SEALPOINT',
 ];
 
 // ─── Vitiligo（白斑病）───
 
 const List<String> vitiligoPatterns = [
-  'VITILIGO', 'VITILIGOTWO', 'MOON', 'PHANTOM',
-  'KOI', 'PAINTED', 'BLEACHED', 'SMOKEY',
+  'VITILIGO',
+  'VITILIGOTWO',
+  'MOON',
+  'PHANTOM',
+  'KOI',
+  'PAINTED',
+  'BLEACHED',
+  'SMOKEY',
 ];
 
 // ─── Tortie Patterns（玳瑁遮罩）───
 
 const List<String> tortiePatterns = [
-  'ONE', 'TWO', 'THREE', 'FOUR', 'REDTAIL', 'DELILAH', 'MINIMALONE',
-  'MINIMALTWO', 'MINIMALTHREE', 'MINIMALFOUR', 'HALF', 'OREO',
-  'SWOOP', 'MOTTLED', 'SIDEMASK', 'EYEDOT', 'BANDANA', 'PACMAN',
-  'STREAMSTRIKE', 'ROBIN', 'BRINDLE', 'EMBER', 'ORIOLE', 'CHIMERA',
-  'DAUB', 'DAUBPAW', 'TOPBAR', 'STREAK', 'MASK', 'CHEST',
-  'ARMTAIL', 'SMOKE', 'GRUMPYFACE', 'BRIE', 'BELOVED', 'BODY',
-  'SHILOH', 'FRECKLED', 'HEARTBEAT',
-  'SMUDGED', 'BULLSEYE', 'SPARROW', 'PHANTOM',
+  'ONE',
+  'TWO',
+  'THREE',
+  'FOUR',
+  'REDTAIL',
+  'DELILAH',
+  'MINIMALONE',
+  'MINIMALTWO',
+  'MINIMALTHREE',
+  'MINIMALFOUR',
+  'HALF',
+  'OREO',
+  'SWOOP',
+  'MOTTLED',
+  'SIDEMASK',
+  'EYEDOT',
+  'BANDANA',
+  'PACMAN',
+  'STREAMSTRIKE',
+  'ROBIN',
+  'BRINDLE',
+  'EMBER',
+  'ORIOLE',
+  'CHIMERA',
+  'DAUB',
+  'DAUBPAW',
+  'TOPBAR',
+  'STREAK',
+  'MASK',
+  'CHEST',
+  'ARMTAIL',
+  'SMOKE',
+  'GRUMPYFACE',
+  'BRIE',
+  'BELOVED',
+  'BODY',
+  'SHILOH',
+  'FRECKLED',
+  'HEARTBEAT',
+  'SMUDGED',
+  'BULLSEYE',
+  'SPARROW',
+  'PHANTOM',
   'ROSETAIL',
 ];
 
 /// 玳瑁底色图案 — tortieBase 用的 spriteName
 const List<String> tortieBases = [
-  'single', 'tabby', 'bengal', 'marbled', 'ticked', 'smoke',
-  'rosette', 'speckled', 'mackerel', 'classic', 'sokoke',
-  'agouti', 'singlestripe', 'masked',
+  'single',
+  'tabby',
+  'bengal',
+  'marbled',
+  'ticked',
+  'smoke',
+  'rosette',
+  'speckled',
+  'mackerel',
+  'classic',
+  'sokoke',
+  'agouti',
+  'singlestripe',
+  'masked',
 ];
 
 // ─── White Patches Tint（白斑色调）───
 
 const List<String> whitePatchesTints = [
-  'none', 'offwhite', 'cream', 'darkcream',
-  'gray', 'pink',
+  'none',
+  'offwhite',
+  'cream',
+  'darkcream',
+  'gray',
+  'pink',
 ];
 
 // ─── Accessories（饰品）───
@@ -202,28 +414,77 @@ const List<String> whitePatchesTints = [
 
 /// 植物类饰品
 const List<String> plantAccessories = [
-  'MAPLE LEAF', 'HOLLY', 'BLUE BERRIES', 'FORGET ME NOTS',
-  'RYE STALK', 'CATTAIL', 'POPPY', 'ORANGE POPPY', 'CYAN POPPY',
-  'WHITE POPPY', 'PINK POPPY', 'BLUEBELLS', 'LILY OF THE VALLEY',
-  'SNAPDRAGON', 'HERBS', 'PETALS', 'NETTLE', 'HEATHER', 'GORSE',
-  'JUNIPER', 'RASPBERRY', 'LAVENDER', 'OAK LEAVES', 'CATMINT',
-  'MAPLE SEED', 'LAUREL',
-  'BULB WHITE', 'BULB YELLOW', 'BULB ORANGE', 'BULB PINK', 'BULB BLUE',
-  'CLOVER', 'DAISY',
-  'DRY HERBS', 'DRY CATMINT', 'DRY NETTLES', 'DRY LAURELS',
+  'MAPLE LEAF',
+  'HOLLY',
+  'BLUE BERRIES',
+  'FORGET ME NOTS',
+  'RYE STALK',
+  'CATTAIL',
+  'POPPY',
+  'ORANGE POPPY',
+  'CYAN POPPY',
+  'WHITE POPPY',
+  'PINK POPPY',
+  'BLUEBELLS',
+  'LILY OF THE VALLEY',
+  'SNAPDRAGON',
+  'HERBS',
+  'PETALS',
+  'NETTLE',
+  'HEATHER',
+  'GORSE',
+  'JUNIPER',
+  'RASPBERRY',
+  'LAVENDER',
+  'OAK LEAVES',
+  'CATMINT',
+  'MAPLE SEED',
+  'LAUREL',
+  'BULB WHITE',
+  'BULB YELLOW',
+  'BULB ORANGE',
+  'BULB PINK',
+  'BULB BLUE',
+  'CLOVER',
+  'DAISY',
+  'DRY HERBS',
+  'DRY CATMINT',
+  'DRY NETTLES',
+  'DRY LAURELS',
 ];
 
 /// 野生类饰品
 const List<String> wildAccessories = [
-  'RED FEATHERS', 'BLUE FEATHERS', 'JAY FEATHERS', 'GULL FEATHERS',
-  'SPARROW FEATHERS', 'MOTH WINGS', 'ROSY MOTH WINGS',
-  'MORPHO BUTTERFLY', 'MONARCH BUTTERFLY', 'CICADA WINGS', 'BLACK CICADA',
+  'RED FEATHERS',
+  'BLUE FEATHERS',
+  'JAY FEATHERS',
+  'GULL FEATHERS',
+  'SPARROW FEATHERS',
+  'MOTH WINGS',
+  'ROSY MOTH WINGS',
+  'MORPHO BUTTERFLY',
+  'MONARCH BUTTERFLY',
+  'CICADA WINGS',
+  'BLACK CICADA',
 ];
 
 /// 项圈类饰品 — 4 种样式 × 15 种颜色
 const List<String> collarColors = [
-  'CRIMSON', 'BLUE', 'YELLOW', 'CYAN', 'RED', 'LIME', 'GREEN',
-  'RAINBOW', 'BLACK', 'SPIKES', 'WHITE', 'PINK', 'PURPLE', 'MULTI', 'INDIGO',
+  'CRIMSON',
+  'BLUE',
+  'YELLOW',
+  'CYAN',
+  'RED',
+  'LIME',
+  'GREEN',
+  'RAINBOW',
+  'BLACK',
+  'SPIKES',
+  'WHITE',
+  'PINK',
+  'PURPLE',
+  'MULTI',
+  'INDIGO',
 ];
 
 const List<String> collarStyles = ['', 'BELL', 'BOW', 'NYLON'];
@@ -233,8 +494,7 @@ List<String> get allAccessories => [
   ...plantAccessories,
   ...wildAccessories,
   for (final style in collarStyles)
-    for (final color in collarColors)
-      '$color$style',
+    for (final color in collarColors) '$color$style',
 ];
 
 // ─── Streak Milestones ───
@@ -252,11 +512,7 @@ const int checkInCoinsWeekday = 10;
 const int checkInCoinsWeekend = 15;
 
 /// 月度签到里程碑 — 累计天数 → 一次性奖励金币。
-const Map<int, int> checkInMilestones = {
-  7: 30,
-  14: 50,
-  21: 80,
-};
+const Map<int, int> checkInMilestones = {7: 30, 14: 50, 21: 80};
 
 /// 全月签到奖励（签满该月所有天数）。
 const int checkInFullMonthBonus = 150;
@@ -269,26 +525,55 @@ const int focusRewardCoinsPerMinute = 10;
 
 /// Budget 级植物（50 金币）
 const List<String> _budgetPlants = [
-  'MAPLE LEAF', 'HOLLY', 'HERBS', 'PETALS', 'CLOVER', 'DAISY',
-  'RYE STALK', 'CATTAIL', 'NETTLE', 'HEATHER', 'GORSE',
-  'DRY HERBS', 'DRY CATMINT', 'DRY NETTLES', 'DRY LAURELS',
+  'MAPLE LEAF',
+  'HOLLY',
+  'HERBS',
+  'PETALS',
+  'CLOVER',
+  'DAISY',
+  'RYE STALK',
+  'CATTAIL',
+  'NETTLE',
+  'HEATHER',
+  'GORSE',
+  'DRY HERBS',
+  'DRY CATMINT',
+  'DRY NETTLES',
+  'DRY LAURELS',
 ];
 
 /// Standard 级植物（100 金币）
 const List<String> _standardPlants = [
-  'BLUE BERRIES', 'FORGET ME NOTS', 'POPPY', 'ORANGE POPPY', 'CYAN POPPY',
-  'WHITE POPPY', 'PINK POPPY', 'BLUEBELLS', 'SNAPDRAGON', 'RASPBERRY', 'LAUREL',
+  'BLUE BERRIES',
+  'FORGET ME NOTS',
+  'POPPY',
+  'ORANGE POPPY',
+  'CYAN POPPY',
+  'WHITE POPPY',
+  'PINK POPPY',
+  'BLUEBELLS',
+  'SNAPDRAGON',
+  'RASPBERRY',
+  'LAUREL',
 ];
 
 /// Premium 级植物（150 金币）
 const List<String> _premiumPlants = [
-  'LAVENDER', 'CATMINT', 'JUNIPER',
-  'BULB WHITE', 'BULB YELLOW', 'BULB ORANGE', 'BULB PINK', 'BULB BLUE',
+  'LAVENDER',
+  'CATMINT',
+  'JUNIPER',
+  'BULB WHITE',
+  'BULB YELLOW',
+  'BULB ORANGE',
+  'BULB PINK',
+  'BULB BLUE',
 ];
 
 /// Legendary 级植物（350 金币）
 const List<String> _legendaryPlants = [
-  'LILY OF THE VALLEY', 'OAK LEAVES', 'MAPLE SEED',
+  'LILY OF THE VALLEY',
+  'OAK LEAVES',
+  'MAPLE SEED',
 ];
 
 /// Legendary 级项圈颜色（所有样式均 350 金币）
@@ -335,8 +620,7 @@ Map<String, int> get accessoryPriceMap {
 }
 
 /// 获取饰品价格，未在价格表中则返回 150（默认值）。
-int accessoryPrice(String accessoryId) =>
-    accessoryPriceMap[accessoryId] ?? 150;
+int accessoryPrice(String accessoryId) => accessoryPriceMap[accessoryId] ?? 150;
 
 /// 饰品 ID → 可读显示名称。
 String accessoryDisplayName(String id) {

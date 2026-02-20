@@ -42,8 +42,7 @@ class DiaryEntry {
       mood: map['mood'] as String,
       stage: map['stage'] as String,
       totalMinutes: map['total_minutes'] as int,
-      createdAt:
-          DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
     );
   }
 

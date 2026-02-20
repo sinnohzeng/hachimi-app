@@ -14,15 +14,16 @@ class RemoteConfigService {
   // Cat system keys
   static const String keyXpMultiplier = 'xp_multiplier';
   static const String keyNotificationCopyVariant = 'notification_copy_variant';
-  static const String keyMoodThresholdLonelyDays =
-      'mood_threshold_lonely_days';
+  static const String keyMoodThresholdLonelyDays = 'mood_threshold_lonely_days';
   static const String keyDefaultFocusDuration = 'default_focus_duration';
 
   Future<void> initialize() async {
-    await _remoteConfig.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: const Duration(hours: 1),
-    ));
+    await _remoteConfig.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(hours: 1),
+      ),
+    );
 
     await _remoteConfig.setDefaults({
       keyCheckInSuccessMessage: defaultSuccessMessage,

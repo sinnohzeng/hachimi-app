@@ -36,7 +36,8 @@ class StatsScreen extends ConsumerWidget {
                 Expanded(
                   child: _StatCard(
                     label: 'Total Hours',
-                    value: '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
+                    value:
+                        '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
                     icon: Icons.hourglass_bottom,
                     color: colorScheme.primaryContainer,
                     onColor: colorScheme.onPrimaryContainer,
@@ -121,59 +122,59 @@ class StatsScreen extends ConsumerWidget {
             }
 
             return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final habit = habits[index];
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Padding(
-                      padding: AppSpacing.paddingBase,
-                      child: Row(
-                        children: [
-                          ProgressRing(
-                            progress: habit.progressPercent,
-                            size: 48,
-                            child: Text(
-                              '${(habit.progressPercent * 100).round()}%',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final habit = habits[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  child: Padding(
+                    padding: AppSpacing.paddingBase,
+                    child: Row(
+                      children: [
+                        ProgressRing(
+                          progress: habit.progressPercent,
+                          size: 48,
+                          child: Text(
+                            '${(habit.progressPercent * 100).round()}%',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.base),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(habit.name,
-                                    style: textTheme.titleSmall),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  habit.progressText,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
+                        ),
+                        const SizedBox(width: AppSpacing.base),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(habit.name, style: textTheme.titleSmall),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                habit.progressText,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          if (habit.currentStreak > 0)
-                            Chip(
-                              avatar: Icon(Icons.local_fire_department,
-                                  size: 16,
-                                  color: colorScheme.onTertiaryContainer),
-                              label: Text('${habit.currentStreak}d'),
-                              backgroundColor: colorScheme.tertiaryContainer,
-                              side: BorderSide.none,
+                        ),
+                        if (habit.currentStreak > 0)
+                          Chip(
+                            avatar: Icon(
+                              Icons.local_fire_department,
+                              size: 16,
+                              color: colorScheme.onTertiaryContainer,
                             ),
-                        ],
-                      ),
+                            label: Text('${habit.currentStreak}d'),
+                            backgroundColor: colorScheme.tertiaryContainer,
+                            side: BorderSide.none,
+                          ),
+                      ],
                     ),
-                  );
-                },
-                childCount: habits.length,
-              ),
+                  ),
+                );
+              }, childCount: habits.length),
             );
           },
         ),
@@ -238,10 +239,7 @@ class _StatCard extends StatelessWidget {
                 color: onColor,
               ),
             ),
-            Text(
-              label,
-              style: textTheme.bodySmall?.copyWith(color: onColor),
-            ),
+            Text(label, style: textTheme.bodySmall?.copyWith(color: onColor)),
           ],
         ),
       ),

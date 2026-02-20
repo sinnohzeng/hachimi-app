@@ -7,9 +7,7 @@ void main() {
     testWidgets('renders error icon and message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ErrorState(message: 'Something went wrong'),
-          ),
+          home: Scaffold(body: ErrorState(message: 'Something went wrong')),
         ),
       );
 
@@ -39,25 +37,21 @@ void main() {
     testWidgets('hides retry button when onRetry is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: ErrorState(message: 'Error occurred'),
-          ),
+          home: Scaffold(body: ErrorState(message: 'Error occurred')),
         ),
       );
 
       expect(find.text('Retry'), findsNothing);
     });
 
-    testWidgets('golden — ErrorState with retry', tags: ['golden'],
-        (tester) async {
+    testWidgets('golden — ErrorState with retry', tags: ['golden'], (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
           home: Scaffold(
-            body: ErrorState(
-              message: 'Failed to load data',
-              onRetry: () {},
-            ),
+            body: ErrorState(message: 'Failed to load data', onRetry: () {}),
           ),
         ),
       );
@@ -68,14 +62,13 @@ void main() {
       );
     });
 
-    testWidgets('golden — ErrorState without retry', tags: ['golden'],
-        (tester) async {
+    testWidgets('golden — ErrorState without retry', tags: ['golden'], (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(colorSchemeSeed: Colors.blue),
-          home: const Scaffold(
-            body: ErrorState(message: 'Network error'),
-          ),
+          home: const Scaffold(body: ErrorState(message: 'Network error')),
         ),
       );
 

@@ -36,24 +36,21 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       final name = _nameController.text.trim();
       final targetHours = int.parse(_hoursController.text.trim());
 
-      await ref.read(firestoreServiceProvider).createHabit(
-            uid: uid,
-            name: name,
-            targetHours: targetHours,
-          );
+      await ref
+          .read(firestoreServiceProvider)
+          .createHabit(uid: uid, name: name, targetHours: targetHours);
 
       // Log analytics event
-      await ref.read(analyticsServiceProvider).logHabitCreated(
-            habitName: name,
-            targetHours: targetHours,
-          );
+      await ref
+          .read(analyticsServiceProvider)
+          .logHabitCreated(habitName: name, targetHours: targetHours);
 
       if (mounted) Navigator.of(context).pop();
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -63,9 +60,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.addHabitTitle),
-      ),
+      appBar: AppBar(title: Text(context.l10n.addHabitTitle)),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingLg,
         child: Form(

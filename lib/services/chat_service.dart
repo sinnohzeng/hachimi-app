@@ -51,8 +51,8 @@ class ChatService {
   ChatService({
     required LlmService llmService,
     required LocalDatabaseService dbService,
-  })  : _llmService = llmService,
-        _dbService = dbService;
+  }) : _llmService = llmService,
+       _dbService = dbService;
 
   /// 释放资源。
   void dispose() {
@@ -105,10 +105,7 @@ class ChatService {
     );
 
     // 3. 构建完整 prompt
-    final prompt = _buildPrompt(
-      chatCtx: chatCtx,
-      history: history,
-    );
+    final prompt = _buildPrompt(chatCtx: chatCtx, history: history);
 
     // 4. 流式生成回复 — 收集 token 并转发到 tokenController
     try {
@@ -121,8 +118,9 @@ class ChatService {
       }
 
       final response = _llmService.cleanResponse(buffer.toString());
-      final cleanedResponse =
-          response.isEmpty ? _fallbackResponse(chatCtx.isZhLocale) : response;
+      final cleanedResponse = response.isEmpty
+          ? _fallbackResponse(chatCtx.isZhLocale)
+          : response;
 
       // 5. 保存助手回复到 SQLite
       await _saveAssistantMessage(chatCtx.cat.id, cleanedResponse);
@@ -187,6 +185,8 @@ class ChatService {
   }
 
   String _fallbackResponse(bool isZhLocale) {
-    return isZhLocale ? '喵~（揉揉眼睛）抱歉，我刚刚走神了...' : 'Meow~ *rubs eyes* Sorry, I spaced out for a moment...';
+    return isZhLocale
+        ? '喵~（揉揉眼睛）抱歉，我刚刚走神了...'
+        : 'Meow~ *rubs eyes* Sorry, I spaced out for a moment...';
   }
 }

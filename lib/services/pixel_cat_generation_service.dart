@@ -31,7 +31,12 @@ class PixelCatGenerationService {
   /// 生成随机外观
   CatAppearance generateRandomAppearance() {
     // 选择皮毛类型（按类别加权）
-    final categoryWeights = [0.35, 0.15, 0.35, 0.15]; // tabby, spotted, plain, exotic
+    final categoryWeights = [
+      0.35,
+      0.15,
+      0.35,
+      0.15,
+    ]; // tabby, spotted, plain, exotic
     final categories = [tabbies, spotted, plain, exotic];
     final category = _weightedChoice(categories, categoryWeights);
     var peltType = _choice(category);
@@ -70,8 +75,17 @@ class PixelCatGenerationService {
     String tint = 'none';
     if (_random.nextDouble() < 0.30) {
       tint = _choice([
-        'pink', 'gray', 'red', 'orange', 'yellow', 'purple', 'blue', 'black',
-        'dilute', 'warmdilute', 'cooldilute',
+        'pink',
+        'gray',
+        'red',
+        'orange',
+        'yellow',
+        'purple',
+        'blue',
+        'black',
+        'dilute',
+        'warmdilute',
+        'cooldilute',
       ]);
     }
 
@@ -117,7 +131,9 @@ class PixelCatGenerationService {
     final spriteVariant = _random.nextInt(3);
 
     return CatAppearance(
-      peltType: isTortie ? (peltType == 'Calico' ? 'Calico' : 'Tortie') : peltType,
+      peltType: isTortie
+          ? (peltType == 'Calico' ? 'Calico' : 'Tortie')
+          : peltType,
       peltColor: peltColor,
       tint: tint,
       eyeColor: eyeColor,
@@ -138,10 +154,7 @@ class PixelCatGenerationService {
   }
 
   /// 生成完整的 Cat 对象
-  Cat generateCat({
-    required String boundHabitId,
-    required int targetMinutes,
-  }) {
+  Cat generateCat({required String boundHabitId, required int targetMinutes}) {
     final appearance = generateRandomAppearance();
     final personality = _choice(catPersonalities);
     final name = _choice(randomCatNames);

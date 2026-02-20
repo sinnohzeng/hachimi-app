@@ -88,8 +88,9 @@ class EnhancedCatInfoCard extends StatelessWidget {
               width: double.infinity,
               padding: AppSpacing.paddingMd,
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(summary, style: textTheme.bodyMedium),
@@ -100,7 +101,10 @@ class EnhancedCatInfoCard extends StatelessWidget {
             Theme(
               data: theme.copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Text(context.l10n.catDetailAppearanceDetails, style: textTheme.labelLarge),
+                title: Text(
+                  context.l10n.catDetailAppearanceDetails,
+                  style: textTheme.labelLarge,
+                ),
                 tilePadding: EdgeInsets.zero,
                 childrenPadding: EdgeInsets.zero,
                 children: _buildAppearanceDetails(context, a),
@@ -110,10 +114,12 @@ class EnhancedCatInfoCard extends StatelessWidget {
             const Divider(height: 24),
             InfoRow(
               label: context.l10n.catDetailStatus,
-              value:
-                  cat.state[0].toUpperCase() + cat.state.substring(1),
+              value: cat.state[0].toUpperCase() + cat.state.substring(1),
             ),
-            InfoRow(label: context.l10n.catDetailAdopted, value: _formatDate(cat.createdAt)),
+            InfoRow(
+              label: context.l10n.catDetailAdopted,
+              value: _formatDate(cat.createdAt),
+            ),
           ],
         ),
       ),
@@ -123,26 +129,42 @@ class EnhancedCatInfoCard extends StatelessWidget {
   List<Widget> _buildAppearanceDetails(BuildContext context, CatAppearance a) {
     final l10n = context.l10n;
     final details = <Widget>[
-      InfoRow(label: l10n.catDetailFurPattern, value: l10n.peltTypeName(a.peltType)),
-      InfoRow(label: l10n.catDetailFurColor, value: l10n.peltColorName(a.peltColor)),
       InfoRow(
-          label: l10n.catDetailFurLength, value: l10n.furLength(a.isLonghair)),
+        label: l10n.catDetailFurPattern,
+        value: l10n.peltTypeName(a.peltType),
+      ),
       InfoRow(
-          label: l10n.catDetailEyes, value: l10n.eyeDesc(a.eyeColor, a.eyeColor2)),
+        label: l10n.catDetailFurColor,
+        value: l10n.peltColorName(a.peltColor),
+      ),
+      InfoRow(
+        label: l10n.catDetailFurLength,
+        value: l10n.furLength(a.isLonghair),
+      ),
+      InfoRow(
+        label: l10n.catDetailEyes,
+        value: l10n.eyeDesc(a.eyeColor, a.eyeColor2),
+      ),
     ];
 
     if (a.whitePatches != null) {
-      details.add(InfoRow(label: l10n.catDetailWhitePatches, value: a.whitePatches!));
+      details.add(
+        InfoRow(label: l10n.catDetailWhitePatches, value: a.whitePatches!),
+      );
     }
     final patchesTint = l10n.whitePatchesTintName(a.whitePatchesTint);
     if (patchesTint != null) {
-      details.add(InfoRow(label: l10n.catDetailPatchesTint, value: patchesTint));
+      details.add(
+        InfoRow(label: l10n.catDetailPatchesTint, value: patchesTint),
+      );
     }
     if (a.tint != 'none') {
-      details.add(InfoRow(
-        label: l10n.catDetailTint,
-        value: a.tint[0].toUpperCase() + a.tint.substring(1),
-      ));
+      details.add(
+        InfoRow(
+          label: l10n.catDetailTint,
+          value: a.tint[0].toUpperCase() + a.tint.substring(1),
+        ),
+      );
     }
     if (a.points != null) {
       details.add(InfoRow(label: l10n.catDetailPoints, value: a.points!));
@@ -151,28 +173,47 @@ class EnhancedCatInfoCard extends StatelessWidget {
       details.add(InfoRow(label: l10n.catDetailVitiligo, value: a.vitiligo!));
     }
     if (a.isTortie) {
-      details.add(InfoRow(label: l10n.catDetailTortoiseshell, value: l10n.commonYes));
+      details.add(
+        InfoRow(label: l10n.catDetailTortoiseshell, value: l10n.commonYes),
+      );
       if (a.tortiePattern != null) {
-        details
-            .add(InfoRow(label: l10n.catDetailTortiePattern, value: a.tortiePattern!));
+        details.add(
+          InfoRow(label: l10n.catDetailTortiePattern, value: a.tortiePattern!),
+        );
       }
       if (a.tortieColor != null) {
-        details.add(InfoRow(
-          label: l10n.catDetailTortieColor,
-          value: l10n.peltColorName(a.tortieColor!),
-        ));
+        details.add(
+          InfoRow(
+            label: l10n.catDetailTortieColor,
+            value: l10n.peltColorName(a.tortieColor!),
+          ),
+        );
       }
     }
-    details
-        .add(InfoRow(label: l10n.catDetailSkin, value: l10n.skinColorName(a.skinColor)));
+    details.add(
+      InfoRow(
+        label: l10n.catDetailSkin,
+        value: l10n.skinColorName(a.skinColor),
+      ),
+    );
 
     return details;
   }
 
   static String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
@@ -203,9 +244,7 @@ class InfoRow extends StatelessWidget {
           const Spacer(),
           Text(
             value,
-            style: textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

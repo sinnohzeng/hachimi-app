@@ -20,19 +20,23 @@ import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 /// Service providers — singletons
-final firestoreServiceProvider =
-    Provider<FirestoreService>((ref) => FirestoreService());
-final analyticsServiceProvider =
-    Provider<AnalyticsService>((ref) => AnalyticsService());
-final catFirestoreServiceProvider =
-    Provider<CatFirestoreService>((ref) => CatFirestoreService());
-final coinServiceProvider =
-    Provider<CoinService>((ref) => CoinService());
-final inventoryServiceProvider =
-    Provider<InventoryService>((ref) => InventoryService());
-final migrationServiceProvider =
-    Provider<MigrationService>((ref) => MigrationService());
-final xpServiceProvider =
-    Provider<XpService>((ref) => XpService());
-final notificationServiceProvider =
-    Provider<NotificationService>((ref) => NotificationService());
+final firestoreServiceProvider = Provider<FirestoreService>(
+  (ref) => FirestoreService(),
+);
+final analyticsServiceProvider = Provider<AnalyticsService>(
+  (ref) => AnalyticsService(),
+);
+final catFirestoreServiceProvider = Provider<CatFirestoreService>(
+  (ref) => CatFirestoreService(),
+);
+final coinServiceProvider = Provider<CoinService>((ref) => CoinService());
+final inventoryServiceProvider = Provider<InventoryService>(
+  (ref) => InventoryService(),
+);
+final migrationServiceProvider = Provider<MigrationService>(
+  (ref) => MigrationService(),
+);
+final xpServiceProvider = Provider<XpService>((ref) => XpService());
+final notificationServiceProvider = Provider<NotificationService>(
+  (ref) => NotificationService(),
+);

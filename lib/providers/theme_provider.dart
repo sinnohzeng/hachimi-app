@@ -114,5 +114,6 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
 }
 
 /// Theme settings provider — SSOT for app theme mode + seed color.
-final themeProvider =
-    NotifierProvider<ThemeNotifier, ThemeSettings>(ThemeNotifier.new);
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeSettings>(
+  ThemeNotifier.new,
+);

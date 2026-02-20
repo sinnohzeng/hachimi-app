@@ -191,8 +191,7 @@ class AiModelSection extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () {
-                      final notifier =
-                          ref.read(modelDownloadProvider.notifier);
+                      final notifier = ref.read(modelDownloadProvider.notifier);
                       if (downloadState.isPaused) {
                         notifier.resume();
                       } else {
@@ -200,7 +199,10 @@ class AiModelSection extends ConsumerWidget {
                       }
                     },
                     child: Text(
-                        downloadState.isPaused ? context.l10n.commonResume : context.l10n.commonPause),
+                      downloadState.isPaused
+                          ? context.l10n.commonResume
+                          : context.l10n.commonPause,
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -287,8 +289,9 @@ class AiModelSection extends ConsumerWidget {
                       width: double.infinity,
                       child: FilledButton.tonalIcon(
                         onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(AppRouter.modelTestChat);
+                          Navigator.of(
+                            context,
+                          ).pushNamed(AppRouter.modelTestChat);
                         },
                         icon: const Icon(Icons.chat_outlined),
                         label: Text(context.l10n.settingsTestModel),
@@ -298,10 +301,11 @@ class AiModelSection extends ConsumerWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () =>
-                            _confirmDeleteModel(context, ref),
-                        icon: Icon(Icons.delete_outline,
-                            color: colorScheme.error),
+                        onPressed: () => _confirmDeleteModel(context, ref),
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: colorScheme.error,
+                        ),
                         label: Text(
                           context.l10n.settingsDeleteModel,
                           style: TextStyle(color: colorScheme.error),
@@ -320,9 +324,7 @@ class AiModelSection extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 downloadState.error!,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.error,
-                ),
+                style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
               ),
             ),
           const SizedBox(height: AppSpacing.xs),
@@ -468,10 +470,7 @@ class FeatureRow extends StatelessWidget {
         Text(emoji, style: const TextStyle(fontSize: 16)),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Text(
-            text,
-            style: textTheme.bodySmall?.copyWith(color: color),
-          ),
+          child: Text(text, style: textTheme.bodySmall?.copyWith(color: color)),
         ),
       ],
     );

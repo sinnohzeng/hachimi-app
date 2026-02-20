@@ -45,8 +45,7 @@ class FirestoreService {
     return _habitsRef(uid)
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(Habit.fromFirestore).toList());
+        .map((snapshot) => snapshot.docs.map(Habit.fromFirestore).toList());
   }
 
   Future<Habit?> getHabit(String uid, String habitId) async {
@@ -110,10 +109,7 @@ class FirestoreService {
     // 2. Create cat document with pixel cat appearance
     final catRef = _catsRef(uid).doc();
     final catData = cat
-        .copyWith(
-          boundHabitId: habitRef.id,
-          targetMinutes: targetHours * 60,
-        )
+        .copyWith(boundHabitId: habitRef.id, targetMinutes: targetHours * 60)
         .toFirestore();
     catData['createdAt'] = FieldValue.serverTimestamp();
     batch.set(catRef, catData);
@@ -155,11 +151,12 @@ class FirestoreService {
     if (targetHours != null) {
       final habitDoc = await _habitsRef(uid).doc(habitId).get();
       if (habitDoc.exists) {
-        final catId = (habitDoc.data() as Map<String, dynamic>)['catId'] as String?;
+        final catId =
+            (habitDoc.data() as Map<String, dynamic>)['catId'] as String?;
         if (catId != null && catId.isNotEmpty) {
-          await _catsRef(uid).doc(catId).update({
-            'targetMinutes': targetHours * 60,
-          });
+          await _catsRef(
+            uid,
+          ).doc(catId).update({'targetMinutes': targetHours * 60});
         }
       }
     }
@@ -174,9 +171,9 @@ class FirestoreService {
     if (habitDoc.exists) {
       final habit = Habit.fromFirestore(habitDoc);
       if (habit.catId != null && habit.catId!.isNotEmpty) {
-        await _catsRef(uid)
-            .doc(habit.catId!)
-            .update({'state': CatState.graduated});
+        await _catsRef(
+          uid,
+        ).doc(habit.catId!).update({'state': CatState.graduated});
       }
     }
     await _habitsRef(uid).doc(habitId).delete();
@@ -218,8 +215,9 @@ class FirestoreService {
 
     if (habitDoc.exists) {
       final habit = Habit.fromFirestore(habitDoc);
-      final yesterday = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(const Duration(days: 1)));
+      final yesterday = DateFormat(
+        'yyyy-MM-dd',
+      ).format(DateTime.now().subtract(const Duration(days: 1)));
 
       final newStreak = StreakUtils.calculateNewStreak(
         lastCheckInDate: habit.lastCheckInDate,
@@ -228,8 +226,9 @@ class FirestoreService {
         currentStreak: habit.currentStreak,
       );
 
-      final newBest =
-          newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
+      final newBest = newStreak > habit.bestStreak
+          ? newStreak
+          : habit.bestStreak;
 
       batch.update(habitRef, {
         'totalMinutes': FieldValue.increment(session.durationMinutes),
@@ -278,8 +277,9 @@ class FirestoreService {
     return _entriesRef(uid, today)
         .orderBy('completedAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(CheckInEntry.fromFirestore).toList());
+        .map(
+          (snapshot) => snapshot.docs.map(CheckInEntry.fromFirestore).toList(),
+        );
   }
 
   Future<void> logCheckIn({
@@ -306,8 +306,9 @@ class FirestoreService {
 
     if (habitDoc.exists) {
       final habit = Habit.fromFirestore(habitDoc);
-      final yesterday = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(const Duration(days: 1)));
+      final yesterday = DateFormat(
+        'yyyy-MM-dd',
+      ).format(DateTime.now().subtract(const Duration(days: 1)));
 
       final newStreak = StreakUtils.calculateNewStreak(
         lastCheckInDate: habit.lastCheckInDate,
@@ -316,8 +317,9 @@ class FirestoreService {
         currentStreak: habit.currentStreak,
       );
 
-      final newBest =
-          newStreak > habit.bestStreak ? newStreak : habit.bestStreak;
+      final newBest = newStreak > habit.bestStreak
+          ? newStreak
+          : habit.bestStreak;
 
       batch.update(habitRef, {
         'totalMinutes': FieldValue.increment(minutes),
@@ -343,8 +345,9 @@ class FirestoreService {
   }) async {
     final allDates = List.generate(
       lastNDays,
-      (i) => DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(Duration(days: i))),
+      (i) => DateFormat(
+        'yyyy-MM-dd',
+      ).format(DateTime.now().subtract(Duration(days: i))),
     );
 
     final results = await Future.wait(
@@ -366,15 +369,16 @@ class FirestoreService {
   }) async {
     final dates = List.generate(
       lastNDays,
-      (i) => DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(Duration(days: i))),
+      (i) => DateFormat(
+        'yyyy-MM-dd',
+      ).format(DateTime.now().subtract(Duration(days: i))),
     );
 
     final futures = dates.map((date) async {
-      final snapshot = await _entriesRef(uid, date)
-          .where('habitId', isEqualTo: habitId)
-          .limit(100)
-          .get();
+      final snapshot = await _entriesRef(
+        uid,
+        date,
+      ).where('habitId', isEqualTo: habitId).limit(100).get();
       int dayTotal = 0;
       for (final doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
@@ -383,8 +387,9 @@ class FirestoreService {
       return MapEntry(date, dayTotal);
     });
 
-    final entries = await Future.wait(futures)
-        .timeout(const Duration(seconds: 10));
+    final entries = await Future.wait(
+      futures,
+    ).timeout(const Duration(seconds: 10));
 
     final result = <String, int>{};
     for (final entry in entries) {
