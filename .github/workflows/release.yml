@@ -71,12 +71,12 @@ jobs:
       - name: Create empty asset directories
         run: mkdir -p assets/sprites assets/room
 
-      - name: Get dependencies
-        run: flutter pub get
-
-      # Setup llama_cpp_dart vendor (clone source + llama.cpp submodule)
+      # Setup llama_cpp_dart vendor BEFORE pub get (path dependency must exist)
       - name: Setup llama_cpp_dart vendor
         run: bash scripts/setup_llm_vendor.sh
+
+      - name: Get dependencies
+        run: flutter pub get
 
       - name: Verify version consistency
         run: |

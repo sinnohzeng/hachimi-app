@@ -4,6 +4,8 @@
 #
 # pub.dev releases exclude the llama.cpp git submodule source,
 # so we clone the full repo with pinned versions for reproducible builds.
+# After cloning, applies patches from patches/llama_cpp_dart.patch for
+# build fixes (ffiPlugin, NDK version, cmake args, model source files).
 #
 # Usage: bash scripts/setup_llm_vendor.sh
 # Re-setup: delete packages/ first, then re-run.
@@ -11,6 +13,7 @@
 
 set -euo pipefail
 
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VENDOR_DIR="packages/llama_cpp_dart"
 REPO_URL="https://github.com/netdur/llama_cpp_dart.git"
 
@@ -18,6 +21,8 @@ REPO_URL="https://github.com/netdur/llama_cpp_dart.git"
 # v0.2.3 release commit (tag not published, using commit hash)
 LLAMA_DART_REF="22dd48a"
 LLAMA_CPP_REF="0e4ebeb05796951fed7885763a73ada18b42e9ca"
+
+cd "$PROJECT_ROOT"
 
 if [ -f "$VENDOR_DIR/pubspec.yaml" ]; then
   echo "Vendor already set up at $VENDOR_DIR."
@@ -41,6 +46,17 @@ git checkout "$LLAMA_CPP_REF" 2>/dev/null || {
   git fetch --depth 100 origin
   git checkout "$LLAMA_CPP_REF"
 }
+
+cd "$PROJECT_ROOT"
+
+echo "==> Applying vendor patches..."
+PATCH_FILE="patches/llama_cpp_dart.patch"
+if [ -f "$PATCH_FILE" ]; then
+  git -C "$VENDOR_DIR" apply "$PROJECT_ROOT/$PATCH_FILE"
+  echo "  Applied $PATCH_FILE"
+else
+  echo "  WARNING: $PATCH_FILE not found, skipping patches"
+fi
 
 echo ""
 echo "Vendor setup complete."
