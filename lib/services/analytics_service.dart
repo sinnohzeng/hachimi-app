@@ -202,16 +202,13 @@ class AnalyticsService {
 
   // ─── Stats & History Events ───
 
-  Future<void> logStatsViewed() => _safeLog(
-    () => _analytics.logEvent(name: AnalyticsEvents.statsViewed),
-  );
+  Future<void> logStatsViewed() =>
+      _safeLog(() => _analytics.logEvent(name: AnalyticsEvents.statsViewed));
 
   Future<void> logHistoryViewed({String? habitId}) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.historyViewed,
-      parameters: {
-        if (habitId != null) AnalyticsEvents.paramHabitId: habitId,
-      },
+      parameters: {if (habitId != null) AnalyticsEvents.paramHabitId: habitId},
     ),
   );
 

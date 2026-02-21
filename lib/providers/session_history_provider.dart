@@ -31,10 +31,10 @@ class SessionHistoryState {
       sessions: sessions ?? this.sessions,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
-      filterHabitId:
-          filterHabitId != null ? filterHabitId() : this.filterHabitId,
-      lastDocument:
-          lastDocument != null ? lastDocument() : this.lastDocument,
+      filterHabitId: filterHabitId != null
+          ? filterHabitId()
+          : this.filterHabitId,
+      lastDocument: lastDocument != null ? lastDocument() : this.lastDocument,
     );
   }
 }
@@ -69,13 +69,15 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
         return;
       }
 
-      final result = await ref.read(firestoreServiceProvider).getSessionHistory(
-        uid: uid,
-        habitIds: habitIds,
-        habitId: state.filterHabitId,
-        limit: _pageSize,
-        startAfter: state.lastDocument,
-      );
+      final result = await ref
+          .read(firestoreServiceProvider)
+          .getSessionHistory(
+            uid: uid,
+            habitIds: habitIds,
+            habitId: state.filterHabitId,
+            limit: _pageSize,
+            startAfter: state.lastDocument,
+          );
 
       state = state.copyWith(
         sessions: [...state.sessions, ...result.sessions],
@@ -90,15 +92,12 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
 
   /// 切换筛选条件，重新加载。
   void setFilter(String? habitId) {
-    state = SessionHistoryState(
-      isLoading: true,
-      filterHabitId: habitId,
-    );
+    state = SessionHistoryState(isLoading: true, filterHabitId: habitId);
     Future.microtask(loadMore);
   }
 }
 
 final sessionHistoryProvider =
     NotifierProvider<SessionHistoryNotifier, SessionHistoryState>(
-  SessionHistoryNotifier.new,
-);
+      SessionHistoryNotifier.new,
+    );

@@ -12,11 +12,9 @@ final dailyMinutesProvider = FutureProvider<Map<String, int>>((ref) async {
   if (habits.isEmpty) return {};
 
   final habitIds = habits.map((h) => h.id).toList();
-  return ref.watch(firestoreServiceProvider).getDailyMinutesFromSessions(
-    uid: uid,
-    habitIds: habitIds,
-    lastNDays: 30,
-  );
+  return ref
+      .watch(firestoreServiceProvider)
+      .getDailyMinutesFromSessions(uid: uid, habitIds: habitIds, lastNDays: 30);
 });
 
 /// 最近 7 天每日总分钟数（周趋势图用）。
@@ -28,11 +26,9 @@ final weeklyTrendProvider = FutureProvider<Map<String, int>>((ref) async {
   if (habits.isEmpty) return {};
 
   final habitIds = habits.map((h) => h.id).toList();
-  return ref.watch(firestoreServiceProvider).getDailyMinutesFromSessions(
-    uid: uid,
-    habitIds: habitIds,
-    lastNDays: 7,
-  );
+  return ref
+      .watch(firestoreServiceProvider)
+      .getDailyMinutesFromSessions(uid: uid, habitIds: habitIds, lastNDays: 7);
 });
 
 /// 最近 5 条专注记录（统计首页预览用）。
@@ -44,9 +40,7 @@ final recentSessionsProvider = FutureProvider<List<FocusSession>>((ref) async {
   if (habits.isEmpty) return [];
 
   final habitIds = habits.map((h) => h.id).toList();
-  return ref.watch(firestoreServiceProvider).getRecentSessions(
-    uid: uid,
-    habitIds: habitIds,
-    limit: 5,
-  );
+  return ref
+      .watch(firestoreServiceProvider)
+      .getRecentSessions(uid: uid, habitIds: habitIds, limit: 5);
 });

@@ -150,7 +150,9 @@ class StageMilestone extends StatelessWidget {
             color: isReached
                 ? color
                 : colorScheme.outlineVariant.withValues(
-                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.7 : 0.4,
+                    alpha: Theme.of(context).brightness == Brightness.dark
+                        ? 0.7
+                        : 0.4,
                   ),
           ),
           child: isReached

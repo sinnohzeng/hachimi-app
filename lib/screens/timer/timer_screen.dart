@@ -225,8 +225,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         : null;
 
     // 构建增强版会话记录
-    final modeStr =
-        timerState.mode == TimerMode.countdown ? 'countdown' : 'stopwatch';
+    final modeStr = timerState.mode == TimerMode.countdown
+        ? 'countdown'
+        : 'stopwatch';
     final targetMinutes = timerState.mode == TimerMode.countdown
         ? timerState.totalSeconds ~/ 60
         : 0;

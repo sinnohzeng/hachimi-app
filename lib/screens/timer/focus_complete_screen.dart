@@ -287,9 +287,14 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: stageColor(
-                                      widget.stageUp!.newStage,
-                                    ).withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.30 : 0.15),
+                                    color: stageColor(widget.stageUp!.newStage)
+                                        .withValues(
+                                          alpha:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? 0.30
+                                              : 0.15,
+                                        ),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Text(
@@ -419,13 +424,17 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                               Icon(
                                 Icons.check_circle,
                                 size: 14,
-                                color: StatusColors.onSuccess(Theme.of(context).brightness),
+                                color: StatusColors.onSuccess(
+                                  Theme.of(context).brightness,
+                                ),
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 l10n.focusCompleteDiaryWritten,
                                 style: textTheme.bodySmall?.copyWith(
-                                  color: StatusColors.onSuccess(Theme.of(context).brightness),
+                                  color: StatusColors.onSuccess(
+                                    Theme.of(context).brightness,
+                                  ),
                                 ),
                               ),
                             ],

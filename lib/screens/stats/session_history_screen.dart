@@ -76,9 +76,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
                     label: Text(l10n.historyFilterAll),
                     selected: historyState.filterHabitId == null,
                     onSelected: (_) {
-                      ref
-                          .read(sessionHistoryProvider.notifier)
-                          .setFilter(null);
+                      ref.read(sessionHistoryProvider.notifier).setFilter(null);
                     },
                   ),
                 ),
@@ -154,10 +152,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
         }
 
         final group = grouped[index];
-        return _DateGroupCard(
-          group: group,
-          habits: habits,
-        );
+        return _DateGroupCard(group: group, habits: habits);
       },
     );
   }
@@ -170,8 +165,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
       map.putIfAbsent(key, () => []).add(session);
     }
 
-    final sorted = map.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
+    final sorted = map.entries.toList()..sort((a, b) => b.key.compareTo(a.key));
 
     return sorted.map((entry) {
       final totalMinutes = entry.value.fold(

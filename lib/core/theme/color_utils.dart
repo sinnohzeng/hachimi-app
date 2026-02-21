@@ -9,8 +9,7 @@ extension BrightnessAlpha on Color {
     required double lightAlpha,
     required double darkAlpha,
   }) =>
-      withValues(
-          alpha: brightness == Brightness.dark ? darkAlpha : lightAlpha);
+      withValues(alpha: brightness == Brightness.dark ? darkAlpha : lightAlpha);
 }
 
 /// 语义化状态颜色 — 提供亮度感知的成功/错误状态色。

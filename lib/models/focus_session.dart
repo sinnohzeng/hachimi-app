@@ -51,8 +51,7 @@ class FocusSession {
       id: doc.id,
       habitId: data['habitId'] as String? ?? '',
       catId: data['catId'] as String? ?? '',
-      startedAt:
-          (data['startedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      startedAt: (data['startedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       endedAt: (data['endedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       durationMinutes: data['durationMinutes'] as int? ?? 0,
       targetDurationMinutes: data['targetDurationMinutes'] as int? ?? 0,

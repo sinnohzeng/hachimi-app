@@ -298,7 +298,7 @@ class FirestoreService {
 
   /// 分页查询专注历史（按 endedAt 降序）。
   Future<({List<FocusSession> sessions, DocumentSnapshot? lastDoc})>
-      getSessionHistory({
+  getSessionHistory({
     required String uid,
     required List<String> habitIds,
     String? habitId,
@@ -307,18 +307,17 @@ class FirestoreService {
   }) async {
     // 单个 habit 查询
     if (habitId != null) {
-      Query query = _sessionsRef(uid, habitId)
-          .orderBy('endedAt', descending: true)
-          .limit(limit);
+      Query query = _sessionsRef(
+        uid,
+        habitId,
+      ).orderBy('endedAt', descending: true).limit(limit);
       if (startAfter != null) {
         query = query.startAfterDocument(startAfter);
       }
 
       final snapshot = await query.get();
-      final sessions =
-          snapshot.docs.map(FocusSession.fromFirestore).toList();
-      final lastDocument =
-          snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+      final sessions = snapshot.docs.map(FocusSession.fromFirestore).toList();
+      final lastDocument = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
       return (sessions: sessions, lastDoc: lastDocument);
     }
 
@@ -327,9 +326,10 @@ class FirestoreService {
     DocumentSnapshot? lastDocument;
 
     final futures = habitIds.map((hId) async {
-      Query query = _sessionsRef(uid, hId)
-          .orderBy('endedAt', descending: true)
-          .limit(limit);
+      Query query = _sessionsRef(
+        uid,
+        hId,
+      ).orderBy('endedAt', descending: true).limit(limit);
       // 分页对跨集合查询无法直接用 startAfter，使用时间戳过滤
       if (startAfter != null) {
         final lastData = startAfter.data() as Map<String, dynamic>?;
@@ -345,9 +345,7 @@ class FirestoreService {
 
     final snapshots = await Future.wait(futures);
     for (final snapshot in snapshots) {
-      allSessions.addAll(
-        snapshot.docs.map(FocusSession.fromFirestore),
-      );
+      allSessions.addAll(snapshot.docs.map(FocusSession.fromFirestore));
     }
 
     // 按 endedAt 降序排列，取前 limit 条
@@ -384,9 +382,10 @@ class FirestoreService {
     final result = <String, int>{};
 
     final futures = habitIds.map((habitId) async {
-      final snapshot = await _sessionsRef(uid, habitId)
-          .where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp)
-          .get();
+      final snapshot = await _sessionsRef(
+        uid,
+        habitId,
+      ).where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp).get();
       return snapshot.docs.map(FocusSession.fromFirestore).toList();
     });
 
@@ -414,10 +413,10 @@ class FirestoreService {
 
     final allSessions = <FocusSession>[];
     final futures = habitIds.map((habitId) async {
-      final snapshot = await _sessionsRef(uid, habitId)
-          .orderBy('endedAt', descending: true)
-          .limit(limit)
-          .get();
+      final snapshot = await _sessionsRef(
+        uid,
+        habitId,
+      ).orderBy('endedAt', descending: true).limit(limit).get();
       return snapshot.docs.map(FocusSession.fromFirestore).toList();
     });
 
@@ -439,9 +438,10 @@ class FirestoreService {
     final cutoff = DateTime.now().subtract(Duration(days: lastNDays));
     final cutoffTimestamp = Timestamp.fromDate(cutoff);
 
-    final snapshot = await _sessionsRef(uid, habitId)
-        .where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp)
-        .get();
+    final snapshot = await _sessionsRef(
+      uid,
+      habitId,
+    ).where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp).get();
 
     final result = <String, int>{};
     for (final doc in snapshot.docs) {
@@ -485,14 +485,11 @@ class FirestoreService {
       final subscriptions = <int, dynamic>{};
 
       for (int i = 0; i < streams.length; i++) {
-        subscriptions[i] = streams[i].listen(
-          (data) {
-            latestValues[i] = data;
-            final merged = latestValues.expand((e) => e).toList();
-            controller.add(merged);
-          },
-          onError: controller.addError,
-        );
+        subscriptions[i] = streams[i].listen((data) {
+          latestValues[i] = data;
+          final merged = latestValues.expand((e) => e).toList();
+          controller.add(merged);
+        }, onError: controller.addError);
       }
 
       controller.onCancel = () {

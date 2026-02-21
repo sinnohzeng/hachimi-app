@@ -255,7 +255,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 value: cat.growthProgress,
                 minHeight: 12,
                 backgroundColor: colorScheme.outlineVariant.withValues(
-                  alpha: Theme.of(context).brightness == Brightness.dark ? 0.8 : 0.5,
+                  alpha: Theme.of(context).brightness == Brightness.dark
+                      ? 0.8
+                      : 0.5,
                 ),
                 valueColor: AlwaysStoppedAnimation(stageClr),
               ),

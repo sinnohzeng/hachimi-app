@@ -39,8 +39,12 @@ class FeaturedCatCard extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
                 colors: [
-                  stageClr.withValues(alpha: theme.brightness == Brightness.dark ? 0.18 : 0.08),
-                  stageClr.withValues(alpha: theme.brightness == Brightness.dark ? 0.08 : 0.03),
+                  stageClr.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.08,
+                  ),
+                  stageClr.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.08 : 0.03,
+                  ),
                 ],
               ),
             ),

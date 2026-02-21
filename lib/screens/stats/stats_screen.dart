@@ -38,9 +38,8 @@ class StatsScreen extends ConsumerWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.history),
-              onPressed: () => Navigator.of(context).pushNamed(
-                AppRouter.sessionHistory,
-              ),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRouter.sessionHistory),
               tooltip: l10n.historyTitle,
             ),
           ],
@@ -256,10 +255,7 @@ class StatsScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text(
-              l10n.statsRecentSessions,
-              style: textTheme.titleMedium,
-            ),
+            child: Text(l10n.statsRecentSessions, style: textTheme.titleMedium),
           ),
         ),
         SliverToBoxAdapter(child: _RecentSessionsCard()),
@@ -489,10 +485,8 @@ class _HeatmapCard extends ConsumerWidget {
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
               error: (_, __) => const SizedBox(height: 120),
-              data: (dailyMinutes) => StreakHeatmap(
-                dailyMinutes: dailyMinutes,
-                days: 30,
-              ),
+              data: (dailyMinutes) =>
+                  StreakHeatmap(dailyMinutes: dailyMinutes, days: 30),
             ),
           ],
         ),
@@ -552,9 +546,9 @@ class _RecentSessionsCard extends ConsumerWidget {
                   }),
                   const Divider(height: 1),
                   TextButton(
-                    onPressed: () => Navigator.of(context).pushNamed(
-                      AppRouter.sessionHistory,
-                    ),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRouter.sessionHistory),
                     child: Text(l10n.statsViewAllHistory),
                   ),
                 ],
@@ -579,8 +573,9 @@ class _SessionTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    final modeLabel =
-        session.mode == 'countdown' ? l10n.sessionCountdown : l10n.sessionStopwatch;
+    final modeLabel = session.mode == 'countdown'
+        ? l10n.sessionCountdown
+        : l10n.sessionStopwatch;
     final statusIcon = session.isCompleted
         ? Icons.check_circle_outline
         : Icons.cancel_outlined;
