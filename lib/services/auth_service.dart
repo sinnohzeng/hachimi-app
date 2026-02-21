@@ -37,8 +37,10 @@ class AuthService {
   }
 
   /// Sign in with Google. Returns null if the user cancelled the sign-in flow.
+  /// [A2] 保底初始化：若 DeferredInit 尚未完成，确保 GoogleSignIn 已初始化。
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      await _googleSignIn.initialize(); // 幂等，多次调用安全
       final googleUser = await _googleSignIn.authenticate();
       final idToken = googleUser.authentication.idToken;
       final credential = GoogleAuthProvider.credential(idToken: idToken);

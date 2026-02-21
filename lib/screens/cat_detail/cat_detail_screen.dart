@@ -63,30 +63,51 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     );
 
     return Scaffold(
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              // Gradient app bar with pixel cat
-              SliverAppBar(
-                expandedHeight: 280,
-                pinned: true,
-                actions: [
-                  // 聊天入口 — 仅当 AI 功能就绪时显示
-                  if (ref.watch(llmAvailabilityProvider) ==
-                      LlmAvailability.ready)
-                    IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      onPressed: () {
-                        Navigator.of(
-                          context,
-                        ).pushNamed(AppRouter.catChat, arguments: widget.catId);
-                      },
-                      tooltip: context.l10n.catDetailChatTooltip,
-                    ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: AnimatedMeshBackground(
+      body: CustomScrollView(
+        slivers: [
+          // [B2] SliverAppBar with FlexibleSpaceBar.title for smooth scroll-to-title
+          SliverAppBar(
+            expandedHeight: 280,
+            pinned: true,
+            // [R4] 展开状态下白色前景保证对比度
+            foregroundColor: Colors.white,
+            actions: [
+              // [B3] 编辑入口移到 AppBar actions
+              IconButton(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () => _showRenameDialog(context, cat),
+                tooltip: context.l10n.catDetailRenameTooltip,
+              ),
+              // 聊天入口 — 仅当 AI 功能就绪时显示
+              if (ref.watch(llmAvailabilityProvider) == LlmAvailability.ready)
+                IconButton(
+                  icon: const Icon(Icons.chat_bubble_outline),
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(AppRouter.catChat, arguments: widget.catId);
+                  },
+                  tooltip: context.l10n.catDetailChatTooltip,
+                ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              // [B2] 猫名作为 FlexibleSpaceBar.title，随滚动平滑过渡
+              title: Text(
+                cat.name,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  shadows: [const Shadow(blurRadius: 4, color: Colors.black26)],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              centerTitle: true,
+              expandedTitleScale: 1.3,
+              // [B1] 粒子效果移入 FlexibleSpaceBar.background，随 AppBar 折叠消失
+              background: Stack(
+                children: [
+                  AnimatedMeshBackground(
                     colors: meshColors,
                     speed: 1.0,
                     child: SafeArea(
@@ -100,26 +121,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                             child: TappableCatSprite(cat: cat, size: 120),
                           ),
                           const SizedBox(height: AppSpacing.md),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                cat.name,
-                                style: textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              IconButton(
-                                icon: const Icon(Icons.edit, size: 18),
-                                onPressed: () =>
-                                    _showRenameDialog(context, cat),
-                                tooltip: context.l10n.catDetailRenameTooltip,
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
+                          // 性格标签（猫名已移到 FlexibleSpaceBar.title）
                           if (personality != null)
                             Text(
                               '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
@@ -127,92 +129,90 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                                 color: colorScheme.onSurfaceVariant,
                               ),
                             ),
+                          // 为 FlexibleSpaceBar.title 留出底部空间
+                          const SizedBox(height: AppSpacing.xxl),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ),
-
-              SliverPadding(
-                padding: AppSpacing.paddingBase,
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    // Mood badge
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.tertiaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onTertiaryContainer,
-                          ),
-                        ),
+                  // [B1] 粒子覆盖层
+                  const Positioned.fill(
+                    child: IgnorePointer(
+                      child: ParticleOverlay(
+                        mode: ParticleMode.firefly,
+                        child: SizedBox.expand(),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Growth progress (time-based)
-                    _buildGrowthCard(context, cat, stageClr),
-                    const SizedBox(height: AppSpacing.base),
-
-                    // Focus statistics card (replaces old "Bound Habit" card)
-                    if (habit != null) ...[
-                      FocusStatsCard(habit: habit, cat: cat),
-                      const SizedBox(height: AppSpacing.base),
-                    ],
-
-                    // Hachimi Diary card — AI 日记预览
-                    if (ref.watch(llmAvailabilityProvider) ==
-                        LlmAvailability.ready) ...[
-                      DiaryPreviewCard(catId: cat.id),
-                      const SizedBox(height: AppSpacing.base),
-
-                      // 聊天入口卡片 — 提升可发现性
-                      ChatEntryCard(catId: cat.id, catName: cat.name),
-                      const SizedBox(height: AppSpacing.base),
-                    ],
-
-                    // Reminder card
-                    if (habit != null) ...[
-                      ReminderCard(habit: habit, cat: cat),
-                      const SizedBox(height: AppSpacing.base),
-                    ],
-
-                    // Streak heatmap
-                    if (habit != null) HabitHeatmapCard(habitId: habit.id),
-                    const SizedBox(height: AppSpacing.base),
-
-                    // Accessories card
-                    AccessoriesCard(cat: cat),
-                    const SizedBox(height: AppSpacing.base),
-
-                    // Enhanced cat info card
-                    EnhancedCatInfoCard(cat: cat),
-                    const SizedBox(height: AppSpacing.xl),
-                  ]),
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          // Particle overlay — covers header area only
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 280,
-            child: IgnorePointer(
-              child: ParticleOverlay(
-                mode: ParticleMode.firefly,
-                child: SizedBox.expand(),
-              ),
+
+          SliverPadding(
+            padding: AppSpacing.paddingBase,
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Mood badge
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiaryContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
+                      style: textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onTertiaryContainer,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Growth progress (time-based)
+                _buildGrowthCard(context, cat, stageClr),
+                const SizedBox(height: AppSpacing.base),
+
+                // Focus statistics card (replaces old "Bound Habit" card)
+                if (habit != null) ...[
+                  FocusStatsCard(habit: habit, cat: cat),
+                  const SizedBox(height: AppSpacing.base),
+                ],
+
+                // Hachimi Diary card — AI 日记预览
+                if (ref.watch(llmAvailabilityProvider) ==
+                    LlmAvailability.ready) ...[
+                  DiaryPreviewCard(catId: cat.id),
+                  const SizedBox(height: AppSpacing.base),
+
+                  // 聊天入口卡片 — 提升可发现性
+                  ChatEntryCard(catId: cat.id, catName: cat.name),
+                  const SizedBox(height: AppSpacing.base),
+                ],
+
+                // Reminder card
+                if (habit != null) ...[
+                  ReminderCard(habit: habit, cat: cat),
+                  const SizedBox(height: AppSpacing.base),
+                ],
+
+                // Streak heatmap
+                if (habit != null) HabitHeatmapCard(habitId: habit.id),
+                const SizedBox(height: AppSpacing.base),
+
+                // Accessories card
+                AccessoriesCard(cat: cat),
+                const SizedBox(height: AppSpacing.base),
+
+                // Enhanced cat info card
+                EnhancedCatInfoCard(cat: cat),
+                const SizedBox(height: AppSpacing.xl),
+              ]),
             ),
           ),
         ],

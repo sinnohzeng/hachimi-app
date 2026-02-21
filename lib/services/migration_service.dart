@@ -1,13 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// MigrationService — 旧版本数据检测 + 清除。
+///
+/// [A3] 迁移结果缓存到 SharedPreferences，已检查过则直接跳过。
 class MigrationService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static const _kSchemaCheckedKey = 'migration_schema_checked_v1';
+  static const _kAccessoriesCheckedKey = 'migration_accessories_checked_v1';
+
   /// 检测是否需要数据迁移。
   /// 条件：存在猫文档且包含旧 schema 字段 `breed` 但无 `appearance`。
+  /// [A3] 结果缓存，已确认无需迁移后跳过 Firestore 查询。
   Future<bool> checkNeedsMigration(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_kSchemaCheckedKey) == true) {
+      return false;
+    }
+
     final catsSnapshot = await _db
         .collection('users')
         .doc(uid)
@@ -21,12 +33,21 @@ class MigrationService {
         return true;
       }
     }
+
+    // 无需迁移，缓存结果
+    await prefs.setBool(_kSchemaCheckedKey, true);
     return false;
   }
 
   /// 迁移旧版 per-cat accessories 到 user-level inventory。
   /// 幂等：若所有猫的 accessories 已为空，则不执行任何操作。
+  /// [A3] 结果缓存，已确认无需迁移后跳过 Firestore 查询。
   Future<bool> migrateAccessoriesToInventory(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_kAccessoriesCheckedKey) == true) {
+      return false;
+    }
+
     final catsSnapshot = await _db
         .collection('users')
         .doc(uid)
@@ -55,8 +76,11 @@ class MigrationService {
       catUpdates[doc.id] = accessories;
     }
 
-    // 无需迁移
-    if (catUpdates.isEmpty) return false;
+    // 无需迁移，缓存结果
+    if (catUpdates.isEmpty) {
+      await prefs.setBool(_kAccessoriesCheckedKey, true);
+      return false;
+    }
 
     // 单个 batch 操作：写入 inventory + 清空各猫 accessories
     final batch = _db.batch();
@@ -78,11 +102,15 @@ class MigrationService {
     }
 
     await batch.commit();
+
+    // 迁移完成，缓存结果
+    await prefs.setBool(_kAccessoriesCheckedKey, true);
     return true;
   }
 
   /// 清除用户全部业务数据（习惯、猫、签到记录）。
   /// 用户确认后调用，重新进入 onboarding 流程。
+  /// [R2] 同步清除迁移缓存 key，确保数据重置后迁移检查可重新执行。
   Future<void> clearAllUserData(String uid) async {
     try {
       final userRef = _db.collection('users').doc(uid);
@@ -100,6 +128,11 @@ class MigrationService {
 
       // 重置用户 profile 字段（保留账号）
       await userRef.update({'coins': 0, 'lastCheckInDate': null});
+
+      // [R2] 清除迁移缓存 key
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kSchemaCheckedKey);
+      await prefs.remove(_kAccessoriesCheckedKey);
     } catch (e, stack) {
       ErrorHandler.record(
         e,

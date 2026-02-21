@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 
 /// Theme settings value object.
 class ThemeSettings {
@@ -43,8 +43,20 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
   @override
   ThemeSettings build() {
     ref.keepAlive();
-    _load();
-    return const ThemeSettings();
+    final prefs = ref.read(sharedPreferencesProvider);
+    final modeIndex = prefs.getInt(_keyThemeMode);
+    final colorValue = prefs.getInt(_keySeedColor);
+    final dynamicColor = prefs.getBool(_keyDynamicColor);
+    final bgAnimation = prefs.getBool(_keyBgAnimation);
+
+    return ThemeSettings(
+      mode: modeIndex != null ? ThemeMode.values[modeIndex] : ThemeMode.system,
+      seedColor: colorValue != null
+          ? Color(colorValue)
+          : AppTheme.defaultSeedColor,
+      useDynamicColor: dynamicColor ?? true,
+      enableBackgroundAnimation: bgAnimation ?? true,
+    );
   }
 
   /// Switch theme mode (system / light / dark).
@@ -71,29 +83,12 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     _persist();
   }
 
-  Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyThemeMode, state.mode.index);
-    await prefs.setInt(_keySeedColor, state.seedColor.toARGB32());
-    await prefs.setBool(_keyDynamicColor, state.useDynamicColor);
-    await prefs.setBool(_keyBgAnimation, state.enableBackgroundAnimation);
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final modeIndex = prefs.getInt(_keyThemeMode);
-    final colorValue = prefs.getInt(_keySeedColor);
-    final dynamicColor = prefs.getBool(_keyDynamicColor);
-    final bgAnimation = prefs.getBool(_keyBgAnimation);
-
-    state = ThemeSettings(
-      mode: modeIndex != null ? ThemeMode.values[modeIndex] : ThemeMode.system,
-      seedColor: colorValue != null
-          ? Color(colorValue)
-          : AppTheme.defaultSeedColor,
-      useDynamicColor: dynamicColor ?? true,
-      enableBackgroundAnimation: bgAnimation ?? true,
-    );
+  void _persist() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    prefs.setInt(_keyThemeMode, state.mode.index);
+    prefs.setInt(_keySeedColor, state.seedColor.toARGB32());
+    prefs.setBool(_keyDynamicColor, state.useDynamicColor);
+    prefs.setBool(_keyBgAnimation, state.enableBackgroundAnimation);
   }
 }
 

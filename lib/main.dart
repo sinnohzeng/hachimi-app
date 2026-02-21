@@ -4,21 +4,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/app.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/services/auth_service.dart';
-import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/notification_service.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // [R6] 冷启动性能度量
+  final startupStopwatch = Stopwatch()..start();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialize Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Firebase + SharedPreferences 并行初始化（关键路径）
+    final results = await Future.wait([
+      Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+      SharedPreferences.getInstance(),
+    ]);
+
+    final prefs = results[1] as SharedPreferences;
 
     // Configure Firestore offline persistence
     FirebaseFirestore.instance.settings = const Settings(
@@ -40,14 +45,18 @@ void main() async {
       return true;
     };
 
-    // Initialize Google Sign-In (must be after Firebase.initializeApp)
-    await AuthService().initializeGoogleSignIn();
+    debugPrint(
+      '[STARTUP] critical init: ${startupStopwatch.elapsedMilliseconds}ms',
+    );
 
-    // Initialize foreground task for focus timer
-    FocusTimerService.init();
-
-    // Initialize notification plugins and channels (no permission request)
-    await NotificationService().initializePlugins();
+    // 非关键初始化（GoogleSignIn、通知、FocusTimer）延迟到首帧后执行
+    // 参见 DeferredInit
+    runApp(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        child: HachimiApp(startupStopwatch: startupStopwatch),
+      ),
+    );
   } catch (e, stack) {
     debugPrint('[main] initialization failed: $e');
     ErrorHandler.record(
@@ -60,8 +69,6 @@ void main() async {
     runApp(_InitErrorApp(error: e.toString()));
     return;
   }
-
-  runApp(const ProviderScope(child: HachimiApp()));
 }
 
 /// 初始化失败时显示的错误页面。

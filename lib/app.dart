@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/utils/deferred_init.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/auth_provider.dart'; // re-exports service_providers
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -22,7 +22,8 @@ import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 
 class HachimiApp extends ConsumerWidget {
-  const HachimiApp({super.key});
+  final Stopwatch? startupStopwatch;
+  const HachimiApp({super.key, this.startupStopwatch});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,7 +51,7 @@ class HachimiApp extends ConsumerWidget {
           // i18n support
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
-          home: const AuthGate(),
+          home: AuthGate(startupStopwatch: startupStopwatch),
           onGenerateRoute: AppRouter.onGenerateRoute,
           navigatorObservers: [analyticsService.observer],
         );
@@ -62,31 +63,30 @@ class HachimiApp extends ConsumerWidget {
 /// AuthGate — reactively switches between OnboardingScreen, LoginScreen,
 /// and HomeScreen based on onboarding state + Firebase Auth state.
 /// This is the SSOT for auth-based routing.
+///
+/// [A4] 乐观认证：cached UID 存在时直接渲染 HomeScreen，无需等待 Auth stream。
 class AuthGate extends ConsumerStatefulWidget {
-  const AuthGate({super.key});
+  final Stopwatch? startupStopwatch;
+  const AuthGate({super.key, this.startupStopwatch});
 
   @override
   ConsumerState<AuthGate> createState() => _AuthGateState();
 }
 
 class _AuthGateState extends ConsumerState<AuthGate> {
-  bool? _onboardingComplete;
+  late final bool _onboardingComplete;
   bool _appOpenLogged = false;
 
   static const _kLastOpenKey = 'last_app_open';
   static const _kConsecutiveDaysKey = 'consecutive_days';
+  static const _kCachedUidKey = 'cached_uid';
 
   @override
   void initState() {
     super.initState();
-    _loadOnboardingState();
-  }
-
-  Future<void> _loadOnboardingState() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
-    });
+    // [A1] 同步读取 onboarding 状态，不再 async
+    final prefs = ref.read(sharedPreferencesProvider);
+    _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
   }
 
   void _onOnboardingComplete() {
@@ -94,11 +94,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
-  Future<void> _logAppOpened() async {
+  /// [R3] 使用 sharedPreferencesProvider 替代独立的 SharedPreferences.getInstance()
+  void _logAppOpened() {
     if (_appOpenLogged) return;
     _appOpenLogged = true;
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
@@ -123,8 +124,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       }
     }
 
-    await prefs.setString(_kLastOpenKey, today.toIso8601String());
-    await prefs.setInt(_kConsecutiveDaysKey, consecutiveDays);
+    prefs.setString(_kLastOpenKey, today.toIso8601String());
+    prefs.setInt(_kConsecutiveDaysKey, consecutiveDays);
 
     ref
         .read(analyticsServiceProvider)
@@ -136,33 +137,48 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    // Still loading onboarding state
-    if (_onboardingComplete == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     // Show onboarding if not completed
-    if (!_onboardingComplete!) {
+    if (!_onboardingComplete) {
       return OnboardingScreen(onComplete: _onOnboardingComplete);
     }
 
     // Onboarding done — check auth state
     final authState = ref.watch(authStateProvider);
+    final prefs = ref.read(sharedPreferencesProvider);
 
     return authState.when(
       data: (user) {
         debugPrint('[APP] authState: data, user=${user?.uid}');
-        if (user == null) return const LoginScreen();
+        if (user == null) {
+          // 用户已登出，清除缓存 UID
+          prefs.remove(_kCachedUidKey);
+          return const LoginScreen();
+        }
+        // [A4] 缓存 UID 以供下次冷启动乐观认证
+        prefs.setString(_kCachedUidKey, user.uid);
         FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
         ErrorHandler.breadcrumb('auth_state: ${user.uid}');
         _logAppOpened();
-        return _VersionGate(uid: user.uid);
+        return _VersionGate(
+          uid: user.uid,
+          startupStopwatch: widget.startupStopwatch,
+        );
       },
       loading: () {
         debugPrint('[APP] authState: loading');
+        // [A4] 乐观认证：cached UID 存在时直接渲染，无需等待 Auth stream
+        final cachedUid = prefs.getString(_kCachedUidKey);
+        if (cachedUid != null) {
+          debugPrint('[APP] using cached UID for optimistic auth: $cachedUid');
+          _logAppOpened();
+          return _VersionGate(
+            uid: cachedUid,
+            startupStopwatch: widget.startupStopwatch,
+          );
+        }
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
-      error: (e, __) {
+      error: (e, _) {
         debugPrint('[APP] authState: error=$e');
         return const LoginScreen();
       },
@@ -172,16 +188,18 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
 /// _VersionGate — detects old data schema and prompts data reset.
 /// Inserted between AuthGate and _FirstHabitGate.
+///
+/// [A3] 迁移检查缓存化：已检查过则直接跳过，不阻塞首屏。
 class _VersionGate extends ConsumerStatefulWidget {
   final String uid;
-  const _VersionGate({required this.uid});
+  final Stopwatch? startupStopwatch;
+  const _VersionGate({required this.uid, this.startupStopwatch});
 
   @override
   ConsumerState<_VersionGate> createState() => _VersionGateState();
 }
 
 class _VersionGateState extends ConsumerState<_VersionGate> {
-  bool _checked = false;
   bool _needsMigration = false;
   bool _clearing = false;
 
@@ -199,21 +217,14 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
       // Lazy migrate per-cat accessories to user-level inventory
       await migrationService.migrateAccessoriesToInventory(widget.uid);
 
-      if (mounted) {
+      if (mounted && needs) {
         setState(() {
-          _checked = true;
-          _needsMigration = needs;
+          _needsMigration = true;
         });
       }
     } catch (e) {
       debugPrint('[VersionGate] migration check failed: $e');
       // 迁移检查失败时跳过，允许用户正常使用
-      if (mounted) {
-        setState(() {
-          _checked = true;
-          _needsMigration = false;
-        });
-      }
     }
   }
 
@@ -231,10 +242,7 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_checked) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
+    // [A3] 默认直接渲染 _FirstHabitGate，仅在检测到需迁移时才阻塞
     if (_needsMigration) {
       return Scaffold(
         body: Center(
@@ -274,7 +282,10 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
       );
     }
 
-    return _FirstHabitGate(uid: widget.uid);
+    return _FirstHabitGate(
+      uid: widget.uid,
+      startupStopwatch: widget.startupStopwatch,
+    );
   }
 }
 
@@ -282,7 +293,8 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
 /// zero habits, auto-navigates to the adoption flow with first-time messaging.
 class _FirstHabitGate extends ConsumerStatefulWidget {
   final String uid;
-  const _FirstHabitGate({required this.uid});
+  final Stopwatch? startupStopwatch;
+  const _FirstHabitGate({required this.uid, this.startupStopwatch});
 
   @override
   ConsumerState<_FirstHabitGate> createState() => _FirstHabitGateState();
@@ -291,11 +303,20 @@ class _FirstHabitGate extends ConsumerStatefulWidget {
 class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   bool _checkedFirstHabit = false;
   bool _remindersScheduled = false;
+  bool _deferredInitTriggered = false;
 
   @override
   void initState() {
     super.initState();
     _checkInterruptedSession();
+
+    // [A2] 延迟初始化：首帧后执行非关键任务
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_deferredInitTriggered) {
+        _deferredInitTriggered = true;
+        DeferredInit.run();
+      }
+    });
   }
 
   Future<void> _checkInterruptedSession() async {
@@ -355,7 +376,9 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
   /// Reschedule daily reminders for all active habits with reminderTime set.
   /// Only runs if notification permission is already granted.
+  /// [R1] 等待 DeferredInit 完成以确保 NotificationService 已初始化。
   Future<void> _rescheduleReminders(List<Habit> habits) async {
+    await DeferredInit.run(); // 幂等，确保通知插件已初始化
     final notifService = NotificationService();
     final hasPermission = await notifService.isPermissionGranted();
     if (!hasPermission) return;
@@ -390,6 +413,15 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
   @override
   Widget build(BuildContext context) {
+    // [R6] 冷启动度量 — 首次 build 时输出启动耗时
+    if (widget.startupStopwatch != null && widget.startupStopwatch!.isRunning) {
+      debugPrint(
+        '[STARTUP] cold start to FirstHabitGate: '
+        '${widget.startupStopwatch!.elapsedMilliseconds}ms',
+      );
+      widget.startupStopwatch!.stop();
+    }
+
     final habitsAsync = ref.watch(habitsProvider);
 
     // Once habits load, check if this is a first-time user

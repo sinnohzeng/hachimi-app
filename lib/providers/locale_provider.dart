@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 
 /// Locale notifier — manages app locale with SharedPreferences persistence.
 /// State is `null` when following system locale.
@@ -10,7 +10,11 @@ class LocaleNotifier extends Notifier<Locale?> {
   @override
   Locale? build() {
     ref.keepAlive();
-    _load();
+    final prefs = ref.read(sharedPreferencesProvider);
+    final code = prefs.getString(_keyLocale);
+    if (code != null) {
+      return _parseLocale(code);
+    }
     return null;
   }
 
@@ -20,24 +24,16 @@ class LocaleNotifier extends Notifier<Locale?> {
     _persist();
   }
 
-  Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
+  void _persist() {
+    final prefs = ref.read(sharedPreferencesProvider);
     if (state == null) {
-      await prefs.remove(_keyLocale);
+      prefs.remove(_keyLocale);
     } else {
       // 存储格式：languageCode 或 languageCode_scriptCode（如 zh_Hant）
       final code = state!.scriptCode != null
           ? '${state!.languageCode}_${state!.scriptCode}'
           : state!.languageCode;
-      await prefs.setString(_keyLocale, code);
-    }
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_keyLocale);
-    if (code != null) {
-      state = _parseLocale(code);
+      prefs.setString(_keyLocale, code);
     }
   }
 
