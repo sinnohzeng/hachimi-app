@@ -890,5 +890,32 @@
   "weekdayFri": "F",
   "weekdaySat": "S",
   "weekdaySun": "S",
-  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)",
+
+  "statsTotalSessions": "Sessions",
+  "statsTotalHabits": "Habits",
+  "statsActiveDays": "Active days",
+  "statsWeeklyTrend": "Weekly trend",
+  "statsRecentSessions": "Recent focus",
+  "statsViewAllHistory": "View all history",
+  "historyTitle": "Focus history",
+  "historyFilterAll": "All",
+  "historySessionCount": "{count} sessions",
+  "@historySessionCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "historyTotalMinutes": "{minutes} min",
+  "@historyTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "historyNoSessions": "No focus records yet",
+  "historyNoSessionsHint": "Complete a focus session to see it here",
+  "historyLoadMore": "Load more",
+  "sessionCompleted": "Completed",
+  "sessionAbandoned": "Abandoned",
+  "sessionInterrupted": "Interrupted",
+  "sessionCountdown": "Countdown",
+  "sessionStopwatch": "Stopwatch",
+  "historyDateGroupToday": "Today",
+  "historyDateGroupYesterday": "Yesterday"
 }

@@ -17,11 +17,10 @@
       ]
     },
     {
-      "collectionGroup": "entries",
-      "queryScope": "COLLECTION",
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "habitId", "order": "ASCENDING" },
-        { "fieldPath": "completedAt", "order": "DESCENDING" }
+        { "fieldPath": "endedAt", "order": "DESCENDING" }
       ]
     }
   ],

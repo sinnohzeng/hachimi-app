@@ -1951,4 +1951,68 @@ class SEn extends S {
 
   @override
   String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
+
+  @override
+  String get statsTotalSessions => 'Sessions';
+
+  @override
+  String get statsTotalHabits => 'Habits';
+
+  @override
+  String get statsActiveDays => 'Active days';
+
+  @override
+  String get statsWeeklyTrend => 'Weekly trend';
+
+  @override
+  String get statsRecentSessions => 'Recent focus';
+
+  @override
+  String get statsViewAllHistory => 'View all history';
+
+  @override
+  String get historyTitle => 'Focus history';
+
+  @override
+  String get historyFilterAll => 'All';
+
+  @override
+  String historySessionCount(int count) {
+    return '$count sessions';
+  }
+
+  @override
+  String historyTotalMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get historyNoSessions => 'No focus records yet';
+
+  @override
+  String get historyNoSessionsHint => 'Complete a focus session to see it here';
+
+  @override
+  String get historyLoadMore => 'Load more';
+
+  @override
+  String get sessionCompleted => 'Completed';
+
+  @override
+  String get sessionAbandoned => 'Abandoned';
+
+  @override
+  String get sessionInterrupted => 'Interrupted';
+
+  @override
+  String get sessionCountdown => 'Countdown';
+
+  @override
+  String get sessionStopwatch => 'Stopwatch';
+
+  @override
+  String get historyDateGroupToday => 'Today';
+
+  @override
+  String get historyDateGroupYesterday => 'Yesterday';
 }

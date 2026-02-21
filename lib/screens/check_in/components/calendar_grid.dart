@@ -116,7 +116,7 @@ class CalendarGrid extends StatelessWidget {
                 color: isChecked
                     ? colorScheme.primary
                     : isWeekendCol
-                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: theme.brightness == Brightness.dark ? 0.8 : 0.5)
                     : null,
                 border: isToday && !isChecked
                     ? Border.all(color: colorScheme.primary, width: 2)

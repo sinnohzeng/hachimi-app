@@ -1921,6 +1921,70 @@ class SZh extends S {
 
   @override
   String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
+
+  @override
+  String get statsTotalSessions => '专注次数';
+
+  @override
+  String get statsTotalHabits => '任务数';
+
+  @override
+  String get statsActiveDays => '活跃天数';
+
+  @override
+  String get statsWeeklyTrend => '本周趋势';
+
+  @override
+  String get statsRecentSessions => '最近专注';
+
+  @override
+  String get statsViewAllHistory => '查看全部历史';
+
+  @override
+  String get historyTitle => '专注历史';
+
+  @override
+  String get historyFilterAll => '全部';
+
+  @override
+  String historySessionCount(int count) {
+    return '$count 次专注';
+  }
+
+  @override
+  String historyTotalMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
+
+  @override
+  String get historyNoSessions => '还没有专注记录';
+
+  @override
+  String get historyNoSessionsHint => '完成一次专注就能在这里看到记录';
+
+  @override
+  String get historyLoadMore => '加载更多';
+
+  @override
+  String get sessionCompleted => '已完成';
+
+  @override
+  String get sessionAbandoned => '已放弃';
+
+  @override
+  String get sessionInterrupted => '被中断';
+
+  @override
+  String get sessionCountdown => '倒计时';
+
+  @override
+  String get sessionStopwatch => '正计时';
+
+  @override
+  String get historyDateGroupToday => '今天';
+
+  @override
+  String get historyDateGroupYesterday => '昨天';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3841,4 +3905,68 @@ class SZhHant extends SZh {
 
   @override
   String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
+
+  @override
+  String get statsTotalSessions => '專注次數';
+
+  @override
+  String get statsTotalHabits => '任務數';
+
+  @override
+  String get statsActiveDays => '活躍天數';
+
+  @override
+  String get statsWeeklyTrend => '本週趨勢';
+
+  @override
+  String get statsRecentSessions => '最近專注';
+
+  @override
+  String get statsViewAllHistory => '查看全部歷史';
+
+  @override
+  String get historyTitle => '專注歷史';
+
+  @override
+  String get historyFilterAll => '全部';
+
+  @override
+  String historySessionCount(int count) {
+    return '$count 次專注';
+  }
+
+  @override
+  String historyTotalMinutes(int minutes) {
+    return '$minutes 分鐘';
+  }
+
+  @override
+  String get historyNoSessions => '還沒有專注紀錄';
+
+  @override
+  String get historyNoSessionsHint => '完成一次專注就能在這裡看到紀錄';
+
+  @override
+  String get historyLoadMore => '載入更多';
+
+  @override
+  String get sessionCompleted => '已完成';
+
+  @override
+  String get sessionAbandoned => '已放棄';
+
+  @override
+  String get sessionInterrupted => '被中斷';
+
+  @override
+  String get sessionCountdown => '倒計時';
+
+  @override
+  String get sessionStopwatch => '正計時';
+
+  @override
+  String get historyDateGroupToday => '今天';
+
+  @override
+  String get historyDateGroupYesterday => '昨天';
 }

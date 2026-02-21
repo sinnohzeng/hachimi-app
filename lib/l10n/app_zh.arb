@@ -890,5 +890,32 @@
   "weekdayFri": "五",
   "weekdaySat": "六",
   "weekdaySun": "日",
-  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)",
+
+  "statsTotalSessions": "专注次数",
+  "statsTotalHabits": "任务数",
+  "statsActiveDays": "活跃天数",
+  "statsWeeklyTrend": "本周趋势",
+  "statsRecentSessions": "最近专注",
+  "statsViewAllHistory": "查看全部历史",
+  "historyTitle": "专注历史",
+  "historyFilterAll": "全部",
+  "historySessionCount": "{count} 次专注",
+  "@historySessionCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "historyTotalMinutes": "{minutes} 分钟",
+  "@historyTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "historyNoSessions": "还没有专注记录",
+  "historyNoSessionsHint": "完成一次专注就能在这里看到记录",
+  "historyLoadMore": "加载更多",
+  "sessionCompleted": "已完成",
+  "sessionAbandoned": "已放弃",
+  "sessionInterrupted": "被中断",
+  "sessionCountdown": "倒计时",
+  "sessionStopwatch": "正计时",
+  "historyDateGroupToday": "今天",
+  "historyDateGroupYesterday": "昨天"
 }

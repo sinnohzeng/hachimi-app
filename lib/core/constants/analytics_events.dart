@@ -57,6 +57,10 @@ class AnalyticsEvents {
   static const String accessoryEquipped = 'accessory_equipped';
   static const String accessoryPurchased = 'accessory_purchased';
 
+  // Stats & History
+  static const String statsViewed = 'stats_viewed';
+  static const String historyViewed = 'history_viewed';
+
   // User lifecycle
   static const String onboardingCompleted = 'onboarding_completed';
   static const String firstSessionCompleted = 'first_session_completed';
@@ -109,6 +113,11 @@ class AnalyticsEvents {
 
   // Engagement depth params
   static const String paramFeature = 'feature';
+
+  // Enhanced session params
+  static const String paramTargetDurationMinutes = 'target_duration_minutes';
+  static const String paramPausedSeconds = 'paused_seconds';
+  static const String paramSessionStatus = 'session_status';
 
   // Session quality params
   static const String paramSessionDuration = 'session_duration';

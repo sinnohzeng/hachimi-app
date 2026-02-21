@@ -3,15 +3,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper: check if the requesting user owns this path
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
     // Users can only access their own document and subcollections
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
 
       // Habits subcollection
       match /habits/{habitId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow create, update: if request.auth != null
-          && request.auth.uid == userId
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
           && request.resource.data.targetHours is int
           && request.resource.data.targetHours >= 1
           && request.resource.data.targetHours <= 10000
@@ -19,41 +23,41 @@ service cloud.firestore {
               || (request.resource.data.goalMinutes is int
                   && request.resource.data.goalMinutes >= 1
                   && request.resource.data.goalMinutes <= 480));
-        allow delete: if request.auth != null && request.auth.uid == userId;
+        allow delete: if isOwner(userId);
 
-        // Focus sessions within a habit
+        // Focus sessions within a habit — immutable audit log
         match /sessions/{sessionId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
+          allow read: if isOwner(userId);
+          allow create: if isOwner(userId)
+            && request.resource.data.durationMinutes is int
+            && request.resource.data.durationMinutes >= 0
+            && request.resource.data.durationMinutes <= 480
+            && request.resource.data.coinsEarned is int
+            && request.resource.data.coinsEarned >= 0
+            && request.resource.data.coinsEarned <= request.resource.data.durationMinutes * 10
+            && request.resource.data.mode in ['countdown', 'stopwatch']
+            && request.resource.data.status in ['completed', 'abandoned', 'interrupted'];
+          // 会话记录不可修改/删除（审计日志）
+          allow update, delete: if false;
         }
       }
 
       // Cats subcollection
       match /cats/{catId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
-        allow create, update: if request.auth != null
-          && request.auth.uid == userId
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
           && request.resource.data.name is string
           && request.resource.data.name.size() >= 1
           && request.resource.data.name.size() <= 30
           && request.resource.data.state in ['active', 'graduated', 'dormant']
           && request.resource.data.totalMinutes is int
           && request.resource.data.totalMinutes >= 0;
-        allow delete: if request.auth != null && request.auth.uid == userId;
-      }
-
-      // Check-ins subcollection (date-partitioned)
-      match /checkIns/{date} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-
-        // Entries within a check-in date
-        match /entries/{entryId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
-        }
+        allow delete: if isOwner(userId);
       }
 
       // Monthly check-in progress (used by CoinService)
       match /monthlyCheckIns/{month} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
     }
 

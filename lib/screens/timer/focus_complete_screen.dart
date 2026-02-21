@@ -2,6 +2,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -288,7 +289,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                   decoration: BoxDecoration(
                                     color: stageColor(
                                       widget.stageUp!.newStage,
-                                    ).withValues(alpha: 0.15),
+                                    ).withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.30 : 0.15),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Text(
@@ -415,16 +416,16 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.check_circle,
                                 size: 14,
-                                color: Colors.green,
+                                color: StatusColors.onSuccess(Theme.of(context).brightness),
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 l10n.focusCompleteDiaryWritten,
                                 style: textTheme.bodySmall?.copyWith(
-                                  color: Colors.green,
+                                  color: StatusColors.onSuccess(Theme.of(context).brightness),
                                 ),
                               ),
                             ],

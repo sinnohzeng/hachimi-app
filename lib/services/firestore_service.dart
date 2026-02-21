@@ -6,7 +6,6 @@ import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/streak_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/cat.dart';
-import 'package:hachimi_app/models/check_in.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:intl/intl.dart';
 
@@ -194,6 +193,7 @@ class FirestoreService {
   /// 1. Write session document
   /// 2. Update habit totals + streak
   /// 3. Update cat totalMinutes + lastSessionAt
+  /// 4. Award focus coins
   Future<void> logFocusSession({
     required String uid,
     required FocusSession session,
@@ -206,16 +206,7 @@ class FirestoreService {
     final sessionRef = _sessionsRef(uid, session.habitId).doc();
     batch.set(sessionRef, session.toFirestore());
 
-    // 2. Add check-in entry
-    final entryRef = _entriesRef(uid, today).doc();
-    batch.set(entryRef, {
-      'habitId': session.habitId,
-      'habitName': habitName,
-      'minutes': session.durationMinutes,
-      'completedAt': FieldValue.serverTimestamp(),
-    });
-
-    // 3. Update habit totals and streak
+    // 2. Update habit totals and streak
     final habitRef = _habitsRef(uid).doc(session.habitId);
     final habitDoc = await habitRef.get();
 
@@ -244,7 +235,7 @@ class FirestoreService {
       });
     }
 
-    // 4. Update cat totalMinutes + lastSessionAt (time-based growth)
+    // 3. Update cat totalMinutes + lastSessionAt (time-based growth)
     if (session.catId.isNotEmpty) {
       final catRef = _catsRef(uid).doc(session.catId);
       batch.update(catRef, {
@@ -253,7 +244,7 @@ class FirestoreService {
       });
     }
 
-    // 5. Award focus coins (durationMinutes × coinsPerMinute)
+    // 4. Award focus coins (durationMinutes × coinsPerMinute)
     if (session.coinsEarned > 0) {
       final userRef = _db.collection('users').doc(uid);
       batch.update(userRef, {
@@ -274,145 +265,241 @@ class FirestoreService {
     }
   });
 
-  // ─── Check-ins ───
+  // ─── Session Queries ───
 
-  CollectionReference _entriesRef(String uid, String date) => _db
-      .collection('users')
-      .doc(uid)
-      .collection('checkIns')
-      .doc(date)
-      .collection('entries');
+  /// 监听今日所有 session（跨习惯），替代旧的 watchTodayCheckIns。
+  Stream<List<FocusSession>> watchTodaySessions(
+    String uid,
+    List<String> habitIds,
+  ) {
+    if (habitIds.isEmpty) return Stream.value([]);
 
-  Stream<List<CheckInEntry>> watchTodayCheckIns(String uid) {
-    final today = AppDateUtils.todayString();
-    return _entriesRef(uid, today)
-        .orderBy('completedAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs.map(CheckInEntry.fromFirestore).toList(),
-        );
-  }
+    final todayStart = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
+    final todayTimestamp = Timestamp.fromDate(todayStart);
 
-  Future<void> logCheckIn({
-    required String uid,
-    required String habitId,
-    required String habitName,
-    required int minutes,
-  }) async {
-    final today = AppDateUtils.todayString();
-    final batch = _db.batch();
-
-    // 1. Add check-in entry
-    final entryRef = _entriesRef(uid, today).doc();
-    batch.set(entryRef, {
-      'habitId': habitId,
-      'habitName': habitName,
-      'minutes': minutes,
-      'completedAt': FieldValue.serverTimestamp(),
+    // 并行监听每个 habit 的 sessions 子集合，合并为单一 stream
+    final streams = habitIds.map((habitId) {
+      return _sessionsRef(uid, habitId)
+          .where('endedAt', isGreaterThanOrEqualTo: todayTimestamp)
+          .snapshots()
+          .map(
+            (snapshot) =>
+                snapshot.docs.map(FocusSession.fromFirestore).toList(),
+          );
     });
 
-    // 2. Update habit totals and streak
-    final habitRef = _habitsRef(uid).doc(habitId);
-    final habitDoc = await habitRef.get();
+    // 合并所有 habit 的 session streams
+    return _mergeStreams(streams.toList());
+  }
 
-    if (habitDoc.exists) {
-      final habit = Habit.fromFirestore(habitDoc);
-      final yesterday = DateFormat(
-        'yyyy-MM-dd',
-      ).format(DateTime.now().subtract(const Duration(days: 1)));
+  /// 分页查询专注历史（按 endedAt 降序）。
+  Future<({List<FocusSession> sessions, DocumentSnapshot? lastDoc})>
+      getSessionHistory({
+    required String uid,
+    required List<String> habitIds,
+    String? habitId,
+    int limit = 20,
+    DocumentSnapshot? startAfter,
+  }) async {
+    // 单个 habit 查询
+    if (habitId != null) {
+      Query query = _sessionsRef(uid, habitId)
+          .orderBy('endedAt', descending: true)
+          .limit(limit);
+      if (startAfter != null) {
+        query = query.startAfterDocument(startAfter);
+      }
 
-      final newStreak = StreakUtils.calculateNewStreak(
-        lastCheckInDate: habit.lastCheckInDate,
-        today: today,
-        yesterday: yesterday,
-        currentStreak: habit.currentStreak,
-      );
-
-      final newBest = newStreak > habit.bestStreak
-          ? newStreak
-          : habit.bestStreak;
-
-      batch.update(habitRef, {
-        'totalMinutes': FieldValue.increment(minutes),
-        'currentStreak': newStreak,
-        'bestStreak': newBest,
-        'lastCheckInDate': today,
-      });
+      final snapshot = await query.get();
+      final sessions =
+          snapshot.docs.map(FocusSession.fromFirestore).toList();
+      final lastDocument =
+          snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+      return (sessions: sessions, lastDoc: lastDocument);
     }
 
-    try {
-      await batch.commit();
-    } catch (e, stack) {
-      ErrorHandler.record(
-        e,
-        stackTrace: stack,
-        source: 'FirestoreService',
-        operation: 'logCheckIn',
+    // 跨 habit 查询：并行查询所有 habit 的 sessions，客户端合并排序
+    final allSessions = <FocusSession>[];
+    DocumentSnapshot? lastDocument;
+
+    final futures = habitIds.map((hId) async {
+      Query query = _sessionsRef(uid, hId)
+          .orderBy('endedAt', descending: true)
+          .limit(limit);
+      // 分页对跨集合查询无法直接用 startAfter，使用时间戳过滤
+      if (startAfter != null) {
+        final lastData = startAfter.data() as Map<String, dynamic>?;
+        if (lastData != null && lastData['endedAt'] != null) {
+          query = _sessionsRef(uid, hId)
+              .orderBy('endedAt', descending: true)
+              .where('endedAt', isLessThan: lastData['endedAt'])
+              .limit(limit);
+        }
+      }
+      return query.get();
+    });
+
+    final snapshots = await Future.wait(futures);
+    for (final snapshot in snapshots) {
+      allSessions.addAll(
+        snapshot.docs.map(FocusSession.fromFirestore),
       );
-      rethrow;
     }
+
+    // 按 endedAt 降序排列，取前 limit 条
+    allSessions.sort((a, b) => b.endedAt.compareTo(a.endedAt));
+    final trimmed = allSessions.take(limit).toList();
+
+    // 获取最后一个文档的原始 snapshot 作为游标
+    if (trimmed.isNotEmpty) {
+      final lastSession = trimmed.last;
+      for (final snapshot in snapshots) {
+        for (final doc in snapshot.docs) {
+          if (doc.id == lastSession.id) {
+            lastDocument = doc;
+            break;
+          }
+        }
+        if (lastDocument != null) break;
+      }
+    }
+
+    return (sessions: trimmed, lastDoc: lastDocument);
+  }
+
+  /// 获取最近 N 天每日总分钟数（从 sessions 聚合）。
+  Future<Map<String, int>> getDailyMinutesFromSessions({
+    required String uid,
+    required List<String> habitIds,
+    required int lastNDays,
+  }) async {
+    if (habitIds.isEmpty) return {};
+
+    final cutoff = DateTime.now().subtract(Duration(days: lastNDays));
+    final cutoffTimestamp = Timestamp.fromDate(cutoff);
+    final result = <String, int>{};
+
+    final futures = habitIds.map((habitId) async {
+      final snapshot = await _sessionsRef(uid, habitId)
+          .where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp)
+          .get();
+      return snapshot.docs.map(FocusSession.fromFirestore).toList();
+    });
+
+    final allResults = await Future.wait(
+      futures,
+    ).timeout(const Duration(seconds: 10));
+
+    for (final sessions in allResults) {
+      for (final session in sessions) {
+        final key = DateFormat('yyyy-MM-dd').format(session.endedAt);
+        result[key] = (result[key] ?? 0) + session.durationMinutes;
+      }
+    }
+
+    return result;
+  }
+
+  /// 获取最近 N 条 session（统计页预览用）。
+  Future<List<FocusSession>> getRecentSessions({
+    required String uid,
+    required List<String> habitIds,
+    int limit = 5,
+  }) async {
+    if (habitIds.isEmpty) return [];
+
+    final allSessions = <FocusSession>[];
+    final futures = habitIds.map((habitId) async {
+      final snapshot = await _sessionsRef(uid, habitId)
+          .orderBy('endedAt', descending: true)
+          .limit(limit)
+          .get();
+      return snapshot.docs.map(FocusSession.fromFirestore).toList();
+    });
+
+    final results = await Future.wait(futures);
+    for (final sessions in results) {
+      allSessions.addAll(sessions);
+    }
+
+    allSessions.sort((a, b) => b.endedAt.compareTo(a.endedAt));
+    return allSessions.take(limit).toList();
+  }
+
+  /// 获取指定 habit 的每日专注分钟数（热力图用）。
+  Future<Map<String, int>> getDailyMinutesForHabit({
+    required String uid,
+    required String habitId,
+    required int lastNDays,
+  }) async {
+    final cutoff = DateTime.now().subtract(Duration(days: lastNDays));
+    final cutoffTimestamp = Timestamp.fromDate(cutoff);
+
+    final snapshot = await _sessionsRef(uid, habitId)
+        .where('endedAt', isGreaterThanOrEqualTo: cutoffTimestamp)
+        .get();
+
+    final result = <String, int>{};
+    for (final doc in snapshot.docs) {
+      final session = FocusSession.fromFirestore(doc);
+      final key = DateFormat('yyyy-MM-dd').format(session.endedAt);
+      result[key] = (result[key] ?? 0) + session.durationMinutes;
+    }
+    return result;
   }
 
   // ─── Stats ───
 
   Future<List<String>> getCheckInDates({
     required String uid,
+    required List<String> habitIds,
     required int lastNDays,
   }) async {
-    final allDates = List.generate(
-      lastNDays,
-      (i) => DateFormat(
-        'yyyy-MM-dd',
-      ).format(DateTime.now().subtract(Duration(days: i))),
+    // 使用 sessions 数据聚合活跃日期
+    final dailyMinutes = await getDailyMinutesFromSessions(
+      uid: uid,
+      habitIds: habitIds,
+      lastNDays: lastNDays,
     );
-
-    final results = await Future.wait(
-      allDates.map((date) async {
-        final snapshot = await _entriesRef(uid, date).limit(1).get();
-        return snapshot.docs.isNotEmpty ? date : null;
-      }),
-    );
-
-    return results.whereType<String>().toList();
+    return dailyMinutes.keys.toList();
   }
 
-  /// Get daily focus minutes for a specific habit over the last N days.
-  /// Queries run in parallel with a 10-second timeout for performance.
-  Future<Map<String, int>> getDailyMinutesForHabit({
-    required String uid,
-    required String habitId,
-    required int lastNDays,
-  }) async {
-    final dates = List.generate(
-      lastNDays,
-      (i) => DateFormat(
-        'yyyy-MM-dd',
-      ).format(DateTime.now().subtract(Duration(days: i))),
+  /// 合并多个 stream 为一个，每次任一 stream 更新时重新汇总。
+  Stream<List<FocusSession>> _mergeStreams(
+    List<Stream<List<FocusSession>>> streams,
+  ) {
+    if (streams.isEmpty) return Stream.value([]);
+    if (streams.length == 1) return streams.first;
+
+    // 维护每个 stream 的最新值，任一更新时合并输出
+    final latestValues = List<List<FocusSession>>.filled(
+      streams.length,
+      const [],
     );
 
-    final futures = dates.map((date) async {
-      final snapshot = await _entriesRef(
-        uid,
-        date,
-      ).where('habitId', isEqualTo: habitId).limit(100).get();
-      int dayTotal = 0;
-      for (final doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        dayTotal += (data['minutes'] as int? ?? 0);
+    return Stream.multi((controller) {
+      final subscriptions = <int, dynamic>{};
+
+      for (int i = 0; i < streams.length; i++) {
+        subscriptions[i] = streams[i].listen(
+          (data) {
+            latestValues[i] = data;
+            final merged = latestValues.expand((e) => e).toList();
+            controller.add(merged);
+          },
+          onError: controller.addError,
+        );
       }
-      return MapEntry(date, dayTotal);
+
+      controller.onCancel = () {
+        for (final sub in subscriptions.values) {
+          (sub as dynamic).cancel();
+        }
+      };
     });
-
-    final entries = await Future.wait(
-      futures,
-    ).timeout(const Duration(seconds: 10));
-
-    final result = <String, int>{};
-    for (final entry in entries) {
-      if (entry.value > 0) {
-        result[entry.key] = entry.value;
-      }
-    }
-    return result;
   }
 }

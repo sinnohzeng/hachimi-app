@@ -642,5 +642,32 @@
   "weekdayFri": "五",
   "weekdaySat": "六",
   "weekdaySun": "日",
-  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)",
+
+  "statsTotalSessions": "專注次數",
+  "statsTotalHabits": "任務數",
+  "statsActiveDays": "活躍天數",
+  "statsWeeklyTrend": "本週趨勢",
+  "statsRecentSessions": "最近專注",
+  "statsViewAllHistory": "查看全部歷史",
+  "historyTitle": "專注歷史",
+  "historyFilterAll": "全部",
+  "historySessionCount": "{count} 次專注",
+  "@historySessionCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "historyTotalMinutes": "{minutes} 分鐘",
+  "@historyTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "historyNoSessions": "還沒有專注紀錄",
+  "historyNoSessionsHint": "完成一次專注就能在這裡看到紀錄",
+  "historyLoadMore": "載入更多",
+  "sessionCompleted": "已完成",
+  "sessionAbandoned": "已放棄",
+  "sessionInterrupted": "被中斷",
+  "sessionCountdown": "倒計時",
+  "sessionStopwatch": "正計時",
+  "historyDateGroupToday": "今天",
+  "historyDateGroupYesterday": "昨天"
 }

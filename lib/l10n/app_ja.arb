@@ -642,5 +642,32 @@
   "weekdayFri": "金",
   "weekdaySat": "土",
   "weekdaySun": "日",
-  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)",
+
+  "statsTotalSessions": "セッション数",
+  "statsTotalHabits": "タスク数",
+  "statsActiveDays": "アクティブ日数",
+  "statsWeeklyTrend": "週間トレンド",
+  "statsRecentSessions": "最近の集中",
+  "statsViewAllHistory": "全履歴を見る",
+  "historyTitle": "集中履歴",
+  "historyFilterAll": "すべて",
+  "historySessionCount": "{count} 回",
+  "@historySessionCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "historyTotalMinutes": "{minutes} 分",
+  "@historyTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "historyNoSessions": "集中記録がありません",
+  "historyNoSessionsHint": "集中セッションを完了すると、ここに表示されます",
+  "historyLoadMore": "もっと読み込む",
+  "sessionCompleted": "完了",
+  "sessionAbandoned": "中断",
+  "sessionInterrupted": "中断された",
+  "sessionCountdown": "カウントダウン",
+  "sessionStopwatch": "ストップウォッチ",
+  "historyDateGroupToday": "今日",
+  "historyDateGroupYesterday": "昨日"
 }

@@ -46,8 +46,9 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor = colorScheme.surfaceContainerHighest;
-    final highlightColor = colorScheme.surfaceContainerLow;
+    final highlightColor = isDark ? colorScheme.surface : colorScheme.surfaceContainerLow;
 
     return AnimatedBuilder(
       animation: _controller,

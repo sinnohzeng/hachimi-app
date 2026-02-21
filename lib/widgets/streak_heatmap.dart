@@ -83,7 +83,7 @@ class StreakHeatmap extends StatelessWidget {
                           color: intensity > 0
                               ? colorScheme.primary.withValues(alpha: intensity)
                               : colorScheme.outlineVariant.withValues(
-                                  alpha: 0.3,
+                                  alpha: Theme.of(context).brightness == Brightness.dark ? 0.5 : 0.3,
                                 ),
                           borderRadius: BorderRadius.circular(3),
                         ),
@@ -137,7 +137,9 @@ class StreakHeatmap extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: alpha > 0
                       ? colorScheme.primary.withValues(alpha: alpha)
-                      : colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      : colorScheme.outlineVariant.withValues(
+                          alpha: Theme.of(context).brightness == Brightness.dark ? 0.5 : 0.3,
+                        ),
                   borderRadius: BorderRadius.circular(2),
                 ),
               );

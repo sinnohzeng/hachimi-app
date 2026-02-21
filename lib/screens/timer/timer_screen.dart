@@ -10,7 +10,9 @@ import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/core/utils/session_checksum.dart';
 import 'package:hachimi_app/models/focus_session.dart';
+import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -222,18 +224,43 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           )
         : null;
 
-    // Save to Firestore
+    // 构建增强版会话记录
+    final modeStr =
+        timerState.mode == TimerMode.countdown ? 'countdown' : 'stopwatch';
+    final targetMinutes = timerState.mode == TimerMode.countdown
+        ? timerState.totalSeconds ~/ 60
+        : 0;
+    final completionRatio = targetMinutes > 0
+        ? (minutes / targetMinutes).clamp(0.0, 1.0)
+        : 1.0;
+    final startedAt = timerState.startedAt ?? DateTime.now();
+
+    // 客户端版本号
+    final packageInfo = ref.read(appInfoProvider).value;
+    final clientVersion = packageInfo?.version ?? '';
+
     final session = FocusSession(
       id: '',
       habitId: widget.habitId,
       catId: habit.catId ?? '',
-      startedAt: timerState.startedAt ?? DateTime.now(),
+      startedAt: startedAt,
       endedAt: DateTime.now(),
       durationMinutes: minutes,
+      targetDurationMinutes: targetMinutes,
+      pausedSeconds: timerState.totalPausedSeconds,
+      status: isCompleted ? 'completed' : 'abandoned',
+      completionRatio: completionRatio,
       xpEarned: xpResult.totalXp,
-      mode: timerState.mode == TimerMode.countdown ? 'countdown' : 'stopwatch',
-      completed: isCompleted,
       coinsEarned: coinsEarned,
+      mode: modeStr,
+      checksum: SessionChecksum.compute(
+        habitId: widget.habitId,
+        durationMinutes: minutes,
+        coinsEarned: coinsEarned,
+        xpEarned: xpResult.totalXp,
+        startedAt: startedAt,
+      ),
+      clientVersion: clientVersion,
     );
 
     ErrorHandler.breadcrumb(
@@ -251,12 +278,18 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         actualMinutes: minutes,
         xpEarned: xpResult.totalXp,
         streakDays: streakDays,
+        targetDurationMinutes: targetMinutes,
+        pausedSeconds: timerState.totalPausedSeconds,
+        completionRatio: completionRatio,
       );
     } else if (isAbandoned) {
       analytics.logFocusSessionAbandoned(
         habitId: widget.habitId,
         minutesCompleted: minutes,
         reason: 'user_abandoned',
+        targetDurationMinutes: targetMinutes,
+        pausedSeconds: timerState.totalPausedSeconds,
+        completionRatio: completionRatio,
       );
     }
 

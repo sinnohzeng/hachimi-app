@@ -19,7 +19,7 @@ Firebase Auth stream ───────────────────�
                               │                        │
                    ┌──────────┴───────────┐   ┌───────┴──────────┐
                    ▼                     ▼   ▼                  ▼
-        todayCheckInsProvider    statsProvider  catByIdProvider    catByHabitProvider
+        todaySessionsProvider    statsProvider  catByIdProvider    catByHabitProvider
         (StreamProvider<...>)    (Provider<...>)   (family)          (family)
                               │
                               ▼
@@ -91,19 +91,19 @@ Device connectivity (independent of auth):
 - **Consumers**: `HomeScreen` (habit list), `StatsScreen`, `_FirstHabitGate`, `statsProvider`
 - **SSOT for**: The user's full habit list, always current with Firestore
 
-### `todayCheckInsProvider`
+### `todaySessionsProvider`
 
-- **Type**: `StreamProvider<List<CheckInEntry>>`
+- **Type**: `StreamProvider<List<FocusSession>>`
 - **File**: `lib/providers/habits_provider.dart`
-- **Source**: `FirestoreService.watchTodayCheckIns(uid)` — today's check-in entries
-- **Consumers**: `HomeScreen` (today's progress per habit)
-- **SSOT for**: All check-in entries for today
+- **Source**: `FirestoreService.watchTodaySessions(uid)` — monitors today's sessions across all habits
+- **Consumers**: `HomeScreen` (today's progress per habit), `todayMinutesPerHabitProvider`
+- **SSOT for**: All focus sessions for today
 
 ### `todayMinutesPerHabitProvider`
 
 - **Type**: `Provider<Map<String, int>>`
 - **File**: `lib/providers/habits_provider.dart`
-- **Source**: Derived from `todayCheckInsProvider` — aggregates minutes by `habitId`
+- **Source**: Derived from `todaySessionsProvider` — aggregates `durationMinutes` by `habitId`
 - **Consumers**: `HomeScreen` habit list rows (today's progress bar)
 - **SSOT for**: Minutes logged today, grouped by habit ID
 
@@ -111,7 +111,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `Provider<HabitStats>`
 - **File**: `lib/providers/stats_provider.dart`
-- **Source**: Derived from `habitsProvider` + `todayCheckInsProvider`
+- **Source**: Derived from `habitsProvider` + `todaySessionsProvider`
 - **Consumers**: `StatsScreen`, `ProfileScreen`
 - **SSOT for**: Aggregated statistics (total focus hours, best streak, active habit count)
 
@@ -434,6 +434,55 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **Source**: `ChatService` (SQLite history + LLM stream)
 - **Consumers**: `CatChatScreen`
 - **SSOT for**: Chat state for a specific cat — messages, generation status, partial response
+
+---
+
+### Session Stats Providers
+
+#### `dailyMinutesProvider`
+
+- **Type**: `FutureProvider<Map<String, int>>`
+- **File**: `lib/providers/session_stats_provider.dart`
+- **Source**: Queries sessions across all habits for the last 30 days, aggregates `durationMinutes` by date
+- **Consumers**: `StatsScreen` (daily chart)
+- **SSOT for**: Last 30 days daily focus minute totals from sessions
+
+#### `weeklyTrendProvider`
+
+- **Type**: `FutureProvider<Map<String, int>>`
+- **File**: `lib/providers/session_stats_provider.dart`
+- **Source**: Queries sessions for the last 7 days, aggregates `durationMinutes` by date
+- **Consumers**: `HomeScreen` (weekly trend widget), `StatsScreen`
+- **SSOT for**: Last 7 days daily focus minute totals
+
+#### `recentSessionsProvider`
+
+- **Type**: `FutureProvider<List<FocusSession>>`
+- **File**: `lib/providers/session_stats_provider.dart`
+- **Source**: Queries the latest 5 sessions across all habits, ordered by `endedAt DESC`
+- **Consumers**: `StatsScreen` (recent activity list)
+- **SSOT for**: The 5 most recent focus sessions
+
+---
+
+### Session History Provider
+
+#### `sessionHistoryProvider`
+
+- **Type**: `AutoDisposeNotifierProvider<SessionHistoryNotifier, SessionHistoryState>`
+- **File**: `lib/providers/session_history_provider.dart`
+- **Source**: Paginated queries to Firestore sessions sub-collections with optional filtering by habit, date range, or status
+- **Consumers**: `SessionHistoryScreen`
+- **SSOT for**: Paginated session history with filtering support
+
+**`SessionHistoryState` fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sessions` | List\<FocusSession\> | Currently loaded sessions |
+| `hasMore` | bool | Whether more pages are available |
+| `isLoading` | bool | Whether a page fetch is in progress |
+| `filter` | SessionFilter? | Active filter (habitId, dateRange, status) |
 
 ---
 

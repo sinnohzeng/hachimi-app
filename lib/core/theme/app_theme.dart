@@ -87,7 +87,9 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         border: const OutlineInputBorder(),
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(
+          alpha: colorScheme.brightness == Brightness.dark ? 0.6 : 0.3,
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,

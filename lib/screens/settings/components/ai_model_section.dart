@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -402,10 +403,11 @@ class StatusChip extends StatelessWidget {
     }
     switch (availability) {
       case LlmAvailability.ready:
+        final brightness = Theme.of(context).brightness;
         return (
           l10n.settingsStatusReady,
-          Colors.green.withValues(alpha: 0.15),
-          Colors.green,
+          StatusColors.successContainer(brightness),
+          StatusColors.onSuccess(brightness),
         );
       case LlmAvailability.error:
         return (

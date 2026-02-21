@@ -1927,4 +1927,68 @@ class SJa extends S {
 
   @override
   String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
+
+  @override
+  String get statsTotalSessions => 'セッション数';
+
+  @override
+  String get statsTotalHabits => 'タスク数';
+
+  @override
+  String get statsActiveDays => 'アクティブ日数';
+
+  @override
+  String get statsWeeklyTrend => '週間トレンド';
+
+  @override
+  String get statsRecentSessions => '最近の集中';
+
+  @override
+  String get statsViewAllHistory => '全履歴を見る';
+
+  @override
+  String get historyTitle => '集中履歴';
+
+  @override
+  String get historyFilterAll => 'すべて';
+
+  @override
+  String historySessionCount(int count) {
+    return '$count 回';
+  }
+
+  @override
+  String historyTotalMinutes(int minutes) {
+    return '$minutes 分';
+  }
+
+  @override
+  String get historyNoSessions => '集中記録がありません';
+
+  @override
+  String get historyNoSessionsHint => '集中セッションを完了すると、ここに表示されます';
+
+  @override
+  String get historyLoadMore => 'もっと読み込む';
+
+  @override
+  String get sessionCompleted => '完了';
+
+  @override
+  String get sessionAbandoned => '中断';
+
+  @override
+  String get sessionInterrupted => '中断された';
+
+  @override
+  String get sessionCountdown => 'カウントダウン';
+
+  @override
+  String get sessionStopwatch => 'ストップウォッチ';
+
+  @override
+  String get historyDateGroupToday => '今日';
+
+  @override
+  String get historyDateGroupYesterday => '昨日';
 }

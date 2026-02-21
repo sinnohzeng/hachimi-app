@@ -642,5 +642,32 @@
   "weekdayFri": "금",
   "weekdaySat": "토",
   "weekdaySun": "일",
-  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)",
+
+  "statsTotalSessions": "집중 횟수",
+  "statsTotalHabits": "작업 수",
+  "statsActiveDays": "활동 일수",
+  "statsWeeklyTrend": "주간 추세",
+  "statsRecentSessions": "최근 집중",
+  "statsViewAllHistory": "전체 기록 보기",
+  "historyTitle": "집중 기록",
+  "historyFilterAll": "전체",
+  "historySessionCount": "{count}회 집중",
+  "@historySessionCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "historyTotalMinutes": "{minutes}분",
+  "@historyTotalMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "historyNoSessions": "집중 기록이 없습니다",
+  "historyNoSessionsHint": "집중 세션을 완료하면 여기에 표시됩니다",
+  "historyLoadMore": "더 불러오기",
+  "sessionCompleted": "완료",
+  "sessionAbandoned": "포기",
+  "sessionInterrupted": "중단됨",
+  "sessionCountdown": "카운트다운",
+  "sessionStopwatch": "스톱워치",
+  "historyDateGroupToday": "오늘",
+  "historyDateGroupYesterday": "어제"
 }

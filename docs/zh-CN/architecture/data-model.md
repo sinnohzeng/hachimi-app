@@ -11,9 +11,7 @@ users/{uid}                          <- 用户基本信息文档
 ├── habits/{habitId}                 <- 习惯元数据 + 连续记录追踪
 │   └── sessions/{sessionId}        <- 专注会话历史
 ├── cats/{catId}                     <- 猫咪状态（外观、成长、配饰）
-├── monthlyCheckIns/{YYYY-MM}        <- 月度签到追踪（每月重置）
-└── checkIns/{date}                  <- 按日期分区的打卡桶（向后兼容）
-    └── entries/{entryId}            <- 每次会话的分钟数记录
+└── monthlyCheckIns/{YYYY-MM}        <- 月度签到追踪（每月重置）
 ```
 
 ---
@@ -80,14 +78,22 @@ users/{uid}                          <- 用户基本信息文档
 | `startedAt` | timestamp | 是 | 专注会话开始时间 |
 | `endedAt` | timestamp | 是 | 会话结束时间（完成或放弃） |
 | `durationMinutes` | int | 是 | 实际专注分钟数（放弃时可能少于目标） |
+| `targetDurationMinutes` | int | 是 | 计划时长（倒计时目标分钟数；正计时模式为 0） |
+| `pausedSeconds` | int | 是 | 本次会话中累计暂停的秒数 |
+| `status` | string | 是 | 会话结果：`"completed"`、`"abandoned"` 或 `"interrupted"` |
+| `completionRatio` | double | 是 | 实际 / 目标比率（正计时模式为 1.0） |
 | `xpEarned` | int | 是 | 会话结束时奖励的 XP（由 `XpService` 计算） |
-| `mode` | string | 是 | 计时器模式：`"countdown"` 或 `"stopwatch"` |
-| `completed` | bool | 是 | `true` 表示正常完成；`false` 表示提前放弃 |
 | `coinsEarned` | int | 是 | 会话结束时奖励的金币（`durationMinutes × 10`；放弃 < 5 分钟则为 0） |
+| `mode` | string | 是 | 计时器模式：`"countdown"` 或 `"stopwatch"` |
+| `checksum` | string | 否 | HMAC-SHA256 签名，用于防篡改检测 |
+| `clientVersion` | string | 是 | 会话创建时的客户端应用版本 |
 
-**放弃会话的 XP 规则：**
-- `completed == false` 且 `durationMinutes >= 5`：`xpEarned = durationMinutes x 1`（仅基础 XP）
-- `completed == false` 且 `durationMinutes < 5`：`xpEarned = 0`
+**说明：** `completed` 布尔字段已移除，替换为 `status` 字符串字段，支持三种状态：completed（已完成）、abandoned（已放弃）、interrupted（已中断）。
+
+**未完成会话的 XP 规则：**
+- `status == "abandoned"` 且 `durationMinutes >= 5`：`xpEarned = durationMinutes x 1`（仅基础 XP）
+- `status == "abandoned"` 且 `durationMinutes < 5`：`xpEarned = 0`
+- `status == "interrupted"`：XP 计算方式与放弃会话相同
 
 **Dart 模型：** `lib/models/focus_session.dart` -> `class FocusSession`
 
@@ -153,23 +159,6 @@ dormant --[习惯重新激活]--> active（未来功能）
 
 ---
 
-## 集合：`users/{uid}/checkIns/{date}/entries/{entryId}`
-
-遗留打卡存储，保留以向后兼容，并用于热力图查询。
-
-`date` 为 ISO 日期字符串 "YYYY-MM-DD"，如 "2026-02-17"。
-
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `habitId` | string | 是 | 父习惯 ID |
-| `habitName` | string | 是 | 反规范化的习惯名称（提升读取性能） |
-| `minutes` | int | 是 | 本次会话记录的分钟数 |
-| `completedAt` | timestamp | 是 | 条目创建时间 |
-
-**Dart 模型：** `lib/models/check_in.dart` -> `class CheckInEntry`
-
----
-
 ## 原子操作（批量写入）
 
 跨多个文档的操作使用 Firestore **批量写入** 保证全有或全无的一致性。任意写入失败则整批回滚。
@@ -191,7 +180,6 @@ dormant --[习惯重新激活]--> active（未来功能）
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — 设置为当前时间
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)`（专注奖励：`durationMinutes × 10`）
-6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — 遗留打卡条目（用于热力图）
 
 > **注意：** 每日签到奖励不再在此批量操作中发放，由 `CoinService.checkIn()` 通过月度签到系统独立管理。
 
@@ -263,7 +251,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 |------|------|------|------|
 | `users/{uid}/cats` | `state ASC`, `createdAt ASC` | 复合 | `watchCats()` —— 按领养日期排序的活跃猫咪 |
 | `users/{uid}/habits/{habitId}/sessions` | `habitId ASC`, `endedAt DESC` | 复合 | 按习惯查询会话历史 |
-| `users/{uid}/checkIns/{date}/entries` | `habitId ASC`, `completedAt DESC` | 复合 | 按习惯查询热力图数据 |
+| `sessions`（集合组） | `endedAt DESC` | 单字段集合组 | 跨习惯会话历史查询 |
 
 其他查询使用单字段默认索引。
 
@@ -279,6 +267,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 6. **`totalMinutes` 是累加的**：始终使用 `FieldValue.increment(delta)`——不用计算后的总值覆盖（防止竞态条件）。
 7. **金币不能为负**：`CoinService` 在扣除前必须验证余额充足。余额不足时购买批量写入应优雅失败。
 8. **外观不可变**：`appearance` Map 在猫咪创建时设置，此后不再修改。
+9. **会话不可变**：会话文档一旦创建，不可更新或删除。这确保了审计轨迹的完整性。
 
 ---
 

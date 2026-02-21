@@ -19,7 +19,7 @@ Firebase Auth 流 ──────────────► authStateProvide
                      │                   │
           ┌──────────┴──────────┐ ┌──────┴────────────┐
           ▼                    ▼ ▼                   ▼
-  todayCheckInsProvider  statsProvider  catByIdProvider  catByHabitProvider
+  todaySessionsProvider  statsProvider  catByIdProvider  catByHabitProvider
   (StreamProvider<...>)  (Provider<...>)  （family）      （family）
                      │
                      ▼
@@ -91,19 +91,19 @@ Firebase Auth 流 ──────────────► authStateProvide
 - **消费者**：`HomeScreen`（习惯列表）、`StatsScreen`、`_FirstHabitGate`、`statsProvider`
 - **SSOT**：用户的完整习惯列表，始终与 Firestore 保持同步
 
-### `todayCheckInsProvider`
+### `todaySessionsProvider`
 
-- **类型**：`StreamProvider<List<CheckInEntry>>`
+- **类型**：`StreamProvider<List<FocusSession>>`
 - **文件**：`lib/providers/habits_provider.dart`
-- **数据源**：`FirestoreService.watchTodayCheckIns(uid)` —— 今日打卡条目
-- **消费者**：`HomeScreen`（今日各习惯进度）
-- **SSOT**：今日所有打卡条目
+- **数据源**：`FirestoreService.watchTodaySessions(uid)` —— 监听今日所有习惯的专注会话
+- **消费者**：`HomeScreen`（今日各习惯进度）、`todayMinutesPerHabitProvider`
+- **SSOT**：今日所有专注会话
 
 ### `todayMinutesPerHabitProvider`
 
 - **类型**：`Provider<Map<String, int>>`
 - **文件**：`lib/providers/habits_provider.dart`
-- **数据源**：派生自 `todayCheckInsProvider` —— 按 `habitId` 汇总分钟数
+- **数据源**：派生自 `todaySessionsProvider` —— 按 `habitId` 汇总 `durationMinutes`
 - **消费者**：`HomeScreen` 习惯列表行（今日进度条）
 - **SSOT**：今日按习惯 ID 分组的记录分钟数
 
@@ -111,7 +111,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`Provider<HabitStats>`
 - **文件**：`lib/providers/stats_provider.dart`
-- **数据源**：派生自 `habitsProvider` + `todayCheckInsProvider`
+- **数据源**：派生自 `habitsProvider` + `todaySessionsProvider`
 - **消费者**：`StatsScreen`、`ProfileScreen`
 - **SSOT**：汇总统计数据（总专注时长、最长连续记录、活跃习惯数量）
 
@@ -434,6 +434,55 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **来源**：`ChatService`（SQLite 历史 + LLM 流）
 - **消费者**：`CatChatScreen`
 - **SSOT**：特定猫咪的聊天状态 — 消息列表、生成状态、部分回复
+
+---
+
+### 会话统计 Provider
+
+#### `dailyMinutesProvider`
+
+- **类型**：`FutureProvider<Map<String, int>>`
+- **文件**：`lib/providers/session_stats_provider.dart`
+- **数据源**：查询过去 30 天所有习惯的会话，按日期汇总 `durationMinutes`
+- **消费者**：`StatsScreen`（每日图表）
+- **SSOT**：过去 30 天基于会话的每日专注分钟数总计
+
+#### `weeklyTrendProvider`
+
+- **类型**：`FutureProvider<Map<String, int>>`
+- **文件**：`lib/providers/session_stats_provider.dart`
+- **数据源**：查询过去 7 天的会话，按日期汇总 `durationMinutes`
+- **消费者**：`HomeScreen`（周趋势组件）、`StatsScreen`
+- **SSOT**：过去 7 天每日专注分钟数总计
+
+#### `recentSessionsProvider`
+
+- **类型**：`FutureProvider<List<FocusSession>>`
+- **文件**：`lib/providers/session_stats_provider.dart`
+- **数据源**：查询所有习惯中最近 5 条会话，按 `endedAt DESC` 排序
+- **消费者**：`StatsScreen`（最近活动列表）
+- **SSOT**：最近 5 条专注会话
+
+---
+
+### 会话历史 Provider
+
+#### `sessionHistoryProvider`
+
+- **类型**：`AutoDisposeNotifierProvider<SessionHistoryNotifier, SessionHistoryState>`
+- **文件**：`lib/providers/session_history_provider.dart`
+- **数据源**：对 Firestore sessions 子集合的分页查询，支持按习惯、日期范围或状态筛选
+- **消费者**：`SessionHistoryScreen`
+- **SSOT**：支持筛选的分页会话历史
+
+**`SessionHistoryState` 字段：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `sessions` | List\<FocusSession\> | 当前已加载的会话列表 |
+| `hasMore` | bool | 是否还有更多页可加载 |
+| `isLoading` | bool | 是否正在加载页面 |
+| `filter` | SessionFilter? | 当前激活的筛选条件（habitId、日期范围、状态） |
 
 ---
 

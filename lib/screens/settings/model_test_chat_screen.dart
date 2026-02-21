@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/llm_provider.dart';
 
@@ -225,10 +226,11 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
         fgColor = colorScheme.onSecondaryContainer;
       case _TestChatStatus.ready:
       case _TestChatStatus.generating:
+        final brightness = Theme.of(context).brightness;
         icon = Icons.check_circle;
         text = l10n.testChatModelLoaded;
-        bgColor = Colors.green.withValues(alpha: 0.12);
-        fgColor = Colors.green;
+        bgColor = StatusColors.successContainer(brightness);
+        fgColor = StatusColors.onSuccess(brightness);
       case _TestChatStatus.error:
         icon = Icons.error;
         text = _errorKind == _ErrorKind.corrupted

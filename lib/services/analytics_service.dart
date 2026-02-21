@@ -125,6 +125,9 @@ class AnalyticsService {
     required int actualMinutes,
     required int xpEarned,
     required int streakDays,
+    int? targetDurationMinutes,
+    int? pausedSeconds,
+    double? completionRatio,
   }) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.focusSessionCompleted,
@@ -133,6 +136,12 @@ class AnalyticsService {
         AnalyticsEvents.paramActualMinutes: actualMinutes,
         AnalyticsEvents.paramXpEarned: xpEarned,
         AnalyticsEvents.paramStreakDays: streakDays,
+        if (targetDurationMinutes != null)
+          AnalyticsEvents.paramTargetDurationMinutes: targetDurationMinutes,
+        if (pausedSeconds != null)
+          AnalyticsEvents.paramPausedSeconds: pausedSeconds,
+        if (completionRatio != null)
+          AnalyticsEvents.paramCompletionRatio: completionRatio,
       },
     ),
   );
@@ -141,6 +150,9 @@ class AnalyticsService {
     required String habitId,
     required int minutesCompleted,
     required String reason,
+    int? targetDurationMinutes,
+    int? pausedSeconds,
+    double? completionRatio,
   }) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.focusSessionAbandoned,
@@ -148,6 +160,12 @@ class AnalyticsService {
         AnalyticsEvents.paramHabitId: habitId,
         AnalyticsEvents.paramMinutesCompleted: minutesCompleted,
         AnalyticsEvents.paramReason: reason,
+        if (targetDurationMinutes != null)
+          AnalyticsEvents.paramTargetDurationMinutes: targetDurationMinutes,
+        if (pausedSeconds != null)
+          AnalyticsEvents.paramPausedSeconds: pausedSeconds,
+        if (completionRatio != null)
+          AnalyticsEvents.paramCompletionRatio: completionRatio,
       },
     ),
   );
@@ -177,6 +195,21 @@ class AnalyticsService {
       parameters: {
         AnalyticsEvents.paramHabitName: habitName,
         AnalyticsEvents.paramStreakDays: milestone,
+        if (habitId != null) AnalyticsEvents.paramHabitId: habitId,
+      },
+    ),
+  );
+
+  // ─── Stats & History Events ───
+
+  Future<void> logStatsViewed() => _safeLog(
+    () => _analytics.logEvent(name: AnalyticsEvents.statsViewed),
+  );
+
+  Future<void> logHistoryViewed({String? habitId}) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.historyViewed,
+      parameters: {
         if (habitId != null) AnalyticsEvents.paramHabitId: habitId,
       },
     ),

@@ -11,9 +11,7 @@ users/{uid}                          <- User profile document
 ├── habits/{habitId}                 <- Habit metadata + streak tracking
 │   └── sessions/{sessionId}        <- Focus session history
 ├── cats/{catId}                     <- Cat state (appearance, growth, accessories)
-├── monthlyCheckIns/{YYYY-MM}        <- Monthly check-in tracking (resets each month)
-└── checkIns/{date}                  <- Date-partitioned check-in buckets (backward compat)
-    └── entries/{entryId}            <- Per-session minute log entries
+└── monthlyCheckIns/{YYYY-MM}        <- Monthly check-in tracking (resets each month)
 ```
 
 ---
@@ -80,14 +78,22 @@ One document per focus session. `sessionId` is a Firestore auto-generated ID.
 | `startedAt` | timestamp | yes | When the focus session began |
 | `endedAt` | timestamp | yes | When the session ended (completed or abandoned) |
 | `durationMinutes` | int | yes | Actual focused minutes (may be less than target if abandoned) |
+| `targetDurationMinutes` | int | yes | Planned duration in minutes (countdown target; 0 for stopwatch mode) |
+| `pausedSeconds` | int | yes | Cumulative paused time in seconds during this session |
+| `status` | string | yes | Session outcome: "completed", "abandoned", or "interrupted" |
+| `completionRatio` | double | yes | Actual / target ratio (1.0 for stopwatch mode) |
 | `xpEarned` | int | yes | XP awarded at session end (computed by `XpService`) |
-| `mode` | string | yes | Timer mode: "countdown" or "stopwatch" |
-| `completed` | bool | yes | `true` if user completed the session; `false` if they gave up early |
 | `coinsEarned` | int | yes | Coins awarded at session end (`durationMinutes × 10`; 0 if abandoned < 5 min) |
+| `mode` | string | yes | Timer mode: "countdown" or "stopwatch" |
+| `checksum` | string | no | HMAC-SHA256 signature for tamper detection |
+| `clientVersion` | string | yes | Client app version at session creation time |
 
-**XP for Abandoned Sessions:**
-- If `completed == false` AND `durationMinutes >= 5`: `xpEarned = durationMinutes x 1` (base XP only)
-- If `completed == false` AND `durationMinutes < 5`: `xpEarned = 0`
+**Note:** The `completed` bool field has been removed and replaced by the `status` string field which supports three states: completed, abandoned, interrupted.
+
+**XP for Non-Completed Sessions:**
+- If `status == "abandoned"` AND `durationMinutes >= 5`: `xpEarned = durationMinutes x 1` (base XP only)
+- If `status == "abandoned"` AND `durationMinutes < 5`: `xpEarned = 0`
+- If `status == "interrupted"`: XP is calculated same as abandoned sessions
 
 **Dart Model:** `lib/models/focus_session.dart` -> `class FocusSession`
 
@@ -155,23 +161,6 @@ One document per calendar month, tracking daily check-in progress and milestone 
 
 ---
 
-## Collection: `users/{uid}/checkIns/{date}/entries/{entryId}`
-
-Legacy check-in storage, preserved for backward compatibility and used by the heatmap queries.
-
-`date` is an ISO date string "YYYY-MM-DD", e.g. "2026-02-17".
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `habitId` | string | yes | Reference to parent habit |
-| `habitName` | string | yes | Denormalized habit name for read performance |
-| `minutes` | int | yes | Minutes logged in this session |
-| `completedAt` | timestamp | yes | When this entry was created |
-
-**Dart Model:** `lib/models/check_in.dart` -> `class CheckInEntry`
-
----
-
 ## Atomic Operations (Batch Writes)
 
 Operations that span multiple documents use Firestore **batch writes** to guarantee all-or-nothing consistency. If any write fails, the entire batch rolls back.
@@ -193,7 +182,6 @@ Batch includes:
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — set to now
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)` (focus reward: `durationMinutes × 10`)
-6. `SET users/{uid}/checkIns/{today}/entries/{entryId}` — legacy check-in entry (for heatmap)
 
 > **Note:** Daily check-in bonus is no longer awarded in this batch. It is managed independently by `CoinService.checkIn()` via the monthly check-in system.
 
@@ -264,7 +252,7 @@ Returns `CheckInResult` with `dailyCoins`, `milestoneBonus`, and `newMilestones`
 |-----------|--------|-------|---------|
 | `users/{uid}/cats` | `state ASC`, `createdAt ASC` | Compound | `watchCats()` — active cats ordered by adoption date |
 | `users/{uid}/habits/{habitId}/sessions` | `habitId ASC`, `endedAt DESC` | Compound | Session history per habit |
-| `users/{uid}/checkIns/{date}/entries` | `habitId ASC`, `completedAt DESC` | Compound | Heatmap queries per habit |
+| `sessions` (collection group) | `endedAt DESC` | Single-field collection group | Cross-habit session history queries |
 
 All other queries use single-field default indexes.
 
@@ -280,6 +268,7 @@ All other queries use single-field default indexes.
 6. **`totalMinutes` is additive**: Always use `FieldValue.increment(delta)` — never overwrite with a calculated total (prevents race conditions).
 7. **Coins never go negative**: The `CoinService` must validate sufficient balance before deducting. The purchase batch write should fail gracefully if balance is insufficient.
 8. **Appearance is immutable**: The `appearance` map is set at cat creation and never modified afterward.
+9. **Sessions are immutable**: Once created, session documents cannot be updated or deleted. This ensures audit trail integrity.
 
 ---
 

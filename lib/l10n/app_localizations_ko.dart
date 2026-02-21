@@ -1928,4 +1928,68 @@ class SKo extends S {
 
   @override
   String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
+
+  @override
+  String get statsTotalSessions => '집중 횟수';
+
+  @override
+  String get statsTotalHabits => '작업 수';
+
+  @override
+  String get statsActiveDays => '활동 일수';
+
+  @override
+  String get statsWeeklyTrend => '주간 추세';
+
+  @override
+  String get statsRecentSessions => '최근 집중';
+
+  @override
+  String get statsViewAllHistory => '전체 기록 보기';
+
+  @override
+  String get historyTitle => '집중 기록';
+
+  @override
+  String get historyFilterAll => '전체';
+
+  @override
+  String historySessionCount(int count) {
+    return '$count회 집중';
+  }
+
+  @override
+  String historyTotalMinutes(int minutes) {
+    return '$minutes분';
+  }
+
+  @override
+  String get historyNoSessions => '집중 기록이 없습니다';
+
+  @override
+  String get historyNoSessionsHint => '집중 세션을 완료하면 여기에 표시됩니다';
+
+  @override
+  String get historyLoadMore => '더 불러오기';
+
+  @override
+  String get sessionCompleted => '완료';
+
+  @override
+  String get sessionAbandoned => '포기';
+
+  @override
+  String get sessionInterrupted => '중단됨';
+
+  @override
+  String get sessionCountdown => '카운트다운';
+
+  @override
+  String get sessionStopwatch => '스톱워치';
+
+  @override
+  String get historyDateGroupToday => '오늘';
+
+  @override
+  String get historyDateGroupYesterday => '어제';
 }

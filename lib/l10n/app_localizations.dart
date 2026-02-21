@@ -3641,6 +3641,126 @@ abstract class S {
   /// In en, this message translates to:
   /// **'by pixel-cat-maker (CC BY-NC 4.0)'**
   String get settingsPixelCatAttribution;
+
+  /// No description provided for @statsTotalSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions'**
+  String get statsTotalSessions;
+
+  /// No description provided for @statsTotalHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits'**
+  String get statsTotalHabits;
+
+  /// No description provided for @statsActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active days'**
+  String get statsActiveDays;
+
+  /// No description provided for @statsWeeklyTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly trend'**
+  String get statsWeeklyTrend;
+
+  /// No description provided for @statsRecentSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent focus'**
+  String get statsRecentSessions;
+
+  /// No description provided for @statsViewAllHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View all history'**
+  String get statsViewAllHistory;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus history'**
+  String get historyTitle;
+
+  /// No description provided for @historyFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get historyFilterAll;
+
+  /// No description provided for @historySessionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sessions'**
+  String historySessionCount(int count);
+
+  /// No description provided for @historyTotalMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String historyTotalMinutes(int minutes);
+
+  /// No description provided for @historyNoSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'No focus records yet'**
+  String get historyNoSessions;
+
+  /// No description provided for @historyNoSessionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a focus session to see it here'**
+  String get historyNoSessionsHint;
+
+  /// No description provided for @historyLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get historyLoadMore;
+
+  /// No description provided for @sessionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get sessionCompleted;
+
+  /// No description provided for @sessionAbandoned.
+  ///
+  /// In en, this message translates to:
+  /// **'Abandoned'**
+  String get sessionAbandoned;
+
+  /// No description provided for @sessionInterrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'Interrupted'**
+  String get sessionInterrupted;
+
+  /// No description provided for @sessionCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown'**
+  String get sessionCountdown;
+
+  /// No description provided for @sessionStopwatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopwatch'**
+  String get sessionStopwatch;
+
+  /// No description provided for @historyDateGroupToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get historyDateGroupToday;
+
+  /// No description provided for @historyDateGroupYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get historyDateGroupYesterday;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
