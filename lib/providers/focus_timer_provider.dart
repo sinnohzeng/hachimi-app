@@ -465,16 +465,18 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
 
-    // Analytics: log session quality
-    final completionRatio = state.totalSeconds > 0
-        ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
-        : 1.0;
-    ref
-        .read(analyticsServiceProvider)
-        .logSessionQuality(
-          sessionDuration: state.elapsedSeconds,
-          completionRatio: completionRatio,
-        );
+    // Analytics: log session quality (non-critical, must not break core flow)
+    try {
+      final completionRatio = state.totalSeconds > 0
+          ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
+          : 1.0;
+      ref
+          .read(analyticsServiceProvider)
+          .logSessionQuality(
+            sessionDuration: state.elapsedSeconds,
+            completionRatio: completionRatio,
+          );
+    } catch (_) {}
   }
 
   /// Abandon the session.
@@ -484,16 +486,18 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
 
-    // Analytics: log session quality (abandoned)
-    final completionRatio = state.totalSeconds > 0
-        ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
-        : 0.0;
-    ref
-        .read(analyticsServiceProvider)
-        .logSessionQuality(
-          sessionDuration: state.elapsedSeconds,
-          completionRatio: completionRatio,
-        );
+    // Analytics: log session quality (non-critical, must not break core flow)
+    try {
+      final completionRatio = state.totalSeconds > 0
+          ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
+          : 0.0;
+      ref
+          .read(analyticsServiceProvider)
+          .logSessionQuality(
+            sessionDuration: state.elapsedSeconds,
+            completionRatio: completionRatio,
+          );
+    } catch (_) {}
   }
 
   /// Handle app going to background.
