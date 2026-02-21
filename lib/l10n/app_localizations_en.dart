@@ -603,6 +603,13 @@ class SEn extends S {
   String get testChatUnknownError => 'Unknown error';
 
   @override
+  String get testChatFileCorrupted =>
+      'Model file is corrupted or incomplete. Please re-download.';
+
+  @override
+  String get testChatRedownload => 'Re-download';
+
+  @override
   String get testChatModelReady => 'Model ready';
 
   @override

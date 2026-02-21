@@ -36,6 +36,12 @@ class LlmConstants {
   /// 下载前要求的最小可用空间（模型 + 300 MB 缓冲）
   static const int minFreeSpaceBytes = 1420000000; // ~1.32 GB
 
+  /// 有效模型文件的最小字节数（预期大小的 95%）。
+  /// 防止 >100 MB 的截断下载文件通过弱校验。
+  /// 计算：modelFileSizeBytes * 95 / 100（避免 const 上下文中的浮点运算）
+  static const int minValidModelSizeBytes =
+      modelFileSizeBytes ~/ 100 * 95; // ~1.00 GB
+
   /// SHA-256 校验值。空字符串表示跳过校验（模型文件未固定版本时适用）。
   static const String modelSha256 = '';
 

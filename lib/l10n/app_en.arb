@@ -276,6 +276,8 @@
   "testChatCouldNotLoad": "Could not load model",
   "testChatFailedToLoad": "Failed to load model",
   "testChatUnknownError": "Unknown error",
+  "testChatFileCorrupted": "Model file is corrupted or incomplete. Please re-download.",
+  "testChatRedownload": "Re-download",
   "testChatModelReady": "Model ready",
   "testChatSendToTest": "Send a message to test the AI model.",
   "testChatGenerating": "Generating...",

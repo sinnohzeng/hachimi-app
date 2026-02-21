@@ -1182,6 +1182,18 @@ abstract class S {
   /// **'Unknown error'**
   String get testChatUnknownError;
 
+  /// No description provided for @testChatFileCorrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'Model file is corrupted or incomplete. Please re-download.'**
+  String get testChatFileCorrupted;
+
+  /// No description provided for @testChatRedownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-download'**
+  String get testChatRedownload;
+
   /// No description provided for @testChatModelReady.
   ///
   /// In en, this message translates to:

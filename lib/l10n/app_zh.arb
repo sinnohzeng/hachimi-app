@@ -276,6 +276,8 @@
   "testChatCouldNotLoad": "无法加载模型",
   "testChatFailedToLoad": "模型加载失败",
   "testChatUnknownError": "未知错误",
+  "testChatFileCorrupted": "模型文件损坏或不完整，请重新下载。",
+  "testChatRedownload": "重新下载",
   "testChatModelReady": "模型就绪",
   "testChatSendToTest": "发送消息来测试 AI 模型。",
   "testChatGenerating": "生成中...",

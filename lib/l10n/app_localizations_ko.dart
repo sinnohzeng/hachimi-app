@@ -598,6 +598,12 @@ class SKo extends S {
   String get testChatUnknownError => '알 수 없는 오류';
 
   @override
+  String get testChatFileCorrupted => '모델 파일이 손상되었거나 불완전합니다. 다시 다운로드하세요.';
+
+  @override
+  String get testChatRedownload => '다시 다운로드';
+
+  @override
   String get testChatModelReady => '모델 준비 완료';
 
   @override

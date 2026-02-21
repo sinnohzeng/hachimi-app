@@ -65,15 +65,15 @@ class LlmService {
       throw LlamaException(_lastError!);
     }
     final fileSize = modelFile.lengthSync();
-    debugPrint(
-      '[LlmService] Loading model: $modelPath '
-      '(${(fileSize / 1024 / 1024).toStringAsFixed(1)} MB)',
-    );
-    if (fileSize < 100 * 1024 * 1024) {
+    final actualMb = (fileSize / 1024 / 1024).toStringAsFixed(1);
+    debugPrint('[LlmService] Loading model: $modelPath ($actualMb MB)');
+    if (fileSize < LlmConstants.minValidModelSizeBytes) {
+      final expectedMb = (LlmConstants.modelFileSizeBytes / 1024 / 1024)
+          .toStringAsFixed(0);
       _status = LlmEngineStatus.error;
       _lastError =
-          'Model file appears corrupted — expected ~1 GB, got '
-          '${(fileSize / 1024 / 1024).toStringAsFixed(1)} MB';
+          'Model file is incomplete ($actualMb MB, expected ~$expectedMb MB). '
+          'Please re-download.';
       throw LlamaException(_lastError!);
     }
 

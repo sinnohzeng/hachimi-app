@@ -598,6 +598,12 @@ class SJa extends S {
   String get testChatUnknownError => '不明なエラー';
 
   @override
+  String get testChatFileCorrupted => 'モデルファイルが破損または不完全です。再ダウンロードしてください。';
+
+  @override
+  String get testChatRedownload => '再ダウンロード';
+
+  @override
   String get testChatModelReady => 'モデル準備完了';
 
   @override

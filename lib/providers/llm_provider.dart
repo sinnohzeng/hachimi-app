@@ -16,6 +16,7 @@ import 'dart:async';
 import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:llama_cpp_dart/llama_cpp_dart.dart' show LlamaException;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/services/llm_service.dart';
@@ -124,6 +125,7 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
   }
 
   /// 加载模型到内存。
+  /// 若 native 层返回"Could not load model"，说明文件已损坏，自动清理并重置为待下载状态。
   Future<void> loadModel() async {
     state = LlmAvailability.modelLoading;
     try {
@@ -137,6 +139,16 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
       final llmService = _ref.read(llmServiceInstanceProvider);
       await llmService.loadModel(modelPath);
       state = LlmAvailability.ready;
+    } on LlamaException catch (e) {
+      final msg = e.toString();
+      // native 加载失败或文件不完整 → 文件已损坏，清理后让用户重新下载
+      if (msg.contains('Could not load model') || msg.contains('incomplete')) {
+        await _ref.read(modelManagerProvider).clearCorruptedModel();
+        state = LlmAvailability.modelNotDownloaded;
+      } else {
+        state = LlmAvailability.error;
+      }
+      rethrow;
     } catch (e) {
       state = LlmAvailability.error;
       rethrow;

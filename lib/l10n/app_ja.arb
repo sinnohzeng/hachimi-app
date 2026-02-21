@@ -197,6 +197,8 @@
   "testChatCouldNotLoad": "モデルを読み込めませんでした",
   "testChatFailedToLoad": "モデルの読み込みに失敗しました",
   "testChatUnknownError": "不明なエラー",
+  "testChatFileCorrupted": "モデルファイルが破損または不完全です。再ダウンロードしてください。",
+  "testChatRedownload": "再ダウンロード",
   "testChatModelReady": "モデル準備完了",
   "testChatSendToTest": "メッセージを送信してAIモデルをテストしてください。",
   "testChatGenerating": "生成中...",

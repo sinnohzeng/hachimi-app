@@ -56,15 +56,25 @@ class ModelManagerService {
   }
 
   /// 获取已下载模型的文件路径。
+  /// 若存储路径过期（OS 升级/多用户切换导致路径漂移），自动尝试当前预期路径并更新。
   Future<String?> getModelPath() async {
     final prefs = await SharedPreferences.getInstance();
-    final path = prefs.getString(LlmConstants.prefModelFilePath);
-    if (path == null) return null;
-    if (!File(path).existsSync()) {
-      await _clearModelPrefs(prefs);
-      return null;
+    final storedPath = prefs.getString(LlmConstants.prefModelFilePath);
+    if (storedPath == null || storedPath.isEmpty) return null;
+
+    if (File(storedPath).existsSync()) return storedPath;
+
+    // 存储路径文件不存在 — 尝试在当前 documents 目录下重新定位文件
+    final expectedPath =
+        '${(await getApplicationDocumentsDirectory()).path}'
+        '/llm_models/${LlmConstants.modelFileName}';
+    if (File(expectedPath).existsSync()) {
+      await prefs.setString(LlmConstants.prefModelFilePath, expectedPath);
+      return expectedPath;
     }
-    return path;
+
+    await _clearModelPrefs(prefs);
+    return null;
   }
 
   /// 获取模型存储目录路径。
@@ -128,9 +138,9 @@ class ModelManagerService {
     final file = File(filePath);
     if (!file.existsSync()) return false;
 
-    // 最小文件大小检查（模型应 >= 100 MB；低于此值多为 HTML 错误页或截断文件）
+    // 文件大小校验：必须接近预期大小（95%），防止截断的大文件通过弱 100 MB 阈值
     final fileSize = file.lengthSync();
-    if (fileSize < 100 * 1024 * 1024) {
+    if (fileSize < LlmConstants.minValidModelSizeBytes) {
       await file.delete();
       return false;
     }
@@ -187,6 +197,17 @@ class ModelManagerService {
       if (file.existsSync()) return file.lengthSync();
     }
     return LlmConstants.modelFileSizeBytes;
+  }
+
+  /// Native 层加载失败时调用：删除可能损坏的文件并重置下载状态，让用户重新下载。
+  Future<void> clearCorruptedModel() async {
+    final prefs = await SharedPreferences.getInstance();
+    final filePath = prefs.getString(LlmConstants.prefModelFilePath);
+    if (filePath != null && filePath.isNotEmpty) {
+      final file = File(filePath);
+      if (file.existsSync()) await file.delete();
+    }
+    await _clearModelPrefs(prefs);
   }
 
   Future<void> _clearModelPrefs(SharedPreferences prefs) async {

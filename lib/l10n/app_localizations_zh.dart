@@ -595,6 +595,12 @@ class SZh extends S {
   String get testChatUnknownError => '未知错误';
 
   @override
+  String get testChatFileCorrupted => '模型文件损坏或不完整，请重新下载。';
+
+  @override
+  String get testChatRedownload => '重新下载';
+
+  @override
   String get testChatModelReady => '模型就绪';
 
   @override
@@ -2471,6 +2477,12 @@ class SZhHant extends SZh {
 
   @override
   String get testChatUnknownError => '未知錯誤';
+
+  @override
+  String get testChatFileCorrupted => '模型文件損毀或不完整，請重新下載。';
+
+  @override
+  String get testChatRedownload => '重新下載';
 
   @override
   String get testChatModelReady => '模型就緒';

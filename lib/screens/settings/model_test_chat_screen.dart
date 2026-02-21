@@ -36,6 +36,9 @@ class _TestMessage {
 /// 模型测试聊天状态。
 enum _TestChatStatus { loading, ready, generating, error }
 
+/// 错误类型 — 区分"文件损坏（需重新下载）"与"普通加载失败（可重试）"。
+enum _ErrorKind { corrupted, generic }
+
 /// 模型测试聊天页面。
 class ModelTestChatScreen extends ConsumerStatefulWidget {
   const ModelTestChatScreen({super.key});
@@ -54,6 +57,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
   String _partialResponse = '';
   _TestChatStatus _status = _TestChatStatus.loading;
   String? _errorMessage;
+  _ErrorKind _errorKind = _ErrorKind.generic;
   StreamSubscription<String>? _streamSub;
 
   @override
@@ -83,12 +87,23 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
         setState(() {
           _status = _TestChatStatus.error;
           _errorMessage = null;
+          _errorKind = _ErrorKind.generic;
         });
       }
     } catch (e) {
+      final msg = e.toString();
+      final isCorrupted =
+          msg.contains('Could not load model') || msg.contains('incomplete');
+      // 自动修复后状态会变为 modelNotDownloaded，也属于文件损坏情况
+      final availability = ref.read(llmAvailabilityProvider);
+      final needsRedownload =
+          isCorrupted || availability == LlmAvailability.modelNotDownloaded;
       setState(() {
         _status = _TestChatStatus.error;
-        _errorMessage = e.toString();
+        _errorMessage = needsRedownload ? null : msg;
+        _errorKind = needsRedownload
+            ? _ErrorKind.corrupted
+            : _ErrorKind.generic;
       });
     }
   }
@@ -234,7 +249,9 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
         fgColor = Colors.green;
       case _TestChatStatus.error:
         icon = Icons.error;
-        text = _errorMessage ?? l10n.testChatErrorLoading;
+        text = _errorKind == _ErrorKind.corrupted
+            ? l10n.testChatFileCorrupted
+            : (_errorMessage ?? l10n.testChatErrorLoading);
         bgColor = colorScheme.errorContainer;
         fgColor = colorScheme.onErrorContainer;
     }
@@ -260,7 +277,16 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
               child: CircularProgressIndicator(strokeWidth: 2, color: fgColor),
             ),
           if (_status == _TestChatStatus.error)
-            TextButton(onPressed: _initModel, child: Text(l10n.commonRetry)),
+            TextButton(
+              onPressed: _errorKind == _ErrorKind.corrupted
+                  ? () => Navigator.of(context).pop()
+                  : _initModel,
+              child: Text(
+                _errorKind == _ErrorKind.corrupted
+                    ? l10n.testChatRedownload
+                    : l10n.commonRetry,
+              ),
+            ),
         ],
       ),
     );
@@ -273,13 +299,18 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
 
     if (_status == _TestChatStatus.error) {
       final l10n = context.l10n;
+      final isCorrupted = _errorKind == _ErrorKind.corrupted;
       return Center(
         child: Padding(
           padding: AppSpacing.paddingXl,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: colorScheme.error),
+              Icon(
+                isCorrupted ? Icons.broken_image_outlined : Icons.error_outline,
+                size: 48,
+                color: colorScheme.error,
+              ),
               const SizedBox(height: AppSpacing.base),
               Text(
                 l10n.testChatCouldNotLoad,
@@ -289,18 +320,27 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                _errorMessage ?? l10n.testChatUnknownError,
+                isCorrupted
+                    ? l10n.testChatFileCorrupted
+                    : (_errorMessage ?? l10n.testChatUnknownError),
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.base),
-              FilledButton.tonalIcon(
-                onPressed: _initModel,
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.commonRetry),
-              ),
+              if (isCorrupted)
+                FilledButton.tonalIcon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.download_outlined),
+                  label: Text(l10n.testChatRedownload),
+                )
+              else
+                FilledButton.tonalIcon(
+                  onPressed: _initModel,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.commonRetry),
+                ),
             ],
           ),
         ),
