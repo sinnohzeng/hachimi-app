@@ -721,5 +721,158 @@
   "addHabitTargetHint": "例如 100",
   "addHabitValidTarget": "请输入目标小时数",
   "addHabitValidNumber": "请输入有效数字",
-  "addHabitCreate": "创建任务"
+  "addHabitCreate": "创建任务",
+  "addHabitHoursSuffix": "小时",
+
+  "shopTabPlants": "植物（{count}）",
+  "@shopTabPlants": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopTabWild": "野生（{count}）",
+  "@shopTabWild": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopTabCollars": "项圈（{count}）",
+  "@shopTabCollars": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopNoAccessories": "暂无饰品",
+  "shopBuyConfirm": "购买 {name}？",
+  "@shopBuyConfirm": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "shopPurchaseButton": "购买",
+  "shopNotEnoughCoinsButton": "金币不足",
+  "shopPurchaseSuccess": "购买成功！{name} 已加入背包",
+  "@shopPurchaseSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "shopPurchaseFailed": "金币不足（需要 {price}）",
+  "@shopPurchaseFailed": {
+    "placeholders": { "price": { "type": "int" } }
+  },
+
+  "inventoryTitle": "背包",
+  "inventoryInBox": "箱中（{count}）",
+  "@inventoryInBox": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "inventoryEmpty": "背包空空如也。\n去商店购买饰品吧！",
+  "inventoryEquippedOnCats": "已装备在猫上（{count}）",
+  "@inventoryEquippedOnCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "inventoryNoEquipped": "还没有给猫猫装备饰品。",
+  "inventoryUnequip": "卸下",
+  "inventoryNoActiveCats": "没有活跃的猫猫",
+  "inventoryEquipTo": "将 {name} 装备给：",
+  "@inventoryEquipTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "inventoryEquipSuccess": "已装备 {name}",
+  "@inventoryEquipSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "inventoryUnequipSuccess": "已从 {catName} 卸下",
+  "@inventoryUnequipSuccess": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+
+  "chatCatNotFound": "找不到猫猫",
+  "chatTitle": "和 {name} 聊天",
+  "@chatTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "chatClearHistory": "清除记录",
+  "chatEmptyTitle": "和 {name} 打个招呼吧！",
+  "@chatEmptyTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "chatEmptySubtitle": "开始和猫猫对话吧，它会根据自己的性格来回复你！",
+  "chatGenerating": "生成中...",
+  "chatTypeMessage": "输入消息...",
+  "chatClearConfirmTitle": "清除聊天记录？",
+  "chatClearConfirmMessage": "这将删除所有消息，此操作无法撤销。",
+  "chatClearButton": "清除",
+
+  "diaryTitle": "{name}的日记",
+  "@diaryTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "diaryLoadFailed": "加载日记失败",
+  "diaryRetry": "重试",
+  "diaryEmptyTitle2": "还没有日记",
+  "diaryEmptySubtitle": "完成一次专注，猫猫就会写下第一篇日记！",
+
+  "statsTitle": "统计",
+  "statsTotalHours": "总时长",
+  "statsTimeValue": "{hours}时{minutes}分",
+  "@statsTimeValue": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "statsBestStreak": "最长连续",
+  "statsStreakDays": "{count} 天",
+  "@statsStreakDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "statsOverallProgress": "总体进度",
+  "statsPercentOfGoals": "{percent}% 目标达成",
+  "@statsPercentOfGoals": {
+    "placeholders": { "percent": { "type": "String" } }
+  },
+  "statsPerQuestProgress": "各任务进度",
+  "statsQuestLoadError": "加载任务统计失败",
+  "statsNoQuestData": "还没有任务数据",
+  "statsNoQuestHint": "开始一个任务来查看进度吧！",
+  "statsLast30Days": "最近 30 天",
+
+  "habitDetailQuestNotFound": "未找到任务",
+  "habitDetailComplete": "完成",
+  "habitDetailTotalTime": "总时长",
+  "habitDetailCurrentStreak": "当前连续",
+  "habitDetailTarget": "目标",
+  "habitDetailDaysUnit": "{count} 天",
+  "@habitDetailDaysUnit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "habitDetailHoursUnit": "{count} 小时",
+  "@habitDetailHoursUnit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "checkInBannerSuccess": "+{coins} 金币！每日签到完成",
+  "@checkInBannerSuccess": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInBannerBonus": " + {bonus} 里程碑奖励！",
+  "@checkInBannerBonus": {
+    "placeholders": { "bonus": { "type": "int" } }
+  },
+  "checkInBannerSemantics": "每日签到",
+  "checkInBannerLoading": "加载签到状态...",
+  "checkInBannerPrompt": "签到领 +{coins} 金币",
+  "@checkInBannerPrompt": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInBannerSummary": "{count}/{total} 天  ·  今天 +{coins}",
+  "@checkInBannerSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" },
+      "coins": { "type": "int" }
+    }
+  },
+
+  "commonErrorWithDetail": "错误：{error}",
+  "@commonErrorWithDetail": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "profileFallbackUser": "用户",
+  "fallbackCatName": "猫猫",
+  "settingsLanguageTraditionalChinese": "繁體中文",
+  "settingsLanguageJapanese": "日本語",
+  "settingsLanguageKorean": "한국어"
 }

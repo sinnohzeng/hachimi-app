@@ -40,7 +40,11 @@ class LocaleNotifier extends Notifier<Locale?> {
     if (state == null) {
       await prefs.remove(_keyLocale);
     } else {
-      await prefs.setString(_keyLocale, state!.languageCode);
+      // 存储格式：languageCode 或 languageCode_scriptCode（如 zh_Hant）
+      final code = state!.scriptCode != null
+          ? '${state!.languageCode}_${state!.scriptCode}'
+          : state!.languageCode;
+      await prefs.setString(_keyLocale, code);
     }
   }
 
@@ -48,13 +52,23 @@ class LocaleNotifier extends Notifier<Locale?> {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_keyLocale);
     if (code != null) {
-      state = Locale(code);
+      state = _parseLocale(code);
     }
+  }
+
+  /// 解析存储的 locale 字符串，支持 "zh_Hant" 等带 script 的格式。
+  static Locale _parseLocale(String code) {
+    if (code.contains('_')) {
+      final parts = code.split('_');
+      return Locale.fromSubtags(languageCode: parts[0], scriptCode: parts[1]);
+    }
+    return Locale(code);
   }
 }
 
 /// Locale provider — SSOT for app language setting.
-/// null = follow system; Locale('en') or Locale('zh') = user override.
+/// null = follow system; Locale('en'), Locale('zh'), Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+/// Locale('ja'), Locale('ko') = user override.
 final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(
   LocaleNotifier.new,
 );

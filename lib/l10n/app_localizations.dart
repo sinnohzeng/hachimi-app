@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -94,7 +96,10 @@ abstract class S {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('ja'),
+    Locale('ko'),
     Locale('zh'),
+    Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
 
   /// No description provided for @appTitle.
@@ -3156,6 +3161,402 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Create Quest'**
   String get addHabitCreate;
+
+  /// No description provided for @addHabitHoursSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get addHabitHoursSuffix;
+
+  /// No description provided for @shopTabPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants ({count})'**
+  String shopTabPlants(int count);
+
+  /// No description provided for @shopTabWild.
+  ///
+  /// In en, this message translates to:
+  /// **'Wild ({count})'**
+  String shopTabWild(int count);
+
+  /// No description provided for @shopTabCollars.
+  ///
+  /// In en, this message translates to:
+  /// **'Collars ({count})'**
+  String shopTabCollars(int count);
+
+  /// No description provided for @shopNoAccessories.
+  ///
+  /// In en, this message translates to:
+  /// **'No accessories available'**
+  String get shopNoAccessories;
+
+  /// No description provided for @shopBuyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {name}?'**
+  String shopBuyConfirm(String name);
+
+  /// No description provided for @shopPurchaseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase'**
+  String get shopPurchaseButton;
+
+  /// No description provided for @shopNotEnoughCoinsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough coins'**
+  String get shopNotEnoughCoinsButton;
+
+  /// No description provided for @shopPurchaseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased! {name} added to inventory'**
+  String shopPurchaseSuccess(String name);
+
+  /// No description provided for @shopPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough coins (need {price})'**
+  String shopPurchaseFailed(int price);
+
+  /// No description provided for @inventoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get inventoryTitle;
+
+  /// No description provided for @inventoryInBox.
+  ///
+  /// In en, this message translates to:
+  /// **'In Box ({count})'**
+  String inventoryInBox(int count);
+
+  /// No description provided for @inventoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your inventory is empty.\nVisit the shop to get accessories!'**
+  String get inventoryEmpty;
+
+  /// No description provided for @inventoryEquippedOnCats.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipped on Cats ({count})'**
+  String inventoryEquippedOnCats(int count);
+
+  /// No description provided for @inventoryNoEquipped.
+  ///
+  /// In en, this message translates to:
+  /// **'No accessories equipped on any cat.'**
+  String get inventoryNoEquipped;
+
+  /// No description provided for @inventoryUnequip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unequip'**
+  String get inventoryUnequip;
+
+  /// No description provided for @inventoryNoActiveCats.
+  ///
+  /// In en, this message translates to:
+  /// **'No active cats'**
+  String get inventoryNoActiveCats;
+
+  /// No description provided for @inventoryEquipTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip {name} to:'**
+  String inventoryEquipTo(String name);
+
+  /// No description provided for @inventoryEquipSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipped {name}'**
+  String inventoryEquipSuccess(String name);
+
+  /// No description provided for @inventoryUnequipSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Unequipped from {catName}'**
+  String inventoryUnequipSuccess(String catName);
+
+  /// No description provided for @chatCatNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat not found'**
+  String get chatCatNotFound;
+
+  /// No description provided for @chatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with {name}'**
+  String chatTitle(String name);
+
+  /// No description provided for @chatClearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear history'**
+  String get chatClearHistory;
+
+  /// No description provided for @chatEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hi to {name}!'**
+  String chatEmptyTitle(String name);
+
+  /// No description provided for @chatEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a conversation with your cat. They will reply based on their personality!'**
+  String get chatEmptySubtitle;
+
+  /// No description provided for @chatGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get chatGenerating;
+
+  /// No description provided for @chatTypeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
+  String get chatTypeMessage;
+
+  /// No description provided for @chatClearConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear chat history?'**
+  String get chatClearConfirmTitle;
+
+  /// No description provided for @chatClearConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete all messages. This cannot be undone.'**
+  String get chatClearConfirmMessage;
+
+  /// No description provided for @chatClearButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get chatClearButton;
+
+  /// No description provided for @diaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} Diary'**
+  String diaryTitle(String name);
+
+  /// No description provided for @diaryLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load diary'**
+  String get diaryLoadFailed;
+
+  /// No description provided for @diaryRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get diaryRetry;
+
+  /// No description provided for @diaryEmptyTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'No diary entries yet'**
+  String get diaryEmptyTitle2;
+
+  /// No description provided for @diaryEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a focus session and your cat will write their first diary entry!'**
+  String get diaryEmptySubtitle;
+
+  /// No description provided for @statsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statsTitle;
+
+  /// No description provided for @statsTotalHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Hours'**
+  String get statsTotalHours;
+
+  /// No description provided for @statsTimeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String statsTimeValue(int hours, int minutes);
+
+  /// No description provided for @statsBestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Streak'**
+  String get statsBestStreak;
+
+  /// No description provided for @statsStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String statsStreakDays(int count);
+
+  /// No description provided for @statsOverallProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Progress'**
+  String get statsOverallProgress;
+
+  /// No description provided for @statsPercentOfGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of all goals'**
+  String statsPercentOfGoals(String percent);
+
+  /// No description provided for @statsPerQuestProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-Quest Progress'**
+  String get statsPerQuestProgress;
+
+  /// No description provided for @statsQuestLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load quest stats'**
+  String get statsQuestLoadError;
+
+  /// No description provided for @statsNoQuestData.
+  ///
+  /// In en, this message translates to:
+  /// **'No quest data yet'**
+  String get statsNoQuestData;
+
+  /// No description provided for @statsNoQuestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a quest to see your progress here!'**
+  String get statsNoQuestHint;
+
+  /// No description provided for @statsLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get statsLast30Days;
+
+  /// No description provided for @habitDetailQuestNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest not found'**
+  String get habitDetailQuestNotFound;
+
+  /// No description provided for @habitDetailComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'complete'**
+  String get habitDetailComplete;
+
+  /// No description provided for @habitDetailTotalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Time'**
+  String get habitDetailTotalTime;
+
+  /// No description provided for @habitDetailCurrentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get habitDetailCurrentStreak;
+
+  /// No description provided for @habitDetailTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get habitDetailTarget;
+
+  /// No description provided for @habitDetailDaysUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String habitDetailDaysUnit(int count);
+
+  /// No description provided for @habitDetailHoursUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hours'**
+  String habitDetailHoursUnit(int count);
+
+  /// No description provided for @checkInBannerSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'+{coins} coins! Daily check-in complete'**
+  String checkInBannerSuccess(int coins);
+
+  /// No description provided for @checkInBannerBonus.
+  ///
+  /// In en, this message translates to:
+  /// **' + {bonus} milestone bonus!'**
+  String checkInBannerBonus(int bonus);
+
+  /// No description provided for @checkInBannerSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily check-in'**
+  String get checkInBannerSemantics;
+
+  /// No description provided for @checkInBannerLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading check-in status...'**
+  String get checkInBannerLoading;
+
+  /// No description provided for @checkInBannerPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in for +{coins} coins'**
+  String checkInBannerPrompt(int coins);
+
+  /// No description provided for @checkInBannerSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{total} days  ·  +{coins} today'**
+  String checkInBannerSummary(int count, int total, int coins);
+
+  /// No description provided for @commonErrorWithDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String commonErrorWithDetail(String error);
+
+  /// No description provided for @profileFallbackUser.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get profileFallbackUser;
+
+  /// No description provided for @fallbackCatName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat'**
+  String get fallbackCatName;
+
+  /// No description provided for @settingsLanguageTraditionalChinese.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional Chinese'**
+  String get settingsLanguageTraditionalChinese;
+
+  /// No description provided for @settingsLanguageJapanese.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese'**
+  String get settingsLanguageJapanese;
+
+  /// No description provided for @settingsLanguageKorean.
+  ///
+  /// In en, this message translates to:
+  /// **'Korean'**
+  String get settingsLanguageKorean;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -3168,17 +3569,33 @@ class _SDelegate extends LocalizationsDelegate<S> {
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+      <String>['en', 'ja', 'ko', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SDelegate old) => false;
 }
 
 S lookupS(Locale locale) {
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.scriptCode) {
+          case 'Hant':
+            return SZhHant();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':
       return SEn();
+    case 'ja':
+      return SJa();
+    case 'ko':
+      return SKo();
     case 'zh':
       return SZh();
   }

@@ -18,7 +18,7 @@
 // ---
 
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
@@ -57,6 +57,26 @@ class LlmService {
       return;
     }
 
+    // 前置校验：在调用 native 层前先在 Dart 侧检查文件有效性
+    final modelFile = File(modelPath);
+    if (!modelFile.existsSync()) {
+      _status = LlmEngineStatus.error;
+      _lastError = 'Model file not found: $modelPath';
+      throw LlamaException(_lastError!);
+    }
+    final fileSize = modelFile.lengthSync();
+    debugPrint(
+      '[LlmService] Loading model: $modelPath '
+      '(${(fileSize / 1024 / 1024).toStringAsFixed(1)} MB)',
+    );
+    if (fileSize < 100 * 1024 * 1024) {
+      _status = LlmEngineStatus.error;
+      _lastError =
+          'Model file appears corrupted — expected ~1 GB, got '
+          '${(fileSize / 1024 / 1024).toStringAsFixed(1)} MB';
+      throw LlamaException(_lastError!);
+    }
+
     _status = LlmEngineStatus.loading;
     _lastError = null;
 
@@ -73,12 +93,13 @@ class LlmService {
           ..temp = LlmConstants.temperature
           ..topP = LlmConstants.topP
           ..penaltyRepeat = LlmConstants.repeatPenalty,
-        verbose: false,
+        verbose: true,
       );
 
       _parent = LlamaParent(loadCommand);
       await _parent!.init();
       _status = LlmEngineStatus.ready;
+      debugPrint('[LlmService] Model loaded successfully');
     } catch (e) {
       _status = LlmEngineStatus.error;
       _lastError = e.toString();

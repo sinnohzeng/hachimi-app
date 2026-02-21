@@ -19,6 +19,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -92,7 +93,7 @@ class AccessoryShopScreen extends ConsumerWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Accessory Shop'),
+          title: Text(context.l10n.shopTitle),
           actions: [
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 12),
@@ -113,9 +114,9 @@ class AccessoryShopScreen extends ConsumerWidget {
           ],
           bottom: TabBar(
             tabs: [
-              Tab(text: 'Plants (${plantItems.length})'),
-              Tab(text: 'Wild (${wildItems.length})'),
-              Tab(text: 'Collars (${collarItems.length})'),
+              Tab(text: context.l10n.shopTabPlants(plantItems.length)),
+              Tab(text: context.l10n.shopTabWild(wildItems.length)),
+              Tab(text: context.l10n.shopTabCollars(collarItems.length)),
             ],
           ),
         ),
@@ -141,7 +142,7 @@ class _AccessoryGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (items.isEmpty) {
-      return const Center(child: Text('No accessories available'));
+      return Center(child: Text(context.l10n.shopNoAccessories));
     }
 
     return GridView.builder(
@@ -176,31 +177,38 @@ class _AccessoryGrid extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Buy ${item.displayName}?'),
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.monetization_on,
-              size: 18,
-              color: Theme.of(ctx).colorScheme.primary,
+      builder: (ctx) {
+        final l10n = ctx.l10n;
+        return AlertDialog(
+          title: Text(l10n.shopBuyConfirm(item.displayName)),
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.monetization_on,
+                size: 18,
+                color: Theme.of(ctx).colorScheme.primary,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Text(l10n.shopPrice(item.price)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonCancel),
             ),
-            const SizedBox(width: AppSpacing.xs),
-            Text('${item.price} coins'),
+            FilledButton(
+              onPressed: canAfford ? () => _purchase(ctx, ref, item) : null,
+              child: Text(
+                canAfford
+                    ? l10n.shopPurchaseButton
+                    : l10n.shopNotEnoughCoinsButton,
+              ),
+            ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: canAfford ? () => _purchase(ctx, ref, item) : null,
-            child: Text(canAfford ? 'Purchase' : 'Not enough coins'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -222,6 +230,7 @@ class _AccessoryGrid extends ConsumerWidget {
 
     if (success) HapticFeedback.mediumImpact();
 
+    final l10n = context.l10n;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -232,8 +241,8 @@ class _AccessoryGrid extends ConsumerWidget {
             Expanded(
               child: Text(
                 success
-                    ? 'Purchased! ${item.displayName} added to inventory'
-                    : 'Not enough coins (need ${item.price})',
+                    ? l10n.shopPurchaseSuccess(item.displayName)
+                    : l10n.shopPurchaseFailed(item.price),
               ),
             ),
           ],

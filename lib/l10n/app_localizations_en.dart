@@ -1658,4 +1658,254 @@ class SEn extends S {
 
   @override
   String get addHabitCreate => 'Create Quest';
+
+  @override
+  String get addHabitHoursSuffix => 'hours';
+
+  @override
+  String shopTabPlants(int count) {
+    return 'Plants ($count)';
+  }
+
+  @override
+  String shopTabWild(int count) {
+    return 'Wild ($count)';
+  }
+
+  @override
+  String shopTabCollars(int count) {
+    return 'Collars ($count)';
+  }
+
+  @override
+  String get shopNoAccessories => 'No accessories available';
+
+  @override
+  String shopBuyConfirm(String name) {
+    return 'Buy $name?';
+  }
+
+  @override
+  String get shopPurchaseButton => 'Purchase';
+
+  @override
+  String get shopNotEnoughCoinsButton => 'Not enough coins';
+
+  @override
+  String shopPurchaseSuccess(String name) {
+    return 'Purchased! $name added to inventory';
+  }
+
+  @override
+  String shopPurchaseFailed(int price) {
+    return 'Not enough coins (need $price)';
+  }
+
+  @override
+  String get inventoryTitle => 'Inventory';
+
+  @override
+  String inventoryInBox(int count) {
+    return 'In Box ($count)';
+  }
+
+  @override
+  String get inventoryEmpty =>
+      'Your inventory is empty.\nVisit the shop to get accessories!';
+
+  @override
+  String inventoryEquippedOnCats(int count) {
+    return 'Equipped on Cats ($count)';
+  }
+
+  @override
+  String get inventoryNoEquipped => 'No accessories equipped on any cat.';
+
+  @override
+  String get inventoryUnequip => 'Unequip';
+
+  @override
+  String get inventoryNoActiveCats => 'No active cats';
+
+  @override
+  String inventoryEquipTo(String name) {
+    return 'Equip $name to:';
+  }
+
+  @override
+  String inventoryEquipSuccess(String name) {
+    return 'Equipped $name';
+  }
+
+  @override
+  String inventoryUnequipSuccess(String catName) {
+    return 'Unequipped from $catName';
+  }
+
+  @override
+  String get chatCatNotFound => 'Cat not found';
+
+  @override
+  String chatTitle(String name) {
+    return 'Chat with $name';
+  }
+
+  @override
+  String get chatClearHistory => 'Clear history';
+
+  @override
+  String chatEmptyTitle(String name) {
+    return 'Say hi to $name!';
+  }
+
+  @override
+  String get chatEmptySubtitle =>
+      'Start a conversation with your cat. They will reply based on their personality!';
+
+  @override
+  String get chatGenerating => 'Generating...';
+
+  @override
+  String get chatTypeMessage => 'Type a message...';
+
+  @override
+  String get chatClearConfirmTitle => 'Clear chat history?';
+
+  @override
+  String get chatClearConfirmMessage =>
+      'This will delete all messages. This cannot be undone.';
+
+  @override
+  String get chatClearButton => 'Clear';
+
+  @override
+  String diaryTitle(String name) {
+    return '$name Diary';
+  }
+
+  @override
+  String get diaryLoadFailed => 'Failed to load diary';
+
+  @override
+  String get diaryRetry => 'Retry';
+
+  @override
+  String get diaryEmptyTitle2 => 'No diary entries yet';
+
+  @override
+  String get diaryEmptySubtitle =>
+      'Complete a focus session and your cat will write their first diary entry!';
+
+  @override
+  String get statsTitle => 'Statistics';
+
+  @override
+  String get statsTotalHours => 'Total Hours';
+
+  @override
+  String statsTimeValue(int hours, int minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String get statsBestStreak => 'Best Streak';
+
+  @override
+  String statsStreakDays(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get statsOverallProgress => 'Overall Progress';
+
+  @override
+  String statsPercentOfGoals(String percent) {
+    return '$percent% of all goals';
+  }
+
+  @override
+  String get statsPerQuestProgress => 'Per-Quest Progress';
+
+  @override
+  String get statsQuestLoadError => 'Failed to load quest stats';
+
+  @override
+  String get statsNoQuestData => 'No quest data yet';
+
+  @override
+  String get statsNoQuestHint => 'Start a quest to see your progress here!';
+
+  @override
+  String get statsLast30Days => 'Last 30 Days';
+
+  @override
+  String get habitDetailQuestNotFound => 'Quest not found';
+
+  @override
+  String get habitDetailComplete => 'complete';
+
+  @override
+  String get habitDetailTotalTime => 'Total Time';
+
+  @override
+  String get habitDetailCurrentStreak => 'Current Streak';
+
+  @override
+  String get habitDetailTarget => 'Target';
+
+  @override
+  String habitDetailDaysUnit(int count) {
+    return '$count days';
+  }
+
+  @override
+  String habitDetailHoursUnit(int count) {
+    return '$count hours';
+  }
+
+  @override
+  String checkInBannerSuccess(int coins) {
+    return '+$coins coins! Daily check-in complete';
+  }
+
+  @override
+  String checkInBannerBonus(int bonus) {
+    return ' + $bonus milestone bonus!';
+  }
+
+  @override
+  String get checkInBannerSemantics => 'Daily check-in';
+
+  @override
+  String get checkInBannerLoading => 'Loading check-in status...';
+
+  @override
+  String checkInBannerPrompt(int coins) {
+    return 'Check in for +$coins coins';
+  }
+
+  @override
+  String checkInBannerSummary(int count, int total, int coins) {
+    return '$count/$total days  ·  +$coins today';
+  }
+
+  @override
+  String commonErrorWithDetail(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get profileFallbackUser => 'User';
+
+  @override
+  String get fallbackCatName => 'Cat';
+
+  @override
+  String get settingsLanguageTraditionalChinese => 'Traditional Chinese';
+
+  @override
+  String get settingsLanguageJapanese => 'Japanese';
+
+  @override
+  String get settingsLanguageKorean => 'Korean';
 }

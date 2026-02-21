@@ -33,7 +33,8 @@ class CheckInScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.checkInTitle)),
       body: monthlyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.commonErrorWithDetail('$e'))),
         data: (monthly) {
           final data = monthly ?? MonthlyCheckIn.empty('');
           return SingleChildScrollView(

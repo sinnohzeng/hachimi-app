@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
@@ -20,16 +21,19 @@ class HabitDetailScreen extends ConsumerWidget {
     return habitsAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+      error: (e, _) => Scaffold(
+        body: Center(child: Text(context.l10n.commonErrorWithDetail('$e'))),
+      ),
       data: (habits) {
         final habit = habits.where((h) => h.id == habitId).firstOrNull;
         if (habit == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Quest not found')),
+            body: Center(child: Text(context.l10n.habitDetailQuestNotFound)),
           );
         }
 
+        final l10n = context.l10n;
         return Scaffold(
           appBar: AppBar(title: Text(habit.name)),
           body: Padding(
@@ -52,7 +56,7 @@ class HabitDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        'complete',
+                        l10n.habitDetailComplete,
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -65,23 +69,23 @@ class HabitDetailScreen extends ConsumerWidget {
                 // Stats
                 _DetailRow(
                   icon: Icons.timer,
-                  label: 'Total Time',
+                  label: l10n.habitDetailTotalTime,
                   value: habit.progressText,
                 ),
                 _DetailRow(
                   icon: Icons.local_fire_department,
-                  label: 'Current Streak',
-                  value: '${habit.currentStreak} days',
+                  label: l10n.habitDetailCurrentStreak,
+                  value: l10n.habitDetailDaysUnit(habit.currentStreak),
                 ),
                 _DetailRow(
                   icon: Icons.emoji_events,
-                  label: 'Best Streak',
-                  value: '${habit.bestStreak} days',
+                  label: l10n.habitDetailBestStreak,
+                  value: l10n.habitDetailDaysUnit(habit.bestStreak),
                 ),
                 _DetailRow(
                   icon: Icons.flag,
-                  label: 'Target',
-                  value: '${habit.targetHours} hours',
+                  label: l10n.habitDetailTarget,
+                  value: l10n.habitDetailHoursUnit(habit.targetHours),
                 ),
               ],
             ),

@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/chat_message.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/chat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -78,13 +79,13 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     if (cat == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Cat not found')),
+        body: Center(child: Text(context.l10n.chatCatNotFound)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${cat.name}'),
+        title: Text(context.l10n.chatTitle(cat.name)),
         actions: [
           if (chatState.messages.isNotEmpty)
             PopupMenuButton<String>(
@@ -94,9 +95,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                 }
               },
               itemBuilder: (ctx) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'clear',
-                  child: Text('Clear history'),
+                  child: Text(context.l10n.chatClearHistory),
                 ),
               ],
             ),
@@ -131,7 +132,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
   Widget _buildEmptyState(
     TextTheme textTheme,
     ColorScheme colorScheme,
-    String catName,
+    String catName, // catName 仍用于传参给 l10n 方法
   ) {
     return Center(
       child: Padding(
@@ -142,14 +143,14 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
             const Text('💬', style: TextStyle(fontSize: 48)),
             const SizedBox(height: AppSpacing.base),
             Text(
-              'Say hi to $catName!',
+              context.l10n.chatEmptyTitle(catName),
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Start a conversation with your cat. They will reply based on their personality!',
+              context.l10n.chatEmptySubtitle,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -233,8 +234,8 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     hintText: isGenerating
-                        ? 'Generating...'
-                        : 'Type a message...',
+                        ? context.l10n.chatGenerating
+                        : context.l10n.chatTypeMessage,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                       borderSide: BorderSide.none,
@@ -301,17 +302,16 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
   }
 
   void _confirmClearHistory(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear chat history?'),
-        content: const Text(
-          'This will delete all messages. This cannot be undone.',
-        ),
+        title: Text(l10n.chatClearConfirmTitle),
+        content: Text(l10n.chatClearConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () {
@@ -320,7 +320,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                   .read(chatNotifierProvider(widget.catId).notifier)
                   .clearHistory();
             },
-            child: const Text('Clear'),
+            child: Text(l10n.chatClearButton),
           ),
         ],
       ),

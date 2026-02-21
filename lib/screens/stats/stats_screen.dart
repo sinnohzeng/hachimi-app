@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
@@ -19,11 +20,13 @@ class StatsScreen extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final l10n = context.l10n;
+
     return CustomScrollView(
       slivers: [
-        const SliverAppBar(
+        SliverAppBar(
           floating: true,
-          title: Text('Statistics'),
+          title: Text(l10n.statsTitle),
           automaticallyImplyLeading: false,
         ),
 
@@ -35,9 +38,11 @@ class StatsScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatCard(
-                    label: 'Total Hours',
-                    value:
-                        '${stats.totalHoursLogged}h ${stats.remainingMinutes}m',
+                    label: l10n.statsTotalHours,
+                    value: l10n.statsTimeValue(
+                      stats.totalHoursLogged,
+                      stats.remainingMinutes,
+                    ),
                     icon: Icons.hourglass_bottom,
                     color: colorScheme.primaryContainer,
                     onColor: colorScheme.onPrimaryContainer,
@@ -46,8 +51,8 @@ class StatsScreen extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: _StatCard(
-                    label: 'Best Streak',
-                    value: '${stats.longestStreak} days',
+                    label: l10n.statsBestStreak,
+                    value: l10n.statsStreakDays(stats.longestStreak),
                     icon: Icons.local_fire_department,
                     color: colorScheme.tertiaryContainer,
                     onColor: colorScheme.onTertiaryContainer,
@@ -68,7 +73,10 @@ class StatsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Overall Progress', style: textTheme.titleMedium),
+                    Text(
+                      l10n.statsOverallProgress,
+                      style: textTheme.titleMedium,
+                    ),
                     const SizedBox(height: AppSpacing.md),
                     LinearProgressIndicator(
                       value: stats.overallProgress,
@@ -77,7 +85,9 @@ class StatsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '${(stats.overallProgress * 100).toStringAsFixed(1)}% of all goals',
+                      l10n.statsPercentOfGoals(
+                        (stats.overallProgress * 100).toStringAsFixed(1),
+                      ),
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -93,7 +103,10 @@ class StatsScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Per-Quest Progress', style: textTheme.titleMedium),
+            child: Text(
+              l10n.statsPerQuestProgress,
+              style: textTheme.titleMedium,
+            ),
           ),
         ),
 
@@ -106,17 +119,17 @@ class StatsScreen extends ConsumerWidget {
           ),
           error: (e, _) => SliverFillRemaining(
             child: ErrorState(
-              message: 'Failed to load quest stats',
+              message: l10n.statsQuestLoadError,
               onRetry: () => ref.invalidate(habitsProvider),
             ),
           ),
           data: (habits) {
             if (habits.isEmpty) {
-              return const SliverFillRemaining(
+              return SliverFillRemaining(
                 child: EmptyState(
                   icon: Icons.bar_chart_outlined,
-                  title: 'No quest data yet',
-                  subtitle: 'Start a quest to see your progress here!',
+                  title: l10n.statsNoQuestData,
+                  subtitle: l10n.statsNoQuestHint,
                 ),
               );
             }
@@ -183,7 +196,7 @@ class StatsScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-            child: Text('Last 30 Days', style: textTheme.titleMedium),
+            child: Text(l10n.statsLast30Days, style: textTheme.titleMedium),
           ),
         ),
         SliverToBoxAdapter(

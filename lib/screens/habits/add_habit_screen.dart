@@ -93,7 +93,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
                   labelText: context.l10n.addHabitTargetHours,
                   hintText: context.l10n.addHabitTargetHint,
                   prefixIcon: const Icon(Icons.flag),
-                  suffixText: 'hours',
+                  suffixText: context.l10n.addHabitHoursSuffix,
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {

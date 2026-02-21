@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
@@ -57,9 +58,10 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
 
       HapticFeedback.mediumImpact();
 
-      String message = '+${result.dailyCoins} coins! Daily check-in complete';
+      final l10n = context.l10n;
+      String message = l10n.checkInBannerSuccess(result.dailyCoins);
       if (result.milestoneBonus > 0) {
-        message += ' + ${result.milestoneBonus} milestone bonus!';
+        message += l10n.checkInBannerBonus(result.milestoneBonus);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -90,7 +92,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     final colorScheme = theme.colorScheme;
 
     return Semantics(
-      label: 'Daily check-in',
+      label: context.l10n.checkInBannerSemantics,
       child: checkedInAsync.when(
         loading: () => _buildLoadingCard(colorScheme),
         error: (_, __) => const SizedBox.shrink(),
@@ -111,17 +113,17 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Card(
         color: colorScheme.secondaryContainer,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              SizedBox(width: AppSpacing.md),
-              Text('Loading check-in status...'),
+              const SizedBox(width: AppSpacing.md),
+              Text(context.l10n.checkInBannerLoading),
             ],
           ),
         ),
@@ -151,7 +153,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
-                  'Check in for +$coins coins',
+                  context.l10n.checkInBannerPrompt(coins),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onTertiaryContainer,
                     fontWeight: FontWeight.w500,
@@ -205,7 +207,11 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
-                    '$checkedCount/$daysInMonth days  ·  +$todayCoins today',
+                    context.l10n.checkInBannerSummary(
+                      checkedCount,
+                      daysInMonth,
+                      todayCoins,
+                    ),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.w500,

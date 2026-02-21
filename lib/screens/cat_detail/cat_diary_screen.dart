@@ -14,6 +14,7 @@ import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/diary_provider.dart';
+import 'package:intl/intl.dart';
 
 /// 猫猫日记列表页。
 class CatDiaryScreen extends ConsumerWidget {
@@ -30,7 +31,11 @@ class CatDiaryScreen extends ConsumerWidget {
     final diaryAsync = ref.watch(diaryEntriesProvider(catId));
 
     return Scaffold(
-      appBar: AppBar(title: Text('${cat?.name ?? "Cat"} Diary')),
+      appBar: AppBar(
+        title: Text(
+          context.l10n.diaryTitle(cat?.name ?? context.l10n.fallbackCatName),
+        ),
+      ),
       body: diaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -43,12 +48,12 @@ class CatDiaryScreen extends ConsumerWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: AppSpacing.base),
-              Text('Failed to load diary', style: textTheme.bodyLarge),
+              Text(context.l10n.diaryLoadFailed, style: textTheme.bodyLarge),
               const SizedBox(height: AppSpacing.sm),
               TextButton.icon(
                 onPressed: () => ref.invalidate(diaryEntriesProvider(catId)),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -64,14 +69,14 @@ class CatDiaryScreen extends ConsumerWidget {
                     const Text('📖', style: TextStyle(fontSize: 48)),
                     const SizedBox(height: AppSpacing.base),
                     Text(
-                      'No diary entries yet',
+                      context.l10n.diaryEmptyTitle,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Complete a focus session and your cat will write their first diary entry!',
+                      context.l10n.diaryEmptyHint,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -102,7 +107,7 @@ class CatDiaryScreen extends ConsumerWidget {
                       Row(
                         children: [
                           Text(
-                            _formatDate(entry.date),
+                            _formatDate(entry.date, context),
                             style: textTheme.labelLarge?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -153,26 +158,11 @@ class CatDiaryScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(String dateStr) {
+  String _formatDate(String dateStr, BuildContext context) {
     try {
-      final parts = dateStr.split('-');
-      final month = int.parse(parts[1]);
-      final day = int.parse(parts[2]);
-      const months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-      return '${months[month - 1]} $day';
+      final date = DateTime.parse(dateStr);
+      final locale = Localizations.localeOf(context).toString();
+      return DateFormat.MMMd(locale).format(date);
     } catch (_) {
       return dateStr;
     }

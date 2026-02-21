@@ -325,7 +325,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
         final cat = habit.catId != null
             ? cats.where((c) => c.id == habit.catId).firstOrNull
             : null;
-        final catName = cat?.name ?? 'Your cat';
+        final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
 
         await notifService.scheduleDailyReminder(
           habitId: habit.id,

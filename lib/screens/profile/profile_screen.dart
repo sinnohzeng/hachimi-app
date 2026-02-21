@@ -19,6 +19,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -72,7 +73,9 @@ class ProfileScreen extends ConsumerWidget {
           // Display name
           Center(
             child: Text(
-              user?.displayName ?? user?.email?.split('@').first ?? 'User',
+              user?.displayName ??
+                  user?.email?.split('@').first ??
+                  l10n.profileFallbackUser,
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -142,22 +145,22 @@ class ProfileScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _StageChip(
-                            label: 'Kitten',
+                            label: l10n.stageName('kitten'),
                             count: stageCounts['kitten'] ?? 0,
                             color: stageColor('kitten'),
                           ),
                           _StageChip(
-                            label: 'Adolescent',
+                            label: l10n.stageName('adolescent'),
                             count: stageCounts['adolescent'] ?? 0,
                             color: stageColor('adolescent'),
                           ),
                           _StageChip(
-                            label: 'Adult',
+                            label: l10n.stageName('adult'),
                             count: stageCounts['adult'] ?? 0,
                             color: stageColor('adult'),
                           ),
                           _StageChip(
-                            label: 'Senior',
+                            label: l10n.stageName('senior'),
                             count: stageCounts['senior'] ?? 0,
                             color: stageColor('senior'),
                           ),

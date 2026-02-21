@@ -721,5 +721,158 @@
   "addHabitTargetHint": "e.g. 100",
   "addHabitValidTarget": "Please enter target hours",
   "addHabitValidNumber": "Please enter a valid number",
-  "addHabitCreate": "Create Quest"
+  "addHabitCreate": "Create Quest",
+  "addHabitHoursSuffix": "hours",
+
+  "shopTabPlants": "Plants ({count})",
+  "@shopTabPlants": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopTabWild": "Wild ({count})",
+  "@shopTabWild": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopTabCollars": "Collars ({count})",
+  "@shopTabCollars": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "shopNoAccessories": "No accessories available",
+  "shopBuyConfirm": "Buy {name}?",
+  "@shopBuyConfirm": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "shopPurchaseButton": "Purchase",
+  "shopNotEnoughCoinsButton": "Not enough coins",
+  "shopPurchaseSuccess": "Purchased! {name} added to inventory",
+  "@shopPurchaseSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "shopPurchaseFailed": "Not enough coins (need {price})",
+  "@shopPurchaseFailed": {
+    "placeholders": { "price": { "type": "int" } }
+  },
+
+  "inventoryTitle": "Inventory",
+  "inventoryInBox": "In Box ({count})",
+  "@inventoryInBox": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "inventoryEmpty": "Your inventory is empty.\nVisit the shop to get accessories!",
+  "inventoryEquippedOnCats": "Equipped on Cats ({count})",
+  "@inventoryEquippedOnCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "inventoryNoEquipped": "No accessories equipped on any cat.",
+  "inventoryUnequip": "Unequip",
+  "inventoryNoActiveCats": "No active cats",
+  "inventoryEquipTo": "Equip {name} to:",
+  "@inventoryEquipTo": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "inventoryEquipSuccess": "Equipped {name}",
+  "@inventoryEquipSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "inventoryUnequipSuccess": "Unequipped from {catName}",
+  "@inventoryUnequipSuccess": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+
+  "chatCatNotFound": "Cat not found",
+  "chatTitle": "Chat with {name}",
+  "@chatTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "chatClearHistory": "Clear history",
+  "chatEmptyTitle": "Say hi to {name}!",
+  "@chatEmptyTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "chatEmptySubtitle": "Start a conversation with your cat. They will reply based on their personality!",
+  "chatGenerating": "Generating...",
+  "chatTypeMessage": "Type a message...",
+  "chatClearConfirmTitle": "Clear chat history?",
+  "chatClearConfirmMessage": "This will delete all messages. This cannot be undone.",
+  "chatClearButton": "Clear",
+
+  "diaryTitle": "{name} Diary",
+  "@diaryTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "diaryLoadFailed": "Failed to load diary",
+  "diaryRetry": "Retry",
+  "diaryEmptyTitle2": "No diary entries yet",
+  "diaryEmptySubtitle": "Complete a focus session and your cat will write their first diary entry!",
+
+  "statsTitle": "Statistics",
+  "statsTotalHours": "Total Hours",
+  "statsTimeValue": "{hours}h {minutes}m",
+  "@statsTimeValue": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "statsBestStreak": "Best Streak",
+  "statsStreakDays": "{count} days",
+  "@statsStreakDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "statsOverallProgress": "Overall Progress",
+  "statsPercentOfGoals": "{percent}% of all goals",
+  "@statsPercentOfGoals": {
+    "placeholders": { "percent": { "type": "String" } }
+  },
+  "statsPerQuestProgress": "Per-Quest Progress",
+  "statsQuestLoadError": "Failed to load quest stats",
+  "statsNoQuestData": "No quest data yet",
+  "statsNoQuestHint": "Start a quest to see your progress here!",
+  "statsLast30Days": "Last 30 Days",
+
+  "habitDetailQuestNotFound": "Quest not found",
+  "habitDetailComplete": "complete",
+  "habitDetailTotalTime": "Total Time",
+  "habitDetailCurrentStreak": "Current Streak",
+  "habitDetailTarget": "Target",
+  "habitDetailDaysUnit": "{count} days",
+  "@habitDetailDaysUnit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "habitDetailHoursUnit": "{count} hours",
+  "@habitDetailHoursUnit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "checkInBannerSuccess": "+{coins} coins! Daily check-in complete",
+  "@checkInBannerSuccess": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInBannerBonus": " + {bonus} milestone bonus!",
+  "@checkInBannerBonus": {
+    "placeholders": { "bonus": { "type": "int" } }
+  },
+  "checkInBannerSemantics": "Daily check-in",
+  "checkInBannerLoading": "Loading check-in status...",
+  "checkInBannerPrompt": "Check in for +{coins} coins",
+  "@checkInBannerPrompt": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "checkInBannerSummary": "{count}/{total} days  ·  +{coins} today",
+  "@checkInBannerSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" },
+      "coins": { "type": "int" }
+    }
+  },
+
+  "commonErrorWithDetail": "Error: {error}",
+  "@commonErrorWithDetail": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "profileFallbackUser": "User",
+  "fallbackCatName": "Cat",
+  "settingsLanguageTraditionalChinese": "Traditional Chinese",
+  "settingsLanguageJapanese": "Japanese",
+  "settingsLanguageKorean": "Korean"
 }

@@ -17,6 +17,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -47,13 +48,13 @@ class InventoryScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory')),
+      appBar: AppBar(title: Text(context.l10n.inventoryTitle)),
       body: ListView(
         padding: AppSpacing.paddingBase,
         children: [
           // 箱中道具
           Text(
-            'In Box (${inventory.length})',
+            context.l10n.inventoryInBox(inventory.length),
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -62,7 +63,7 @@ class InventoryScreen extends ConsumerWidget {
               padding: AppSpacing.paddingVLg,
               child: Center(
                 child: Text(
-                  'Your inventory is empty.\nPurchase accessories from the shop!',
+                  context.l10n.inventoryEmpty,
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
@@ -88,7 +89,7 @@ class InventoryScreen extends ConsumerWidget {
 
           // 已装备在猫上
           Text(
-            'Equipped on Cats (${equippedItems.length})',
+            context.l10n.inventoryEquippedOnCats(equippedItems.length),
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -97,7 +98,7 @@ class InventoryScreen extends ConsumerWidget {
               padding: AppSpacing.paddingVLg,
               child: Center(
                 child: Text(
-                  'No accessories equipped on any cat.',
+                  context.l10n.inventoryNoEquipped,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -113,7 +114,7 @@ class InventoryScreen extends ConsumerWidget {
                   subtitle: Text(item.cat.name),
                   trailing: TextButton(
                     onPressed: () => _unequip(context, ref, item.cat),
-                    child: const Text('Unequip'),
+                    child: Text(context.l10n.inventoryUnequip),
                   ),
                 ),
               );
@@ -132,9 +133,9 @@ class InventoryScreen extends ConsumerWidget {
     HapticFeedback.mediumImpact();
 
     if (cats.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No active cats')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.inventoryNoActiveCats)),
+      );
       return;
     }
 
@@ -147,7 +148,9 @@ class InventoryScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Equip ${accessoryDisplayName(accessoryId)} to:',
+                context.l10n.inventoryEquipTo(
+                  accessoryDisplayName(accessoryId),
+                ),
                 style: Theme.of(
                   ctx,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -209,7 +212,11 @@ class InventoryScreen extends ConsumerWidget {
         .read(inventoryServiceProvider)
         .equipAccessory(uid: uid, catId: catId, accessoryId: accessoryId);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Equipped ${accessoryDisplayName(accessoryId)}')),
+      SnackBar(
+        content: Text(
+          context.l10n.inventoryEquipSuccess(accessoryDisplayName(accessoryId)),
+        ),
+      ),
     );
   }
 
@@ -219,9 +226,9 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .unequipAccessory(uid: uid, catId: cat.id);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Unequipped from ${cat.name}')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.inventoryUnequipSuccess(cat.name))),
+    );
   }
 }
 

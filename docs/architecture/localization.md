@@ -21,8 +21,20 @@ Hachimi uses Flutter's built-in localization system powered by **`flutter_locali
 |--------|----------|----------|--------|
 | `en` | English | `lib/l10n/app_en.arb` | Primary (source of truth) |
 | `zh` | Chinese (Simplified) | `lib/l10n/app_zh.arb` | Translation |
+| `zh-Hant` | Chinese (Traditional / HK) | `lib/l10n/app_zh_Hant.arb` | Translation |
+| `ja` | Japanese | `lib/l10n/app_ja.arb` | Translation |
+| `ko` | Korean | `lib/l10n/app_ko.arb` | Translation |
 
-English is the **template locale** — all new keys must be added to `app_en.arb` first, then translated to `app_zh.arb`.
+English is the **template locale** — all new keys must be added to `app_en.arb` first, then translated to all other ARB files.
+
+### Traditional Chinese locale code
+
+Flutter distinguishes Simplified and Traditional Chinese via the **script subtag**, not the country code:
+
+- `Locale('zh')` → Simplified Chinese (`app_zh.arb`)
+- `Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')` → Traditional Chinese (`app_zh_Hant.arb`)
+
+The `locale_provider.dart` stores the compound code `"zh_Hant"` in SharedPreferences and reconstructs it with `Locale.fromSubtags` on load.
 
 ---
 
@@ -137,7 +149,7 @@ Follow this workflow when adding any new user-facing text:
 
 1. **Add the key to `app_en.arb`** with the English string value and an `@key` metadata entry containing a `description`.
 
-2. **Add the translation to `app_zh.arb`** with the same key and the Chinese translation.
+2. **Add the translation to all locale ARB files** (`app_zh.arb`, `app_zh_Hant.arb`, `app_ja.arb`, `app_ko.arb`) with idiomatic translations.
 
 3. **Run code generation**:
    ```bash
@@ -167,8 +179,12 @@ The `gen-l10n` tool produces:
 .dart_tool/flutter_gen/gen_l10n/
 ├── app_localizations.dart          # Abstract AppLocalizations class
 ├── app_localizations_en.dart       # English implementation
-└── app_localizations_zh.dart       # Chinese implementation
+├── app_localizations_zh.dart       # Chinese (Simplified) implementation
+├── app_localizations_ja.dart       # Japanese implementation
+└── app_localizations_ko.dart       # Korean implementation
 ```
+
+Note: Traditional Chinese (`zh-Hant`) is generated as a sub-locale of `zh` and included within `app_localizations_zh.dart`.
 
 These files are generated at compile time and should **not** be checked into version control. They are listed in `.gitignore` via the `.dart_tool/` pattern.
 
@@ -196,6 +212,7 @@ These files are generated at compile time and should **not** be checked into ver
 
 To verify localization completeness:
 
-1. **Compile check**: `flutter gen-l10n` will fail if `app_zh.arb` is missing any key that exists in `app_en.arb`.
-2. **Visual check**: Run the app with `--locale zh` to verify Chinese strings render correctly.
-3. **Placeholder check**: Ensure all placeholders (`{catName}`, `{minutes}`) are present in both ARB files.
+1. **Compile check**: `flutter gen-l10n` will fail if any translation ARB file is missing a key that exists in `app_en.arb`.
+2. **Visual check**: Run the app and switch language in Settings to verify strings render correctly for all 5 locales.
+3. **Placeholder check**: Ensure all placeholders (`{catName}`, `{minutes}`) are present in all ARB files.
+4. **Test localization delegates**: Widget tests that render l10n-dependent widgets must include `S.localizationsDelegates` and `S.supportedLocales` in their `MaterialApp`.

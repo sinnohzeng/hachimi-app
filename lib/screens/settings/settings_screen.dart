@@ -224,11 +224,19 @@ class SettingsScreen extends ConsumerWidget {
 
   String _localeName(Locale? locale, S l10n) {
     if (locale == null) return l10n.settingsLanguageSystem;
+    // 繁体中文需要检查 scriptCode
+    if (locale.languageCode == 'zh' && locale.scriptCode == 'Hant') {
+      return l10n.settingsLanguageTraditionalChinese;
+    }
     switch (locale.languageCode) {
       case 'en':
         return l10n.settingsLanguageEnglish;
       case 'zh':
         return l10n.settingsLanguageChinese;
+      case 'ja':
+        return l10n.settingsLanguageJapanese;
+      case 'ko':
+        return l10n.settingsLanguageKorean;
       default:
         return locale.languageCode;
     }
@@ -243,6 +251,12 @@ class SettingsScreen extends ConsumerWidget {
       if (result != null) {
         if (result == 'system') {
           ref.read(localeProvider.notifier).setLocale(null);
+        } else if (result == 'zh_Hant') {
+          ref
+              .read(localeProvider.notifier)
+              .setLocale(
+                Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+              );
         } else {
           ref.read(localeProvider.notifier).setLocale(Locale(result as String));
         }

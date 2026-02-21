@@ -128,6 +128,13 @@ class ModelManagerService {
     final file = File(filePath);
     if (!file.existsSync()) return false;
 
+    // 最小文件大小检查（模型应 >= 100 MB；低于此值多为 HTML 错误页或截断文件）
+    final fileSize = file.lengthSync();
+    if (fileSize < 100 * 1024 * 1024) {
+      await file.delete();
+      return false;
+    }
+
     // SHA-256 校验（如果设置了 hash）
     if (LlmConstants.modelSha256.isNotEmpty) {
       final fileBytes = await file.readAsBytes();

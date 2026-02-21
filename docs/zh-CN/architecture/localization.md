@@ -21,8 +21,20 @@ Hachimi 使用 Flutter 内置的本地化系统，由 **`flutter_localizations`*
 |---------|------|----------|------|
 | `en` | 英语 | `lib/l10n/app_en.arb` | 主要（真值来源） |
 | `zh` | 中文（简体） | `lib/l10n/app_zh.arb` | 翻译 |
+| `zh-Hant` | 中文（繁体 / 港式） | `lib/l10n/app_zh_Hant.arb` | 翻译 |
+| `ja` | 日语 | `lib/l10n/app_ja.arb` | 翻译 |
+| `ko` | 韩语 | `lib/l10n/app_ko.arb` | 翻译 |
 
-英语是 **模板语言区域** —— 所有新键必须先添加到 `app_en.arb`，然后翻译到 `app_zh.arb`。
+英语是 **模板语言区域** —— 所有新键必须先添加到 `app_en.arb`，然后翻译到所有其他 ARB 文件。
+
+### 繁体中文语言区域代码
+
+Flutter 通过 **script 子标签** 区分简体和繁体中文，而非国家代码：
+
+- `Locale('zh')` → 简体中文（`app_zh.arb`）
+- `Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')` → 繁体中文（`app_zh_Hant.arb`）
+
+`locale_provider.dart` 在 SharedPreferences 中存储复合代码 `"zh_Hant"`，加载时使用 `Locale.fromSubtags` 重建。
 
 ---
 
@@ -137,7 +149,7 @@ ARB 文件是带有元数据注解的 JSON。每个用户可见的字符串是�
 
 1. **将键添加到 `app_en.arb`**，包含英文字符串值和包含 `description` 的 `@key` 元数据条目。
 
-2. **将翻译添加到 `app_zh.arb`**，使用相同的键和中文翻译。
+2. **将翻译添加到所有语言区域 ARB 文件**（`app_zh.arb`、`app_zh_Hant.arb`、`app_ja.arb`、`app_ko.arb`），使用地道的翻译。
 
 3. **运行代码生成**：
    ```bash
@@ -167,8 +179,12 @@ ARB 文件是带有元数据注解的 JSON。每个用户可见的字符串是�
 .dart_tool/flutter_gen/gen_l10n/
 ├── app_localizations.dart          # 抽象 AppLocalizations 类
 ├── app_localizations_en.dart       # 英文实现
-└── app_localizations_zh.dart       # 中文实现
+├── app_localizations_zh.dart       # 中文（简体 + 繁体子区域）实现
+├── app_localizations_ja.dart       # 日文实现
+└── app_localizations_ko.dart       # 韩文实现
 ```
+
+注意：繁体中文（`zh-Hant`）作为 `zh` 的子区域生成，包含在 `app_localizations_zh.dart` 中。
 
 这些文件在编译时生成，**不应** 提交到版本控制。它们通过 `.gitignore` 中的 `.dart_tool/` 模式被排除。
 
@@ -196,6 +212,7 @@ ARB 文件是带有元数据注解的 JSON。每个用户可见的字符串是�
 
 验证本地化完整性：
 
-1. **编译检查**：如果 `app_zh.arb` 缺少 `app_en.arb` 中存在的键，`flutter gen-l10n` 将失败。
-2. **视觉检查**：使用 `--locale zh` 运行应用，验证中文字符串正确渲染。
-3. **占位符检查**：确保所有占位符（`{catName}`、`{minutes}`）在两个 ARB 文件中都存在。
+1. **编译检查**：如果任何翻译 ARB 文件缺少 `app_en.arb` 中存在的键，`flutter gen-l10n` 将失败。
+2. **视觉检查**：运行应用并在设置中切换语言，验证所有 5 种语言的字符串正确渲染。
+3. **占位符检查**：确保所有占位符（`{catName}`、`{minutes}`）在所有 ARB 文件中都存在。
+4. **测试本地化代理**：渲染依赖 l10n 的组件的 Widget 测试必须在 `MaterialApp` 中包含 `S.localizationsDelegates` 和 `S.supportedLocales`。

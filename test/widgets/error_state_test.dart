@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/widgets/error_state.dart';
 
 void main() {
@@ -7,6 +8,8 @@ void main() {
     testWidgets('renders error icon and message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           home: Scaffold(body: ErrorState(message: 'Something went wrong')),
         ),
       );
@@ -20,6 +23,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           home: Scaffold(
             body: ErrorState(
               message: 'Failed to load',
@@ -37,6 +42,8 @@ void main() {
     testWidgets('hides retry button when onRetry is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           home: Scaffold(body: ErrorState(message: 'Error occurred')),
         ),
       );
@@ -49,6 +56,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           theme: ThemeData(colorSchemeSeed: Colors.blue),
           home: Scaffold(
             body: ErrorState(message: 'Failed to load data', onRetry: () {}),
@@ -67,6 +76,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
           theme: ThemeData(colorSchemeSeed: Colors.blue),
           home: const Scaffold(body: ErrorState(message: 'Network error')),
         ),
