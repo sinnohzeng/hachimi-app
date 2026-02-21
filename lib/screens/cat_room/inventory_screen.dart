@@ -197,10 +197,9 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .equipAccessory(uid: uid, catId: catId, accessoryId: accessoryId);
-    ref.read(analyticsServiceProvider).logAccessoryEquipped(
-      catId: catId,
-      accessoryId: accessoryId,
-    );
+    ref
+        .read(analyticsServiceProvider)
+        .logAccessoryEquipped(catId: catId, accessoryId: accessoryId);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

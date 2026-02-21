@@ -89,7 +89,12 @@ class LlmService {
       _status = LlmEngineStatus.error;
       _lastError = e.toString();
       _parent = null;
-      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'loadModel');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LlmService',
+        operation: 'loadModel',
+      );
       rethrow;
     }
   }
@@ -146,7 +151,12 @@ class LlmService {
       return cleanResponse(text);
     } catch (e, stack) {
       _resetOnError(e);
-      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'generate');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LlmService',
+        operation: 'generate',
+      );
       rethrow;
     }
   }
@@ -208,7 +218,12 @@ class LlmService {
     try {
       await _parent?.stop();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'stopGeneration');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LlmService',
+        operation: 'stopGeneration',
+      );
     }
     if (_status == LlmEngineStatus.generating) {
       _status = LlmEngineStatus.ready;
@@ -220,7 +235,12 @@ class LlmService {
     try {
       await _parent?.dispose();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'unloadModel');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LlmService',
+        operation: 'unloadModel',
+      );
     }
     _parent = null;
     _status = LlmEngineStatus.unloaded;

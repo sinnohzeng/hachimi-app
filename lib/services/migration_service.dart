@@ -101,7 +101,12 @@ class MigrationService {
       // 重置用户 profile 字段（保留账号）
       await userRef.update({'coins': 0, 'lastCheckInDate': null});
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'MigrationService', operation: 'clearAllUserData');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'MigrationService',
+        operation: 'clearAllUserData',
+      );
       rethrow;
     }
   }
@@ -121,7 +126,12 @@ class MigrationService {
       try {
         await batch.commit();
       } catch (e, stack) {
-        ErrorHandler.record(e, stackTrace: stack, source: 'MigrationService', operation: '_deleteSubcollection');
+        ErrorHandler.record(
+          e,
+          stackTrace: stack,
+          source: 'MigrationService',
+          operation: '_deleteSubcollection',
+        );
         rethrow;
       }
     } while (snapshot.docs.length == batchSize);

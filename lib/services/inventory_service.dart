@@ -57,7 +57,12 @@ class InventoryService {
         tx.update(catRef, {'equippedAccessory': accessoryId});
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'InventoryService', operation: 'equipAccessory');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'InventoryService',
+        operation: 'equipAccessory',
+      );
       rethrow;
     }
   }
@@ -91,7 +96,12 @@ class InventoryService {
         tx.update(catRef, {'equippedAccessory': null});
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'InventoryService', operation: 'unequipAccessory');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'InventoryService',
+        operation: 'unequipAccessory',
+      );
       rethrow;
     }
   }

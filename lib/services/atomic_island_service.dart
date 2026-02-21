@@ -27,7 +27,12 @@ class AtomicIslandService {
         'startTimeMs': startTimeMs,
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'AtomicIslandService', operation: 'updateNotification');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'AtomicIslandService',
+        operation: 'updateNotification',
+      );
     }
   }
 
@@ -36,7 +41,12 @@ class AtomicIslandService {
     try {
       await _channel.invokeMethod('cancelTimerNotification');
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'AtomicIslandService', operation: 'cancel');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'AtomicIslandService',
+        operation: 'cancel',
+      );
     }
   }
 }

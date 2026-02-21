@@ -16,7 +16,12 @@ class AnalyticsService {
     try {
       await fn();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'AnalyticsService', operation: '_safeLog');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'AnalyticsService',
+        operation: '_safeLog',
+      );
     }
   }
 
@@ -314,18 +319,16 @@ class AnalyticsService {
 
   // ─── Economy System Events ───
 
-  Future<void> logCoinsEarned({
-    required int amount,
-    required String source,
-  }) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.coinsEarned,
-      parameters: {
-        AnalyticsEvents.paramCoinAmount: amount,
-        AnalyticsEvents.paramCoinSource: source,
-      },
-    ),
-  );
+  Future<void> logCoinsEarned({required int amount, required String source}) =>
+      _safeLog(
+        () => _analytics.logEvent(
+          name: AnalyticsEvents.coinsEarned,
+          parameters: {
+            AnalyticsEvents.paramCoinAmount: amount,
+            AnalyticsEvents.paramCoinSource: source,
+          },
+        ),
+      );
 
   Future<void> logCoinsSpent({
     required int amount,

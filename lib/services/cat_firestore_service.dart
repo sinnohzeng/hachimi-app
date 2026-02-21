@@ -47,7 +47,12 @@ class CatFirestoreService {
         'lastSessionAt': FieldValue.serverTimestamp(),
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'updateCatProgress');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CatFirestoreService',
+        operation: 'updateCatProgress',
+      );
       rethrow;
     }
   }
@@ -61,7 +66,12 @@ class CatFirestoreService {
     try {
       await _catsRef(uid).doc(catId).update({'name': newName});
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'renameCat');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CatFirestoreService',
+        operation: 'renameCat',
+      );
       rethrow;
     }
   }
@@ -97,7 +107,12 @@ class CatFirestoreService {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.graduated});
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'graduateCat');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CatFirestoreService',
+        operation: 'graduateCat',
+      );
       rethrow;
     }
   }
@@ -107,7 +122,12 @@ class CatFirestoreService {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.dormant});
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'archiveCat');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CatFirestoreService',
+        operation: 'archiveCat',
+      );
       rethrow;
     }
   }

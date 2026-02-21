@@ -62,7 +62,10 @@ class DiaryService {
 
     try {
       // 生成日记文本
-      final content = await AppTraces.trace('diary_generate', () => _llmService.generate(prompt));
+      final content = await AppTraces.trace(
+        'diary_generate',
+        () => _llmService.generate(prompt),
+      );
       if (content.isEmpty) return null;
 
       // 构建日记条目
@@ -84,7 +87,12 @@ class DiaryService {
       final saved = await _dbService.insertDiaryEntry(entry);
       return saved ? entry : null;
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'DiaryService', operation: 'generateTodayDiary');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'DiaryService',
+        operation: 'generateTodayDiary',
+      );
       return null;
     }
   }

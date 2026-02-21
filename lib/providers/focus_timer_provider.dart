@@ -469,10 +469,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final completionRatio = state.totalSeconds > 0
         ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
         : 1.0;
-    ref.read(analyticsServiceProvider).logSessionQuality(
-      sessionDuration: state.elapsedSeconds,
-      completionRatio: completionRatio,
-    );
+    ref
+        .read(analyticsServiceProvider)
+        .logSessionQuality(
+          sessionDuration: state.elapsedSeconds,
+          completionRatio: completionRatio,
+        );
   }
 
   /// Abandon the session.
@@ -486,10 +488,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final completionRatio = state.totalSeconds > 0
         ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
         : 0.0;
-    ref.read(analyticsServiceProvider).logSessionQuality(
-      sessionDuration: state.elapsedSeconds,
-      completionRatio: completionRatio,
-    );
+    ref
+        .read(analyticsServiceProvider)
+        .logSessionQuality(
+          sessionDuration: state.elapsedSeconds,
+          completionRatio: completionRatio,
+        );
   }
 
   /// Handle app going to background.

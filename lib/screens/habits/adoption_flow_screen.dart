@@ -147,7 +147,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             cat: selectedCat,
           );
 
-      ErrorHandler.breadcrumb('cat_adopted: ${_catNameController.text.trim()}, habit=${_nameController.text.trim()}');
+      ErrorHandler.breadcrumb(
+        'cat_adopted: ${_catNameController.text.trim()}, habit=${_nameController.text.trim()}',
+      );
       await ref
           .read(analyticsServiceProvider)
           .logHabitCreated(

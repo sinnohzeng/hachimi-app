@@ -33,7 +33,9 @@ class OfflineWriteGuard {
     try {
       await writeFn();
     } catch (e, stack) {
-      debugPrint('[OfflineWriteGuard] $operationName failed, queuing for retry');
+      debugPrint(
+        '[OfflineWriteGuard] $operationName failed, queuing for retry',
+      );
       ErrorHandler.record(
         e,
         stackTrace: stack,
@@ -71,14 +73,16 @@ class OfflineWriteGuard {
   /// Successfully retried operations are removed from the queue.
   static Future<void> retryPending(
     Map<String, Future<void> Function(Map<String, dynamic> payload)>
-        retryHandler,
+    retryHandler,
   ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final pending = prefs.getStringList(_pendingKey) ?? [];
       if (pending.isEmpty) return;
 
-      debugPrint('[OfflineWriteGuard] Retrying ${pending.length} pending writes');
+      debugPrint(
+        '[OfflineWriteGuard] Retrying ${pending.length} pending writes',
+      );
       final remaining = <String>[];
 
       for (final entryJson in pending) {

@@ -27,8 +27,9 @@ void main() async {
     );
 
     // Crashlytics: only collect in release builds
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(kReleaseMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      kReleaseMode,
+    );
 
     // Capture Flutter framework errors
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;

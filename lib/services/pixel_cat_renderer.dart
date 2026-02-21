@@ -103,7 +103,12 @@ class PixelCatRenderer {
             .toList();
       }
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'PixelCatRenderer', operation: '_ensureConfigLoaded');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'PixelCatRenderer',
+        operation: '_ensureConfigLoaded',
+      );
       // 初始化空默认值防止重复尝试
       _spritesIndex ??= {};
       _offsetMap ??= [];
@@ -143,7 +148,13 @@ class PixelCatRenderer {
       _spritesheetCache[name] = frame.image;
       return frame.image;
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'PixelCatRenderer', operation: '_loadSpritesheet', extras: {'spritesheet': name});
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'PixelCatRenderer',
+        operation: '_loadSpritesheet',
+        extras: {'spritesheet': name},
+      );
       rethrow;
     }
   }

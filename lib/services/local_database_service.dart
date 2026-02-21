@@ -74,7 +74,12 @@ class LocalDatabaseService {
       );
       return true;
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'LocalDatabaseService', operation: 'insertDiaryEntry');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LocalDatabaseService',
+        operation: 'insertDiaryEntry',
+      );
       return false;
     }
   }

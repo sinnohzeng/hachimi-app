@@ -236,7 +236,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       coinsEarned: coinsEarned,
     );
 
-    ErrorHandler.breadcrumb('focus_completed: ${habit.name}, ${minutes}min, ${coinsEarned}coins');
+    ErrorHandler.breadcrumb(
+      'focus_completed: ${habit.name}, ${minutes}min, ${coinsEarned}coins',
+    );
     await ref
         .read(firestoreServiceProvider)
         .logFocusSession(uid: uid, session: session, habitName: habit.name);
@@ -260,10 +262,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
     // Track coins earned from focus session
     if (coinsEarned > 0) {
-      analytics.logCoinsEarned(
-        amount: coinsEarned,
-        source: 'focus_session',
-      );
+      analytics.logCoinsEarned(amount: coinsEarned, source: 'focus_session');
     }
 
     if (mounted) {

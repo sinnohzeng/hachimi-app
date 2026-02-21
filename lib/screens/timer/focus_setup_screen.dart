@@ -59,7 +59,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         );
 
     HapticFeedback.lightImpact();
-    ErrorHandler.breadcrumb('focus_started: ${habit.name}, ${_selectedMinutes}min, ${_selectedMode.name}');
+    ErrorHandler.breadcrumb(
+      'focus_started: ${habit.name}, ${_selectedMinutes}min, ${_selectedMode.name}',
+    );
 
     // Navigate to focus timer screen
     Navigator.of(

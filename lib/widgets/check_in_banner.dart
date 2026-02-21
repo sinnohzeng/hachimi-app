@@ -40,12 +40,13 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     final result = await coinService.checkIn(uid);
 
     if (result != null && mounted) {
-      ErrorHandler.breadcrumb('daily_checkin_completed: +${result.dailyCoins} coins');
-      final totalCoins = result.dailyCoins + result.milestoneBonus;
-      ref.read(analyticsServiceProvider).logCoinsEarned(
-        amount: totalCoins,
-        source: 'daily_checkin',
+      ErrorHandler.breadcrumb(
+        'daily_checkin_completed: +${result.dailyCoins} coins',
       );
+      final totalCoins = result.dailyCoins + result.milestoneBonus;
+      ref
+          .read(analyticsServiceProvider)
+          .logCoinsEarned(amount: totalCoins, source: 'daily_checkin');
       ref.invalidate(hasCheckedInTodayProvider);
       ref.invalidate(monthlyCheckInProvider);
 

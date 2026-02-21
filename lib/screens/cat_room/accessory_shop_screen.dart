@@ -214,14 +214,12 @@ class _AccessoryGrid extends ConsumerWidget {
 
     if (success) {
       HapticFeedback.mediumImpact();
-      ref.read(analyticsServiceProvider).logAccessoryPurchased(
-        accessoryId: item.id,
-        price: item.price,
-      );
-      ref.read(analyticsServiceProvider).logCoinsSpent(
-        amount: item.price,
-        accessoryId: item.id,
-      );
+      ref
+          .read(analyticsServiceProvider)
+          .logAccessoryPurchased(accessoryId: item.id, price: item.price);
+      ref
+          .read(analyticsServiceProvider)
+          .logCoinsSpent(amount: item.price, accessoryId: item.id);
     }
 
     final l10n = context.l10n;

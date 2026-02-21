@@ -121,7 +121,12 @@ class FirestoreService {
     try {
       await batch.commit();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'createHabitWithCat');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'FirestoreService',
+        operation: 'createHabitWithCat',
+      );
       rethrow;
     }
     return (habitId: habitRef.id, catId: catRef.id);
@@ -259,7 +264,12 @@ class FirestoreService {
     try {
       await batch.commit();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'logFocusSession');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'FirestoreService',
+        operation: 'logFocusSession',
+      );
       rethrow;
     }
   });
@@ -333,7 +343,12 @@ class FirestoreService {
     try {
       await batch.commit();
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'logCheckIn');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'FirestoreService',
+        operation: 'logCheckIn',
+      );
       rethrow;
     }
   }

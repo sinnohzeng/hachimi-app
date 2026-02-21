@@ -126,10 +126,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     await prefs.setString(_kLastOpenKey, today.toIso8601String());
     await prefs.setInt(_kConsecutiveDaysKey, consecutiveDays);
 
-    ref.read(analyticsServiceProvider).logAppOpened(
-      daysSinceLast: daysSinceLast,
-      consecutiveDays: consecutiveDays,
-    );
+    ref
+        .read(analyticsServiceProvider)
+        .logAppOpened(
+          daysSinceLast: daysSinceLast,
+          consecutiveDays: consecutiveDays,
+        );
   }
 
   @override

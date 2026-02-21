@@ -65,91 +65,99 @@ class CoinService {
     final monthRef = _monthlyCheckInRef(uid, month);
 
     try {
-      return await AppTraces.trace('coin_check_in', () => _db.runTransaction((tx) async {
-        // 1. 检查今日是否已签到
-        final userDoc = await tx.get(userRef);
-        final userData = userDoc.data() as Map<String, dynamic>? ?? {};
-        final lastDate = userData['lastCheckInDate'] as String?;
-        if (lastDate == today) return null;
+      return await AppTraces.trace(
+        'coin_check_in',
+        () => _db.runTransaction((tx) async {
+          // 1. 检查今日是否已签到
+          final userDoc = await tx.get(userRef);
+          final userData = userDoc.data() as Map<String, dynamic>? ?? {};
+          final lastDate = userData['lastCheckInDate'] as String?;
+          if (lastDate == today) return null;
 
-        // 2. 读取当月签到文档
-        final monthDoc = await tx.get(monthRef);
-        final existingDays = monthDoc.exists
-            ? ((monthDoc.data() as Map<String, dynamic>)['checkedDays']
-                          as List<dynamic>? ??
-                      [])
-                  .whereType<num>()
-                  .map((e) => e.toInt())
-                  .toList()
-            : <int>[];
-        final existingMilestones = monthDoc.exists
-            ? ((monthDoc.data() as Map<String, dynamic>)['milestonesClaimed']
-                          as List<dynamic>? ??
-                      [])
-                  .whereType<num>()
-                  .map((e) => e.toInt())
-                  .toList()
-            : <int>[];
-        // 3. 计算每日奖励
-        final dailyCoins = isWeekend
-            ? checkInCoinsWeekend
-            : checkInCoinsWeekday;
+          // 2. 读取当月签到文档
+          final monthDoc = await tx.get(monthRef);
+          final existingDays = monthDoc.exists
+              ? ((monthDoc.data() as Map<String, dynamic>)['checkedDays']
+                            as List<dynamic>? ??
+                        [])
+                    .whereType<num>()
+                    .map((e) => e.toInt())
+                    .toList()
+              : <int>[];
+          final existingMilestones = monthDoc.exists
+              ? ((monthDoc.data() as Map<String, dynamic>)['milestonesClaimed']
+                            as List<dynamic>? ??
+                        [])
+                    .whereType<num>()
+                    .map((e) => e.toInt())
+                    .toList()
+              : <int>[];
+          // 3. 计算每日奖励
+          final dailyCoins = isWeekend
+              ? checkInCoinsWeekend
+              : checkInCoinsWeekday;
 
-        // 4. 计算新的签到天数
-        final newDays = [...existingDays, dayOfMonth];
-        final newCount = newDays.length;
+          // 4. 计算新的签到天数
+          final newDays = [...existingDays, dayOfMonth];
+          final newCount = newDays.length;
 
-        // 5. 检查里程碑
-        int milestoneBonus = 0;
-        final newMilestones = <int>[];
+          // 5. 检查里程碑
+          int milestoneBonus = 0;
+          final newMilestones = <int>[];
 
-        for (final entry in checkInMilestones.entries) {
-          if (newCount >= entry.key &&
-              !existingMilestones.contains(entry.key)) {
-            milestoneBonus += entry.value;
-            newMilestones.add(entry.key);
+          for (final entry in checkInMilestones.entries) {
+            if (newCount >= entry.key &&
+                !existingMilestones.contains(entry.key)) {
+              milestoneBonus += entry.value;
+              newMilestones.add(entry.key);
+            }
           }
-        }
 
-        // 6. 检查全月奖励
-        if (newCount == totalDaysInMonth &&
-            !existingMilestones.contains(totalDaysInMonth)) {
-          milestoneBonus += checkInFullMonthBonus;
-          newMilestones.add(totalDaysInMonth);
-        }
+          // 6. 检查全月奖励
+          if (newCount == totalDaysInMonth &&
+              !existingMilestones.contains(totalDaysInMonth)) {
+            milestoneBonus += checkInFullMonthBonus;
+            newMilestones.add(totalDaysInMonth);
+          }
 
-        final totalReward = dailyCoins + milestoneBonus;
+          final totalReward = dailyCoins + milestoneBonus;
 
-        // 7. 更新月度签到文档
-        if (monthDoc.exists) {
-          tx.update(monthRef, {
-            'checkedDays': FieldValue.arrayUnion([dayOfMonth]),
-            'totalCoins': FieldValue.increment(totalReward),
-            if (newMilestones.isNotEmpty)
-              'milestonesClaimed': FieldValue.arrayUnion(newMilestones),
+          // 7. 更新月度签到文档
+          if (monthDoc.exists) {
+            tx.update(monthRef, {
+              'checkedDays': FieldValue.arrayUnion([dayOfMonth]),
+              'totalCoins': FieldValue.increment(totalReward),
+              if (newMilestones.isNotEmpty)
+                'milestonesClaimed': FieldValue.arrayUnion(newMilestones),
+            });
+          } else {
+            tx.set(monthRef, {
+              'checkedDays': [dayOfMonth],
+              'totalCoins': totalReward,
+              'milestonesClaimed': newMilestones,
+            });
+          }
+
+          // 8. 更新用户金币 + lastCheckInDate
+          tx.update(userRef, {
+            'coins': FieldValue.increment(totalReward),
+            'lastCheckInDate': today,
           });
-        } else {
-          tx.set(monthRef, {
-            'checkedDays': [dayOfMonth],
-            'totalCoins': totalReward,
-            'milestonesClaimed': newMilestones,
-          });
-        }
 
-        // 8. 更新用户金币 + lastCheckInDate
-        tx.update(userRef, {
-          'coins': FieldValue.increment(totalReward),
-          'lastCheckInDate': today,
-        });
-
-        return CheckInResult(
-          dailyCoins: dailyCoins,
-          milestoneBonus: milestoneBonus,
-          newMilestones: newMilestones,
-        );
-      }));
+          return CheckInResult(
+            dailyCoins: dailyCoins,
+            milestoneBonus: milestoneBonus,
+            newMilestones: newMilestones,
+          );
+        }),
+      );
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'checkIn');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CoinService',
+        operation: 'checkIn',
+      );
       rethrow;
     }
   }
@@ -171,7 +179,12 @@ class CoinService {
         return true;
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'spendCoins');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CoinService',
+        operation: 'spendCoins',
+      );
       rethrow;
     }
   }
@@ -208,7 +221,12 @@ class CoinService {
         return true;
       });
     } catch (e, stack) {
-      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'purchaseAccessory');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CoinService',
+        operation: 'purchaseAccessory',
+      );
       rethrow;
     }
   }
