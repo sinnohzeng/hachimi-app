@@ -184,6 +184,19 @@ app_opened → onboarding_completed → first_session_completed → streak_achie
 - **触发条件**：用户通过推送通知打开应用
 - **参数**：`notification_type`（string）
 
+### 统计与历史事件
+
+#### `stats_viewed`（统计页浏览）
+- **触发条件**：用户打开统计页面
+- **参数**：无
+- **代码位置**：`stats_screen.dart`（`initState`）
+
+#### `history_viewed`（历史页浏览）
+- **触发条件**：用户打开完整专注历史页面
+- **参数**：
+  - `habit_id`（string，可选）：筛选的任务 ID
+- **代码位置**：`session_history_screen.dart`（`initState`）
+
 ### 留存信号
 
 #### `app_opened`（应用打开）
@@ -237,6 +250,10 @@ adb shell setprop debug.firebase.analytics.app com.hachimi.hachimi_app
 - [ ] `all_habits_done` 在今日所有习惯完成时触发
 - [ ] `cat_room_viewed` 在打开猫咪房间时触发
 - [ ] `notification_opened` 在通过通知打开应用时触发
+
+**新增事件（v2.8）：**
+- [ ] `stats_viewed` 在统计页打开时触发
+- [ ] `history_viewed` 在专注历史页打开时触发
 
 **新增事件（v2.5）：**
 - [ ] `app_error` 在通过 ErrorHandler 捕获错误时触发

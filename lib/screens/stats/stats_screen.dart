@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/focus_session.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/session_stats_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
@@ -15,11 +16,24 @@ import 'package:hachimi_app/widgets/error_state.dart';
 import 'package:hachimi_app/widgets/streak_heatmap.dart';
 import 'package:intl/intl.dart';
 
-class StatsScreen extends ConsumerWidget {
+class StatsScreen extends ConsumerStatefulWidget {
   const StatsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StatsScreen> createState() => _StatsScreenState();
+}
+
+class _StatsScreenState extends ConsumerState<StatsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(analyticsServiceProvider).logStatsViewed();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final stats = ref.watch(statsProvider);
     final habitsAsync = ref.watch(habitsProvider);
     final dailyMinutes = ref.watch(dailyMinutesProvider).value ?? {};

@@ -188,6 +188,19 @@ app_opened → onboarding_completed → first_session_completed → streak_achie
 - **Parameters**:
   - `notification_type` (string): `"daily_reminder"`, `"streak_at_risk"`, `"level_up"`, or `"win_back"`
 
+### Stats & History Events
+
+#### `stats_viewed`
+- **Trigger**: User opens the Stats tab
+- **Parameters**: none
+- **Code**: `stats_screen.dart` (`initState`)
+
+#### `history_viewed`
+- **Trigger**: User opens the full session history page
+- **Parameters**:
+  - `habit_id` (string, optional): habit filter if applied
+- **Code**: `session_history_screen.dart` (`initState`)
+
 ### Retention Signals
 
 #### `app_opened`
@@ -240,6 +253,10 @@ Use `adb shell setprop debug.firebase.analytics.app com.hachimi.hachimi_app` to 
 - [ ] `cat_room_viewed` fires on Cat Room tab open
 - [ ] `notification_opened` fires when app opened via notification
 - [ ] User properties update after adoption and sessions
+
+**New Events (v2.8):**
+- [ ] `stats_viewed` fires on Stats tab open
+- [ ] `history_viewed` fires on session history page open
 
 **New Events (v2.5):**
 - [ ] `app_error` fires when an error is caught via ErrorHandler
