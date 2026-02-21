@@ -13,7 +13,6 @@ class RemoteConfigService {
 
   // Cat system keys
   static const String keyXpMultiplier = 'xp_multiplier';
-  static const String keyNotificationCopyVariant = 'notification_copy_variant';
   static const String keyMoodThresholdLonelyDays = 'mood_threshold_lonely_days';
   static const String keyDefaultFocusDuration = 'default_focus_duration';
 
@@ -28,7 +27,6 @@ class RemoteConfigService {
     await _remoteConfig.setDefaults({
       keyCheckInSuccessMessage: defaultSuccessMessage,
       keyXpMultiplier: 1.0,
-      keyNotificationCopyVariant: 'A',
       keyMoodThresholdLonelyDays: 3,
       keyDefaultFocusDuration: 25,
     });
@@ -47,10 +45,6 @@ class RemoteConfigService {
   /// XP multiplier for events/promotions (default: 1.0, range: 0.1-10.0).
   double get xpMultiplier =>
       _remoteConfig.getDouble(keyXpMultiplier).clamp(0.1, 10.0);
-
-  /// Notification copy variant for A/B testing (default: 'A').
-  String get notificationCopyVariant =>
-      _remoteConfig.getString(keyNotificationCopyVariant);
 
   /// Days without a session before mood becomes 'lonely' (default: 3, range: 1-30).
   int get moodThresholdLonelyDays =>

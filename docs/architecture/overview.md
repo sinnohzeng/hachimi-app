@@ -196,4 +196,24 @@ The focus timer is a **two-isolate system**:
 
 `AppLifecycleState` changes are observed via `WidgetsBindingObserver`:
 - `paused` / `hidden` -> record timestamp (`onAppBackgrounded`)
-- `resumed` -> calculate away duration; auto-pause if >15 s, auto-end if >5 min (`onAppResumed`)
+- `resumed` -> calculate away duration; auto-pause if >15 s, auto-end if >5 min (`onAppResumed`). Also checks `FlutterForegroundTask.isRunningService` and restarts the foreground service if the OS killed it while backgrounded.
+
+---
+
+## Notification Architecture
+
+The focus timer uses a **three-layer notification system**, each serving a distinct purpose:
+
+| Layer | Plugin | Channel ID | Purpose | When Active |
+|-------|--------|------------|---------|-------------|
+| Foreground Service | `flutter_foreground_task` | `hachimi_focus` | Persistent timer notification (keeps process alive) | While timer is running |
+| Atomic Island | Native MethodChannel | `hachimi_focus_timer_v2` | vivo Atomic Island + Android 16 lockscreen rich notification | While timer is running (vivo only) |
+| Completion | `flutter_local_notifications` | `hachimi_focus_complete` | One-shot completion alert with XP summary | When countdown finishes |
+
+**Foreground Service notification** includes Pause/End action buttons that communicate with the main isolate via `FlutterForegroundTask.sendDataToMain()` / `addTaskDataCallback()`. The main isolate updates the notification text each tick via `FocusTimerService.updateNotification()`.
+
+**Atomic Island** provides a rich, platform-native timer display on supported devices (vivo OriginOS). See `docs/architecture/atomic-island.md`.
+
+**Completion notification** fires from `_onTick()` when a countdown reaches zero — this works even when the app is backgrounded since the notification is sent from the main isolate. Uses a fixed notification ID (`300000`) so duplicate sends (from both `_onTick()` and `_saveSession()`) simply overwrite rather than stack.
+
+**L10N for notification text**: Since providers have no `BuildContext`, localized labels (`labelRemaining`, `labelElapsed`, `labelFocusing`, `labelDefaultCat`, `labelInProgress`) are passed to `FocusTimerNotifier.configure()` at setup time from `FocusSetupScreen`, which has access to `context.l10n`. English fallbacks are used when labels are empty.

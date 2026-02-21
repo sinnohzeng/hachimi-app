@@ -30,20 +30,29 @@ class FocusTimerService {
   }
 
   /// Start the foreground task with initial timer data.
-  static Future<void> start({
+  ///
+  /// Returns [ServiceRequestResult] so callers can detect and handle failures
+  /// (e.g. show a permission banner) instead of silently losing the notification.
+  static Future<ServiceRequestResult> start({
     required String habitName,
     required String catEmoji,
     required int totalSeconds,
     required bool isCountdown,
   }) async {
     try {
-      await FlutterForegroundTask.startService(
+      return await FlutterForegroundTask.startService(
+        serviceTypes: [ForegroundServiceTypes.specialUse],
         notificationTitle: '$catEmoji $habitName',
         notificationText: 'Focus session starting...',
+        notificationButtons: [
+          const NotificationButton(id: 'pause', text: 'Pause'),
+          const NotificationButton(id: 'end_session', text: 'End'),
+        ],
         callback: _startCallback,
       );
     } catch (e) {
       debugPrint('[FocusTimerService] Failed to start foreground service: $e');
+      return ServiceRequestFailure(error: e);
     }
   }
 
@@ -61,6 +70,19 @@ class FocusTimerService {
   /// Stop the foreground task.
   static Future<void> stop() async {
     await FlutterForegroundTask.stopService();
+  }
+
+  /// Listen for notification button actions from the background isolate.
+  /// The [_TimerTaskHandler.onNotificationButtonPressed] sends data via
+  /// [FlutterForegroundTask.sendDataToMain], and this stream receives it
+  /// in the main isolate.
+  static void addActionListener(void Function(Object data) callback) {
+    FlutterForegroundTask.addTaskDataCallback(callback);
+  }
+
+  /// Remove a previously registered action listener.
+  static void removeActionListener(void Function(Object data) callback) {
+    FlutterForegroundTask.removeTaskDataCallback(callback);
   }
 }
 

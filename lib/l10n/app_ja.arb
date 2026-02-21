@@ -628,5 +628,8 @@
   "fallbackCatName": "ネコ",
   "settingsLanguageTraditionalChinese": "繁體中文",
   "settingsLanguageJapanese": "日本語",
-  "settingsLanguageKorean": "한국어"
+  "settingsLanguageKorean": "한국어",
+
+  "notifFocusing": "集中中…",
+  "notifInProgress": "集中セッション実行中"
 }

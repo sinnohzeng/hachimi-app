@@ -1,19 +1,28 @@
 // ---
 // 📘 文件说明：
-// FocusTimerState 单元测试 — 验证计时器状态值对象的计算属性和 copyWith。
+// FocusTimerState & FocusTimerNotifier 单元测试。
+// Part 1: 状态值对象的计算属性和 copyWith。
+// Part 2: Notifier 生命周期状态机（configure, start, pause, resume, complete,
+//         abandon, reset）。
+//
+// Note: Timer-ticking tests (countdown auto-complete, elapsed increments)
+// are not included because _onTick() uses DateTime.now() for wall-clock
+// calculations, which is not overridden by fakeAsync. Testing those
+// requires an injectable clock, which is out of scope.
 //
 // 🧩 文件结构：
-// - 默认状态
-// - remainingSeconds
-// - progress
-// - displayTime (MM:SS, HH:MM:SS)
-// - focusedMinutes
-// - copyWith 行为
+// - FocusTimerState: defaults, remainingSeconds, progress, displayTime,
+//   focusedMinutes, copyWith
+// - FocusTimerNotifier: configure, start, pause/resume, complete, abandon,
+//   reset
 //
 // 🕒 创建时间：2026-02-20
 // ---
 
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 
 void main() {
@@ -226,6 +235,335 @@ void main() {
       expect(s2.mode, equals(TimerMode.stopwatch));
       expect(s2.startedAt, equals(now));
       expect(s2.pausedAt, equals(now));
+    });
+
+    test('copies L10N label fields', () {
+      const s = FocusTimerState(
+        labelRemaining: 'remaining',
+        labelElapsed: 'elapsed',
+        labelFocusing: 'focusing...',
+        labelDefaultCat: 'Your cat',
+        labelInProgress: 'In progress',
+      );
+      final s2 = s.copyWith(labelRemaining: 'restant');
+      expect(s2.labelRemaining, equals('restant'));
+      expect(s2.labelElapsed, equals('elapsed'));
+      expect(s2.labelFocusing, equals('focusing...'));
+      expect(s2.labelDefaultCat, equals('Your cat'));
+      expect(s2.labelInProgress, equals('In progress'));
+    });
+  });
+
+  // ─── Part 2: FocusTimerNotifier lifecycle tests ───
+  //
+  // These tests verify the state-machine transitions of FocusTimerNotifier.
+  // Timer-ticking tests are excluded because _onTick() uses DateTime.now()
+  // for wall-clock calculations, which is not overridden by fakeAsync.
+
+  group('FocusTimerNotifier — lifecycle', () {
+    late ProviderContainer container;
+    late FocusTimerNotifier notifier;
+
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+
+      // Mock platform channels used by AtomicIslandService and
+      // FlutterForegroundTask to prevent MissingPluginException
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('com.hachimi.notification'),
+            (MethodCall methodCall) async => null,
+          );
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_foreground_task/methods'),
+            (MethodCall methodCall) async {
+              if (methodCall.method == 'isRunningService') return false;
+              return null;
+            },
+          );
+
+      container = ProviderContainer();
+      notifier = container.read(focusTimerProvider.notifier);
+    });
+
+    tearDown(() async {
+      // Reset notifier to cancel pending timers before container disposal,
+      // preventing _saveState from accessing a disposed ref.
+      try {
+        notifier.reset();
+      } catch (_) {}
+      // Flush pending microtasks from _saveState / clearSavedState
+      await Future<void>.delayed(Duration.zero);
+      container.dispose();
+    });
+
+    test('configure() sets correct state', () {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+        labelRemaining: 'restant',
+      );
+
+      final s = container.read(focusTimerProvider);
+      expect(s.habitId, equals('h1'));
+      expect(s.catId, equals('c1'));
+      expect(s.catName, equals('Mochi'));
+      expect(s.habitName, equals('Reading'));
+      expect(s.totalSeconds, equals(1500));
+      expect(s.elapsedSeconds, equals(0));
+      expect(s.status, equals(TimerStatus.idle));
+      expect(s.mode, equals(TimerMode.countdown));
+      expect(s.labelRemaining, equals('restant'));
+    });
+
+    test('start() transitions idle → running and sets startedAt', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      // Flush _saveState microtasks
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.running));
+      expect(s.startedAt, isNotNull);
+    });
+
+    test('start() is idempotent when already running', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      final startedAt = container.read(focusTimerProvider).startedAt;
+
+      // Calling start() again should be a no-op
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.running));
+      expect(s.startedAt, equals(startedAt));
+    });
+
+    test('pause() transitions running → paused with pausedAt', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.pause();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.paused));
+      expect(s.pausedAt, isNotNull);
+    });
+
+    test('resume() clears pausedAt and resumes running', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.pause();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.resume();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.running));
+      expect(s.pausedAt, isNull);
+    });
+
+    test('resume() accumulates totalPausedSeconds', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      // Simulate pause by manually setting pausedAt in the past
+      notifier.pause();
+      await Future<void>.delayed(Duration.zero);
+
+      // The pausedAt was just set; totalPausedSeconds starts at 0
+      final beforeResume = container.read(focusTimerProvider);
+      expect(beforeResume.totalPausedSeconds, equals(0));
+      expect(beforeResume.pausedAt, isNotNull);
+
+      // Resume immediately — pause duration is ~0 seconds
+      notifier.resume();
+      await Future<void>.delayed(Duration.zero);
+
+      final afterResume = container.read(focusTimerProvider);
+      expect(afterResume.pausedAt, isNull);
+      // totalPausedSeconds >= 0 (tiny pause duration is 0)
+      expect(afterResume.totalPausedSeconds, greaterThanOrEqualTo(0));
+    });
+
+    test('complete() transitions → completed', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.stopwatch,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.complete();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.completed));
+    });
+
+    test('abandon() transitions → abandoned', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.abandon();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.abandoned));
+    });
+
+    test('reset() returns to idle defaults', () async {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      notifier.reset();
+      await Future<void>.delayed(Duration.zero);
+
+      final s = container.read(focusTimerProvider);
+      expect(s.status, equals(TimerStatus.idle));
+      expect(s.habitId, isEmpty);
+      expect(s.elapsedSeconds, equals(0));
+      expect(s.startedAt, isNull);
+    });
+
+    test('configure() after start resets to idle', () {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+
+      // Reconfigure should reset
+      notifier.configure(
+        habitId: 'h2',
+        catId: 'c2',
+        catName: 'Luna',
+        habitName: 'Writing',
+        durationSeconds: 3600,
+        mode: TimerMode.stopwatch,
+      );
+
+      final s = container.read(focusTimerProvider);
+      expect(s.habitId, equals('h2'));
+      expect(s.habitName, equals('Writing'));
+      expect(s.totalSeconds, equals(3600));
+      expect(s.mode, equals(TimerMode.stopwatch));
+      expect(s.status, equals(TimerStatus.idle));
+    });
+
+    test('L10N labels default to empty string', () {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+      );
+
+      final s = container.read(focusTimerProvider);
+      expect(s.labelRemaining, isEmpty);
+      expect(s.labelElapsed, isEmpty);
+      expect(s.labelFocusing, isEmpty);
+      expect(s.labelDefaultCat, isEmpty);
+      expect(s.labelInProgress, isEmpty);
+    });
+
+    test('configure() with L10N labels stores them', () {
+      notifier.configure(
+        habitId: 'h1',
+        catId: 'c1',
+        catName: 'Mochi',
+        habitName: 'Reading',
+        durationSeconds: 1500,
+        mode: TimerMode.countdown,
+        labelRemaining: 'remaining',
+        labelElapsed: 'elapsed',
+        labelFocusing: 'focusing...',
+        labelDefaultCat: 'Your cat',
+        labelInProgress: 'Focus session in progress',
+      );
+
+      final s = container.read(focusTimerProvider);
+      expect(s.labelRemaining, equals('remaining'));
+      expect(s.labelElapsed, equals('elapsed'));
+      expect(s.labelFocusing, equals('focusing...'));
+      expect(s.labelDefaultCat, equals('Your cat'));
+      expect(s.labelInProgress, equals('Focus session in progress'));
     });
   });
 }

@@ -195,4 +195,24 @@ AuthGate
 
 `AppLifecycleState` 变化通过 `WidgetsBindingObserver` 监听：
 - `paused` / `hidden` -> 记录时间戳（`onAppBackgrounded`）
-- `resumed` -> 计算离开时长；>15s 自动暂停，>5min 自动结束（`onAppResumed`）
+- `resumed` -> 计算离开时长；>15s 自动暂停，>5min 自动结束（`onAppResumed`）。同时检查 `FlutterForegroundTask.isRunningService`，若 OS 在后台期间终止了前台服务则重启。
+
+---
+
+## 通知架构
+
+专注计时器使用 **三层通知系统**，各层职责独立：
+
+| 层级 | 插件 | 渠道 ID | 用途 | 活跃时机 |
+|------|------|---------|------|----------|
+| 前台服务 | `flutter_foreground_task` | `hachimi_focus` | 持久化计时器通知（保持进程存活） | 计时器运行期间 |
+| 原子岛 | Native MethodChannel | `hachimi_focus_timer_v2` | vivo 原子岛 + Android 16 锁屏富通知 | 计时器运行期间（仅 vivo） |
+| 完成通知 | `flutter_local_notifications` | `hachimi_focus_complete` | 一次性完成提醒，包含 XP 摘要 | 倒计时结束时 |
+
+**前台服务通知** 包含暂停/结束操作按钮，通过 `FlutterForegroundTask.sendDataToMain()` / `addTaskDataCallback()` 与主 Isolate 通信。主 Isolate 在每个心跳通过 `FocusTimerService.updateNotification()` 更新通知文本。
+
+**原子岛** 在支持的设备（vivo OriginOS）上提供富平台原生计时器展示。详见 `docs/zh-CN/architecture/atomic-island.md`。
+
+**完成通知** 在倒计时归零时从 `_onTick()` 触发——即使应用在后台也能工作，因为通知从主 Isolate 发送。使用固定通知 ID（`300000`），因此重复发送（来自 `_onTick()` 和 `_saveSession()`）只会覆盖而非堆叠。
+
+**通知文本 L10N**：由于 Provider 无 `BuildContext`，本地化标签（`labelRemaining`、`labelElapsed`、`labelFocusing`、`labelDefaultCat`、`labelInProgress`）在设置时从 `FocusSetupScreen`（有 `context.l10n` 访问权限）传入 `FocusTimerNotifier.configure()`。标签为空时使用英文兜底。

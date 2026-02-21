@@ -3569,6 +3569,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Korean'**
   String get settingsLanguageKorean;
+
+  /// No description provided for @notifFocusing.
+  ///
+  /// In en, this message translates to:
+  /// **'focusing...'**
+  String get notifFocusing;
+
+  /// No description provided for @notifInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus session in progress'**
+  String get notifInProgress;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

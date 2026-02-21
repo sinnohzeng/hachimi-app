@@ -1915,4 +1915,10 @@ class SEn extends S {
 
   @override
   String get settingsLanguageKorean => 'Korean';
+
+  @override
+  String get notifFocusing => 'focusing...';
+
+  @override
+  String get notifInProgress => 'Focus session in progress';
 }

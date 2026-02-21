@@ -39,7 +39,8 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     final cat = catId.isNotEmpty ? ref.read(catByIdProvider(catId)) : null;
     final catName = cat?.name ?? 'Your cat';
 
-    // Configure the timer
+    // Configure the timer with L10N labels for notification text
+    final l10n = context.l10n;
     ref
         .read(focusTimerProvider.notifier)
         .configure(
@@ -49,6 +50,11 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           habitName: habit.name,
           durationSeconds: _selectedMinutes * 60,
           mode: _selectedMode,
+          labelRemaining: l10n.timerRemaining,
+          labelElapsed: l10n.timerElapsed,
+          labelFocusing: l10n.notifFocusing,
+          labelDefaultCat: l10n.focusCompleteYourCat,
+          labelInProgress: l10n.notifInProgress,
         );
 
     HapticFeedback.lightImpact();

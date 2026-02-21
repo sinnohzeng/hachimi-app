@@ -40,7 +40,7 @@ TimerScreen._saveSession()
 
 | Field | Value |
 |-------|-------|
-| Channel | `hachimi_focus` (importance HIGH) |
+| Channel | `hachimi_focus_complete` (importance HIGH, dedicated channel for completion alerts) |
 | ID | `300000` (fixed — new notification overwrites old) |
 | Title | L10N `focusCompleteNotifTitle` ("Quest complete!") |
 | Body | L10N `focusCompleteNotifBody` ("{catName} earned +{xp} XP from {minutes}min of focus") |
@@ -104,3 +104,4 @@ All hardcoded strings in `focus_complete_screen.dart` are replaced with ARB keys
 | Date | Change |
 |------|--------|
 | 2026-02-19 | Initial spec — notification, vibration, confetti, L10N |
+| 2026-02-21 | Channel ID changed from `hachimi_focus` (shared with foreground service) to `hachimi_focus_complete` (dedicated). Background completion notification now fires from `_onTick()` when countdown reaches zero. |

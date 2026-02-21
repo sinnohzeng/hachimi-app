@@ -876,5 +876,8 @@
   "fallbackCatName": "Cat",
   "settingsLanguageTraditionalChinese": "Traditional Chinese",
   "settingsLanguageJapanese": "Japanese",
-  "settingsLanguageKorean": "Korean"
+  "settingsLanguageKorean": "Korean",
+
+  "notifFocusing": "focusing...",
+  "notifInProgress": "Focus session in progress"
 }

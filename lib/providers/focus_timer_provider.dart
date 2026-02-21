@@ -21,8 +21,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart'
+    show FlutterForegroundTask;
 import 'package:hachimi_app/services/atomic_island_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 
 /// Timer status for focus sessions.
 enum TimerStatus { idle, running, paused, completed, abandoned }
@@ -44,6 +47,13 @@ class FocusTimerState {
   final DateTime? startedAt;
   final DateTime? pausedAt;
 
+  // L10N labels for notification text (set via configure(), empty = English fallback)
+  final String labelRemaining;
+  final String labelElapsed;
+  final String labelFocusing;
+  final String labelDefaultCat;
+  final String labelInProgress;
+
   const FocusTimerState({
     this.habitId = '',
     this.catId = '',
@@ -56,6 +66,11 @@ class FocusTimerState {
     this.mode = TimerMode.countdown,
     this.startedAt,
     this.pausedAt,
+    this.labelRemaining = '',
+    this.labelElapsed = '',
+    this.labelFocusing = '',
+    this.labelDefaultCat = '',
+    this.labelInProgress = '',
   });
 
   /// Remaining seconds for countdown mode.
@@ -105,6 +120,11 @@ class FocusTimerState {
     DateTime? startedAt,
     DateTime? pausedAt,
     bool clearPausedAt = false,
+    String? labelRemaining,
+    String? labelElapsed,
+    String? labelFocusing,
+    String? labelDefaultCat,
+    String? labelInProgress,
   }) {
     return FocusTimerState(
       habitId: habitId ?? this.habitId,
@@ -118,6 +138,11 @@ class FocusTimerState {
       mode: mode ?? this.mode,
       startedAt: startedAt ?? this.startedAt,
       pausedAt: clearPausedAt ? null : (pausedAt ?? this.pausedAt),
+      labelRemaining: labelRemaining ?? this.labelRemaining,
+      labelElapsed: labelElapsed ?? this.labelElapsed,
+      labelFocusing: labelFocusing ?? this.labelFocusing,
+      labelDefaultCat: labelDefaultCat ?? this.labelDefaultCat,
+      labelInProgress: labelInProgress ?? this.labelInProgress,
     );
   }
 }
@@ -211,6 +236,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   }
 
   /// Initialize the timer with habit/cat info and duration.
+  /// L10N label parameters are optional; when empty, [_updateNotification]
+  /// falls back to English defaults.
   void configure({
     required String habitId,
     required String catId,
@@ -218,6 +245,11 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     required String habitName,
     required int durationSeconds,
     required TimerMode mode,
+    String labelRemaining = '',
+    String labelElapsed = '',
+    String labelFocusing = '',
+    String labelDefaultCat = '',
+    String labelInProgress = '',
   }) {
     _ticker?.cancel();
     state = FocusTimerState(
@@ -229,6 +261,11 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       elapsedSeconds: 0,
       status: TimerStatus.idle,
       mode: mode,
+      labelRemaining: labelRemaining,
+      labelElapsed: labelElapsed,
+      labelFocusing: labelFocusing,
+      labelDefaultCat: labelDefaultCat,
+      labelInProgress: labelInProgress,
     );
   }
 
@@ -337,6 +374,20 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       );
       FocusTimerNotifier.clearSavedState();
       AtomicIslandService.cancel();
+
+      // Fire completion notification immediately — works even when app is
+      // backgrounded since _onTick runs in the main isolate with ticker alive.
+      // Uses a fixed notification ID (300000) so the localized notification
+      // from timer_screen._saveSession() will replace this if app is visible.
+      final catLabel = state.catName.isNotEmpty
+          ? state.catName
+          : (state.labelDefaultCat.isNotEmpty
+                ? state.labelDefaultCat
+                : 'Focus');
+      NotificationService().showFocusComplete(
+        title: catLabel,
+        body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+      );
       return;
     }
 
@@ -353,18 +404,24 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     }
   }
 
-  // TODO: L10N — needs platform-level string resources or locale forwarding
-  // Provider layer has no BuildContext, so notification text stays hardcoded.
-  // Completion notification L10N is handled in timer_screen.dart (has context).
+  /// Update the foreground service notification with current timer state.
+  /// Uses L10N labels from [configure()] with English fallbacks.
   void _updateNotification() {
-    final label = state.mode == TimerMode.countdown ? 'remaining' : 'elapsed';
+    final label = state.mode == TimerMode.countdown
+        ? (state.labelRemaining.isNotEmpty ? state.labelRemaining : 'remaining')
+        : (state.labelElapsed.isNotEmpty ? state.labelElapsed : 'elapsed');
+    final focusingLabel = state.labelFocusing.isNotEmpty
+        ? state.labelFocusing
+        : 'focusing...';
     final catDisplayName = state.catName.isNotEmpty
         ? state.catName
-        : 'Your cat';
+        : (state.labelDefaultCat.isNotEmpty
+              ? state.labelDefaultCat
+              : 'Your cat');
 
     // 基础通知（fallback）
     FocusTimerService.updateNotification(
-      title: '$catDisplayName focusing...',
+      title: '$catDisplayName $focusingLabel',
       text: '${state.habitName} \u{00B7} ${state.displayTime} $label',
     );
 
@@ -437,19 +494,33 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   }
 
   /// Handle app going to background.
-  /// Records pausedAt for tracking background time, saves state, and updates
-  /// the foreground notification to static text. The timer state stays
-  /// "running" — wall-clock anchoring will catch up on resume.
+  ///
+  /// **State contract:** Sets [pausedAt] as a wall-clock anchor while keeping
+  /// [status] as [TimerStatus.running]. This is intentional — it differs from
+  /// user-initiated [pause()] which sets status to [TimerStatus.paused].
+  ///
+  /// The [onAppResumed] method checks for this exact combination
+  /// (`status == running && pausedAt != null`) to detect background recovery.
+  /// This avoids introducing a separate `backgrounded` status that would
+  /// complicate the state machine.
   void onAppBackgrounded() {
     if (state.status == TimerStatus.running) {
       state = state.copyWith(pausedAt: DateTime.now());
       _saveState();
+      final focusingLabel = state.labelFocusing.isNotEmpty
+          ? state.labelFocusing
+          : 'focusing...';
+      final inProgressLabel = state.labelInProgress.isNotEmpty
+          ? state.labelInProgress
+          : 'Focus session in progress';
       final catDisplayName = state.catName.isNotEmpty
           ? state.catName
-          : 'Your cat';
+          : (state.labelDefaultCat.isNotEmpty
+                ? state.labelDefaultCat
+                : 'Your cat');
       FocusTimerService.updateNotification(
-        title: '$catDisplayName focusing...',
-        text: 'Focus session in progress',
+        title: '$catDisplayName $focusingLabel',
+        text: inProgressLabel,
       );
     }
   }
@@ -457,7 +528,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Handle app coming back to foreground.
   /// Uses wall-clock anchoring to compute the real elapsed time. The timer
   /// continues seamlessly — no time is ever lost.
-  void onAppResumed() {
+  /// Restarts the foreground service if the OS killed it while backgrounded.
+  Future<void> onAppResumed() async {
     if (state.status != TimerStatus.running || state.pausedAt == null) return;
     if (state.startedAt == null) return;
 
@@ -494,6 +566,17 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       );
       FocusTimerNotifier.clearSavedState();
       return;
+    }
+
+    // Restart foreground service if the OS killed it while backgrounded
+    final isRunning = await FlutterForegroundTask.isRunningService;
+    if (!isRunning) {
+      await FocusTimerService.start(
+        habitName: state.habitName,
+        catEmoji: '\u{1F431}',
+        totalSeconds: state.totalSeconds,
+        isCountdown: state.mode == TimerMode.countdown,
+      );
     }
 
     // Normal resume — clear pausedAt, restart ticker, refresh display

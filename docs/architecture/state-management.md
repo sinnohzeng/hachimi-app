@@ -279,19 +279,24 @@ Device connectivity (independent of auth):
 | `mode` | enum | `countdown`, `stopwatch` |
 | `startedAt` | DateTime? | Session start timestamp |
 | `pausedAt` | DateTime? | Timestamp when timer was paused or app went to background |
+| `labelRemaining` | String | L10N label for "remaining" (countdown notification text) |
+| `labelElapsed` | String | L10N label for "elapsed" (stopwatch notification text) |
+| `labelFocusing` | String | L10N label for "focusing..." (notification subtitle) |
+| `labelDefaultCat` | String | L10N label for default cat name (completion notification fallback) |
+| `labelInProgress` | String | L10N label for "Focus session in progress" (notification text) |
 
 **`FocusTimerNotifier` methods:**
 
 | Method | Description |
 |--------|-------------|
-| `configure(habitId, catId, catName, habitName, seconds, mode)` | Initialize timer parameters |
+| `configure(habitId, catId, catName, habitName, seconds, mode, {l10n labels})` | Initialize timer parameters and optional L10N labels |
 | `start()` | Start the timer tick |
 | `pause()` | Pause the timer (record `pausedAt`) |
 | `resume()` | Resume from paused state (accumulate pause duration into `totalPausedSeconds`) |
 | `complete()` | Mark as completed, clear saved state |
 | `abandon()` | Mark as abandoned (partial XP if >= 5 min), clear saved state |
 | `onAppBackgrounded()` | Record `pausedAt` timestamp and save state; timer continues running via wall-clock |
-| `onAppResumed()` | Recompute elapsed from wall-clock; auto-complete if countdown finished or >30 min away |
+| `onAppResumed()` | Recompute elapsed from wall-clock; auto-complete if countdown finished or >30 min away; restart foreground service if OS killed it |
 | `reset()` | Return to `idle` state, clear saved state |
 | `restoreSession()` | Restore interrupted session from SharedPreferences |
 | `static hasInterruptedSession()` | Check if there's a saved session to recover |

@@ -40,7 +40,7 @@ TimerScreen._saveSession()
 
 | 字段 | 值 |
 |------|-----|
-| 通知渠道 | `hachimi_focus`（重要性 HIGH） |
+| 通知渠道 | `hachimi_focus_complete`（重要性 HIGH，完成提醒专用渠道） |
 | ID | `300000`（固定值 —— 新通知覆盖旧通知） |
 | 标题 | L10N `focusCompleteNotifTitle`（"任务完成！"） |
 | 正文 | L10N `focusCompleteNotifBody`（"{catName} 通过 {minutes} 分钟专注获得了 +{xp} XP"） |
@@ -104,3 +104,4 @@ TimerScreen._saveSession()
 | 日期 | 变更 |
 |------|------|
 | 2026-02-19 | 初始规格 —— 通知、震动、撒花、L10N |
+| 2026-02-21 | 渠道 ID 从 `hachimi_focus`（与前台服务共用）改为 `hachimi_focus_complete`（专用）。后台完成通知现在在倒计时归零时从 `_onTick()` 触发。 |

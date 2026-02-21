@@ -1885,6 +1885,12 @@ class SZh extends S {
 
   @override
   String get settingsLanguageKorean => '한국어';
+
+  @override
+  String get notifFocusing => '专注中…';
+
+  @override
+  String get notifInProgress => '正在专注';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3769,4 +3775,10 @@ class SZhHant extends SZh {
 
   @override
   String get settingsLanguageKorean => '한국어';
+
+  @override
+  String get notifFocusing => '專注中…';
+
+  @override
+  String get notifInProgress => '正在專注';
 }

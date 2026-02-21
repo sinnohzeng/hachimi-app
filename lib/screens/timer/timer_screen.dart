@@ -30,6 +30,8 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart'
+    show ServiceRequestFailure;
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -56,6 +58,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    FocusTimerService.addActionListener(_onNotificationAction);
     // Auto-start timer on entry — user already expressed intent on FocusSetupScreen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _startTimer();
@@ -64,8 +67,25 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
   @override
   void dispose() {
+    FocusTimerService.removeActionListener(_onNotificationAction);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Handle notification button presses from the foreground service isolate.
+  void _onNotificationAction(Object data) {
+    if (data is Map<String, dynamic>) {
+      if (data['action'] == 'pause') {
+        final status = ref.read(focusTimerProvider).status;
+        if (status == TimerStatus.running) {
+          _pauseTimer();
+        } else if (status == TimerStatus.paused) {
+          _resumeTimer();
+        }
+      } else if (data['action'] == 'end') {
+        _completeTimer();
+      }
+    }
   }
 
   @override
@@ -94,16 +114,32 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       setState(() => _showPermissionBanner = true);
     }
 
-    ref.read(focusTimerProvider.notifier).start();
-    setState(() => _hasStarted = true);
-
-    // Start foreground service
-    FocusTimerService.start(
+    // Start foreground service FIRST, then start ticker — avoids race where
+    // ticker fires before the notification channel is ready.
+    final result = await FocusTimerService.start(
       habitName: habit?.name ?? 'Focus',
       catEmoji: '🐱',
       totalSeconds: timerState.totalSeconds,
       isCountdown: timerState.mode == TimerMode.countdown,
     );
+    if (result is ServiceRequestFailure && mounted) {
+      setState(() => _showPermissionBanner = true);
+    }
+
+    if (!mounted) return;
+    ref.read(focusTimerProvider.notifier).start();
+    setState(() => _hasStarted = true);
+
+    // Analytics: log focus session started
+    ref
+        .read(analyticsServiceProvider)
+        .logFocusSessionStarted(
+          habitId: widget.habitId,
+          timerMode: timerState.mode == TimerMode.countdown
+              ? 'countdown'
+              : 'stopwatch',
+          targetMinutes: timerState.totalSeconds ~/ 60,
+        );
   }
 
   void _pauseTimer() {
@@ -178,7 +214,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     // Calculate XP (still used for display)
     final xpService = ref.read(xpServiceProvider);
     final streakDays = habit.currentStreak;
-    const allHabitsDone = false; // TODO: check if all habits done today
+    final todayMap = ref.read(todayMinutesPerHabitProvider);
+    final activeHabits = habits.where((h) => h.isActive).toList();
+    final allHabitsDone =
+        activeHabits.isNotEmpty &&
+        activeHabits.every((h) => (todayMap[h.id] ?? 0) >= h.goalMinutes);
     final xpResult = xpService.calculateXp(
       minutes: minutes,
       streakDays: streakDays,
@@ -214,6 +254,23 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     await ref
         .read(firestoreServiceProvider)
         .logFocusSession(uid: uid, session: session, habitName: habit.name);
+
+    // Analytics: log session outcome
+    final analytics = ref.read(analyticsServiceProvider);
+    if (isCompleted) {
+      analytics.logFocusSessionCompleted(
+        habitId: widget.habitId,
+        actualMinutes: minutes,
+        xpEarned: xpResult.totalXp,
+        streakDays: streakDays,
+      );
+    } else if (isAbandoned) {
+      analytics.logFocusSessionAbandoned(
+        habitId: widget.habitId,
+        minutesCompleted: minutes,
+        reason: 'user_abandoned',
+      );
+    }
 
     if (mounted) {
       // Send completion notification (only on successful completion)

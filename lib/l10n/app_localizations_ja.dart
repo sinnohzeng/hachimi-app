@@ -1891,4 +1891,10 @@ class SJa extends S {
 
   @override
   String get settingsLanguageKorean => '한국어';
+
+  @override
+  String get notifFocusing => '集中中…';
+
+  @override
+  String get notifInProgress => '集中セッション実行中';
 }

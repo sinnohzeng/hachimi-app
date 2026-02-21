@@ -2,7 +2,7 @@ name: hachimi_app
 description: "Cat-parenting habit app. Adopt cats, build habits, earn XP. Built with Flutter + Firebase + Material Design 3."
 publish_to: 'none'
 
-version: 2.4.1+21
+version: 2.5.0+22
 
 environment:
   sdk: ^3.11.0
@@ -79,6 +79,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   mocktail: ^1.0.4
+  fake_async: ^1.3.3
 
 flutter_launcher_icons:
   android: true

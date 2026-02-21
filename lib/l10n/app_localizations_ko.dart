@@ -1892,4 +1892,10 @@ class SKo extends S {
 
   @override
   String get settingsLanguageKorean => '한국어';
+
+  @override
+  String get notifFocusing => '집중 중...';
+
+  @override
+  String get notifInProgress => '집중 세션 진행 중';
 }

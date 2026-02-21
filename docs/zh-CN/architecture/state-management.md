@@ -279,19 +279,24 @@ Firebase Auth 流 ──────────────► authStateProvide
 | `mode` | 枚举 | `countdown`（倒计时）、`stopwatch`（正计时） |
 | `startedAt` | DateTime? | 会话开始时间戳 |
 | `pausedAt` | DateTime? | 暂停或进入后台时的时间戳 |
+| `labelRemaining` | String | L10N 标签："剩余"（倒计时通知文本） |
+| `labelElapsed` | String | L10N 标签："已过"（正计时通知文本） |
+| `labelFocusing` | String | L10N 标签："专注中…"（通知副标题） |
+| `labelDefaultCat` | String | L10N 标签：默认猫咪名称（完成通知兜底） |
+| `labelInProgress` | String | L10N 标签："正在专注"（通知文本） |
 
 **`FocusTimerNotifier` 方法：**
 
 | 方法 | 说明 |
 |------|------|
-| `configure(habitId, catId, catName, habitName, seconds, mode)` | 初始化计时器参数 |
+| `configure(habitId, catId, catName, habitName, seconds, mode, {l10n labels})` | 初始化计时器参数及可选 L10N 标签 |
 | `start()` | 启动计时器心跳 |
 | `pause()` | 暂停计时器（记录 `pausedAt`） |
 | `resume()` | 从暂停状态恢复（将暂停时长累加到 `totalPausedSeconds`） |
 | `complete()` | 标记为已完成，清除持久化数据 |
 | `abandon()` | 标记为已放弃（>= 5 分钟获得部分 XP），清除持久化数据 |
 | `onAppBackgrounded()` | 记录 `pausedAt` 时间戳并保存状态；计时器通过墙钟继续运行 |
-| `onAppResumed()` | 从墙钟重算已过时间；倒计时结束或离开 >30 分钟时自动完成 |
+| `onAppResumed()` | 从墙钟重算已过时间；倒计时结束或离开 >30 分钟时自动完成；若 OS 终止了前台服务则重启 |
 | `reset()` | 返回 `idle` 状态，清除持久化数据 |
 | `restoreSession()` | 从 SharedPreferences 恢复中断的会话 |
 | `static hasInterruptedSession()` | 检查是否有已保存的会话需要恢复 |

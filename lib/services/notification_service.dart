@@ -44,9 +44,9 @@ class NotificationService {
   static const String _channelName = 'Habit Reminders';
   static const String _channelDesc = 'Daily habit and streak reminders';
 
-  static const String _focusChannelId = 'hachimi_focus';
-  static const String _focusChannelName = 'Focus Timer';
-  static const String _focusChannelDesc = 'Focus session notifications';
+  static const String _focusChannelId = 'hachimi_focus_complete';
+  static const String _focusChannelName = 'Focus Complete';
+  static const String _focusChannelDesc = 'Focus session completion alerts';
 
   bool _pluginsInitialized = false;
 
