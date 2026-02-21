@@ -1,21 +1,5 @@
-// ---
-// 📘 文件说明：
-// 原子岛通知服务 — 通过 MethodChannel 调用原生 Kotlin 富通知构建器，
-// 触发 vivo 原子岛展示和 Android 16 ProgressStyle 锁屏。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. updateNotification() 发送计时器元数据到原生层；
-// 2. cancel() 取消富通知；
-// 3. 所有调用静默失败 — flutter_foreground_task 基础通知作为 fallback；
-//
-// 🧩 文件结构：
-// - AtomicIslandService：静态方法类，平台通道封装；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// AtomicIslandService — platform channel wrapper for vivo Atomic Island
 /// rich notification. Silently falls back to flutter_foreground_task's
@@ -42,8 +26,8 @@ class AtomicIslandService {
         'endTimeMs': endTimeMs,
         'startTimeMs': startTimeMs,
       });
-    } catch (e) {
-      debugPrint('[AtomicIsland] updateNotification failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'AtomicIslandService', operation: 'updateNotification');
     }
   }
 
@@ -51,8 +35,8 @@ class AtomicIslandService {
   static Future<void> cancel() async {
     try {
       await _channel.invokeMethod('cancelTimerNotification');
-    } catch (e) {
-      debugPrint('[AtomicIsland] cancel failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'AtomicIslandService', operation: 'cancel');
     }
   }
 }

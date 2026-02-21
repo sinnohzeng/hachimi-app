@@ -1,21 +1,8 @@
-// ---
-// 📘 文件说明：
-// 日记服务 — 负责猫猫日记的 prompt 构建、LLM 生成编排、SQLite 读写。
-// 每猫每天最多生成一条日记。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 检查当天是否已有日记（UNIQUE 约束）；
-// 2. 从 Cat/Habit 数据构建 prompt；
-// 3. 调用 LlmService 生成日记文本；
-// 4. 保存到 SQLite；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
-import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/diary_entry.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -75,7 +62,7 @@ class DiaryService {
 
     try {
       // 生成日记文本
-      final content = await _llmService.generate(prompt);
+      final content = await AppTraces.trace('diary_generate', () => _llmService.generate(prompt));
       if (content.isEmpty) return null;
 
       // 构建日记条目
@@ -96,8 +83,8 @@ class DiaryService {
       // 保存到 SQLite
       final saved = await _dbService.insertDiaryEntry(entry);
       return saved ? entry : null;
-    } catch (e) {
-      debugPrint('[DiaryService] generate failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'DiaryService', operation: 'generateTodayDiary');
       return null;
     }
   }

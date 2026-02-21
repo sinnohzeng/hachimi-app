@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// FocusTimerService — manages the Android foreground service for focus sessions.
 /// Keeps the timer alive when the app is minimized via a persistent notification.
@@ -50,8 +50,8 @@ class FocusTimerService {
         ],
         callback: _startCallback,
       );
-    } catch (e) {
-      debugPrint('[FocusTimerService] Failed to start foreground service: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'FocusTimerService', operation: 'start');
       return ServiceRequestFailure(error: e);
     }
   }

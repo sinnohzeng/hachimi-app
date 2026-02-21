@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// EmptyState — 统一空状态组件，替代散落各处的 emoji + 文本。
-// 包含图标、标题、副标题和可选 CTA 按钮。
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 

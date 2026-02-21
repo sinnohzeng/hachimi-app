@@ -1,20 +1,3 @@
-// ---
-// 📘 文件说明：
-// Edit Quest Sheet — 编辑任务 BottomSheet 组件。
-// 支持修改任务的名称、每日目标和总目标。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 Habit 数据，初始化表单状态；
-// 2. 渲染名称输入框；
-// 3. 渲染每日目标和总目标 ChoiceChip 组；
-// 4. 保存时调用 Firestore 更新任务；
-//
-// 🧩 文件结构：
-// - EditQuestSheet：编辑任务 BottomSheet ConsumerStatefulWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

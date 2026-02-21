@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/services/analytics_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/app.dart' show kOnboardingCompleteKey;
 
@@ -59,6 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _finish() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(kOnboardingCompleteKey, true);
+    AnalyticsService().logOnboardingCompleted();
     widget.onComplete();
   }
 

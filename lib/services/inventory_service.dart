@@ -1,18 +1,5 @@
-// ---
-// 📘 文件说明：
-// InventoryService — 用户级道具箱服务。
-// 管理配饰的装备、卸下、道具箱监听。
-//
-// 📋 程序整体伪代码：
-// 1. watchInventory：实时监听用户 inventory 字段；
-// 2. equipAccessory：transaction 将配饰从 inventory 移到猫；
-// 3. unequipAccessory：transaction 将配饰从猫移回 inventory；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// InventoryService — 道具箱装备/卸下操作。
 /// 所有写操作使用 transaction 保证原子性。
@@ -69,8 +56,8 @@ class InventoryService {
         // 设置新装备
         tx.update(catRef, {'equippedAccessory': accessoryId});
       });
-    } catch (e) {
-      debugPrint('[InventoryService] equipAccessory failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'InventoryService', operation: 'equipAccessory');
       rethrow;
     }
   }
@@ -103,8 +90,8 @@ class InventoryService {
         // 清除装备
         tx.update(catRef, {'equippedAccessory': null});
       });
-    } catch (e) {
-      debugPrint('[InventoryService] unequipAccessory failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'InventoryService', operation: 'unequipAccessory');
       rethrow;
     }
   }

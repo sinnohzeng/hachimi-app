@@ -1,12 +1,3 @@
-// ---
-// 📘 文件说明：
-// PixelCatSprite — 像素猫显示组件。
-// 使用 PixelCatRenderer 合成的 ui.Image，通过 CustomPaint 绘制。
-// FilterQuality.none 保证像素完美放大。
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

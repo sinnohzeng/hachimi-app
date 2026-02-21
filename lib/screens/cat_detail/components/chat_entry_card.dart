@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// Chat Entry Card — 聊天入口卡片组件。
-// 在 Diary Preview 下方，提升聊天功能可发现性。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 catId 和 catName；
-// 2. 渲染聊天图标 + 标题 + 副标题 + 箭头；
-// 3. 点击跳转到猫猫聊天页；
-//
-// 🧩 文件结构：
-// - ChatEntryCard：聊天入口卡片 StatelessWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';

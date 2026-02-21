@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// MonthlyCheckIn 数据模型 — 月度签到追踪。
-// 存储于 users/{uid}/monthlyCheckIns/{YYYY-MM}。
-//
-// 📋 程序整体伪代码：
-// 1. 定义 MonthlyCheckIn 模型（checkedDays, totalCoins, milestonesClaimed）；
-// 2. 提供 Firestore 序列化/反序列化方法；
-// 3. 定义 CheckInResult 签到结果类；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// 月度签到记录 — 对应 Firestore 文档 users/{uid}/monthlyCheckIns/{YYYY-MM}。

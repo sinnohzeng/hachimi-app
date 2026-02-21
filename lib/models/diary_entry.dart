@@ -1,10 +1,3 @@
-// ---
-// 📘 文件说明：
-// DiaryEntry 数据模型 — 猫猫日记条目，存储于本地 SQLite。
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 /// 猫猫日记条目 — 每猫每天最多一条。
 class DiaryEntry {
   final String id;

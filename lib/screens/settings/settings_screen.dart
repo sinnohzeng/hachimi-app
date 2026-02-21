@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// 设置页面 — 外观（主题模式/主题色）、通知、语言、关于信息、账号操作。
-//
-// 🧩 文件结构：
-// - SettingsScreen：主页面；
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -157,7 +149,7 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.pets_outlined),
             title: Text(l10n.settingsPixelCatSprites),
             subtitle: Text(
-              'by pixel-cat-maker (CC BY-NC 4.0)',
+              l10n.settingsPixelCatAttribution,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

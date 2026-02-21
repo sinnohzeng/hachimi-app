@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// 猫猫日记列表页 — 按日期倒序展示所有 AI 生成的日记条目。
-// 每条日记包含日期、心情 emoji、性格快照和完整日记文本。
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

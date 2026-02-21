@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +6,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -69,6 +71,10 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool? _onboardingComplete;
+  bool _appOpenLogged = false;
+
+  static const _kLastOpenKey = 'last_app_open';
+  static const _kConsecutiveDaysKey = 'consecutive_days';
 
   @override
   void initState() {
@@ -85,6 +91,45 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   void _onOnboardingComplete() {
     setState(() => _onboardingComplete = true);
+  }
+
+  /// Log app_opened analytics event with days_since_last and consecutive_days.
+  Future<void> _logAppOpened() async {
+    if (_appOpenLogged) return;
+    _appOpenLogged = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    int daysSinceLast = 0;
+    int consecutiveDays = 1;
+
+    final lastOpenStr = prefs.getString(_kLastOpenKey);
+    if (lastOpenStr != null) {
+      final lastOpen = DateTime.tryParse(lastOpenStr);
+      if (lastOpen != null) {
+        final lastDate = DateTime(lastOpen.year, lastOpen.month, lastOpen.day);
+        daysSinceLast = today.difference(lastDate).inDays;
+
+        final savedConsecutive = prefs.getInt(_kConsecutiveDaysKey) ?? 1;
+        if (daysSinceLast == 1) {
+          consecutiveDays = savedConsecutive + 1;
+        } else if (daysSinceLast == 0) {
+          consecutiveDays = savedConsecutive;
+        } else {
+          consecutiveDays = 1;
+        }
+      }
+    }
+
+    await prefs.setString(_kLastOpenKey, today.toIso8601String());
+    await prefs.setInt(_kConsecutiveDaysKey, consecutiveDays);
+
+    ref.read(analyticsServiceProvider).logAppOpened(
+      daysSinceLast: daysSinceLast,
+      consecutiveDays: consecutiveDays,
+    );
   }
 
   @override
@@ -106,6 +151,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       data: (user) {
         debugPrint('[APP] authState: data, user=${user?.uid}');
         if (user == null) return const LoginScreen();
+        FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+        ErrorHandler.breadcrumb('auth_state: ${user.uid}');
+        _logAppOpened();
         return _VersionGate(uid: user.uid);
       },
       loading: () {

@@ -3581,6 +3581,66 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Focus session in progress'**
   String get notifInProgress;
+
+  /// No description provided for @unitMinShort.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get unitMinShort;
+
+  /// No description provided for @unitHourShort.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get unitHourShort;
+
+  /// No description provided for @weekdayMon.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get weekdayMon;
+
+  /// No description provided for @weekdayTue.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get weekdayTue;
+
+  /// No description provided for @weekdayWed.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get weekdayWed;
+
+  /// No description provided for @weekdayThu.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get weekdayThu;
+
+  /// No description provided for @weekdayFri.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get weekdayFri;
+
+  /// No description provided for @weekdaySat.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get weekdaySat;
+
+  /// No description provided for @weekdaySun.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get weekdaySun;
+
+  /// No description provided for @settingsPixelCatAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'by pixel-cat-maker (CC BY-NC 4.0)'**
+  String get settingsPixelCatAttribution;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

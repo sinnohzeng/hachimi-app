@@ -1,14 +1,3 @@
-// ---
-// 📘 文件说明：
-// 外观描述的本地化扩展 — 将 CatAppearance 各字段 ID 映射为本地化展示文案。
-// 替代原 appearance_descriptions.dart 中的硬编码英文函数。
-//
-// 🧩 文件结构：
-// - AppearanceL10n on S：皮毛类型、皮毛颜色、眼色、皮肤色、毛长、白斑色调、摘要；
-//
-// 🕒 创建时间：2026-02-20
-// ---
-
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
 

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -37,7 +38,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
 
     final catId = habit.catId ?? '';
     final cat = catId.isNotEmpty ? ref.read(catByIdProvider(catId)) : null;
-    final catName = cat?.name ?? 'Your cat';
+    final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
 
     // Configure the timer with L10N labels for notification text
     final l10n = context.l10n;
@@ -58,6 +59,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         );
 
     HapticFeedback.lightImpact();
+    ErrorHandler.breadcrumb('focus_started: ${habit.name}, ${_selectedMinutes}min, ${_selectedMode.name}');
 
     // Navigate to focus timer screen
     Navigator.of(

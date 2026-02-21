@@ -1,28 +1,9 @@
-// ---
-// 📘 文件说明：
-// 专注计时器 Provider — 管理计时器生命周期、通知更新和崩溃恢复。
-// 使用 SharedPreferences 持久化活跃会话，App 被杀后可恢复。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. configure() 初始化计时器参数（含 habitName）；
-// 2. start() 启动周期性心跳，每秒更新 state 并刷新通知；
-// 3. 每 5 秒自动保存状态到 SharedPreferences；
-// 4. complete/abandon/reset 时清除持久化数据；
-// 5. 静态方法 hasInterruptedSession() 检测未完成会话；
-// 6. restoreSession() 从 SharedPreferences 恢复状态；
-//
-// 🧩 文件结构：
-// - TimerStatus/TimerMode：枚举；
-// - FocusTimerState：状态值对象；
-// - FocusTimerNotifier：Notifier + 持久化逻辑；
-// - focusTimerProvider：全局 Provider（keepAlive）；
-// ---
-
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show FlutterForegroundTask;
+import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/services/atomic_island_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
@@ -483,6 +464,15 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = state.copyWith(status: TimerStatus.completed);
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
+
+    // Analytics: log session quality
+    final completionRatio = state.totalSeconds > 0
+        ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
+        : 1.0;
+    ref.read(analyticsServiceProvider).logSessionQuality(
+      sessionDuration: state.elapsedSeconds,
+      completionRatio: completionRatio,
+    );
   }
 
   /// Abandon the session.
@@ -491,6 +481,15 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = state.copyWith(status: TimerStatus.abandoned);
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
+
+    // Analytics: log session quality (abandoned)
+    final completionRatio = state.totalSeconds > 0
+        ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
+        : 0.0;
+    ref.read(analyticsServiceProvider).logSessionQuality(
+      sessionDuration: state.elapsedSeconds,
+      completionRatio: completionRatio,
+    );
   }
 
   /// Handle app going to background.

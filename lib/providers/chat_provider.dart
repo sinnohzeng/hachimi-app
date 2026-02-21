@@ -1,14 +1,3 @@
-// ---
-// 📘 文件说明：
-// 聊天 Provider — 管理猫猫聊天状态（Notifier）。
-// 状态机：idle → generating → complete | error
-//
-// 📋 Provider Graph:
-// - chatNotifierProvider(catId)：聊天状态 Notifier
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

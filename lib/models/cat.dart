@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// Cat 数据模型 — 映射 Firestore `users/{uid}/cats/{catId}`。
-// v2: 从品种/XP 体系迁移到像素猫外观参数/时间进度体系。
-//
-// 📋 程序整体伪代码：
-// 1. 定义 Cat 字段（appearance + totalMinutes + targetMinutes）；
-// 2. 提供 computedStage / growthProgress 计算属性；
-// 3. Firestore 序列化/反序列化；
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';

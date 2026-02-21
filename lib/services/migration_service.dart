@@ -1,17 +1,5 @@
-// ---
-// 📘 文件说明：
-// MigrationService — 版本门控数据检测与清除。
-// 检测旧 schema 猫文档（有 breed 无 appearance），提供全量清除。
-//
-// 📋 程序整体伪代码：
-// 1. checkNeedsMigration：读取猫集合，检测旧 schema 标记；
-// 2. clearAllUserData：batch 删除 habits、cats、checkIns 全部文档；
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// MigrationService — 旧版本数据检测 + 清除。
 class MigrationService {
@@ -112,8 +100,8 @@ class MigrationService {
 
       // 重置用户 profile 字段（保留账号）
       await userRef.update({'coins': 0, 'lastCheckInDate': null});
-    } catch (e) {
-      debugPrint('[MigrationService] clearAllUserData failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'MigrationService', operation: 'clearAllUserData');
       rethrow;
     }
   }
@@ -132,8 +120,8 @@ class MigrationService {
       }
       try {
         await batch.commit();
-      } catch (e) {
-        debugPrint('[MigrationService] _deleteSubcollection batch failed: $e');
+      } catch (e, stack) {
+        ErrorHandler.record(e, stackTrace: stack, source: 'MigrationService', operation: '_deleteSubcollection');
         rethrow;
       }
     } while (snapshot.docs.length == batchSize);

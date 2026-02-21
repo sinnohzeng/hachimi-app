@@ -1,20 +1,3 @@
-// ---
-// 📘 文件说明：
-// 像素猫外观参数不可变数据类。字段命名与 pixel-cat-maker 严格一致。
-// 用于 Firestore 序列化和渲染引擎输入。
-//
-// 📋 程序整体伪代码：
-// 1. 定义 17 个外观参数字段；
-// 2. 提供 fromMap / toMap 用于 Firestore 序列化；
-// 3. 提供 cacheKey getter 用于渲染缓存；
-// 4. 提供 copyWith 用于饰品变更；
-//
-// 🧩 文件结构：
-// - CatAppearance：不可变数据类
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 /// 像素猫外观参数 — 与 pixel-cat-maker 的 Pelt 类型严格对齐。
 /// 所有字段在创建时随机生成，之后不可变（饰品除外）。
 class CatAppearance {

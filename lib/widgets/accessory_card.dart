@@ -1,12 +1,3 @@
-// ---
-// 📘 文件说明：
-// AccessoryCard — 可复用饰品卡片组件。
-// 展示饰品名称、价格标签、已拥有徽章。
-// 用于商店网格和 CatDetail 装备区。
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/streak_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -119,8 +120,8 @@ class FirestoreService {
 
     try {
       await batch.commit();
-    } catch (e) {
-      debugPrint('[FirestoreService] createHabitWithCat batch failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'createHabitWithCat');
       rethrow;
     }
     return (habitId: habitRef.id, catId: catRef.id);
@@ -192,7 +193,7 @@ class FirestoreService {
     required String uid,
     required FocusSession session,
     String habitName = '',
-  }) async {
+  }) => AppTraces.trace('log_focus_session', () async {
     final today = AppDateUtils.todayString();
     final batch = _db.batch();
 
@@ -257,11 +258,11 @@ class FirestoreService {
 
     try {
       await batch.commit();
-    } catch (e) {
-      debugPrint('[FirestoreService] saveFocusSession batch failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'logFocusSession');
       rethrow;
     }
-  }
+  });
 
   // ─── Check-ins ───
 
@@ -331,8 +332,8 @@ class FirestoreService {
 
     try {
       await batch.commit();
-    } catch (e) {
-      debugPrint('[FirestoreService] logCheckIn batch failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'FirestoreService', operation: 'logCheckIn');
       rethrow;
     }
   }

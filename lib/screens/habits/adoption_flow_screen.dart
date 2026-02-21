@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -10,6 +11,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
+import 'components/step_indicator.dart';
 
 /// 3-step adoption flow: Define Habit → Adopt Cat → Name Cat.
 /// Creates both a habit and its bound cat in Firestore on completion.
@@ -145,6 +147,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             cat: selectedCat,
           );
 
+      ErrorHandler.breadcrumb('cat_adopted: ${_catNameController.text.trim()}, habit=${_nameController.text.trim()}');
       await ref
           .read(analyticsServiceProvider)
           .logHabitCreated(
@@ -208,7 +211,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       ),
       body: Column(
         children: [
-          _StepIndicator(
+          StepIndicator(
             currentStep: _currentStep,
             steps: [
               context.l10n.adoptionStepDefineQuest,
@@ -433,7 +436,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           decoration: InputDecoration(
             labelText: context.l10n.adoptionMinutesPerDay,
             hintText: context.l10n.adoptionMinutesHint,
-            suffixText: 'min',
+            suffixText: context.l10n.unitMinShort,
           ),
         ),
         actions: [
@@ -478,7 +481,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           decoration: InputDecoration(
             labelText: context.l10n.adoptionTotalHours,
             hintText: context.l10n.adoptionHoursHint,
-            suffixText: 'h',
+            suffixText: context.l10n.unitHourShort,
           ),
         ),
         actions: [
@@ -742,89 +745,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Step indicator widget showing progress through the adoption flow.
-class _StepIndicator extends StatelessWidget {
-  final int currentStep;
-  final List<String> steps;
-
-  const _StepIndicator({required this.currentStep, required this.steps});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-      child: Row(
-        children: List.generate(steps.length * 2 - 1, (index) {
-          if (index.isOdd) {
-            final stepIndex = index ~/ 2;
-            return Expanded(
-              child: Container(
-                height: 2,
-                color: stepIndex < currentStep
-                    ? colorScheme.primary
-                    : colorScheme.outlineVariant,
-              ),
-            );
-          }
-
-          final stepIndex = index ~/ 2;
-          final isActive = stepIndex <= currentStep;
-          final isCurrent = stepIndex == currentStep;
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive
-                      ? colorScheme.primary
-                      : colorScheme.surfaceContainerHighest,
-                  border: isCurrent
-                      ? Border.all(color: colorScheme.primary, width: 2)
-                      : null,
-                ),
-                child: Center(
-                  child: stepIndex < currentStep
-                      ? Icon(
-                          Icons.check,
-                          size: 16,
-                          color: colorScheme.onPrimary,
-                        )
-                      : Text(
-                          '${stepIndex + 1}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: isActive
-                                ? colorScheme.onPrimary
-                                : colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                steps[stepIndex],
-                style: textTheme.labelSmall?.copyWith(
-                  color: isActive
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ],
-          );
-        }),
       ),
     );
   }

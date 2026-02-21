@@ -1,15 +1,4 @@
-// ---
-// 📘 文件说明：
-// 本地 SQLite 数据库服务 — 管理 diary_entries 和 chat_messages 表。
-// AI 生成内容仅存储在本地，不上传 Firestore。
-//
-// 🧩 文件结构：
-// - LocalDatabaseService：SQLite 初始化、表创建、CRUD 操作；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
-import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
@@ -84,8 +73,8 @@ class LocalDatabaseService {
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
       return true;
-    } catch (e) {
-      debugPrint('[LocalDB] insertDiaryEntry failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'LocalDatabaseService', operation: 'insertDiaryEntry');
       return false;
     }
   }

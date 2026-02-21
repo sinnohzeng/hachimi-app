@@ -1,31 +1,15 @@
-// ---
-// 📘 文件说明：
-// 专注完成庆祝页面 — 展示本次专注的时长、XP 奖励明细、猫猫阶段跃迁提示。
-// 带入场动画：emoji scale-up、标题/副标题 fade-in、stats 卡片 slide-up。
-// 完成时：撒花特效（confetti_widget）+ 自定义震动模式（vibration）。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 habitId、分钟数、XpResult、StageUpResult 参数；
-// 2. 从 Provider 加载关联的 habit 和 cat 数据；
-// 3. initState 中启动 staggered 入场动画 + 撒花 + 震动；
-// 4. 显示像素猫 sprite + 阶段跃迁标签（若有）；
-// 5. XP 明细卡片（slide-up + fade-in）；
-// 6. Done 按钮返回首页；
-//
-// 🧩 文件结构：
-// - FocusCompleteScreen：主页面 ConsumerStatefulWidget；
-// - _StatRow：XP 明细行组件；
-// ---
-
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
+import 'package:hachimi_app/screens/timer/components/stat_row.dart';
 import 'package:hachimi_app/services/diary_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -176,6 +160,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
 
     final locale = Localizations.localeOf(context);
     final diaryService = ref.read(diaryServiceProvider);
+    final catId = (cat as Cat).id;
     final ctx = DiaryGenerationContext(
       cat: cat,
       habit: habit,
@@ -192,6 +177,10 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
               _diaryGenerating = false;
               _diarySuccess = true;
             });
+            // Analytics: log AI diary generated
+            ref
+                .read(analyticsServiceProvider)
+                .logAiDiaryGenerated(catId: catId);
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) setState(() => _diarySuccess = false);
             });
@@ -333,28 +322,28 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
-                                _StatRow(
+                                StatRow(
                                   label: l10n.focusCompleteFocusTime,
                                   value: '+${widget.minutes} min',
                                   icon: Icons.timer_outlined,
                                 ),
                                 if (widget.coinsEarned > 0) ...[
                                   const Divider(height: 16),
-                                  _StatRow(
+                                  StatRow(
                                     label: l10n.focusCompleteCoinsEarned,
                                     value: '+${widget.coinsEarned}',
                                     icon: Icons.monetization_on,
                                   ),
                                 ],
                                 const Divider(height: 16),
-                                _StatRow(
+                                StatRow(
                                   label: l10n.focusCompleteBaseXp,
                                   value: '+${widget.xpResult.baseXp} XP',
                                   icon: Icons.star_outline,
                                 ),
                                 if (widget.xpResult.streakBonus > 0) ...[
                                   const Divider(height: 16),
-                                  _StatRow(
+                                  StatRow(
                                     label: l10n.focusCompleteStreakBonus,
                                     value: '+${widget.xpResult.streakBonus} XP',
                                     icon: Icons.local_fire_department,
@@ -362,7 +351,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                 ],
                                 if (widget.xpResult.milestoneBonus > 0) ...[
                                   const Divider(height: 16),
-                                  _StatRow(
+                                  StatRow(
                                     label: l10n.focusCompleteMilestoneBonus,
                                     value:
                                         '+${widget.xpResult.milestoneBonus} XP',
@@ -371,7 +360,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                 ],
                                 if (widget.xpResult.fullHouseBonus > 0) ...[
                                   const Divider(height: 16),
-                                  _StatRow(
+                                  StatRow(
                                     label: l10n.focusCompleteFullHouseBonus,
                                     value:
                                         '+${widget.xpResult.fullHouseBonus} XP',
@@ -379,7 +368,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                   ),
                                 ],
                                 const Divider(height: 16),
-                                _StatRow(
+                                StatRow(
                                   label: l10n.focusCompleteTotal,
                                   value: '+${widget.xpResult.totalXp} XP',
                                   icon: Icons.star,
@@ -497,49 +486,6 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
           ),
         ],
       ),
-    );
-  }
-}
-
-class _StatRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-  final bool isBold;
-
-  const _StatRow({
-    required this.label,
-    required this.value,
-    required this.icon,
-    this.isBold = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
-              ?.copyWith(
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              ),
-        ),
-        const Spacer(),
-        Text(
-          value,
-          style: (isBold ? textTheme.titleSmall : textTheme.bodyMedium)
-              ?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-      ],
     );
   }
 }

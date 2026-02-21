@@ -1,13 +1,3 @@
-// ---
-// 📘 文件说明：
-// 通知设置对话框 — 包含专注提醒开关，通过 SharedPreferences 持久化。
-//
-// 🧩 文件结构：
-// - NotificationSettingsDialog：通知设置 StatefulWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';

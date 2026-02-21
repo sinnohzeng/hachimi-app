@@ -1,18 +1,3 @@
-// ---
-// 📘 文件说明：
-// 语言设置 Provider — 管理应用语言区域设置。
-// null 表示跟随系统，否则为用户手动选择的 Locale。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 从 SharedPreferences 加载已保存的语言偏好；
-// 2. 暴露 Locale? 供 MaterialApp.locale 使用；
-// 3. 提供 setLocale 方法修改并持久化偏好；
-//
-// 🧩 文件结构：
-// - LocaleNotifier：Notifier，管理 Locale 状态 + 持久化；
-// - localeProvider：全局 Provider 定义；
-// ---
-
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,13 +1,3 @@
-// ---
-// 📘 文件说明：
-// 主题模式选择对话框 — 系统/浅色/深色三选一，通过 RadioGroup 切换。
-//
-// 🧩 文件结构：
-// - ThemeModeDialog：主题模式选择 StatelessWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 

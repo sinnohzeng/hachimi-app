@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// SkeletonLoader — M3 风格骨架屏组件，替代 CircularProgressIndicator。
-// 使用 shimmer 动画模拟内容加载中的占位符。
-//
-// 🧩 文件结构：
-// - SkeletonLoader：通用骨架块（可指定宽高、圆角）；
-// - SkeletonCard：模拟卡片形状的骨架（带标题行和内容行）；
-// - SkeletonListTile：模拟 ListTile 形状的骨架；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 

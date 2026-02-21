@@ -1,14 +1,3 @@
-// ---
-// 📘 文件说明：
-// AppMotion — M3 motion token 体系，统一全项目的动效时长和缓动曲线。
-// 所有 AnimationController duration / Curve 应使用此处常量。
-//
-// 🧩 文件结构：
-// - AppMotion：static 常量类；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 
 /// AppMotion — Material Design 3 duration and easing tokens.

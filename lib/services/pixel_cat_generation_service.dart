@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// 像素猫随机外观生成服务。概率权重参考 pixel-cat-maker inheritance.ts。
-// 生成 CatAppearance 和完整 Cat 对象。
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'dart:math';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';

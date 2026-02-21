@@ -1,15 +1,3 @@
-// ---
-// 📘 文件说明：
-// AI 模型设置区块 — 功能开关、隐私徽章、模型信息、下载/删除/测试。
-//
-// 🧩 文件结构：
-// - AiModelSection：AI 模型设置 ConsumerWidget；
-// - StatusChip：模型可用性状态标签；
-// - FeatureRow：功能说明行；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';

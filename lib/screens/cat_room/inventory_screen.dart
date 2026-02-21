@@ -1,17 +1,3 @@
-// ---
-// 📘 文件说明：
-// InventoryScreen — 道具箱页面。
-// 分「箱中」和「已装备在猫上」两区展示配饰。
-//
-// 📋 程序整体伪代码：
-// 1. 从 inventoryProvider 读取箱中道具；
-// 2. 从 catsProvider 收集各猫的 equippedAccessory；
-// 3. 点击箱中道具 → 选猫弹窗 → 装备；
-// 4. 点击已装备道具 → 卸下确认；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
@@ -211,6 +197,10 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .equipAccessory(uid: uid, catId: catId, accessoryId: accessoryId);
+    ref.read(analyticsServiceProvider).logAccessoryEquipped(
+      catId: catId,
+      accessoryId: accessoryId,
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

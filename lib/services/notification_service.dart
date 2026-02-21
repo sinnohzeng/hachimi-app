@@ -1,21 +1,3 @@
-// ---
-// 📘 文件说明：
-// NotificationService — 封装 FCM 和 flutter_local_notifications，
-// 支持每日提醒、连续打卡风险提醒、庆祝通知和权限管理。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. initializePlugins() 初始化插件和通知渠道（不请求权限）；
-// 2. setupFCM() 注册 FCM token 和监听前台消息（需权限）；
-// 3. requestPermission() 请求 Android POST_NOTIFICATIONS / iOS 通知权限；
-// 4. isPermissionGranted() 检查当前权限状态；
-// 5. scheduleDailyReminder() / cancelDailyReminder() 调度/取消提醒；
-//
-// 🧩 文件结构：
-// - NotificationService：单例服务；
-// - 权限管理方法；
-// - 调度方法；
-// ---
-
 import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

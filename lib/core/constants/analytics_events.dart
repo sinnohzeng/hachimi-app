@@ -37,6 +37,30 @@ class AnalyticsEvents {
   // Notifications
   static const String notificationOpened = 'notification_opened';
 
+  // Error tracking
+  static const String appError = 'app_error';
+
+  // Engagement depth
+  static const String featureUsed = 'feature_used';
+  static const String aiChatStarted = 'ai_chat_started';
+  static const String aiDiaryGenerated = 'ai_diary_generated';
+
+  // Session quality
+  static const String sessionQuality = 'session_quality';
+
+  // Retention signals
+  static const String appOpened = 'app_opened';
+
+  // Economy system
+  static const String coinsEarned = 'coins_earned';
+  static const String coinsSpent = 'coins_spent';
+  static const String accessoryEquipped = 'accessory_equipped';
+  static const String accessoryPurchased = 'accessory_purchased';
+
+  // User lifecycle
+  static const String onboardingCompleted = 'onboarding_completed';
+  static const String firstSessionCompleted = 'first_session_completed';
+
   // Legacy (kept for backward compat with existing screens)
   static const String timerStarted = 'timer_started';
   static const String timerCompleted = 'timer_completed';
@@ -75,6 +99,30 @@ class AnalyticsEvents {
   static const String paramMinutesToday = 'minutes_today';
   static const String paramMilestone = 'milestone';
   static const String paramPercentComplete = 'percent_complete';
+
+  // Error tracking params
+  static const String paramErrorType = 'error_type';
+  static const String paramErrorSource = 'error_source';
+  static const String paramErrorOperation = 'error_operation';
+  static const String paramScreen = 'screen';
+  static const String paramService = 'service';
+
+  // Engagement depth params
+  static const String paramFeature = 'feature';
+
+  // Session quality params
+  static const String paramSessionDuration = 'session_duration';
+  static const String paramCompletionRatio = 'completion_ratio';
+
+  // Retention signal params
+  static const String paramDaysSinceLast = 'days_since_last';
+  static const String paramConsecutiveDays = 'consecutive_days';
+
+  // Economy params
+  static const String paramCoinAmount = 'coin_amount';
+  static const String paramCoinSource = 'coin_source';
+  static const String paramAccessoryId = 'accessory_id';
+  static const String paramPrice = 'price';
 
   // ─── User Property Keys ───
 

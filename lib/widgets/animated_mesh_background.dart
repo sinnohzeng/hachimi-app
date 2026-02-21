@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// 动态 mesh 渐变背景组件 — 封装 AnimatedMeshGradient，支持动画开关。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 4 色列表 + speed + child；
-// 2. 检查 themeProvider.enableBackgroundAnimation 和系统无障碍设置；
-// 3. 启用时渲染 AnimatedMeshGradient；
-// 4. 禁用时 fallback 为静态 LinearGradient；
-//
-// 🧩 文件结构：
-// - AnimatedMeshBackground：可复用 ConsumerWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';

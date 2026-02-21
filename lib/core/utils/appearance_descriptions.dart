@@ -1,18 +1,3 @@
-// ---
-// 📘 文件说明：
-// 猫咪外观参数的人类可读描述映射。
-// 将 CatAppearance 的各字段 ID 转换为友好文案，用于 Cat Info Card。
-//
-// 📋 程序整体伪代码：
-// 1. peltTypeDescription — 皮毛图案类型描述；
-// 2. peltColorDescription — 皮毛颜色描述；
-// 3. eyeDescription — 眼色描述（含异色瞳）；
-// 4. furLengthDescription — 毛发长度描述；
-// 5. fullSummary — 一行摘要（如 "Ginger tabby, golden eyes, longhair"）；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:hachimi_app/models/cat_appearance.dart';
 
 /// 皮毛图案类型 → 人类可读描述。

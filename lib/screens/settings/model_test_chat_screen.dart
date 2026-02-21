@@ -1,21 +1,3 @@
-// ---
-// 📘 文件说明：
-// 模型测试聊天页 — 下载模型后快速验证 LLM 是否正常工作。
-// 无猫猫角色、不持久化消息、纯验证用途。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. initState 检查模型可用性，必要时触发加载；
-// 2. 用户发送消息 → TestPrompt 构建 prompt → LlmService.generateStream() 流式生成；
-// 3. 流式 token 实时更新到 AI 气泡中，支持 Stop 中断；
-// 4. dispose 时不卸载模型（保留给后续 Cat Chat 使用）；
-//
-// 🧩 文件结构：
-// - ModelTestChatScreen：主页面 ConsumerStatefulWidget；
-// - _TestMessage：内存消息模型；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';

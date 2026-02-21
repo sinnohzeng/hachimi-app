@@ -1,14 +1,3 @@
-// ---
-// 📘 文件说明：
-// AppSpacing — M3 spacing token 体系，消除全项目 magic numbers。
-// 所有间距、内边距、外边距应使用此处常量代替硬编码字面量。
-//
-// 🧩 文件结构：
-// - AppSpacing：static 常量类，包含 EdgeInsets 快捷方法；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 
 /// AppSpacing — Material Design 3 spacing tokens.

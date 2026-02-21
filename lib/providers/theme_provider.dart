@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// 主题设置 Provider — 管理深色/浅色模式和种子色切换。
-// 使用 SharedPreferences 持久化用户偏好。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 从 SharedPreferences 加载已保存的主题设置；
-// 2. 暴露 ThemeSettings（ThemeMode + seedColor）供 MaterialApp 使用；
-// 3. 提供 toggleMode / setSeedColor 方法修改并持久化偏好；
-//
-// 🧩 文件结构：
-// - ThemeSettings：主题设置值对象；
-// - ThemeNotifier：Notifier，管理主题状态 + 持久化；
-// - themeProvider：全局 Provider 定义；
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';

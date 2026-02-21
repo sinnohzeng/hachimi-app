@@ -1,13 +1,3 @@
-// ---
-// 📘 文件说明：
-// 主题色选择对话框 — 8 色网格选择器，使用 AppTheme.presetColors。
-//
-// 🧩 文件结构：
-// - ThemeColorDialog：主题色选择 StatelessWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';

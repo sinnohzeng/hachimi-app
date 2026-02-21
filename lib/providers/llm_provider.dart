@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// LLM Provider — AI 功能可用性状态机、模型下载进度、服务实例管理。
-//
-// 📋 Provider Graph:
-// - aiFeatureEnabledProvider：AI 功能开关（SharedPreferences 持久化）
-// - llmAvailabilityProvider：LLM 可用性状态机
-// - llmServiceProvider：LLM 推理服务实例
-// - modelDownloadProgressProvider：模型下载进度
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'dart:async';
 
 import 'package:background_downloader/background_downloader.dart';
@@ -19,6 +6,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart' show LlamaException;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/services/llm_service.dart';
 import 'package:hachimi_app/services/model_manager_service.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
@@ -138,6 +126,7 @@ class LlmAvailabilityNotifier extends StateNotifier<LlmAvailability> {
 
       final llmService = _ref.read(llmServiceInstanceProvider);
       await llmService.loadModel(modelPath);
+      ErrorHandler.breadcrumb('llm_model_loaded: $modelPath');
       state = LlmAvailability.ready;
     } on LlamaException catch (e) {
       final msg = e.toString();

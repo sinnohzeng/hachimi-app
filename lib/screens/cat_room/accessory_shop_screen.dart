@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// AccessoryShopScreen — 饰品商店全页界面。
-// TabBar 3 标签（Plants / Wild / Collars），3 列网格展示。
-// 购买流程：点击 → BottomSheet 选猫 → 确认购买。
-//
-// 📋 程序整体伪代码：
-// 1. 从 Provider 读取金币余额和所有猫咪数据；
-// 2. 构建 3 标签页（植物/野生/项圈），填充饰品网格；
-// 3. 点击未拥有饰品 → BottomSheet：选猫 + 购买确认；
-// 4. 调用 CoinService.purchaseAccessory()；
-// 5. 反馈结果（SnackBar）；
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
@@ -228,7 +212,17 @@ class _AccessoryGrid extends ConsumerWidget {
 
     if (!context.mounted) return;
 
-    if (success) HapticFeedback.mediumImpact();
+    if (success) {
+      HapticFeedback.mediumImpact();
+      ref.read(analyticsServiceProvider).logAccessoryPurchased(
+        accessoryId: item.id,
+        price: item.price,
+      );
+      ref.read(analyticsServiceProvider).logCoinsSpent(
+        amount: item.price,
+        accessoryId: item.id,
+      );
+    }
 
     final l10n = context.l10n;
     ScaffoldMessenger.of(context).showSnackBar(

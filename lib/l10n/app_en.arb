@@ -879,5 +879,16 @@
   "settingsLanguageKorean": "Korean",
 
   "notifFocusing": "focusing...",
-  "notifInProgress": "Focus session in progress"
+  "notifInProgress": "Focus session in progress",
+
+  "unitMinShort": "min",
+  "unitHourShort": "h",
+  "weekdayMon": "M",
+  "weekdayTue": "T",
+  "weekdayWed": "W",
+  "weekdayThu": "T",
+  "weekdayFri": "F",
+  "weekdaySat": "S",
+  "weekdaySun": "S",
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
 }

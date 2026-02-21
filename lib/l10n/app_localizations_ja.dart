@@ -1897,4 +1897,34 @@ class SJa extends S {
 
   @override
   String get notifInProgress => '集中セッション実行中';
+
+  @override
+  String get unitMinShort => '分';
+
+  @override
+  String get unitHourShort => '時間';
+
+  @override
+  String get weekdayMon => '月';
+
+  @override
+  String get weekdayTue => '火';
+
+  @override
+  String get weekdayWed => '水';
+
+  @override
+  String get weekdayThu => '木';
+
+  @override
+  String get weekdayFri => '金';
+
+  @override
+  String get weekdaySat => '土';
+
+  @override
+  String get weekdaySun => '日';
+
+  @override
+  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 }

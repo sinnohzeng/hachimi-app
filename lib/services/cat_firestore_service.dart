@@ -1,20 +1,6 @@
-// ---
-// 📘 文件说明：
-// CatFirestoreService — 猫相关 Firestore CRUD 操作。
-// 从 firestore_service.dart 提取，适配像素猫新 schema。
-//
-// 📋 程序整体伪代码：
-// 1. 提供猫数据的实时监听（active / all）；
-// 2. 单猫查询、重命名、饰品更新；
-// 3. 成长进度增量更新（totalMinutes）；
-// 4. 猫状态流转（active → graduated / dormant）；
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
 
 /// CatFirestoreService — 猫 CRUD 操作独立服务。
@@ -60,8 +46,8 @@ class CatFirestoreService {
         'totalMinutes': FieldValue.increment(minutesDelta),
         'lastSessionAt': FieldValue.serverTimestamp(),
       });
-    } catch (e) {
-      debugPrint('[CatFirestoreService] updateCatProgress failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'updateCatProgress');
       rethrow;
     }
   }
@@ -74,8 +60,8 @@ class CatFirestoreService {
   }) async {
     try {
       await _catsRef(uid).doc(catId).update({'name': newName});
-    } catch (e) {
-      debugPrint('[CatFirestoreService] renameCat failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'renameCat');
       rethrow;
     }
   }
@@ -110,8 +96,8 @@ class CatFirestoreService {
   Future<void> graduateCat({required String uid, required String catId}) async {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.graduated});
-    } catch (e) {
-      debugPrint('[CatFirestoreService] graduateCat failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'graduateCat');
       rethrow;
     }
   }
@@ -120,8 +106,8 @@ class CatFirestoreService {
   Future<void> archiveCat({required String uid, required String catId}) async {
     try {
       await _catsRef(uid).doc(catId).update({'state': CatState.dormant});
-    } catch (e) {
-      debugPrint('[CatFirestoreService] archiveCat failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CatFirestoreService', operation: 'archiveCat');
       rethrow;
     }
   }

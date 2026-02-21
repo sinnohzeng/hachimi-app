@@ -1,20 +1,3 @@
-// ---
-// 📘 文件说明：
-// Diary Preview Card — 日记预览卡片组件。
-// 展示今日日记摘要，点击进入日记列表。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 catId；
-// 2. 监听 todayDiaryProvider 获取今日日记；
-// 3. loading/error/data 三种状态分别渲染；
-// 4. 点击跳转到日记列表页；
-//
-// 🧩 文件结构：
-// - DiaryPreviewCard：日记预览卡片 ConsumerWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';

@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// 专注计时器页面 — 沉浸式全屏视图，显示像素猫、环形进度条和计时器。
-// 支持倒计时 / 正计时两种模式，后台前台 Service 通知。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 从 Provider 获取 habit 和 cat 数据；
-// 2. 管理计时器状态（idle/running/paused/completed/abandoned）；
-// 3. 前台 Service 推送通知；
-// 4. 完成后计算 XP、检测阶段跃迁、保存 session、跳转完成页；
-//
-// 🧩 文件结构：
-// - TimerScreen：主页面 ConsumerStatefulWidget；
-// - _buildControls：根据状态渲染不同按钮；
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -251,6 +236,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       coinsEarned: coinsEarned,
     );
 
+    ErrorHandler.breadcrumb('focus_completed: ${habit.name}, ${minutes}min, ${coinsEarned}coins');
     await ref
         .read(firestoreServiceProvider)
         .logFocusSession(uid: uid, session: session, habitName: habit.name);
@@ -269,6 +255,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         habitId: widget.habitId,
         minutesCompleted: minutes,
         reason: 'user_abandoned',
+      );
+    }
+
+    // Track coins earned from focus session
+    if (coinsEarned > 0) {
+      analytics.logCoinsEarned(
+        amount: coinsEarned,
+        source: 'focus_session',
       );
     }
 

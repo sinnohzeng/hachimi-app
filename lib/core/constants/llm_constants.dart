@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// LLM 常量 — 模型下载地址、SHA-256 校验、prompt 模板、推理参数。
-// 所有 AI 功能的配置集中管理于此。
-//
-// 🧩 文件结构：
-// - LlmConstants：静态常量类；
-// - DiaryPrompt：日记 prompt 构建器；
-// - ChatPrompt：聊天 prompt 构建器；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 /// LLM 模型与推理配置常量。
 class LlmConstants {
   LlmConstants._();

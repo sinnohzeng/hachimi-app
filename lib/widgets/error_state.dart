@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// ErrorState — 统一错误状态组件，替代散落各处的 Text('Error: $error')。
-// 包含错误图标、消息文本和重试按钮。
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';

@@ -1,11 +1,3 @@
-// ---
-// 📘 文件说明：
-// 金币系统 Provider — 余额监听 + 签到状态 + 月度签到进度。
-//
-// 🕒 创建时间：2026-02-18
-// 🔄 更新：2026-02-19 — 新增 monthlyCheckInProvider
-// ---
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';

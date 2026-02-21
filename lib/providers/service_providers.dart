@@ -1,14 +1,3 @@
-// ---
-// 📘 文件说明：
-// Service Provider 定义 — 所有非认证 Service 的 Riverpod Provider 单例注册。
-// 从 auth_provider.dart 迁出，职责分离。
-//
-// 🧩 文件结构：
-// - firestoreServiceProvider / analyticsServiceProvider / ...：Service 单例；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/services/analytics_service.dart';
 import 'package:hachimi_app/services/firestore_service.dart';

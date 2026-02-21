@@ -1,21 +1,3 @@
-// ---
-// 📘 文件说明：
-// Habit Heatmap Card — 活动热力图卡片组件。
-// 展示最近 91 天的每日专注时长热力图。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 habitId；
-// 2. initState 中加载 Firestore 每日分钟数据；
-// 3. loading/error/data 三种状态分别渲染；
-// 4. 成功时渲染 StreakHeatmap 组件；
-//
-// 🧩 文件结构：
-// - HabitHeatmapCard：活动热力图卡片 ConsumerStatefulWidget；
-// - StageMilestone：成长阶段里程碑辅助 Widget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';

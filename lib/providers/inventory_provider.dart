@@ -1,10 +1,3 @@
-// ---
-// 📘 文件说明：
-// 道具箱 Provider — 实时监听用户 inventory 字段。
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 

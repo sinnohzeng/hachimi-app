@@ -1,16 +1,3 @@
-// ---
-// 📘 文件说明：
-// 猫猫聊天页 — 与猫猫进行简单文字对话。
-// 支持 token-by-token 流式显示，猫猫回复基于性格特征。
-//
-// 🧩 文件结构：
-// - CatChatScreen：主页面 ConsumerStatefulWidget；
-// - _MessageBubble：消息气泡组件；
-// - _TypingIndicator：打字指示器；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +6,8 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/chat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
+import 'package:hachimi_app/screens/cat_detail/components/message_bubble.dart';
 
 /// 猫猫聊天页。
 class CatChatScreen extends ConsumerStatefulWidget {
@@ -178,7 +167,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
       itemBuilder: (context, index) {
         // 流式部分回复
         if (index == messages.length) {
-          return _MessageBubble(
+          return MessageBubble(
             content: partial,
             isUser: false,
             colorScheme: colorScheme,
@@ -187,7 +176,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         }
 
         final msg = messages[index];
-        return _MessageBubble(
+        return MessageBubble(
           content: msg.content,
           isUser: msg.role == ChatRole.user,
           colorScheme: colorScheme,
@@ -299,6 +288,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     ref
         .read(chatNotifierProvider(widget.catId).notifier)
         .sendMessage(text: text, cat: cat, habit: habit, isZhLocale: isZh);
+
+    // Analytics: log AI chat started
+    ref.read(analyticsServiceProvider).logAiChatStarted(catId: widget.catId);
   }
 
   void _confirmClearHistory(BuildContext context) {
@@ -323,55 +315,6 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
             child: Text(l10n.chatClearButton),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// 消息气泡组件。
-class _MessageBubble extends StatelessWidget {
-  final String content;
-  final bool isUser;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-
-  const _MessageBubble({
-    required this.content,
-    required this.isUser,
-    required this.colorScheme,
-    required this.textTheme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: isUser
-          ? AlignmentDirectional.centerEnd
-          : AlignmentDirectional.centerStart,
-      child: Container(
-        margin: AppSpacing.paddingVXs,
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: isUser
-              ? colorScheme.primary
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
-          ),
-        ),
-        child: Text(
-          content,
-          style: textTheme.bodyMedium?.copyWith(
-            color: isUser ? colorScheme.onPrimary : colorScheme.onSurface,
-            height: 1.4,
-          ),
-        ),
       ),
     );
   }

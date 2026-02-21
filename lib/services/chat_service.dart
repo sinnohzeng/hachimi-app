@@ -1,17 +1,3 @@
-// ---
-// 📘 文件说明：
-// 猫猫聊天服务 — 负责聊天 prompt 构建、历史管理、LLM 流式生成、SQLite 读写。
-// 上下文窗口管理：最近 10 轮对话 + system prompt。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 加载最近 10 轮聊天历史；
-// 2. 构建完整 prompt（system + history + user message）；
-// 3. 调用 LlmService 流式生成回复；
-// 4. 保存用户消息和助手回复到 SQLite；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'dart:async';
 
 import 'package:uuid/uuid.dart';

@@ -1,23 +1,10 @@
-// ---
-// 📘 文件说明：
-// 每日签到横幅组件 — 可视化卡片，展示月度签到进度。
-// 未签到时自动触发签到 + 显示奖励反馈；已签到时展示进度摘要。
-//
-// 📋 程序整体伪代码：
-// 1. 监听 hasCheckedInTodayProvider + monthlyCheckInProvider；
-// 2. 未签到 → 显示"签到领金币"卡片 + 自动执行签到；
-// 3. 已签到 → 显示"X/N 天 · +Y 金币"摘要，点击进入月度详情；
-//
-// 🕒 创建时间：2026-02-18
-// 🔄 更新：2026-02-19 — 从 SizedBox.shrink() 重构为可视卡片
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -53,6 +40,12 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
     final result = await coinService.checkIn(uid);
 
     if (result != null && mounted) {
+      ErrorHandler.breadcrumb('daily_checkin_completed: +${result.dailyCoins} coins');
+      final totalCoins = result.dailyCoins + result.milestoneBonus;
+      ref.read(analyticsServiceProvider).logCoinsEarned(
+        amount: totalCoins,
+        source: 'daily_checkin',
+      );
       ref.invalidate(hasCheckedInTodayProvider);
       ref.invalidate(monthlyCheckInProvider);
 

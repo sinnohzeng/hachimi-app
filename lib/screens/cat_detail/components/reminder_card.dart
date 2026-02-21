@@ -1,21 +1,3 @@
-// ---
-// 📘 文件说明：
-// Reminder Card — 每日提醒卡片组件。
-// 展示/设置/修改/移除每日专注提醒。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 接收 Habit 和 Cat 数据；
-// 2. 判断是否已设置提醒；
-// 3. 已设置：显示时间 + 修改/删除按钮；
-// 4. 未设置：显示"设置提醒"按钮；
-// 5. 调用 Firestore + NotificationService 完成操作；
-//
-// 🧩 文件结构：
-// - ReminderCard：每日提醒卡片 ConsumerWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';

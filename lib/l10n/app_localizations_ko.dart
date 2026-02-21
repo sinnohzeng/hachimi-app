@@ -1898,4 +1898,34 @@ class SKo extends S {
 
   @override
   String get notifInProgress => '집중 세션 진행 중';
+
+  @override
+  String get unitMinShort => '분';
+
+  @override
+  String get unitHourShort => '시간';
+
+  @override
+  String get weekdayMon => '월';
+
+  @override
+  String get weekdayTue => '화';
+
+  @override
+  String get weekdayWed => '수';
+
+  @override
+  String get weekdayThu => '목';
+
+  @override
+  String get weekdayFri => '금';
+
+  @override
+  String get weekdaySat => '토';
+
+  @override
+  String get weekdaySun => '일';
+
+  @override
+  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 }

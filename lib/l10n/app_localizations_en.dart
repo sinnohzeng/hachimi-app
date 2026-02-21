@@ -1921,4 +1921,34 @@ class SEn extends S {
 
   @override
   String get notifInProgress => 'Focus session in progress';
+
+  @override
+  String get unitMinShort => 'min';
+
+  @override
+  String get unitHourShort => 'h';
+
+  @override
+  String get weekdayMon => 'M';
+
+  @override
+  String get weekdayTue => 'T';
+
+  @override
+  String get weekdayWed => 'W';
+
+  @override
+  String get weekdayThu => 'T';
+
+  @override
+  String get weekdayFri => 'F';
+
+  @override
+  String get weekdaySat => 'S';
+
+  @override
+  String get weekdaySun => 'S';
+
+  @override
+  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 }

@@ -1,38 +1,9 @@
-// ---
-// 📘 文件说明：
-// 像素猫 13 层 sprite 合成引擎。
-// 将 pixel-cat-maker 的 drawCat.ts 翻译为 dart:ui Canvas 操作。
-// 通过 Provider 暴露给 Widget 层，不直接被 Screen 引用。
-//
-// 📋 程序整体伪代码：
-// 1. 懒加载 spritesheet Image + config JSON；
-// 2. 从 spritesheet 裁切单个 50×50 sprite；
-// 3. 按 13 层顺序合成最终图像；
-// 4. LRU 缓存合成结果；
-//
-// 🔄 程序流程图：
-// ┌─────────────┐
-// │ CatAppearance│
-// └──────┬──────┘
-//        ↓
-// ┌─────────────────┐
-// │ renderCat()      │
-// │ 13 层 Canvas 合成│
-// └──────┬──────────┘
-//        ↓
-// ┌─────────────┐
-// │  ui.Image    │
-// └─────────────┘
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'dart:convert';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
 
 /// sprite 位置信息（对应 spritesIndex.json 的每个条目）
@@ -131,8 +102,8 @@ class PixelCatRenderer {
             .map((e) => e as String)
             .toList();
       }
-    } catch (e) {
-      debugPrint('[PixelCatRenderer] _ensureConfigLoaded failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'PixelCatRenderer', operation: '_ensureConfigLoaded');
       // 初始化空默认值防止重复尝试
       _spritesIndex ??= {};
       _offsetMap ??= [];
@@ -171,8 +142,8 @@ class PixelCatRenderer {
       final frame = await codec.getNextFrame();
       _spritesheetCache[name] = frame.image;
       return frame.image;
-    } catch (e) {
-      debugPrint('[PixelCatRenderer] _loadSpritesheet($name) failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'PixelCatRenderer', operation: '_loadSpritesheet', extras: {'spritesheet': name});
       rethrow;
     }
   }

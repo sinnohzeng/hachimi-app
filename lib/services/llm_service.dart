@@ -1,28 +1,11 @@
-// ---
-// 📘 文件说明：
-// LLM 推理服务 — 封装 llama_cpp_dart 的 Isolate 推理引擎。
-// 推理在独立 Isolate 运行（dart:ffi），不阻塞 Dart UI 线程。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 使用 LlamaParent 创建独立 Isolate 加载 GGUF 模型；
-// 2. 暴露 generate() 用于一次性文本生成（日记）；
-// 3. 暴露 generateStream() 用于流式 token 输出（聊天）；
-// 4. 管理模型加载/卸载生命周期；
-// 5. Isolate 崩溃时自动重置状态，允许重新加载；
-//
-// 🧩 文件结构：
-// - LlmService：推理引擎封装；
-// - LlmEngineStatus：引擎状态枚举；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'dart:async';
 import 'dart:io' show File, Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/core/utils/performance_traces.dart';
 
 /// LLM 引擎状态。
 enum LlmEngineStatus { unloaded, loading, ready, generating, error }
@@ -81,29 +64,32 @@ class LlmService {
     _lastError = null;
 
     try {
-      final loadCommand = LlamaLoad(
-        path: modelPath,
-        modelParams: ModelParams()..nGpuLayers = 0, // CPU only
-        contextParams: ContextParams()
-          ..nCtx = LlmConstants.contextSize
-          ..nBatch = 512
-          ..nThreads = 4
-          ..nPredict = LlmConstants.diaryMaxTokens,
-        samplingParams: SamplerParams()
-          ..temp = LlmConstants.temperature
-          ..topP = LlmConstants.topP
-          ..penaltyRepeat = LlmConstants.repeatPenalty,
-        verbose: true,
-      );
+      await AppTraces.trace('llm_load_model', () async {
+        final loadCommand = LlamaLoad(
+          path: modelPath,
+          modelParams: ModelParams()..nGpuLayers = 0, // CPU only
+          contextParams: ContextParams()
+            ..nCtx = LlmConstants.contextSize
+            ..nBatch = 512
+            ..nThreads = 4
+            ..nPredict = LlmConstants.diaryMaxTokens,
+          samplingParams: SamplerParams()
+            ..temp = LlmConstants.temperature
+            ..topP = LlmConstants.topP
+            ..penaltyRepeat = LlmConstants.repeatPenalty,
+          verbose: true,
+        );
 
-      _parent = LlamaParent(loadCommand);
-      await _parent!.init();
+        _parent = LlamaParent(loadCommand);
+        await _parent!.init();
+      });
       _status = LlmEngineStatus.ready;
       debugPrint('[LlmService] Model loaded successfully');
-    } catch (e) {
+    } catch (e, stack) {
       _status = LlmEngineStatus.error;
       _lastError = e.toString();
       _parent = null;
+      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'loadModel');
       rethrow;
     }
   }
@@ -118,45 +104,49 @@ class LlmService {
 
     _status = LlmEngineStatus.generating;
     try {
-      final buffer = StringBuffer();
-      StreamSubscription<String>? streamSub;
+      final text = await AppTraces.trace('llm_generate', () async {
+        final buffer = StringBuffer();
+        StreamSubscription<String>? streamSub;
 
-      final completer = Completer<String>();
+        final completer = Completer<String>();
 
-      streamSub = parent.stream.listen(
-        buffer.write,
-        onError: (e) {
-          if (!completer.isCompleted) {
-            completer.completeError(e);
-          }
-        },
-        onDone: () {
-          // stream 意外关闭（Isolate 崩溃等），防止 completer 悬空
+        streamSub = parent.stream.listen(
+          buffer.write,
+          onError: (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(e);
+            }
+          },
+          onDone: () {
+            // stream 意外关闭（Isolate 崩溃等），防止 completer 悬空
+            if (!completer.isCompleted) {
+              completer.complete(buffer.toString());
+            }
+          },
+        );
+
+        // 监听完成事件
+        StreamSubscription<CompletionEvent>? completionSub;
+        completionSub = parent.completions.listen((event) {
           if (!completer.isCompleted) {
             completer.complete(buffer.toString());
           }
-        },
-      );
+          completionSub?.cancel();
+        });
 
-      // 监听完成事件
-      StreamSubscription<CompletionEvent>? completionSub;
-      completionSub = parent.completions.listen((event) {
-        if (!completer.isCompleted) {
-          completer.complete(buffer.toString());
-        }
-        completionSub?.cancel();
+        await parent.sendPrompt(prompt);
+
+        final result = await completer.future;
+        await streamSub.cancel();
+        await completionSub.cancel();
+        return result;
       });
 
-      await parent.sendPrompt(prompt);
-
-      final result = await completer.future;
-      await streamSub.cancel();
-      await completionSub.cancel();
-
       _status = LlmEngineStatus.ready;
-      return cleanResponse(result);
-    } catch (e) {
+      return cleanResponse(text);
+    } catch (e, stack) {
       _resetOnError(e);
+      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'generate');
       rethrow;
     }
   }
@@ -217,8 +207,8 @@ class LlmService {
   Future<void> stopGeneration() async {
     try {
       await _parent?.stop();
-    } catch (e) {
-      debugPrint('[LlmService] stop error: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'stopGeneration');
     }
     if (_status == LlmEngineStatus.generating) {
       _status = LlmEngineStatus.ready;
@@ -229,8 +219,8 @@ class LlmService {
   Future<void> unloadModel() async {
     try {
       await _parent?.dispose();
-    } catch (e) {
-      debugPrint('[LlmService] dispose error: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'LlmService', operation: 'unloadModel');
     }
     _parent = null;
     _status = LlmEngineStatus.unloaded;

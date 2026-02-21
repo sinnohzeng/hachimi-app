@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// 浮动粒子覆盖层 — 封装 AtmosphericParticles，提供 firefly/dust 两种预设。
-//
-// 📋 程序整体伪代码（中文）：
-// 1. 根据 ParticleMode 选择粒子数量、速度、大小等参数；
-// 2. 检查动画开关，禁用时不渲染任何粒子；
-// 3. 渲染 AtmosphericParticles 覆盖在 child 上方；
-//
-// 🧩 文件结构：
-// - ParticleMode 枚举：firefly / dust；
-// - ParticleOverlay：可复用 ConsumerWidget；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:atmospheric_particles/atmospheric_particles.dart';

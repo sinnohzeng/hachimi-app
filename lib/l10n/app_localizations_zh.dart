@@ -1891,6 +1891,36 @@ class SZh extends S {
 
   @override
   String get notifInProgress => '正在专注';
+
+  @override
+  String get unitMinShort => '分钟';
+
+  @override
+  String get unitHourShort => '小时';
+
+  @override
+  String get weekdayMon => '一';
+
+  @override
+  String get weekdayTue => '二';
+
+  @override
+  String get weekdayWed => '三';
+
+  @override
+  String get weekdayThu => '四';
+
+  @override
+  String get weekdayFri => '五';
+
+  @override
+  String get weekdaySat => '六';
+
+  @override
+  String get weekdaySun => '日';
+
+  @override
+  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -3781,4 +3811,34 @@ class SZhHant extends SZh {
 
   @override
   String get notifInProgress => '正在專注';
+
+  @override
+  String get unitMinShort => '分鐘';
+
+  @override
+  String get unitHourShort => '小時';
+
+  @override
+  String get weekdayMon => '一';
+
+  @override
+  String get weekdayTue => '二';
+
+  @override
+  String get weekdayWed => '三';
+
+  @override
+  String get weekdayThu => '四';
+
+  @override
+  String get weekdayFri => '五';
+
+  @override
+  String get weekdaySat => '六';
+
+  @override
+  String get weekdaySun => '日';
+
+  @override
+  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 }

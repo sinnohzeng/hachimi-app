@@ -1,13 +1,3 @@
-// ---
-// 📘 文件说明：
-// appInfoProvider — 从系统读取应用版本信息，消除硬编码版本号。
-//
-// 🧩 文件结构：
-// - appInfoProvider：FutureProvider，异步获取 PackageInfo；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 

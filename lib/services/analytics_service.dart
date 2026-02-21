@@ -1,6 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/constants/analytics_events.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 
 /// AnalyticsService — wraps Firebase Analytics for all custom event tracking.
 /// Event definitions are in analytics_events.dart (SSOT for event names/params).
@@ -15,8 +15,8 @@ class AnalyticsService {
   Future<void> _safeLog(Future<void> Function() fn) async {
     try {
       await fn();
-    } catch (e) {
-      debugPrint('[Analytics] $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'AnalyticsService', operation: '_safeLog');
     }
   }
 
@@ -255,6 +255,132 @@ class AnalyticsService {
       parameters: {
         AnalyticsEvents.paramHabitName: habitName,
         AnalyticsEvents.paramPercentComplete: percentComplete,
+      },
+    ),
+  );
+
+  // ─── Engagement Depth Events ───
+
+  Future<void> logFeatureUsed({required String feature}) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.featureUsed,
+      parameters: {AnalyticsEvents.paramFeature: feature},
+    ),
+  );
+
+  Future<void> logAiChatStarted({required String catId}) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.aiChatStarted,
+      parameters: {AnalyticsEvents.paramCatId: catId},
+    ),
+  );
+
+  Future<void> logAiDiaryGenerated({required String catId}) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.aiDiaryGenerated,
+      parameters: {AnalyticsEvents.paramCatId: catId},
+    ),
+  );
+
+  // ─── Session Quality Events ───
+
+  Future<void> logSessionQuality({
+    required int sessionDuration,
+    required double completionRatio,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.sessionQuality,
+      parameters: {
+        AnalyticsEvents.paramSessionDuration: sessionDuration,
+        AnalyticsEvents.paramCompletionRatio: completionRatio,
+      },
+    ),
+  );
+
+  // ─── Retention Signal Events ───
+
+  Future<void> logAppOpened({
+    required int daysSinceLast,
+    required int consecutiveDays,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.appOpened,
+      parameters: {
+        AnalyticsEvents.paramDaysSinceLast: daysSinceLast,
+        AnalyticsEvents.paramConsecutiveDays: consecutiveDays,
+      },
+    ),
+  );
+
+  // ─── Economy System Events ───
+
+  Future<void> logCoinsEarned({
+    required int amount,
+    required String source,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.coinsEarned,
+      parameters: {
+        AnalyticsEvents.paramCoinAmount: amount,
+        AnalyticsEvents.paramCoinSource: source,
+      },
+    ),
+  );
+
+  Future<void> logCoinsSpent({
+    required int amount,
+    required String accessoryId,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.coinsSpent,
+      parameters: {
+        AnalyticsEvents.paramCoinAmount: amount,
+        AnalyticsEvents.paramAccessoryId: accessoryId,
+      },
+    ),
+  );
+
+  Future<void> logAccessoryEquipped({
+    required String catId,
+    required String accessoryId,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.accessoryEquipped,
+      parameters: {
+        AnalyticsEvents.paramCatId: catId,
+        AnalyticsEvents.paramAccessoryId: accessoryId,
+      },
+    ),
+  );
+
+  Future<void> logAccessoryPurchased({
+    required String accessoryId,
+    required int price,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.accessoryPurchased,
+      parameters: {
+        AnalyticsEvents.paramAccessoryId: accessoryId,
+        AnalyticsEvents.paramPrice: price,
+      },
+    ),
+  );
+
+  // ─── User Lifecycle Events ───
+
+  Future<void> logOnboardingCompleted() => _safeLog(
+    () => _analytics.logEvent(name: AnalyticsEvents.onboardingCompleted),
+  );
+
+  Future<void> logFirstSessionCompleted({
+    required String habitId,
+    required int actualMinutes,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.firstSessionCompleted,
+      parameters: {
+        AnalyticsEvents.paramHabitId: habitId,
+        AnalyticsEvents.paramActualMinutes: actualMinutes,
       },
     ),
   );

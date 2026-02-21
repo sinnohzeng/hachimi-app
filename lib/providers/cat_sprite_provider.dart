@@ -1,10 +1,3 @@
-// ---
-// 📘 文件说明：
-// 像素猫 Sprite 渲染 Provider — 单例渲染器 + 缓存图片 FutureProvider。
-//
-// 🕒 创建时间：2026-02-18
-// ---
-
 import 'dart:ui' as ui;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';

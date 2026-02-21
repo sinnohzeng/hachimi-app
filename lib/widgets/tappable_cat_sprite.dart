@@ -1,19 +1,3 @@
-// ---
-// 📘 文件说明：
-// TappableCatSprite — 可点击切换动作的像素猫交互组件。
-// 包裹 PixelCatSprite，提供 tap-to-cycle pose + bounce animation + haptic feedback。
-// 所有展示猫猫形象的页面应使用此组件代替裸 PixelCatSprite。
-//
-// 📋 程序整体伪代码：
-// 1. 接收 cat + size + enableTap 参数；
-// 2. 维护本地 _displayVariant 状态（不持久化）；
-// 3. 点击时循环切换 variant (0→1→2→0)，触发弹跳动画和触觉反馈；
-// 4. 使用 computeSpriteIndex 计算当前 sprite；
-// 5. 通过 GestureDetector + AnimatedBuilder + Transform.scale 实现弹跳；
-//
-// 🕒 创建时间：2026-02-19
-// ---
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'

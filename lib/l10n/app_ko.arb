@@ -631,5 +631,16 @@
   "settingsLanguageKorean": "한국어",
 
   "notifFocusing": "집중 중...",
-  "notifInProgress": "집중 세션 진행 중"
+  "notifInProgress": "집중 세션 진행 중",
+
+  "unitMinShort": "분",
+  "unitHourShort": "시간",
+  "weekdayMon": "월",
+  "weekdayTue": "화",
+  "weekdayWed": "수",
+  "weekdayThu": "목",
+  "weekdayFri": "금",
+  "weekdaySat": "토",
+  "weekdaySun": "일",
+  "settingsPixelCatAttribution": "by pixel-cat-maker (CC BY-NC 4.0)"
 }

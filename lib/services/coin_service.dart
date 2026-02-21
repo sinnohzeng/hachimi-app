@@ -1,22 +1,7 @@
-// ---
-// 📘 文件说明：
-// CoinService — 金币系统服务。
-// 管理月度签到奖励（weekday/weekend + 里程碑）、余额查询、金币消费、饰品购买。
-//
-// 📋 程序整体伪代码：
-// 1. checkIn：判断今日是否已签到，未签到则按 weekday/weekend 发放金币 + 检查里程碑；
-// 2. watchMonthlyCheckIn：实时监听当月签到文档；
-// 3. spendCoins：扣减金币，余额不足返回 false；
-// 4. purchaseAccessory：事务操作：扣币 + 追加饰品到用户 inventory；
-// 5. watchBalance / getBalance：实时/一次性读取余额；
-//
-// 🕒 创建时间：2026-02-18
-// 🔄 更新：2026-02-19 — 重构为月度签到系统
-// ---
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:intl/intl.dart';
@@ -80,7 +65,7 @@ class CoinService {
     final monthRef = _monthlyCheckInRef(uid, month);
 
     try {
-      return await _db.runTransaction((tx) async {
+      return await AppTraces.trace('coin_check_in', () => _db.runTransaction((tx) async {
         // 1. 检查今日是否已签到
         final userDoc = await tx.get(userRef);
         final userData = userDoc.data() as Map<String, dynamic>? ?? {};
@@ -162,9 +147,9 @@ class CoinService {
           milestoneBonus: milestoneBonus,
           newMilestones: newMilestones,
         );
-      });
-    } catch (e) {
-      debugPrint('[CoinService] checkIn transaction failed: $e');
+      }));
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'checkIn');
       rethrow;
     }
   }
@@ -185,8 +170,8 @@ class CoinService {
         tx.update(userRef, {'coins': FieldValue.increment(-amount)});
         return true;
       });
-    } catch (e) {
-      debugPrint('[CoinService] spendCoins transaction failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'spendCoins');
       rethrow;
     }
   }
@@ -222,8 +207,8 @@ class CoinService {
         });
         return true;
       });
-    } catch (e) {
-      debugPrint('[CoinService] purchaseAccessory transaction failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(e, stackTrace: stack, source: 'CoinService', operation: 'purchaseAccessory');
       rethrow;
     }
   }
