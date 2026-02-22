@@ -200,8 +200,23 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 - **精灵图**：使用本地变体覆盖调用 `computeSpriteIndex(stage, _displayVariant, isLonghair)`
 - **构建**：`GestureDetector` → `AnimatedBuilder` → `Transform.scale` → `PixelCatSprite`
 
+**导航层 vs 互动层（v2.8.2+）：**
+
+列表和网格是导航入口——点击猫咪应跳转到详情页，而非切换姿势。详情页和氛围页是互动场所，姿势切换才有意义。
+
+| 场景 | `enableTap` | 原因 |
+|------|-------------|------|
+| 个人资料猫咪相册 | `false` | 导航入口——点击跳转到详情页 |
+| 首页精选猫咪卡片 | `false` | 导航入口——点击跳转到详情页 |
+| 猫舍网格卡片 | `false` | 导航入口——点击跳转到详情页 |
+| 猫咪详情页 | `true` | 互动空间——点击切换姿势 |
+| 计时器页面 | `true` | 氛围场景——点击切换姿势 |
+| 专注完成页 | `true` | 庆祝场景——点击切换姿势 |
+| 专注设置页 | `true` | 预览——点击切换姿势 |
+| 领养流程 | `true` | 预览——点击切换姿势 |
+
 **使用位置（10+ 个文件）：**
-- `cat_detail_screen.dart`（120px）、`home_screen.dart`（72px 精选猫咪卡片）、`focus_setup_screen.dart`（120px）、`timer_screen.dart`（100px）、`focus_complete_screen.dart`（120px）、`cat_room_screen.dart`（80px）、`profile_screen.dart`（48px）、`adoption_flow_screen.dart`（预览）
+- `cat_detail_screen.dart`（120px）、`featured_cat_card.dart`（72px）、`focus_setup_screen.dart`（120px）、`timer_screen.dart`（100px）、`focus_complete_screen.dart`（120px）、`cat_room_screen.dart`（80px）、`profile_screen.dart`（48px）、`adoption_flow_screen.dart`（预览）
 
 > **注意：** `PixelCatSprite` 保留为底层渲染组件。`TappableCatSprite` 是交互层包装。
 

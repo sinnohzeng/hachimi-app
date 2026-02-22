@@ -28,7 +28,9 @@ DynamicColorBuilder(
 )
 ```
 
-When dynamic color is active, the seed color setting is ignored and the system-provided `ColorScheme` is used directly. Users can toggle this via **Settings > Appearance > Material You**.
+When dynamic color is active, the seed color setting is ignored and the system-provided `ColorScheme` is used directly.
+
+**Settings entry point (v2.8.2+):** Dynamic color and preset colors are unified into a single **Settings > Theme Color** dialog (`ThemeColorDialog`). The dialog shows a "Dynamic" option (gradient circle with wallpaper icon) at the top, followed by the 8 preset colors. Selecting "Dynamic" calls `setDynamicColor(true)`; selecting a preset calls `setDynamicColor(false)` + `setSeedColor(color)`. The previous standalone Material You `SwitchListTile` has been removed.
 
 ### Color Tokens
 
@@ -98,7 +100,7 @@ Always access text styles via `Theme.of(context).textTheme`. Never hardcode `Tex
 | `SnackBar` | Success/error feedback (session saved, quest completed) |
 | `AlertDialog` | Confirm destructive actions (delete quest, archive cat, rename) |
 | `ModalBottomSheet` | Cat quick actions in CatHouse (rename, edit quest, archive) |
-| `SwitchListTile` | Settings toggles (Material You, dark mode, notifications) |
+| `SwitchListTile` | Settings toggles (dark mode, notifications, background animation) |
 | `Chip` | Streak badge in per-quest stats |
 
 ---
@@ -231,9 +233,20 @@ M3 uses **tonal elevation** (surface tint) instead of drop shadows. Higher eleva
 | Level | Use |
 |-------|-----|
 | Level 0 | Background |
-| Level 1 | Cards (default) |
+| Level 1 | Cards (light mode default) |
 | Level 2 | Raised cards, navigation bar |
 | Level 3 | Dialogs, FAB |
+
+### Card Theme (v2.8.2+)
+
+Cards use brightness-aware styling for clear visual separation between card and background:
+
+| Mode | Card Color | Elevation | Border |
+|------|-----------|-----------|--------|
+| Light | `surfaceContainerLow` | 1 | None |
+| Dark | `surfaceContainerHigh` | 0 | `outlineVariant` at alpha 0.3 |
+
+This is configured in `CardThemeData` within `AppTheme._buildTheme()`. All 84+ `Card` usages in the project inherit this automatically — no per-card `color:` overrides are needed.
 
 Do not set `elevation` on widgets unless intentionally overriding the component default.
 

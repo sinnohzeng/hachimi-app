@@ -197,8 +197,23 @@ The `peltColorToMaterial()` function in `pixel_cat_constants.dart` maps each of 
 - **Sprite**: Calls `computeSpriteIndex(stage, _displayVariant, isLonghair)` with local variant override
 - **Build**: `GestureDetector` → `AnimatedBuilder` → `Transform.scale` → `PixelCatSprite`
 
+**Navigation Layer vs Interaction Layer (v2.8.2+):**
+
+Lists and grids are navigation entry points — tapping a cat should navigate to its detail page, not cycle poses. Detail and ambient screens are interaction spaces where pose-cycling is appropriate.
+
+| Context | `enableTap` | Reason |
+|---------|-------------|--------|
+| Profile cat album | `false` | Navigation entry — tap navigates to detail |
+| Home featured cat card | `false` | Navigation entry — tap navigates to detail |
+| CatHouse grid card | `false` | Navigation entry — tap navigates to detail |
+| Cat detail page | `true` | Interaction space — tap cycles poses |
+| Timer screen | `true` | Ambient — tap cycles poses |
+| Focus complete screen | `true` | Celebration — tap cycles poses |
+| Focus setup screen | `true` | Preview — tap cycles poses |
+| Adoption flow | `true` | Preview — tap cycles poses |
+
 **Usage locations (10+ files):**
-- `cat_detail_screen.dart` (120px), `home_screen.dart` (72px featured card), `focus_setup_screen.dart` (120px), `timer_screen.dart` (100px), `focus_complete_screen.dart` (120px), `cat_room_screen.dart` (80px), `profile_screen.dart` (48px), `adoption_flow_screen.dart` (preview)
+- `cat_detail_screen.dart` (120px), `featured_cat_card.dart` (72px), `focus_setup_screen.dart` (120px), `timer_screen.dart` (100px), `focus_complete_screen.dart` (120px), `cat_room_screen.dart` (80px), `profile_screen.dart` (48px), `adoption_flow_screen.dart` (preview)
 
 > **Note:** `PixelCatSprite` is retained as the low-level rendering widget. `TappableCatSprite` is the interaction layer wrapper.
 

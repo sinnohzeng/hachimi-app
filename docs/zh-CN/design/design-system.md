@@ -29,7 +29,9 @@ DynamicColorBuilder(
 )
 ```
 
-动态取色激活时，种子色设置将被忽略，直接使用系统提供的 `ColorScheme`。用户可通过 **设置 > 外观 > Material You** 切换。
+动态取色激活时，种子色设置将被忽略，直接使用系统提供的 `ColorScheme`。
+
+**设置入口（v2.8.2+）：** 动态取色和预设色已统一为一个 **设置 > 主题颜色** 对话框（`ThemeColorDialog`）。对话框顶部显示「动态」选项（渐变圆圈 + 壁纸图标），下方为 8 个预设色。选择「动态」调用 `setDynamicColor(true)`；选择预设色调用 `setDynamicColor(false)` + `setSeedColor(color)`。之前独立的 Material You `SwitchListTile` 开关已移除。
 
 ### 色彩角色
 
@@ -99,7 +101,7 @@ DynamicColorBuilder(
 | `SnackBar` | 成功/错误反馈（会话已保存、任务完成） |
 | `AlertDialog` | 确认破坏性操作（删除任务、归档猫咪、重命名） |
 | `ModalBottomSheet` | 猫舍快速操作（重命名、编辑任务、归档） |
-| `SwitchListTile` | 设置页开关（Material You、深色模式、通知） |
+| `SwitchListTile` | 设置页开关（深色模式、通知、背景动画） |
 | `Chip` | 每任务统计中的连续记录徽章 |
 
 ---
@@ -232,9 +234,20 @@ M3 使用 **色调高度**（表面叠加主色）代替投影。高度越高，
 | 等级 | 用途 |
 |------|------|
 | Level 0 | 背景 |
-| Level 1 | 卡片（默认） |
+| Level 1 | 卡片（浅色模式默认） |
 | Level 2 | 提升卡片、导航栏 |
 | Level 3 | 对话框、FAB |
+
+### 卡片主题（v2.8.2+）
+
+卡片使用亮度感知样式，确保卡片与背景之间有明确的视觉区分：
+
+| 模式 | 卡片颜色 | 阴影 | 边框 |
+|------|---------|------|------|
+| 浅色 | `surfaceContainerLow` | elevation 1 | 无 |
+| 深色 | `surfaceContainerHigh` | elevation 0 | `outlineVariant` alpha 0.3 |
+
+此配置位于 `AppTheme._buildTheme()` 的 `CardThemeData` 中。项目中 84+ 处 `Card` 用法均自动继承——不需要为每个卡片设置 `color:` 覆盖。
 
 除非有意覆盖组件默认值，不要在组件上显式设置 `elevation`。
 

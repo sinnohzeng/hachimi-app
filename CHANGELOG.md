@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.3] - 2026-02-22
+### Changed
+- Docs: updated design-system.md with unified Theme Color dialog and brightness-aware card theme (EN + zh-CN)
+- Docs: updated cat-system.md with navigation vs interaction layer design rule (EN + zh-CN)
+- Docs: updated release/process.md with CI monitoring, formatting checklist, and user-facing release body requirements (EN + zh-CN)
+- Added .claude/memory/ and .claude/rules/12-workflow-release.md to version control for cross-device sync
+
 ## [2.8.2] - 2026-02-22
 ### Changed
 - Settings: merged Material You toggle into Theme Color picker — "Dynamic" wallpaper option + 8 preset colors in a single dialog

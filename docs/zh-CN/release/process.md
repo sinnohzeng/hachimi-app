@@ -56,6 +56,14 @@ git push && git push --tags
 
 > **重要**：tag 版本号必须与 `pubspec.yaml` 中的语义版本号一致（不含 `+构建号`）。
 
+### 第 2.5 步 — 打 tag 前格式化整个代码库
+
+```bash
+dart format lib/ test/
+```
+
+> **关键**：必须对所有文件运行 `dart format`，而不仅是你编辑过的文件。CI 强制执行 `--set-exit-if-changed`，任何未格式化的文件都会导致失败。添加命名参数可能导致行长超限，formatter 会重排你没有直接修改的文件。
+
 ### 第三步 — CI 自动接管
 
 GitHub Actions（`.github/workflows/release.yml`）将自动执行：
@@ -63,25 +71,76 @@ GitHub Actions（`.github/workflows/release.yml`）将自动执行：
 1. 检出 tag 对应的代码
 2. 配置 JDK 17 + Flutter 3.41.1
 3. 从 GitHub Secrets 恢复 Firebase 配置文件和签名 keystore
-4. 运行 `dart analyze lib/`
-5. 构建 release 签名 APK（`flutter build apk --release`）
-6. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
-7. 创建 GitHub Release，自动生成 release notes 并附上 APK
+4. 验证版本一致性（tag 必须与 pubspec 版本号匹配）
+5. 检查代码格式（`dart format --set-exit-if-changed lib/ test/`）
+6. 运行 `dart analyze lib/`
+7. 运行测试（`flutter test --exclude-tags golden`）
+8. 构建 release 签名 APK（`flutter build apk --release`）
+9. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
+10. 创建 GitHub Release 并附上 APK
 
-### 第四步 — 验证
+### 第 3.5 步 — 监控 CI 构建
+
+推送 tag 后，立即监控 GitHub Actions 运行状态：
+
+```bash
+# 查找 run ID
+gh run list --limit 3
+
+# 阻塞等待直到完成
+gh run watch <RUN_ID> --exit-status
+```
+
+如果 CI 失败：
+1. 读取失败步骤日志：`gh run view <RUN_ID> --log-failed`
+2. 在本地修复问题（最常见：`dart format` 失败）
+3. 推送修复 commit 到 main
+4. 移动 tag：`git tag -d vX.Y.Z && git tag -a vX.Y.Z -m "..."` 然后 `git push origin vX.Y.Z --force`
+5. 监控新的 CI 运行直到通过
+
+### 第四步 — 创建面向用户的 GitHub Release
+
+使用 `gh release create` 并编写面向用户的发布说明。Release 页面是用户从官网看到的内容——绝不能只放一个 CHANGELOG 链接。
+
+**必须遵循的结构：**
+
+```markdown
+## What's New in vX.Y.Z
+
+### [功能标题]
+[2-3 句通俗易懂的描述。聚焦于用户能感受到的变化。]
+
+### [另一项变化]
+[同样的方式——以用户价值为导向，避免技术术语。]
+
+---
+
+**Full changelog:** [CHANGELOG.md](https://github.com/sinnohzeng/hachimi-app/blob/main/CHANGELOG.md)
+```
+
+**写作原则：**
+- 用户优先——解释用户体验到了什么变化，而非实现细节
+- 合并关联改动——将小修复归纳为逻辑性的段落
+- 通俗语言——避免 "ConsumerWidget"、"surfaceContainerHigh" 等术语
+- 同时包含面向用户的介绍和底部的 CHANGELOG 链接
+
+### 第五步 — 验证
 
 1. 打开 https://github.com/sinnohzeng/hachimi-app/releases
-2. 确认 Release 标签、标题和 APK 附件显示正确
+2. 确认 Release 标签、标题、描述和 APK 附件显示正确
 3. 下载并安装 APK，验证功能正常
 
 ## 发布前检查清单
 
-- [ ] `pubspec.yaml` 版本号已更新
-- [ ] 版本号变更已提交
+- [ ] `CHANGELOG.md` 已更新新条目
+- [ ] `pubspec.yaml` 版本号已更新（语义版本 + 构建号）
+- [ ] `dart format lib/ test/` 已对整个代码库执行
+- [ ] `dart analyze lib/` 无错误
+- [ ] 所有变更已 commit
 - [ ] Git tag 已创建（如 `v1.1.0`）
-- [ ] Tag 已推送到远程（`git push --tags`）
-- [ ] GitHub Actions workflow 运行成功
-- [ ] https://github.com/sinnohzeng/hachimi-app/releases 页面显示新 Release
+- [ ] Tag 已推送到远程（`git push origin main --tags`）
+- [ ] GitHub Actions workflow 已监控并成功完成
+- [ ] GitHub Release 已创建，包含面向用户的描述和 APK 附件
 - [ ] APK 可在测试设备上正常安装和运行
 
 ## Release 签名
