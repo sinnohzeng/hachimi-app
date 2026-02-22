@@ -53,6 +53,7 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | `bestStreak` | int | yes | 0 | All-time highest consecutive day streak |
 | `lastCheckInDate` | string | no | null | ISO date string "YYYY-MM-DD" of most recent session (for streak calculation) |
 | `reminderTime` | string | no | null | Daily reminder time in "HH:mm" 24-hour format, e.g. "08:30" |
+| `motivationText` | string | no | null | Motivational quote, max 40 characters |
 | `isActive` | bool | yes | true | `false` when habit is deactivated (cat becomes dormant) |
 | `createdAt` | timestamp | yes | — | Habit creation timestamp |
 
@@ -193,13 +194,13 @@ Batch includes:
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
 ### 4. Habit Update (Edit)
-**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
 
 Single or multi-document update:
-1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `reminderTime`; if `clearReminder == true`, set `reminderTime` to `null`)
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `reminderTime`, `motivationText`; if `clearReminder == true`, set `reminderTime` to `null`; if `clearMotivation == true`, set `motivationText` to `null`)
 2. If `targetHours` changed: `UPDATE users/{uid}/cats/{catId}.targetMinutes` — sync to `targetHours × 60` (reads habit's `catId` to find bound cat)
 
-**Validation**: At least one field must be non-null or `clearReminder` must be true. Empty strings are rejected.
+**Validation**: At least one field must be non-null or `clearReminder`/`clearMotivation` must be true. Empty strings are rejected.
 
 > **Note:** Internal identifier remains `habit`. User-facing term is **Quest**.
 
@@ -290,6 +291,7 @@ The `firestore.rules` file enforces server-side field validation on write operat
 |-----------|-------|----------------|
 | `habits` | `targetHours` | `int`, range `1–10000` |
 | `habits` | `goalMinutes` | `int` (optional), range `1–480` |
+| `habits` | `motivationText` | `string` (optional), length `0–40` characters |
 | `cats` | `name` | `string`, length `1–30` characters |
 | `cats` | `state` | `string`, must be one of `['active', 'graduated', 'dormant']` |
 | `cats` | `totalMinutes` | `int`, `>= 0` |

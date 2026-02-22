@@ -1432,6 +1432,24 @@ class SZh extends S {
   }
 
   @override
+  String get adoptionBasicInfo => '基础信息';
+
+  @override
+  String get adoptionGoals => '目标设置';
+
+  @override
+  String get adoptionReminderSection => '提醒';
+
+  @override
+  String get adoptionMotivationLabel => '激励语';
+
+  @override
+  String get adoptionMotivationHint => '写一句话鼓励自己';
+
+  @override
+  String get adoptionMotivationSwap => '换一句';
+
+  @override
   String get loginAppName => 'Hachimi';
 
   @override
@@ -3473,6 +3491,24 @@ class SZhHant extends SZh {
   String adoptionError(String message) {
     return '錯誤：$message';
   }
+
+  @override
+  String get adoptionBasicInfo => '基本資訊';
+
+  @override
+  String get adoptionGoals => '目標設定';
+
+  @override
+  String get adoptionReminderSection => '提醒';
+
+  @override
+  String get adoptionMotivationLabel => '激勵語';
+
+  @override
+  String get adoptionMotivationHint => '寫一句話鼓勵自己';
+
+  @override
+  String get adoptionMotivationSwap => '換一句';
 
   @override
   String get loginAppName => 'Hachimi';

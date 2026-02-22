@@ -638,6 +638,13 @@
     "placeholders": { "message": { "type": "String" } }
   },
 
+  "adoptionBasicInfo": "Basic info",
+  "adoptionGoals": "Goals",
+  "adoptionReminderSection": "Reminder",
+  "adoptionMotivationLabel": "Motivational quote",
+  "adoptionMotivationHint": "Write something to encourage yourself",
+  "adoptionMotivationSwap": "New quote",
+
   "loginAppName": "Hachimi",
   "loginTagline": "Raise cats. Complete quests.",
   "loginContinueGoogle": "Continue with Google",

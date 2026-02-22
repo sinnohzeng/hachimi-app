@@ -1435,6 +1435,24 @@ class SJa extends S {
   }
 
   @override
+  String get adoptionBasicInfo => '基本情報';
+
+  @override
+  String get adoptionGoals => '目標設定';
+
+  @override
+  String get adoptionReminderSection => 'リマインダー';
+
+  @override
+  String get adoptionMotivationLabel => 'モチベーション';
+
+  @override
+  String get adoptionMotivationHint => '自分を励ます言葉を書こう';
+
+  @override
+  String get adoptionMotivationSwap => '別の言葉';
+
+  @override
   String get loginAppName => 'Hachimi';
 
   @override

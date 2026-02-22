@@ -638,6 +638,13 @@
     "placeholders": { "message": { "type": "String" } }
   },
 
+  "adoptionBasicInfo": "基础信息",
+  "adoptionGoals": "目标设置",
+  "adoptionReminderSection": "提醒",
+  "adoptionMotivationLabel": "激励语",
+  "adoptionMotivationHint": "写一句话鼓励自己",
+  "adoptionMotivationSwap": "换一句",
+
   "loginAppName": "Hachimi",
   "loginTagline": "养猫咪，完成任务。",
   "loginContinueGoogle": "使用 Google 登录",

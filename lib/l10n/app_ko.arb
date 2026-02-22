@@ -483,6 +483,12 @@
   "adoptionValidQuestName": "퀘스트 이름을 입력해 주세요",
   "adoptionValidCatName": "고양이 이름을 지어주세요",
   "adoptionError": "오류: {message}",
+  "adoptionBasicInfo": "기본 정보",
+  "adoptionGoals": "목표 설정",
+  "adoptionReminderSection": "알림",
+  "adoptionMotivationLabel": "동기부여 문구",
+  "adoptionMotivationHint": "자신을 격려하는 말을 적어보세요",
+  "adoptionMotivationSwap": "다른 문구",
 
   "loginAppName": "하치미",
   "loginTagline": "고양이를 키우고, 퀘스트를 완료하세요.",

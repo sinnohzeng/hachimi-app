@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
-/// Modal bottom sheet for editing quest: name, goal, target.
+/// Modal bottom sheet for editing quest: name, goal, target, motivation.
 class EditQuestSheet extends ConsumerStatefulWidget {
   final Habit habit;
 
@@ -18,6 +19,7 @@ class EditQuestSheet extends ConsumerStatefulWidget {
 
 class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   late final TextEditingController _nameController;
+  late final TextEditingController _motivationController;
   late int _selectedGoal;
   late int _selectedTarget;
   bool _isSaving = false;
@@ -29,6 +31,9 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.habit.name);
+    _motivationController = TextEditingController(
+      text: widget.habit.motivationText ?? '',
+    );
     _selectedGoal = widget.habit.goalMinutes;
     _selectedTarget = widget.habit.targetHours;
   }
@@ -36,6 +41,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   @override
   void dispose() {
     _nameController.dispose();
+    _motivationController.dispose();
     super.dispose();
   }
 
@@ -124,7 +130,31 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Motivation field
+            TextField(
+              controller: _motivationController,
+              maxLength: 40,
+              decoration: InputDecoration(
+                labelText: context.l10n.adoptionMotivationLabel,
+                hintText: context.l10n.adoptionMotivationHint,
+                prefixIcon: const Icon(Icons.format_quote),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.refresh),
+                  tooltip: context.l10n.adoptionMotivationSwap,
+                  onPressed: () {
+                    final current = _motivationController.text;
+                    final locale = Localizations.localeOf(context);
+                    _motivationController.text = randomMotivationQuote(
+                      locale,
+                      exclude: current.isNotEmpty ? current : null,
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
 
             // Save button
             SizedBox(
@@ -165,6 +195,11 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
+    // 判断激励语是否变化
+    final newMotivation = _motivationController.text.trim();
+    final oldMotivation = widget.habit.motivationText ?? '';
+    final motivationChanged = newMotivation != oldMotivation;
+
     HapticFeedback.mediumImpact();
     await ref
         .read(firestoreServiceProvider)
@@ -178,6 +213,13 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           targetHours: _selectedTarget != widget.habit.targetHours
               ? _selectedTarget
               : null,
+          motivationText: motivationChanged && newMotivation.isNotEmpty
+              ? newMotivation
+              : null,
+          clearMotivation:
+              motivationChanged &&
+              newMotivation.isEmpty &&
+              oldMotivation.isNotEmpty,
         );
 
     if (mounted) {

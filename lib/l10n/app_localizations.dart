@@ -2772,6 +2772,42 @@ abstract class S {
   /// **'Error: {message}'**
   String adoptionError(String message);
 
+  /// No description provided for @adoptionBasicInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic info'**
+  String get adoptionBasicInfo;
+
+  /// No description provided for @adoptionGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals'**
+  String get adoptionGoals;
+
+  /// No description provided for @adoptionReminderSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get adoptionReminderSection;
+
+  /// No description provided for @adoptionMotivationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Motivational quote'**
+  String get adoptionMotivationLabel;
+
+  /// No description provided for @adoptionMotivationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write something to encourage yourself'**
+  String get adoptionMotivationHint;
+
+  /// No description provided for @adoptionMotivationSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'New quote'**
+  String get adoptionMotivationSwap;
+
   /// No description provided for @loginAppName.
   ///
   /// In en, this message translates to:

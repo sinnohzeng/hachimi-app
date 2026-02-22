@@ -86,6 +86,7 @@ class FirestoreService {
     required int targetHours,
     required int goalMinutes,
     String? reminderTime,
+    String? motivationText,
     required Cat cat,
   }) async {
     final batch = _db.batch();
@@ -97,6 +98,7 @@ class FirestoreService {
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
+      if (motivationText != null) 'motivationText': motivationText,
       'catId': '', // Will update after cat is created
       'isActive': true,
       'totalMinutes': 0,
@@ -141,6 +143,8 @@ class FirestoreService {
     int? targetHours,
     String? reminderTime,
     bool clearReminder = false,
+    String? motivationText,
+    bool clearMotivation = false,
   }) async {
     final updates = <String, dynamic>{};
     if (name != null && name.trim().isNotEmpty) updates['name'] = name.trim();
@@ -148,6 +152,10 @@ class FirestoreService {
     if (targetHours != null) updates['targetHours'] = targetHours;
     if (reminderTime != null) updates['reminderTime'] = reminderTime;
     if (clearReminder) updates['reminderTime'] = null;
+    if (motivationText != null && motivationText.trim().isNotEmpty) {
+      updates['motivationText'] = motivationText.trim();
+    }
+    if (clearMotivation) updates['motivationText'] = null;
     if (updates.isEmpty) return;
 
     await _habitsRef(uid).doc(habitId).update(updates);

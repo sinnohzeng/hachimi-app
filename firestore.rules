@@ -22,7 +22,11 @@ service cloud.firestore {
           && (!('goalMinutes' in request.resource.data)
               || (request.resource.data.goalMinutes is int
                   && request.resource.data.goalMinutes >= 1
-                  && request.resource.data.goalMinutes <= 480));
+                  && request.resource.data.goalMinutes <= 480))
+          && (!('motivationText' in request.resource.data)
+              || request.resource.data.motivationText == null
+              || (request.resource.data.motivationText is string
+                  && request.resource.data.motivationText.size() <= 40));
         allow delete: if isOwner(userId);
 
         // Focus sessions within a habit — immutable audit log

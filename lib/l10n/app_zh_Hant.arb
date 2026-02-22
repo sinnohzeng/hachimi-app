@@ -483,6 +483,12 @@
   "adoptionValidQuestName": "請輸入任務名稱",
   "adoptionValidCatName": "請幫貓咪改個名",
   "adoptionError": "錯誤：{message}",
+  "adoptionBasicInfo": "基本資訊",
+  "adoptionGoals": "目標設定",
+  "adoptionReminderSection": "提醒",
+  "adoptionMotivationLabel": "激勵語",
+  "adoptionMotivationHint": "寫一句話鼓勵自己",
+  "adoptionMotivationSwap": "換一句",
 
   "loginAppName": "Hachimi",
   "loginTagline": "養貓咪，完成任務。",

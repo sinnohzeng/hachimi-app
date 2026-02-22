@@ -56,6 +56,16 @@ class FocusStatsCard extends ConsumerWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (habit.motivationText != null &&
+                    habit.motivationText!.isNotEmpty)
+                  Text(
+                    habit.motivationText!,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.base),

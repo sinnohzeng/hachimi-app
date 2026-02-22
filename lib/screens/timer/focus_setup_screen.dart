@@ -153,6 +153,19 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
+                if (habit.motivationText != null &&
+                    habit.motivationText!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    child: Text(
+                      '"${habit.motivationText}"',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
               ] else ...[
                 Icon(
                   Icons.self_improvement,

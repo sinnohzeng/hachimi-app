@@ -53,6 +53,7 @@ users/{uid}                          <- 用户基本信息文档
 | `bestStreak` | int | 是 | 0 | 历史最高连续打卡天数 |
 | `lastCheckInDate` | string | 否 | null | 最近一次会话的 ISO 日期字符串 "YYYY-MM-DD" |
 | `reminderTime` | string | 否 | null | 每日提醒时间，24 小时格式 "HH:mm"，如 "08:30" |
+| `motivationText` | string | 否 | null | 激励语，最长 40 字符 |
 | `isActive` | bool | 是 | true | `false` 表示习惯已停用（猫咪进入休眠状态） |
 | `createdAt` | timestamp | 是 | — | 习惯创建时间戳 |
 
@@ -191,13 +192,13 @@ dormant --[习惯重新激活]--> active（未来功能）
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
 ### 4. 习惯更新（编辑）
-**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder})`
+**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
 
 单文档或多文档更新：
-1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`goalMinutes`、`targetHours`、`reminderTime`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`）
+1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`goalMinutes`、`targetHours`、`reminderTime`、`motivationText`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`；若 `clearMotivation == true`，则将 `motivationText` 设为 `null`）
 2. 若 `targetHours` 发生变更：`UPDATE users/{uid}/cats/{catId}.targetMinutes` — 同步为 `targetHours × 60`（通过读取 habit 的 `catId` 找到绑定的猫咪）
 
-**验证**：至少一个字段不为 null 或 `clearReminder` 必须为 true，空字符串将被拒绝。
+**验证**：至少一个字段不为 null 或 `clearReminder`/`clearMotivation` 必须为 true，空字符串将被拒绝。
 
 > **注意：** 内部标识符仍为 `habit`，面向用户的术语为 **Quest（任务）**。
 
@@ -289,6 +290,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 |------|------|---------|
 | `habits` | `targetHours` | `int`，范围 `1–10000` |
 | `habits` | `goalMinutes` | `int`（可选），范围 `1–480` |
+| `habits` | `motivationText` | `string`（可选），长度 `0–40` 字符 |
 | `cats` | `name` | `string`，长度 `1–30` 字符 |
 | `cats` | `state` | `string`，必须为 `['active', 'graduated', 'dormant']` 之一 |
 | `cats` | `totalMinutes` | `int`，`>= 0` |

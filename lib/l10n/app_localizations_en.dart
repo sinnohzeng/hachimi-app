@@ -1454,6 +1454,24 @@ class SEn extends S {
   }
 
   @override
+  String get adoptionBasicInfo => 'Basic info';
+
+  @override
+  String get adoptionGoals => 'Goals';
+
+  @override
+  String get adoptionReminderSection => 'Reminder';
+
+  @override
+  String get adoptionMotivationLabel => 'Motivational quote';
+
+  @override
+  String get adoptionMotivationHint => 'Write something to encourage yourself';
+
+  @override
+  String get adoptionMotivationSwap => 'New quote';
+
+  @override
   String get loginAppName => 'Hachimi';
 
   @override

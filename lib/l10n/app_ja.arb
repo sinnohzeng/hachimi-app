@@ -483,6 +483,12 @@
   "adoptionValidQuestName": "クエスト名を入力してください",
   "adoptionValidCatName": "ネコの名前を入力してください",
   "adoptionError": "エラー: {message}",
+  "adoptionBasicInfo": "基本情報",
+  "adoptionGoals": "目標設定",
+  "adoptionReminderSection": "リマインダー",
+  "adoptionMotivationLabel": "モチベーション",
+  "adoptionMotivationHint": "自分を励ます言葉を書こう",
+  "adoptionMotivationSwap": "別の言葉",
 
   "loginAppName": "Hachimi",
   "loginTagline": "ネコを育てて、クエストを達成しよう。",

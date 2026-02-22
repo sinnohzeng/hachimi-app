@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 2026-02-22
+### Added
+- Motivational quote field on quests — set during creation with random locale-aware quotes, editable later
+- "New quote" button to randomly swap motivation quotes across 5 languages (en/zh/zh-Hant/ja/ko)
+- Motivation quote display on FocusSetupScreen (italic, below cat mood) and FocusStatsCard (single-line)
+- Motivation quote editing in EditQuestSheet with clear/swap support
+
+### Changed
+- Adoption flow Step 1 refactored from flat list to 3 card-based sections (Basic info / Goals / Reminder)
+- Firestore security rules updated to validate `motivationText` field (optional string, max 40 chars)
+
 ## [2.9.0] - 2026-02-22
 ### Added
 - Achievement system with 163 achievements across 4 categories: Quest (8), Streak (8), Cat (9), Persist (138)

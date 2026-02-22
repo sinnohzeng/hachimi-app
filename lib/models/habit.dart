@@ -8,6 +8,7 @@ class Habit {
   final int targetHours; // long-term cumulative target
   final int goalMinutes; // daily focus goal (default: 25)
   final String? reminderTime; // 'HH:mm' or null
+  final String? motivationText; // 激励语，max 40 chars
   final String? catId; // reference to bound cat
   final bool isActive;
   final int totalMinutes;
@@ -23,6 +24,7 @@ class Habit {
     required this.targetHours,
     this.goalMinutes = 25,
     this.reminderTime,
+    this.motivationText,
     this.catId,
     this.isActive = true,
     this.totalMinutes = 0,
@@ -56,6 +58,7 @@ class Habit {
       targetHours: data['targetHours'] as int? ?? 0,
       goalMinutes: data['goalMinutes'] as int? ?? 25,
       reminderTime: data['reminderTime'] as String?,
+      motivationText: data['motivationText'] as String?,
       catId: data['catId'] as String?,
       isActive: data['isActive'] as bool? ?? true,
       totalMinutes: data['totalMinutes'] as int? ?? 0,
@@ -73,6 +76,7 @@ class Habit {
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
+      'motivationText': motivationText,
       'catId': catId,
       'isActive': isActive,
       'totalMinutes': totalMinutes,
@@ -90,6 +94,7 @@ class Habit {
     int? targetHours,
     int? goalMinutes,
     String? reminderTime,
+    String? motivationText,
     String? catId,
     bool? isActive,
     int? totalMinutes,
@@ -105,6 +110,7 @@ class Habit {
       targetHours: targetHours ?? this.targetHours,
       goalMinutes: goalMinutes ?? this.goalMinutes,
       reminderTime: reminderTime ?? this.reminderTime,
+      motivationText: motivationText ?? this.motivationText,
       catId: catId ?? this.catId,
       isActive: isActive ?? this.isActive,
       totalMinutes: totalMinutes ?? this.totalMinutes,
