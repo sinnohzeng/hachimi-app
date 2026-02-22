@@ -73,20 +73,16 @@ class HabitDetailScreen extends ConsumerWidget {
                   value: habit.progressText,
                 ),
                 _DetailRow(
-                  icon: Icons.local_fire_department,
-                  label: l10n.habitDetailCurrentStreak,
-                  value: l10n.habitDetailDaysUnit(habit.currentStreak),
-                ),
-                _DetailRow(
-                  icon: Icons.emoji_events,
+                  icon: Icons.calendar_today,
                   label: l10n.habitDetailBestStreak,
-                  value: l10n.habitDetailDaysUnit(habit.bestStreak),
+                  value: l10n.habitDetailDaysUnit(habit.totalCheckInDays),
                 ),
-                _DetailRow(
-                  icon: Icons.flag,
-                  label: l10n.habitDetailTarget,
-                  value: l10n.habitDetailHoursUnit(habit.targetHours),
-                ),
+                if (habit.targetHours != null)
+                  _DetailRow(
+                    icon: Icons.flag,
+                    label: l10n.habitDetailTarget,
+                    value: l10n.habitDetailHoursUnit(habit.targetHours!),
+                  ),
               ],
             ),
           ),

@@ -8,7 +8,7 @@
 
 ```
 users/{uid}                          <- User profile document
-├── habits/{habitId}                 <- Habit metadata + streak tracking
+├── habits/{habitId}                 <- Habit metadata + goal tracking
 │   └── sessions/{sessionId}        <- Focus session history
 ├── cats/{catId}                     <- Cat state (appearance, growth, accessories)
 └── monthlyCheckIns/{YYYY-MM}        <- Monthly check-in tracking (resets each month)
@@ -47,22 +47,22 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | `name` | string | yes | — | Habit display name, e.g. "Daily Reading" |
 | `catId` | string | yes | — | Reference to the bound cat document ID in `users/{uid}/cats/` |
 | `goalMinutes` | int | yes | 25 | Daily focus goal in minutes (used for progress display) |
-| `targetHours` | int | yes | — | Cumulative long-term target in hours (required, used for cat growth calculation) |
+| `targetHours` | int? | no | null | Cumulative long-term target in hours. `null` = unlimited mode (no target). Used for cat growth calculation when set. |
 | `totalMinutes` | int | yes | 0 | Total minutes logged across all time |
-| `currentStreak` | int | yes | 0 | Current consecutive days with at least one session |
-| `bestStreak` | int | yes | 0 | All-time highest consecutive day streak |
-| `lastCheckInDate` | string | no | null | ISO date string "YYYY-MM-DD" of most recent session (for streak calculation) |
+| `deadlineDate` | timestamp? | no | null | Optional deadline for milestone mode. Only meaningful when `targetHours` is set. |
+| `targetCompleted` | bool | yes | false | Whether the milestone target has been reached. When `true`, quest auto-converts to unlimited mode. |
+| `lastCheckInDate` | string | no | null | ISO date string "YYYY-MM-DD" of most recent session |
 | `reminderTime` | string | no | null | Daily reminder time in "HH:mm" 24-hour format, e.g. "08:30" |
 | `motivationText` | string | no | null | Motivational quote, max 40 characters |
 | `isActive` | bool | yes | true | `false` when habit is deactivated (cat becomes dormant) |
 | `createdAt` | timestamp | yes | — | Habit creation timestamp |
 
-**Streak Calculation Rule:**
-- On each session completion, compare today's date with `lastCheckInDate`.
-- If `lastCheckInDate == yesterday`: `currentStreak += 1`
-- If `lastCheckInDate == today`: streak unchanged (multiple sessions same day)
-- Otherwise: `currentStreak = 1` (streak broken)
-- Update `bestStreak = max(bestStreak, currentStreak)` after each update.
+**Quest Modes:**
+- **Unlimited mode** (永续模式): `targetHours == null` — no cumulative target, keep accumulating focus time indefinitely.
+- **Milestone mode** (里程碑模式): `targetHours` is set, with optional `deadlineDate` — work toward a specific hour goal.
+- **Auto-conversion**: When `totalMinutes >= targetHours * 60`, `targetCompleted` is set to `true` and the quest automatically converts to unlimited mode.
+
+**Computed property:** `isUnlimited` returns `true` when `targetHours == null` or `targetCompleted == true`.
 
 **Dart Model:** `lib/models/habit.dart` -> `class Habit`
 
@@ -109,14 +109,13 @@ One document per cat. `catId` is a Firestore auto-generated ID.
 | `name` | string | yes | Cat's given name, e.g. "Mochi" |
 | `appearance` | map | yes | Pixel-cat-maker appearance parameters — see [Cat System](cat-system.md) for full parameter list |
 | `personality` | string | yes | Personality ID from `CatPersonality.id` — see [Cat System](cat-system.md) |
-| `totalMinutes` | int | yes | Total focus minutes accumulated for this cat's habit. Stage is computed from this. |
-| `targetMinutes` | int | yes | Target minutes derived from the habit's `targetHours` (targetHours x 60). Used for stage calculation. |
+| `totalMinutes` | int | yes | Total focus minutes accumulated for this cat's habit. Stage is computed from this using fixed thresholds. |
 | `accessories` | list\<string\> | yes | **DEPRECATED** — Legacy per-cat owned accessories. Migrated to `users/{uid}.inventory`. Only used during migration. |
 | `equippedAccessory` | string | no | Currently equipped accessory ID (null = none equipped) |
 | `boundHabitId` | string | yes | Reference to the habit that spawned this cat |
 | `state` | string | yes | "active", "dormant", or "graduated" |
 | `lastSessionAt` | timestamp | no | Timestamp of the most recent focus session for this cat's habit |
-| `highestStage` | string | no | Highest growth stage ever reached (monotonic; null for legacy cats). Valid values: "kitten", "adolescent", "adult". |
+| `highestStage` | string | no | Highest growth stage ever reached (monotonic; null for legacy cats). Valid values: "kitten", "adolescent", "adult", "senior". |
 | `createdAt` | timestamp | yes | Cat adoption timestamp |
 
 **Computed Fields (not stored in Firestore):**
@@ -124,12 +123,12 @@ These are derived from stored fields at read time to prevent drift.
 
 | Computed | Derived From | Logic |
 |----------|-------------|-------|
-| `stage` | `totalMinutes`, `targetMinutes` | kitten (< 33%), adolescent (33%–66%), adult (>= 66%) |
-| `displayStage` | `stage`, `highestStage` | max(computedStage, highestStage ?? computedStage). For legacy cats (highestStage == null), uses old thresholds (20%/45%) to prevent visual regression. |
+| `stage` | `totalMinutes` | Fixed 200h (12000min) ladder: kitten (0h), adolescent (20h/1200min), adult (100h/6000min), senior (200h/12000min) |
+| `growthProgress` | `totalMinutes` | `totalMinutes / 12000` capped at 1.0. Progress is relative to the fixed 200h ladder, not to habit `targetHours`. |
 | `mood` | `lastSessionAt` | happy (under 24h), neutral (1–3d), lonely (3–7d), missing (over 7d) |
 
 **Why not store `stage` and `mood` directly?**
-Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`totalMinutes`, `targetMinutes`, and `lastSessionAt`), the app always shows the correct state without background jobs. The `highestStage` field is the exception — it is stored because it must be monotonically increasing (only goes up, never down) to protect against stage regression when users change their target hours.
+Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`totalMinutes` and `lastSessionAt`), the app always shows the correct state without background jobs. The `highestStage` field is the exception — it is stored because it must be monotonically increasing (only goes up, never down) to protect against stage regression.
 
 **State Transitions:**
 
@@ -172,8 +171,8 @@ Operations that span multiple documents use Firestore **batch writes** to guaran
 **Method:** `FirestoreService.createHabitWithCat(uid, habit, cat)`
 
 Batch includes:
-1. `SET users/{uid}/habits/{habitId}` — new habit document (with `targetHours` as required field)
-2. `SET users/{uid}/cats/{catId}` — new cat document with `appearance` Map, `targetMinutes` (= `targetHours x 60`), `totalMinutes: 0`, `accessories: []`, and `boundHabitId` pointing to habit
+1. `SET users/{uid}/habits/{habitId}` — new habit document (`targetHours` is optional; `null` for unlimited mode)
+2. `SET users/{uid}/cats/{catId}` — new cat document with `appearance` Map, `totalMinutes: 0`, `accessories: []`, and `boundHabitId` pointing to habit
 3. `UPDATE users/{uid}/habits/{habitId}.catId` — back-reference from habit to cat
 
 ### 2. Focus Session Completion
@@ -181,7 +180,7 @@ Batch includes:
 
 Batch includes:
 1. `SET users/{uid}/habits/{habitId}/sessions/{sessionId}` — session record
-2. `UPDATE users/{uid}/habits/{habitId}` — increment `totalMinutes`, update `currentStreak`, `bestStreak`, `lastCheckInDate`
+2. `UPDATE users/{uid}/habits/{habitId}` — increment `totalMinutes`, update `lastCheckInDate`
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — set to now
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)` (focus reward: `durationMinutes × 10`)
@@ -196,11 +195,10 @@ Batch includes:
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
 ### 4. Habit Update (Edit)
-**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, deadlineDate?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
 
-Single or multi-document update:
-1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `reminderTime`, `motivationText`; if `clearReminder == true`, set `reminderTime` to `null`; if `clearMotivation == true`, set `motivationText` to `null`)
-2. If `targetHours` changed: `UPDATE users/{uid}/cats/{catId}.targetMinutes` — sync to `targetHours × 60` (reads habit's `catId` to find bound cat)
+Single-document update:
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `deadlineDate`, `reminderTime`, `motivationText`; if `clearReminder == true`, set `reminderTime` to `null`; if `clearMotivation == true`, set `motivationText` to `null`)
 
 **Validation**: At least one field must be non-null or `clearReminder`/`clearMotivation` must be true. Empty strings are rejected.
 
@@ -266,7 +264,7 @@ All other queries use single-field default indexes.
 1. **No orphaned cats**: Every cat document must have a valid `boundHabitId`. Use batch writes to enforce this.
 2. **No orphaned habit references**: When a habit is deleted, the bound cat's state is updated to "graduated" in the same batch.
 3. **totalMinutes never decreases**: `totalMinutes` is always incremented, never set to a lower value.
-4. **Stage is computed, not stored**: Never write `stage` to Firestore. Always derive it from `totalMinutes` and `targetMinutes`.
+4. **Stage is computed, not stored**: Never write `stage` to Firestore. Always derive it from `totalMinutes` using the fixed 200h growth ladder.
 5. **Mood is computed, not stored**: Never write `mood` to Firestore. Always derive it from `lastSessionAt`.
 6. **`totalMinutes` is additive**: Always use `FieldValue.increment(delta)` — never overwrite with a calculated total (prevents race conditions).
 7. **Coins never go negative**: The `CoinService` must validate sufficient balance before deducting. The purchase batch write should fail gracefully if balance is insufficient.
@@ -291,7 +289,7 @@ The `firestore.rules` file enforces server-side field validation on write operat
 
 | Collection | Field | Validation Rule |
 |-----------|-------|----------------|
-| `habits` | `targetHours` | `int`, range `1–10000` |
+| `habits` | `targetHours` | `int` (optional, nullable), range `1–10000` when present |
 | `habits` | `goalMinutes` | `int` (optional), range `1–480` |
 | `habits` | `motivationText` | `string` (optional), length `0–40` characters |
 | `cats` | `name` | `string`, length `1–30` characters |

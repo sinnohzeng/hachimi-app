@@ -483,14 +483,6 @@ List<String> get allAccessories => [
     for (final color in collarColors) '$color$style',
 ];
 
-// ─── Streak Milestones ───
-
-/// 连续签到里程碑天数 — 达到时给予一次性 XP 奖励。
-const List<int> streakMilestones = [7, 14, 30];
-
-/// 连续签到里程碑 XP 奖励。
-const int streakMilestoneXpBonus = 30;
-
 /// 签到金币：工作日（周一至周五）
 const int checkInCoinsWeekday = 10;
 
@@ -706,7 +698,7 @@ Color peltColorToMaterial(String peltColor) {
 /// - 3-5: adolescent
 /// - 6-8: adult (shorthair)
 /// - 9-11: adult (longhair)
-/// - 12-14: 闲置（原 senior，不再使用）
+/// - 12-14: senior (复用 adult shorthair 变体)
 int computeSpriteIndex({
   required String stage,
   required int variant,
@@ -720,29 +712,40 @@ int computeSpriteIndex({
       return 3 + v;
     case 'adult':
       return (isLonghair ? 9 : 6) + v;
+    case 'senior':
+      return 12 + v;
     default:
       return 0 + v;
   }
 }
 
-/// 成长阶段百分比阈值（3 阶段：幼猫 / 青年猫 / 成熟猫）
+/// 成长阶段阈值（4 阶段，基于固定时长阶梯）
+/// growthProgress 基准：200h (12000min) = 1.0
+/// - kitten:     0h   (0.0)   — 初始探索
+/// - adolescent: 20h  (0.10)  — 初始能力建立（对标 Kaufman「20 小时入门」）
+/// - adult:      100h (0.50)  — 完成一个「项目」
+/// - senior:     200h (1.0)   — 深度投入
 const Map<String, double> stageThresholds = {
   'kitten': 0.0,
-  'adolescent': 0.33,
-  'adult': 0.66,
+  'adolescent': 0.10,
+  'adult': 0.50,
+  'senior': 1.0,
 };
+
+/// 阶段列表（有序）
+const List<String> stageList = ['kitten', 'adolescent', 'adult', 'senior'];
 
 /// 根据进度百分比计算成长阶段
 String stageForProgress(double progress) {
-  if (progress >= 0.66) return 'adult';
-  if (progress >= 0.33) return 'adolescent';
+  if (progress >= 1.0) return 'senior';
+  if (progress >= 0.50) return 'adult';
+  if (progress >= 0.10) return 'adolescent';
   return 'kitten';
 }
 
 /// 阶段顺序索引（用于比较）
 int stageOrder(String stage) {
-  const order = ['kitten', 'adolescent', 'adult'];
-  final idx = order.indexOf(stage);
+  final idx = stageList.indexOf(stage);
   return idx >= 0 ? idx : 0;
 }
 
@@ -751,15 +754,30 @@ double stageProgressInRange(double progress) {
   final stage = stageForProgress(progress);
   final currentThreshold = stageThresholds[stage]!;
 
-  // 查找下一阶段阈值
-  final stages = ['kitten', 'adolescent', 'adult'];
-  final currentIndex = stages.indexOf(stage);
-  if (currentIndex >= stages.length - 1) {
-    // adult（最终阶段）：从 0.66 到 1.0
-    return ((progress - 0.66) / 0.34).clamp(0.0, 1.0);
+  final currentIndex = stageList.indexOf(stage);
+  if (currentIndex >= stageList.length - 1) {
+    // senior（最终阶段）：已满级
+    return 1.0;
   }
-  final nextThreshold = stageThresholds[stages[currentIndex + 1]]!;
+  final nextThreshold = stageThresholds[stageList[currentIndex + 1]]!;
   final range = nextThreshold - currentThreshold;
   if (range <= 0) return 1.0;
   return ((progress - currentThreshold) / range).clamp(0.0, 1.0);
+}
+
+/// 阶段对应的固定小时数阈值
+const Map<String, int> stageHourThresholds = {
+  'kitten': 0,
+  'adolescent': 20,
+  'adult': 100,
+  'senior': 200,
+};
+
+/// 获取下一阶段信息（用于 UI 展示「下一阶段：xxx，还差 xx 小时」）
+/// 返回 null 表示已是最终阶段
+({String stage, int hours})? nextStageInfo(String currentStage) {
+  final idx = stageList.indexOf(currentStage);
+  if (idx < 0 || idx >= stageList.length - 1) return null;
+  final next = stageList[idx + 1];
+  return (stage: next, hours: stageHourThresholds[next]!);
 }

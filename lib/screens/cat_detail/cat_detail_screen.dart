@@ -274,7 +274,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                   ),
                 ),
                 Text(
-                  context.l10n.catDetailTarget(cat.targetMinutes ~/ 60),
+                  '200h',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -300,6 +300,11 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                   name: context.l10n.stageAdult,
                   isReached: stageOrder(cat.displayStage) >= 2,
                   color: stageColor('adult'),
+                ),
+                StageMilestone(
+                  name: context.l10n.stageSenior,
+                  isReached: stageOrder(cat.displayStage) >= 3,
+                  color: stageColor('senior'),
                 ),
               ],
             ),

@@ -114,7 +114,7 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
         source: 'SessionHistoryNotifier',
         operation: 'loadMore',
       );
-      state = state.copyWith(isLoading: false, error: () => e.toString());
+      state = state.copyWith(isLoading: false, error: e.toString);
     }
   }
 

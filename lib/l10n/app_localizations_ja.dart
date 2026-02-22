@@ -708,6 +708,9 @@ class SJa extends S {
   String get catDetailDaysActive => 'アクティブ日数';
 
   @override
+  String get catDetailCheckInDays => 'チェックイン日数';
+
+  @override
   String get catDetailEditQuestTitle => 'クエストを編集';
 
   @override
@@ -721,6 +724,9 @@ class SJa extends S {
 
   @override
   String get catDetailQuestUpdated => 'クエストを更新しました！';
+
+  @override
+  String get catDetailTargetCompletedHint => '目標達成済み、永続モードに移行しました';
 
   @override
   String get catDetailDailyReminder => 'デイリーリマインダー';
@@ -1441,6 +1447,24 @@ class SJa extends S {
   String get adoptionGoals => '目標設定';
 
   @override
+  String get adoptionUnlimitedMode => '永続モード';
+
+  @override
+  String get adoptionUnlimitedDesc => '上限なし、ずっと積み上げ';
+
+  @override
+  String get adoptionMilestoneMode => 'マイルストーンモード';
+
+  @override
+  String get adoptionMilestoneDesc => '目標を設定する';
+
+  @override
+  String get adoptionDeadlineLabel => '期限';
+
+  @override
+  String get adoptionDeadlineNone => '設定なし';
+
+  @override
   String get adoptionReminderSection => 'リマインダー';
 
   @override
@@ -2067,5 +2091,45 @@ class SJa extends S {
   @override
   String achievementTitleCount(int count) {
     return '$count titles unlocked';
+  }
+
+  @override
+  String get growthPathTitle => '成長の道';
+
+  @override
+  String get growthPathKitten => '新しい旅の始まり';
+
+  @override
+  String get growthPathAdolescent => '基礎を築く';
+
+  @override
+  String get growthPathAdult => 'スキルの定着';
+
+  @override
+  String get growthPathSenior => '深い習熟';
+
+  @override
+  String get growthPathTip =>
+      '研究によると、20時間の集中練習で新しいスキルの基礎を築くことができます —— Josh Kaufman';
+
+  @override
+  String achievementCelebrationCoins(int count) {
+    return '+$count コイン';
+  }
+
+  @override
+  String achievementCelebrationTitle(String title) {
+    return '称号獲得：$title';
+  }
+
+  @override
+  String get achievementCelebrationDismiss => 'すごい！';
+
+  @override
+  String get achievementCelebrationSkipAll => 'すべてスキップ';
+
+  @override
+  String achievementCelebrationCounter(int current, int total) {
+    return '$current / $total';
   }
 }

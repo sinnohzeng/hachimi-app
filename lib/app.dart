@@ -13,6 +13,7 @@ import 'package:hachimi_app/providers/auth_provider.dart'; // re-exports service
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/widgets/achievement_celebration_overlay.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
@@ -54,6 +55,9 @@ class HachimiApp extends ConsumerWidget {
           home: AuthGate(startupStopwatch: startupStopwatch),
           onGenerateRoute: AppRouter.onGenerateRoute,
           navigatorObservers: [analyticsService.observer],
+          builder: (context, child) {
+            return AchievementCelebrationLayer(child: child!);
+          },
         );
       },
     );
@@ -378,6 +382,9 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   /// Only runs if notification permission is already granted.
   /// [R1] 等待 DeferredInit 完成以确保 NotificationService 已初始化。
   Future<void> _rescheduleReminders(List<Habit> habits) async {
+    // 在 async gap 之前缓存 context 引用
+    final fallbackCatName = context.l10n.focusCompleteYourCat;
+
     await DeferredInit.run(); // 幂等，确保通知插件已初始化
     final notifService = NotificationService();
     final hasPermission = await notifService.isPermissionGranted();
@@ -398,7 +405,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
         final cat = habit.catId != null
             ? cats.where((c) => c.id == habit.catId).firstOrNull
             : null;
-        final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
+        final catName = cat?.name ?? fallbackCatName;
 
         await notifService.scheduleDailyReminder(
           habitId: habit.id,

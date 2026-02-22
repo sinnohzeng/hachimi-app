@@ -10,7 +10,7 @@ import 'package:hachimi_app/screens/achievements/components/achievement_summary.
 import 'package:hachimi_app/screens/achievements/components/overview_tab.dart';
 
 /// 成就页面 — 底部导航 Tab 2，替代原 StatsScreen。
-/// 包含 5 个 Tab：概览、任务、连续、猫咪、坚持。
+/// 包含 4 个 Tab：概览、任务、猫咪、坚持。
 class AchievementScreen extends ConsumerStatefulWidget {
   const AchievementScreen({super.key});
 
@@ -25,7 +25,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -61,7 +61,6 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
               tabs: [
                 Tab(text: l10n.achievementTabOverview),
                 Tab(text: l10n.achievementTabQuest),
-                Tab(text: l10n.achievementTabStreak),
                 Tab(text: l10n.achievementTabCat),
                 Tab(text: l10n.achievementTabPersist),
               ],
@@ -73,7 +72,6 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
           children: const [
             OverviewTab(),
             _AchievementListTab(category: AchievementCategory.quest),
-            _AchievementListTab(category: AchievementCategory.streak),
             _AchievementListTab(category: AchievementCategory.cat),
             _AchievementListTab(category: AchievementCategory.persist),
           ],

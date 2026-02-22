@@ -705,6 +705,9 @@ class SZh extends S {
   String get catDetailDaysActive => '活跃天数';
 
   @override
+  String get catDetailCheckInDays => '打卡天数';
+
+  @override
   String get catDetailEditQuestTitle => '编辑任务';
 
   @override
@@ -718,6 +721,9 @@ class SZh extends S {
 
   @override
   String get catDetailQuestUpdated => '任务已更新！';
+
+  @override
+  String get catDetailTargetCompletedHint => '目标已达成，已转为永续模式';
 
   @override
   String get catDetailDailyReminder => '每日提醒';
@@ -1438,6 +1444,24 @@ class SZh extends S {
   String get adoptionGoals => '目标设置';
 
   @override
+  String get adoptionUnlimitedMode => '永续模式';
+
+  @override
+  String get adoptionUnlimitedDesc => '不设上限，持续累积';
+
+  @override
+  String get adoptionMilestoneMode => '里程碑模式';
+
+  @override
+  String get adoptionMilestoneDesc => '设定一个目标';
+
+  @override
+  String get adoptionDeadlineLabel => '截止日期';
+
+  @override
+  String get adoptionDeadlineNone => '不设';
+
+  @override
   String get adoptionReminderSection => '提醒';
 
   @override
@@ -2061,6 +2085,45 @@ class SZh extends S {
   @override
   String achievementTitleCount(int count) {
     return '已解锁 $count 个称号';
+  }
+
+  @override
+  String get growthPathTitle => '成长之路';
+
+  @override
+  String get growthPathKitten => '开始新的旅程';
+
+  @override
+  String get growthPathAdolescent => '初步入门，建立基础';
+
+  @override
+  String get growthPathAdult => '技能巩固，完成一个项目';
+
+  @override
+  String get growthPathSenior => '深度投入，持续精进';
+
+  @override
+  String get growthPathTip => '研究表明，20 小时的专注练习足以建立一项新技能的基础 —— Josh Kaufman';
+
+  @override
+  String achievementCelebrationCoins(int count) {
+    return '+$count 金币';
+  }
+
+  @override
+  String achievementCelebrationTitle(String title) {
+    return '获得称号：$title';
+  }
+
+  @override
+  String get achievementCelebrationDismiss => '太棒了！';
+
+  @override
+  String get achievementCelebrationSkipAll => '跳过全部';
+
+  @override
+  String achievementCelebrationCounter(int current, int total) {
+    return '$current / $total';
   }
 }
 
@@ -2766,6 +2829,9 @@ class SZhHant extends SZh {
   String get catDetailDaysActive => '活躍天數';
 
   @override
+  String get catDetailCheckInDays => '打卡天數';
+
+  @override
   String get catDetailEditQuestTitle => '編輯任務';
 
   @override
@@ -2779,6 +2845,9 @@ class SZhHant extends SZh {
 
   @override
   String get catDetailQuestUpdated => '任務已更新！';
+
+  @override
+  String get catDetailTargetCompletedHint => '目標已達成，已轉為永續模式';
 
   @override
   String get catDetailDailyReminder => '每日提醒';
@@ -3499,6 +3568,24 @@ class SZhHant extends SZh {
   String get adoptionGoals => '目標設定';
 
   @override
+  String get adoptionUnlimitedMode => '永續模式';
+
+  @override
+  String get adoptionUnlimitedDesc => '不設上限，持續累積';
+
+  @override
+  String get adoptionMilestoneMode => '里程碑模式';
+
+  @override
+  String get adoptionMilestoneDesc => '設定一個目標';
+
+  @override
+  String get adoptionDeadlineLabel => '截止日期';
+
+  @override
+  String get adoptionDeadlineNone => '不設';
+
+  @override
   String get adoptionReminderSection => '提醒';
 
   @override
@@ -4058,4 +4145,43 @@ class SZhHant extends SZh {
 
   @override
   String get historyDateGroupYesterday => '昨天';
+
+  @override
+  String get growthPathTitle => '成長之路';
+
+  @override
+  String get growthPathKitten => '開始新的旅程';
+
+  @override
+  String get growthPathAdolescent => '初步入門，建立基礎';
+
+  @override
+  String get growthPathAdult => '技能鞏固，完成一個項目';
+
+  @override
+  String get growthPathSenior => '深度投入，持續精進';
+
+  @override
+  String get growthPathTip => '研究表明，20 小時的專注練習足以建立一項新技能的基礎 —— Josh Kaufman';
+
+  @override
+  String achievementCelebrationCoins(int count) {
+    return '+$count 金幣';
+  }
+
+  @override
+  String achievementCelebrationTitle(String title) {
+    return '獲得稱號：$title';
+  }
+
+  @override
+  String get achievementCelebrationDismiss => '太棒了！';
+
+  @override
+  String get achievementCelebrationSkipAll => '跳過全部';
+
+  @override
+  String achievementCelebrationCounter(int current, int total) {
+    return '$current / $total';
+  }
 }

@@ -2,7 +2,7 @@
 /// See docs/firebase/analytics-events.md for the full specification.
 ///
 /// Conversion funnel:
-/// app_open → sign_up → cat_adopted → focus_session_completed → cat_level_up → streak_achieved_7
+/// app_open → sign_up → cat_adopted → focus_session_completed → cat_level_up → achievement_unlocked
 class AnalyticsEvents {
   AnalyticsEvents._();
 
@@ -28,7 +28,6 @@ class AnalyticsEvents {
 
   // Progress
   static const String allHabitsDone = 'all_habits_done';
-  static const String streakAchieved = 'streak_achieved';
 
   // Navigation
   static const String catRoomViewed = 'cat_room_viewed';
@@ -85,7 +84,7 @@ class AnalyticsEvents {
   static const String paramTargetMinutes = 'target_minutes';
   static const String paramActualMinutes = 'actual_minutes';
   static const String paramXpEarned = 'xp_earned';
-  static const String paramStreakDays = 'streak_days';
+  static const String paramCheckInDays = 'check_in_days';
   static const String paramMinutesCompleted = 'minutes_completed';
   static const String paramReason = 'reason';
   static const String paramHabitCount = 'habit_count';
@@ -102,7 +101,7 @@ class AnalyticsEvents {
   static const String paramAction = 'action';
   static const String paramNotificationType = 'notification_type';
   static const String paramDurationMinutes = 'duration_minutes';
-  static const String paramStreakCount = 'streak_count';
+  static const String paramTotalCheckInDays = 'total_check_in_days';
   static const String paramMinutesToday = 'minutes_today';
   static const String paramMilestone = 'milestone';
   static const String paramPercentComplete = 'percent_complete';
@@ -144,7 +143,7 @@ class AnalyticsEvents {
   static const String propTotalHabits = 'total_habits';
   static const String propCatCount = 'cat_count';
   static const String propMaxCatLevel = 'max_cat_level';
-  static const String propLongestStreak = 'longest_streak';
+  static const String propMaxCheckInDays = 'max_check_in_days';
   static const String propTotalFocusMinutes = 'total_focus_minutes';
   static const String propTotalHoursLogged = 'total_hours_logged';
   static const String propDaysActive = 'days_active';
@@ -152,6 +151,6 @@ class AnalyticsEvents {
 
   // ─── Milestones ───
 
-  static const List<int> streakMilestones = [3, 7, 14, 30, 60, 100];
+  static const List<int> checkInMilestones = [5, 10, 30, 50, 100];
   static const List<int> progressMilestones = [25, 50, 75, 100];
 }

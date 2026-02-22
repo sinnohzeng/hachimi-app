@@ -17,6 +17,8 @@ class AchievementTitles {
   static const String unbreakable = 'title_unbreakable';
   static const String fourSeasons = 'title_four_seasons';
   static const String speedOfLight = 'title_speed_of_light';
+  static const String thousandHours = 'title_thousand_hours';
+  static const String aheadOfTime = 'title_ahead_of_time';
 
   static const List<String> all = [
     marathonCat,
@@ -27,6 +29,8 @@ class AchievementTitles {
     unbreakable,
     fourSeasons,
     speedOfLight,
+    thousandHours,
+    aheadOfTime,
   ];
 }
 
@@ -36,11 +40,10 @@ class AchievementCategory {
   AchievementCategory._();
 
   static const String quest = 'quest';
-  static const String streak = 'streak';
   static const String cat = 'cat';
   static const String persist = 'persist';
 
-  static const List<String> all = [quest, streak, cat, persist];
+  static const List<String> all = [quest, cat, persist];
 }
 
 // ─── 坚持成就数据表 (days, coins, titleReward?, isHidden?) ───
@@ -265,84 +268,46 @@ class AchievementDefinitions {
     ),
   ];
 
-  // ─── 连续成就 (Streak, 8 个) ───
+  // ─── 累计小时成就 (Hours, 4 个) ───
 
-  static const List<AchievementDef> streakAchievements = [
+  static const List<AchievementDef> hoursAchievements = [
     AchievementDef(
-      id: 'streak_3',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak3Name',
-      descKey: 'achievementStreak3Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 3,
-      coinReward: 30,
-    ),
-    AchievementDef(
-      id: 'streak_7',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak7Name',
-      descKey: 'achievementStreak7Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 7,
-      coinReward: 70,
-    ),
-    AchievementDef(
-      id: 'streak_14',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak14Name',
-      descKey: 'achievementStreak14Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 14,
-      coinReward: 140,
-    ),
-    AchievementDef(
-      id: 'streak_21',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak21Name',
-      descKey: 'achievementStreak21Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 21,
-      coinReward: 210,
-      titleReward: AchievementTitles.perseveranceStar,
-    ),
-    AchievementDef(
-      id: 'streak_30',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak30Name',
-      descKey: 'achievementStreak30Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 30,
-      coinReward: 300,
-    ),
-    AchievementDef(
-      id: 'streak_49',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak49Name',
-      descKey: 'achievementStreak49Desc',
-      icon: Icons.local_fire_department,
-      targetValue: 49,
-      coinReward: 490,
-    ),
-    AchievementDef(
-      id: 'streak_100',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak100Name',
-      descKey: 'achievementStreak100Desc',
+      id: 'hours_100',
+      category: AchievementCategory.quest,
+      nameKey: 'achievementHours100Name',
+      descKey: 'achievementHours100Desc',
       icon: Icons.military_tech,
-      targetValue: 100,
-      coinReward: 1000,
+      targetValue: 6000, // 100h = 6000min
+      coinReward: 300,
       titleReward: AchievementTitles.centurion,
     ),
     AchievementDef(
-      id: 'streak_365',
-      category: AchievementCategory.streak,
-      nameKey: 'achievementStreak365Name',
-      descKey: 'achievementStreak365Desc',
+      id: 'hours_1000',
+      category: AchievementCategory.quest,
+      nameKey: 'achievementHours1000Name',
+      descKey: 'achievementHours1000Desc',
       icon: Icons.auto_awesome,
-      targetValue: 365,
-      coinReward: 3650,
-      titleReward: AchievementTitles.catYear,
+      targetValue: 60000, // 1000h = 60000min
+      coinReward: 1000,
+      titleReward: AchievementTitles.thousandHours,
       isHidden: true,
+    ),
+    AchievementDef(
+      id: 'goal_on_time',
+      category: AchievementCategory.quest,
+      nameKey: 'achievementGoalOnTimeName',
+      descKey: 'achievementGoalOnTimeDesc',
+      icon: Icons.flag,
+      coinReward: 200,
+    ),
+    AchievementDef(
+      id: 'goal_ahead',
+      category: AchievementCategory.quest,
+      nameKey: 'achievementGoalAheadName',
+      descKey: 'achievementGoalAheadDesc',
+      icon: Icons.rocket_launch,
+      coinReward: 500,
+      titleReward: AchievementTitles.aheadOfTime,
     ),
   ];
 
@@ -447,7 +412,7 @@ class AchievementDefinitions {
   /// 所有成就列表
   static final List<AchievementDef> all = [
     ...questAchievements,
-    ...streakAchievements,
+    ...hoursAchievements,
     ...catAchievements,
     ...persistAchievements,
   ];

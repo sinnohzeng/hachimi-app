@@ -117,7 +117,7 @@ class DiaryService {
       habitName: habit.name,
       todayMinutes: ctx.todayMinutes,
       goalMinutes: habit.goalMinutes,
-      currentStreak: habit.currentStreak,
+      totalCheckInDays: habit.totalCheckInDays,
       totalHours: cat.totalMinutes ~/ 60,
       totalMins: cat.totalMinutes % 60,
       targetHours: habit.targetHours,

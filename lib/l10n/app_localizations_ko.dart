@@ -708,6 +708,9 @@ class SKo extends S {
   String get catDetailDaysActive => '활동 일수';
 
   @override
+  String get catDetailCheckInDays => '체크인 일수';
+
+  @override
   String get catDetailEditQuestTitle => '퀘스트 편집';
 
   @override
@@ -721,6 +724,9 @@ class SKo extends S {
 
   @override
   String get catDetailQuestUpdated => '퀘스트가 업데이트되었어요!';
+
+  @override
+  String get catDetailTargetCompletedHint => '목표 달성 완료, 무제한 모드로 전환됨';
 
   @override
   String get catDetailDailyReminder => '일일 알림';
@@ -1442,6 +1448,24 @@ class SKo extends S {
   String get adoptionGoals => '목표 설정';
 
   @override
+  String get adoptionUnlimitedMode => '무제한 모드';
+
+  @override
+  String get adoptionUnlimitedDesc => '상한 없이 계속 쌓기';
+
+  @override
+  String get adoptionMilestoneMode => '마일스톤 모드';
+
+  @override
+  String get adoptionMilestoneDesc => '목표 설정하기';
+
+  @override
+  String get adoptionDeadlineLabel => '마감일';
+
+  @override
+  String get adoptionDeadlineNone => '미설정';
+
+  @override
   String get adoptionReminderSection => '알림';
 
   @override
@@ -2068,5 +2092,45 @@ class SKo extends S {
   @override
   String achievementTitleCount(int count) {
     return '$count titles unlocked';
+  }
+
+  @override
+  String get growthPathTitle => '성장의 길';
+
+  @override
+  String get growthPathKitten => '새로운 여정의 시작';
+
+  @override
+  String get growthPathAdolescent => '기초를 다지다';
+
+  @override
+  String get growthPathAdult => '스킬 정착';
+
+  @override
+  String get growthPathSenior => '깊은 숙련';
+
+  @override
+  String get growthPathTip =>
+      '연구에 따르면 20시간의 집중 연습만으로도 새로운 기술의 기초를 쌓을 수 있습니다 — Josh Kaufman';
+
+  @override
+  String achievementCelebrationCoins(int count) {
+    return '+$count 코인';
+  }
+
+  @override
+  String achievementCelebrationTitle(String title) {
+    return '칭호 획득: $title';
+  }
+
+  @override
+  String get achievementCelebrationDismiss => '대단해!';
+
+  @override
+  String get achievementCelebrationSkipAll => '모두 건너뛰기';
+
+  @override
+  String achievementCelebrationCounter(int current, int total) {
+    return '$current / $total';
   }
 }

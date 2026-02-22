@@ -137,14 +137,16 @@ class AccessoryCard extends StatelessWidget {
   }
 
   Color _priceColor(int price, ColorScheme colorScheme, Brightness brightness) {
-    if (price >= 350)
+    if (price >= 350) {
       return brightness == Brightness.dark
           ? Colors.amber.shade400
           : Colors.amber.shade700;
-    if (price >= 250)
+    }
+    if (price >= 250) {
       return brightness == Brightness.dark
           ? Colors.purple.shade300
           : Colors.purple.shade400;
+    }
     if (price >= 150) return colorScheme.primary;
     return colorScheme.onSurfaceVariant;
   }

@@ -154,7 +154,7 @@ class SettingsScreen extends ConsumerWidget {
                 .when(
                   data: (info) => Text(info.version),
                   loading: () => const Text('...'),
-                  error: (_, __) => const Text('?'),
+                  error: (_, _) => const Text('?'),
                 ),
           ),
           ListTile(
@@ -249,7 +249,10 @@ class SettingsScreen extends ConsumerWidget {
           ref
               .read(localeProvider.notifier)
               .setLocale(
-                Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+                const Locale.fromSubtags(
+                  languageCode: 'zh',
+                  scriptCode: 'Hant',
+                ),
               );
         } else {
           ref.read(localeProvider.notifier).setLocale(Locale(result as String));

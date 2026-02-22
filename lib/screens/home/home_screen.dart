@@ -4,8 +4,6 @@ import 'package:animations/animations.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
-import 'package:hachimi_app/core/constants/achievement_constants.dart';
-import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/screens/achievements/achievement_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 
@@ -30,33 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 监听新解锁成就，显示 SnackBar
-    ref.listen<List<String>>(newlyUnlockedProvider, (prev, next) {
-      if (next.isEmpty) return;
-      for (final id in next) {
-        final def = AchievementDefinitions.byId(id);
-        if (def == null) continue;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(def.icon, color: Colors.amber, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${context.l10n.achievementUnlocked} +${def.coinReward}',
-                  ),
-                ),
-              ],
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-      // 消费完清空
-      ref.read(newlyUnlockedProvider.notifier).clear();
-    });
+    // 成就庆祝已移至全局 AchievementCelebrationLayer（app.dart）
 
     return Scaffold(
       body: PageTransitionSwitcher(

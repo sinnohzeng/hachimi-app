@@ -6,13 +6,11 @@ import 'package:hachimi_app/providers/habits_provider.dart';
 class HabitStats {
   final int totalHabits;
   final int totalMinutesLogged;
-  final int longestStreak;
   final int totalTargetHours;
 
   const HabitStats({
     this.totalHabits = 0,
     this.totalMinutesLogged = 0,
-    this.longestStreak = 0,
     this.totalTargetHours = 0,
   });
 
@@ -32,21 +30,16 @@ final statsProvider = Provider<HabitStats>((ref) {
   if (habits.isEmpty) return const HabitStats();
 
   int totalMinutes = 0;
-  int longestStreak = 0;
   int totalTargetHours = 0;
 
   for (final habit in habits) {
     totalMinutes += habit.totalMinutes;
-    if (habit.bestStreak > longestStreak) {
-      longestStreak = habit.bestStreak;
-    }
-    totalTargetHours += habit.targetHours;
+    totalTargetHours += habit.targetHours ?? 0;
   }
 
   return HabitStats(
     totalHabits: habits.length,
     totalMinutesLogged: totalMinutes,
-    longestStreak: longestStreak,
     totalTargetHours: totalTargetHours,
   );
 });

@@ -70,8 +70,8 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   Expanded(
                     child: _StatCard(
                       label: l10n.statsBestStreak,
-                      value: l10n.statsStreakDays(stats.longestStreak),
-                      icon: Icons.local_fire_department,
+                      value: '${stats.totalHabits}',
+                      icon: Icons.flag,
                       color: colorScheme.tertiaryContainer,
                       onColor: colorScheme.onTertiaryContainer,
                     ),
@@ -205,14 +205,14 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                             ],
                           ),
                         ),
-                        if (habit.currentStreak > 0)
+                        if (habit.totalCheckInDays > 0)
                           Chip(
                             avatar: Icon(
-                              Icons.local_fire_department,
+                              Icons.calendar_today,
                               size: 16,
                               color: colorScheme.onTertiaryContainer,
                             ),
-                            label: Text('${habit.currentStreak}d'),
+                            label: Text('${habit.totalCheckInDays}d'),
                             backgroundColor: colorScheme.tertiaryContainer,
                             side: BorderSide.none,
                           ),
@@ -310,7 +310,7 @@ class _WeeklyTrendCard extends ConsumerWidget {
                 height: 150,
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, __) => const SizedBox(height: 150),
+              error: (_, _) => const SizedBox(height: 150),
               data: (dailyMinutes) {
                 final now = DateTime.now();
                 final bars = List.generate(7, (i) {
@@ -454,7 +454,7 @@ class _HeatmapCard extends ConsumerWidget {
                 height: 120,
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, __) => const SizedBox(height: 120),
+              error: (_, _) => const SizedBox(height: 120),
               data: (dailyMinutes) =>
                   StreakHeatmap(dailyMinutes: dailyMinutes, days: 30),
             ),
@@ -487,7 +487,7 @@ class _RecentSessionsCard extends ConsumerWidget {
               height: 80,
               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
-            error: (_, __) => const SizedBox(height: 80),
+            error: (_, _) => const SizedBox(height: 80),
             data: (sessions) {
               if (sessions.isEmpty) {
                 return Padding(

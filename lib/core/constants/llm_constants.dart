@@ -130,10 +130,10 @@ class DiaryPrompt {
     required String habitName,
     required int todayMinutes,
     required int goalMinutes,
-    required int currentStreak,
+    required int totalCheckInDays,
     required int totalHours,
     required int totalMins,
-    required int targetHours,
+    required int? targetHours,
     required bool isZhLocale,
   }) {
     if (isZhLocale) {
@@ -150,8 +150,8 @@ class DiaryPrompt {
           '- 成长阶段：$sName（成长进度 $progressPercent%）\n'
           '- 主人的目标：$habitName\n'
           '- 今天的专注：$todayMinutes分钟（目标$goalMinutes分钟）\n'
-          '- 连续打卡：$currentStreak天\n'
-          '- 总进度：$totalHours小时$totalMins分 / $targetHours小时\n'
+          '- 累计打卡：$totalCheckInDays天\n'
+          '- 总进度：$totalHours小时$totalMins分${targetHours != null ? ' / $targetHours小时' : ''}\n'
           '\n'
           '用第一人称写一篇短日记（2-4句话）。\n'
           '根据性格调整语气。如果主人今天完成了专注，表达开心；如果很久没来，根据心情表达想念。\n'
@@ -173,8 +173,8 @@ class DiaryPrompt {
         '- Growth stage: $sName ($progressPercent% progress)\n'
         '- Owner\'s quest: $habitName\n'
         '- Today\'s focus: ${todayMinutes}min (goal: ${goalMinutes}min)\n'
-        '- Current streak: ${currentStreak}d\n'
-        '- Total progress: ${totalHours}h${totalMins}m / ${targetHours}h\n'
+        '- Total check-in days: ${totalCheckInDays}d\n'
+        '- Total progress: ${totalHours}h${totalMins}m${targetHours != null ? ' / ${targetHours}h' : ''}\n'
         '\n'
         'Write a short diary entry in first person (2-4 sentences).\n'
         'Adjust tone based on your personality. If the owner focused today, express happiness. If they haven\'t come in a while, express feelings based on your mood.\n'

@@ -89,22 +89,15 @@ class FocusStatsCard extends ConsumerWidget {
                   '${habit.totalMinutes ~/ 60}h ${habit.totalMinutes % 60}m',
                   Icons.emoji_events_outlined,
                   context.l10n.catDetailTargetLabel,
-                  '${habit.targetHours}h',
+                  habit.targetHours != null ? '${habit.targetHours}h' : '∞',
                 ),
                 _statRow(
                   context,
                   Icons.pie_chart_outline,
                   context.l10n.catDetailCompletion,
-                  '${(habit.progressPercent * 100).toStringAsFixed(0)}%',
-                  Icons.local_fire_department,
-                  context.l10n.catDetailCurrentStreak,
-                  '${habit.currentStreak}d',
-                ),
-                _statRow(
-                  context,
-                  Icons.star_outline,
-                  context.l10n.catDetailBestStreakLabel,
-                  '${habit.bestStreak}d',
+                  habit.targetHours != null
+                      ? '${(habit.progressPercent * 100).toStringAsFixed(0)}%'
+                      : '—',
                   Icons.trending_up,
                   context.l10n.catDetailAvgDaily,
                   '${avgDaily}m',
@@ -114,10 +107,20 @@ class FocusStatsCard extends ConsumerWidget {
                   Icons.calendar_today_outlined,
                   context.l10n.catDetailDaysActive,
                   '$daysActive',
-                  null,
-                  null,
-                  null,
+                  Icons.check_circle_outline,
+                  context.l10n.catDetailCheckInDays,
+                  '${habit.totalCheckInDays}',
                 ),
+                if (habit.deadlineDate != null && !habit.isUnlimited)
+                  _statRow(
+                    context,
+                    Icons.event,
+                    context.l10n.adoptionDeadlineLabel,
+                    _formatDate(habit.deadlineDate!),
+                    null,
+                    null,
+                    null,
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.base),
@@ -176,6 +179,10 @@ class FocusStatsCard extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   void _showEditQuestSheet(BuildContext context) {

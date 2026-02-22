@@ -4,7 +4,6 @@ import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
-import 'package:hachimi_app/core/utils/streak_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/focus_session.dart';
@@ -58,7 +57,7 @@ class FirestoreService {
   Future<String> createHabit({
     required String uid,
     required String name,
-    required int targetHours,
+    int? targetHours,
     int goalMinutes = 25,
     String? reminderTime,
     String? catId,
@@ -71,23 +70,23 @@ class FirestoreService {
       'catId': catId,
       'isActive': true,
       'totalMinutes': 0,
-      'currentStreak': 0,
-      'bestStreak': 0,
       'lastCheckInDate': null,
+      'totalCheckInDays': 0,
+      'targetCompleted': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
     return docRef.id;
   }
 
   /// Create a habit and its bound cat in a single batch.
-  /// Cat stores appearance Map + targetMinutes (targetHours × 60).
   Future<({String habitId, String catId})> createHabitWithCat({
     required String uid,
     required String name,
-    required int targetHours,
+    int? targetHours,
     required int goalMinutes,
     String? reminderTime,
     String? motivationText,
+    DateTime? deadlineDate,
     required Cat cat,
   }) async {
     final batch = _db.batch();
@@ -99,21 +98,21 @@ class FirestoreService {
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
       'reminderTime': reminderTime,
-      if (motivationText != null) 'motivationText': motivationText,
+      'motivationText': ?motivationText,
+      if (deadlineDate != null)
+        'deadlineDate': Timestamp.fromDate(deadlineDate),
       'catId': '', // Will update after cat is created
       'isActive': true,
       'totalMinutes': 0,
-      'currentStreak': 0,
-      'bestStreak': 0,
       'lastCheckInDate': null,
+      'totalCheckInDays': 0,
+      'targetCompleted': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
 
     // 2. Create cat document with pixel cat appearance
     final catRef = _catsRef(uid).doc();
-    final catData = cat
-        .copyWith(boundHabitId: habitRef.id, targetMinutes: targetHours * 60)
-        .toFirestore();
+    final catData = cat.copyWith(boundHabitId: habitRef.id).toFirestore();
     catData['createdAt'] = FieldValue.serverTimestamp();
     batch.set(catRef, catData);
 
@@ -135,45 +134,42 @@ class FirestoreService {
   }
 
   /// Update a habit's editable fields.
-  /// When [targetHours] changes, syncs [cat.targetMinutes] = targetHours × 60.
   Future<void> updateHabit({
     required String uid,
     required String habitId,
     String? name,
     int? goalMinutes,
     int? targetHours,
+    bool clearTargetHours = false,
     String? reminderTime,
     bool clearReminder = false,
     String? motivationText,
     bool clearMotivation = false,
+    DateTime? deadlineDate,
+    bool clearDeadlineDate = false,
   }) async {
     final updates = <String, dynamic>{};
     if (name != null && name.trim().isNotEmpty) updates['name'] = name.trim();
     if (goalMinutes != null) updates['goalMinutes'] = goalMinutes;
-    if (targetHours != null) updates['targetHours'] = targetHours;
+    if (clearTargetHours) {
+      updates['targetHours'] = null;
+    } else if (targetHours != null) {
+      updates['targetHours'] = targetHours;
+    }
     if (reminderTime != null) updates['reminderTime'] = reminderTime;
     if (clearReminder) updates['reminderTime'] = null;
     if (motivationText != null && motivationText.trim().isNotEmpty) {
       updates['motivationText'] = motivationText.trim();
     }
     if (clearMotivation) updates['motivationText'] = null;
+    if (clearDeadlineDate) {
+      updates['deadlineDate'] = null;
+    } else if (deadlineDate != null) {
+      updates['deadlineDate'] = Timestamp.fromDate(deadlineDate);
+    }
     if (updates.isEmpty) return;
 
     await _habitsRef(uid).doc(habitId).update(updates);
-
-    // Sync cat.targetMinutes when targetHours changes
-    if (targetHours != null) {
-      final habitDoc = await _habitsRef(uid).doc(habitId).get();
-      if (habitDoc.exists) {
-        final catId =
-            (habitDoc.data() as Map<String, dynamic>)['catId'] as String?;
-        if (catId != null && catId.isNotEmpty) {
-          await _catsRef(
-            uid,
-          ).doc(catId).update({'targetMinutes': targetHours * 60});
-        }
-      }
-    }
   }
 
   Future<void> deleteHabit({
@@ -200,9 +196,10 @@ class FirestoreService {
 
   /// Log a completed focus session with atomic batch updates:
   /// 1. Write session document
-  /// 2. Update habit totals + streak
-  /// 3. Update cat totalMinutes + lastSessionAt
+  /// 2. Update habit totals (cumulative, no streak)
+  /// 3. Update cat totalMinutes + lastSessionAt + highestStage (fixed ladder)
   /// 4. Award focus coins
+  /// 5. Check target completion (milestone mode)
   Future<void> logFocusSession({
     required String uid,
     required FocusSession session,
@@ -215,40 +212,34 @@ class FirestoreService {
     final sessionRef = _sessionsRef(uid, session.habitId).doc();
     batch.set(sessionRef, session.toFirestore());
 
-    // 2. Update habit totals and streak
+    // 2. Update habit totals
     final habitRef = _habitsRef(uid).doc(session.habitId);
     final habitDoc = await habitRef.get();
 
     if (habitDoc.exists) {
       final habit = Habit.fromFirestore(habitDoc);
-      final yesterday = DateFormat(
-        'yyyy-MM-dd',
-      ).format(DateTime.now().subtract(const Duration(days: 1)));
-
-      final newStreak = StreakUtils.calculateNewStreak(
-        lastCheckInDate: habit.lastCheckInDate,
-        today: today,
-        yesterday: yesterday,
-        currentStreak: habit.currentStreak,
-      );
-
-      final newBest = newStreak > habit.bestStreak
-          ? newStreak
-          : habit.bestStreak;
 
       // 今日首次 session 时，累计打卡天数 +1
       final isFirstSessionToday = habit.lastCheckInDate != today;
 
-      batch.update(habitRef, {
+      final habitUpdates = <String, dynamic>{
         'totalMinutes': FieldValue.increment(session.durationMinutes),
-        'currentStreak': newStreak,
-        'bestStreak': newBest,
         'lastCheckInDate': today,
         if (isFirstSessionToday) 'totalCheckInDays': FieldValue.increment(1),
-      });
+      };
+
+      // 5. 目标达成检测（里程碑模式）
+      if (habit.targetHours != null && !habit.targetCompleted) {
+        final newTotalMinutes = habit.totalMinutes + session.durationMinutes;
+        if (newTotalMinutes >= habit.targetHours! * 60) {
+          habitUpdates['targetCompleted'] = true;
+        }
+      }
+
+      batch.update(habitRef, habitUpdates);
     }
 
-    // 3. Update cat totalMinutes + lastSessionAt + highestStage
+    // 3. Update cat totalMinutes + lastSessionAt + highestStage (fixed ladder)
     if (session.catId.isNotEmpty) {
       final catRef = _catsRef(uid).doc(session.catId);
       final catUpdates = <String, dynamic>{
@@ -261,9 +252,8 @@ class FirestoreService {
       if (catDoc.exists) {
         final cat = Cat.fromFirestore(catDoc);
         final newTotalMinutes = cat.totalMinutes + session.durationMinutes;
-        final newProgress = cat.targetMinutes > 0
-            ? (newTotalMinutes / cat.targetMinutes).clamp(0.0, 1.0)
-            : 0.0;
+        // 固定阶梯：200h (12000min) = 1.0
+        final newProgress = (newTotalMinutes / 12000.0).clamp(0.0, 1.0);
         final newStage = stageForProgress(newProgress);
         final currentHighest = cat.highestStage ?? cat.computedStage;
         if (stageOrder(newStage) > stageOrder(currentHighest)) {

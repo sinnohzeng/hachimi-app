@@ -10,7 +10,7 @@ The cat system is the emotional core of Hachimi. It transforms abstract habit tr
 
 1. **Reward consistency** — growth stages and mood improvements are earned through regular focus sessions
 2. **Create attachment** — pixel-art appearance, personalities, and names make each cat feel personal
-3. **Visualize progress** — cat evolution provides clear, emotionally resonant feedback for habit streaks
+3. **Visualize progress** — cat evolution provides clear, emotionally resonant feedback for cumulative focus time
 4. **Scale with ambition** — unlimited cats displayed in a 2-column CatHouse grid; unlimited in the cat album
 
 ---
@@ -64,31 +64,34 @@ Personalities are assigned randomly at adoption.
 
 ## Growth Stages
 
-Cats evolve through **3 stages** based on the percentage of `totalMinutes` against `targetMinutes` (the cumulative minute goal derived from the habit's `targetHours`):
+Cats evolve through **4 stages** based on a **fixed 200-hour (12000-minute) growth ladder**. Stage thresholds are absolute cumulative focus time, independent of the habit's `targetHours`:
 
-| Stage | ID | Name | Emoji | Condition | Description |
-|-------|----|------|-------|-----------|-------------|
-| 1 | `kitten` | Kitten | 🐱 | progress < 33% | Newborn, tiny, full of potential |
-| 2 | `adolescent` | Adolescent | 🐈 | 33% <= progress < 66% | Growing fast, more expressive |
-| 3 | `adult` | Adult | 🐈‍⬛ | progress >= 66% | Fully formed, confident and composed |
+| Stage | ID | Name | Emoji | Threshold | Progress | Description |
+|-------|----|------|-------|-----------|----------|-------------|
+| 1 | `kitten` | Kitten | 🐱 | 0h (0min) | 0.00 | Newborn, tiny, full of potential |
+| 2 | `adolescent` | Adolescent | 🐈 | 20h (1200min) | ~0.10 | Growing fast, more expressive |
+| 3 | `adult` | Adult | 🐈‍⬛ | 100h (6000min) | 0.50 | Fully formed, confident and composed |
+| 4 | `senior` | Senior | 🏆 | 200h (12000min) | 1.00 | Wise elder, legendary companion |
 
-**Stage calculation** is derived at read time from `totalMinutes` and `targetMinutes` — it is not stored separately in Firestore (to prevent drift). The computed getter `cat.computedStage` always returns the authoritative stage.
+**Stage calculation** is derived at read time from `totalMinutes` using fixed thresholds — it is not stored separately in Firestore (to prevent drift). The computed getter `cat.computedStage` always returns the authoritative stage.
 
-**Anti-regression protection:** The `highestStage` field (stored in Firestore) records the highest stage a cat has ever reached. The UI uses `displayStage = max(computedStage, highestStage)` to prevent visual regression when users increase their target hours. `highestStage` is monotonically increasing — it only goes up, never down. For legacy cats where `highestStage == null`, old thresholds (20%/45%) are used as a fallback to prevent visual regression from the threshold change.
+**Anti-regression protection:** The `highestStage` field (stored in Firestore) records the highest stage a cat has ever reached. `highestStage` is monotonically increasing — it only goes up, never down.
 
 **Progress formula:**
 ```
-progress = totalMinutes / (targetMinutes)
-stage = kitten     if progress < 0.33
-        adolescent if progress < 0.66
-        adult      if progress >= 0.66
+growthProgress = totalMinutes / 12000   (capped at 1.0)
+
+stage = kitten     if totalMinutes < 1200
+        adolescent if totalMinutes < 6000
+        adult      if totalMinutes < 12000
+        senior     if totalMinutes >= 12000
 ```
 
 **Stage progress** (used for progress bars within a stage):
 ```
-stageProgress = (progress - stageFloor) / (stageCeiling - stageFloor)
+stageProgress = (totalMinutes - stageFloorMinutes) / (stageCeilingMinutes - stageFloorMinutes)
 ```
-At max stage (Adult), `stageProgress` scales from 0.66 to 1.0, capped at `1.0`.
+At max stage (Senior), `stageProgress` is `1.0`.
 
 ---
 
@@ -163,27 +166,21 @@ XP is earned at the end of each focus session. All calculations are in `XpServic
 ### XP Formula
 
 ```
-totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
+totalXp = baseXp + fullHouseBonus
 ```
 
 | Component | Formula | Condition |
 |-----------|---------|-----------|
 | `baseXp` | `minutes x 1` | Always |
-| `streakBonus` | `+5` per session | `currentStreak >= 3` |
-| `milestoneBonus` | `+30` one-time | Streak reaches a milestone day (see below) |
 | `fullHouseBonus` | `+10` per session | All habits completed today |
-
-**Streak Milestone Constants** (defined in `lib/core/constants/pixel_cat_constants.dart`):
-- `streakMilestones = [7, 14, 30]` — the streak day thresholds that trigger a milestone bonus
-- `streakMilestoneXpBonus = 30` — XP awarded for each milestone reached
 
 The XP multiplier from Remote Config (`xp_multiplier`, default `1.0`) scales `totalXp` for promotional events.
 
 ### Abandoned Sessions
 
 Sessions ended early (Give Up) still earn XP if the user focused for **>= 5 minutes**:
-- XP = `focusedMinutes x 1` (base only; no streak or bonus XP)
-- The session is marked `completed: false` in Firestore
+- XP = `focusedMinutes x 1` (base only; no bonus XP)
+- The session is marked with `status: "abandoned"` in Firestore
 
 ---
 
@@ -330,14 +327,14 @@ After compositing, the sprite is optionally flipped horizontally if `reverse == 
 The `PixelCatGenerationService.generateRandomCat()` method produces a single random cat for the adoption flow:
 
 ```
-generateRandomCat(boundHabitId, targetMinutes) -> Cat
+generateRandomCat(boundHabitId) -> Cat
 ```
 
 **Algorithm:**
 1. Generate random appearance parameters by selecting each field independently from valid values defined in `pixel_cat_constants.dart`
 2. Assign a random personality (equal probability)
 3. Generate a random name from the `catNames` pool
-4. Return a single `Cat` object with `state: 'active'`, `totalMinutes: 0`, `targetMinutes: targetMinutes`, no `id` (assigned by Firestore on creation)
+4. Return a single `Cat` object with `state: 'active'`, `totalMinutes: 0`, no `id` (assigned by Firestore on creation)
 
 **Refresh mechanism:** The adoption screen shows one cat at a time. The user can tap a "refresh" button to re-roll a new random cat as many times as desired before confirming adoption. Each refresh calls `generateRandomCat()` again.
 
@@ -476,7 +473,7 @@ The diary prompt uses ChatML format (`<|im_start|>system/assistant<|im_end|>`) a
 - Cat name, personality, and flavor text
 - Current mood and hours since last session
 - Growth stage and progress percentage
-- Habit details (today's focus, streak, total progress)
+- Habit details (today's focus, total progress, quest mode)
 - Instruction: 2-4 sentences, first person, personality-adjusted tone
 - Bilingual templates (English and Chinese based on app locale)
 

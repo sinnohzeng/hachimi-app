@@ -9,7 +9,7 @@ class AchievementStrings {
     return map[id] ?? id;
   }
 
-  /// 根据 locale 获取成就描述（仅 quest/streak/cat 类使用，persist 类使用参数化 l10n）。
+  /// 根据 locale 获取成就描述（仅 quest/cat/hours 类使用，persist 类使用参数化 l10n）。
   static String desc(String id, String locale) {
     final map = locale.startsWith('zh') ? _descsZh : _descsEn;
     return map[id] ?? '';
@@ -28,15 +28,11 @@ class AchievementStrings {
     'quest_first_checkin': 'Morning Cat',
     'quest_marathon': 'Marathon Cat',
 
-    // Streak (8)
-    'streak_3': 'Warming Up',
-    'streak_7': 'One Week Wonder',
-    'streak_14': 'Fortnight Fighter',
-    'streak_21': 'Three Week Hero',
-    'streak_30': 'Monthly Master',
-    'streak_49': 'Seven Weeks Strong',
-    'streak_100': 'Centurion',
-    'streak_365': 'Year of the Cat',
+    // Hours & Goal (4)
+    'hours_100': 'Centurion',
+    'hours_1000': 'Millennium Master',
+    'goal_on_time': 'Right on Time',
+    'goal_ahead': 'Ahead of Schedule',
 
     // Cat (9)
     'cat_first_adopt': 'Welcome Home',
@@ -202,15 +198,11 @@ class AchievementStrings {
     'quest_first_checkin': '签到喵',
     'quest_marathon': '马拉松猫',
 
-    // Streak (8)
-    'streak_3': '热身三天',
-    'streak_7': '一周达成',
-    'streak_14': '两周坚持',
-    'streak_21': '三周英雄',
-    'streak_30': '月度大师',
-    'streak_49': '七七四十九',
-    'streak_100': '百日征程',
-    'streak_365': '猫年传说',
+    // Hours & Goal (4)
+    'hours_100': '百时征途',
+    'hours_1000': '千时大师',
+    'goal_on_time': '按时达成',
+    'goal_ahead': '提前达标',
 
     // Cat (9)
     'cat_first_adopt': '欢迎回家',
@@ -363,7 +355,7 @@ class AchievementStrings {
     'persist_2997': '光速勋章',
   };
 
-  // ─── 英文描述（quest/streak/cat，persist 使用参数化 l10n）───
+  // ─── 英文描述（quest/cat/hours，persist 使用参数化 l10n）───
 
   static const Map<String, String> _descsEn = {
     // Quest
@@ -372,26 +364,22 @@ class AchievementStrings {
     'quest_3_habits': 'Have 3 active quests at the same time',
     'quest_5_habits': 'Have 5 active quests at the same time',
     'quest_all_done': 'Complete all daily goals in one day',
-    'quest_5_workdays': 'Check in 5 consecutive weekdays',
+    'quest_5_workdays': 'Check in on 5 or more days for any quest',
     'quest_first_checkin': 'Complete your first daily check-in',
     'quest_marathon': 'Focus for 120+ minutes in one session',
 
-    // Streak
-    'streak_3': '3-day streak on any quest',
-    'streak_7': '7-day streak on any quest',
-    'streak_14': '14-day streak on any quest',
-    'streak_21': '21-day streak on any quest',
-    'streak_30': '30-day streak on any quest',
-    'streak_49': '49-day streak on any quest',
-    'streak_100': '100-day streak on any quest',
-    'streak_365': '365-day streak on any quest',
+    // Hours & Goal
+    'hours_100': 'Accumulate 100 hours on any quest',
+    'hours_1000': 'Accumulate 1000 hours on any quest',
+    'goal_on_time': 'Complete a milestone target before its deadline',
+    'goal_ahead': 'Complete a milestone target 7+ days early',
 
     // Cat
     'cat_first_adopt': 'Adopt your first cat',
     'cat_3_adopted': 'Adopt 3 cats in total',
     'cat_adolescent': 'A cat reaches the adolescent stage',
     'cat_adult': 'A cat reaches the adult stage',
-    'cat_senior': 'A cat completes 100% of its growth target',
+    'cat_senior': 'A cat reaches 200 hours of focus',
     'cat_graduated': 'Graduate your first cat',
     'cat_accessory': 'Equip an accessory for the first time',
     'cat_5_accessories': 'Own 5 accessories',
@@ -407,26 +395,22 @@ class AchievementStrings {
     'quest_3_habits': '同时拥有 3 个活跃任务',
     'quest_5_habits': '同时拥有 5 个活跃任务',
     'quest_all_done': '一天内完成所有任务的每日目标',
-    'quest_5_workdays': '连续 5 个工作日打卡',
+    'quest_5_workdays': '任一任务累计打卡 5 天以上',
     'quest_first_checkin': '首次每日签到',
     'quest_marathon': '单次专注 120 分钟以上',
 
-    // Streak
-    'streak_3': '任一任务连续 3 天',
-    'streak_7': '任一任务连续 7 天',
-    'streak_14': '任一任务连续 14 天',
-    'streak_21': '任一任务连续 21 天',
-    'streak_30': '任一任务连续 30 天',
-    'streak_49': '任一任务连续 49 天',
-    'streak_100': '任一任务连续 100 天',
-    'streak_365': '任一任务连续 365 天',
+    // Hours & Goal
+    'hours_100': '任一任务累计 100 小时',
+    'hours_1000': '任一任务累计 1000 小时',
+    'goal_on_time': '在截止日期前完成里程碑目标',
+    'goal_ahead': '提前 7 天以上完成里程碑目标',
 
     // Cat
     'cat_first_adopt': '领养第一只猫',
     'cat_3_adopted': '累计领养 3 只猫',
-    'cat_adolescent': '任一猫达到少年期',
+    'cat_adolescent': '任一猫达到青年期',
     'cat_adult': '任一猫达到成年期',
-    'cat_senior': '任一猫完成 100% 成长目标',
+    'cat_senior': '任一猫累计 200 小时专注',
     'cat_graduated': '首只猫毕业',
     'cat_accessory': '首次装备配饰',
     'cat_5_accessories': '拥有 5 件配饰',
@@ -444,17 +428,21 @@ class AchievementStrings {
     'title_unbreakable': 'Unbreakable',
     'title_four_seasons': 'Four Seasons',
     'title_speed_of_light': 'Speed of Light',
+    'title_thousand_hours': 'Thousand Hours',
+    'title_ahead_of_time': 'Ahead of Time',
   };
 
   static const Map<String, String> _titleNamesZh = {
     'title_marathon_cat': '马拉松猫',
     'title_perseverance_star': '毅力新星',
-    'title_centurion': '百日战士',
+    'title_centurion': '百时战士',
     'title_cat_year': '猫年传说',
     'title_elder_cat': '猫咪长老',
     'title_unbreakable': '百折不挠',
     'title_four_seasons': '春夏秋冬',
     'title_speed_of_light': '光速猫',
+    'title_thousand_hours': '千时传奇',
+    'title_ahead_of_time': '时光先行者',
   };
 
   /// 获取称号显示名称。

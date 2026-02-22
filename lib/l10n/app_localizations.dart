@@ -1398,6 +1398,12 @@ abstract class S {
   /// **'Days active'**
   String get catDetailDaysActive;
 
+  /// No description provided for @catDetailCheckInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in days'**
+  String get catDetailCheckInDays;
+
   /// No description provided for @catDetailEditQuestTitle.
   ///
   /// In en, this message translates to:
@@ -1427,6 +1433,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Quest updated!'**
   String get catDetailQuestUpdated;
+
+  /// No description provided for @catDetailTargetCompletedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Target already reached — now in unlimited mode'**
+  String get catDetailTargetCompletedHint;
 
   /// No description provided for @catDetailDailyReminder.
   ///
@@ -2784,6 +2796,42 @@ abstract class S {
   /// **'Goals'**
   String get adoptionGoals;
 
+  /// No description provided for @adoptionUnlimitedMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited mode'**
+  String get adoptionUnlimitedMode;
+
+  /// No description provided for @adoptionUnlimitedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'No upper limit, keep accumulating'**
+  String get adoptionUnlimitedDesc;
+
+  /// No description provided for @adoptionMilestoneMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone mode'**
+  String get adoptionMilestoneMode;
+
+  /// No description provided for @adoptionMilestoneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a target to reach'**
+  String get adoptionMilestoneDesc;
+
+  /// No description provided for @adoptionDeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get adoptionDeadlineLabel;
+
+  /// No description provided for @adoptionDeadlineNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get adoptionDeadlineNone;
+
   /// No description provided for @adoptionReminderSection.
   ///
   /// In en, this message translates to:
@@ -3899,6 +3947,72 @@ abstract class S {
   /// In en, this message translates to:
   /// **'{count} titles unlocked'**
   String achievementTitleCount(int count);
+
+  /// Title for the growth path card
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Path'**
+  String get growthPathTitle;
+
+  /// Description for kitten stage (0h)
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new journey'**
+  String get growthPathKitten;
+
+  /// Description for adolescent stage (20h)
+  ///
+  /// In en, this message translates to:
+  /// **'Build initial foundation'**
+  String get growthPathAdolescent;
+
+  /// Description for adult stage (100h)
+  ///
+  /// In en, this message translates to:
+  /// **'Skills consolidate'**
+  String get growthPathAdult;
+
+  /// Description for senior stage (200h)
+  ///
+  /// In en, this message translates to:
+  /// **'Deep mastery'**
+  String get growthPathSenior;
+
+  /// Research tip about the 20-hour rule
+  ///
+  /// In en, this message translates to:
+  /// **'Research shows that 20 hours of focused practice is enough to build the foundation of a new skill — Josh Kaufman'**
+  String get growthPathTip;
+
+  /// Shows coins earned from achievement
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} coins'**
+  String achievementCelebrationCoins(int count);
+
+  /// Shows title earned from achievement
+  ///
+  /// In en, this message translates to:
+  /// **'Title earned: {title}'**
+  String achievementCelebrationTitle(String title);
+
+  /// Button to dismiss celebration
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome!'**
+  String get achievementCelebrationDismiss;
+
+  /// Button to skip all remaining celebrations
+  ///
+  /// In en, this message translates to:
+  /// **'Skip all'**
+  String get achievementCelebrationSkipAll;
+
+  /// Shows queue progress for celebrations
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {total}'**
+  String achievementCelebrationCounter(int current, int total);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

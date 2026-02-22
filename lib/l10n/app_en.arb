@@ -317,11 +317,13 @@
   "catDetailBestStreakLabel": "Best streak",
   "catDetailAvgDaily": "Avg daily",
   "catDetailDaysActive": "Days active",
+  "catDetailCheckInDays": "Check-in days",
   "catDetailEditQuestTitle": "Edit Quest",
   "catDetailQuestName": "Quest name",
   "catDetailDailyGoalMinutes": "Daily goal (minutes)",
   "catDetailTargetTotalHours": "Target total (hours)",
   "catDetailQuestUpdated": "Quest updated!",
+  "catDetailTargetCompletedHint": "Target already reached — now in unlimited mode",
   "catDetailDailyReminder": "Daily Reminder",
   "catDetailEveryDay": "{time} every day",
   "@catDetailEveryDay": {
@@ -640,6 +642,12 @@
 
   "adoptionBasicInfo": "Basic info",
   "adoptionGoals": "Goals",
+  "adoptionUnlimitedMode": "Unlimited mode",
+  "adoptionUnlimitedDesc": "No upper limit, keep accumulating",
+  "adoptionMilestoneMode": "Milestone mode",
+  "adoptionMilestoneDesc": "Set a target to reach",
+  "adoptionDeadlineLabel": "Deadline",
+  "adoptionDeadlineNone": "Not set",
   "adoptionReminderSection": "Reminder",
   "adoptionMotivationLabel": "Motivational quote",
   "adoptionMotivationHint": "Write something to encourage yourself",
@@ -953,5 +961,57 @@
   "achievementTitleCount": "{count} titles unlocked",
   "@achievementTitleCount": {
     "placeholders": { "count": { "type": "int" } }
+  },
+
+  "growthPathTitle": "Growth Path",
+  "@growthPathTitle": {
+    "description": "Title for the growth path card"
+  },
+  "growthPathKitten": "Start a new journey",
+  "@growthPathKitten": {
+    "description": "Description for kitten stage (0h)"
+  },
+  "growthPathAdolescent": "Build initial foundation",
+  "@growthPathAdolescent": {
+    "description": "Description for adolescent stage (20h)"
+  },
+  "growthPathAdult": "Skills consolidate",
+  "@growthPathAdult": {
+    "description": "Description for adult stage (100h)"
+  },
+  "growthPathSenior": "Deep mastery",
+  "@growthPathSenior": {
+    "description": "Description for senior stage (200h)"
+  },
+  "growthPathTip": "Research shows that 20 hours of focused practice is enough to build the foundation of a new skill — Josh Kaufman",
+  "@growthPathTip": {
+    "description": "Research tip about the 20-hour rule"
+  },
+
+  "achievementCelebrationCoins": "+{count} coins",
+  "@achievementCelebrationCoins": {
+    "description": "Shows coins earned from achievement",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementCelebrationTitle": "Title earned: {title}",
+  "@achievementCelebrationTitle": {
+    "description": "Shows title earned from achievement",
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "achievementCelebrationDismiss": "Awesome!",
+  "@achievementCelebrationDismiss": {
+    "description": "Button to dismiss celebration"
+  },
+  "achievementCelebrationSkipAll": "Skip all",
+  "@achievementCelebrationSkipAll": {
+    "description": "Button to skip all remaining celebrations"
+  },
+  "achievementCelebrationCounter": "{current} / {total}",
+  "@achievementCelebrationCounter": {
+    "description": "Shows queue progress for celebrations",
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
   }
 }

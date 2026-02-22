@@ -45,7 +45,7 @@ class TodayTab extends ConsumerWidget {
         // Featured cat card（首屏核心情感焦点）
         catsAsync.when(
           loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          error: (_, _) => const SliverToBoxAdapter(child: SizedBox.shrink()),
           data: (cats) {
             if (cats.isEmpty) {
               return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -112,7 +112,7 @@ class TodayTab extends ConsumerWidget {
         habitsAsync.when(
           loading: () => SliverList(
             delegate: SliverChildBuilderDelegate(
-              (_, __) => const SkeletonCard(),
+              (_, _) => const SkeletonCard(),
               childCount: 3,
             ),
           ),

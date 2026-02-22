@@ -317,11 +317,13 @@
   "catDetailBestStreakLabel": "最长连续",
   "catDetailAvgDaily": "日均",
   "catDetailDaysActive": "活跃天数",
+  "catDetailCheckInDays": "打卡天数",
   "catDetailEditQuestTitle": "编辑任务",
   "catDetailQuestName": "任务名称",
   "catDetailDailyGoalMinutes": "每日目标（分钟）",
   "catDetailTargetTotalHours": "目标总时长（小时）",
   "catDetailQuestUpdated": "任务已更新！",
+  "catDetailTargetCompletedHint": "目标已达成，已转为永续模式",
   "catDetailDailyReminder": "每日提醒",
   "catDetailEveryDay": "每天 {time}",
   "@catDetailEveryDay": {
@@ -640,6 +642,12 @@
 
   "adoptionBasicInfo": "基础信息",
   "adoptionGoals": "目标设置",
+  "adoptionUnlimitedMode": "永续模式",
+  "adoptionUnlimitedDesc": "不设上限，持续累积",
+  "adoptionMilestoneMode": "里程碑模式",
+  "adoptionMilestoneDesc": "设定一个目标",
+  "adoptionDeadlineLabel": "截止日期",
+  "adoptionDeadlineNone": "不设",
   "adoptionReminderSection": "提醒",
   "adoptionMotivationLabel": "激励语",
   "adoptionMotivationHint": "写一句话鼓励自己",
@@ -953,5 +961,18 @@
   "achievementTitleCount": "已解锁 {count} 个称号",
   "@achievementTitleCount": {
     "placeholders": { "count": { "type": "int" } }
-  }
+  },
+
+  "growthPathTitle": "成长之路",
+  "growthPathKitten": "开始新的旅程",
+  "growthPathAdolescent": "初步入门，建立基础",
+  "growthPathAdult": "技能巩固，完成一个项目",
+  "growthPathSenior": "深度投入，持续精进",
+  "growthPathTip": "研究表明，20 小时的专注练习足以建立一项新技能的基础 —— Josh Kaufman",
+
+  "achievementCelebrationCoins": "+{count} 金币",
+  "achievementCelebrationTitle": "获得称号：{title}",
+  "achievementCelebrationDismiss": "太棒了！",
+  "achievementCelebrationSkipAll": "跳过全部",
+  "achievementCelebrationCounter": "{current} / {total}"
 }

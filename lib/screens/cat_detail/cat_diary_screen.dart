@@ -83,7 +83,7 @@ class CatDiaryScreen extends ConsumerWidget {
           return ListView.separated(
             padding: AppSpacing.paddingBase,
             itemCount: entries.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) {
               final entry = entries[index];
               final moodData = moodById(entry.mood);

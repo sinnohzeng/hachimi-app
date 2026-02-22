@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2026-02-22
+### Changed
+- Quest goal system redesigned: quests now support **unlimited mode** (no target, continuous accumulation) and **milestone mode** (target hours + optional deadline)
+- Cat growth uses a fixed 4-stage time ladder (0h/20h/100h/200h) independent of quest target — all cats grow at the same pace
+- Senior stage re-enabled as the 4th growth stage (200h milestone)
+- Quest creation flow redesigned with mode toggle (unlimited/milestone), daily goal, and optional deadline picker
+- Quest editing supports switching between unlimited and milestone modes
+- Achievement celebration upgraded from SnackBar to full-screen animated overlay with confetti, coin display, and queue system
+- Achievement screen reduced from 5 tabs to 4 (streak tab removed)
+- Profile page stage breakdown expanded to 4 stages with responsive Wrap layout
+- Architecture docs (data-model, cat-system) updated in both EN and zh-CN
+
+### Added
+- "Growth Path" card in quest creation flow — shows 4-stage milestones with research-backed tips (Josh Kaufman's 20-hour rule)
+- `AchievementCelebrationLayer` — global overlay mounted at app root, supports multi-achievement queue with dismiss/skip-all
+- Confetti particle effect and glowing icon animation for achievement celebrations
+- 4 new achievements: `hours_100`, `hours_1000`, `goal_on_time`, `goal_ahead` with associated titles
+- `deadlineDate` (optional) and `targetCompleted` (auto-conversion flag) fields on Habit model
+- `isUnlimited` computed property on Habit model
+- Haptic feedback on achievement unlock
+- Firestore rules for new habit fields and senior stage validation
+- 11 new L10N keys across 5 languages (EN/ZH/ZH-Hant/JA/KO)
+
+### Removed
+- **Streak system entirely removed** — `currentStreak`, `bestStreak` fields, `streak_utils.dart`, streak calculation logic, streak XP bonuses
+- 8 streak-based achievements (`streak_3` through `streak_365`) and streak achievement category
+- `targetMinutes` field from Cat model (replaced by fixed growth ladder)
+- `logStreakAchieved()` analytics event
+- Old SnackBar-based achievement notification in HomeScreen
+
 ## [2.10.0] - 2026-02-22
 ### Changed
 - Cat growth system simplified from 4 stages to 3: kitten (<33%), adolescent (33%–66%), adult (>=66%)

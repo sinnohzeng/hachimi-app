@@ -16,9 +16,12 @@ service cloud.firestore {
       match /habits/{habitId} {
         allow read: if isOwner(userId);
         allow create, update: if isOwner(userId)
-          && request.resource.data.targetHours is int
-          && request.resource.data.targetHours >= 1
-          && request.resource.data.targetHours <= 10000
+          // targetHours: optional (null = unlimited mode), int 1-10000 when set
+          && (!('targetHours' in request.resource.data)
+              || request.resource.data.targetHours == null
+              || (request.resource.data.targetHours is int
+                  && request.resource.data.targetHours >= 1
+                  && request.resource.data.targetHours <= 10000))
           && (!('goalMinutes' in request.resource.data)
               || (request.resource.data.goalMinutes is int
                   && request.resource.data.goalMinutes >= 1
@@ -26,7 +29,14 @@ service cloud.firestore {
           && (!('motivationText' in request.resource.data)
               || request.resource.data.motivationText == null
               || (request.resource.data.motivationText is string
-                  && request.resource.data.motivationText.size() <= 40));
+                  && request.resource.data.motivationText.size() <= 40))
+          // deadlineDate: optional timestamp
+          && (!('deadlineDate' in request.resource.data)
+              || request.resource.data.deadlineDate == null
+              || request.resource.data.deadlineDate is timestamp)
+          // targetCompleted: optional bool
+          && (!('targetCompleted' in request.resource.data)
+              || request.resource.data.targetCompleted is bool);
         allow delete: if isOwner(userId);
 
         // Focus sessions within a habit — immutable audit log
@@ -58,7 +68,7 @@ service cloud.firestore {
           && request.resource.data.totalMinutes >= 0
           && (!('highestStage' in request.resource.data)
               || request.resource.data.highestStage == null
-              || request.resource.data.highestStage in ['kitten', 'adolescent', 'adult']);
+              || request.resource.data.highestStage in ['kitten', 'adolescent', 'adult', 'senior']);
         allow delete: if isOwner(userId);
       }
 

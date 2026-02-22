@@ -146,7 +146,7 @@ class PixelCatGenerationService {
   }
 
   /// 生成完整的 Cat 对象
-  Cat generateCat({required String boundHabitId, required int targetMinutes}) {
+  Cat generateCat({required String boundHabitId}) {
     final appearance = generateRandomAppearance();
     final personality = _choice(catPersonalities);
     final name = _choice(randomCatNames);
@@ -157,7 +157,6 @@ class PixelCatGenerationService {
       personality: personality.id,
       appearance: appearance,
       totalMinutes: 0,
-      targetMinutes: targetMinutes,
       boundHabitId: boundHabitId,
       state: 'active',
       createdAt: DateTime.now(),

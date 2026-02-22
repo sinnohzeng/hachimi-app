@@ -12,6 +12,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 import 'package:hachimi_app/services/notification_service.dart';
+import 'package:hachimi_app/widgets/growth_path_card.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'components/step_indicator.dart';
@@ -36,10 +37,12 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   final _nameController = TextEditingController();
   late final TextEditingController _motivationController;
   int _goalMinutes = 25;
-  int _targetHours = 100;
+  int? _targetHours = 100; // null = 永续模式
+  bool _isUnlimitedMode = true; // 默认永续模式
   bool _isCustomGoal = false;
   bool _isCustomTarget = false;
   String? _reminderTime;
+  DateTime? _deadlineDate;
   bool _motivationInitialized = false;
 
   // Step 2: 3 cats to choose from
@@ -116,10 +119,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     setState(() {
       _previewCats = List.generate(
         3,
-        (_) => catGenService.generateCat(
-          boundHabitId: '',
-          targetMinutes: _targetHours * 60,
-        ),
+        (_) => catGenService.generateCat(boundHabitId: ''),
       );
       _selectedCatIndex = 0;
     });
@@ -128,10 +128,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   void _regenerateSingleCat(int index) {
     final catGenService = ref.read(pixelCatGenerationServiceProvider);
     setState(() {
-      _previewCats[index] = catGenService.generateCat(
-        boundHabitId: '',
-        targetMinutes: _targetHours * 60,
-      );
+      _previewCats[index] = catGenService.generateCat(boundHabitId: '');
       if (_selectedCatIndex == index) {
         // Keep selection, but update preview
       }
@@ -168,10 +165,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           .createHabitWithCat(
             uid: uid,
             name: _nameController.text.trim(),
-            targetHours: _targetHours,
+            targetHours: _isUnlimitedMode ? null : _targetHours,
             goalMinutes: _goalMinutes,
             reminderTime: _reminderTime,
             motivationText: motivationText,
+            deadlineDate: _isUnlimitedMode ? null : _deadlineDate,
             cat: selectedCat,
           );
 
@@ -182,7 +180,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           .read(analyticsServiceProvider)
           .logHabitCreated(
             habitName: _nameController.text.trim(),
-            targetHours: _targetHours,
+            targetHours: _isUnlimitedMode ? 0 : (_targetHours ?? 0),
           );
 
       // Schedule daily reminder if user set a reminder time
@@ -389,13 +387,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Target hours
-                  Text(
-                    context.l10n.adoptionTotalTarget,
-                    style: textTheme.labelLarge,
-                  ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     context.l10n.adoptionGrowthHint,
@@ -403,39 +394,56 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ...targetHourOptions.map((hours) {
-                        final isSelected =
-                            !_isCustomTarget && _targetHours == hours;
-                        return ChoiceChip(
-                          label: Text('${hours}h'),
-                          selected: isSelected,
-                          onSelected: (_) => setState(() {
-                            _targetHours = hours;
-                            _isCustomTarget = false;
-                          }),
-                        );
-                      }),
-                      if (_isCustomTarget)
-                        ChoiceChip(
-                          label: Text('${_targetHours}h'),
-                          selected: true,
-                          onSelected: (_) => _showCustomTargetDialog(),
-                        )
-                      else
-                        ActionChip(
-                          label: Text(context.l10n.adoptionCustom),
-                          avatar: const Icon(Icons.tune, size: 18),
-                          onPressed: _showCustomTargetDialog,
-                        ),
-                    ],
-                  ),
                   const SizedBox(height: AppSpacing.md),
 
-                  // Daily goal
+                  // 目标模式切换
+                  _buildModeToggle(theme),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 里程碑模式：目标小时数 + 截止日期
+                  if (!_isUnlimitedMode) ...[
+                    Text(
+                      context.l10n.adoptionTotalTarget,
+                      style: textTheme.labelLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        ...targetHourOptions.map((hours) {
+                          final isSelected =
+                              !_isCustomTarget && _targetHours == hours;
+                          return ChoiceChip(
+                            label: Text('${hours}h'),
+                            selected: isSelected,
+                            onSelected: (_) => setState(() {
+                              _targetHours = hours;
+                              _isCustomTarget = false;
+                            }),
+                          );
+                        }),
+                        if (_isCustomTarget)
+                          ChoiceChip(
+                            label: Text('${_targetHours}h'),
+                            selected: true,
+                            onSelected: (_) => _showCustomTargetDialog(),
+                          )
+                        else
+                          ActionChip(
+                            label: Text(context.l10n.adoptionCustom),
+                            avatar: const Icon(Icons.tune, size: 18),
+                            onPressed: _showCustomTargetDialog,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // 截止日期（可选）
+                    _buildDeadlinePicker(theme),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+
+                  // 每日目标（始终显示）
                   Text(
                     context.l10n.adoptionDailyGoalLabel,
                     style: textTheme.labelLarge,
@@ -474,6 +482,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               ),
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
+
+          // ── 成长之路说明卡片 ──
+          GrowthPathCard(initiallyExpanded: widget.isFirstHabit),
           const SizedBox(height: AppSpacing.md),
 
           // ── Card 3: 提醒 ──
@@ -535,6 +547,94 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         ],
       ),
     );
+  }
+
+  // ─── 目标模式切换 ───
+
+  Widget _buildModeToggle(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Column(
+      children: [
+        // 永续模式
+        _ModeOption(
+          selected: _isUnlimitedMode,
+          icon: Icons.all_inclusive,
+          title: context.l10n.adoptionUnlimitedMode,
+          subtitle: context.l10n.adoptionUnlimitedDesc,
+          colorScheme: colorScheme,
+          textTheme: textTheme,
+          onTap: () => setState(() => _isUnlimitedMode = true),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        // 里程碑模式
+        _ModeOption(
+          selected: !_isUnlimitedMode,
+          icon: Icons.flag_outlined,
+          title: context.l10n.adoptionMilestoneMode,
+          subtitle: context.l10n.adoptionMilestoneDesc,
+          colorScheme: colorScheme,
+          textTheme: textTheme,
+          onTap: () => setState(() {
+            _isUnlimitedMode = false;
+            _targetHours ??= 100;
+          }),
+        ),
+      ],
+    );
+  }
+
+  // ─── 截止日期选择器 ───
+
+  Widget _buildDeadlinePicker(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final l10n = context.l10n;
+
+    return Row(
+      children: [
+        Icon(Icons.event, size: 20, color: colorScheme.onSurfaceVariant),
+        const SizedBox(width: AppSpacing.sm),
+        Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
+        const Spacer(),
+        if (_deadlineDate != null) ...[
+          Text(
+            _formatDate(_deadlineDate!),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 18),
+            onPressed: () => setState(() => _deadlineDate = null),
+            visualDensity: VisualDensity.compact,
+          ),
+        ] else
+          TextButton(
+            onPressed: _pickDeadlineDate,
+            child: Text(l10n.adoptionDeadlineNone),
+          ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _pickDeadlineDate() async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: now.add(const Duration(days: 30)),
+      firstDate: now.add(const Duration(days: 1)),
+      lastDate: now.add(const Duration(days: 365 * 3)),
+    );
+    if (date != null) {
+      setState(() => _deadlineDate = date);
+    }
   }
 
   void _showCustomGoalDialog() {
@@ -851,16 +951,103 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.base),
 
           Text(
-            context.l10n.adoptionGrowthTarget(
-              _nameController.text.trim(),
-              _targetHours,
-            ),
+            _isUnlimitedMode
+                ? context.l10n.adoptionGrowthHint
+                : context.l10n.adoptionGrowthTarget(
+                    _nameController.text.trim(),
+                    _targetHours ?? 100,
+                  ),
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 目标模式选项卡片
+class _ModeOption extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final VoidCallback onTap;
+
+  const _ModeOption({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.colorScheme,
+    required this.textTheme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: selected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              selected
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              color: selected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+              size: 22,
+            ),
+          ],
+        ),
       ),
     );
   }

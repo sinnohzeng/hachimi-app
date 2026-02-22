@@ -21,7 +21,9 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   late final TextEditingController _nameController;
   late final TextEditingController _motivationController;
   late int _selectedGoal;
-  late int _selectedTarget;
+  late int? _selectedTarget;
+  late bool _isUnlimitedMode;
+  DateTime? _deadlineDate;
   bool _isSaving = false;
 
   static const _defaultGoalOptions = [15, 25, 40, 60];
@@ -36,6 +38,8 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     );
     _selectedGoal = widget.habit.goalMinutes;
     _selectedTarget = widget.habit.targetHours;
+    _isUnlimitedMode = widget.habit.isUnlimited;
+    _deadlineDate = widget.habit.deadlineDate;
   }
 
   @override
@@ -53,10 +57,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
 
     // Include current value in chips if non-standard
     final goalChips = _buildChipValues(_defaultGoalOptions, _selectedGoal);
-    final targetChips = _buildChipValues(
-      _defaultTargetOptions,
-      _selectedTarget,
-    );
+    final targetChips = _selectedTarget != null
+        ? _buildChipValues(_defaultTargetOptions, _selectedTarget!)
+        : _defaultTargetOptions;
+    final isTargetCompleted = widget.habit.targetCompleted;
 
     return SingleChildScrollView(
       child: Padding(
@@ -96,6 +100,101 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
+            // 目标模式切换
+            Text(context.l10n.adoptionGoals, style: textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.sm),
+            SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(
+                  value: true,
+                  label: Text(context.l10n.adoptionUnlimitedMode),
+                  icon: const Icon(Icons.all_inclusive, size: 18),
+                ),
+                ButtonSegment(
+                  value: false,
+                  label: Text(context.l10n.adoptionMilestoneMode),
+                  icon: const Icon(Icons.flag_outlined, size: 18),
+                  enabled: !isTargetCompleted,
+                ),
+              ],
+              selected: {_isUnlimitedMode},
+              onSelectionChanged: isTargetCompleted
+                  ? null
+                  : (selected) => setState(() {
+                      _isUnlimitedMode = selected.first;
+                      if (!_isUnlimitedMode) {
+                        _selectedTarget ??= 100;
+                      }
+                    }),
+            ),
+            if (isTargetCompleted) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                context.l10n.catDetailTargetCompletedHint,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.lg),
+
+            // 里程碑模式：目标小时数 + 截止日期
+            if (!_isUnlimitedMode) ...[
+              Text(
+                context.l10n.catDetailTargetTotalHours,
+                style: textTheme.labelLarge,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: 8,
+                children: targetChips.map((hrs) {
+                  return ChoiceChip(
+                    label: Text('$hrs'),
+                    selected: _selectedTarget == hrs,
+                    onSelected: (_) => setState(() => _selectedTarget = hrs),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // 截止日期
+              Row(
+                children: [
+                  Icon(
+                    Icons.event,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    context.l10n.adoptionDeadlineLabel,
+                    style: textTheme.labelLarge,
+                  ),
+                  const Spacer(),
+                  if (_deadlineDate != null) ...[
+                    Text(
+                      _formatDate(_deadlineDate!),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () => setState(() => _deadlineDate = null),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ] else
+                    TextButton(
+                      onPressed: _pickDeadlineDate,
+                      child: Text(context.l10n.adoptionDeadlineNone),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+
             // Daily goal chips
             Text(
               context.l10n.catDetailDailyGoalMinutes,
@@ -109,24 +208,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
                   label: Text('$mins'),
                   selected: _selectedGoal == mins,
                   onSelected: (_) => setState(() => _selectedGoal = mins),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Target hours chips
-            Text(
-              context.l10n.catDetailTargetTotalHours,
-              style: textTheme.labelLarge,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 8,
-              children: targetChips.map((hrs) {
-                return ChoiceChip(
-                  label: Text('$hrs'),
-                  selected: _selectedTarget == hrs,
-                  onSelected: (_) => setState(() => _selectedTarget = hrs),
                 );
               }).toList(),
             ),
@@ -186,6 +267,23 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     return chips;
   }
 
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _pickDeadlineDate() async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _deadlineDate ?? now.add(const Duration(days: 30)),
+      firstDate: now.add(const Duration(days: 1)),
+      lastDate: now.add(const Duration(days: 365 * 3)),
+    );
+    if (date != null) {
+      setState(() => _deadlineDate = date);
+    }
+  }
+
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
@@ -200,6 +298,16 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final oldMotivation = widget.habit.motivationText ?? '';
     final motivationChanged = newMotivation != oldMotivation;
 
+    // 判断目标模式是否变化
+    final wasUnlimited = widget.habit.isUnlimited;
+    final switchedToUnlimited = !wasUnlimited && _isUnlimitedMode;
+    final switchedToMilestone = wasUnlimited && !_isUnlimitedMode;
+
+    // 判断截止日期是否变化
+    final oldDeadline = widget.habit.deadlineDate;
+    final deadlineChanged = _deadlineDate != oldDeadline;
+    final deadlineCleared = deadlineChanged && _deadlineDate == null;
+
     HapticFeedback.mediumImpact();
     await ref
         .read(firestoreServiceProvider)
@@ -210,9 +318,17 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           goalMinutes: _selectedGoal != widget.habit.goalMinutes
               ? _selectedGoal
               : null,
-          targetHours: _selectedTarget != widget.habit.targetHours
+          targetHours:
+              switchedToMilestone ||
+                  (!_isUnlimitedMode &&
+                      _selectedTarget != widget.habit.targetHours)
               ? _selectedTarget
               : null,
+          clearTargetHours: switchedToUnlimited,
+          deadlineDate: !_isUnlimitedMode && deadlineChanged && !deadlineCleared
+              ? _deadlineDate
+              : null,
+          clearDeadlineDate: _isUnlimitedMode || deadlineCleared,
           motivationText: motivationChanged && newMotivation.isNotEmpty
               ? newMotivation
               : null,

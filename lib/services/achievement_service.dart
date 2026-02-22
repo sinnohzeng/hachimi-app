@@ -109,8 +109,7 @@ class AchievementService {
         return ctx.allHabitsDoneToday && ctx.activeHabitCount > 0;
 
       case 'quest_5_workdays':
-        // 用最大连续 streak 作为近似判断（简化实现）
-        return ctx.habitStreaks.any((s) => s >= 5);
+        return ctx.habitCheckInDays.any((d) => d >= 5);
 
       case 'quest_first_checkin':
         return trigger == AchievementTrigger.checkInCompleted;
@@ -118,16 +117,15 @@ class AchievementService {
       case 'quest_marathon':
         return ctx.lastSessionMinutes != null && ctx.lastSessionMinutes! >= 120;
 
-      // ─── 连续成就 ───
-      case 'streak_3':
-      case 'streak_7':
-      case 'streak_14':
-      case 'streak_21':
-      case 'streak_30':
-      case 'streak_49':
-      case 'streak_100':
-      case 'streak_365':
-        return ctx.habitStreaks.any((s) => s >= (def.targetValue ?? 0));
+      // ─── 累计小时成就 ───
+      case 'hours_100':
+        return ctx.habitTotalMinutes.any((m) => m >= 6000); // 100h
+      case 'hours_1000':
+        return ctx.habitTotalMinutes.any((m) => m >= 60000); // 1000h
+      case 'goal_on_time':
+        return ctx.hasCompletedGoalOnTime;
+      case 'goal_ahead':
+        return ctx.hasCompletedGoalAhead;
 
       // ─── 猫咪成就 ───
       case 'cat_first_adopt':
@@ -144,7 +142,7 @@ class AchievementService {
         return ctx.catStages.contains('adult');
 
       case 'cat_senior':
-        // 重新定义：任一猫达到 100% 目标完成
+        // 任一猫达到 200h (growthProgress >= 1.0)
         return ctx.catProgresses.any((p) => p >= 1.0);
 
       case 'cat_graduated':

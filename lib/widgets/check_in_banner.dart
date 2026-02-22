@@ -94,7 +94,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       label: context.l10n.checkInBannerSemantics,
       child: checkedInAsync.when(
         loading: () => _buildLoadingCard(colorScheme),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, _) => const SizedBox.shrink(),
         data: (hasCheckedIn) {
           final monthly = monthlyAsync.value;
           if (hasCheckedIn) {

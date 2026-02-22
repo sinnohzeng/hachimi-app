@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/achievement.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -36,9 +37,8 @@ Future<void> triggerAchievementEvaluation(
   final context = AchievementEvalContext(
     totalSessionCount: habits.fold(0, (sum, h) => sum + h.totalCheckInDays) + 1,
     activeHabitCount: activeHabits.length,
-    habitStreaks: habits.map((h) => h.currentStreak).toList(),
-    habitBestStreaks: habits.map((h) => h.bestStreak).toList(),
     habitCheckInDays: habits.map((h) => h.totalCheckInDays).toList(),
+    habitTotalMinutes: habits.map((h) => h.totalMinutes).toList(),
     catStages: allCats.map((c) => c.displayStage).toList(),
     catProgresses: allCats.map((c) => c.growthProgress).toList(),
     totalCatCount: allCats.length,
@@ -53,6 +53,8 @@ Future<void> triggerAchievementEvaluation(
     allCatsHappy: allCatsHappy,
     allHabitsDoneToday: allHabitsDoneToday,
     lastSessionMinutes: lastSessionMinutes,
+    hasCompletedGoalOnTime: _checkGoalOnTime(habits),
+    hasCompletedGoalAhead: _checkGoalAhead(habits),
     unlockedIds: unlockedIds,
   );
 
@@ -70,4 +72,23 @@ Future<void> triggerAchievementEvaluation(
       analytics.logAchievementUnlocked(achievementId: id);
     }
   }
+}
+
+/// 检查是否有 habit 在截止日期前达成了目标
+bool _checkGoalOnTime(List<Habit> habits) {
+  return habits.any(
+    (h) => h.targetCompleted && h.deadlineDate != null && h.targetHours != null,
+  );
+}
+
+/// 检查是否有 habit 在截止日期前 7+ 天达成了目标
+bool _checkGoalAhead(List<Habit> habits) {
+  final now = DateTime.now();
+  return habits.any(
+    (h) =>
+        h.targetCompleted &&
+        h.deadlineDate != null &&
+        h.targetHours != null &&
+        h.deadlineDate!.difference(now).inDays >= 7,
+  );
 }

@@ -202,7 +202,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
     // Calculate XP (still used for display)
     final xpService = ref.read(xpServiceProvider);
-    final streakDays = habit.currentStreak;
     final todayMap = ref.read(todayMinutesPerHabitProvider);
     final activeHabits = habits.where((h) => h.isActive).toList();
     final allHabitsDone =
@@ -210,11 +209,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         activeHabits.every((h) => (todayMap[h.id] ?? 0) >= h.goalMinutes);
     final xpResult = xpService.calculateXp(
       minutes: minutes,
-      streakDays: streakDays,
       allHabitsDone: allHabitsDone,
     );
 
-    // Check for stage-up (time-based growth)
+    // Check for stage-up (fixed hour ladder)
     final cat = habit.catId != null
         ? ref.read(catByIdProvider(habit.catId!))
         : null;
@@ -222,7 +220,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? xpService.checkStageUp(
             oldTotalMinutes: cat.totalMinutes,
             newTotalMinutes: cat.totalMinutes + minutes,
-            targetMinutes: cat.targetMinutes,
           )
         : null;
 
@@ -280,7 +277,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         habitId: widget.habitId,
         actualMinutes: minutes,
         xpEarned: xpResult.totalXp,
-        streakDays: streakDays,
         targetDurationMinutes: targetMinutes,
         pausedSeconds: timerState.totalPausedSeconds,
         completionRatio: completionRatio,
@@ -464,7 +460,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        if (habit.currentStreak > 0) ...[
+                        if (habit.totalCheckInDays > 0) ...[
                           const SizedBox(width: AppSpacing.md),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -478,13 +474,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.local_fire_department,
-                                  size: 14,
-                                ),
+                                const Icon(Icons.calendar_today, size: 14),
                                 const SizedBox(width: 2),
                                 Text(
-                                  '${habit.currentStreak}',
+                                  '${habit.totalCheckInDays}d',
                                   style: textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),

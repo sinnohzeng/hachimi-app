@@ -108,6 +108,8 @@ Color stageColor(String stage) {
       return const Color(0xFF81C784); // 浅绿
     case 'adult':
       return const Color(0xFF64B5F6); // 浅蓝
+    case 'senior':
+      return const Color(0xFFE57373); // 暖红（长老猫威严感）
     default:
       return const Color(0xFFFFB74D);
   }

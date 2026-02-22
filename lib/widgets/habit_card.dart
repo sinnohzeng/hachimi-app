@@ -3,7 +3,6 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
-import 'package:hachimi_app/widgets/streak_indicator.dart';
 
 /// HabitCard — displays a single habit with progress, streak, and today's time.
 class HabitCard extends StatelessWidget {
@@ -77,9 +76,14 @@ class HabitCard extends StatelessWidget {
                   ),
                 ),
 
-                // Streak badge
-                if (habit.currentStreak > 0)
-                  StreakIndicator(streak: habit.currentStreak),
+                // 累计天数
+                if (habit.totalCheckInDays > 0)
+                  Chip(
+                    avatar: const Icon(Icons.calendar_today, size: 14),
+                    label: Text('${habit.totalCheckInDays}d'),
+                    visualDensity: VisualDensity.compact,
+                    side: BorderSide.none,
+                  ),
 
                 // Delete button
                 IconButton(

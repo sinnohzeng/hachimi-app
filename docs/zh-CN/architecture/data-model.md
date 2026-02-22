@@ -8,7 +8,7 @@
 
 ```
 users/{uid}                          <- 用户基本信息文档
-├── habits/{habitId}                 <- 习惯元数据 + 连续记录追踪
+├── habits/{habitId}                 <- 习惯元数据 + 目标追踪
 │   └── sessions/{sessionId}        <- 专注会话历史
 ├── cats/{catId}                     <- 猫咪状态（外观、成长、配饰）
 └── monthlyCheckIns/{YYYY-MM}        <- 月度签到追踪（每月重置）
@@ -47,22 +47,22 @@ users/{uid}                          <- 用户基本信息文档
 | `name` | string | 是 | — | 习惯显示名称，如「每日阅读」 |
 | `catId` | string | 是 | — | 绑定猫咪文档 ID（位于 `users/{uid}/cats/`） |
 | `goalMinutes` | int | 是 | 25 | 每日专注目标分钟数（用于进度显示） |
-| `targetHours` | int | 是 | — | 累计长期目标小时数（必填，用于猫咪成长计算） |
+| `targetHours` | int? | 否 | null | 累计长期目标小时数。`null` 表示永续模式（无目标上限）。设置后用于猫咪成长计算。 |
 | `totalMinutes` | int | 是 | 0 | 所有时间累计记录的总分钟数 |
-| `currentStreak` | int | 是 | 0 | 当前连续打卡天数 |
-| `bestStreak` | int | 是 | 0 | 历史最高连续打卡天数 |
+| `deadlineDate` | timestamp? | 否 | null | 里程碑模式的可选截止日期。仅在 `targetHours` 设置时有意义。 |
+| `targetCompleted` | bool | 是 | false | 里程碑目标是否已达成。为 `true` 时，任务自动转换为永续模式。 |
 | `lastCheckInDate` | string | 否 | null | 最近一次会话的 ISO 日期字符串 "YYYY-MM-DD" |
 | `reminderTime` | string | 否 | null | 每日提醒时间，24 小时格式 "HH:mm"，如 "08:30" |
 | `motivationText` | string | 否 | null | 激励语，最长 40 字符 |
 | `isActive` | bool | 是 | true | `false` 表示习惯已停用（猫咪进入休眠状态） |
 | `createdAt` | timestamp | 是 | — | 习惯创建时间戳 |
 
-**连续记录计算规则：**
-- 每次会话完成后，将今日日期与 `lastCheckInDate` 比较。
-- `lastCheckInDate == 昨天`：`currentStreak += 1`
-- `lastCheckInDate == 今天`：连续记录不变（同一天多次会话）
-- 其他情况：`currentStreak = 1`（连续记录中断）
-- 每次更新后：`bestStreak = max(bestStreak, currentStreak)`
+**任务模式：**
+- **永续模式**（Unlimited mode）：`targetHours == null` —— 无累计目标，无限积累专注时间。
+- **里程碑模式**（Milestone mode）：设置 `targetHours`，可选 `deadlineDate` —— 朝着特定小时目标努力。
+- **自动转换**：当 `totalMinutes >= targetHours * 60` 时，`targetCompleted` 设为 `true`，任务自动转换为永续模式。
+
+**计算属性：** `isUnlimited` 在 `targetHours == null` 或 `targetCompleted == true` 时返回 `true`。
 
 **Dart 模型：** `lib/models/habit.dart` -> `class Habit`
 
@@ -109,26 +109,25 @@ users/{uid}                          <- 用户基本信息文档
 | `name` | string | 是 | 猫咪名字，如 "Mochi" |
 | `appearance` | map | 是 | pixel-cat-maker 外观参数——详见[猫咪系统](cat-system.md)完整参数列表 |
 | `personality` | string | 是 | 性格 ID——详见[猫咪系统](cat-system.md) |
-| `totalMinutes` | int | 是 | 该猫咪对应习惯累计的专注分钟数。阶段从此字段计算。 |
-| `targetMinutes` | int | 是 | 从习惯的 `targetHours` 派生的目标分钟数（targetHours x 60）。用于阶段计算。 |
+| `totalMinutes` | int | 是 | 该猫咪对应习惯累计的专注分钟数。阶段使用固定阈值从此字段计算。 |
 | `accessories` | list\<string\> | 是 | **已弃用** —— 旧版按猫存储的配饰列表。已迁移至 `users/{uid}.inventory`。仅在迁移期间使用。 |
 | `equippedAccessory` | string | 否 | 当前装备的配饰 ID（null = 未装备） |
 | `boundHabitId` | string | 是 | 生成此猫咪的习惯 ID |
 | `state` | string | 是 | `"active"`、`"dormant"` 或 `"graduated"` |
 | `lastSessionAt` | timestamp | 否 | 最近一次专注会话的时间戳 |
-| `highestStage` | string | 否 | 曾达到的最高成长阶段（单调递增；旧猫为 null）。有效值："kitten"、"adolescent"、"adult"。 |
+| `highestStage` | string | 否 | 曾达到的最高成长阶段（单调递增；旧猫为 null）。有效值："kitten"、"adolescent"、"adult"、"senior"。 |
 | `createdAt` | timestamp | 是 | 猫咪领养时间戳 |
 
 **计算字段（不存储于 Firestore）：**
 
 | 计算字段 | 来源 | 计算逻辑 |
 |---------|------|---------|
-| `stage` | `totalMinutes`、`targetMinutes` | kitten（< 33%）、adolescent（33%-66%）、adult（>= 66%） |
-| `displayStage` | `stage`、`highestStage` | max(computedStage, highestStage ?? computedStage)。旧猫（highestStage == null）使用旧阈值（20%/45%）防止视觉回退。 |
+| `stage` | `totalMinutes` | 固定 200h（12000min）阶梯：kitten（0h）、adolescent（20h/1200min）、adult（100h/6000min）、senior（200h/12000min） |
+| `growthProgress` | `totalMinutes` | `totalMinutes / 12000`，上限为 1.0。进度基于固定 200h 阶梯，而非习惯的 `targetHours`。 |
 | `mood` | `lastSessionAt` | happy（24h 内）、neutral（1-3 天）、lonely（3-7 天）、missing（7 天以上） |
 
 **为何不直接存储 `stage` 和 `mood`？**
-存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`totalMinutes`、`targetMinutes` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。`highestStage` 是例外——它必须存储，因为它需要单调递增（只升不降），以保护用户修改目标小时数时不发生阶段回退。
+存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`totalMinutes` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。`highestStage` 是例外——它必须存储，因为它需要单调递增（只升不降），以防止阶段回退。
 
 **状态转换：**
 ```
@@ -170,8 +169,8 @@ dormant --[习惯重新激活]--> active（未来功能）
 **方法：** `FirestoreService.createHabitWithCat(uid, habit, cat)`
 
 批量操作包括：
-1. `SET users/{uid}/habits/{habitId}` — 新习惯文档（`targetHours` 为必填字段）
-2. `SET users/{uid}/cats/{catId}` — 新猫咪文档，包含 `appearance` Map、`targetMinutes`（= `targetHours x 60`）、`totalMinutes: 0`、`accessories: []` 和指向习惯的 `boundHabitId`
+1. `SET users/{uid}/habits/{habitId}` — 新习惯文档（`targetHours` 为可选字段，`null` 表示永续模式）
+2. `SET users/{uid}/cats/{catId}` — 新猫咪文档，包含 `appearance` Map、`totalMinutes: 0`、`accessories: []` 和指向习惯的 `boundHabitId`
 3. `UPDATE users/{uid}/habits/{habitId}.catId` — 习惯到猫咪的反向引用
 
 ### 2. 专注会话完成
@@ -179,7 +178,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 
 批量操作包括：
 1. `SET users/{uid}/habits/{habitId}/sessions/{sessionId}` — 会话记录
-2. `UPDATE users/{uid}/habits/{habitId}` — 累加 `totalMinutes`，更新 `currentStreak`、`bestStreak`、`lastCheckInDate`
+2. `UPDATE users/{uid}/habits/{habitId}` — 累加 `totalMinutes`，更新 `lastCheckInDate`
 3. `UPDATE users/{uid}/cats/{catId}.totalMinutes` — `totalMinutes += session.durationMinutes`
 4. `UPDATE users/{uid}/cats/{catId}.lastSessionAt` — 设置为当前时间
 5. `UPDATE users/{uid}.coins` — `FieldValue.increment(session.coinsEarned)`（专注奖励：`durationMinutes × 10`）
@@ -194,11 +193,10 @@ dormant --[习惯重新激活]--> active（未来功能）
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — 猫咪进入毕业状态
 
 ### 4. 习惯更新（编辑）
-**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
+**方法：** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, deadlineDate?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
 
-单文档或多文档更新：
-1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`goalMinutes`、`targetHours`、`reminderTime`、`motivationText`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`；若 `clearMotivation == true`，则将 `motivationText` 设为 `null`）
-2. 若 `targetHours` 发生变更：`UPDATE users/{uid}/cats/{catId}.targetMinutes` — 同步为 `targetHours × 60`（通过读取 habit 的 `catId` 找到绑定的猫咪）
+单文档更新：
+1. `UPDATE users/{uid}/habits/{habitId}` — 仅设置提供的字段（`name`、`goalMinutes`、`targetHours`、`deadlineDate`、`reminderTime`、`motivationText`；若 `clearReminder == true`，则将 `reminderTime` 设为 `null`；若 `clearMotivation == true`，则将 `motivationText` 设为 `null`）
 
 **验证**：至少一个字段不为 null 或 `clearReminder`/`clearMotivation` 必须为 true，空字符串将被拒绝。
 
@@ -265,7 +263,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 1. **无孤立猫咪**：每个猫咪文档必须有有效的 `boundHabitId`，通过批量写入保证。
 2. **无孤立习惯引用**：删除习惯时，绑定猫咪的状态在同一批次中更新为 `"graduated"`。
 3. **totalMinutes 只增不减**：`totalMinutes` 始终递增，不能设置为更低的值。
-4. **阶段是计算值，不存储**：不向 Firestore 写入 `stage`，始终从 `totalMinutes` 和 `targetMinutes` 派生。
+4. **阶段是计算值，不存储**：不向 Firestore 写入 `stage`，始终使用固定 200h 成长阶梯从 `totalMinutes` 派生。
 5. **心情是计算值，不存储**：不向 Firestore 写入 `mood`，始终从 `lastSessionAt` 派生。
 6. **`totalMinutes` 是累加的**：始终使用 `FieldValue.increment(delta)`——不用计算后的总值覆盖（防止竞态条件）。
 7. **金币不能为负**：`CoinService` 在扣除前必须验证余额充足。余额不足时购买批量写入应优雅失败。
@@ -290,7 +288,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 
 | 集合 | 字段 | 校验规则 |
 |------|------|---------|
-| `habits` | `targetHours` | `int`，范围 `1–10000` |
+| `habits` | `targetHours` | `int`（可选，可为 null），存在时范围 `1–10000` |
 | `habits` | `goalMinutes` | `int`（可选），范围 `1–480` |
 | `habits` | `motivationText` | `string`（可选），长度 `0–40` 字符 |
 | `cats` | `name` | `string`，长度 `1–30` 字符 |

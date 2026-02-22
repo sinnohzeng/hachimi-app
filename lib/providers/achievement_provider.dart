@@ -34,14 +34,6 @@ final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
 
   // 汇总数据
   final activeHabits = habits.where((h) => h.isActive).toList();
-  final maxStreak = habits.fold(
-    0,
-    (max, h) => h.currentStreak > max ? h.currentStreak : max,
-  );
-  final maxBestStreak = habits.fold(
-    0,
-    (max, h) => h.bestStreak > max ? h.bestStreak : max,
-  );
   final maxCheckInDays = habits.fold(
     0,
     (max, h) => h.totalCheckInDays > max ? h.totalCheckInDays : max,
@@ -70,14 +62,19 @@ final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
             current = activeHabits.length;
           case 'quest_5_habits':
             current = activeHabits.length;
+          case 'hours_100':
+          case 'hours_1000':
+            final maxMinutes = habits.fold(
+              0,
+              (m, h) => h.totalMinutes > m ? h.totalMinutes : m,
+            );
+            current = maxMinutes;
           case 'quest_marathon':
-            current = 0; // 无法预计，由单次 session 触发
+            current = 0; // 由单次 session 触发
           default:
             current = 0;
             target = 1;
         }
-      case AchievementCategory.streak:
-        current = maxBestStreak > maxStreak ? maxBestStreak : maxStreak;
       case AchievementCategory.cat:
         switch (def.id) {
           case 'cat_3_adopted':

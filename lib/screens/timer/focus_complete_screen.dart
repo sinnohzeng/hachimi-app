@@ -347,23 +347,6 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                   value: '+${widget.xpResult.baseXp} XP',
                                   icon: Icons.star_outline,
                                 ),
-                                if (widget.xpResult.streakBonus > 0) ...[
-                                  const Divider(height: 16),
-                                  StatRow(
-                                    label: l10n.focusCompleteStreakBonus,
-                                    value: '+${widget.xpResult.streakBonus} XP',
-                                    icon: Icons.local_fire_department,
-                                  ),
-                                ],
-                                if (widget.xpResult.milestoneBonus > 0) ...[
-                                  const Divider(height: 16),
-                                  StatRow(
-                                    label: l10n.focusCompleteMilestoneBonus,
-                                    value:
-                                        '+${widget.xpResult.milestoneBonus} XP',
-                                    icon: Icons.emoji_events,
-                                  ),
-                                ],
                                 if (widget.xpResult.fullHouseBonus > 0) ...[
                                   const Divider(height: 16),
                                   StatRow(

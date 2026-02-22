@@ -4,7 +4,6 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
-import 'package:hachimi_app/widgets/streak_indicator.dart';
 
 class HabitRow extends StatelessWidget {
   final Habit habit;
@@ -97,9 +96,22 @@ class HabitRow extends StatelessWidget {
                 ),
               ),
 
-              // Streak badge
-              if (habit.currentStreak > 0) ...[
-                StreakIndicator(streak: habit.currentStreak),
+              // 累计天数
+              if (habit.totalCheckInDays > 0) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${habit.totalCheckInDays}d',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ),
                 const SizedBox(width: AppSpacing.sm),
               ],
 

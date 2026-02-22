@@ -717,6 +717,9 @@ class SEn extends S {
   String get catDetailDaysActive => 'Days active';
 
   @override
+  String get catDetailCheckInDays => 'Check-in days';
+
+  @override
   String get catDetailEditQuestTitle => 'Edit Quest';
 
   @override
@@ -730,6 +733,10 @@ class SEn extends S {
 
   @override
   String get catDetailQuestUpdated => 'Quest updated!';
+
+  @override
+  String get catDetailTargetCompletedHint =>
+      'Target already reached — now in unlimited mode';
 
   @override
   String get catDetailDailyReminder => 'Daily Reminder';
@@ -1460,6 +1467,24 @@ class SEn extends S {
   String get adoptionGoals => 'Goals';
 
   @override
+  String get adoptionUnlimitedMode => 'Unlimited mode';
+
+  @override
+  String get adoptionUnlimitedDesc => 'No upper limit, keep accumulating';
+
+  @override
+  String get adoptionMilestoneMode => 'Milestone mode';
+
+  @override
+  String get adoptionMilestoneDesc => 'Set a target to reach';
+
+  @override
+  String get adoptionDeadlineLabel => 'Deadline';
+
+  @override
+  String get adoptionDeadlineNone => 'Not set';
+
+  @override
   String get adoptionReminderSection => 'Reminder';
 
   @override
@@ -2091,5 +2116,45 @@ class SEn extends S {
   @override
   String achievementTitleCount(int count) {
     return '$count titles unlocked';
+  }
+
+  @override
+  String get growthPathTitle => 'Growth Path';
+
+  @override
+  String get growthPathKitten => 'Start a new journey';
+
+  @override
+  String get growthPathAdolescent => 'Build initial foundation';
+
+  @override
+  String get growthPathAdult => 'Skills consolidate';
+
+  @override
+  String get growthPathSenior => 'Deep mastery';
+
+  @override
+  String get growthPathTip =>
+      'Research shows that 20 hours of focused practice is enough to build the foundation of a new skill — Josh Kaufman';
+
+  @override
+  String achievementCelebrationCoins(int count) {
+    return '+$count coins';
+  }
+
+  @override
+  String achievementCelebrationTitle(String title) {
+    return 'Title earned: $title';
+  }
+
+  @override
+  String get achievementCelebrationDismiss => 'Awesome!';
+
+  @override
+  String get achievementCelebrationSkipAll => 'Skip all';
+
+  @override
+  String achievementCelebrationCounter(int current, int total) {
+    return '$current / $total';
   }
 }

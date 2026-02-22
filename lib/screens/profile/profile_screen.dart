@@ -145,8 +145,8 @@ class ProfileScreen extends ConsumerWidget {
                           color: colorScheme.tertiary,
                         ),
                         _StatBadge(
-                          icon: Icons.local_fire_department,
-                          value: '${stats.longestStreak}',
+                          icon: Icons.flag,
+                          value: '${stats.totalHabits}',
                           label: l10n.profileBestStreak,
                           color: colorScheme.error,
                         ),
@@ -157,8 +157,10 @@ class ProfileScreen extends ConsumerWidget {
                       const Divider(),
                       const SizedBox(height: AppSpacing.md),
                       // Stage breakdown
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      Wrap(
+                        alignment: WrapAlignment.spaceEvenly,
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
                           _StageChip(
                             label: l10n.stageName('kitten'),
@@ -174,6 +176,11 @@ class ProfileScreen extends ConsumerWidget {
                             label: l10n.stageName('adult'),
                             count: stageCounts['adult'] ?? 0,
                             color: stageColor('adult'),
+                          ),
+                          _StageChip(
+                            label: l10n.stageName('senior'),
+                            count: stageCounts['senior'] ?? 0,
+                            color: stageColor('senior'),
                           ),
                         ],
                       ),

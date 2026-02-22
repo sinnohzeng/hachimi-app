@@ -54,7 +54,7 @@ class DiaryPreviewCard extends ConsumerWidget {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                error: (_, __) => Text(
+                error: (_, _) => Text(
                   context.l10n.catDetailDiaryError,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,

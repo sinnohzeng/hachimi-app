@@ -42,7 +42,7 @@ class AnalyticsService {
       parameters: {
         AnalyticsEvents.paramHabitName: habitName,
         AnalyticsEvents.paramTargetHours: targetHours,
-        if (goalMinutes != null) AnalyticsEvents.paramGoalMinutes: goalMinutes,
+        AnalyticsEvents.paramGoalMinutes: ?goalMinutes,
       },
     ),
   );
@@ -124,7 +124,6 @@ class AnalyticsService {
     required String habitId,
     required int actualMinutes,
     required int xpEarned,
-    required int streakDays,
     int? targetDurationMinutes,
     int? pausedSeconds,
     double? completionRatio,
@@ -135,13 +134,9 @@ class AnalyticsService {
         AnalyticsEvents.paramHabitId: habitId,
         AnalyticsEvents.paramActualMinutes: actualMinutes,
         AnalyticsEvents.paramXpEarned: xpEarned,
-        AnalyticsEvents.paramStreakDays: streakDays,
-        if (targetDurationMinutes != null)
-          AnalyticsEvents.paramTargetDurationMinutes: targetDurationMinutes,
-        if (pausedSeconds != null)
-          AnalyticsEvents.paramPausedSeconds: pausedSeconds,
-        if (completionRatio != null)
-          AnalyticsEvents.paramCompletionRatio: completionRatio,
+        AnalyticsEvents.paramTargetDurationMinutes: ?targetDurationMinutes,
+        AnalyticsEvents.paramPausedSeconds: ?pausedSeconds,
+        AnalyticsEvents.paramCompletionRatio: ?completionRatio,
       },
     ),
   );
@@ -160,12 +155,9 @@ class AnalyticsService {
         AnalyticsEvents.paramHabitId: habitId,
         AnalyticsEvents.paramMinutesCompleted: minutesCompleted,
         AnalyticsEvents.paramReason: reason,
-        if (targetDurationMinutes != null)
-          AnalyticsEvents.paramTargetDurationMinutes: targetDurationMinutes,
-        if (pausedSeconds != null)
-          AnalyticsEvents.paramPausedSeconds: pausedSeconds,
-        if (completionRatio != null)
-          AnalyticsEvents.paramCompletionRatio: completionRatio,
+        AnalyticsEvents.paramTargetDurationMinutes: ?targetDurationMinutes,
+        AnalyticsEvents.paramPausedSeconds: ?pausedSeconds,
+        AnalyticsEvents.paramCompletionRatio: ?completionRatio,
       },
     ),
   );
@@ -181,21 +173,6 @@ class AnalyticsService {
       parameters: {
         AnalyticsEvents.paramHabitCount: habitCount,
         AnalyticsEvents.paramTotalBonusXp: totalBonusXp,
-      },
-    ),
-  );
-
-  Future<void> logStreakAchieved({
-    required String habitName,
-    required int milestone,
-    String? habitId,
-  }) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.streakAchieved,
-      parameters: {
-        AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramStreakDays: milestone,
-        if (habitId != null) AnalyticsEvents.paramHabitId: habitId,
       },
     ),
   );
@@ -218,7 +195,7 @@ class AnalyticsService {
   Future<void> logHistoryViewed({String? habitId}) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.historyViewed,
-      parameters: {if (habitId != null) AnalyticsEvents.paramHabitId: habitId},
+      parameters: {AnalyticsEvents.paramHabitId: ?habitId},
     ),
   );
 
@@ -247,10 +224,7 @@ class AnalyticsService {
   Future<void> logNotificationOpened({String? notificationType}) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.notificationOpened,
-      parameters: {
-        if (notificationType != null)
-          AnalyticsEvents.paramNotificationType: notificationType,
-      },
+      parameters: {AnalyticsEvents.paramNotificationType: ?notificationType},
     ),
   );
 
@@ -278,14 +252,14 @@ class AnalyticsService {
 
   Future<void> logDailyCheckIn({
     required String habitName,
-    required int streakCount,
+    required int totalCheckInDays,
     required int minutesToday,
   }) => _safeLog(
     () => _analytics.logEvent(
       name: AnalyticsEvents.dailyCheckIn,
       parameters: {
         AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramStreakCount: streakCount,
+        AnalyticsEvents.paramTotalCheckInDays: totalCheckInDays,
         AnalyticsEvents.paramMinutesToday: minutesToday,
       },
     ),
@@ -434,7 +408,6 @@ class AnalyticsService {
     int? totalHabits,
     int? catCount,
     int? maxCatLevel,
-    int? longestStreak,
     int? totalFocusMinutes,
     int? totalHoursLogged,
     int? daysActive,
@@ -461,14 +434,6 @@ class AnalyticsService {
         () => _analytics.setUserProperty(
           name: AnalyticsEvents.propMaxCatLevel,
           value: maxCatLevel.toString(),
-        ),
-      );
-    }
-    if (longestStreak != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propLongestStreak,
-          value: longestStreak.toString(),
         ),
       );
     }

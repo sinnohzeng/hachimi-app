@@ -10,7 +10,7 @@
 
 1. **奖励坚持** —— 成长阶段和心情改善通过定期专注获得
 2. **建立依附** —— 像素风外观、性格和名字让每只猫咪都感觉是你的
-3. **可视化进步** —— 猫咪进化为习惯连续记录提供清晰、有情感共鸣的反馈
+3. **可视化进步** —— 猫咪进化为累计专注时间提供清晰、有情感共鸣的反馈
 4. **随雄心扩展** —— CatHouse 网格展示无限数量的猫咪；猫咪相册数量同样无限制
 
 ---
@@ -65,31 +65,34 @@
 
 ## 成长阶段
 
-猫咪根据 `totalMinutes` 占 `targetMinutes`（由习惯的 `targetHours` 派生的累计分钟目标）的百分比经历 **3 个阶段**：
+猫咪根据 **固定 200 小时（12000 分钟）成长阶梯** 经历 **4 个阶段**。阶段阈值为绝对累计专注时间，与习惯的 `targetHours` 无关：
 
-| 阶段 | ID | 名称 | Emoji | 条件 | 描述 |
-|------|-----|------|-------|------|------|
-| 1 | `kitten` | 幼猫 | 🐱 | 进度 < 33% | 刚出生，小小的，充满潜力 |
-| 2 | `adolescent` | 青年猫 | 🐈 | 33% <= 进度 < 66% | 快速成长，更有表情 |
-| 3 | `adult` | 成熟猫 | 🐈‍⬛ | 进度 >= 66% | 完全成形，从容自信 |
+| 阶段 | ID | 名称 | Emoji | 阈值 | 进度 | 描述 |
+|------|-----|------|-------|------|------|------|
+| 1 | `kitten` | 幼猫 | 🐱 | 0h（0min） | 0.00 | 刚出生，小小的，充满潜力 |
+| 2 | `adolescent` | 青年猫 | 🐈 | 20h（1200min） | ~0.10 | 快速成长，更有表情 |
+| 3 | `adult` | 成熟猫 | 🐈‍⬛ | 100h（6000min） | 0.50 | 完全成形，从容自信 |
+| 4 | `senior` | 长老猫 | 🏆 | 200h（12000min） | 1.00 | 睿智的长者，传奇伙伴 |
 
-**阶段计算** 在读取时从 `totalMinutes` 和 `targetMinutes` 派生，不单独存储于 Firestore（防止漂移）。计算属性 `cat.computedStage` 始终返回权威阶段。
+**阶段计算** 在读取时使用固定阈值从 `totalMinutes` 派生，不单独存储于 Firestore（防止漂移）。计算属性 `cat.computedStage` 始终返回权威阶段。
 
-**防回退保护：** `highestStage` 字段（存储于 Firestore）记录猫咪曾达到的最高阶段。UI 使用 `displayStage = max(computedStage, highestStage)` 来防止用户提高目标小时数时的视觉回退。`highestStage` 单调递增——只升不降。对于 `highestStage == null` 的旧数据猫咪，使用旧阈值（20%/45%）作为兜底，防止阈值变更导致的视觉回退。
+**防回退保护：** `highestStage` 字段（存储于 Firestore）记录猫咪曾达到的最高阶段。`highestStage` 单调递增——只升不降。
 
 **进度公式：**
 ```
-progress = totalMinutes / targetMinutes
-stage = kitten     若 progress < 0.33
-        adolescent 若 progress < 0.66
-        adult      若 progress >= 0.66
+growthProgress = totalMinutes / 12000（上限为 1.0）
+
+stage = kitten     若 totalMinutes < 1200
+        adolescent 若 totalMinutes < 6000
+        adult      若 totalMinutes < 12000
+        senior     若 totalMinutes >= 12000
 ```
 
 **阶段内进度**（用于阶段内进度条）：
 ```
-stageProgress = (progress - 阶段下限) / (阶段上限 - 阶段下限)
+stageProgress = (totalMinutes - 阶段下限分钟数) / (阶段上限分钟数 - 阶段下限分钟数)
 ```
-达到最高阶段（成熟猫）时，`stageProgress` 从 0.66 缩放到 1.0，上限为 `1.0`。
+达到最高阶段（长老猫）时，`stageProgress` 为 `1.0`。
 
 ---
 
@@ -165,19 +168,13 @@ XP 在每次专注会话结束时获得。所有计算在 `XpService`（纯 Dart
 ### XP 公式
 
 ```
-totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
+totalXp = baseXp + fullHouseBonus
 ```
 
 | 组成部分 | 公式 | 条件 |
 |---------|------|------|
 | `baseXp`（基础 XP） | `分钟数 x 1` | 始终 |
-| `streakBonus`（连击奖励） | `+5` / 会话 | `currentStreak >= 3` |
-| `milestoneBonus`（里程碑奖励） | `+30` 一次性 | 连续记录达到里程碑天数（见下） |
 | `fullHouseBonus`（全家福奖励） | `+10` / 会话 | 今日所有习惯均已完成 |
-
-**连续记录里程碑常量**（定义于 `lib/core/constants/pixel_cat_constants.dart`）：
-- `streakMilestones = [7, 14, 30]` — 触发里程碑奖励的连续天数阈值
-- `streakMilestoneXpBonus = 30` — 每达到一个里程碑时奖励的 XP
 
 来自 Remote Config 的 XP 倍率（键：`xp_multiplier`，默认值：`1.0`）用于活动期间缩放 `totalXp`。
 
@@ -185,8 +182,8 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 
 提前结束（放弃）的会话，若用户专注时间 **>= 5 分钟** 仍可获得 XP：
 
-- XP = `已专注分钟数 x 1`（仅基础部分，无连击或奖励 XP）
-- 会话在 Firestore 中标记为 `completed: false`
+- XP = `已专注分钟数 x 1`（仅基础部分，无奖励 XP）
+- 会话在 Firestore 中标记为 `status: "abandoned"`
 
 ---
 
@@ -333,7 +330,7 @@ totalXp = baseXp + streakBonus + milestoneBonus + fullHouseBonus
 `PixelCatGenerationService.generateRandomCat()` 方法为领养流程生成一只随机猫咪：
 
 ```
-generateRandomCat(boundHabitId, targetMinutes) -> Cat
+generateRandomCat(boundHabitId) -> Cat
 ```
 
 **算法：**
@@ -341,7 +338,7 @@ generateRandomCat(boundHabitId, targetMinutes) -> Cat
 1. 通过从 `pixel_cat_constants.dart` 中定义的有效值集合独立选取每个字段来生成随机外观参数
 2. 分配随机性格（概率相等）
 3. 从 `catNames` 池生成随机名字
-4. 返回一个 `Cat` 对象，初始状态：`state: 'active'`、`totalMinutes: 0`、`targetMinutes: targetMinutes`，无 `id`（由 Firestore 在创建时分配）
+4. 返回一个 `Cat` 对象，初始状态：`state: 'active'`、`totalMinutes: 0`，无 `id`（由 Firestore 在创建时分配）
 
 **刷新机制：** 领养界面每次显示一只猫咪。用户可以点击「刷新」按钮重新随机生成一只新猫咪，确认领养前可以无限次刷新。每次刷新都会重新调用 `generateRandomCat()`。
 
@@ -480,7 +477,7 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 - 猫咪名称、性格及性格描述
 - 当前心情及距上次会话的小时数
 - 成长阶段及进度百分比
-- 习惯详情（今日专注、连续天数、总进度）
+- 习惯详情（今日专注、总进度、任务模式）
 - 指令：2-4 句话、第一人称、根据性格调整语气
 - 双语模板（根据 app locale 选择中文或英文）
 
