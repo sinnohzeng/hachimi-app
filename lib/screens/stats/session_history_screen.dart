@@ -9,9 +9,10 @@ import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/session_history_provider.dart';
 import 'package:hachimi_app/widgets/empty_state.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
 import 'package:intl/intl.dart';
 
-/// 完整专注历史记录页面 — 支持分页加载、按习惯筛选、按日期分组。
+/// 完整专注历史记录页面 — 支持分页加载、按习惯筛选、按月份筛选、按日期分组。
 class SessionHistoryScreen extends ConsumerStatefulWidget {
   const SessionHistoryScreen({super.key});
 
@@ -59,45 +60,45 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     // 按日期分组
     final grouped = _groupByDate(historyState.sessions);
 
+    // 月份显示文本
+    final monthLabel = historyState.selectedMonth != null
+        ? DateFormat.yMMM(
+            Localizations.localeOf(context).toString(),
+          ).format(historyState.selectedMonth!)
+        : l10n.historyAllMonths;
+
+    // Habit 筛选显示文本
+    final habitLabel = historyState.filterHabitId != null
+        ? (habits
+                  .where((h) => h.id == historyState.filterHabitId)
+                  .firstOrNull
+                  ?.name ??
+              l10n.historyAllHabits)
+        : l10n.historyAllHabits;
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
       body: Column(
         children: [
-          // FilterChip 横向滚动
-          SizedBox(
-            height: 48,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+          // ActionChip 筛选栏
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(l10n.historyFilterAll),
-                    selected: historyState.filterHabitId == null,
-                    onSelected: (_) {
-                      ref.read(sessionHistoryProvider.notifier).setFilter(null);
-                    },
-                  ),
+                ActionChip(
+                  avatar: const Icon(Icons.calendar_month, size: 18),
+                  label: Text(monthLabel),
+                  onPressed: () => _showMonthPicker(context),
                 ),
-                ...habits.map((habit) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(habit.name),
-                      selected: historyState.filterHabitId == habit.id,
-                      onSelected: (_) {
-                        ref
-                            .read(sessionHistoryProvider.notifier)
-                            .setFilter(habit.id);
-                      },
-                    ),
-                  );
-                }),
+                const SizedBox(width: 8),
+                ActionChip(
+                  avatar: const Icon(Icons.filter_list, size: 18),
+                  label: Text(habitLabel),
+                  onPressed: () => _showHabitFilter(context, habits),
+                ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
 
           // 内容区域
           Expanded(
@@ -116,6 +117,115 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     );
   }
 
+  void _showMonthPicker(BuildContext context) {
+    final historyState = ref.read(sessionHistoryProvider);
+    final l10n = context.l10n;
+    final now = DateTime.now();
+    // 生成最近 12 个月
+    final months = List.generate(12, (i) {
+      return DateTime(now.year, now.month - i);
+    });
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) {
+        final locale = Localizations.localeOf(context).toString();
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  l10n.historySelectMonth,
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+              ),
+              ListTile(
+                title: Text(l10n.historyAllMonths),
+                selected: historyState.selectedMonth == null,
+                leading: const Icon(Icons.all_inclusive),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  ref.read(sessionHistoryProvider.notifier).setMonth(null);
+                },
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: months.length,
+                  itemBuilder: (_, index) {
+                    final m = months[index];
+                    final selected =
+                        historyState.selectedMonth != null &&
+                        historyState.selectedMonth!.year == m.year &&
+                        historyState.selectedMonth!.month == m.month;
+                    return ListTile(
+                      title: Text(DateFormat.yMMM(locale).format(m)),
+                      selected: selected,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        ref.read(sessionHistoryProvider.notifier).setMonth(m);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showHabitFilter(BuildContext context, List<Habit> habits) {
+    final historyState = ref.read(sessionHistoryProvider);
+    final l10n = context.l10n;
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  l10n.historyFilterAll,
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+              ),
+              ListTile(
+                title: Text(l10n.historyAllHabits),
+                selected: historyState.filterHabitId == null,
+                leading: const Icon(Icons.select_all),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  ref.read(sessionHistoryProvider.notifier).setFilter(null);
+                },
+              ),
+              const Divider(height: 1),
+              ...habits.map((habit) {
+                return ListTile(
+                  title: Text(habit.name),
+                  selected: historyState.filterHabitId == habit.id,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    ref
+                        .read(sessionHistoryProvider.notifier)
+                        .setFilter(habit.id);
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildContent(
     BuildContext context,
     SessionHistoryState historyState,
@@ -125,6 +235,14 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     TextTheme textTheme,
     S l10n,
   ) {
+    // 错误状态
+    if (historyState.error != null && historyState.sessions.isEmpty) {
+      return ErrorState(
+        message: l10n.historyLoadError,
+        onRetry: () => ref.read(sessionHistoryProvider.notifier).retry(),
+      );
+    }
+
     // 首次加载中
     if (historyState.isLoading && historyState.sessions.isEmpty) {
       return const Center(child: CircularProgressIndicator());

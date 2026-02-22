@@ -39,11 +39,27 @@ class TodayTab extends ConsumerWidget {
       slivers: [
         SliverAppBar(floating: true, title: Text(l10n.appTitle)),
 
-        // Daily check-in trigger
-        const SliverToBoxAdapter(child: CheckInBanner()),
-
         // Offline banner
         const SliverToBoxAdapter(child: OfflineBanner()),
+
+        // Featured cat card（首屏核心情感焦点）
+        catsAsync.when(
+          loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+          data: (cats) {
+            if (cats.isEmpty) {
+              return const SliverToBoxAdapter(child: SizedBox.shrink());
+            }
+            final featured = _findFeaturedCat(cats, todayMinutes);
+            if (featured == null) {
+              return const SliverToBoxAdapter(child: SizedBox.shrink());
+            }
+            return SliverToBoxAdapter(child: FeaturedCatCard(cat: featured));
+          },
+        ),
+
+        // Daily check-in trigger
+        const SliverToBoxAdapter(child: CheckInBanner()),
 
         // Today summary
         SliverToBoxAdapter(
@@ -77,22 +93,6 @@ class TodayTab extends ConsumerWidget {
               ),
             ),
           ),
-        ),
-
-        // Featured cat card
-        catsAsync.when(
-          loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
-          data: (cats) {
-            if (cats.isEmpty) {
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
-            }
-            final featured = _findFeaturedCat(cats);
-            if (featured == null) {
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
-            }
-            return SliverToBoxAdapter(child: FeaturedCatCard(cat: featured));
-          },
         ),
 
         // Section header
@@ -162,21 +162,61 @@ class TodayTab extends ConsumerWidget {
     );
   }
 
-  Cat? _findFeaturedCat(List<Cat> cats) {
+  /// 加权评分算法：综合最近互动、心情、成长激励和今日完成情况
+  Cat? _findFeaturedCat(List<Cat> cats, Map<String, int> todayMinutes) {
     if (cats.isEmpty) return null;
+    if (cats.length == 1) return cats.first;
+
     Cat? best;
-    double bestProgress = -1;
+    double bestScore = -1;
 
     for (final cat in cats) {
-      if (cat.computedStage != 'senior') {
-        final progress = cat.stageProgress;
-        if (progress > bestProgress) {
-          bestProgress = progress;
-          best = cat;
-        }
+      final recency = _recencyScore(cat.lastSessionAt);
+      final mood = _moodScore(cat.computedMood);
+      final growth = _growthScore(cat.stageProgress, cat.computedStage);
+      final today = (todayMinutes[cat.boundHabitId] ?? 0) > 0 ? 0.0 : 1.0;
+
+      final score = recency * 0.45 + mood * 0.30 + growth * 0.20 + today * 0.05;
+      if (score > bestScore) {
+        bestScore = score;
+        best = cat;
       }
     }
-    return best ?? cats.first;
+    return best;
+  }
+
+  static double _recencyScore(DateTime? lastSessionAt) {
+    if (lastSessionAt == null) return 0.05;
+    final hours = DateTime.now().difference(lastSessionAt).inHours;
+    if (hours < 1) return 1.0;
+    if (hours < 6) return 0.8;
+    if (hours < 24) return 0.6;
+    final days = hours ~/ 24;
+    if (days < 3) return 0.3;
+    if (days < 7) return 0.15;
+    return 0.05;
+  }
+
+  static double _moodScore(String mood) {
+    switch (mood) {
+      case 'missing':
+        return 1.0;
+      case 'lonely':
+        return 0.8;
+      case 'neutral':
+        return 0.3;
+      case 'happy':
+        return 0.1;
+      default:
+        return 0.3;
+    }
+  }
+
+  static double _growthScore(double stageProgress, String stage) {
+    if (stage == 'senior') return 0.2;
+    if (stageProgress >= 0.85) return 1.0;
+    if (stageProgress >= 0.70) return 0.7;
+    return stageProgress * 0.5;
   }
 
   void _confirmDelete(

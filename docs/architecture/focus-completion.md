@@ -22,11 +22,17 @@ When a focus session ends (countdown completes or stopwatch "Done" pressed), the
 ## Completion Flow
 
 ```
+FocusTimerNotifier._onTick() [countdown reaches zero]
+  ├── AtomicIslandService.cancel()
+  ├── FocusTimerService.stop()          // Stop foreground service BEFORE notification
+  ├── NotificationService.cancelTimerBackup()  // Cancel backup alarm
+  └── NotificationService.showFocusComplete()  // Immediate completion notification
+
 TimerScreen._saveSession()
-  ├── FocusTimerService.stop()          // Stop foreground service
+  ├── FocusTimerService.stop()          // Idempotent (already stopped above)
   ├── Calculate XP, coins, stage-up
   ├── Save FocusSession to Firestore
-  ├── NotificationService.showFocusComplete()  // System notification (if completed)
+  ├── NotificationService.showFocusComplete()  // Localized notification (overwrites above)
   └── Navigator → FocusCompleteScreen
         ├── ConfettiController.play()   // 2s blast (if not abandoned)
         ├── Vibration.vibrate(pattern)  // Strong pattern (or light for abandon)
@@ -99,9 +105,37 @@ All hardcoded strings in `focus_complete_screen.dart` are replaced with ARB keys
 
 ---
 
+## Backup Alarm (AlarmManager)
+
+When the foreground service is killed by the OS, the user would never receive the completion notification. To mitigate this, a backup alarm is scheduled via `flutter_local_notifications` `zonedSchedule()` with `exactAllowWhileIdle` mode.
+
+| Field | Value |
+|-------|-------|
+| ID | `300001` (fixed) |
+| Channel | `hachimi_focus_complete` (same as completion notification) |
+| Schedule mode | `exactAllowWhileIdle` (uses `AlarmManager.setExactAndAllowWhileIdle` on Android) |
+| Permission | `SCHEDULE_EXACT_ALARM` (already declared in `AndroidManifest.xml`) |
+
+### Lifecycle
+
+| Event | Action |
+|-------|--------|
+| `start()` (countdown mode) | Schedule backup at `startedAt + totalSeconds + totalPausedSeconds` |
+| `_onTick()` completion | Cancel backup |
+| `pause()` | Cancel backup |
+| `resume()` | Reschedule backup |
+| `complete()` | Cancel backup |
+| `abandon()` | Cancel backup |
+| `reset()` | Cancel backup |
+
+Stopwatch mode does not schedule a backup (no known end time).
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-02-19 | Initial spec — notification, vibration, confetti, L10N |
 | 2026-02-21 | Channel ID changed from `hachimi_focus` (shared with foreground service) to `hachimi_focus_complete` (dedicated). Background completion notification now fires from `_onTick()` when countdown reaches zero. |
+| 2026-02-22 | Fix notification overlap: `FocusTimerService.stop()` now called before completion notification in `_onTick()`, `complete()`, and `abandon()`. Added backup alarm via `zonedSchedule()` for OS-killed foreground service. Notification text reordered: time displayed before habit name, with truncation at 20 chars. |

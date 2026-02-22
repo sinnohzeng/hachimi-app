@@ -1986,4 +1986,16 @@ class SKo extends S {
 
   @override
   String get historyDateGroupYesterday => '어제';
+
+  @override
+  String get historyLoadError => 'Failed to load history';
+
+  @override
+  String get historySelectMonth => 'Select month';
+
+  @override
+  String get historyAllMonths => 'All months';
+
+  @override
+  String get historyAllHabits => 'All';
 }

@@ -3749,6 +3749,30 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get historyDateGroupYesterday;
+
+  /// No description provided for @historyLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load history'**
+  String get historyLoadError;
+
+  /// No description provided for @historySelectMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Select month'**
+  String get historySelectMonth;
+
+  /// No description provided for @historyAllMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'All months'**
+  String get historyAllMonths;
+
+  /// No description provided for @historyAllHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get historyAllHabits;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

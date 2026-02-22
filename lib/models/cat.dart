@@ -53,8 +53,8 @@ class Cat {
     isLonghair: appearance.isLonghair,
   );
 
-  /// 心情（基于 lastSessionAt 计算）
-  String get computedMood => calculateMood(lastSessionAt);
+  /// 心情（基于 lastSessionAt 计算，新猫 24h 内默认 happy）
+  String get computedMood => calculateMood(lastSessionAt, createdAt: createdAt);
 
   /// 心情元数据
   CatMood get moodData => moodById(computedMood);

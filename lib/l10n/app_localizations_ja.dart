@@ -1985,4 +1985,16 @@ class SJa extends S {
 
   @override
   String get historyDateGroupYesterday => '昨日';
+
+  @override
+  String get historyLoadError => 'Failed to load history';
+
+  @override
+  String get historySelectMonth => 'Select month';
+
+  @override
+  String get historyAllMonths => 'All months';
+
+  @override
+  String get historyAllHabits => 'All';
 }

@@ -71,6 +71,19 @@ class FeaturedCatCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        context.l10n.moodMessage(
+                          cat.personality,
+                          cat.computedMood,
+                        ),
+                        style: textTheme.bodySmall?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
                       if (habit != null)
                         Text(
                           habit.name,

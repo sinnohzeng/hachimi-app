@@ -98,23 +98,52 @@ Cat mood is computed from `lastSessionAt` (the timestamp of the most recent focu
 
 | Mood ID | Name | Emoji | Condition | Behavior |
 |---------|------|-------|-----------|----------|
-| `happy` | Happy | 😸 | Last session < 24 hours ago | Default display; cat is lively |
+| `happy` | Happy | 😸 | Last session < 24 hours ago **OR** newly adopted (< 24h, no sessions) | Default display; cat is lively |
 | `neutral` | Neutral | 😐 | Last session 1–3 days ago | Slightly subdued |
 | `lonely` | Lonely | 😿 | Last session 3–7 days ago | Sad sprite; worried speech |
-| `missing` | Missing | 💔 | Last session > 7 days ago | Very sad; triggers win-back notification |
+| `missing` | Missing | 💔 | Last session > 7 days ago (or never, after 24h since adoption) | Very sad; triggers win-back notification |
+
+**New user fix:** When `lastSessionAt == null`, `calculateMood` checks `createdAt`. If the cat was adopted within the last 24 hours, mood is `happy` (not `missing`). This prevents newly adopted cats from appearing sad before the user has a chance to focus.
 
 > The `mood_threshold_lonely_days` Remote Config key (default: 3) controls the lonely threshold in days.
 
 **Mood affects:**
 - Cat sprite selection (happy/neutral/sad pose variant)
-- Speech bubble text content
+- Speech bubble text content (displayed in Featured Cat Card and Focus Setup Screen)
 - CatHouse card atmosphere (dormant cats appear faded)
+- Featured Cat selection score (see below)
+
+---
+
+## Featured Cat Selection
+
+The home screen displays one "Featured Cat" as the primary emotional anchor. Selection uses a **weighted scoring algorithm** that considers user behavior, cat emotional state, growth progress, and daily completion.
+
+**Score formula:**
+```
+score = recencyScore * 0.45 + moodScore * 0.30 + growthScore * 0.20 + todayScore * 0.05
+```
+
+| Component | Weight | Meaning | Scoring Rules |
+|-----------|--------|---------|---------------|
+| `recencyScore` | 0.45 | Recent interaction | <1h: 1.0, 1-6h: 0.8, 6-24h: 0.6, 1-3d: 0.3, 3-7d: 0.15, >7d/null: 0.05 |
+| `moodScore` | 0.30 | Mood urgency | missing: 1.0, lonely: 0.8, neutral: 0.3, happy: 0.1 |
+| `growthScore` | 0.20 | Growth incentive | stageProgress>=0.85 (non-senior): 1.0, >=0.70: 0.7, senior: 0.2, else: stageProgress*0.5 |
+| `todayScore` | 0.05 | Today's completion | Not done: 1.0, Done: 0.0 |
+
+**Behavior examples:**
+- Just finished focus → recency (1.0 * 0.45) dominates → shows the cat you just spent time with
+- Week without opening app → mood (1.0 * 0.30) dominates → shows the cat that misses you most
+- All senior cats → recency + mood still effective → no degenerate selection
+- Single cat → short-circuit returns `cats.first`
+
+**Implementation:** `TodayTab._findFeaturedCat()` in `lib/screens/home/components/today_tab.dart`
 
 ---
 
 ## Speech Bubble Messages
 
-Speech messages follow a `personality:mood` matrix. Each combination has 1–3 message variants; the current implementation returns one message per combination.
+Speech messages follow a `personality:mood` matrix. Each combination has 1–3 message variants; the current implementation returns one message per combination. Mood messages are displayed in the **Featured Cat Card** (home screen) and **Focus Setup Screen** as italic text.
 
 | | `happy` | `neutral` | `lonely` | `missing` |
 |--|---------|-----------|---------|---------|

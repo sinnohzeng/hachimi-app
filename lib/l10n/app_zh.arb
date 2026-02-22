@@ -914,5 +914,9 @@
   "sessionCountdown": "倒计时",
   "sessionStopwatch": "正计时",
   "historyDateGroupToday": "今天",
-  "historyDateGroupYesterday": "昨天"
+  "historyDateGroupYesterday": "昨天",
+  "historyLoadError": "加载历史记录失败",
+  "historySelectMonth": "选择月份",
+  "historyAllMonths": "全部月份",
+  "historyAllHabits": "全部"
 }

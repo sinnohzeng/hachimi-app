@@ -281,6 +281,42 @@ class NotificationService {
     );
   }
 
+  // ─── Timer Backup Alarm ───
+
+  static const int _timerBackupId = 300001;
+
+  /// Schedule a backup alarm for focus timer completion.
+  /// If the foreground service is killed by the OS, this alarm ensures
+  /// the user still gets a completion notification.
+  Future<void> scheduleTimerBackup({
+    required DateTime fireAt,
+    required String title,
+    required String body,
+  }) async {
+    final scheduledDate = tz.TZDateTime.from(fireAt, tz.local);
+    await _localNotifications.zonedSchedule(
+      id: _timerBackupId,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _focusChannelId,
+          _focusChannelName,
+          channelDescription: _focusChannelDesc,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      title: title,
+      body: body,
+    );
+  }
+
+  /// Cancel the backup timer alarm (called on normal completion, pause, etc.).
+  Future<void> cancelTimerBackup() async {
+    await _localNotifications.cancel(id: _timerBackupId);
+  }
+
   /// Show a focus completion notification.
   /// Called from TimerScreen with localized strings (screen has BuildContext).
   Future<void> showFocusComplete({

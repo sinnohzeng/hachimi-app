@@ -22,11 +22,17 @@
 ## 完成流程
 
 ```
+FocusTimerNotifier._onTick() [倒计时归零]
+  ├── AtomicIslandService.cancel()
+  ├── FocusTimerService.stop()          // 在通知之前停止前台服务
+  ├── NotificationService.cancelTimerBackup()  // 取消备用闹钟
+  └── NotificationService.showFocusComplete()  // 即时完成通知
+
 TimerScreen._saveSession()
-  ├── FocusTimerService.stop()          // 停止前台服务
+  ├── FocusTimerService.stop()          // 幂等（上面已停止）
   ├── 计算 XP、金币、阶段跃迁
   ├── 保存 FocusSession 到 Firestore
-  ├── NotificationService.showFocusComplete()  // 系统通知（仅成功完成时）
+  ├── NotificationService.showFocusComplete()  // 本地化通知（覆盖上面的）
   └── Navigator → FocusCompleteScreen
         ├── ConfettiController.play()   // 2 秒爆发（非放弃时）
         ├── Vibration.vibrate(pattern)  // 强震动模式（放弃时轻震）
@@ -99,9 +105,37 @@ TimerScreen._saveSession()
 
 ---
 
+## 备用闹钟（AlarmManager）
+
+当前台服务被操作系统杀死时，用户不会收到完成通知。为此，通过 `flutter_local_notifications` 的 `zonedSchedule()` 调度一个备用闹钟，使用 `exactAllowWhileIdle` 模式。
+
+| 字段 | 值 |
+|------|-----|
+| ID | `300001`（固定值） |
+| 通知渠道 | `hachimi_focus_complete`（与完成通知共用渠道） |
+| 调度模式 | `exactAllowWhileIdle`（Android 上使用 `AlarmManager.setExactAndAllowWhileIdle`） |
+| 权限 | `SCHEDULE_EXACT_ALARM`（已在 `AndroidManifest.xml` 中声明） |
+
+### 生命周期
+
+| 事件 | 操作 |
+|------|------|
+| `start()`（倒计时模式） | 在 `startedAt + totalSeconds + totalPausedSeconds` 时间点调度备用闹钟 |
+| `_onTick()` 完成 | 取消备用闹钟 |
+| `pause()` | 取消备用闹钟 |
+| `resume()` | 重新调度备用闹钟 |
+| `complete()` | 取消备用闹钟 |
+| `abandon()` | 取消备用闹钟 |
+| `reset()` | 取消备用闹钟 |
+
+正计时模式不调度备用闹钟（无已知结束时间）。
+
+---
+
 ## 更新日志
 
 | 日期 | 变更 |
 |------|------|
 | 2026-02-19 | 初始规格 —— 通知、震动、撒花、L10N |
 | 2026-02-21 | 渠道 ID 从 `hachimi_focus`（与前台服务共用）改为 `hachimi_focus_complete`（专用）。后台完成通知现在在倒计时归零时从 `_onTick()` 触发。 |
+| 2026-02-22 | 修复通知重叠：`FocusTimerService.stop()` 现在在 `_onTick()`、`complete()` 和 `abandon()` 中于完成通知之前调用。新增通过 `zonedSchedule()` 的备用闹钟以应对前台服务被系统杀死的情况。通知文本重新排序：时间优先于任务名显示，任务名超 20 字符截断。 |

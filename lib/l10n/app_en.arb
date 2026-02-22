@@ -914,5 +914,9 @@
   "sessionCountdown": "Countdown",
   "sessionStopwatch": "Stopwatch",
   "historyDateGroupToday": "Today",
-  "historyDateGroupYesterday": "Yesterday"
+  "historyDateGroupYesterday": "Yesterday",
+  "historyLoadError": "Failed to load history",
+  "historySelectMonth": "Select month",
+  "historyAllMonths": "All months",
+  "historyAllHabits": "All"
 }

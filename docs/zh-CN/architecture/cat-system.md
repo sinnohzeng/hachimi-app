@@ -99,24 +99,53 @@ stageProgress = (progress - 阶段下限) / (阶段上限 - 阶段下限)
 
 | 心情 ID | 名称 | Emoji | 条件 | 表现 |
 |---------|------|-------|------|------|
-| `happy` | 开心 | 😸 | 最近会话在 24 小时内 | 默认显示，猫咪活泼 |
+| `happy` | 开心 | 😸 | 最近会话在 24 小时内 **或** 新领养猫咪（< 24h，无会话） | 默认显示，猫咪活泼 |
 | `neutral` | 平静 | 😐 | 最近会话在 1-3 天内 | 略显低落 |
 | `lonely` | 孤独 | 😿 | 最近会话在 3-7 天内 | 悲伤精灵，担忧的话语 |
-| `missing` | 思念 | 💔 | 最近会话超过 7 天 | 非常悲伤，触发召回通知 |
+| `missing` | 思念 | 💔 | 最近会话超过 7 天（或领养超过 24h 从未互动） | 非常悲伤，触发召回通知 |
+
+**新用户修复：** 当 `lastSessionAt == null` 时，`calculateMood` 会检查 `createdAt`。如果猫咪在 24 小时内被领养，心情为 `happy`（而非 `missing`）。这避免了新领养的猫咪在用户还未开始专注前就显示悲伤心情。
 
 > Remote Config（远程配置）键 `mood_threshold_lonely_days`（默认值：3）控制孤独阈值（天数）。
 
 **心情影响：**
 
 - 猫咪精灵选择（开心/平静/悲伤姿势变体）
-- 对话气泡文字内容
+- 对话气泡文字内容（在 Featured Cat Card 和专注设置页面显示）
 - CatHouse 卡片氛围（休眠猫咪显示为淡化状态）
+- Featured Cat 选择评分（见下方）
+
+---
+
+## Featured Cat 选择算法
+
+首页展示一只「Featured Cat」作为核心情感锚点。选择采用 **加权评分算法**，综合考虑用户行为、猫咪情绪状态、成长进度和每日完成情况。
+
+**评分公式：**
+```
+score = recencyScore * 0.45 + moodScore * 0.30 + growthScore * 0.20 + todayScore * 0.05
+```
+
+| 分量 | 权重 | 含义 | 评分规则 |
+|------|------|------|----------|
+| `recencyScore` | 0.45 | 最近互动 | <1h: 1.0, 1-6h: 0.8, 6-24h: 0.6, 1-3d: 0.3, 3-7d: 0.15, >7d/null: 0.05 |
+| `moodScore` | 0.30 | 心情紧迫性 | missing: 1.0, lonely: 0.8, neutral: 0.3, happy: 0.1 |
+| `growthScore` | 0.20 | 成长激励 | stageProgress>=0.85（非 senior）: 1.0, >=0.70: 0.7, senior: 0.2, 其他: stageProgress*0.5 |
+| `todayScore` | 0.05 | 今日完成 | 未做: 1.0, 已做: 0.0 |
+
+**行为推演：**
+- 刚完成专注 → recency（1.0 × 0.45）主导 → 显示刚陪伴的猫
+- 一周没开 app → mood（1.0 × 0.30）主导 → 显示最想念用户的猫
+- 全 senior → recency + mood 仍有效 → 不退化为盲选
+- 单猫 → 短路返回 `cats.first`
+
+**实现位置：** `TodayTab._findFeaturedCat()`，`lib/screens/home/components/today_tab.dart`
 
 ---
 
 ## 对话气泡文案
 
-对话文案遵循「性格：心情」矩阵。每种组合有 1-3 条文案变体，当前实现每种组合返回一条。
+对话文案遵循「性格：心情」矩阵。每种组合有 1-3 条文案变体，当前实现每种组合返回一条。心情文案在 **Featured Cat Card**（首页）和 **专注设置页面** 中以斜体显示。
 
 | | `happy` | `neutral` | `lonely` | `missing` |
 |--|---------|-----------|---------|---------|

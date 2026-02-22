@@ -1979,6 +1979,18 @@ class SZh extends S {
 
   @override
   String get historyDateGroupYesterday => '昨天';
+
+  @override
+  String get historyLoadError => '加载历史记录失败';
+
+  @override
+  String get historySelectMonth => '选择月份';
+
+  @override
+  String get historyAllMonths => '全部月份';
+
+  @override
+  String get historyAllHabits => '全部';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

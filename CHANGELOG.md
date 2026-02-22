@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.4] - 2026-02-22
+### Fixed
+- Focus timer: foreground service notification now dismissed before completion notification, preventing notification overlap
+- Focus timer: notification text reordered to show time before habit name, with truncation at 20 characters
+- Focus history: added error handling with retry UI when loading fails (was silently swallowed)
+- Focus history: added 10-second timeout to cross-habit Firestore queries
+
+### Added
+- Focus history: month and habit filter via ActionChip + BottomSheet (replaces horizontal FilterChip list)
+- Focus history: month-based date range filtering at Firestore query level for faster loads
+- Focus timer: AlarmManager backup notification via `zonedSchedule()` for OS-killed foreground service
+
+### Changed
+- Docs: updated focus-completion.md with backup alarm spec and corrected completion flow (EN + zh-CN)
+
 ## [2.8.3] - 2026-02-22
 ### Changed
 - Docs: updated design-system.md with unified Theme Color dialog and brightness-aware card theme (EN + zh-CN)

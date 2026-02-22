@@ -62,9 +62,17 @@ const CatMood moodMissing = CatMood(
   spriteKey: 'sad',
 );
 
-/// 根据最近一次专注时间计算心情
-String calculateMood(DateTime? lastSessionAt) {
-  if (lastSessionAt == null) return moodMissing.id;
+/// 根据最近一次专注时间计算心情。
+/// [createdAt] 用于区分新领养猫（24h 内为 happy）和长期未互动猫（missing）。
+String calculateMood(DateTime? lastSessionAt, {DateTime? createdAt}) {
+  if (lastSessionAt == null) {
+    // 领养 24h 内的猫应该是 happy，不是 missing
+    if (createdAt != null &&
+        DateTime.now().difference(createdAt).inHours < 24) {
+      return moodHappy.id;
+    }
+    return moodMissing.id;
+  }
   final now = DateTime.now();
   final diff = now.difference(lastSessionAt);
   if (diff.inHours < 24) return moodHappy.id;

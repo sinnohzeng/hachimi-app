@@ -331,6 +331,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     _ticksSinceSave = 0;
     _saveState(); // Save immediately on start
+    _scheduleBackupAlarm();
 
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
@@ -355,6 +356,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       );
       FocusTimerNotifier.clearSavedState();
       AtomicIslandService.cancel();
+      FocusTimerService.stop();
+      _cancelBackupAlarm();
 
       // Fire completion notification immediately — works even when app is
       // backgrounded since _onTick runs in the main isolate with ticker alive.
@@ -400,10 +403,13 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
               ? state.labelDefaultCat
               : 'Your cat');
 
-    // 基础通知（fallback）
+    // 基础通知（fallback）— 时间优先显示，habitName 截断防止遮挡
+    final truncatedHabit = state.habitName.length > 20
+        ? '${state.habitName.substring(0, 20)}...'
+        : state.habitName;
     FocusTimerService.updateNotification(
       title: '$catDisplayName $focusingLabel',
-      text: '${state.habitName} \u{00B7} ${state.displayTime} $label',
+      text: '${state.displayTime} $label \u{00B7} $truncatedHabit',
     );
 
     // 富通知（触发 vivo 原子岛 + Android 16 ProgressStyle）
@@ -431,6 +437,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Pause the timer.
   void pause() {
     _ticker?.cancel();
+    _cancelBackupAlarm();
     state = state.copyWith(
       status: TimerStatus.paused,
       pausedAt: DateTime.now(),
@@ -455,6 +462,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     _ticker?.cancel();
     _ticksSinceSave = 0;
     _saveState();
+    _scheduleBackupAlarm();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
   }
 
@@ -464,6 +472,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = state.copyWith(status: TimerStatus.completed);
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
+    FocusTimerService.stop();
+    _cancelBackupAlarm();
 
     // Analytics: log session quality (non-critical, must not break core flow)
     try {
@@ -485,6 +495,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     state = state.copyWith(status: TimerStatus.abandoned);
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
+    FocusTimerService.stop();
+    _cancelBackupAlarm();
 
     // Analytics: log session quality (non-critical, must not break core flow)
     try {
@@ -599,7 +611,47 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     _ticker?.cancel();
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
+    _cancelBackupAlarm();
     state = const FocusTimerState();
+  }
+
+  /// Schedule a backup alarm for countdown mode.
+  /// If the foreground service is killed, this ensures the user still
+  /// gets a notification when the timer would have completed.
+  /// Non-critical — failures are silently ignored (e.g. in test environments).
+  void _scheduleBackupAlarm() {
+    try {
+      if (state.mode != TimerMode.countdown) return;
+      if (state.startedAt == null) return;
+
+      final fireAt = state.startedAt!.add(
+        Duration(seconds: state.totalSeconds + state.totalPausedSeconds),
+      );
+      // 只在未来的时间点调度
+      if (fireAt.isBefore(DateTime.now())) return;
+
+      final catLabel = state.catName.isNotEmpty
+          ? state.catName
+          : (state.labelDefaultCat.isNotEmpty
+                ? state.labelDefaultCat
+                : 'Focus');
+      NotificationService().scheduleTimerBackup(
+        fireAt: fireAt,
+        title: catLabel,
+        body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+      );
+    } catch (_) {
+      // Non-critical: backup alarm is best-effort
+    }
+  }
+
+  /// Cancel backup alarm. Non-critical — failures are silently ignored.
+  void _cancelBackupAlarm() {
+    try {
+      NotificationService().cancelTimerBackup();
+    } catch (_) {
+      // Non-critical: backup alarm is best-effort
+    }
   }
 
   /// Persist current timer state to SharedPreferences.

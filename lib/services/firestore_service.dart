@@ -297,6 +297,7 @@ class FirestoreService {
   }
 
   /// 分页查询专注历史（按 endedAt 降序）。
+  /// [startDate] / [endDate] 用于月份筛选（endedAt 范围）。
   Future<({List<FocusSession> sessions, DocumentSnapshot? lastDoc})>
   getSessionHistory({
     required String uid,
@@ -304,13 +305,25 @@ class FirestoreService {
     String? habitId,
     int limit = 20,
     DocumentSnapshot? startAfter,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     // 单个 habit 查询
     if (habitId != null) {
       Query query = _sessionsRef(
         uid,
         habitId,
-      ).orderBy('endedAt', descending: true).limit(limit);
+      ).orderBy('endedAt', descending: true);
+      if (startDate != null) {
+        query = query.where(
+          'endedAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        );
+      }
+      if (endDate != null) {
+        query = query.where('endedAt', isLessThan: Timestamp.fromDate(endDate));
+      }
+      query = query.limit(limit);
       if (startAfter != null) {
         query = query.startAfterDocument(startAfter);
       }
@@ -326,24 +339,42 @@ class FirestoreService {
     DocumentSnapshot? lastDocument;
 
     final futures = habitIds.map((hId) async {
-      Query query = _sessionsRef(
-        uid,
-        hId,
-      ).orderBy('endedAt', descending: true).limit(limit);
+      Query query = _sessionsRef(uid, hId).orderBy('endedAt', descending: true);
+      if (startDate != null) {
+        query = query.where(
+          'endedAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        );
+      }
+      if (endDate != null) {
+        query = query.where('endedAt', isLessThan: Timestamp.fromDate(endDate));
+      }
       // 分页对跨集合查询无法直接用 startAfter，使用时间戳过滤
       if (startAfter != null) {
         final lastData = startAfter.data() as Map<String, dynamic>?;
         if (lastData != null && lastData['endedAt'] != null) {
-          query = _sessionsRef(uid, hId)
-              .orderBy('endedAt', descending: true)
+          query = _sessionsRef(uid, hId).orderBy('endedAt', descending: true);
+          if (startDate != null) {
+            query = query.where(
+              'endedAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+            );
+          }
+          query = query
               .where('endedAt', isLessThan: lastData['endedAt'])
               .limit(limit);
+        } else {
+          query = query.limit(limit);
         }
+      } else {
+        query = query.limit(limit);
       }
       return query.get();
     });
 
-    final snapshots = await Future.wait(futures);
+    final snapshots = await Future.wait(
+      futures,
+    ).timeout(const Duration(seconds: 10));
     for (final snapshot in snapshots) {
       allSessions.addAll(snapshot.docs.map(FocusSession.fromFirestore));
     }
