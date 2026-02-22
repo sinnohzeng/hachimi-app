@@ -8,12 +8,13 @@ import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/achievement.dart';
+import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/services/achievement_trigger_helper.dart';
-import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/growth_path_card.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
+import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'components/step_indicator.dart';
 
@@ -41,7 +42,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   bool _isUnlimitedMode = true; // 默认永续模式
   bool _isCustomGoal = false;
   bool _isCustomTarget = false;
-  String? _reminderTime;
+  final List<ReminderConfig> _reminders = [];
   DateTime? _deadlineDate;
   bool _motivationInitialized = false;
 
@@ -82,6 +83,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   }
 
   void _nextStep() {
+    FocusScope.of(context).unfocus();
+
     if (_currentStep == 0) {
       if (_nameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +107,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   }
 
   void _previousStep() {
+    FocusScope.of(context).unfocus();
+
     if (_currentStep > 0) {
       setState(() => _currentStep--);
       _pageController.animateToPage(
@@ -167,7 +172,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             name: _nameController.text.trim(),
             targetHours: _isUnlimitedMode ? null : _targetHours,
             goalMinutes: _goalMinutes,
-            reminderTime: _reminderTime,
+            reminders: _reminders.isNotEmpty ? _reminders : null,
             motivationText: motivationText,
             deadlineDate: _isUnlimitedMode ? null : _deadlineDate,
             cat: selectedCat,
@@ -183,23 +188,24 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             targetHours: _isUnlimitedMode ? 0 : (_targetHours ?? 0),
           );
 
-      // Schedule daily reminder if user set a reminder time
-      if (_reminderTime != null) {
-        final notifService = NotificationService();
+      // 调度提醒通知
+      if (_reminders.isNotEmpty) {
+        final notifService = ref.read(notificationServiceProvider);
         var hasPermission = await notifService.isPermissionGranted();
         if (!hasPermission) {
           hasPermission = await notifService.requestPermission();
         }
-        if (hasPermission) {
-          final parts = _reminderTime!.split(':');
-          final hour = int.parse(parts[0]);
-          final minute = int.parse(parts[1]);
-          await notifService.scheduleDailyReminder(
+        if (hasPermission && mounted) {
+          final l10n = context.l10n;
+          await notifService.scheduleReminders(
             habitId: result.habitId,
             habitName: _nameController.text.trim(),
             catName: _catNameController.text.trim(),
-            hour: hour,
-            minute: minute,
+            reminders: _reminders,
+            title: l10n.reminderNotificationTitle(
+              _catNameController.text.trim(),
+            ),
+            body: l10n.reminderNotificationBody(_nameController.text.trim()),
           );
         }
       }
@@ -295,14 +301,14 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     );
   }
 
-  // ─── Step 1: Define Habit (Card-based layout) ───
+  // ─── Step 1: Define Habit ───
 
   Widget _buildStep1HabitForm(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     return SingleChildScrollView(
-      padding: AppSpacing.paddingLg,
+      padding: AppSpacing.paddingBase,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -323,230 +329,227 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             const SizedBox(height: AppSpacing.lg),
           ],
 
-          // ── Card 1: 基础信息 ──
-          Card(
-            child: Padding(
-              padding: AppSpacing.paddingBase,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.l10n.adoptionBasicInfo,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.adoptionQuestName,
-                      hintText: context.l10n.adoptionQuestHint,
-                      prefixIcon: const Icon(Icons.edit_outlined),
-                    ),
-                    textInputAction: TextInputAction.done,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  TextFormField(
-                    controller: _motivationController,
-                    maxLength: 40,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.adoptionMotivationLabel,
-                      hintText: context.l10n.adoptionMotivationHint,
-                      prefixIcon: const Icon(Icons.format_quote),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.refresh),
-                        tooltip: context.l10n.adoptionMotivationSwap,
-                        onPressed: () {
-                          final current = _motivationController.text;
-                          final locale = Localizations.localeOf(context);
-                          _motivationController.text = randomMotivationQuote(
-                            locale,
-                            exclude: current,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+          // ── 基础信息 ──
+          Text(
+            context.l10n.adoptionBasicInfo,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: context.l10n.adoptionQuestName,
+              hintText: context.l10n.adoptionQuestHint,
+              prefixIcon: const Icon(Icons.edit_outlined),
+            ),
+            textInputAction: TextInputAction.done,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextFormField(
+            controller: _motivationController,
+            maxLength: 240,
+            decoration: InputDecoration(
+              labelText: context.l10n.adoptionMotivationLabel,
+              hintText: context.l10n.adoptionMotivationHint,
+              prefixIcon: const Icon(Icons.format_quote),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: context.l10n.adoptionMotivationSwap,
+                onPressed: () {
+                  final current = _motivationController.text;
+                  final locale = Localizations.localeOf(context);
+                  _motivationController.text = randomMotivationQuote(
+                    locale,
+                    exclude: current,
+                  );
+                },
               ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          const Divider(),
+          const SizedBox(height: AppSpacing.sm),
+
+          // ── 目标设置 ──
+          Text(
+            context.l10n.adoptionGoals,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            context.l10n.adoptionGrowthHint,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // ── Card 2: 目标设置 ──
-          Card(
-            child: Padding(
-              padding: AppSpacing.paddingBase,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.l10n.adoptionGoals,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    context.l10n.adoptionGrowthHint,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // 目标模式切换
-                  _buildModeToggle(theme),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // 里程碑模式：目标小时数 + 截止日期
-                  if (!_isUnlimitedMode) ...[
-                    Text(
-                      context.l10n.adoptionTotalTarget,
-                      style: textTheme.labelLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        ...targetHourOptions.map((hours) {
-                          final isSelected =
-                              !_isCustomTarget && _targetHours == hours;
-                          return ChoiceChip(
-                            label: Text('${hours}h'),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() {
-                              _targetHours = hours;
-                              _isCustomTarget = false;
-                            }),
-                          );
-                        }),
-                        if (_isCustomTarget)
-                          ChoiceChip(
-                            label: Text('${_targetHours}h'),
-                            selected: true,
-                            onSelected: (_) => _showCustomTargetDialog(),
-                          )
-                        else
-                          ActionChip(
-                            label: Text(context.l10n.adoptionCustom),
-                            avatar: const Icon(Icons.tune, size: 18),
-                            onPressed: _showCustomTargetDialog,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // 截止日期（可选）
-                    _buildDeadlinePicker(theme),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-
-                  // 每日目标（始终显示）
-                  Text(
-                    context.l10n.adoptionDailyGoalLabel,
-                    style: textTheme.labelLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ...goalOptions.map((minutes) {
-                        final isSelected =
-                            !_isCustomGoal && _goalMinutes == minutes;
-                        return ChoiceChip(
-                          label: Text('${minutes}min'),
-                          selected: isSelected,
-                          onSelected: (_) => setState(() {
-                            _goalMinutes = minutes;
-                            _isCustomGoal = false;
-                          }),
-                        );
-                      }),
-                      if (_isCustomGoal)
-                        ChoiceChip(
-                          label: Text('${_goalMinutes}min'),
-                          selected: true,
-                          onSelected: (_) => _showCustomGoalDialog(),
-                        )
-                      else
-                        ActionChip(
-                          label: Text(context.l10n.adoptionCustom),
-                          avatar: const Icon(Icons.tune, size: 18),
-                          onPressed: _showCustomGoalDialog,
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // 目标模式切换
+          _buildModeToggle(theme),
           const SizedBox(height: AppSpacing.md),
+
+          // 里程碑模式：目标小时数 + 截止日期
+          if (!_isUnlimitedMode) ...[
+            Text(context.l10n.adoptionTotalTarget, style: textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: 8,
+              children: [
+                ...targetHourOptions.map((hours) {
+                  final isSelected = !_isCustomTarget && _targetHours == hours;
+                  return ChoiceChip(
+                    label: Text('${hours}h'),
+                    selected: isSelected,
+                    onSelected: (_) => setState(() {
+                      _targetHours = hours;
+                      _isCustomTarget = false;
+                    }),
+                  );
+                }),
+                if (_isCustomTarget)
+                  ChoiceChip(
+                    label: Text('${_targetHours}h'),
+                    selected: true,
+                    onSelected: (_) => _showCustomTargetDialog(),
+                  )
+                else
+                  ActionChip(
+                    label: Text(context.l10n.adoptionCustom),
+                    avatar: const Icon(Icons.tune, size: 18),
+                    onPressed: _showCustomTargetDialog,
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+
+            // 截止日期（可选）
+            _buildDeadlinePicker(theme),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
+          // 每日目标（始终显示）
+          Text(
+            context.l10n.adoptionDailyGoalLabel,
+            style: textTheme.labelLarge,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: 8,
+            children: [
+              ...goalOptions.map((minutes) {
+                final isSelected = !_isCustomGoal && _goalMinutes == minutes;
+                return ChoiceChip(
+                  label: Text('${minutes}min'),
+                  selected: isSelected,
+                  onSelected: (_) => setState(() {
+                    _goalMinutes = minutes;
+                    _isCustomGoal = false;
+                  }),
+                );
+              }),
+              if (_isCustomGoal)
+                ChoiceChip(
+                  label: Text('${_goalMinutes}min'),
+                  selected: true,
+                  onSelected: (_) => _showCustomGoalDialog(),
+                )
+              else
+                ActionChip(
+                  label: Text(context.l10n.adoptionCustom),
+                  avatar: const Icon(Icons.tune, size: 18),
+                  onPressed: _showCustomGoalDialog,
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          const Divider(),
+          const SizedBox(height: AppSpacing.sm),
 
           // ── 成长之路说明卡片 ──
           GrowthPathCard(initiallyExpanded: widget.isFirstHabit),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
+          const Divider(),
+          const SizedBox(height: AppSpacing.sm),
 
-          // ── Card 3: 提醒 ──
-          Card(
-            child: Padding(
-              padding: AppSpacing.paddingBase,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.l10n.adoptionReminderSection,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    context.l10n.adoptionReminderLabel,
-                    style: textTheme.labelLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: Text(context.l10n.adoptionReminderNone),
-                        selected: _reminderTime == null,
-                        onSelected: (_) => setState(() => _reminderTime = null),
-                      ),
-                      ChoiceChip(
-                        label: const Text('7:00 AM'),
-                        selected: _reminderTime == '07:00',
-                        onSelected: (_) =>
-                            setState(() => _reminderTime = '07:00'),
-                      ),
-                      ChoiceChip(
-                        label: const Text('8:00 AM'),
-                        selected: _reminderTime == '08:00',
-                        onSelected: (_) =>
-                            setState(() => _reminderTime = '08:00'),
-                      ),
-                      ChoiceChip(
-                        label: const Text('9:00 PM'),
-                        selected: _reminderTime == '21:00',
-                        onSelected: (_) =>
-                            setState(() => _reminderTime = '21:00'),
-                      ),
-                      ActionChip(
-                        label: Text(context.l10n.adoptionCustom),
-                        avatar: const Icon(Icons.access_time, size: 18),
-                        onPressed: () => _pickCustomTime(context),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          // ── 提醒 ──
+          Text(
+            context.l10n.adoptionReminderSection,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
+          const SizedBox(height: AppSpacing.md),
+          _buildReminderList(theme),
         ],
       ),
     );
+  }
+
+  /// 提醒列表 UI：已添加的提醒 + 添加按钮。
+  Widget _buildReminderList(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final l10n = context.l10n;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 已添加的提醒列表
+        for (int i = 0; i < _reminders.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.notifications_active,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    _reminderDescription(_reminders[i]),
+                    style: textTheme.bodyMedium,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, size: 18, color: colorScheme.error),
+                  onPressed: () => setState(() => _reminders.removeAt(i)),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+          ),
+
+        // 添加提醒按钮
+        if (_reminders.length < 5)
+          TextButton.icon(
+            onPressed: _addReminder,
+            icon: const Icon(Icons.add_alarm, size: 18),
+            label: Text(l10n.reminderAddMore),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: Text(
+              l10n.reminderMaxReached,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// 生成提醒描述文案。
+  String _reminderDescription(ReminderConfig reminder) =>
+      reminder.localizedDescription(context.l10n);
+
+  Future<void> _addReminder() async {
+    final result = await showReminderPickerSheet(context);
+    if (result != null) {
+      setState(() => _reminders.add(result));
+    }
   }
 
   // ─── 目标模式切换 ───
@@ -725,19 +728,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _pickCustomTime(BuildContext context) async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (time != null) {
-      setState(() {
-        _reminderTime =
-            '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-      });
-    }
   }
 
   // ─── Step 2: Choose from 3 cats ───

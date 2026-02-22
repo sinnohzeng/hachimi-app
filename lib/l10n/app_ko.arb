@@ -681,6 +681,38 @@
   "sessionStopwatch": "스톱워치",
   "historyDateGroupToday": "오늘",
   "historyDateGroupYesterday": "어제",
+  "historyLoadError": "기록 불러오기 실패",
+  "historySelectMonth": "월 선택",
+  "historyAllMonths": "전체 월",
+  "historyAllHabits": "전체",
+
+  "homeTabAchievements": "업적",
+  "achievementTitle": "업적",
+  "achievementTabOverview": "개요",
+  "achievementTabQuest": "퀘스트",
+  "achievementTabStreak": "연속",
+  "achievementTabCat": "고양이",
+  "achievementTabPersist": "꾸준함",
+  "achievementSummaryTitle": "업적 현황",
+  "achievementUnlockedCount": "{count}개 달성",
+  "@achievementUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementTotalCoins": "{coins} 코인 획득",
+  "@achievementTotalCoins": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "achievementUnlocked": "업적 달성!",
+  "achievementHidden": "???",
+  "achievementHiddenDesc": "숨겨진 업적입니다",
+  "achievementPersistDesc": "아무 퀘스트에서 {days}일 체크인 달성",
+  "@achievementPersistDesc": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "achievementTitleCount": "{count}개 칭호 달성",
+  "@achievementTitleCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "growthPathTitle": "성장의 길",
   "growthPathKitten": "새로운 여정의 시작",
@@ -693,5 +725,45 @@
   "achievementCelebrationTitle": "칭호 획득: {title}",
   "achievementCelebrationDismiss": "대단해!",
   "achievementCelebrationSkipAll": "모두 건너뛰기",
-  "achievementCelebrationCounter": "{current} / {total}"
+  "achievementCelebrationCounter": "{current} / {total}",
+
+  "reminderModeDaily": "매일",
+  "reminderModeWeekdays": "평일",
+  "reminderModeMonday": "월요일",
+  "reminderModeTuesday": "화요일",
+  "reminderModeWednesday": "수요일",
+  "reminderModeThursday": "목요일",
+  "reminderModeFriday": "금요일",
+  "reminderModeSaturday": "토요일",
+  "reminderModeSunday": "일요일",
+  "reminderPickerTitle": "알림 시간 선택",
+  "reminderHourUnit": "시",
+  "reminderMinuteUnit": "분",
+  "reminderAddMore": "알림 추가",
+  "reminderMaxReached": "최대 5개 알림",
+  "reminderConfirm": "확인",
+  "reminderNotificationTitle": "{catName}이(가) 보고 싶어해요!",
+  "@reminderNotificationTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "reminderNotificationBody": "{habitName} 시간이에요. 고양이가 기다리고 있어요!",
+  "@reminderNotificationBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+
+  "deleteAccountDataWarning": "다음 모든 데이터가 영구적으로 삭제됩니다:",
+  "deleteAccountQuests": "퀘스트",
+  "deleteAccountCats": "고양이",
+  "deleteAccountHours": "집중 시간",
+  "deleteAccountIrreversible": "이 작업은 되돌릴 수 없습니다",
+  "deleteAccountContinue": "계속",
+  "deleteAccountConfirmTitle": "삭제 확인",
+  "deleteAccountTypeDelete": "계정 삭제를 확인하려면 DELETE를 입력하세요:",
+  "deleteAccountAuthCancelled": "인증이 취소되었습니다",
+  "deleteAccountAuthFailed": "인증 실패: {error}",
+  "@deleteAccountAuthFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteAccountProgress": "계정 삭제 중...",
+  "deleteAccountSuccess": "계정이 삭제되었습니다"
 }

@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_10y.dart' as tz;
 
@@ -208,40 +209,105 @@ class NotificationService {
 
   // ─── Scheduling ───
 
-  /// Schedule a daily reminder for a habit.
-  Future<void> scheduleDailyReminder({
+  /// 为一个 habit 调度多条提醒。先取消旧通知，再按模式逐条调度。
+  ///
+  /// ID 方案: `base * 100 + reminderIdx * 10 + dayOffset`
+  /// - base = habitId.hashCode.abs() % 100000（10 万空间，降低碰撞概率）
+  /// - dayOffset: daily=0, weekdays=0~4, 具体星期=0
+  ///
+  /// [title] 和 [body] 为已本地化的通知文案，由调用方传入。
+  Future<void> scheduleReminders({
     required String habitId,
     required String habitName,
     required String catName,
-    required int hour,
-    required int minute,
+    required List<ReminderConfig> reminders,
+    required String title,
+    required String body,
   }) async {
-    final id = habitId.hashCode.abs() % 100000;
+    // 先清理该 habit 所有已有通知
+    await cancelAllRemindersForHabit(habitId);
 
-    await _localNotifications.zonedSchedule(
-      id: id,
-      scheduledDate: _nextInstanceOfTime(hour, minute),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: _channelDesc,
-          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      title: '$catName misses you!',
-      body: 'Time for $habitName — your cat is waiting!',
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'habit:$habitId',
-    );
+    final base = habitId.hashCode.abs() % 100000;
+
+    for (int i = 0; i < reminders.length; i++) {
+      final reminder = reminders[i];
+
+      switch (reminder.mode) {
+        case 'daily':
+          final id = base * 100 + i * 10;
+          await _localNotifications.zonedSchedule(
+            id: id,
+            scheduledDate: _nextInstanceOfTime(reminder.hour, reminder.minute),
+            notificationDetails: _reminderDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            title: title,
+            body: body,
+            matchDateTimeComponents: DateTimeComponents.time,
+            payload: 'habit:$habitId',
+          );
+
+        case 'weekdays':
+          for (int d = 0; d < 5; d++) {
+            final weekday = DateTime.monday + d;
+            final id = base * 100 + i * 10 + d;
+            await _localNotifications.zonedSchedule(
+              id: id,
+              scheduledDate: _nextInstanceOfWeekdayTime(
+                weekday,
+                reminder.hour,
+                reminder.minute,
+              ),
+              notificationDetails: _reminderDetails,
+              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+              title: title,
+              body: body,
+              matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+              payload: 'habit:$habitId',
+            );
+          }
+
+        default:
+          final weekday = reminder.weekday;
+          if (weekday == null) continue;
+          final id = base * 100 + i * 10;
+          await _localNotifications.zonedSchedule(
+            id: id,
+            scheduledDate: _nextInstanceOfWeekdayTime(
+              weekday,
+              reminder.hour,
+              reminder.minute,
+            ),
+            notificationDetails: _reminderDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            title: title,
+            body: body,
+            matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+            payload: 'habit:$habitId',
+          );
+      }
+    }
   }
 
-  /// Cancel a habit's daily reminder.
-  Future<void> cancelDailyReminder(String habitId) async {
-    final id = habitId.hashCode.abs() % 100000;
-    await _localNotifications.cancel(id: id);
+  /// 取消该 habit 的所有提醒通知（最多 5 reminders × 10 slots each）。
+  Future<void> cancelAllRemindersForHabit(String habitId) async {
+    final base = habitId.hashCode.abs() % 100000;
+    for (int i = 0; i < 5; i++) {
+      for (int d = 0; d < 10; d++) {
+        final id = base * 100 + i * 10 + d;
+        await _localNotifications.cancel(id: id);
+      }
+    }
   }
+
+  /// 通知详情（提醒通道复用）。
+  static const _reminderDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      channelDescription: _channelDesc,
+      largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+    ),
+  );
 
   /// Schedule a streak-at-risk notification for 20:00 today.
   Future<void> scheduleStreakAtRisk({
@@ -383,6 +449,32 @@ class NotificationService {
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
+    return scheduled;
+  }
+
+  /// 计算下一个指定星期几 + 时间的实例。
+  /// [weekday] 遵循 DateTime.monday(1) ~ DateTime.sunday(7)。
+  tz.TZDateTime _nextInstanceOfWeekdayTime(int weekday, int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    // 调整到目标星期几
+    while (scheduled.weekday != weekday) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+
+    // 如果已过去，推到下周
+    if (scheduled.isBefore(now)) {
+      scheduled = scheduled.add(const Duration(days: 7));
+    }
+
     return scheduled;
   }
 }

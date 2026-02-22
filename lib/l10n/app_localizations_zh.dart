@@ -2125,6 +2125,99 @@ class SZh extends S {
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
   }
+
+  @override
+  String get reminderModeDaily => '每天';
+
+  @override
+  String get reminderModeWeekdays => '工作日';
+
+  @override
+  String get reminderModeMonday => '周一';
+
+  @override
+  String get reminderModeTuesday => '周二';
+
+  @override
+  String get reminderModeWednesday => '周三';
+
+  @override
+  String get reminderModeThursday => '周四';
+
+  @override
+  String get reminderModeFriday => '周五';
+
+  @override
+  String get reminderModeSaturday => '周六';
+
+  @override
+  String get reminderModeSunday => '周日';
+
+  @override
+  String get reminderPickerTitle => '选择提醒时间';
+
+  @override
+  String get reminderHourUnit => '点';
+
+  @override
+  String get reminderMinuteUnit => '分';
+
+  @override
+  String get reminderAddMore => '添加提醒';
+
+  @override
+  String get reminderMaxReached => '最多 5 个提醒';
+
+  @override
+  String get reminderConfirm => '确认';
+
+  @override
+  String reminderNotificationTitle(String catName) {
+    return '$catName想你了！';
+  }
+
+  @override
+  String reminderNotificationBody(String habitName) {
+    return '$habitName的时间到了，你的猫咪在等你！';
+  }
+
+  @override
+  String get deleteAccountDataWarning => '以下所有数据将被永久删除：';
+
+  @override
+  String get deleteAccountQuests => '任务';
+
+  @override
+  String get deleteAccountCats => '猫咪';
+
+  @override
+  String get deleteAccountHours => '专注时长';
+
+  @override
+  String get deleteAccountIrreversible => '此操作不可撤销';
+
+  @override
+  String get deleteAccountContinue => '继续';
+
+  @override
+  String get deleteAccountConfirmTitle => '确认删除';
+
+  @override
+  String get deleteAccountTypeDelete => '输入 DELETE 以确认删除账号：';
+
+  @override
+  String get deleteAccountAuthCancelled => '认证已取消';
+
+  @override
+  String deleteAccountAuthFailed(String error) {
+    return '认证失败：$error';
+  }
+
+  @override
+  String get deleteAccountProgress => '正在删除账号...';
+
+  @override
+  String get deleteAccountSuccess => '账号已删除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4147,6 +4240,71 @@ class SZhHant extends SZh {
   String get historyDateGroupYesterday => '昨天';
 
   @override
+  String get historyLoadError => '載入歷史記錄失敗';
+
+  @override
+  String get historySelectMonth => '選擇月份';
+
+  @override
+  String get historyAllMonths => '全部月份';
+
+  @override
+  String get historyAllHabits => '全部';
+
+  @override
+  String get homeTabAchievements => '成就';
+
+  @override
+  String get achievementTitle => '成就';
+
+  @override
+  String get achievementTabOverview => '概覽';
+
+  @override
+  String get achievementTabQuest => '任務';
+
+  @override
+  String get achievementTabStreak => '連續';
+
+  @override
+  String get achievementTabCat => '貓咪';
+
+  @override
+  String get achievementTabPersist => '堅持';
+
+  @override
+  String get achievementSummaryTitle => '成就進度';
+
+  @override
+  String achievementUnlockedCount(int count) {
+    return '已解鎖 $count 個';
+  }
+
+  @override
+  String achievementTotalCoins(int coins) {
+    return '共獲 $coins 金幣';
+  }
+
+  @override
+  String get achievementUnlocked => '成就解鎖！';
+
+  @override
+  String get achievementHidden => '???';
+
+  @override
+  String get achievementHiddenDesc => '這是一個隱藏成就';
+
+  @override
+  String achievementPersistDesc(int days) {
+    return '累計打卡 $days 天';
+  }
+
+  @override
+  String achievementTitleCount(int count) {
+    return '已解鎖 $count 個稱號';
+  }
+
+  @override
   String get growthPathTitle => '成長之路';
 
   @override
@@ -4184,4 +4342,97 @@ class SZhHant extends SZh {
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
   }
+
+  @override
+  String get reminderModeDaily => '每天';
+
+  @override
+  String get reminderModeWeekdays => '工作日';
+
+  @override
+  String get reminderModeMonday => '週一';
+
+  @override
+  String get reminderModeTuesday => '週二';
+
+  @override
+  String get reminderModeWednesday => '週三';
+
+  @override
+  String get reminderModeThursday => '週四';
+
+  @override
+  String get reminderModeFriday => '週五';
+
+  @override
+  String get reminderModeSaturday => '週六';
+
+  @override
+  String get reminderModeSunday => '週日';
+
+  @override
+  String get reminderPickerTitle => '選擇提醒時間';
+
+  @override
+  String get reminderHourUnit => '點';
+
+  @override
+  String get reminderMinuteUnit => '分';
+
+  @override
+  String get reminderAddMore => '添加提醒';
+
+  @override
+  String get reminderMaxReached => '最多 5 個提醒';
+
+  @override
+  String get reminderConfirm => '確認';
+
+  @override
+  String reminderNotificationTitle(String catName) {
+    return '$catName想你了！';
+  }
+
+  @override
+  String reminderNotificationBody(String habitName) {
+    return '$habitName的時間到了，你的貓咪在等你！';
+  }
+
+  @override
+  String get deleteAccountDataWarning => '以下所有資料將被永久刪除：';
+
+  @override
+  String get deleteAccountQuests => '任務';
+
+  @override
+  String get deleteAccountCats => '貓咪';
+
+  @override
+  String get deleteAccountHours => '專注時長';
+
+  @override
+  String get deleteAccountIrreversible => '此操作不可撤銷';
+
+  @override
+  String get deleteAccountContinue => '繼續';
+
+  @override
+  String get deleteAccountConfirmTitle => '確認刪除';
+
+  @override
+  String get deleteAccountTypeDelete => '輸入 DELETE 以確認刪除帳號：';
+
+  @override
+  String get deleteAccountAuthCancelled => '認證已取消';
+
+  @override
+  String deleteAccountAuthFailed(String error) {
+    return '認證失敗：$error';
+  }
+
+  @override
+  String get deleteAccountProgress => '正在刪除帳號...';
+
+  @override
+  String get deleteAccountSuccess => '帳號已刪除';
 }

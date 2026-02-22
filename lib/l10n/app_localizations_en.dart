@@ -2157,4 +2157,99 @@ class SEn extends S {
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
   }
+
+  @override
+  String get reminderModeDaily => 'Every day';
+
+  @override
+  String get reminderModeWeekdays => 'Weekdays';
+
+  @override
+  String get reminderModeMonday => 'Monday';
+
+  @override
+  String get reminderModeTuesday => 'Tuesday';
+
+  @override
+  String get reminderModeWednesday => 'Wednesday';
+
+  @override
+  String get reminderModeThursday => 'Thursday';
+
+  @override
+  String get reminderModeFriday => 'Friday';
+
+  @override
+  String get reminderModeSaturday => 'Saturday';
+
+  @override
+  String get reminderModeSunday => 'Sunday';
+
+  @override
+  String get reminderPickerTitle => 'Select reminder time';
+
+  @override
+  String get reminderHourUnit => 'h';
+
+  @override
+  String get reminderMinuteUnit => 'min';
+
+  @override
+  String get reminderAddMore => 'Add reminder';
+
+  @override
+  String get reminderMaxReached => 'Up to 5 reminders';
+
+  @override
+  String get reminderConfirm => 'Confirm';
+
+  @override
+  String reminderNotificationTitle(String catName) {
+    return '$catName misses you!';
+  }
+
+  @override
+  String reminderNotificationBody(String habitName) {
+    return 'Time for $habitName — your cat is waiting!';
+  }
+
+  @override
+  String get deleteAccountDataWarning =>
+      'All the following data will be permanently deleted:';
+
+  @override
+  String get deleteAccountQuests => 'Quests';
+
+  @override
+  String get deleteAccountCats => 'Cats';
+
+  @override
+  String get deleteAccountHours => 'Focus hours';
+
+  @override
+  String get deleteAccountIrreversible => 'This action is irreversible';
+
+  @override
+  String get deleteAccountContinue => 'Continue';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Confirm deletion';
+
+  @override
+  String get deleteAccountTypeDelete =>
+      'Type DELETE to confirm account deletion:';
+
+  @override
+  String get deleteAccountAuthCancelled => 'Authentication cancelled';
+
+  @override
+  String deleteAccountAuthFailed(String error) {
+    return 'Authentication failed: $error';
+  }
+
+  @override
+  String get deleteAccountProgress => 'Deleting account...';
+
+  @override
+  String get deleteAccountSuccess => 'Account deleted';
 }

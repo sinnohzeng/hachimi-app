@@ -1013,5 +1013,45 @@
       "current": { "type": "int" },
       "total": { "type": "int" }
     }
-  }
+  },
+
+  "reminderModeDaily": "Every day",
+  "reminderModeWeekdays": "Weekdays",
+  "reminderModeMonday": "Monday",
+  "reminderModeTuesday": "Tuesday",
+  "reminderModeWednesday": "Wednesday",
+  "reminderModeThursday": "Thursday",
+  "reminderModeFriday": "Friday",
+  "reminderModeSaturday": "Saturday",
+  "reminderModeSunday": "Sunday",
+  "reminderPickerTitle": "Select reminder time",
+  "reminderHourUnit": "h",
+  "reminderMinuteUnit": "min",
+  "reminderAddMore": "Add reminder",
+  "reminderMaxReached": "Up to 5 reminders",
+  "reminderConfirm": "Confirm",
+  "reminderNotificationTitle": "{catName} misses you!",
+  "@reminderNotificationTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "reminderNotificationBody": "Time for {habitName} — your cat is waiting!",
+  "@reminderNotificationBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+
+  "deleteAccountDataWarning": "All the following data will be permanently deleted:",
+  "deleteAccountQuests": "Quests",
+  "deleteAccountCats": "Cats",
+  "deleteAccountHours": "Focus hours",
+  "deleteAccountIrreversible": "This action is irreversible",
+  "deleteAccountContinue": "Continue",
+  "deleteAccountConfirmTitle": "Confirm deletion",
+  "deleteAccountTypeDelete": "Type DELETE to confirm account deletion:",
+  "deleteAccountAuthCancelled": "Authentication cancelled",
+  "deleteAccountAuthFailed": "Authentication failed: {error}",
+  "@deleteAccountAuthFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteAccountProgress": "Deleting account...",
+  "deleteAccountSuccess": "Account deleted"
 }

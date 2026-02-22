@@ -7,6 +7,7 @@ import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/focus_session.dart';
+import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:intl/intl.dart';
 
 /// FirestoreService — wraps Firestore CRUD for users, habits, sessions, stats.
@@ -59,14 +60,14 @@ class FirestoreService {
     required String name,
     int? targetHours,
     int goalMinutes = 25,
-    String? reminderTime,
+    List<ReminderConfig>? reminders,
     String? catId,
   }) async {
     final docRef = await _habitsRef(uid).add({
       'name': name,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
-      'reminderTime': reminderTime,
+      'reminders': reminders?.map((r) => r.toMap()).toList() ?? [],
       'catId': catId,
       'isActive': true,
       'totalMinutes': 0,
@@ -84,7 +85,7 @@ class FirestoreService {
     required String name,
     int? targetHours,
     required int goalMinutes,
-    String? reminderTime,
+    List<ReminderConfig>? reminders,
     String? motivationText,
     DateTime? deadlineDate,
     required Cat cat,
@@ -97,7 +98,7 @@ class FirestoreService {
       'name': name,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
-      'reminderTime': reminderTime,
+      'reminders': reminders?.map((r) => r.toMap()).toList() ?? [],
       'motivationText': ?motivationText,
       if (deadlineDate != null)
         'deadlineDate': Timestamp.fromDate(deadlineDate),
@@ -141,8 +142,8 @@ class FirestoreService {
     int? goalMinutes,
     int? targetHours,
     bool clearTargetHours = false,
-    String? reminderTime,
-    bool clearReminder = false,
+    List<ReminderConfig>? reminders,
+    bool clearReminders = false,
     String? motivationText,
     bool clearMotivation = false,
     DateTime? deadlineDate,
@@ -156,8 +157,10 @@ class FirestoreService {
     } else if (targetHours != null) {
       updates['targetHours'] = targetHours;
     }
-    if (reminderTime != null) updates['reminderTime'] = reminderTime;
-    if (clearReminder) updates['reminderTime'] = null;
+    if (reminders != null) {
+      updates['reminders'] = reminders.map((r) => r.toMap()).toList();
+    }
+    if (clearReminders) updates['reminders'] = [];
     if (motivationText != null && motivationText.trim().isNotEmpty) {
       updates['motivationText'] = motivationText.trim();
     }

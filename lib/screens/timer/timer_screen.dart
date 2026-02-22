@@ -22,7 +22,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show ServiceRequestFailure;
 import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/notification_service.dart';
+// NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
@@ -94,7 +94,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
 
     // Check notification permission — request if not granted
-    final notifService = NotificationService();
+    final notifService = ref.read(notificationServiceProvider);
     var hasPermission = await notifService.isPermissionGranted();
     if (!hasPermission) {
       hasPermission = await notifService.requestPermission();
@@ -308,14 +308,16 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       // Send completion notification (only on successful completion)
       if (isCompleted) {
         final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
-        NotificationService().showFocusComplete(
-          title: context.l10n.focusCompleteNotifTitle,
-          body: context.l10n.focusCompleteNotifBody(
-            catName,
-            xpResult.totalXp,
-            minutes,
-          ),
-        );
+        ref
+            .read(notificationServiceProvider)
+            .showFocusComplete(
+              title: context.l10n.focusCompleteNotifTitle,
+              body: context.l10n.focusCompleteNotifBody(
+                catName,
+                xpResult.totalXp,
+                minutes,
+              ),
+            );
       }
 
       // Navigate to completion screen
@@ -437,7 +439,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                         ),
                         TextButton(
                           onPressed: () async {
-                            final granted = await NotificationService()
+                            final granted = await ref
+                                .read(notificationServiceProvider)
                                 .requestPermission();
                             if (mounted) {
                               setState(() => _showPermissionBanner = !granted);

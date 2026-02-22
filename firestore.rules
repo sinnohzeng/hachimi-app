@@ -29,7 +29,12 @@ service cloud.firestore {
           && (!('motivationText' in request.resource.data)
               || request.resource.data.motivationText == null
               || (request.resource.data.motivationText is string
-                  && request.resource.data.motivationText.size() <= 40))
+                  && request.resource.data.motivationText.size() <= 240))
+          // reminders: optional list, max 5 items
+          && (!('reminders' in request.resource.data)
+              || request.resource.data.reminders == null
+              || (request.resource.data.reminders is list
+                  && request.resource.data.reminders.size() <= 5))
           // deadlineDate: optional timestamp
           && (!('deadlineDate' in request.resource.data)
               || request.resource.data.deadlineDate == null

@@ -8,6 +8,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 
+import 'components/delete_account_flow.dart';
 import 'components/notification_settings_dialog.dart';
 import 'components/language_dialog.dart';
 import 'components/theme_mode_dialog.dart';
@@ -319,37 +320,6 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _confirmDeleteAccount(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteAccountTitle),
-        content: Text(l10n.deleteAccountMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                await ref.read(authServiceProvider).deleteAccount();
-              } on Exception catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(e.toString())));
-                }
-              }
-            },
-            child: Text(l10n.commonDeleteAccount),
-          ),
-        ],
-      ),
-    );
+    DeleteAccountFlow(context: context, ref: ref).start();
   }
 }

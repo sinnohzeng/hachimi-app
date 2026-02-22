@@ -19,7 +19,7 @@ import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
-import 'package:hachimi_app/services/notification_service.dart';
+// NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/providers/cat_provider.dart';
 
 class HachimiApp extends ConsumerWidget {
@@ -378,15 +378,16 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     // Session check complete — no state tracking needed
   }
 
-  /// Reschedule daily reminders for all active habits with reminderTime set.
-  /// Only runs if notification permission is already granted.
+  /// 重新调度所有有提醒的 habit 的通知。
+  /// 仅在通知权限已授予时执行。
   /// [R1] 等待 DeferredInit 完成以确保 NotificationService 已初始化。
   Future<void> _rescheduleReminders(List<Habit> habits) async {
     // 在 async gap 之前缓存 context 引用
-    final fallbackCatName = context.l10n.focusCompleteYourCat;
+    final l10n = context.l10n;
+    final fallbackCatName = l10n.focusCompleteYourCat;
 
     await DeferredInit.run(); // 幂等，确保通知插件已初始化
-    final notifService = NotificationService();
+    final notifService = ref.read(notificationServiceProvider);
     final hasPermission = await notifService.isPermissionGranted();
     if (!hasPermission) return;
 
@@ -394,26 +395,24 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     final cats = catsAsync.value ?? [];
 
     for (final habit in habits) {
-      if (habit.isActive && habit.reminderTime != null) {
-        final parts = habit.reminderTime!.split(':');
-        if (parts.length != 2) continue;
-        final hour = int.tryParse(parts[0]);
-        final minute = int.tryParse(parts[1]);
-        if (hour == null || minute == null) continue;
+      if (habit.isActive && habit.hasReminders) {
+        try {
+          final cat = habit.catId != null
+              ? cats.where((c) => c.id == habit.catId).firstOrNull
+              : null;
+          final catName = cat?.name ?? fallbackCatName;
 
-        // Find the cat name for the notification
-        final cat = habit.catId != null
-            ? cats.where((c) => c.id == habit.catId).firstOrNull
-            : null;
-        final catName = cat?.name ?? fallbackCatName;
-
-        await notifService.scheduleDailyReminder(
-          habitId: habit.id,
-          habitName: habit.name,
-          catName: catName,
-          hour: hour,
-          minute: minute,
-        );
+          await notifService.scheduleReminders(
+            habitId: habit.id,
+            habitName: habit.name,
+            catName: catName,
+            reminders: habit.reminders,
+            title: l10n.reminderNotificationTitle(catName),
+            body: l10n.reminderNotificationBody(habit.name),
+          );
+        } on Exception catch (e) {
+          debugPrint('[REMINDER] Failed to schedule for ${habit.id}: $e');
+        }
       }
     }
   }

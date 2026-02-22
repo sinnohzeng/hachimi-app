@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2026-02-23
+### Added
+- Multi-reminder system — each quest supports up to 5 independent reminders with 9 scheduling modes (daily, weekdays, individual days)
+- Reminder picker bottom sheet with time and mode selection
+- 4-step account deletion flow with data summary, DELETE confirmation, Google re-auth, and progress dialog
+- Custom daily goal and target hours input dialogs in quest editing
+- Motivation quote field expanded to 240 characters
+- `ReminderConfig` model with localized descriptions and defensive Firestore parsing
+- `AccountDeletionService` with auth-first deletion order (prevents orphaned accounts)
+- 48 new L10N keys across 5 languages (EN/ZH/ZH-Hant/JA/KO) for reminders, account deletion, and achievements
+
+### Changed
+- Check-in banner redesigned: removed spinner, switched to manual check-in with explicit button
+- Featured cat card redesigned with two-row layout
+- Adoption flow Step 1 UI simplified — removed Card containers for cleaner look
+- Keyboard auto-dismisses on step switch in adoption flow
+- Notification text fully localized (was hardcoded English)
+- `NotificationService` access unified through provider pattern across all screens and providers
+- `NotificationSettingsDialog` converted from `StatefulWidget` to `ConsumerStatefulWidget`
+- Notification ID space expanded from `%10000` to `%100000` to reduce collision probability
+
+### Fixed
+- Account deletion now deletes Auth account first — if Auth fails, user data is preserved
+- 3 `use_build_context_synchronously` warnings resolved with mounted guards
+- `_onProgress` callback in deletion dialog hardened with `ctx.mounted` guard
+- `_pickDeadlineDate` missing mounted check after `showDatePicker` await
+- Malformed Firestore reminder data no longer crashes — `tryFromMap` filters invalid entries
+
+### Removed
+- Redundant `_reminderDescription` switch statements in 3 files — consolidated into `ReminderConfig.localizedDescription()`
+
 ## [2.11.0] - 2026-02-22
 ### Changed
 - Quest goal system redesigned: quests now support **unlimited mode** (no target, continuous accumulation) and **milestone mode** (target hours + optional deadline)

@@ -13,6 +13,7 @@ import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 
 /// CheckInBanner — 可视化签到卡片，放置于 HomeScreen 顶部。
+/// 用户点击手动签到，不自动签到。
 class CheckInBanner extends ConsumerStatefulWidget {
   const CheckInBanner({super.key});
 
@@ -21,65 +22,70 @@ class CheckInBanner extends ConsumerStatefulWidget {
 }
 
 class _CheckInBannerState extends ConsumerState<CheckInBanner> {
-  bool _checkInAttempted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _tryCheckIn();
-    });
-  }
+  bool _isCheckingIn = false;
 
   Future<void> _tryCheckIn() async {
-    if (_checkInAttempted) return;
-    _checkInAttempted = true;
+    if (_isCheckingIn) return;
+    setState(() => _isCheckingIn = true);
 
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
+    try {
+      final uid = ref.read(currentUidProvider);
+      if (uid == null) return;
 
-    final coinService = ref.read(coinServiceProvider);
-    final result = await coinService.checkIn(uid);
+      final coinService = ref.read(coinServiceProvider);
+      final result = await coinService.checkIn(uid);
 
-    if (result != null && mounted) {
-      ErrorHandler.breadcrumb(
-        'daily_checkin_completed: +${result.dailyCoins} coins',
-      );
-      final totalCoins = result.dailyCoins + result.milestoneBonus;
-      ref
-          .read(analyticsServiceProvider)
-          .logCoinsEarned(amount: totalCoins, source: 'daily_checkin');
-      ref.invalidate(hasCheckedInTodayProvider);
-      ref.invalidate(monthlyCheckInProvider);
+      if (result != null && mounted) {
+        ErrorHandler.breadcrumb(
+          'daily_checkin_completed: +${result.dailyCoins} coins',
+        );
+        final totalCoins = result.dailyCoins + result.milestoneBonus;
+        ref
+            .read(analyticsServiceProvider)
+            .logCoinsEarned(amount: totalCoins, source: 'daily_checkin');
+        ref.invalidate(hasCheckedInTodayProvider);
+        ref.invalidate(monthlyCheckInProvider);
 
-      // 触发成就评估（签到后）
-      triggerAchievementEvaluation(ref, AchievementTrigger.checkInCompleted);
+        // 触发成就评估（签到后）
+        triggerAchievementEvaluation(ref, AchievementTrigger.checkInCompleted);
 
-      HapticFeedback.mediumImpact();
+        HapticFeedback.mediumImpact();
 
-      final l10n = context.l10n;
-      String message = l10n.checkInBannerSuccess(result.dailyCoins);
-      if (result.milestoneBonus > 0) {
-        message += l10n.checkInBannerBonus(result.milestoneBonus);
-      }
+        final l10n = context.l10n;
+        String message = l10n.checkInBannerSuccess(result.dailyCoins);
+        if (result.milestoneBonus > 0) {
+          message += l10n.checkInBannerBonus(result.milestoneBonus);
+        }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(
-                Icons.monetization_on,
-                color: Color(0xFFFFD700),
-                size: 20,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(child: Text(message)),
-            ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.monetization_on,
+                  color: Color(0xFFFFD700),
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(child: Text(message)),
+              ],
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
           ),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isCheckingIn = false);
     }
   }
 
@@ -140,34 +146,45 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Card(
         color: colorScheme.tertiaryContainer,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                Icons.calendar_today,
-                color: colorScheme.onTertiaryContainer,
-                size: 20,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  context.l10n.checkInBannerPrompt(coins),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.w500,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: _isCheckingIn ? null : _tryCheckIn,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: colorScheme.onTertiaryContainer,
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    context.l10n.checkInBannerPrompt(coins),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onTertiaryContainer,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.onTertiaryContainer,
-                ),
-              ),
-            ],
+                if (_isCheckingIn)
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.onTertiaryContainer,
+                    ),
+                  )
+                else
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: colorScheme.onTertiaryContainer,
+                    size: 22,
+                  ),
+              ],
+            ),
           ),
         ),
       ),

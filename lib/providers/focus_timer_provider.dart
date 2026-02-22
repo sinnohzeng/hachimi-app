@@ -6,7 +6,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart'
 import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/services/atomic_island_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/notification_service.dart';
+// NotificationService accessed via notificationServiceProvider (from service_providers)
 
 /// Timer status for focus sessions.
 enum TimerStatus { idle, running, paused, completed, abandoned }
@@ -368,10 +368,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
           : (state.labelDefaultCat.isNotEmpty
                 ? state.labelDefaultCat
                 : 'Focus');
-      NotificationService().showFocusComplete(
-        title: catLabel,
-        body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
-      );
+      ref
+          .read(notificationServiceProvider)
+          .showFocusComplete(
+            title: catLabel,
+            body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+          );
       return;
     }
 
@@ -635,11 +637,13 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
           : (state.labelDefaultCat.isNotEmpty
                 ? state.labelDefaultCat
                 : 'Focus');
-      NotificationService().scheduleTimerBackup(
-        fireAt: fireAt,
-        title: catLabel,
-        body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
-      );
+      ref
+          .read(notificationServiceProvider)
+          .scheduleTimerBackup(
+            fireAt: fireAt,
+            title: catLabel,
+            body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+          );
     } catch (_) {
       // Non-critical: backup alarm is best-effort
     }
@@ -648,7 +652,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Cancel backup alarm. Non-critical — failures are silently ignored.
   void _cancelBackupAlarm() {
     try {
-      NotificationService().cancelTimerBackup();
+      ref.read(notificationServiceProvider).cancelTimerBackup();
     } catch (_) {
       // Non-critical: backup alarm is best-effort
     }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/models/reminder_config.dart';
 
 /// Habit data model — maps to Firestore `users/{uid}/habits/{habitId}`.
 /// See docs/architecture/data-model.md for the SSOT schema.
@@ -11,8 +12,8 @@ class Habit {
   final String name;
   final int? targetHours; // 累计目标小时数（可选，null = 永续模式）
   final int goalMinutes; // 每日专注目标（默认 25 分钟）
-  final String? reminderTime; // 'HH:mm' or null
-  final String? motivationText; // 激励语，max 40 chars
+  final List<ReminderConfig> reminders; // 提醒列表（上限 5 个）
+  final String? motivationText; // 激励语，max 240 chars
   final String? catId; // 绑定的猫咪 ID
   final bool isActive;
   final int totalMinutes; // 累计专注分钟数
@@ -27,7 +28,7 @@ class Habit {
     required this.name,
     this.targetHours,
     this.goalMinutes = 25,
-    this.reminderTime,
+    this.reminders = const [],
     this.motivationText,
     this.catId,
     this.isActive = true,
@@ -41,6 +42,9 @@ class Habit {
 
   /// 是否为永续模式（无目标或目标已达成）
   bool get isUnlimited => targetHours == null || targetCompleted;
+
+  /// 是否有提醒
+  bool get hasReminders => reminders.isNotEmpty;
 
   /// 目标进度百分比（仅里程碑模式有意义）
   double get progressPercent {
@@ -78,12 +82,23 @@ class Habit {
 
   factory Habit.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    // 防御性解析 reminders 数组（跳过畸形数据）
+    final rawReminders = data['reminders'] as List<dynamic>?;
+    final reminders =
+        rawReminders
+            ?.whereType<Map<String, dynamic>>()
+            .map(ReminderConfig.tryFromMap)
+            .whereType<ReminderConfig>()
+            .toList() ??
+        [];
+
     return Habit(
       id: doc.id,
       name: data['name'] as String? ?? '',
       targetHours: data['targetHours'] as int?,
       goalMinutes: data['goalMinutes'] as int? ?? 25,
-      reminderTime: data['reminderTime'] as String?,
+      reminders: reminders,
       motivationText: data['motivationText'] as String?,
       catId: data['catId'] as String?,
       isActive: data['isActive'] as bool? ?? true,
@@ -101,7 +116,7 @@ class Habit {
       'name': name,
       'targetHours': targetHours,
       'goalMinutes': goalMinutes,
-      'reminderTime': reminderTime,
+      'reminders': reminders.map((r) => r.toMap()).toList(),
       'motivationText': motivationText,
       'catId': catId,
       'isActive': isActive,
@@ -122,7 +137,7 @@ class Habit {
     int? targetHours,
     bool clearTargetHours = false,
     int? goalMinutes,
-    String? reminderTime,
+    List<ReminderConfig>? reminders,
     String? motivationText,
     String? catId,
     bool? isActive,
@@ -139,7 +154,7 @@ class Habit {
       name: name ?? this.name,
       targetHours: clearTargetHours ? null : (targetHours ?? this.targetHours),
       goalMinutes: goalMinutes ?? this.goalMinutes,
-      reminderTime: reminderTime ?? this.reminderTime,
+      reminders: reminders ?? this.reminders,
       motivationText: motivationText ?? this.motivationText,
       catId: catId ?? this.catId,
       isActive: isActive ?? this.isActive,

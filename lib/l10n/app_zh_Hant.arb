@@ -681,6 +681,38 @@
   "sessionStopwatch": "正計時",
   "historyDateGroupToday": "今天",
   "historyDateGroupYesterday": "昨天",
+  "historyLoadError": "載入歷史記錄失敗",
+  "historySelectMonth": "選擇月份",
+  "historyAllMonths": "全部月份",
+  "historyAllHabits": "全部",
+
+  "homeTabAchievements": "成就",
+  "achievementTitle": "成就",
+  "achievementTabOverview": "概覽",
+  "achievementTabQuest": "任務",
+  "achievementTabStreak": "連續",
+  "achievementTabCat": "貓咪",
+  "achievementTabPersist": "堅持",
+  "achievementSummaryTitle": "成就進度",
+  "achievementUnlockedCount": "已解鎖 {count} 個",
+  "@achievementUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementTotalCoins": "共獲 {coins} 金幣",
+  "@achievementTotalCoins": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "achievementUnlocked": "成就解鎖！",
+  "achievementHidden": "???",
+  "achievementHiddenDesc": "這是一個隱藏成就",
+  "achievementPersistDesc": "累計打卡 {days} 天",
+  "@achievementPersistDesc": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "achievementTitleCount": "已解鎖 {count} 個稱號",
+  "@achievementTitleCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "growthPathTitle": "成長之路",
   "growthPathKitten": "開始新的旅程",
@@ -693,5 +725,45 @@
   "achievementCelebrationTitle": "獲得稱號：{title}",
   "achievementCelebrationDismiss": "太棒了！",
   "achievementCelebrationSkipAll": "跳過全部",
-  "achievementCelebrationCounter": "{current} / {total}"
+  "achievementCelebrationCounter": "{current} / {total}",
+
+  "reminderModeDaily": "每天",
+  "reminderModeWeekdays": "工作日",
+  "reminderModeMonday": "週一",
+  "reminderModeTuesday": "週二",
+  "reminderModeWednesday": "週三",
+  "reminderModeThursday": "週四",
+  "reminderModeFriday": "週五",
+  "reminderModeSaturday": "週六",
+  "reminderModeSunday": "週日",
+  "reminderPickerTitle": "選擇提醒時間",
+  "reminderHourUnit": "點",
+  "reminderMinuteUnit": "分",
+  "reminderAddMore": "添加提醒",
+  "reminderMaxReached": "最多 5 個提醒",
+  "reminderConfirm": "確認",
+  "reminderNotificationTitle": "{catName}想你了！",
+  "@reminderNotificationTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "reminderNotificationBody": "{habitName}的時間到了，你的貓咪在等你！",
+  "@reminderNotificationBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+
+  "deleteAccountDataWarning": "以下所有資料將被永久刪除：",
+  "deleteAccountQuests": "任務",
+  "deleteAccountCats": "貓咪",
+  "deleteAccountHours": "專注時長",
+  "deleteAccountIrreversible": "此操作不可撤銷",
+  "deleteAccountContinue": "繼續",
+  "deleteAccountConfirmTitle": "確認刪除",
+  "deleteAccountTypeDelete": "輸入 DELETE 以確認刪除帳號：",
+  "deleteAccountAuthCancelled": "認證已取消",
+  "deleteAccountAuthFailed": "認證失敗：{error}",
+  "@deleteAccountAuthFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteAccountProgress": "正在刪除帳號...",
+  "deleteAccountSuccess": "帳號已刪除"
 }

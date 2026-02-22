@@ -7,6 +7,7 @@ import 'package:hachimi_app/services/coin_service.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/migration_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
+import 'package:hachimi_app/services/account_deletion_service.dart';
 import 'package:hachimi_app/services/achievement_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
@@ -41,4 +42,7 @@ final notificationServiceProvider = Provider<NotificationService>(
 );
 final achievementServiceProvider = Provider<AchievementService>(
   (ref) => AchievementService(),
+);
+final accountDeletionServiceProvider = Provider<AccountDeletionService>(
+  (ref) => AccountDeletionService(),
 );

@@ -2030,68 +2030,68 @@ class SKo extends S {
   String get historyDateGroupYesterday => '어제';
 
   @override
-  String get historyLoadError => 'Failed to load history';
+  String get historyLoadError => '기록 불러오기 실패';
 
   @override
-  String get historySelectMonth => 'Select month';
+  String get historySelectMonth => '월 선택';
 
   @override
-  String get historyAllMonths => 'All months';
+  String get historyAllMonths => '전체 월';
 
   @override
-  String get historyAllHabits => 'All';
+  String get historyAllHabits => '전체';
 
   @override
-  String get homeTabAchievements => 'Achievements';
+  String get homeTabAchievements => '업적';
 
   @override
-  String get achievementTitle => 'Achievements';
+  String get achievementTitle => '업적';
 
   @override
-  String get achievementTabOverview => 'Overview';
+  String get achievementTabOverview => '개요';
 
   @override
-  String get achievementTabQuest => 'Quest';
+  String get achievementTabQuest => '퀘스트';
 
   @override
-  String get achievementTabStreak => 'Streak';
+  String get achievementTabStreak => '연속';
 
   @override
-  String get achievementTabCat => 'Cat';
+  String get achievementTabCat => '고양이';
 
   @override
-  String get achievementTabPersist => 'Persist';
+  String get achievementTabPersist => '꾸준함';
 
   @override
-  String get achievementSummaryTitle => 'Achievement Progress';
+  String get achievementSummaryTitle => '업적 현황';
 
   @override
   String achievementUnlockedCount(int count) {
-    return '$count unlocked';
+    return '$count개 달성';
   }
 
   @override
   String achievementTotalCoins(int coins) {
-    return '$coins coins earned';
+    return '$coins 코인 획득';
   }
 
   @override
-  String get achievementUnlocked => 'Achievement unlocked!';
+  String get achievementUnlocked => '업적 달성!';
 
   @override
   String get achievementHidden => '???';
 
   @override
-  String get achievementHiddenDesc => 'This is a hidden achievement';
+  String get achievementHiddenDesc => '숨겨진 업적입니다';
 
   @override
   String achievementPersistDesc(int days) {
-    return 'Accumulate $days check-in days on any quest';
+    return '아무 퀘스트에서 $days일 체크인 달성';
   }
 
   @override
   String achievementTitleCount(int count) {
-    return '$count titles unlocked';
+    return '$count개 칭호 달성';
   }
 
   @override
@@ -2133,4 +2133,97 @@ class SKo extends S {
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
   }
+
+  @override
+  String get reminderModeDaily => '매일';
+
+  @override
+  String get reminderModeWeekdays => '평일';
+
+  @override
+  String get reminderModeMonday => '월요일';
+
+  @override
+  String get reminderModeTuesday => '화요일';
+
+  @override
+  String get reminderModeWednesday => '수요일';
+
+  @override
+  String get reminderModeThursday => '목요일';
+
+  @override
+  String get reminderModeFriday => '금요일';
+
+  @override
+  String get reminderModeSaturday => '토요일';
+
+  @override
+  String get reminderModeSunday => '일요일';
+
+  @override
+  String get reminderPickerTitle => '알림 시간 선택';
+
+  @override
+  String get reminderHourUnit => '시';
+
+  @override
+  String get reminderMinuteUnit => '분';
+
+  @override
+  String get reminderAddMore => '알림 추가';
+
+  @override
+  String get reminderMaxReached => '최대 5개 알림';
+
+  @override
+  String get reminderConfirm => '확인';
+
+  @override
+  String reminderNotificationTitle(String catName) {
+    return '$catName이(가) 보고 싶어해요!';
+  }
+
+  @override
+  String reminderNotificationBody(String habitName) {
+    return '$habitName 시간이에요. 고양이가 기다리고 있어요!';
+  }
+
+  @override
+  String get deleteAccountDataWarning => '다음 모든 데이터가 영구적으로 삭제됩니다:';
+
+  @override
+  String get deleteAccountQuests => '퀘스트';
+
+  @override
+  String get deleteAccountCats => '고양이';
+
+  @override
+  String get deleteAccountHours => '집중 시간';
+
+  @override
+  String get deleteAccountIrreversible => '이 작업은 되돌릴 수 없습니다';
+
+  @override
+  String get deleteAccountContinue => '계속';
+
+  @override
+  String get deleteAccountConfirmTitle => '삭제 확인';
+
+  @override
+  String get deleteAccountTypeDelete => '계정 삭제를 확인하려면 DELETE를 입력하세요:';
+
+  @override
+  String get deleteAccountAuthCancelled => '인증이 취소되었습니다';
+
+  @override
+  String deleteAccountAuthFailed(String error) {
+    return '인증 실패: $error';
+  }
+
+  @override
+  String get deleteAccountProgress => '계정 삭제 중...';
+
+  @override
+  String get deleteAccountSuccess => '계정이 삭제되었습니다';
 }

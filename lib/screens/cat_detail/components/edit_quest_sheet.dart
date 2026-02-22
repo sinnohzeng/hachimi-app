@@ -23,6 +23,8 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   late int _selectedGoal;
   late int? _selectedTarget;
   late bool _isUnlimitedMode;
+  late bool _isCustomGoal;
+  late bool _isCustomTarget;
   DateTime? _deadlineDate;
   bool _isSaving = false;
 
@@ -40,6 +42,12 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     _selectedTarget = widget.habit.targetHours;
     _isUnlimitedMode = widget.habit.isUnlimited;
     _deadlineDate = widget.habit.deadlineDate;
+
+    // 判断当前值是否为自定义值
+    _isCustomGoal = !_defaultGoalOptions.contains(_selectedGoal);
+    _isCustomTarget =
+        _selectedTarget != null &&
+        !_defaultTargetOptions.contains(_selectedTarget);
   }
 
   @override
@@ -54,12 +62,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
-
-    // Include current value in chips if non-standard
-    final goalChips = _buildChipValues(_defaultGoalOptions, _selectedGoal);
-    final targetChips = _selectedTarget != null
-        ? _buildChipValues(_defaultTargetOptions, _selectedTarget!)
-        : _defaultTargetOptions;
     final isTargetCompleted = widget.habit.targetCompleted;
 
     return SingleChildScrollView(
@@ -148,13 +150,32 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: 8,
-                children: targetChips.map((hrs) {
-                  return ChoiceChip(
-                    label: Text('$hrs'),
-                    selected: _selectedTarget == hrs,
-                    onSelected: (_) => setState(() => _selectedTarget = hrs),
-                  );
-                }).toList(),
+                children: [
+                  ..._defaultTargetOptions.map((hrs) {
+                    final isSelected =
+                        !_isCustomTarget && _selectedTarget == hrs;
+                    return ChoiceChip(
+                      label: Text('$hrs'),
+                      selected: isSelected,
+                      onSelected: (_) => setState(() {
+                        _selectedTarget = hrs;
+                        _isCustomTarget = false;
+                      }),
+                    );
+                  }),
+                  if (_isCustomTarget)
+                    ChoiceChip(
+                      label: Text('${_selectedTarget}h'),
+                      selected: true,
+                      onSelected: (_) => _showCustomTargetDialog(),
+                    )
+                  else
+                    ActionChip(
+                      label: Text(context.l10n.adoptionCustom),
+                      avatar: const Icon(Icons.tune, size: 18),
+                      onPressed: _showCustomTargetDialog,
+                    ),
+                ],
               ),
               const SizedBox(height: AppSpacing.md),
 
@@ -203,20 +224,38 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: 8,
-              children: goalChips.map((mins) {
-                return ChoiceChip(
-                  label: Text('$mins'),
-                  selected: _selectedGoal == mins,
-                  onSelected: (_) => setState(() => _selectedGoal = mins),
-                );
-              }).toList(),
+              children: [
+                ..._defaultGoalOptions.map((mins) {
+                  final isSelected = !_isCustomGoal && _selectedGoal == mins;
+                  return ChoiceChip(
+                    label: Text('$mins'),
+                    selected: isSelected,
+                    onSelected: (_) => setState(() {
+                      _selectedGoal = mins;
+                      _isCustomGoal = false;
+                    }),
+                  );
+                }),
+                if (_isCustomGoal)
+                  ChoiceChip(
+                    label: Text('${_selectedGoal}min'),
+                    selected: true,
+                    onSelected: (_) => _showCustomGoalDialog(),
+                  )
+                else
+                  ActionChip(
+                    label: Text(context.l10n.adoptionCustom),
+                    avatar: const Icon(Icons.tune, size: 18),
+                    onPressed: _showCustomGoalDialog,
+                  ),
+              ],
             ),
             const SizedBox(height: AppSpacing.lg),
 
             // Motivation field
             TextField(
               controller: _motivationController,
-              maxLength: 40,
+              maxLength: 240,
               decoration: InputDecoration(
                 labelText: context.l10n.adoptionMotivationLabel,
                 hintText: context.l10n.adoptionMotivationHint,
@@ -258,15 +297,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     );
   }
 
-  List<int> _buildChipValues(List<int> defaults, int current) {
-    final chips = [...defaults];
-    if (!chips.contains(current)) {
-      chips.add(current);
-      chips.sort();
-    }
-    return chips;
-  }
-
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
@@ -279,9 +309,99 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
       firstDate: now.add(const Duration(days: 1)),
       lastDate: now.add(const Duration(days: 365 * 3)),
     );
-    if (date != null) {
+    if (date != null && mounted) {
       setState(() => _deadlineDate = date);
     }
+  }
+
+  void _showCustomGoalDialog() {
+    final controller = TextEditingController(
+      text: _isCustomGoal ? '$_selectedGoal' : '',
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.adoptionCustomGoalTitle),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionMinutesPerDay,
+            hintText: context.l10n.adoptionMinutesHint,
+            suffixText: context.l10n.unitMinShort,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(context.l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              if (value == null || value < 5 || value > 180) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(context.l10n.adoptionValidMinutes)),
+                );
+                return;
+              }
+              setState(() {
+                _selectedGoal = value;
+                _isCustomGoal = true;
+              });
+              Navigator.of(ctx).pop();
+            },
+            child: Text(context.l10n.adoptionSet),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCustomTargetDialog() {
+    final controller = TextEditingController(
+      text: _isCustomTarget ? '$_selectedTarget' : '',
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.adoptionCustomTargetTitle),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionTotalHours,
+            hintText: context.l10n.adoptionHoursHint,
+            suffixText: context.l10n.unitHourShort,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(context.l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              if (value == null || value < 10 || value > 2000) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(context.l10n.adoptionValidHours)),
+                );
+                return;
+              }
+              setState(() {
+                _selectedTarget = value;
+                _isCustomTarget = true;
+              });
+              Navigator.of(ctx).pop();
+            },
+            child: Text(context.l10n.adoptionSet),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _save() async {

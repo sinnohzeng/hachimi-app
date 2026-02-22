@@ -2029,68 +2029,68 @@ class SJa extends S {
   String get historyDateGroupYesterday => '昨日';
 
   @override
-  String get historyLoadError => 'Failed to load history';
+  String get historyLoadError => '履歴の読み込みに失敗しました';
 
   @override
-  String get historySelectMonth => 'Select month';
+  String get historySelectMonth => '月を選択';
 
   @override
-  String get historyAllMonths => 'All months';
+  String get historyAllMonths => 'すべての月';
 
   @override
-  String get historyAllHabits => 'All';
+  String get historyAllHabits => 'すべて';
 
   @override
-  String get homeTabAchievements => 'Achievements';
+  String get homeTabAchievements => '実績';
 
   @override
-  String get achievementTitle => 'Achievements';
+  String get achievementTitle => '実績';
 
   @override
-  String get achievementTabOverview => 'Overview';
+  String get achievementTabOverview => '概要';
 
   @override
-  String get achievementTabQuest => 'Quest';
+  String get achievementTabQuest => 'クエスト';
 
   @override
-  String get achievementTabStreak => 'Streak';
+  String get achievementTabStreak => '連続';
 
   @override
-  String get achievementTabCat => 'Cat';
+  String get achievementTabCat => '猫';
 
   @override
-  String get achievementTabPersist => 'Persist';
+  String get achievementTabPersist => '継続';
 
   @override
-  String get achievementSummaryTitle => 'Achievement Progress';
+  String get achievementSummaryTitle => '実績の進捗';
 
   @override
   String achievementUnlockedCount(int count) {
-    return '$count unlocked';
+    return '$count個解除済み';
   }
 
   @override
   String achievementTotalCoins(int coins) {
-    return '$coins coins earned';
+    return '$coinsコイン獲得';
   }
 
   @override
-  String get achievementUnlocked => 'Achievement unlocked!';
+  String get achievementUnlocked => '実績解除！';
 
   @override
   String get achievementHidden => '???';
 
   @override
-  String get achievementHiddenDesc => 'This is a hidden achievement';
+  String get achievementHiddenDesc => 'これは隠し実績です';
 
   @override
   String achievementPersistDesc(int days) {
-    return 'Accumulate $days check-in days on any quest';
+    return '任意のクエストで$days日チェックイン';
   }
 
   @override
   String achievementTitleCount(int count) {
-    return '$count titles unlocked';
+    return '$count個の称号を解除';
   }
 
   @override
@@ -2132,4 +2132,97 @@ class SJa extends S {
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
   }
+
+  @override
+  String get reminderModeDaily => '毎日';
+
+  @override
+  String get reminderModeWeekdays => '平日';
+
+  @override
+  String get reminderModeMonday => '月曜日';
+
+  @override
+  String get reminderModeTuesday => '火曜日';
+
+  @override
+  String get reminderModeWednesday => '水曜日';
+
+  @override
+  String get reminderModeThursday => '木曜日';
+
+  @override
+  String get reminderModeFriday => '金曜日';
+
+  @override
+  String get reminderModeSaturday => '土曜日';
+
+  @override
+  String get reminderModeSunday => '日曜日';
+
+  @override
+  String get reminderPickerTitle => 'リマインダー時間を選択';
+
+  @override
+  String get reminderHourUnit => '時';
+
+  @override
+  String get reminderMinuteUnit => '分';
+
+  @override
+  String get reminderAddMore => 'リマインダーを追加';
+
+  @override
+  String get reminderMaxReached => '最大 5 件のリマインダー';
+
+  @override
+  String get reminderConfirm => '確認';
+
+  @override
+  String reminderNotificationTitle(String catName) {
+    return '$catNameが会いたがってるよ！';
+  }
+
+  @override
+  String reminderNotificationBody(String habitName) {
+    return '$habitNameの時間だよ。猫が待ってるよ！';
+  }
+
+  @override
+  String get deleteAccountDataWarning => '以下のすべてのデータが完全に削除されます：';
+
+  @override
+  String get deleteAccountQuests => 'クエスト';
+
+  @override
+  String get deleteAccountCats => '猫';
+
+  @override
+  String get deleteAccountHours => '集中時間';
+
+  @override
+  String get deleteAccountIrreversible => 'この操作は取り消せません';
+
+  @override
+  String get deleteAccountContinue => '続ける';
+
+  @override
+  String get deleteAccountConfirmTitle => '削除を確認';
+
+  @override
+  String get deleteAccountTypeDelete => 'DELETE と入力してアカウント削除を確認：';
+
+  @override
+  String get deleteAccountAuthCancelled => '認証がキャンセルされました';
+
+  @override
+  String deleteAccountAuthFailed(String error) {
+    return '認証に失敗しました：$error';
+  }
+
+  @override
+  String get deleteAccountProgress => 'アカウントを削除中...';
+
+  @override
+  String get deleteAccountSuccess => 'アカウントが削除されました';
 }

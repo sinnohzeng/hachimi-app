@@ -974,5 +974,45 @@
   "achievementCelebrationTitle": "获得称号：{title}",
   "achievementCelebrationDismiss": "太棒了！",
   "achievementCelebrationSkipAll": "跳过全部",
-  "achievementCelebrationCounter": "{current} / {total}"
+  "achievementCelebrationCounter": "{current} / {total}",
+
+  "reminderModeDaily": "每天",
+  "reminderModeWeekdays": "工作日",
+  "reminderModeMonday": "周一",
+  "reminderModeTuesday": "周二",
+  "reminderModeWednesday": "周三",
+  "reminderModeThursday": "周四",
+  "reminderModeFriday": "周五",
+  "reminderModeSaturday": "周六",
+  "reminderModeSunday": "周日",
+  "reminderPickerTitle": "选择提醒时间",
+  "reminderHourUnit": "点",
+  "reminderMinuteUnit": "分",
+  "reminderAddMore": "添加提醒",
+  "reminderMaxReached": "最多 5 个提醒",
+  "reminderConfirm": "确认",
+  "reminderNotificationTitle": "{catName}想你了！",
+  "@reminderNotificationTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "reminderNotificationBody": "{habitName}的时间到了，你的猫咪在等你！",
+  "@reminderNotificationBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+
+  "deleteAccountDataWarning": "以下所有数据将被永久删除：",
+  "deleteAccountQuests": "任务",
+  "deleteAccountCats": "猫咪",
+  "deleteAccountHours": "专注时长",
+  "deleteAccountIrreversible": "此操作不可撤销",
+  "deleteAccountContinue": "继续",
+  "deleteAccountConfirmTitle": "确认删除",
+  "deleteAccountTypeDelete": "输入 DELETE 以确认删除账号：",
+  "deleteAccountAuthCancelled": "认证已取消",
+  "deleteAccountAuthFailed": "认证失败：{error}",
+  "@deleteAccountAuthFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteAccountProgress": "正在删除账号...",
+  "deleteAccountSuccess": "账号已删除"
 }

@@ -681,6 +681,38 @@
   "sessionStopwatch": "ストップウォッチ",
   "historyDateGroupToday": "今日",
   "historyDateGroupYesterday": "昨日",
+  "historyLoadError": "履歴の読み込みに失敗しました",
+  "historySelectMonth": "月を選択",
+  "historyAllMonths": "すべての月",
+  "historyAllHabits": "すべて",
+
+  "homeTabAchievements": "実績",
+  "achievementTitle": "実績",
+  "achievementTabOverview": "概要",
+  "achievementTabQuest": "クエスト",
+  "achievementTabStreak": "連続",
+  "achievementTabCat": "猫",
+  "achievementTabPersist": "継続",
+  "achievementSummaryTitle": "実績の進捗",
+  "achievementUnlockedCount": "{count}個解除済み",
+  "@achievementUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementTotalCoins": "{coins}コイン獲得",
+  "@achievementTotalCoins": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "achievementUnlocked": "実績解除！",
+  "achievementHidden": "???",
+  "achievementHiddenDesc": "これは隠し実績です",
+  "achievementPersistDesc": "任意のクエストで{days}日チェックイン",
+  "@achievementPersistDesc": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "achievementTitleCount": "{count}個の称号を解除",
+  "@achievementTitleCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "growthPathTitle": "成長の道",
   "growthPathKitten": "新しい旅の始まり",
@@ -693,5 +725,45 @@
   "achievementCelebrationTitle": "称号獲得：{title}",
   "achievementCelebrationDismiss": "すごい！",
   "achievementCelebrationSkipAll": "すべてスキップ",
-  "achievementCelebrationCounter": "{current} / {total}"
+  "achievementCelebrationCounter": "{current} / {total}",
+
+  "reminderModeDaily": "毎日",
+  "reminderModeWeekdays": "平日",
+  "reminderModeMonday": "月曜日",
+  "reminderModeTuesday": "火曜日",
+  "reminderModeWednesday": "水曜日",
+  "reminderModeThursday": "木曜日",
+  "reminderModeFriday": "金曜日",
+  "reminderModeSaturday": "土曜日",
+  "reminderModeSunday": "日曜日",
+  "reminderPickerTitle": "リマインダー時間を選択",
+  "reminderHourUnit": "時",
+  "reminderMinuteUnit": "分",
+  "reminderAddMore": "リマインダーを追加",
+  "reminderMaxReached": "最大 5 件のリマインダー",
+  "reminderConfirm": "確認",
+  "reminderNotificationTitle": "{catName}が会いたがってるよ！",
+  "@reminderNotificationTitle": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "reminderNotificationBody": "{habitName}の時間だよ。猫が待ってるよ！",
+  "@reminderNotificationBody": {
+    "placeholders": { "habitName": { "type": "String" } }
+  },
+
+  "deleteAccountDataWarning": "以下のすべてのデータが完全に削除されます：",
+  "deleteAccountQuests": "クエスト",
+  "deleteAccountCats": "猫",
+  "deleteAccountHours": "集中時間",
+  "deleteAccountIrreversible": "この操作は取り消せません",
+  "deleteAccountContinue": "続ける",
+  "deleteAccountConfirmTitle": "削除を確認",
+  "deleteAccountTypeDelete": "DELETE と入力してアカウント削除を確認：",
+  "deleteAccountAuthCancelled": "認証がキャンセルされました",
+  "deleteAccountAuthFailed": "認証に失敗しました：{error}",
+  "@deleteAccountAuthFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteAccountProgress": "アカウントを削除中...",
+  "deleteAccountSuccess": "アカウントが削除されました"
 }

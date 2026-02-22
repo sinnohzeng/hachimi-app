@@ -4013,6 +4013,180 @@ abstract class S {
   /// In en, this message translates to:
   /// **'{current} / {total}'**
   String achievementCelebrationCounter(int current, int total);
+
+  /// No description provided for @reminderModeDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get reminderModeDaily;
+
+  /// No description provided for @reminderModeWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays'**
+  String get reminderModeWeekdays;
+
+  /// No description provided for @reminderModeMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get reminderModeMonday;
+
+  /// No description provided for @reminderModeTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get reminderModeTuesday;
+
+  /// No description provided for @reminderModeWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get reminderModeWednesday;
+
+  /// No description provided for @reminderModeThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get reminderModeThursday;
+
+  /// No description provided for @reminderModeFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get reminderModeFriday;
+
+  /// No description provided for @reminderModeSaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get reminderModeSaturday;
+
+  /// No description provided for @reminderModeSunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get reminderModeSunday;
+
+  /// No description provided for @reminderPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select reminder time'**
+  String get reminderPickerTitle;
+
+  /// No description provided for @reminderHourUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get reminderHourUnit;
+
+  /// No description provided for @reminderMinuteUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get reminderMinuteUnit;
+
+  /// No description provided for @reminderAddMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get reminderAddMore;
+
+  /// No description provided for @reminderMaxReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 5 reminders'**
+  String get reminderMaxReached;
+
+  /// No description provided for @reminderConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get reminderConfirm;
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{catName} misses you!'**
+  String reminderNotificationTitle(String catName);
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for {habitName} — your cat is waiting!'**
+  String reminderNotificationBody(String habitName);
+
+  /// No description provided for @deleteAccountDataWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'All the following data will be permanently deleted:'**
+  String get deleteAccountDataWarning;
+
+  /// No description provided for @deleteAccountQuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Quests'**
+  String get deleteAccountQuests;
+
+  /// No description provided for @deleteAccountCats.
+  ///
+  /// In en, this message translates to:
+  /// **'Cats'**
+  String get deleteAccountCats;
+
+  /// No description provided for @deleteAccountHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus hours'**
+  String get deleteAccountHours;
+
+  /// No description provided for @deleteAccountIrreversible.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is irreversible'**
+  String get deleteAccountIrreversible;
+
+  /// No description provided for @deleteAccountContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get deleteAccountContinue;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm deletion'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountTypeDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to confirm account deletion:'**
+  String get deleteAccountTypeDelete;
+
+  /// No description provided for @deleteAccountAuthCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication cancelled'**
+  String get deleteAccountAuthCancelled;
+
+  /// No description provided for @deleteAccountAuthFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed: {error}'**
+  String deleteAccountAuthFailed(String error);
+
+  /// No description provided for @deleteAccountProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting account...'**
+  String get deleteAccountProgress;
+
+  /// No description provided for @deleteAccountSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted'**
+  String get deleteAccountSuccess;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
