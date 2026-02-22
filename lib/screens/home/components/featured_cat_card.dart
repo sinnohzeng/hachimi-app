@@ -22,7 +22,7 @@ class FeaturedCatCard extends ConsumerWidget {
 
     final habits = ref.watch(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
-    final stageClr = stageColor(cat.computedStage);
+    final stageClr = stageColor(cat.displayStage);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -103,7 +103,7 @@ class FeaturedCatCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        '${context.l10n.durationHoursMinutes(cat.totalMinutes ~/ 60, cat.totalMinutes % 60)}  •  ${context.l10n.stageName(cat.computedStage)}',
+                        '${context.l10n.durationHoursMinutes(cat.totalMinutes ~/ 60, cat.totalMinutes % 60)}  •  ${context.l10n.stageName(cat.displayStage)}',
                         style: textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),

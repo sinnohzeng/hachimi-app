@@ -78,7 +78,7 @@ class DiaryService {
         date: AppDateUtils.todayString(),
         personality: ctx.cat.personality,
         mood: ctx.cat.computedMood,
-        stage: ctx.cat.computedStage,
+        stage: ctx.cat.displayStage,
         totalMinutes: ctx.cat.totalMinutes,
         createdAt: now,
       );
@@ -112,7 +112,7 @@ class DiaryService {
       personalityId: personality?.id ?? 'playful',
       moodId: moodData.id,
       hoursSinceLastSession: hoursSince,
-      stageId: cat.computedStage,
+      stageId: cat.displayStage,
       progressPercent: (cat.growthProgress * 100).round(),
       habitName: habit.name,
       todayMinutes: ctx.todayMinutes,

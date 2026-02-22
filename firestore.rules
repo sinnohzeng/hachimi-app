@@ -55,7 +55,10 @@ service cloud.firestore {
           && request.resource.data.name.size() <= 30
           && request.resource.data.state in ['active', 'graduated', 'dormant']
           && request.resource.data.totalMinutes is int
-          && request.resource.data.totalMinutes >= 0;
+          && request.resource.data.totalMinutes >= 0
+          && (!('highestStage' in request.resource.data)
+              || request.resource.data.highestStage == null
+              || request.resource.data.highestStage in ['kitten', 'adolescent', 'adult']);
         allow delete: if isOwner(userId);
       }
 

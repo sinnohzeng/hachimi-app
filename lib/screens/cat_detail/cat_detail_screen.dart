@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -53,11 +54,11 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
     final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
-    final stageClr = stageColor(cat.computedStage);
+    final stageClr = stageColor(cat.displayStage);
 
     // Mesh gradient colors derived from cat appearance
     final meshColors = catMeshColors(
-      cat.computedStage,
+      cat.displayStage,
       cat.appearance.peltColor,
       colorScheme,
     );
@@ -240,7 +241,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 ),
                 const Spacer(),
                 Text(
-                  context.l10n.stageName(cat.computedStage),
+                  context.l10n.stageName(cat.displayStage),
                   style: textTheme.labelLarge?.copyWith(
                     color: stageClr,
                     fontWeight: FontWeight.bold,
@@ -292,18 +293,13 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 ),
                 StageMilestone(
                   name: context.l10n.stageAdolescent,
-                  isReached: cat.growthProgress >= 0.20,
+                  isReached: stageOrder(cat.displayStage) >= 1,
                   color: stageColor('adolescent'),
                 ),
                 StageMilestone(
                   name: context.l10n.stageAdult,
-                  isReached: cat.growthProgress >= 0.45,
+                  isReached: stageOrder(cat.displayStage) >= 2,
                   color: stageColor('adult'),
-                ),
-                StageMilestone(
-                  name: context.l10n.stageSenior,
-                  isReached: cat.growthProgress >= 0.75,
-                  color: stageColor('senior'),
                 ),
               ],
             ),

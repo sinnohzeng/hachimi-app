@@ -5,7 +5,7 @@
 // 🧩 测试场景：
 // - 刚专注完 → recency 主导
 // - 一周未开 app → mood 主导
-// - 全 senior 猫 → recency + mood 仍有效
+// - 全 adult 猫 → recency + mood 仍有效
 // - 单猫 → 短路返回
 // - 新用户 → calculateMood 的 createdAt 修复
 //
@@ -63,7 +63,7 @@ Cat? findFeaturedCat(List<Cat> cats, Map<String, int> todayMinutes) {
   for (final cat in cats) {
     final recency = _recencyScore(cat.lastSessionAt);
     final mood = _moodScore(cat.computedMood);
-    final growth = _growthScore(cat.stageProgress, cat.computedStage);
+    final growth = _growthScore(cat.stageProgress);
     final today = (todayMinutes[cat.boundHabitId] ?? 0) > 0 ? 0.0 : 1.0;
 
     final score = recency * 0.45 + mood * 0.30 + growth * 0.20 + today * 0.05;
@@ -102,8 +102,7 @@ double _moodScore(String mood) {
   }
 }
 
-double _growthScore(double stageProgress, String stage) {
-  if (stage == 'senior') return 0.2;
+double _growthScore(double stageProgress) {
   if (stageProgress >= 0.85) return 1.0;
   if (stageProgress >= 0.70) return 0.7;
   return stageProgress * 0.5;
@@ -148,33 +147,32 @@ void main() {
       expect(result?.id, equals('missing'));
     });
 
-    test('全 senior 猫 → recency + mood 仍有效，不退化为盲选', () {
+    test('全 adult 猫 → recency + mood 仍有效，不退化为盲选', () {
       final now = DateTime.now();
-      // 两只 senior 猫（totalMinutes/targetMinutes >= 0.75）
-      final recentSenior = _makeCat(
-        id: 'recent-senior',
+      // 两只 adult 猫，相同进度以消除 growthScore 差异
+      final recentAdult = _makeCat(
+        id: 'recent-adult',
         totalMinutes: 800,
         targetMinutes: 1000,
         lastSessionAt: now.subtract(const Duration(hours: 2)),
         boundHabitId: 'h1',
       );
-      final oldSenior = _makeCat(
-        id: 'old-senior',
-        totalMinutes: 900,
+      final oldAdult = _makeCat(
+        id: 'old-adult',
+        totalMinutes: 800,
         targetMinutes: 1000,
         lastSessionAt: now.subtract(const Duration(days: 4)),
         boundHabitId: 'h2',
       );
 
-      expect(recentSenior.computedStage, equals('senior'));
-      expect(oldSenior.computedStage, equals('senior'));
+      expect(recentAdult.computedStage, equals('adult'));
+      expect(oldAdult.computedStage, equals('adult'));
 
-      final result = findFeaturedCat([recentSenior, oldSenior], {});
-      // recentSenior: recency=0.8, mood(happy)=0.1, growth(senior)=0.2
-      //   → 0.8*0.45 + 0.1*0.30 + 0.2*0.20 + 1.0*0.05 = 0.48
-      // oldSenior: recency=0.15, mood(lonely)=0.8, growth(senior)=0.2
-      //   → 0.15*0.45 + 0.8*0.30 + 0.2*0.20 + 1.0*0.05 = 0.3975
-      expect(result?.id, equals('recent-senior'));
+      final result = findFeaturedCat([recentAdult, oldAdult], {});
+      // 相同 growthScore 下，recency(0.8) > mood(lonely 0.8) 权重
+      // recentAdult: 0.8*0.45 + 0.1*0.30 = 0.39
+      // oldAdult: 0.15*0.45 + 0.8*0.30 = 0.3075
+      expect(result?.id, equals('recent-adult'));
     });
 
     test('单猫 → 短路返回', () {
@@ -214,22 +212,22 @@ void main() {
       // 两只猫最近互动时间相同、心情相同，但 A 接近进化
       final nearEvolveCat = _makeCat(
         id: 'near-evolve',
-        totalMinutes: 180, // 180/1000=0.18 → kitten, stageProgress≈0.9
+        totalMinutes: 300, // 300/1000=0.30 → kitten, stageProgress≈0.91
         targetMinutes: 1000,
         lastSessionAt: now.subtract(const Duration(days: 2)),
         boundHabitId: 'h1',
       );
       final earlyCat = _makeCat(
         id: 'early',
-        totalMinutes: 50, // 50/1000=0.05 → kitten, stageProgress=0.25
+        totalMinutes: 50, // 50/1000=0.05 → kitten, stageProgress≈0.15
         targetMinutes: 1000,
         lastSessionAt: now.subtract(const Duration(days: 2)),
         boundHabitId: 'h2',
       );
 
       final result = findFeaturedCat([nearEvolveCat, earlyCat], {});
-      // nearEvolveCat: stageProgress=0.9 → growthScore=1.0
-      // earlyCat: stageProgress=0.25 → growthScore=0.25*0.5=0.125
+      // nearEvolveCat: stageProgress≈0.91 → growthScore=1.0
+      // earlyCat: stageProgress≈0.15 → growthScore≈0.075
       expect(result?.id, equals('near-evolve'));
     });
   });

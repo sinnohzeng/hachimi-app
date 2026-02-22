@@ -69,7 +69,7 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
     final cat = widget.cat;
     final displayVariant = _displayVariant ?? cat.appearance.spriteVariant;
     final spriteIndex = computeSpriteIndex(
-      stage: cat.computedStage,
+      stage: cat.displayStage,
       variant: displayVariant,
       isLonghair: cat.appearance.isLonghair,
     );

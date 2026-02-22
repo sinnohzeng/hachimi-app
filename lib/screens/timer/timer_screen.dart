@@ -378,7 +378,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
     // Use stage color for mesh gradient background
     final bgColor = cat != null
-        ? stageColor(cat.computedStage)
+        ? stageColor(cat.displayStage)
         : colorScheme.primary;
     final meshColors = timerMeshColors(bgColor, colorScheme);
 

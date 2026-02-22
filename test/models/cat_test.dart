@@ -6,7 +6,8 @@
 // 🧩 文件结构：
 // - toFirestore() 输出格式验证；
 // - growthProgress 计算属性；
-// - computedStage 阶段判定；
+// - computedStage 阶段判定（3 阶段系统）；
+// - displayStage 防回退保护；
 // - copyWith() 字段覆盖；
 //
 // 🕒 创建时间：2026-02-19
@@ -23,6 +24,7 @@ Cat _createTestCat({
   String personality = 'playful',
   String name = 'TestCat',
   String state = 'active',
+  String? highestStage,
   DateTime? createdAt,
   DateTime? lastSessionAt,
 }) {
@@ -46,6 +48,7 @@ Cat _createTestCat({
     targetMinutes: targetMinutes,
     boundHabitId: 'habit-1',
     state: state,
+    highestStage: highestStage,
     createdAt: createdAt ?? DateTime(2026, 1, 1),
     lastSessionAt: lastSessionAt,
   );
@@ -90,6 +93,18 @@ void main() {
       expect(appearanceMap['eyeColor'], equals('GREEN'));
       expect(appearanceMap['isLonghair'], isFalse);
     });
+
+    test('toFirestore includes highestStage', () {
+      final cat = _createTestCat(highestStage: 'adult');
+      final map = cat.toFirestore();
+      expect(map['highestStage'], equals('adult'));
+    });
+
+    test('toFirestore includes null highestStage for legacy cats', () {
+      final cat = _createTestCat();
+      final map = cat.toFirestore();
+      expect(map['highestStage'], isNull);
+    });
   });
 
   group('Cat.growthProgress', () {
@@ -114,52 +129,105 @@ void main() {
     });
   });
 
-  group('Cat.computedStage', () {
-    test('kitten stage: progress < 0.20', () {
-      // 100 / 1000 = 0.10 -> kitten
-      final cat = _createTestCat(totalMinutes: 100, targetMinutes: 1000);
+  group('Cat.computedStage (3-stage system)', () {
+    test('kitten stage: progress < 0.33', () {
+      // 200 / 1000 = 0.20 -> kitten
+      final cat = _createTestCat(totalMinutes: 200, targetMinutes: 1000);
       expect(cat.computedStage, equals('kitten'));
     });
 
-    test('adolescent stage: 0.20 <= progress < 0.45', () {
-      // 300 / 1000 = 0.30 -> adolescent
-      final cat = _createTestCat(totalMinutes: 300, targetMinutes: 1000);
+    test('adolescent stage: 0.33 <= progress < 0.66', () {
+      // 400 / 1000 = 0.40 -> adolescent
+      final cat = _createTestCat(totalMinutes: 400, targetMinutes: 1000);
       expect(cat.computedStage, equals('adolescent'));
     });
 
-    test('adult stage: 0.45 <= progress < 0.75', () {
-      // 500 / 1000 = 0.50 -> adult
-      final cat = _createTestCat(totalMinutes: 500, targetMinutes: 1000);
+    test('adult stage: progress >= 0.66', () {
+      // 700 / 1000 = 0.70 -> adult
+      final cat = _createTestCat(totalMinutes: 700, targetMinutes: 1000);
       expect(cat.computedStage, equals('adult'));
     });
 
-    test('senior stage: progress >= 0.75', () {
-      // 800 / 1000 = 0.80 -> senior
-      final cat = _createTestCat(totalMinutes: 800, targetMinutes: 1000);
-      expect(cat.computedStage, equals('senior'));
-    });
-
-    test('boundary: exactly 0.20 is adolescent', () {
-      // 200 / 1000 = 0.20 -> adolescent
-      final cat = _createTestCat(totalMinutes: 200, targetMinutes: 1000);
+    test('boundary: exactly 0.33 is adolescent', () {
+      // 330 / 1000 = 0.33 -> adolescent
+      final cat = _createTestCat(totalMinutes: 330, targetMinutes: 1000);
       expect(cat.computedStage, equals('adolescent'));
     });
 
-    test('boundary: exactly 0.45 is adult', () {
-      // 450 / 1000 = 0.45 -> adult
-      final cat = _createTestCat(totalMinutes: 450, targetMinutes: 1000);
+    test('boundary: exactly 0.66 is adult', () {
+      // 660 / 1000 = 0.66 -> adult
+      final cat = _createTestCat(totalMinutes: 660, targetMinutes: 1000);
       expect(cat.computedStage, equals('adult'));
-    });
-
-    test('boundary: exactly 0.75 is senior', () {
-      // 750 / 1000 = 0.75 -> senior
-      final cat = _createTestCat(totalMinutes: 750, targetMinutes: 1000);
-      expect(cat.computedStage, equals('senior'));
     });
 
     test('targetMinutes == 0 -> defaults to kitten (progress = 0.0)', () {
       final cat = _createTestCat(totalMinutes: 500, targetMinutes: 0);
       expect(cat.computedStage, equals('kitten'));
+    });
+  });
+
+  group('Cat.displayStage (highestStage protection)', () {
+    test(
+      'returns computedStage when highestStage is null (legacy, low progress)',
+      () {
+        // 100 / 1000 = 0.10 -> kitten (both old and new thresholds)
+        final cat = _createTestCat(totalMinutes: 100, targetMinutes: 1000);
+        expect(cat.displayStage, equals('kitten'));
+      },
+    );
+
+    test('legacy cat: uses old thresholds to prevent regression (20%-33%)', () {
+      // 250 / 1000 = 0.25 -> new: kitten (<33%), old: adolescent (>=20%)
+      // displayStage should use old threshold -> adolescent
+      final cat = _createTestCat(totalMinutes: 250, targetMinutes: 1000);
+      expect(cat.computedStage, equals('kitten'));
+      expect(cat.displayStage, equals('adolescent'));
+    });
+
+    test('legacy cat: uses old thresholds to prevent regression (45%-66%)', () {
+      // 500 / 1000 = 0.50 -> new: adolescent (<66%), old: adult (>=45%)
+      // displayStage should use old threshold -> adult
+      final cat = _createTestCat(totalMinutes: 500, targetMinutes: 1000);
+      expect(cat.computedStage, equals('adolescent'));
+      expect(cat.displayStage, equals('adult'));
+    });
+
+    test('legacy cat: high progress works correctly', () {
+      // 800 / 1000 = 0.80 -> new: adult (>=66%), old: also adult (was senior)
+      final cat = _createTestCat(totalMinutes: 800, targetMinutes: 1000);
+      expect(cat.computedStage, equals('adult'));
+      expect(cat.displayStage, equals('adult'));
+    });
+
+    test('returns highestStage when computed stage regresses', () {
+      // Progress < 33% but was previously adult
+      final cat = _createTestCat(
+        totalMinutes: 200,
+        targetMinutes: 1000,
+        highestStage: 'adult',
+      );
+      expect(cat.computedStage, equals('kitten'));
+      expect(cat.displayStage, equals('adult'));
+    });
+
+    test('returns computedStage when it exceeds highestStage', () {
+      final cat = _createTestCat(
+        totalMinutes: 700,
+        targetMinutes: 1000,
+        highestStage: 'adolescent',
+      );
+      expect(cat.computedStage, equals('adult'));
+      expect(cat.displayStage, equals('adult'));
+    });
+
+    test('returns highestStage when equal to computedStage', () {
+      final cat = _createTestCat(
+        totalMinutes: 400,
+        targetMinutes: 1000,
+        highestStage: 'adolescent',
+      );
+      expect(cat.computedStage, equals('adolescent'));
+      expect(cat.displayStage, equals('adolescent'));
     });
   });
 
@@ -188,6 +256,13 @@ void main() {
       expect(copied.state, equals('graduated'));
     });
 
+    test('correctly overrides highestStage', () {
+      final cat = _createTestCat(highestStage: 'kitten');
+      final copied = cat.copyWith(highestStage: 'adult');
+
+      expect(copied.highestStage, equals('adult'));
+    });
+
     test('preserves all fields when no overrides given', () {
       final cat = _createTestCat(
         name: 'Mochi',
@@ -195,6 +270,7 @@ void main() {
         targetMinutes: 2000,
         personality: 'curious',
         state: 'active',
+        highestStage: 'adolescent',
       );
       final copied = cat.copyWith();
 
@@ -204,6 +280,7 @@ void main() {
       expect(copied.totalMinutes, equals(cat.totalMinutes));
       expect(copied.targetMinutes, equals(cat.targetMinutes));
       expect(copied.state, equals(cat.state));
+      expect(copied.highestStage, equals(cat.highestStage));
       expect(copied.boundHabitId, equals(cat.boundHabitId));
     });
 

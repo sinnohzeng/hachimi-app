@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
@@ -247,13 +248,30 @@ class FirestoreService {
       });
     }
 
-    // 3. Update cat totalMinutes + lastSessionAt (time-based growth)
+    // 3. Update cat totalMinutes + lastSessionAt + highestStage
     if (session.catId.isNotEmpty) {
       final catRef = _catsRef(uid).doc(session.catId);
-      batch.update(catRef, {
+      final catUpdates = <String, dynamic>{
         'totalMinutes': FieldValue.increment(session.durationMinutes),
         'lastSessionAt': FieldValue.serverTimestamp(),
-      });
+      };
+
+      // 检测是否升阶，原子更新 highestStage
+      final catDoc = await catRef.get();
+      if (catDoc.exists) {
+        final cat = Cat.fromFirestore(catDoc);
+        final newTotalMinutes = cat.totalMinutes + session.durationMinutes;
+        final newProgress = cat.targetMinutes > 0
+            ? (newTotalMinutes / cat.targetMinutes).clamp(0.0, 1.0)
+            : 0.0;
+        final newStage = stageForProgress(newProgress);
+        final currentHighest = cat.highestStage ?? cat.computedStage;
+        if (stageOrder(newStage) > stageOrder(currentHighest)) {
+          catUpdates['highestStage'] = newStage;
+        }
+      }
+
+      batch.update(catRef, catUpdates);
     }
 
     // 4. Award focus coins + increment totalSessionCount

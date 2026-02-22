@@ -706,7 +706,7 @@ Color peltColorToMaterial(String peltColor) {
 /// - 3-5: adolescent
 /// - 6-8: adult (shorthair)
 /// - 9-11: adult (longhair)
-/// - 12-14: senior
+/// - 12-14: 闲置（原 senior，不再使用）
 int computeSpriteIndex({
   required String stage,
   required int variant,
@@ -720,27 +720,30 @@ int computeSpriteIndex({
       return 3 + v;
     case 'adult':
       return (isLonghair ? 9 : 6) + v;
-    case 'senior':
-      return 12 + v;
     default:
       return 0 + v;
   }
 }
 
-/// 成长阶段百分比阈值
+/// 成长阶段百分比阈值（3 阶段：幼猫 / 青年猫 / 成熟猫）
 const Map<String, double> stageThresholds = {
   'kitten': 0.0,
-  'adolescent': 0.20,
-  'adult': 0.45,
-  'senior': 0.75,
+  'adolescent': 0.33,
+  'adult': 0.66,
 };
 
 /// 根据进度百分比计算成长阶段
 String stageForProgress(double progress) {
-  if (progress >= 0.75) return 'senior';
-  if (progress >= 0.45) return 'adult';
-  if (progress >= 0.20) return 'adolescent';
+  if (progress >= 0.66) return 'adult';
+  if (progress >= 0.33) return 'adolescent';
   return 'kitten';
+}
+
+/// 阶段顺序索引（用于比较）
+int stageOrder(String stage) {
+  const order = ['kitten', 'adolescent', 'adult'];
+  final idx = order.indexOf(stage);
+  return idx >= 0 ? idx : 0;
 }
 
 /// 计算当前阶段内的进度（0.0-1.0）
@@ -749,11 +752,11 @@ double stageProgressInRange(double progress) {
   final currentThreshold = stageThresholds[stage]!;
 
   // 查找下一阶段阈值
-  final stages = ['kitten', 'adolescent', 'adult', 'senior'];
+  final stages = ['kitten', 'adolescent', 'adult'];
   final currentIndex = stages.indexOf(stage);
   if (currentIndex >= stages.length - 1) {
-    // senior: 从 0.75 到 1.0
-    return ((progress - 0.75) / 0.25).clamp(0.0, 1.0);
+    // adult（最终阶段）：从 0.66 到 1.0
+    return ((progress - 0.66) / 0.34).clamp(0.0, 1.0);
   }
   final nextThreshold = stageThresholds[stages[currentIndex + 1]]!;
   final range = nextThreshold - currentThreshold;

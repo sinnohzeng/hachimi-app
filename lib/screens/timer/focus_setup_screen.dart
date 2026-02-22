@@ -95,7 +95,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     }
 
     final bgColor = cat != null
-        ? stageColor(cat.computedStage)
+        ? stageColor(cat.displayStage)
         : colorScheme.primary;
 
     return Scaffold(

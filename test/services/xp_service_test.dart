@@ -241,10 +241,10 @@ void main() {
       expect(result.newStage, equals('kitten'));
     });
 
-    test('stage up from kitten to adolescent at 20%', () {
+    test('stage up from kitten to adolescent at 33%', () {
       final result = xpService.checkStageUp(
-        oldTotalMinutes: 190,
-        newTotalMinutes: 210,
+        oldTotalMinutes: 320,
+        newTotalMinutes: 340,
         targetMinutes: 1000,
       );
 

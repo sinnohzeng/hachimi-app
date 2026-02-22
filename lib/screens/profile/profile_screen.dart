@@ -28,7 +28,7 @@ class ProfileScreen extends ConsumerWidget {
     // Count cats by stage
     final stageCounts = <String, int>{};
     for (final cat in allCats) {
-      final stage = cat.computedStage;
+      final stage = cat.displayStage;
       stageCounts[stage] = (stageCounts[stage] ?? 0) + 1;
     }
 
@@ -174,11 +174,6 @@ class ProfileScreen extends ConsumerWidget {
                             label: l10n.stageName('adult'),
                             count: stageCounts['adult'] ?? 0,
                             color: stageColor('adult'),
-                          ),
-                          _StageChip(
-                            label: l10n.stageName('senior'),
-                            count: stageCounts['senior'] ?? 0,
-                            color: stageColor('senior'),
                           ),
                         ],
                       ),

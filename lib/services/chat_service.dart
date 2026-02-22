@@ -148,7 +148,7 @@ class ChatService {
       catName: cat.name,
       personalityId: personality?.id ?? 'playful',
       moodId: moodData.id,
-      stageId: cat.computedStage,
+      stageId: cat.displayStage,
       habitName: habit.name,
       isZhLocale: chatCtx.isZhLocale,
     );

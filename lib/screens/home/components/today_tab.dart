@@ -173,7 +173,7 @@ class TodayTab extends ConsumerWidget {
     for (final cat in cats) {
       final recency = _recencyScore(cat.lastSessionAt);
       final mood = _moodScore(cat.computedMood);
-      final growth = _growthScore(cat.stageProgress, cat.computedStage);
+      final growth = _growthScore(cat.stageProgress);
       final today = (todayMinutes[cat.boundHabitId] ?? 0) > 0 ? 0.0 : 1.0;
 
       final score = recency * 0.45 + mood * 0.30 + growth * 0.20 + today * 0.05;
@@ -212,8 +212,7 @@ class TodayTab extends ConsumerWidget {
     }
   }
 
-  static double _growthScore(double stageProgress, String stage) {
-    if (stage == 'senior') return 0.2;
+  static double _growthScore(double stageProgress) {
     if (stageProgress >= 0.85) return 1.0;
     if (stageProgress >= 0.70) return 0.7;
     return stageProgress * 0.5;

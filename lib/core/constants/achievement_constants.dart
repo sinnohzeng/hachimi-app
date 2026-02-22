@@ -383,11 +383,11 @@ class AchievementDefinitions {
       coinReward: 100,
     ),
     AchievementDef(
-      id: 'cat_senior',
+      id: 'cat_senior', // 保留 ID 以兼容已解锁用户
       category: AchievementCategory.cat,
       nameKey: 'achievementCatSeniorName',
       descKey: 'achievementCatSeniorDesc',
-      icon: Icons.stars,
+      icon: Icons.emoji_events,
       coinReward: 200,
       titleReward: AchievementTitles.elderCat,
     ),

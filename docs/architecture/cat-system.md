@@ -64,31 +64,31 @@ Personalities are assigned randomly at adoption.
 
 ## Growth Stages
 
-Cats evolve through **4 stages** based on the percentage of `totalMinutes` against `targetMinutes` (the cumulative minute goal derived from the habit's `targetHours`):
+Cats evolve through **3 stages** based on the percentage of `totalMinutes` against `targetMinutes` (the cumulative minute goal derived from the habit's `targetHours`):
 
 | Stage | ID | Name | Emoji | Condition | Description |
 |-------|----|------|-------|-----------|-------------|
-| 1 | `kitten` | Kitten | 🐱 | progress < 20% | Newborn, tiny, full of potential |
-| 2 | `adolescent` | Adolescent | 🐈 | 20% <= progress < 45% | Growing fast, more expressive |
-| 3 | `adult` | Adult | 🐈‍⬛ | 45% <= progress < 75% | Fully formed, confident |
-| 4 | `senior` | Senior | 🎓🐈 | progress >= 75% | Wise elder, distinguished appearance |
+| 1 | `kitten` | Kitten | 🐱 | progress < 33% | Newborn, tiny, full of potential |
+| 2 | `adolescent` | Adolescent | 🐈 | 33% <= progress < 66% | Growing fast, more expressive |
+| 3 | `adult` | Adult | 🐈‍⬛ | progress >= 66% | Fully formed, confident and composed |
 
 **Stage calculation** is derived at read time from `totalMinutes` and `targetMinutes` — it is not stored separately in Firestore (to prevent drift). The computed getter `cat.computedStage` always returns the authoritative stage.
+
+**Anti-regression protection:** The `highestStage` field (stored in Firestore) records the highest stage a cat has ever reached. The UI uses `displayStage = max(computedStage, highestStage)` to prevent visual regression when users increase their target hours. `highestStage` is monotonically increasing — it only goes up, never down. For legacy cats where `highestStage == null`, old thresholds (20%/45%) are used as a fallback to prevent visual regression from the threshold change.
 
 **Progress formula:**
 ```
 progress = totalMinutes / (targetMinutes)
-stage = kitten     if progress < 0.20
-        adolescent if progress < 0.45
-        adult      if progress < 0.75
-        senior     if progress >= 0.75
+stage = kitten     if progress < 0.33
+        adolescent if progress < 0.66
+        adult      if progress >= 0.66
 ```
 
 **Stage progress** (used for progress bars within a stage):
 ```
 stageProgress = (progress - stageFloor) / (stageCeiling - stageFloor)
 ```
-At max stage (Senior), `stageProgress` scales from 0.75 to 1.0, capped at `1.0`.
+At max stage (Adult), `stageProgress` scales from 0.66 to 1.0, capped at `1.0`.
 
 ---
 
@@ -128,13 +128,13 @@ score = recencyScore * 0.45 + moodScore * 0.30 + growthScore * 0.20 + todayScore
 |-----------|--------|---------|---------------|
 | `recencyScore` | 0.45 | Recent interaction | <1h: 1.0, 1-6h: 0.8, 6-24h: 0.6, 1-3d: 0.3, 3-7d: 0.15, >7d/null: 0.05 |
 | `moodScore` | 0.30 | Mood urgency | missing: 1.0, lonely: 0.8, neutral: 0.3, happy: 0.1 |
-| `growthScore` | 0.20 | Growth incentive | stageProgress>=0.85 (non-senior): 1.0, >=0.70: 0.7, senior: 0.2, else: stageProgress*0.5 |
+| `growthScore` | 0.20 | Growth incentive | stageProgress>=0.85: 1.0, >=0.70: 0.7, else: stageProgress*0.5 |
 | `todayScore` | 0.05 | Today's completion | Not done: 1.0, Done: 0.0 |
 
 **Behavior examples:**
 - Just finished focus → recency (1.0 * 0.45) dominates → shows the cat you just spent time with
 - Week without opening app → mood (1.0 * 0.30) dominates → shows the cat that misses you most
-- All senior cats → recency + mood still effective → no degenerate selection
+- All adult cats → recency + mood still effective → no degenerate selection
 - Single cat → short-circuit returns `cats.first`
 
 **Implementation:** `TodayTab._findFeaturedCat()` in `lib/screens/home/components/today_tab.dart`

@@ -128,8 +128,6 @@ extension CatL10n on S {
         return stageAdolescent;
       case 'adult':
         return stageAdult;
-      case 'senior':
-        return stageSenior;
       default:
         return stageId;
     }

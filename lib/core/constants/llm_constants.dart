@@ -112,14 +112,8 @@ const _stageNameEn = {
   'kitten': 'Kitten',
   'adolescent': 'Adolescent',
   'adult': 'Adult',
-  'senior': 'Senior',
 };
-const _stageNameZh = {
-  'kitten': '幼猫',
-  'adolescent': '少年猫',
-  'adult': '成年猫',
-  'senior': '长老猫',
-};
+const _stageNameZh = {'kitten': '幼猫', 'adolescent': '青年猫', 'adult': '成熟猫'};
 
 /// 日记 prompt 构建器。
 class DiaryPrompt {

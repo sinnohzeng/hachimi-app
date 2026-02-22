@@ -116,17 +116,19 @@ users/{uid}                          <- 用户基本信息文档
 | `boundHabitId` | string | 是 | 生成此猫咪的习惯 ID |
 | `state` | string | 是 | `"active"`、`"dormant"` 或 `"graduated"` |
 | `lastSessionAt` | timestamp | 否 | 最近一次专注会话的时间戳 |
+| `highestStage` | string | 否 | 曾达到的最高成长阶段（单调递增；旧猫为 null）。有效值："kitten"、"adolescent"、"adult"。 |
 | `createdAt` | timestamp | 是 | 猫咪领养时间戳 |
 
 **计算字段（不存储于 Firestore）：**
 
 | 计算字段 | 来源 | 计算逻辑 |
 |---------|------|---------|
-| `stage` | `totalMinutes`、`targetMinutes` | kitten（< 20%）、adolescent（20%-45%）、adult（45%-75%）、senior（>= 75%） |
+| `stage` | `totalMinutes`、`targetMinutes` | kitten（< 33%）、adolescent（33%-66%）、adult（>= 66%） |
+| `displayStage` | `stage`、`highestStage` | max(computedStage, highestStage ?? computedStage)。旧猫（highestStage == null）使用旧阈值（20%/45%）防止视觉回退。 |
 | `mood` | `lastSessionAt` | happy（24h 内）、neutral（1-3 天）、lonely（3-7 天）、missing（7 天以上） |
 
 **为何不直接存储 `stage` 和 `mood`？**
-存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`totalMinutes`、`targetMinutes` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。
+存储派生值会产生漂移风险（存储值与公式计算值不一致）。通过在读取时从权威输入（`totalMinutes`、`targetMinutes` 和 `lastSessionAt`）计算，应用始终显示正确状态，无需后台任务。`highestStage` 是例外——它必须存储，因为它需要单调递增（只升不降），以保护用户修改目标小时数时不发生阶段回退。
 
 **状态转换：**
 ```

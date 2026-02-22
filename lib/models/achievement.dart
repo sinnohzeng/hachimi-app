@@ -78,7 +78,8 @@ class AchievementEvalContext {
   final List<int> habitStreaks; // 所有 habit 的 currentStreak
   final List<int> habitBestStreaks; // 所有 habit 的 bestStreak
   final List<int> habitCheckInDays; // 所有 habit 的 totalCheckInDays
-  final List<String> catStages; // 所有 cat 的 computedStage
+  final List<String> catStages; // 所有 cat 的 displayStage
+  final List<double> catProgresses; // 所有 cat 的 growthProgress
   final int totalCatCount;
   final int graduatedCatCount;
   final int accessoryCount;
@@ -95,6 +96,7 @@ class AchievementEvalContext {
     required this.habitBestStreaks,
     required this.habitCheckInDays,
     required this.catStages,
+    this.catProgresses = const [],
     required this.totalCatCount,
     required this.graduatedCatCount,
     required this.accessoryCount,

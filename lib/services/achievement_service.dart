@@ -138,15 +138,14 @@ class AchievementService {
 
       case 'cat_adolescent':
         return ctx.catStages.contains('adolescent') ||
-            ctx.catStages.contains('adult') ||
-            ctx.catStages.contains('senior');
+            ctx.catStages.contains('adult');
 
       case 'cat_adult':
-        return ctx.catStages.contains('adult') ||
-            ctx.catStages.contains('senior');
+        return ctx.catStages.contains('adult');
 
       case 'cat_senior':
-        return ctx.catStages.contains('senior');
+        // 重新定义：任一猫达到 100% 目标完成
+        return ctx.catProgresses.any((p) => p >= 1.0);
 
       case 'cat_graduated':
         return ctx.graduatedCatCount >= 1;

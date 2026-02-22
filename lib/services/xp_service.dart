@@ -75,7 +75,7 @@ class XpService {
   }
 
   /// Check if adding minutes results in a stage transition.
-  /// Uses percentage-based thresholds: kitten / adolescent / adult / senior.
+  /// Uses percentage-based thresholds: kitten / adolescent / adult.
   StageUpResult checkStageUp({
     required int oldTotalMinutes,
     required int newTotalMinutes,

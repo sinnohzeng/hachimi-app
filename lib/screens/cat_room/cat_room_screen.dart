@@ -271,7 +271,7 @@ class _CatHouseCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final stageClr = stageColor(cat.computedStage);
+    final stageClr = stageColor(cat.displayStage);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -333,7 +333,7 @@ class _CatHouseCard extends StatelessWidget {
 
               // Stage label
               Text(
-                context.l10n.stageName(cat.computedStage),
+                context.l10n.stageName(cat.displayStage),
                 style: textTheme.labelSmall?.copyWith(
                   color: stageClr,
                   fontWeight: FontWeight.w600,

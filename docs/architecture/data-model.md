@@ -116,6 +116,7 @@ One document per cat. `catId` is a Firestore auto-generated ID.
 | `boundHabitId` | string | yes | Reference to the habit that spawned this cat |
 | `state` | string | yes | "active", "dormant", or "graduated" |
 | `lastSessionAt` | timestamp | no | Timestamp of the most recent focus session for this cat's habit |
+| `highestStage` | string | no | Highest growth stage ever reached (monotonic; null for legacy cats). Valid values: "kitten", "adolescent", "adult". |
 | `createdAt` | timestamp | yes | Cat adoption timestamp |
 
 **Computed Fields (not stored in Firestore):**
@@ -123,11 +124,12 @@ These are derived from stored fields at read time to prevent drift.
 
 | Computed | Derived From | Logic |
 |----------|-------------|-------|
-| `stage` | `totalMinutes`, `targetMinutes` | kitten (< 20%), adolescent (20%–45%), adult (45%–75%), senior (>= 75%) |
+| `stage` | `totalMinutes`, `targetMinutes` | kitten (< 33%), adolescent (33%–66%), adult (>= 66%) |
+| `displayStage` | `stage`, `highestStage` | max(computedStage, highestStage ?? computedStage). For legacy cats (highestStage == null), uses old thresholds (20%/45%) to prevent visual regression. |
 | `mood` | `lastSessionAt` | happy (under 24h), neutral (1–3d), lonely (3–7d), missing (over 7d) |
 
 **Why not store `stage` and `mood` directly?**
-Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`totalMinutes`, `targetMinutes`, and `lastSessionAt`), the app always shows the correct state without background jobs.
+Storing derived values creates a risk of drift (the stored value diverges from what the formula would compute). By computing at read time from authoritative inputs (`totalMinutes`, `targetMinutes`, and `lastSessionAt`), the app always shows the correct state without background jobs. The `highestStage` field is the exception — it is stored because it must be monotonically increasing (only goes up, never down) to protect against stage regression when users change their target hours.
 
 **State Transitions:**
 

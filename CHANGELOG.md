@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-02-22
+### Changed
+- Cat growth system simplified from 4 stages to 3: kitten (<33%), adolescent (33%–66%), adult (>=66%)
+- Equal stage distribution (33/33/34) replaces old uneven thresholds (20/25/30/25)
+- Cat detail page shows 3 stage milestones instead of 4
+- Profile page shows 3 stage count chips instead of 4
+- "Elder Whiskers" achievement renamed to "Master Cat" — now triggers at 100% growth target completion
+- LLM prompt stage names updated: 青年猫 (adolescent), 成熟猫 (adult)
+
+### Added
+- `highestStage` field on Cat model — prevents visual stage regression when users increase target hours
+- `displayStage` computed property — returns the higher of computed stage and stored highest stage
+- Legacy data compatibility: cats without `highestStage` use old thresholds to avoid visual regression
+- Firestore security rules validation for `highestStage` field
+- Atomic `highestStage` update in `logFocusSession` (only increases, never decreases)
+
+### Removed
+- Senior stage (was >=75%) — merged into adult stage
+- Senior-specific scoring in Featured Cat selection algorithm
+
 ## [2.9.1] - 2026-02-22
 ### Added
 - Motivational quote field on quests — set during creation with random locale-aware quotes, editable later
