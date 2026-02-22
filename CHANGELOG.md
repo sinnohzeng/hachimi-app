@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.1] - 2026-02-22
+### Fixed
+- Cat detail page: cat sprite and personality text now correctly centered in AppBar
+- AnimatedMeshBackground: internally enforces tight constraints, preventing layout drift in loose-constraint contexts
+
 ## [2.8.0] - 2026-02-21
 ### Added
 - Redesigned stats page with weekly trend chart (fl_chart), summary cards, and session history with pagination

@@ -14,6 +14,9 @@ class AnimatedMeshBackground extends ConsumerWidget {
   final double speed;
 
   /// 渲染在渐变之上的子组件。
+  ///
+  /// 子组件会接收到 tight constraints（等于父级可用空间），
+  /// 无需在调用方额外包裹 [SizedBox.expand]。
   final Widget? child;
 
   const AnimatedMeshBackground({
@@ -35,19 +38,25 @@ class AnimatedMeshBackground extends ConsumerWidget {
     );
     final disableAnimations = MediaQuery.of(context).disableAnimations;
 
+    // SizedBox.expand 将 loose constraints 转为 tight constraints，
+    // 确保子组件在 FlexibleSpaceBar.background 等场景下也能正确填满。
     if (!animationEnabled || disableAnimations) {
-      return _StaticFallback(colors: colors, child: child);
+      return SizedBox.expand(
+        child: _StaticFallback(colors: colors, child: child),
+      );
     }
 
-    return AnimatedMeshGradient(
-      colors: colors,
-      options: AnimatedMeshGradientOptions(
-        speed: speed,
-        grain: 0.0,
-        frequency: 3,
-        amplitude: 20,
+    return SizedBox.expand(
+      child: AnimatedMeshGradient(
+        colors: colors,
+        options: AnimatedMeshGradientOptions(
+          speed: speed,
+          grain: 0.0,
+          frequency: 3,
+          amplitude: 20,
+        ),
+        child: child ?? const SizedBox.shrink(),
       ),
-      child: child ?? const SizedBox.expand(),
     );
   }
 }
