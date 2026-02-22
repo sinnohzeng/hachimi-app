@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.2] - 2026-02-22
+### Changed
+- Settings: merged Material You toggle into Theme Color picker — "Dynamic" wallpaper option + 8 preset colors in a single dialog
+- Settings: moved Pixel Cat Sprites CC BY-NC 4.0 attribution into Flutter license registry
+- Theme: improved card visibility in dark mode (surfaceContainerHigh + subtle border) and light mode (surfaceContainerLow + elevation)
+### Fixed
+- Cat gesture conflict: tapping cats in album, home card, and cat room now navigates instead of switching poses
+- Cat detail AppBar: replaced hardcoded white foreground with theme-aware colors
+
 ## [2.8.1] - 2026-02-22
 ### Fixed
 - Cat detail page: cat sprite and personality text now correctly centered in AppBar

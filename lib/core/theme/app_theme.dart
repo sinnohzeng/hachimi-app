@@ -73,8 +73,18 @@ class AppTheme {
         elevation: 0,
       ),
       cardTheme: CardThemeData(
-        elevation: 1,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: colorScheme.brightness == Brightness.dark ? 0 : 1,
+        color: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: colorScheme.brightness == Brightness.dark
+              ? BorderSide(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                )
+              : BorderSide.none,
+        ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primaryContainer,

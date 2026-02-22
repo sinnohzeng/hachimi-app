@@ -73,39 +73,51 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showThemeModeSettings(context, ref),
           ),
-          SwitchListTile(
-            secondary: const Icon(Icons.wallpaper_outlined),
-            title: Text(l10n.settingsMaterialYou),
-            subtitle: Text(
-              l10n.settingsMaterialYouSubtitle,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            value: themeSettings.useDynamicColor,
-            onChanged: (value) {
-              ref.read(themeProvider.notifier).setDynamicColor(value);
-            },
-          ),
           ListTile(
             leading: const Icon(Icons.palette_outlined),
             title: Text(l10n.settingsThemeColor),
+            subtitle: themeSettings.useDynamicColor
+                ? Text(
+                    l10n.settingsThemeColorDynamic,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  )
+                : null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: themeSettings.seedColor,
-                    shape: BoxShape.circle,
+                if (themeSettings.useDynamicColor)
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(
+                        colors: [
+                          Color(0xFF4285F4),
+                          Color(0xFF34A853),
+                          Color(0xFFFBBC05),
+                          Color(0xFFEA4335),
+                          Color(0xFF4285F4),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: themeSettings.seedColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
                 const SizedBox(width: AppSpacing.sm),
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () => _showThemeColorSettings(context, ref),
+            onTap: () => _showThemeColorSettings(context),
           ),
           SwitchListTile(
             secondary: const Icon(Icons.auto_awesome_outlined),
@@ -144,16 +156,6 @@ class SettingsScreen extends ConsumerWidget {
                   loading: () => const Text('...'),
                   error: (_, __) => const Text('?'),
                 ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.pets_outlined),
-            title: Text(l10n.settingsPixelCatSprites),
-            subtitle: Text(
-              l10n.settingsPixelCatAttribution,
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
@@ -283,16 +285,8 @@ class SettingsScreen extends ConsumerWidget {
 
   // --- Theme Color Settings ---
 
-  void _showThemeColorSettings(BuildContext context, WidgetRef ref) {
-    final currentColor = ref.read(themeProvider).seedColor;
-    showDialog(
-      context: context,
-      builder: (ctx) => ThemeColorDialog(currentColor: currentColor),
-    ).then((result) {
-      if (result != null) {
-        ref.read(themeProvider.notifier).setSeedColor(result as Color);
-      }
-    });
+  void _showThemeColorSettings(BuildContext context) {
+    showDialog(context: context, builder: (ctx) => const ThemeColorDialog());
   }
 
   // --- Account Actions ---

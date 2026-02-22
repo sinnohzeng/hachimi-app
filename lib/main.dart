@@ -49,6 +49,16 @@ void main() async {
       '[STARTUP] critical init: ${startupStopwatch.elapsedMilliseconds}ms',
     );
 
+    // 注册 Pixel Cat Sprites 的 CC BY-NC 4.0 许可证归属
+    LicenseRegistry.addLicense(() async* {
+      yield const LicenseEntryWithLineBreaks(
+        ['Pixel Cat Sprites'],
+        'Pixel Cat Sprites by pixel-cat-maker\n'
+        'Licensed under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)\n'
+        'https://creativecommons.org/licenses/by-nc/4.0/',
+      );
+    });
+
     // 非关键初始化（GoogleSignIn、通知、FocusTimer）延迟到首帧后执行
     // 参见 DeferredInit
     runApp(

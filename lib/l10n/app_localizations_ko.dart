@@ -425,13 +425,13 @@ class SKo extends S {
   String get settingsThemeModeDark => '어둡게';
 
   @override
-  String get settingsMaterialYou => 'Material You';
-
-  @override
-  String get settingsMaterialYouSubtitle => '배경화면 색상을 테마에 적용';
-
-  @override
   String get settingsThemeColor => '테마 색상';
+
+  @override
+  String get settingsThemeColorDynamic => '다이내믹';
+
+  @override
+  String get settingsThemeColorDynamicSubtitle => '배경화면 색상 사용';
 
   @override
   String get settingsAiModel => 'AI 모델';
@@ -447,9 +447,6 @@ class SKo extends S {
 
   @override
   String get settingsVersion => '버전';
-
-  @override
-  String get settingsPixelCatSprites => '픽셀 고양이 스프라이트';
 
   @override
   String get settingsLicenses => '라이선스';
@@ -1925,9 +1922,6 @@ class SKo extends S {
 
   @override
   String get weekdaySun => '일';
-
-  @override
-  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 
   @override
   String get statsTotalSessions => '집중 횟수';

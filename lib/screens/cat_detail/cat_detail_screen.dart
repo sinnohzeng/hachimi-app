@@ -69,8 +69,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
-            // [R4] 展开状态下白色前景保证对比度
-            foregroundColor: Colors.white,
+            systemOverlayStyle: Theme.of(context).brightness == Brightness.light
+                ? SystemUiOverlayStyle.dark
+                : SystemUiOverlayStyle.light,
             actions: [
               // [B3] 编辑入口移到 AppBar actions
               IconButton(
@@ -96,8 +97,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 cat.name,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: [const Shadow(blurRadius: 4, color: Colors.black26)],
+                  color: colorScheme.onSurface,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

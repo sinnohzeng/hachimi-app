@@ -428,13 +428,13 @@ class SEn extends S {
   String get settingsThemeModeDark => 'Dark';
 
   @override
-  String get settingsMaterialYou => 'Material You';
-
-  @override
-  String get settingsMaterialYouSubtitle => 'Use wallpaper colors for theme';
-
-  @override
   String get settingsThemeColor => 'Theme Color';
+
+  @override
+  String get settingsThemeColorDynamic => 'Dynamic';
+
+  @override
+  String get settingsThemeColorDynamicSubtitle => 'Use wallpaper colors';
 
   @override
   String get settingsAiModel => 'AI Model';
@@ -451,9 +451,6 @@ class SEn extends S {
 
   @override
   String get settingsVersion => 'Version';
-
-  @override
-  String get settingsPixelCatSprites => 'Pixel Cat Sprites';
 
   @override
   String get settingsLicenses => 'Licenses';
@@ -1948,9 +1945,6 @@ class SEn extends S {
 
   @override
   String get weekdaySun => 'S';
-
-  @override
-  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 
   @override
   String get statsTotalSessions => 'Sessions';

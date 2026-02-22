@@ -423,13 +423,13 @@ class SZh extends S {
   String get settingsThemeModeDark => '深色';
 
   @override
-  String get settingsMaterialYou => 'Material You';
-
-  @override
-  String get settingsMaterialYouSubtitle => '使用壁纸颜色作为主题色';
-
-  @override
   String get settingsThemeColor => '主题颜色';
+
+  @override
+  String get settingsThemeColorDynamic => '动态';
+
+  @override
+  String get settingsThemeColorDynamicSubtitle => '使用壁纸颜色';
 
   @override
   String get settingsAiModel => 'AI 模型';
@@ -445,9 +445,6 @@ class SZh extends S {
 
   @override
   String get settingsVersion => '版本';
-
-  @override
-  String get settingsPixelCatSprites => '像素猫素材';
 
   @override
   String get settingsLicenses => '开源许可';
@@ -1920,9 +1917,6 @@ class SZh extends S {
   String get weekdaySun => '日';
 
   @override
-  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
-
-  @override
   String get statsTotalSessions => '专注次数';
 
   @override
@@ -2406,13 +2400,13 @@ class SZhHant extends SZh {
   String get settingsThemeModeDark => '深色';
 
   @override
-  String get settingsMaterialYou => 'Material You';
-
-  @override
-  String get settingsMaterialYouSubtitle => '使用桌布顏色作為主題色';
-
-  @override
   String get settingsThemeColor => '主題顏色';
+
+  @override
+  String get settingsThemeColorDynamic => '動態';
+
+  @override
+  String get settingsThemeColorDynamicSubtitle => '使用桌布顏色';
 
   @override
   String get settingsAiModel => 'AI 模型';
@@ -2428,9 +2422,6 @@ class SZhHant extends SZh {
 
   @override
   String get settingsVersion => '版本';
-
-  @override
-  String get settingsPixelCatSprites => '像素貓素材';
 
   @override
   String get settingsLicenses => '開放原始碼授權';
@@ -3902,9 +3893,6 @@ class SZhHant extends SZh {
 
   @override
   String get weekdaySun => '日';
-
-  @override
-  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 
   @override
   String get statsTotalSessions => '專注次數';

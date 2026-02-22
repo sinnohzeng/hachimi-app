@@ -846,23 +846,23 @@ abstract class S {
   /// **'Dark'**
   String get settingsThemeModeDark;
 
-  /// No description provided for @settingsMaterialYou.
-  ///
-  /// In en, this message translates to:
-  /// **'Material You'**
-  String get settingsMaterialYou;
-
-  /// No description provided for @settingsMaterialYouSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use wallpaper colors for theme'**
-  String get settingsMaterialYouSubtitle;
-
   /// No description provided for @settingsThemeColor.
   ///
   /// In en, this message translates to:
   /// **'Theme Color'**
   String get settingsThemeColor;
+
+  /// No description provided for @settingsThemeColorDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic'**
+  String get settingsThemeColorDynamic;
+
+  /// No description provided for @settingsThemeColorDynamicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use wallpaper colors'**
+  String get settingsThemeColorDynamicSubtitle;
 
   /// No description provided for @settingsAiModel.
   ///
@@ -893,12 +893,6 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Version'**
   String get settingsVersion;
-
-  /// No description provided for @settingsPixelCatSprites.
-  ///
-  /// In en, this message translates to:
-  /// **'Pixel Cat Sprites'**
-  String get settingsPixelCatSprites;
 
   /// No description provided for @settingsLicenses.
   ///
@@ -3635,12 +3629,6 @@ abstract class S {
   /// In en, this message translates to:
   /// **'S'**
   String get weekdaySun;
-
-  /// No description provided for @settingsPixelCatAttribution.
-  ///
-  /// In en, this message translates to:
-  /// **'by pixel-cat-maker (CC BY-NC 4.0)'**
-  String get settingsPixelCatAttribution;
 
   /// No description provided for @statsTotalSessions.
   ///

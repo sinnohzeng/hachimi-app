@@ -425,13 +425,13 @@ class SJa extends S {
   String get settingsThemeModeDark => 'ダーク';
 
   @override
-  String get settingsMaterialYou => 'Material You';
-
-  @override
-  String get settingsMaterialYouSubtitle => '壁紙の色をテーマに使用';
-
-  @override
   String get settingsThemeColor => 'テーマカラー';
+
+  @override
+  String get settingsThemeColorDynamic => 'ダイナミック';
+
+  @override
+  String get settingsThemeColorDynamicSubtitle => '壁紙の色を使用';
 
   @override
   String get settingsAiModel => 'AIモデル';
@@ -447,9 +447,6 @@ class SJa extends S {
 
   @override
   String get settingsVersion => 'バージョン';
-
-  @override
-  String get settingsPixelCatSprites => 'ピクセルネコスプライト';
 
   @override
   String get settingsLicenses => 'ライセンス';
@@ -1924,9 +1921,6 @@ class SJa extends S {
 
   @override
   String get weekdaySun => '日';
-
-  @override
-  String get settingsPixelCatAttribution => 'by pixel-cat-maker (CC BY-NC 4.0)';
 
   @override
   String get statsTotalSessions => 'セッション数';

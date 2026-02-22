@@ -285,7 +285,7 @@ class _CatHouseCard extends StatelessWidget {
               // Pixel cat sprite
               Hero(
                 tag: 'cat-${cat.id}',
-                child: TappableCatSprite(cat: cat, size: 80),
+                child: TappableCatSprite(cat: cat, size: 80, enableTap: false),
               ),
               const SizedBox(height: AppSpacing.xs),
 
