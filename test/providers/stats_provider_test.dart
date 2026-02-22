@@ -1,13 +1,10 @@
 // ---
-// 📘 文件说明：
 // HabitStats 单元测试 — 验证聚合统计计算属性。
 //
 // 🧩 文件结构：
 // - HabitStats 构造: 默认值、自定义值
 // - 计算属性: totalHoursLogged, remainingMinutes, overallProgress
 // - 边界: 零 targetHours, 大数值, 超过目标
-//
-// 🕒 创建时间：2026-02-20
 // ---
 
 import 'package:flutter_test/flutter_test.dart';
@@ -19,7 +16,6 @@ void main() {
       const stats = HabitStats();
       expect(stats.totalHabits, equals(0));
       expect(stats.totalMinutesLogged, equals(0));
-      expect(stats.longestStreak, equals(0));
       expect(stats.totalTargetHours, equals(0));
     });
   });

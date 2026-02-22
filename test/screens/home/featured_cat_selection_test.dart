@@ -1,5 +1,4 @@
 // ---
-// 📘 文件说明：
 // Featured Cat 智能选择算法单元测试 — 验证加权评分逻辑和心情修复。
 //
 // 🧩 测试场景：
@@ -8,8 +7,6 @@
 // - 全 adult 猫 → recency + mood 仍有效
 // - 单猫 → 短路返回
 // - 新用户 → calculateMood 的 createdAt 修复
-//
-// 🕒 创建时间：2026-02-22
 // ---
 
 import 'package:flutter_test/flutter_test.dart';
@@ -34,7 +31,6 @@ Cat _makeCat({
   required String id,
   String personality = 'playful',
   int totalMinutes = 100,
-  int targetMinutes = 1000,
   DateTime? createdAt,
   DateTime? lastSessionAt,
   String boundHabitId = 'habit-1',
@@ -45,7 +41,6 @@ Cat _makeCat({
     personality: personality,
     appearance: _defaultAppearance,
     totalMinutes: totalMinutes,
-    targetMinutes: targetMinutes,
     boundHabitId: boundHabitId,
     createdAt: createdAt ?? DateTime(2026, 1, 1),
     lastSessionAt: lastSessionAt,
@@ -129,7 +124,6 @@ void main() {
 
     test('一周未开 app → mood(missing) 主导，选择最想念用户的猫', () {
       final now = DateTime.now();
-      // 两只猫都很久没互动，但 missingCat 更久
       final missingCat = _makeCat(
         id: 'missing',
         lastSessionAt: now.subtract(const Duration(days: 10)),
@@ -142,25 +136,21 @@ void main() {
       );
 
       final result = findFeaturedCat([missingCat, lonelyCat], {});
-      // missingCat: mood=missing(1.0), recency=0.05 → 0.05*0.45 + 1.0*0.30 = 0.3225
-      // lonelyCat: mood=lonely(0.8), recency=0.15 → 0.15*0.45 + 0.8*0.30 = 0.3075
       expect(result?.id, equals('missing'));
     });
 
-    test('全 adult 猫 → recency + mood 仍有效，不退化为盲选', () {
+    test('全 adult 猫 → recency + mood 仍有效', () {
       final now = DateTime.now();
-      // 两只 adult 猫，相同进度以消除 growthScore 差异
+      // 6000 min = 100h → adult stage
       final recentAdult = _makeCat(
         id: 'recent-adult',
-        totalMinutes: 800,
-        targetMinutes: 1000,
+        totalMinutes: 6000,
         lastSessionAt: now.subtract(const Duration(hours: 2)),
         boundHabitId: 'h1',
       );
       final oldAdult = _makeCat(
         id: 'old-adult',
-        totalMinutes: 800,
-        targetMinutes: 1000,
+        totalMinutes: 6000,
         lastSessionAt: now.subtract(const Duration(days: 4)),
         boundHabitId: 'h2',
       );
@@ -169,9 +159,6 @@ void main() {
       expect(oldAdult.computedStage, equals('adult'));
 
       final result = findFeaturedCat([recentAdult, oldAdult], {});
-      // 相同 growthScore 下，recency(0.8) > mood(lonely 0.8) 权重
-      // recentAdult: 0.8*0.45 + 0.1*0.30 = 0.39
-      // oldAdult: 0.15*0.45 + 0.8*0.30 = 0.3075
       expect(result?.id, equals('recent-adult'));
     });
 
@@ -188,7 +175,6 @@ void main() {
 
     test('todayScore 影响：今日已做 vs 未做', () {
       final now = DateTime.now();
-      // 两只猫其他维度相同
       final doneCat = _makeCat(
         id: 'done',
         lastSessionAt: now.subtract(const Duration(hours: 12)),
@@ -200,35 +186,8 @@ void main() {
         boundHabitId: 'h-not-done',
       );
 
-      // h-done 有今日分钟数
       final result = findFeaturedCat([doneCat, notDoneCat], {'h-done': 25});
-      // doneCat 的 todayScore=0.0, notDoneCat 的 todayScore=1.0
-      // 差值 0.05，其他相同 → 选 notDoneCat
       expect(result?.id, equals('not-done'));
-    });
-
-    test('接近进化 → growthScore 提升权重', () {
-      final now = DateTime.now();
-      // 两只猫最近互动时间相同、心情相同，但 A 接近进化
-      final nearEvolveCat = _makeCat(
-        id: 'near-evolve',
-        totalMinutes: 300, // 300/1000=0.30 → kitten, stageProgress≈0.91
-        targetMinutes: 1000,
-        lastSessionAt: now.subtract(const Duration(days: 2)),
-        boundHabitId: 'h1',
-      );
-      final earlyCat = _makeCat(
-        id: 'early',
-        totalMinutes: 50, // 50/1000=0.05 → kitten, stageProgress≈0.15
-        targetMinutes: 1000,
-        lastSessionAt: now.subtract(const Duration(days: 2)),
-        boundHabitId: 'h2',
-      );
-
-      final result = findFeaturedCat([nearEvolveCat, earlyCat], {});
-      // nearEvolveCat: stageProgress≈0.91 → growthScore=1.0
-      // earlyCat: stageProgress≈0.15 → growthScore≈0.075
-      expect(result?.id, equals('near-evolve'));
     });
   });
 
@@ -245,7 +204,7 @@ void main() {
       expect(mood, equals('missing'));
     });
 
-    test('lastSessionAt == null 且 createdAt == null → missing（向后兼容）', () {
+    test('lastSessionAt == null 且 createdAt == null → missing', () {
       final mood = calculateMood(null);
       expect(mood, equals('missing'));
     });
@@ -257,7 +216,6 @@ void main() {
     });
 
     test('Cat 模型的 computedMood 使用 createdAt', () {
-      // 新领养的猫，无 lastSessionAt
       final newCat = _makeCat(
         id: 'new',
         createdAt: DateTime.now().subtract(const Duration(hours: 1)),
