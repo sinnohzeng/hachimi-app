@@ -28,39 +28,37 @@ Hachimi is a **cat-parenting habit app** where every habit you create comes with
 
 The core loop:
 
-> **Create habit → Adopt kitten → Start focus timer → Earn XP → Cat evolves**
+> **Create habit → Adopt kitten → Start focus timer → Earn XP & coins → Cat evolves**
 
 ---
 
 ## Features
 
-### 🐱 Cat Adoption System
+### Core Loop
+**Cat Adoption** · **Focus Timer** · **XP & Evolution**
 - Each habit adopts a unique kitten from a draft of 3 randomly generated candidates
-- 10 breeds × 6 personalities × 4 rarity tiers (common / uncommon / rare)
-- Cats evolve through 4 growth stages: **Kitten → Young → Adult → Shiny**
-- Cat mood reacts to your consistency: Happy → Neutral → Lonely → Missing
+- 15 pelt patterns × 19 colors × 21 eye colors × 6 personalities
+- Countdown / stopwatch modes, Android foreground service for persistent timing
+- XP formula: base value + streak bonus + milestone bonus + full-house bonus
+- 4 growth stages: Kitten → Adolescent → Adult → Senior
 
-### ⏱️ Focus Timer
-- Countdown mode (set a target) and Stopwatch mode (open-ended)
-- Persistent Android foreground service — timer survives app minimization
-- Auto-pause after 15 s away; auto-end after 5 min away
-- XP formula: base (1 XP/min) + streak bonus + milestone bonus + full-house bonus
+### Cat World
+**Cat Room** · **Accessory Shop** · **Inventory**
+- Day/night ambience illustrated room, personality-based slot placement
+- 100+ accessories across 5 price tiers (50–350 coins)
+- Coin sources: focus sessions (10 coins/min) + daily check-in rewards
 
-### 🏠 Cat Room
-- Cozy illustrated room scene with all active cats
-- Day/night ambience based on system time
-- Tap a cat → speech bubble + quick-action sheet (Start Focus / View Details)
-- Personality-based slot placement (lazy cats prefer the sofa, curious cats claim the windowsill)
+### AI Companion
+**Cat Chat** · **AI Diary**
+- Local LLM (Qwen3-1.7B via llama_cpp_dart), no cloud dependency
+- Cats reply in personality-flavored tone, fully private on-device
+- Daily auto-generated diary blending mood, growth, and focus data
 
-### 📊 Stats & Cat Album
-- GitHub-style 91-day activity heatmap per habit
-- Today's summary (minutes, total hours, cat count)
-- Full cat album with rarity breakdown (active, dormant, graduated cats)
-
-### 🔔 Notifications
-- Daily reminders at your chosen time (per habit)
-- Streak-at-risk alert at 20:00 if no session that day and streak ≥ 3
-- Level-up celebration notification
+### Progress & Rewards
+**Stats Dashboard** · **Daily Check-In** · **Notifications**
+- Weekly trend bar chart (fl_chart) + 91-day heatmap + paginated session history
+- Monthly calendar UI, weekday 10 / weekend 15 coins, streak milestones at 7/14/21/full month
+- Daily reminders + streak-at-risk alerts + level-up celebrations
 
 ---
 
@@ -71,15 +69,20 @@ The core loop:
 | UI Framework | Flutter | 3.41.1 | Cross-platform mobile |
 | Language | Dart | 3.11.0 | Type-safe, null-safe |
 | Design System | Material Design 3 | — | Consistent UI theming |
-| State Management | Riverpod | 2.6.1 | Reactive SSOT providers |
-| Auth | Firebase Auth | 5.x | Google + email sign-in |
-| Database | Cloud Firestore | 5.x | Real-time data sync |
-| Analytics | Firebase Analytics | 11.x | GA4 event tracking |
-| Push Notifications | Firebase Messaging | 15.x | Server-triggered FCM |
-| Local Notifications | flutter_local_notifications | 18.x | Scheduled daily reminders |
-| Background Timer | flutter_foreground_task | 8.x | Android foreground service |
-| A/B Testing | Firebase Remote Config | 5.x | Dynamic configuration |
-| Crash Reporting | Firebase Crashlytics | 4.x | Production error tracking |
+| State Management | Riverpod | 3.2.1 | Reactive SSOT providers |
+| Auth | Firebase Auth | 6.x | Google + email sign-in |
+| Database | Cloud Firestore | 6.x | Real-time data sync |
+| Local Database | sqflite | 2.4.x | LLM chat history + diary cache |
+| Analytics | Firebase Analytics | 12.x | GA4 event tracking |
+| Performance | Firebase Performance | 0.11.x | Custom traces + monitoring |
+| Push Notifications | Firebase Messaging | 16.x | Server-triggered FCM |
+| Local Notifications | flutter_local_notifications | 20.x | Scheduled daily reminders |
+| Background Timer | flutter_foreground_task | 9.x | Android foreground service |
+| A/B Testing | Firebase Remote Config | 6.x | Dynamic configuration |
+| Crash Reporting | Firebase Crashlytics | 5.x | Non-fatal + fatal error tracking |
+| Charts | fl_chart | 0.70.x | Weekly trend + stats visualization |
+| Dynamic Color | dynamic_color | 1.8.x | Material You color extraction |
+| Local LLM | llama_cpp_dart | vendored | On-device Qwen3-1.7B inference |
 
 ---
 
@@ -87,56 +90,19 @@ The core loop:
 
 ```
 lib/
-├── app.dart                    # Root widget + AuthGate + _FirstHabitGate
-├── main.dart                   # Entry point, Firebase + foreground task init
 ├── core/
-│   ├── constants/
-│   │   ├── analytics_events.dart    # SSOT: all GA4 event names & params
-│   │   └── cat_constants.dart       # SSOT: breeds, stages, moods, room slots
-│   ├── router/
-│   │   └── app_router.dart          # Named route registry
-│   └── theme/
-│       └── app_theme.dart           # SSOT: Material 3 theme (seed color)
-├── models/
-│   ├── cat.dart                     # Cat — Firestore model + computed getters
-│   ├── habit.dart                   # Habit — Firestore model
-│   ├── focus_session.dart           # FocusSession — session history
-│   └── check_in.dart                # CheckInEntry — daily check-in entries
-├── providers/
-│   ├── auth_provider.dart           # SSOT: auth state (currentUser, uid)
-│   ├── cat_provider.dart            # SSOT: cats stream + family providers
-│   ├── focus_timer_provider.dart    # SSOT: timer state machine (FSM)
-│   ├── habits_provider.dart         # SSOT: habits stream + today minutes
-│   └── stats_provider.dart          # SSOT: computed stats (HabitStats)
-├── services/
-│   ├── analytics_service.dart       # Firebase Analytics wrapper
-│   ├── auth_service.dart            # Firebase Auth wrapper
-│   ├── cat_generation_service.dart  # Draft algorithm (weighted breed selection)
-│   ├── firestore_service.dart       # Firestore CRUD + atomic batch ops
-│   ├── focus_timer_service.dart     # Android foreground task wrapper
-│   ├── notification_service.dart    # FCM + flutter_local_notifications
-│   ├── remote_config_service.dart   # Remote Config keys + typed getters
-│   └── xp_service.dart             # XP & level-up calculation (pure Dart)
-├── screens/
-│   ├── auth/login_screen.dart
-│   ├── cat_detail/cat_detail_screen.dart
-│   ├── cat_room/cat_room_screen.dart
-│   ├── habits/adoption_flow_screen.dart
-│   ├── home/home_screen.dart
-│   ├── onboarding/onboarding_screen.dart
-│   ├── profile/profile_screen.dart
-│   ├── stats/stats_screen.dart
-│   └── timer/
-│       ├── focus_setup_screen.dart
-│       ├── focus_complete_screen.dart
-│       └── timer_screen.dart
-└── widgets/
-    ├── cat_preview_card.dart   # Adoption draft candidate card
-    ├── cat_sprite.dart         # Cat display with breed color tinting
-    ├── progress_ring.dart      # Circular progress indicator for timer
-    ├── streak_heatmap.dart     # 91-day GitHub-style activity heatmap
-    └── streak_indicator.dart   # Fire badge for current streak
+│   ├── constants/       # SSOT: analytics, cats, LLM, pixel cats (4 files)
+│   ├── router/          # Named route registry
+│   ├── theme/           # Material 3 seed + color utils
+│   └── utils/           # Error handling, checksums, date utils (9 files)
+├── models/              # 7 Firestore/local data models
+├── providers/           # 19 Riverpod state providers
+├── services/            # 19 Firebase + local service wrappers
+├── screens/             # 11 feature screen directories
+└── widgets/             # 17 reusable UI components
 ```
+
+Full file listing → [Folder Structure](docs/architecture/folder-structure.md)
 
 ---
 
@@ -158,7 +124,7 @@ lib/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/hachimi-app.git
+git clone https://github.com/sinnohzeng/hachimi-app.git
 cd hachimi-app
 flutter pub get
 ```
@@ -181,13 +147,22 @@ In the [Firebase Console](https://console.firebase.google.com):
 3. **Analytics** → Enable Google Analytics
 4. **Remote Config** → Publish default parameters (see [remote-config.md](docs/firebase/remote-config.md))
 5. **Crashlytics** → Enable in the Crashlytics dashboard
+6. **Performance** → Enable in the Performance dashboard
 
 Deploy security rules:
 ```bash
 firebase deploy --only firestore:rules
 ```
 
-### 4. Run the app
+### 4. Set up local LLM (optional, for AI Chat)
+
+```bash
+bash scripts/setup_llm_vendor.sh
+```
+
+This downloads the Qwen3-1.7B model file required for on-device AI chat. The app works without it, but cat chat and AI diary features will be unavailable.
+
+### 5. Run the app
 
 ```bash
 flutter run                      # Standard run on connected device
@@ -216,6 +191,7 @@ adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
 | [Remote Config](docs/firebase/remote-config.md) | A/B test parameter definitions |
 | [Design System](docs/design/design-system.md) | Material 3 theme spec, color roles, typography |
 | [Screens](docs/design/screens.md) | Screen-by-screen UI specifications |
+| [Website Deployment](docs/website/deployment.md) | hachimi.ai website deploy & maintenance |
 | [Contributing](docs/CONTRIBUTING.md) | Development workflow, branch conventions |
 
 ---
@@ -235,9 +211,14 @@ Screens  →  Providers  →  Services  →  Firebase SDK
 | Auth state | `authStateProvider` |
 | Cats list | `catsProvider` |
 | Timer state | `focusTimerProvider` |
+| Coin balance | `coinBalanceProvider` |
+| Inventory | `inventoryProvider` |
+| Check-in state | `checkInProvider` |
 | UI theme | `lib/core/theme/app_theme.dart` |
 | Analytics events | `lib/core/constants/analytics_events.dart` |
 | Cat game data | `lib/core/constants/cat_constants.dart` |
+| LLM config | `lib/core/constants/llm_constants.dart` |
+| Chat history | SQLite (via sqflite) |
 | Dynamic config | Firebase Remote Config |
 
 ---
@@ -246,11 +227,10 @@ Screens  →  Providers  →  Services  →  Firebase SDK
 
 ```
 users/{uid}
-├── habits/{habitId}            Habit metadata + streak tracking
-│   └── sessions/{sessionId}   Focus session history (XP, duration, mode)
-├── cats/{catId}                Cat state (XP, stage, mood, room slot)
-└── checkIns/{date}
-    └── entries/{entryId}       Daily minute logs (backward compat)
+├── habits/{habitId}              Habit metadata + streak tracking
+│   └── sessions/{sessionId}     Focus session history (XP, duration, mode, coins, status)
+├── cats/{catId}                  Cat state (XP, stage, mood, room slot, appearance)
+└── monthlyCheckIns/{YYYY-MM}    Monthly check-in calendar (days map, streak, coins)
 ```
 
 Full schema → [Data Model](docs/architecture/data-model.md)
@@ -263,7 +243,7 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## License
 
-Copyright (c) 2025 Zixuan Zeng. All Rights Reserved.
+Copyright (c) 2025–2026 Zixuan Zeng. All Rights Reserved.
 
 This source code is publicly available for portfolio and reference purposes only.
 You may view and reference the code, but may not copy, modify, distribute, or use
