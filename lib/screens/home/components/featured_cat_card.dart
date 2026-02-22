@@ -53,7 +53,11 @@ class FeaturedCatCard extends ConsumerWidget {
               children: [
                 Hero(
                   tag: 'cat-${cat.id}',
-                  child: TappableCatSprite(cat: cat, size: 72, enableTap: false),
+                  child: TappableCatSprite(
+                    cat: cat,
+                    size: 72,
+                    enableTap: false,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.base),
                 Expanded(

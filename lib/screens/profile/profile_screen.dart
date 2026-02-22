@@ -411,7 +411,13 @@ class _CatAlbumTile extends StatelessWidget {
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(child: TappableCatSprite(cat: cat, size: 48, enableTap: false)),
+                child: Center(
+                  child: TappableCatSprite(
+                    cat: cat,
+                    size: 48,
+                    enableTap: false,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
