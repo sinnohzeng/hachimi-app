@@ -918,5 +918,33 @@
   "historyLoadError": "Failed to load history",
   "historySelectMonth": "Select month",
   "historyAllMonths": "All months",
-  "historyAllHabits": "All"
+  "historyAllHabits": "All",
+
+  "homeTabAchievements": "Achievements",
+  "achievementTitle": "Achievements",
+  "achievementTabOverview": "Overview",
+  "achievementTabQuest": "Quest",
+  "achievementTabStreak": "Streak",
+  "achievementTabCat": "Cat",
+  "achievementTabPersist": "Persist",
+  "achievementSummaryTitle": "Achievement Progress",
+  "achievementUnlockedCount": "{count} unlocked",
+  "@achievementUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementTotalCoins": "{coins} coins earned",
+  "@achievementTotalCoins": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "achievementUnlocked": "Achievement unlocked!",
+  "achievementHidden": "???",
+  "achievementHiddenDesc": "This is a hidden achievement",
+  "achievementPersistDesc": "Accumulate {days} check-in days on any quest",
+  "@achievementPersistDesc": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "achievementTitleCount": "{count} titles unlocked",
+  "@achievementTitleCount": {
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

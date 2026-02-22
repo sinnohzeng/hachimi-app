@@ -59,6 +59,15 @@ service cloud.firestore {
       match /monthlyCheckIns/{month} {
         allow read, write: if isOwner(userId);
       }
+
+      // Achievements subcollection — immutable once created
+      match /achievements/{achievementId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.unlockedAt is timestamp
+          && request.resource.data.rewardClaimed is bool;
+        allow update, delete: if false;
+      }
     }
 
     // Deny all other access

@@ -14,6 +14,7 @@ class Habit {
   final int currentStreak;
   final int bestStreak;
   final String? lastCheckInDate;
+  final int totalCheckInDays;
   final DateTime createdAt;
 
   const Habit({
@@ -28,6 +29,7 @@ class Habit {
     this.currentStreak = 0,
     this.bestStreak = 0,
     this.lastCheckInDate,
+    this.totalCheckInDays = 0,
     required this.createdAt,
   });
 
@@ -60,6 +62,7 @@ class Habit {
       currentStreak: data['currentStreak'] as int? ?? 0,
       bestStreak: data['bestStreak'] as int? ?? 0,
       lastCheckInDate: data['lastCheckInDate'] as String?,
+      totalCheckInDays: data['totalCheckInDays'] as int? ?? 0,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -76,6 +79,7 @@ class Habit {
       'currentStreak': currentStreak,
       'bestStreak': bestStreak,
       'lastCheckInDate': lastCheckInDate,
+      'totalCheckInDays': totalCheckInDays,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }
@@ -92,6 +96,7 @@ class Habit {
     int? currentStreak,
     int? bestStreak,
     String? lastCheckInDate,
+    int? totalCheckInDays,
     DateTime? createdAt,
   }) {
     return Habit(
@@ -106,6 +111,7 @@ class Habit {
       currentStreak: currentStreak ?? this.currentStreak,
       bestStreak: bestStreak ?? this.bestStreak,
       lastCheckInDate: lastCheckInDate ?? this.lastCheckInDate,
+      totalCheckInDays: totalCheckInDays ?? this.totalCheckInDays,
       createdAt: createdAt ?? this.createdAt,
     );
   }

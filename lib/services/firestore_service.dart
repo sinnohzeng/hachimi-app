@@ -227,11 +227,15 @@ class FirestoreService {
           ? newStreak
           : habit.bestStreak;
 
+      // 今日首次 session 时，累计打卡天数 +1
+      final isFirstSessionToday = habit.lastCheckInDate != today;
+
       batch.update(habitRef, {
         'totalMinutes': FieldValue.increment(session.durationMinutes),
         'currentStreak': newStreak,
         'bestStreak': newBest,
         'lastCheckInDate': today,
+        if (isFirstSessionToday) 'totalCheckInDays': FieldValue.increment(1),
       });
     }
 
@@ -244,13 +248,15 @@ class FirestoreService {
       });
     }
 
-    // 4. Award focus coins (durationMinutes × coinsPerMinute)
+    // 4. Award focus coins + increment totalSessionCount
+    final userRef = _db.collection('users').doc(uid);
+    final userUpdates = <String, dynamic>{
+      'totalSessionCount': FieldValue.increment(1),
+    };
     if (session.coinsEarned > 0) {
-      final userRef = _db.collection('users').doc(uid);
-      batch.update(userRef, {
-        'coins': FieldValue.increment(session.coinsEarned),
-      });
+      userUpdates['coins'] = FieldValue.increment(session.coinsEarned);
     }
+    batch.update(userRef, userUpdates);
 
     try {
       await batch.commit();

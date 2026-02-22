@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
@@ -77,6 +79,36 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
             ),
+
+          // 当前称号
+          Builder(
+            builder: (context) {
+              final unlockedIds = ref.watch(unlockedIdsProvider);
+              final titleCount = unlockedIds.where((id) {
+                final def = AchievementDefinitions.byId(id);
+                return def?.titleReward != null;
+              }).length;
+              if (titleCount == 0) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Center(
+                  child: Chip(
+                    avatar: Icon(
+                      Icons.military_tech,
+                      size: 16,
+                      color: colorScheme.primary,
+                    ),
+                    label: Text(
+                      l10n.achievementTitleCount(titleCount),
+                      style: textTheme.labelSmall,
+                    ),
+                    side: BorderSide.none,
+                    backgroundColor: colorScheme.primaryContainer,
+                  ),
+                ),
+              );
+            },
+          ),
 
           const SizedBox(height: AppSpacing.lg),
 

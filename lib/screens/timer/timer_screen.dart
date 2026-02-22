@@ -12,6 +12,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/utils/session_checksum.dart';
 import 'package:hachimi_app/models/focus_session.dart';
+import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -19,6 +20,7 @@ import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show ServiceRequestFailure;
+import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -298,6 +300,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     if (coinsEarned > 0) {
       analytics.logCoinsEarned(amount: coinsEarned, source: 'focus_session');
     }
+
+    // 触发成就评估
+    triggerAchievementEvaluation(
+      ref,
+      AchievementTrigger.sessionCompleted,
+      lastSessionMinutes: minutes,
+    );
 
     if (mounted) {
       // Send completion notification (only on successful completion)

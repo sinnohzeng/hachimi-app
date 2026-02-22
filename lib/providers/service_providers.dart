@@ -7,6 +7,7 @@ import 'package:hachimi_app/services/coin_service.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/migration_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
+import 'package:hachimi_app/services/achievement_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 /// SharedPreferences — 在 main() 中预加载并通过 ProviderScope.overrides 注入。
@@ -37,4 +38,7 @@ final migrationServiceProvider = Provider<MigrationService>(
 final xpServiceProvider = Provider<XpService>((ref) => XpService());
 final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),
+);
+final achievementServiceProvider = Provider<AchievementService>(
+  (ref) => AchievementService(),
 );

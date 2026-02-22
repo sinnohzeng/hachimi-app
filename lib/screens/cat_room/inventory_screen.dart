@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
+import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// 道具箱页面 — 管理用户所有配饰的装备/卸下。
@@ -200,6 +202,8 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(analyticsServiceProvider)
         .logAccessoryEquipped(catId: catId, accessoryId: accessoryId);
+    // 触发成就评估（装备配饰后）
+    triggerAchievementEvaluation(ref, AchievementTrigger.accessoryEquipped);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

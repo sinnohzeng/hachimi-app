@@ -918,5 +918,33 @@
   "historyLoadError": "加载历史记录失败",
   "historySelectMonth": "选择月份",
   "historyAllMonths": "全部月份",
-  "historyAllHabits": "全部"
+  "historyAllHabits": "全部",
+
+  "homeTabAchievements": "成就",
+  "achievementTitle": "成就",
+  "achievementTabOverview": "概览",
+  "achievementTabQuest": "任务",
+  "achievementTabStreak": "连续",
+  "achievementTabCat": "猫咪",
+  "achievementTabPersist": "坚持",
+  "achievementSummaryTitle": "成就进度",
+  "achievementUnlockedCount": "已解锁 {count} 个",
+  "@achievementUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "achievementTotalCoins": "共获 {coins} 金币",
+  "@achievementTotalCoins": {
+    "placeholders": { "coins": { "type": "int" } }
+  },
+  "achievementUnlocked": "成就解锁！",
+  "achievementHidden": "???",
+  "achievementHiddenDesc": "这是一个隐藏成就",
+  "achievementPersistDesc": "累计打卡 {days} 天",
+  "@achievementPersistDesc": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "achievementTitleCount": "已解锁 {count} 个称号",
+  "@achievementTitleCount": {
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

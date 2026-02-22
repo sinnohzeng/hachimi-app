@@ -200,6 +200,16 @@ class AnalyticsService {
     ),
   );
 
+  // ─── Achievement Events ───
+
+  Future<void> logAchievementUnlocked({required String achievementId}) =>
+      _safeLog(
+        () => _analytics.logEvent(
+          name: AnalyticsEvents.achievementUnlocked,
+          parameters: {AnalyticsEvents.paramAchievementId: achievementId},
+        ),
+      );
+
   // ─── Stats & History Events ───
 
   Future<void> logStatsViewed() =>

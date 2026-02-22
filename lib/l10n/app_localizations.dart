@@ -3773,6 +3773,96 @@ abstract class S {
   /// In en, this message translates to:
   /// **'All'**
   String get historyAllHabits;
+
+  /// No description provided for @homeTabAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get homeTabAchievements;
+
+  /// No description provided for @achievementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievementTitle;
+
+  /// No description provided for @achievementTabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get achievementTabOverview;
+
+  /// No description provided for @achievementTabQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest'**
+  String get achievementTabQuest;
+
+  /// No description provided for @achievementTabStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get achievementTabStreak;
+
+  /// No description provided for @achievementTabCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat'**
+  String get achievementTabCat;
+
+  /// No description provided for @achievementTabPersist.
+  ///
+  /// In en, this message translates to:
+  /// **'Persist'**
+  String get achievementTabPersist;
+
+  /// No description provided for @achievementSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement Progress'**
+  String get achievementSummaryTitle;
+
+  /// No description provided for @achievementUnlockedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unlocked'**
+  String achievementUnlockedCount(int count);
+
+  /// No description provided for @achievementTotalCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} coins earned'**
+  String achievementTotalCoins(int coins);
+
+  /// No description provided for @achievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement unlocked!'**
+  String get achievementUnlocked;
+
+  /// No description provided for @achievementHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'???'**
+  String get achievementHidden;
+
+  /// No description provided for @achievementHiddenDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a hidden achievement'**
+  String get achievementHiddenDesc;
+
+  /// No description provided for @achievementPersistDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Accumulate {days} check-in days on any quest'**
+  String achievementPersistDesc(int days);
+
+  /// No description provided for @achievementTitleCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} titles unlocked'**
+  String achievementTitleCount(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

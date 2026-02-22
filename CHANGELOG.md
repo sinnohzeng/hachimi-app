@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-02-22
+### Added
+- Achievement system with 163 achievements across 4 categories: Quest (8), Streak (8), Cat (9), Persist (138)
+- Achievement evaluation engine triggered after focus sessions, habit creation, check-in, and accessory equip
+- 8 unlockable titles tied to milestone achievements (e.g. Marathon Cat, Centurion, Four Seasons)
+- Achievement screen with 5 tabs (Overview, Quest, Streak, Cat, Persist) replacing bottom nav Stats tab
+- Achievement cards with progress bars, coin rewards, and unlock status
+- Achievement summary header with progress ring showing unlocked/total count
+- Title display on profile page with unlocked title count chip
+- Bilingual achievement names and descriptions (EN + ZH) via static string maps
+- Firestore `achievements/{id}` subcollection for unlock records (immutable, create-only)
+- `totalCheckInDays` field on habits for persist achievement tracking
+- `totalSessionCount` field on user document for session-based achievements
+- Analytics event `achievement_unlocked` with achievement ID parameter
+- Firestore security rules for achievements subcollection
+
+### Changed
+- Bottom navigation tab 2: Stats icon/label replaced with Achievements (emoji_events)
+- Home screen now listens to `newlyUnlockedProvider` and shows unlock celebration SnackBar
+- Overview tab extracted from former StatsScreen into reusable component
+
 ## [2.8.4] - 2026-02-22
 ### Fixed
 - Focus timer: foreground service notification now dismissed before completion notification, preventing notification overlap

@@ -7,8 +7,10 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
+import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
+import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 
 /// CheckInBanner — 可视化签到卡片，放置于 HomeScreen 顶部。
 class CheckInBanner extends ConsumerStatefulWidget {
@@ -49,6 +51,9 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
           .logCoinsEarned(amount: totalCoins, source: 'daily_checkin');
       ref.invalidate(hasCheckedInTodayProvider);
       ref.invalidate(monthlyCheckInProvider);
+
+      // 触发成就评估（签到后）
+      triggerAchievementEvaluation(ref, AchievementTrigger.checkInCompleted);
 
       HapticFeedback.mediumImpact();
 

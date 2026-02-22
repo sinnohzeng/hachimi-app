@@ -1991,6 +1991,59 @@ class SZh extends S {
 
   @override
   String get historyAllHabits => '全部';
+
+  @override
+  String get homeTabAchievements => '成就';
+
+  @override
+  String get achievementTitle => '成就';
+
+  @override
+  String get achievementTabOverview => '概览';
+
+  @override
+  String get achievementTabQuest => '任务';
+
+  @override
+  String get achievementTabStreak => '连续';
+
+  @override
+  String get achievementTabCat => '猫咪';
+
+  @override
+  String get achievementTabPersist => '坚持';
+
+  @override
+  String get achievementSummaryTitle => '成就进度';
+
+  @override
+  String achievementUnlockedCount(int count) {
+    return '已解锁 $count 个';
+  }
+
+  @override
+  String achievementTotalCoins(int coins) {
+    return '共获 $coins 金币';
+  }
+
+  @override
+  String get achievementUnlocked => '成就解锁！';
+
+  @override
+  String get achievementHidden => '???';
+
+  @override
+  String get achievementHiddenDesc => '这是一个隐藏成就';
+
+  @override
+  String achievementPersistDesc(int days) {
+    return '累计打卡 $days 天';
+  }
+
+  @override
+  String achievementTitleCount(int count) {
+    return '已解锁 $count 个称号';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

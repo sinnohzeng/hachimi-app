@@ -1997,4 +1997,57 @@ class SJa extends S {
 
   @override
   String get historyAllHabits => 'All';
+
+  @override
+  String get homeTabAchievements => 'Achievements';
+
+  @override
+  String get achievementTitle => 'Achievements';
+
+  @override
+  String get achievementTabOverview => 'Overview';
+
+  @override
+  String get achievementTabQuest => 'Quest';
+
+  @override
+  String get achievementTabStreak => 'Streak';
+
+  @override
+  String get achievementTabCat => 'Cat';
+
+  @override
+  String get achievementTabPersist => 'Persist';
+
+  @override
+  String get achievementSummaryTitle => 'Achievement Progress';
+
+  @override
+  String achievementUnlockedCount(int count) {
+    return '$count unlocked';
+  }
+
+  @override
+  String achievementTotalCoins(int coins) {
+    return '$coins coins earned';
+  }
+
+  @override
+  String get achievementUnlocked => 'Achievement unlocked!';
+
+  @override
+  String get achievementHidden => '???';
+
+  @override
+  String get achievementHiddenDesc => 'This is a hidden achievement';
+
+  @override
+  String achievementPersistDesc(int days) {
+    return 'Accumulate $days check-in days on any quest';
+  }
+
+  @override
+  String achievementTitleCount(int count) {
+    return '$count titles unlocked';
+  }
 }

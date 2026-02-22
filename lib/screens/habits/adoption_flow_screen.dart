@@ -6,8 +6,10 @@ import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/services/achievement_trigger_helper.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -177,6 +179,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           );
         }
       }
+
+      // 触发成就评估（新建任务后）
+      triggerAchievementEvaluation(ref, AchievementTrigger.habitCreated);
 
       if (mounted) {
         Navigator.of(context).pop(true);

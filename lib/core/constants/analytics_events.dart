@@ -61,6 +61,9 @@ class AnalyticsEvents {
   static const String statsViewed = 'stats_viewed';
   static const String historyViewed = 'history_viewed';
 
+  // Achievements
+  static const String achievementUnlocked = 'achievement_unlocked';
+
   // User lifecycle
   static const String onboardingCompleted = 'onboarding_completed';
   static const String firstSessionCompleted = 'first_session_completed';
@@ -126,6 +129,9 @@ class AnalyticsEvents {
   // Retention signal params
   static const String paramDaysSinceLast = 'days_since_last';
   static const String paramConsecutiveDays = 'consecutive_days';
+
+  // Achievement params
+  static const String paramAchievementId = 'achievement_id';
 
   // Economy params
   static const String paramCoinAmount = 'coin_amount';
