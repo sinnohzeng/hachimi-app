@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.18.0] - 2026-02-23
+
+### Added
+- M3 tablet-responsive achievement page: adaptive grid (Feed Layout) and side-by-side stats dashboard (Supporting Pane Layout)
+- OverviewTab sub-component extraction: `OverviewStatCard`, `OverviewWeeklyTrend`, `OverviewHeatmapCard`, `OverviewRecentSessions`
+- Onboarding tablet layout: side-by-side illustration + content on expanded screens
+- Login screen tablet adaptation with centered constrained width (480dp)
+- Focus setup screen scrollable layout for tablet compatibility
+- Development workflow documentation (EN + zh-CN) covering hot reload, build modes, and debugging
+- Gradle build optimizations: parallel builds, build cache, UseParallelGC
+
+### Changed
+- Achievement grid uses `SliverGridDelegateWithMaxCrossAxisExtent` for auto-adapting columns (replaces fixed column count)
+- OverviewTab: expanded layout shows 4×1 summary cards, side-by-side charts, 2-column habit progress
+- Cat room navigation replaced `OpenContainer` with standard `MaterialPageRoute`
+- Onboarding copy refreshed across all languages — removed outdated XP/streak references, aligned with cumulative time growth model
+- `AchievementCard` margin reduced from 16dp to 8dp to work with grid cross-axis spacing
+
+### Removed
+- `ContentWidthConstraint` wrapper from `AchievementScreen` (root cause of tablet layout issues)
+
 ## [2.17.0] - 2026-02-23
 
 ### Added
