@@ -230,17 +230,11 @@
   "profileYourJourney": "你的旅程",
   "profileTotalFocus": "总专注",
   "profileTotalCats": "猫猫总数",
-  "profileBestStreak": "最长连续",
-  "profileCatAlbum": "猫猫图鉴",
-  "profileCatAlbumCount": "{count} 只猫",
-  "@profileCatAlbumCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "profileSeeAll": "查看全部 {count} 只猫",
-  "@profileSeeAll": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "profileGraduated": "已毕业",
+  "profileTotalQuests": "任务",
+  "profileEditName": "修改名称",
+  "profileDisplayName": "显示名称",
+  "profileChooseAvatar": "选择头像",
+  "profileSaved": "资料已保存",
   "profileSettings": "设置",
 
   "habitDetailStreak": "连续",
@@ -270,7 +264,10 @@
   "testChatGenerating": "生成中...",
   "testChatTypeMessage": "输入消息...",
 
-  "settingsAiCloudBadge": "由 MiniMax 云端 AI 驱动 — 需要网络连接",
+  "settingsAiProvider": "服务商",
+  "settingsAiProviderMinimax": "MiniMax（默认）",
+  "settingsAiProviderGemini": "Gemini",
+  "settingsAiCloudBadge": "由云端 AI 驱动 — 需要网络连接",
   "settingsAiWhatYouGet": "你将获得：",
   "settingsAiFeatureDiary": "Hachimi 日记 — 猫猫每天为你写日记",
   "settingsAiFeatureChat": "猫猫聊天 — 和你的猫猫对话",

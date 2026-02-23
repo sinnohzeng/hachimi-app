@@ -15,7 +15,7 @@ import 'package:hachimi_app/services/ai/sse_parser.dart';
 /// 使用 MiniMax 官方 API（api.minimax.io），兼容 OpenAI Chat Completions 格式。
 class MiniMaxProvider implements AiProvider {
   static const _endpoint = 'https://api.minimax.io/v1/text/chatcompletion_v2';
-  static const _model = 'MiniMax-M2';
+  static const _model = 'MiniMax-M2.5';
   static const _connectTimeout = Duration(seconds: 30);
   static const _streamIdleTimeout = Duration(seconds: 120);
 

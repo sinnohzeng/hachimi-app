@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0] - 2026-02-23
+### Added
+- Gemini 3 Flash as second AI provider — user-selectable in AI settings
+- AI settings moved to dedicated sub-page with provider selection (MiniMax/Gemini)
+- `SseParser` now supports pluggable token extractors via `SseTokenExtractor` typedef
+- `AiProviderId` enum and `AiProviderSelectionNotifier` for persistent provider selection
+- `.env.example` for local development API key management (`flutter run --dart-define-from-file=.env`)
+- New L10N keys for provider selection across all 5 languages
+
+### Changed
+- MiniMax model upgraded from M2 to M2.5
+- AI settings extracted from Settings main page into `/ai-settings` route (full-screen Scaffold)
+- Settings main page now shows AI as a navigation ListTile with status subtitle
+- `RadioListTile` migrated to `RadioGroup` pattern (Flutter 3.41 deprecation fix)
+- `animated_mesh_background.dart` null-safety fix for `ModalRoute.animation`
+- CI workflow updated to inject `GEMINI_API_KEY` secret during release builds
+
+### Removed
+- `ai_settings_section.dart` — logic migrated to `ai_settings_page.dart`
+
 ## [2.14.0] - 2026-02-23
 ### Changed
 - AI system migrated from local LLM (Qwen-1.7B via llama_cpp_dart) to cloud-based MiniMax API

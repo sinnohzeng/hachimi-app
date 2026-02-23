@@ -8,6 +8,7 @@ class AiConstants {
 
   static const String prefAiEnabled = 'ai_features_enabled';
   static const String prefAiPrivacyAcknowledged = 'ai_privacy_acknowledged';
+  static const String prefAiProvider = 'ai_selected_provider';
 }
 
 // ─── Prompt Metadata Lookup Tables ───

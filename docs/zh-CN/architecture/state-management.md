@@ -384,20 +384,32 @@ Firebase Auth 流 ──────────────► authStateProvide
 ### AI 提供商 Provider
 
 ```
-模型管理 + LLM 引擎（独立于认证 — 仅本地）：
+云端 AI 引擎（独立于认证——多提供商策略模式）：
 
-localDatabaseProvider (Provider<LocalDatabaseService>)
+aiProviderSelectionProvider (StateNotifierProvider<AiProviderSelectionNotifier, AiProviderId>)
+  └── SharedPreferences 持久化（key: ai_selected_provider）
+  AiProviderId 枚举：minimax | gemini
+
 aiServiceProvider (Provider<AiService>)
-
-diaryServiceProvider (Provider<DiaryService>)
-chatServiceProvider (Provider<ChatService>)
+  └── 监听：aiProviderSelectionProvider
+  └── 根据用户选择动态实例化 MiniMaxProvider 或 GeminiProvider
 
 aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
-  来源：SharedPreferences 'ai_features_enabled'
+  └── SharedPreferences 持久化（key: ai_features_enabled）
 
 aiAvailabilityProvider (StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>)
+  ├── 读取：aiFeatureEnabledProvider
+  └── 读取：aiServiceProvider
   枚举：disabled | ready | error
-  依赖：aiFeatureEnabledProvider
+
+diaryServiceProvider (Provider<DiaryService>)
+  ├── 监听：aiServiceProvider
+  └── 监听：localDatabaseProvider
+
+chatServiceProvider (Provider<ChatService>)
+  ├── 监听：aiServiceProvider
+  └── 监听：localDatabaseProvider
+
 diaryEntriesProvider(catId) — FutureProvider.family<List<DiaryEntry>, String>
 todayDiaryProvider(catId) — FutureProvider.family<DiaryEntry?, String>
 
@@ -411,7 +423,7 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **类型**：`StateNotifierProvider<AiFeatureNotifier, bool>`
 - **文件**：`lib/providers/ai_provider.dart`
 - **来源**：SharedPreferences `ai_features_enabled`
-- **消费者**：`SettingsScreen`（AI 开关）、`aiAvailabilityProvider`
+- **消费者**：`AiSettingsPage`（AI 开关）、`aiAvailabilityProvider`
 - **SSOT**：用户是否启用了 AI 功能
 
 ### `aiAvailabilityProvider`
@@ -488,6 +500,14 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **数据源**：`PackageInfo.fromPlatform()`（来自 `package_info_plus`）
 - **消费者**：`SettingsScreen`（版本显示 + 许可证页面）
 - **SSOT**：运行时应用版本信息（version、buildNumber、packageName）—— 消除硬编码版本号
+
+### `avatarIdProvider`
+
+- **类型**：`StreamProvider<String?>`
+- **文件**：`lib/providers/user_profile_provider.dart`
+- **数据源**：Firestore `users/{uid}` 文档——通过 `FirestoreService.watchAvatarId()` 读取 `avatarId` 字段
+- **消费者**：`ProfileScreen`（头像展示）、`AvatarPickerSheet`（当前选中状态）
+- **SSOT**：当前用户选择的资料头像 ID（null = 首字母缩写兜底）
 
 ---
 

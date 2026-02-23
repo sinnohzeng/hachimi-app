@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/services/ai/gemini_provider.dart';
 import 'package:hachimi_app/services/ai/minimax_provider.dart';
 import 'package:hachimi_app/services/ai_service.dart';
 import 'package:hachimi_app/services/chat_service.dart';
@@ -15,9 +16,14 @@ final localDatabaseProvider = Provider<LocalDatabaseService>(
   (ref) => LocalDatabaseService(),
 );
 
-/// AI 门面服务 — 持有当前活跃的 AiProvider 实例。
+/// AI 门面服务 — 根据用户选择的提供商动态实例化。
 final aiServiceProvider = Provider<AiService>((ref) {
-  return AiService(provider: MiniMaxProvider());
+  final selected = ref.watch(aiProviderSelectionProvider);
+  final provider = switch (selected) {
+    AiProviderId.minimax => MiniMaxProvider(),
+    AiProviderId.gemini => GeminiProvider(),
+  };
+  return AiService(provider: provider);
 });
 
 final diaryServiceProvider = Provider<DiaryService>((ref) {
@@ -35,6 +41,37 @@ final chatServiceProvider = Provider<ChatService>((ref) {
   ref.onDispose(service.dispose);
   return service;
 });
+
+// ─── AI Provider Selection ───
+
+/// 可选的 AI 提供商标识。
+enum AiProviderId { minimax, gemini }
+
+/// AI 提供商选择 — 持久化到 SharedPreferences。
+class AiProviderSelectionNotifier extends StateNotifier<AiProviderId> {
+  AiProviderSelectionNotifier() : super(AiProviderId.minimax) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(AiConstants.prefAiProvider);
+    if (saved == AiProviderId.gemini.name) {
+      state = AiProviderId.gemini;
+    }
+  }
+
+  Future<void> select(AiProviderId id) async {
+    state = id;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AiConstants.prefAiProvider, id.name);
+  }
+}
+
+final aiProviderSelectionProvider =
+    StateNotifierProvider<AiProviderSelectionNotifier, AiProviderId>(
+      (ref) => AiProviderSelectionNotifier(),
+    );
 
 // ─── AI Feature Toggle ───
 

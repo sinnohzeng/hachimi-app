@@ -34,6 +34,28 @@ class FirestoreService {
     });
   }
 
+  /// 更新用户资料字段（displayName、avatarId）。
+  Future<void> updateUserProfile({
+    required String uid,
+    String? displayName,
+    String? avatarId,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (displayName != null) updates['displayName'] = displayName;
+    if (avatarId != null) updates['avatarId'] = avatarId;
+    if (updates.isEmpty) return;
+    await _db.collection('users').doc(uid).update(updates);
+  }
+
+  /// 监听用户头像 ID。返回 null 表示未设置头像（使用首字母兜底）。
+  Stream<String?> watchAvatarId(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map((doc) => doc.data()?['avatarId'] as String?);
+  }
+
   // ─── Habits ───
 
   CollectionReference _habitsRef(String uid) =>

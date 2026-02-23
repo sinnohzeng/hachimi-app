@@ -480,23 +480,19 @@ class SZh extends S {
   String get profileTotalCats => '猫猫总数';
 
   @override
-  String get profileBestStreak => '最长连续';
+  String get profileTotalQuests => '任务';
 
   @override
-  String get profileCatAlbum => '猫猫图鉴';
+  String get profileEditName => '修改名称';
 
   @override
-  String profileCatAlbumCount(int count) {
-    return '$count 只猫';
-  }
+  String get profileDisplayName => '显示名称';
 
   @override
-  String profileSeeAll(int count) {
-    return '查看全部 $count 只猫';
-  }
+  String get profileChooseAvatar => '选择头像';
 
   @override
-  String get profileGraduated => '已毕业';
+  String get profileSaved => '资料已保存';
 
   @override
   String get profileSettings => '设置';
@@ -574,7 +570,16 @@ class SZh extends S {
   String get testChatTypeMessage => '输入消息...';
 
   @override
-  String get settingsAiCloudBadge => '由 MiniMax 云端 AI 驱动 — 需要网络连接';
+  String get settingsAiProvider => '服务商';
+
+  @override
+  String get settingsAiProviderMinimax => 'MiniMax（默认）';
+
+  @override
+  String get settingsAiProviderGemini => 'Gemini';
+
+  @override
+  String get settingsAiCloudBadge => '由云端 AI 驱动 — 需要网络连接';
 
   @override
   String get settingsAiWhatYouGet => '你将获得：';
@@ -2670,23 +2675,19 @@ class SZhHant extends SZh {
   String get profileTotalCats => '貓咪總數';
 
   @override
-  String get profileBestStreak => '最長連續';
+  String get profileTotalQuests => '任務';
 
   @override
-  String get profileCatAlbum => '貓咪圖鑑';
+  String get profileEditName => '修改名稱';
 
   @override
-  String profileCatAlbumCount(int count) {
-    return '$count 隻貓';
-  }
+  String get profileDisplayName => '顯示名稱';
 
   @override
-  String profileSeeAll(int count) {
-    return '查看全部 $count 隻貓';
-  }
+  String get profileChooseAvatar => '選擇頭像';
 
   @override
-  String get profileGraduated => '已畢業';
+  String get profileSaved => '資料已儲存';
 
   @override
   String get profileSettings => '設定';
@@ -2764,7 +2765,16 @@ class SZhHant extends SZh {
   String get testChatTypeMessage => '輸入訊息⋯';
 
   @override
-  String get settingsAiCloudBadge => '由 MiniMax 雲端 AI 驅動——需要網絡連接';
+  String get settingsAiProvider => '服務商';
+
+  @override
+  String get settingsAiProviderMinimax => 'MiniMax（預設）';
+
+  @override
+  String get settingsAiProviderGemini => 'Gemini';
+
+  @override
+  String get settingsAiCloudBadge => '由雲端 AI 驅動——需要網絡連接';
 
   @override
   String get settingsAiWhatYouGet => '你會獲得：';

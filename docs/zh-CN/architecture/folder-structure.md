@@ -49,7 +49,8 @@ hachimi-app/
 │   │   │   ├── analytics_events.dart       # SSOT：所有 GA4 事件名 + 参数
 │   │   │   ├── cat_constants.dart          # SSOT：阶段、心情、性格
 │   │   │   ├── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
-│   │   │   └── ai_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
+│   │   │   ├── ai_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
+│   │   │   └── avatar_constants.dart     # SSOT：预设头像选项（id、图标、颜色）
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
 │   │   │   ├── date_utils.dart             # AppDateUtils — 统一日期字符串格式化
@@ -90,8 +91,9 @@ hachimi-app/
 │   │   ├── remote_config_service.dart      # Remote Config（远程配置）—— 类型化 getter + 默认值
 │   │   ├── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
 │   │   ├── ai/                             # AI 子模块
-│   │   │   ├── minimax_provider.dart        # MiniMax HTTP SSE 实现
-│   │   │   └── sse_parser.dart              # SSE 流解析工具
+│   │   │   ├── minimax_provider.dart        # MiniMax M2.5 HTTP SSE 实现
+│   │   │   ├── gemini_provider.dart        # Gemini 3 Flash HTTP SSE 实现
+│   │   │   └── sse_parser.dart              # SSE 流解析工具（可插拔 token 提取器）
 │   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
 │   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
 │   │   └── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
@@ -110,7 +112,8 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider（应用语言覆盖）
 │   │   ├── stats_provider.dart             # statsProvider（计算型 HabitStats）
 │   │   ├── theme_provider.dart             # themeProvider（主题模式 + 种子色）
-│   │   ├── ai_provider.dart              # AI 功能开关、LLM 可用性、模型下载
+│   │   ├── user_profile_provider.dart     # avatarIdProvider（Firestore 用户头像）
+│   │   ├── ai_provider.dart              # AI 提供商选择、功能开关、可用性、服务装配
 │   │   ├── diary_provider.dart            # diaryEntriesProvider、todayDiaryProvider（family）
 │   │   └── chat_provider.dart             # chatNotifierProvider（StateNotifier family）
 │   │
@@ -140,16 +143,20 @@ hachimi-app/
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3 页引导走马灯
 │   │   ├── profile/
-│   │   │   └── profile_screen.dart         # 统计数据、猫咪相册、设置入口
+│   │   │   ├── profile_screen.dart         # 用户信息、统计数据、设置入口
+│   │   │   └── components/
+│   │   │       ├── edit_name_dialog.dart    # 显示名称编辑 AlertDialog
+│   │   │       └── avatar_picker_sheet.dart # 预设头像选择 BottomSheet
 │   │   ├── settings/
 │   │   │   ├── settings_screen.dart        # 通知、语言、关于、账号操作
-│   │   │   ├── model_test_chat_screen.dart # AI 模型测试聊天（验证 LLM 是否正常）
+│   │   │   ├── ai_settings_page.dart       # AI 设置子页面（提供商选择、开关、状态）
+│   │   │   ├── model_test_chat_screen.dart # AI 测试聊天（验证云端 AI 连接）
 │   │   │   └── components/              # SettingsScreen 提取的子组件
 │   │   │       ├── notification_settings_dialog.dart
 │   │   │       ├── language_dialog.dart
 │   │   │       ├── theme_mode_dialog.dart
 │   │   │       ├── theme_color_dialog.dart
-│   │   │       ├── ai_model_section.dart
+│   │   │       ├── delete_account_flow.dart
 │   │   │       └── section_header.dart
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # 活动热力图 + 各习惯进度

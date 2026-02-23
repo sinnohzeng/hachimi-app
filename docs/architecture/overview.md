@@ -22,7 +22,7 @@
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
 | Connectivity | connectivity_plus | 6.x | Device network status monitoring |
 | i18n | flutter_localizations + gen-l10n | — | Compile-time localization via ARB files |
-| Cloud AI | MiniMax API | - | Cloud LLM via AiProvider strategy pattern (dart:io HttpClient) |
+| Cloud AI | MiniMax M2.5 / Gemini 3 Flash | — | Cloud LLM via AiProvider strategy pattern (dart:io HttpClient, user-selectable) |
 | Dynamic Background | mesh_gradient | 1.3.x | GPU-accelerated fluid mesh gradient via fragment shader |
 | Particle Effects | atmospheric_particles | 0.3.x | Lightweight floating particle overlay (Isolate-based) |
 
@@ -138,6 +138,7 @@ The app uses Flutter's `Navigator 1.0` with named routes managed by `AppRouter`:
 /habit-detail       -> HabitDetailScreen   (args: habitId: String)
 /cat-detail         -> CatDetailScreen     (args: catId: String)
 /profile            -> ProfileScreen
+/ai-settings        -> AiSettingsPage
 ```
 
 **Root routing** is managed by `AuthGate` -> `_FirstHabitGate`:

@@ -230,17 +230,11 @@
   "profileYourJourney": "Your Journey",
   "profileTotalFocus": "Total Focus",
   "profileTotalCats": "Total Cats",
-  "profileBestStreak": "Best Streak",
-  "profileCatAlbum": "Cat Album",
-  "profileCatAlbumCount": "{count} cats",
-  "@profileCatAlbumCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "profileSeeAll": "See all {count} cats",
-  "@profileSeeAll": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "profileGraduated": "Graduated",
+  "profileTotalQuests": "Quests",
+  "profileEditName": "Edit name",
+  "profileDisplayName": "Display name",
+  "profileChooseAvatar": "Choose avatar",
+  "profileSaved": "Profile saved",
   "profileSettings": "Settings",
 
   "habitDetailStreak": "Streak",
@@ -270,7 +264,10 @@
   "testChatGenerating": "Generating...",
   "testChatTypeMessage": "Type a message...",
 
-  "settingsAiCloudBadge": "Powered by MiniMax cloud AI — requires network",
+  "settingsAiProvider": "Provider",
+  "settingsAiProviderMinimax": "MiniMax (default)",
+  "settingsAiProviderGemini": "Gemini",
+  "settingsAiCloudBadge": "Powered by cloud AI — requires network",
   "settingsAiWhatYouGet": "What you get:",
   "settingsAiFeatureDiary": "Hachimi Diary — Your cat writes daily diary entries",
   "settingsAiFeatureChat": "Cat Chat — Have conversations with your cat",

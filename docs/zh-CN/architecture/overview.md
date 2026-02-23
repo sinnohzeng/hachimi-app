@@ -22,7 +22,7 @@
 | 崩溃报告 | Firebase Crashlytics | 4.x | 生产环境错误监控 |
 | 网络连接 | connectivity_plus | 6.x | 设备网络状态监测 |
 | 国际化 | flutter_localizations + gen-l10n | — | 通过 ARB 文件进行编译期本地化 |
-| AI 提供商 | MiniMax API | — | 云端大语言模型推理（HTTP SSE 流式输出） |
+| AI 提供商 | MiniMax M2.5 / Gemini 3 Flash | — | 云端大语言模型推理（策略模式，用户可切换，HTTP SSE 流式输出） |
 | 动态背景 | mesh_gradient | 1.3.x | GPU 加速流体 mesh 渐变（fragment shader） |
 | 粒子特效 | atmospheric_particles | 0.3.x | 轻量浮动粒子覆盖层（Isolate 架构） |
 
@@ -138,6 +138,7 @@ Screens -> Providers -> Services -> Firebase SDK
 | `/focus-complete` | FocusCompleteScreen | `Map<String, dynamic>` |
 | `/cat-detail` | CatDetailScreen | `catId: String` |
 | `/profile` | ProfileScreen | — |
+| `/ai-settings` | AiSettingsPage | — |
 
 **根路由** 由 `AuthGate` -> `_FirstHabitGate` 管理：
 1. `AuthGate` 检查引导完成状态（SharedPreferences）和 Firebase Auth 状态

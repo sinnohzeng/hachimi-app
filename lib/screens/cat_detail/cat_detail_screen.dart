@@ -111,6 +111,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                   AnimatedMeshBackground(
                     colors: meshColors,
                     speed: 1.0,
+                    fadeIn: true,
                     child: SafeArea(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

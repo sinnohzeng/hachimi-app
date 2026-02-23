@@ -29,6 +29,7 @@ The top-level user document. Created on first sign-in.
 | `coins` | int | yes | Current coin balance for purchasing accessories (default: 0) |
 | `inventory` | list\<string\> | yes | User-level accessory inventory — IDs of owned but unequipped accessories (default: empty list) |
 | `lastCheckInDate` | string | no | ISO date string "YYYY-MM-DD" of the most recent daily check-in bonus claim |
+| `avatarId` | string | no | Predefined avatar icon ID for the user's profile picture. null = show initials fallback |
 
 **Notes:**
 - `uid` is the Firebase Auth UID and serves as both the document ID and the top-level namespace for all user data.
@@ -355,8 +356,6 @@ In addition to Firestore, the app uses local-only storage for AI-generated conte
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `ai_features_enabled` | bool | false | Master toggle for AI features |
-| `ai_model_downloaded` | bool | false | Whether the GGUF model file exists locally |
-| `ai_model_file_path` | String | "" | Absolute path to the downloaded model file |
-| `ai_model_version` | String | "" | Version identifier for model upgrade detection |
+| `ai_selected_provider` | String | "minimax" | Active AI provider ID (`minimax` or `gemini`) |
 
 **Constants:** `lib/core/constants/ai_constants.dart` -> `class AiConstants`

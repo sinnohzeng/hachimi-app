@@ -29,6 +29,7 @@ users/{uid}                          <- 用户基本信息文档
 | `coins` | int | 是 | 当前金币余额，用于购买配饰（默认值：0） |
 | `inventory` | list\<string\> | 是 | 用户级道具箱——已拥有但未装备的配饰 ID 列表（默认值：空列表） |
 | `lastCheckInDate` | string | 否 | 最近一次每日签到奖励领取的 ISO 日期字符串 "YYYY-MM-DD" |
+| `avatarId` | string | 否 | 预设头像图标 ID，用于用户资料头像。null = 显示首字母缩写 |
 
 **说明：**
 - `uid` 是 Firebase Auth UID，同时作为文档 ID 和所有用户数据的顶层命名空间。
@@ -354,8 +355,6 @@ dormant --[习惯重新激活]--> active（未来功能）
 | 键名 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `ai_features_enabled` | bool | false | AI 功能总开关 |
-| `ai_model_downloaded` | bool | false | GGUF 模型文件是否已下载 |
-| `ai_model_file_path` | String | "" | 模型文件的绝对路径 |
-| `ai_model_version` | String | "" | 模型版本标识（用于升级检测） |
+| `ai_selected_provider` | String | "minimax" | 当前 AI 提供商 ID（`minimax` 或 `gemini`） |
 
 **常量定义：** `lib/core/constants/ai_constants.dart` -> `class AiConstants`

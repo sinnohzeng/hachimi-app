@@ -6,14 +6,15 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
+import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
+import 'package:hachimi_app/core/router/app_router.dart';
 
 import 'components/delete_account_flow.dart';
 import 'components/notification_settings_dialog.dart';
 import 'components/language_dialog.dart';
 import 'components/theme_mode_dialog.dart';
 import 'components/theme_color_dialog.dart';
-import 'components/ai_settings_section.dart';
 import 'components/section_header.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -140,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // AI Model section
           SectionHeader(title: l10n.settingsAiModel, colorScheme: colorScheme),
-          AiSettingsSection(colorScheme: colorScheme, textTheme: textTheme),
+          _buildAiListTile(context, ref, l10n, colorScheme, textTheme),
 
           const SizedBox(height: AppSpacing.sm),
           const Divider(),
@@ -204,6 +205,45 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  // --- AI Settings Navigation ---
+
+  Widget _buildAiListTile(
+    BuildContext context,
+    WidgetRef ref,
+    S l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final aiEnabled = ref.watch(aiFeatureEnabledProvider);
+    final availability = ref.watch(aiAvailabilityProvider);
+    final aiService = ref.watch(aiServiceProvider);
+
+    final subtitle = aiEnabled
+        ? '${aiService.providerName} · ${_availabilityLabel(availability, l10n)}'
+        : l10n.settingsStatusDisabled;
+
+    return ListTile(
+      leading: const Icon(Icons.smart_toy_outlined),
+      title: Text(l10n.settingsAiFeatures),
+      subtitle: Text(
+        subtitle,
+        style: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => Navigator.of(context).pushNamed(AppRouter.aiSettings),
+    );
+  }
+
+  String _availabilityLabel(AiAvailability availability, S l10n) {
+    return switch (availability) {
+      AiAvailability.ready => l10n.settingsStatusReady,
+      AiAvailability.error => l10n.settingsStatusError,
+      AiAvailability.disabled => l10n.settingsStatusDisabled,
+    };
   }
 
   // --- Notification Settings ---

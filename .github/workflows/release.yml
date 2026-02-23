@@ -6,7 +6,8 @@
 #
 # Required GitHub Secrets:
 #   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD,
-#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART, MINIMAX_API_KEY
+#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART, MINIMAX_API_KEY,
+#   GEMINI_API_KEY
 # ---
 
 name: Build & Release APK
@@ -97,7 +98,7 @@ jobs:
         run: flutter test --exclude-tags golden
 
       - name: Build release APK
-        run: flutter build apk --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }}
+        run: flutter build apk --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
       - name: Report APK size
         run: |

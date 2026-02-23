@@ -11,6 +11,19 @@ import 'package:hachimi_app/core/ai/ai_message.dart';
 import 'package:hachimi_app/providers/ai_provider.dart';
 
 void main() {
+  group('AiProviderId — enum', () {
+    test('has 2 values', () {
+      expect(AiProviderId.values.length, equals(2));
+      expect(AiProviderId.values, contains(AiProviderId.minimax));
+      expect(AiProviderId.values, contains(AiProviderId.gemini));
+    });
+
+    test('name serializes correctly', () {
+      expect(AiProviderId.minimax.name, equals('minimax'));
+      expect(AiProviderId.gemini.name, equals('gemini'));
+    });
+  });
+
   group('AiAvailability — enum', () {
     test('has 3 values', () {
       expect(AiAvailability.values.length, equals(3));

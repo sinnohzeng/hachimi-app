@@ -487,23 +487,19 @@ class SEn extends S {
   String get profileTotalCats => 'Total Cats';
 
   @override
-  String get profileBestStreak => 'Best Streak';
+  String get profileTotalQuests => 'Quests';
 
   @override
-  String get profileCatAlbum => 'Cat Album';
+  String get profileEditName => 'Edit name';
 
   @override
-  String profileCatAlbumCount(int count) {
-    return '$count cats';
-  }
+  String get profileDisplayName => 'Display name';
 
   @override
-  String profileSeeAll(int count) {
-    return 'See all $count cats';
-  }
+  String get profileChooseAvatar => 'Choose avatar';
 
   @override
-  String get profileGraduated => 'Graduated';
+  String get profileSaved => 'Profile saved';
 
   @override
   String get profileSettings => 'Settings';
@@ -581,8 +577,16 @@ class SEn extends S {
   String get testChatTypeMessage => 'Type a message...';
 
   @override
-  String get settingsAiCloudBadge =>
-      'Powered by MiniMax cloud AI — requires network';
+  String get settingsAiProvider => 'Provider';
+
+  @override
+  String get settingsAiProviderMinimax => 'MiniMax (default)';
+
+  @override
+  String get settingsAiProviderGemini => 'Gemini';
+
+  @override
+  String get settingsAiCloudBadge => 'Powered by cloud AI — requires network';
 
   @override
   String get settingsAiWhatYouGet => 'What you get:';

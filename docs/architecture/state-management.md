@@ -384,10 +384,15 @@ Device connectivity (independent of auth):
 ### AI Providers
 
 ```
-Cloud AI engine (independent of auth — uses MiniMax API):
+Cloud AI engine (independent of auth — multi-provider strategy pattern):
+
+aiProviderSelectionProvider (StateNotifierProvider<AiProviderSelectionNotifier, AiProviderId>)
+  └── SharedPreferences persistence (key: ai_selected_provider)
+  AiProviderId enum: minimax | gemini
 
 aiServiceProvider (Provider<AiService>)
-  └── holds MiniMaxProvider (AiProvider interface)
+  └── watches: aiProviderSelectionProvider
+  └── dynamically instantiates MiniMaxProvider or GeminiProvider based on selection
 
 aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
   └── SharedPreferences persistence
@@ -418,7 +423,7 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **Type**: `StateNotifierProvider<AiFeatureNotifier, bool>`
 - **File**: `lib/providers/ai_provider.dart`
 - **Source**: SharedPreferences `ai_features_enabled`
-- **Consumers**: `SettingsScreen` (AI toggle), `aiAvailabilityProvider`
+- **Consumers**: `AiSettingsPage` (AI toggle), `aiAvailabilityProvider`
 - **SSOT for**: Whether AI features are enabled by the user
 
 ### `aiAvailabilityProvider`
@@ -495,6 +500,14 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **Source**: `PackageInfo.fromPlatform()` (from `package_info_plus`)
 - **Consumers**: `SettingsScreen` (version display + license page)
 - **SSOT for**: Runtime app version info (version, buildNumber, packageName) — eliminates hardcoded version strings
+
+### `avatarIdProvider`
+
+- **Type**: `StreamProvider<String?>`
+- **File**: `lib/providers/user_profile_provider.dart`
+- **Source**: Firestore `users/{uid}` document — reads `avatarId` field via `FirestoreService.watchAvatarId()`
+- **Consumers**: `ProfileScreen` (avatar display), `AvatarPickerSheet` (current selection)
+- **SSOT for**: The current user's selected profile avatar ID (null = initials fallback)
 
 ---
 

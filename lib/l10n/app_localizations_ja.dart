@@ -482,23 +482,19 @@ class SJa extends S {
   String get profileTotalCats => 'ネコの数';
 
   @override
-  String get profileBestStreak => '最長連続日数';
+  String get profileTotalQuests => 'クエスト';
 
   @override
-  String get profileCatAlbum => 'ネコアルバム';
+  String get profileEditName => '名前を変更';
 
   @override
-  String profileCatAlbumCount(int count) {
-    return '$count匹';
-  }
+  String get profileDisplayName => '表示名';
 
   @override
-  String profileSeeAll(int count) {
-    return 'すべてのネコを見る ($count匹)';
-  }
+  String get profileChooseAvatar => 'アバターを選択';
 
   @override
-  String get profileGraduated => '卒業済み';
+  String get profileSaved => '保存しました';
 
   @override
   String get profileSettings => '設定';
@@ -576,7 +572,16 @@ class SJa extends S {
   String get testChatTypeMessage => 'メッセージを入力...';
 
   @override
-  String get settingsAiCloudBadge => 'MiniMaxクラウドAI搭載 — ネットワーク接続が必要です';
+  String get settingsAiProvider => 'プロバイダー';
+
+  @override
+  String get settingsAiProviderMinimax => 'MiniMax（デフォルト）';
+
+  @override
+  String get settingsAiProviderGemini => 'Gemini';
+
+  @override
+  String get settingsAiCloudBadge => 'クラウドAI搭載 — ネットワーク接続が必要です';
 
   @override
   String get settingsAiWhatYouGet => '利用できる機能:';

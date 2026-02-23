@@ -960,35 +960,35 @@ abstract class S {
   /// **'Total Cats'**
   String get profileTotalCats;
 
-  /// No description provided for @profileBestStreak.
+  /// No description provided for @profileTotalQuests.
   ///
   /// In en, this message translates to:
-  /// **'Best Streak'**
-  String get profileBestStreak;
+  /// **'Quests'**
+  String get profileTotalQuests;
 
-  /// No description provided for @profileCatAlbum.
+  /// No description provided for @profileEditName.
   ///
   /// In en, this message translates to:
-  /// **'Cat Album'**
-  String get profileCatAlbum;
+  /// **'Edit name'**
+  String get profileEditName;
 
-  /// No description provided for @profileCatAlbumCount.
+  /// No description provided for @profileDisplayName.
   ///
   /// In en, this message translates to:
-  /// **'{count} cats'**
-  String profileCatAlbumCount(int count);
+  /// **'Display name'**
+  String get profileDisplayName;
 
-  /// No description provided for @profileSeeAll.
+  /// No description provided for @profileChooseAvatar.
   ///
   /// In en, this message translates to:
-  /// **'See all {count} cats'**
-  String profileSeeAll(int count);
+  /// **'Choose avatar'**
+  String get profileChooseAvatar;
 
-  /// No description provided for @profileGraduated.
+  /// No description provided for @profileSaved.
   ///
   /// In en, this message translates to:
-  /// **'Graduated'**
-  String get profileGraduated;
+  /// **'Profile saved'**
+  String get profileSaved;
 
   /// No description provided for @profileSettings.
   ///
@@ -1140,10 +1140,28 @@ abstract class S {
   /// **'Type a message...'**
   String get testChatTypeMessage;
 
+  /// No description provided for @settingsAiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get settingsAiProvider;
+
+  /// No description provided for @settingsAiProviderMinimax.
+  ///
+  /// In en, this message translates to:
+  /// **'MiniMax (default)'**
+  String get settingsAiProviderMinimax;
+
+  /// No description provided for @settingsAiProviderGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini'**
+  String get settingsAiProviderGemini;
+
   /// No description provided for @settingsAiCloudBadge.
   ///
   /// In en, this message translates to:
-  /// **'Powered by MiniMax cloud AI — requires network'**
+  /// **'Powered by cloud AI — requires network'**
   String get settingsAiCloudBadge;
 
   /// No description provided for @settingsAiWhatYouGet.

@@ -49,7 +49,8 @@ hachimi-app/
 │   │   │   ├── analytics_events.dart       # SSOT: all GA4 event names + params
 │   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
 │   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
-│   │   │   └── ai_constants.dart           # SSOT: AI config, prompts, inference params
+│   │   │   ├── ai_constants.dart           # SSOT: AI config, prompts, inference params
+│   │   │   └── avatar_constants.dart      # SSOT: predefined avatar options (id, icon, color)
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
 │   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
@@ -90,9 +91,10 @@ hachimi-app/
 │   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
 │   │   ├── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
 │   │   ├── ai_service.dart                # AI facade service (routes to AiProvider, concurrency control)
-   │   ├── ai/                        # AI provider implementations
-   │   │   ├── minimax_provider.dart   # MiniMax cloud AI provider
-   │   │   └── sse_parser.dart         # SSE stream parser utility
+│   │   ├── ai/                             # AI provider implementations
+│   │   │   ├── minimax_provider.dart       # MiniMax M2.5 cloud AI provider
+│   │   │   ├── gemini_provider.dart        # Gemini 3 Flash cloud AI provider
+│   │   │   └── sse_parser.dart             # SSE stream parser with pluggable token extractors
 │   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
 │   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
 ││   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
@@ -111,7 +113,8 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider (app language override)
 │   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
 │   │   ├── theme_provider.dart             # themeProvider (theme mode + seed color)
-│   │   ├── ai_provider.dart               # AI feature toggle, availability, service wiring
+│   │   ├── user_profile_provider.dart      # avatarIdProvider (Firestore user avatar)
+│   │   ├── ai_provider.dart               # AI provider selection, feature toggle, availability, service wiring
 │   │   ├── diary_provider.dart            # diaryEntriesProvider, todayDiaryProvider (family)
 │   │   └── chat_provider.dart             # chatNotifierProvider (StateNotifier family)
 │   │
@@ -141,16 +144,20 @@ hachimi-app/
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3-page intro carousel
 │   │   ├── profile/
-│   │   │   └── profile_screen.dart         # Stats, cat album, settings entry
+│   │   │   ├── profile_screen.dart         # User info, stats, settings entry
+│   │   │   └── components/
+│   │   │       ├── edit_name_dialog.dart    # Display name edit AlertDialog
+│   │   │       └── avatar_picker_sheet.dart # Predefined avatar selection BottomSheet
 │   │   ├── settings/
 │   │   │   ├── settings_screen.dart        # Notifications, language, about, account actions
+│   │   │   ├── ai_settings_page.dart       # AI settings sub-page (provider selection, toggle, status)
 │   │   │   ├── model_test_chat_screen.dart # AI test chat (verify cloud AI connection)
 │   │   │   └── components/              # Extracted sub-widgets for SettingsScreen
 │   │   │       ├── notification_settings_dialog.dart
 │   │   │       ├── language_dialog.dart
 │   │   │       ├── theme_mode_dialog.dart
 │   │   │       ├── theme_color_dialog.dart
-│   │   │       ├── ai_model_section.dart
+│   │   │       ├── delete_account_flow.dart
 │   │   │       └── section_header.dart
 │   │   ├── stats/
 │   │   │   └── stats_screen.dart           # Activity heatmap + per-habit progress

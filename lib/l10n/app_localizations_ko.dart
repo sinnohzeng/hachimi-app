@@ -482,23 +482,19 @@ class SKo extends S {
   String get profileTotalCats => '총 고양이 수';
 
   @override
-  String get profileBestStreak => '최고 연속 기록';
+  String get profileTotalQuests => '퀘스트';
 
   @override
-  String get profileCatAlbum => '고양이 앨범';
+  String get profileEditName => '이름 변경';
 
   @override
-  String profileCatAlbumCount(int count) {
-    return '$count마리';
-  }
+  String get profileDisplayName => '표시 이름';
 
   @override
-  String profileSeeAll(int count) {
-    return '$count마리 모두 보기';
-  }
+  String get profileChooseAvatar => '아바타 선택';
 
   @override
-  String get profileGraduated => '졸업';
+  String get profileSaved => '저장되었습니다';
 
   @override
   String get profileSettings => '설정';
@@ -576,7 +572,16 @@ class SKo extends S {
   String get testChatTypeMessage => '메시지를 입력하세요...';
 
   @override
-  String get settingsAiCloudBadge => 'MiniMax 클라우드 AI 탑재 — 네트워크 연결 필요';
+  String get settingsAiProvider => '공급자';
+
+  @override
+  String get settingsAiProviderMinimax => 'MiniMax (기본값)';
+
+  @override
+  String get settingsAiProviderGemini => 'Gemini';
+
+  @override
+  String get settingsAiCloudBadge => '클라우드 AI 탑재 — 네트워크 연결 필요';
 
   @override
   String get settingsAiWhatYouGet => '제공되는 기능:';
