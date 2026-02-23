@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
@@ -14,6 +15,7 @@ Future<ReminderConfig?> showReminderPickerSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
     builder: (ctx) => _ReminderPickerSheet(initial: initial),
   );
 }

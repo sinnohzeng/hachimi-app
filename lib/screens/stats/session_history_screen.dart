@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -129,6 +130,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
       builder: (ctx) {
         final locale = Localizations.localeOf(context).toString();
         return SafeArea(
@@ -187,6 +189,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
       builder: (ctx) {
         return SafeArea(
           child: Column(

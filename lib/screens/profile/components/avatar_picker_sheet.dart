@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
@@ -15,6 +16,7 @@ Future<void> showAvatarPickerSheet(BuildContext context, WidgetRef ref) {
   return showModalBottomSheet(
     context: context,
     showDragHandle: true,
+    constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
     builder: (ctx) => _AvatarPickerContent(parentRef: ref),
   );
 }

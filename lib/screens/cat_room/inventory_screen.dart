@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -131,6 +132,7 @@ class InventoryScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
+      constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: AppSpacing.paddingBase,
