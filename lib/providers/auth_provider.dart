@@ -30,3 +30,8 @@ final currentUidProvider = Provider<String?>((ref) {
     error: (_, _) => null,
   );
 });
+
+/// 当前用户是否为匿名（访客模式）。
+final isAnonymousProvider = Provider<bool>((ref) {
+  return ref.watch(authServiceProvider).isAnonymous;
+});

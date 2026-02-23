@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -125,6 +127,61 @@ class Cat {
           ? Timestamp.fromDate(lastSessionAt!)
           : null,
     };
+  }
+
+  /// SQLite 序列化 — 对应 local_cats 表。
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'id': id,
+      'uid': uid,
+      'name': name,
+      'personality': personality,
+      'appearance': jsonEncode(appearance.toMap()),
+      'total_minutes': totalMinutes,
+      'equipped_accessory': equippedAccessory,
+      'bound_habit_id': boundHabitId,
+      'state': state,
+      'highest_stage': highestStage,
+      'last_session_at': lastSessionAt?.millisecondsSinceEpoch,
+      'created_at': createdAt.millisecondsSinceEpoch,
+    };
+  }
+
+  /// 从 SQLite 行反序列化。
+  factory Cat.fromSqlite(Map<String, dynamic> map) {
+    final rawAppearance = map['appearance'] as String? ?? '{}';
+    final appearanceMap =
+        jsonDecode(rawAppearance) as Map<String, dynamic>? ?? {};
+
+    return Cat(
+      id: map['id'] as String,
+      name: map['name'] as String? ?? '',
+      personality: map['personality'] as String? ?? 'playful',
+      appearance: appearanceMap.isNotEmpty
+          ? CatAppearance.fromMap(appearanceMap)
+          : const CatAppearance(
+              peltType: 'SingleColour',
+              peltColor: 'WHITE',
+              tint: 'none',
+              eyeColor: 'YELLOW',
+              whitePatchesTint: 'none',
+              skinColor: 'PINK',
+              isTortie: false,
+              isLonghair: false,
+              reverse: false,
+              spriteVariant: 0,
+            ),
+      totalMinutes: map['total_minutes'] as int? ?? 0,
+      accessories: const [], // 配饰列表从 materialized_state 管理
+      equippedAccessory: map['equipped_accessory'] as String?,
+      boundHabitId: map['bound_habit_id'] as String? ?? '',
+      state: map['state'] as String? ?? 'active',
+      highestStage: map['highest_stage'] as String?,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      lastSessionAt: map['last_session_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['last_session_at'] as int)
+          : null,
+    );
   }
 
   Cat copyWith({

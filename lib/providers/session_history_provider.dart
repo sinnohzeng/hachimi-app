@@ -1,26 +1,24 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
-import 'package:hachimi_app/providers/habits_provider.dart';
 
 /// 分页历史记录状态。
 class SessionHistoryState {
   final List<FocusSession> sessions;
   final bool isLoading;
   final bool hasMore;
-  final String? filterHabitId; // null = 全部
-  final DocumentSnapshot? lastDocument; // Firestore 游标
-  final String? error; // 错误信息
-  final DateTime? selectedMonth; // 月份筛选
+  final String? filterHabitId;
+  final int offset; // SQLite offset 游标
+  final String? error;
+  final DateTime? selectedMonth;
 
   const SessionHistoryState({
     this.sessions = const [],
     this.isLoading = false,
     this.hasMore = true,
     this.filterHabitId,
-    this.lastDocument,
+    this.offset = 0,
     this.error,
     this.selectedMonth,
   });
@@ -30,7 +28,7 @@ class SessionHistoryState {
     bool? isLoading,
     bool? hasMore,
     String? Function()? filterHabitId,
-    DocumentSnapshot? Function()? lastDocument,
+    int? offset,
     String? Function()? error,
     DateTime? Function()? selectedMonth,
   }) {
@@ -41,7 +39,7 @@ class SessionHistoryState {
       filterHabitId: filterHabitId != null
           ? filterHabitId()
           : this.filterHabitId,
-      lastDocument: lastDocument != null ? lastDocument() : this.lastDocument,
+      offset: offset ?? this.offset,
       error: error != null ? error() : this.error,
       selectedMonth: selectedMonth != null
           ? selectedMonth()
@@ -50,20 +48,20 @@ class SessionHistoryState {
   }
 }
 
-/// 历史记录 Notifier — 管理分页加载和筛选。
+/// 历史记录 Notifier — 管理分页加载和筛选（SQLite 版）。
 class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
   static const _pageSize = 20;
 
   @override
   SessionHistoryState build() {
-    // 首次构建时自动加载第一页
     Future.microtask(loadMore);
     return const SessionHistoryState(isLoading: true);
   }
 
   /// 加载下一页数据。
   Future<void> loadMore() async {
-    if (state.isLoading || !state.hasMore) return;
+    if (state.isLoading && state.sessions.isNotEmpty) return;
+    if (!state.hasMore) return;
     state = state.copyWith(isLoading: true, error: () => null);
 
     try {
@@ -73,39 +71,27 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
         return;
       }
 
-      final habits = ref.read(habitsProvider).value ?? [];
-      final habitIds = habits.map((h) => h.id).toList();
-      if (habitIds.isEmpty) {
-        state = state.copyWith(isLoading: false, hasMore: false);
-        return;
-      }
-
-      // 计算月份筛选的时间边界
-      DateTime? startDate;
-      DateTime? endDate;
+      // 月份筛选格式
+      String? monthStr;
       if (state.selectedMonth != null) {
         final m = state.selectedMonth!;
-        startDate = DateTime(m.year, m.month);
-        endDate = DateTime(m.year, m.month + 1);
+        monthStr = '${m.year}-${m.month.toString().padLeft(2, '0')}';
       }
 
-      final result = await ref
-          .read(firestoreServiceProvider)
-          .getSessionHistory(
-            uid: uid,
-            habitIds: habitIds,
-            habitId: state.filterHabitId,
-            limit: _pageSize,
-            startAfter: state.lastDocument,
-            startDate: startDate,
-            endDate: endDate,
-          );
+      final sessionRepo = ref.read(localSessionRepositoryProvider);
+      final result = await sessionRepo.getSessionHistory(
+        uid,
+        habitId: state.filterHabitId,
+        month: monthStr,
+        limit: _pageSize,
+        offset: state.offset,
+      );
 
       state = state.copyWith(
-        sessions: [...state.sessions, ...result.sessions],
+        sessions: [...state.sessions, ...result],
         isLoading: false,
-        hasMore: result.sessions.length >= _pageSize,
-        lastDocument: () => result.lastDoc,
+        hasMore: result.length >= _pageSize,
+        offset: state.offset + result.length,
       );
     } catch (e, stack) {
       ErrorHandler.record(
@@ -138,7 +124,7 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
     Future.microtask(loadMore);
   }
 
-  /// 重试加载（清除错误状态后重新加载）。
+  /// 重试加载。
   void retry() {
     state = SessionHistoryState(
       isLoading: true,

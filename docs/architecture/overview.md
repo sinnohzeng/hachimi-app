@@ -11,7 +11,7 @@
 | UI Framework | Flutter | 3.41.x stable | Cross-platform mobile (iOS + Android) |
 | Language | Dart | 3.11.x | Type-safe, null-safe development |
 | Design System | Material Design 3 | — | Google-aligned UI components and theming |
-| State Management | Riverpod | 2.6.x | Reactive, compile-safe dependency injection |
+| State Management | Riverpod | 3.x | Reactive, compile-safe dependency injection |
 | Auth | Firebase Auth | 5.x | Google OAuth + email/password |
 | Database | Cloud Firestore | 5.x | Real-time NoSQL, offline-capable |
 | Analytics | Firebase Analytics (GA4) | 11.x | Event-based behavioral analytics |
@@ -20,7 +20,9 @@
 | Background Timer | flutter_foreground_task | 8.x | Android foreground service for focus timer |
 | A/B Testing | Firebase Remote Config | 5.x | Dynamic config, feature flags |
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
-| Connectivity | connectivity_plus | 6.x | Device network status monitoring |
+| Connectivity | connectivity_plus | 7.x | Device network status monitoring |
+| Local Database | sqflite | 2.4.x | Local-first SQLite storage (action ledger, materialized state) |
+| UUID | uuid | 4.5.x | Deterministic unique IDs for local entities |
 | i18n | flutter_localizations + gen-l10n | — | Compile-time localization via ARB files |
 | Cloud AI | MiniMax M2.5 / Gemini 3 Flash | — | Cloud LLM via AiProvider strategy pattern (dart:io HttpClient, user-selectable) |
 | Dynamic Background | mesh_gradient | 1.3.x | GPU-accelerated fluid mesh gradient via fragment shader |
@@ -37,10 +39,9 @@
 │  Screens  (UI Layer — no business logic)                        │
 │  ├── OnboardingScreen          ├── CatRoomScreen                │
 │  ├── LoginScreen               ├── CatDetailScreen              │
-│  ├── HomeScreen (4-tab shell)  ├── FocusSetupScreen             │
+│  ├── HomeScreen (3-tab + Drawer) ├── FocusSetupScreen            │
 │  ├── AdoptionFlowScreen        ├── TimerScreen                  │
 │  ├── StatsScreen               ├── FocusCompleteScreen          │
-│  └── ProfileScreen                                              │
 ├─────────────────────────────────────────────────────────────────┤
 │  Providers  (State Layer — Riverpod, reactive SSOT)            │
 │  ├── authStateProvider         ├── focusTimerProvider           │
@@ -50,7 +51,9 @@
 │  ├── catByIdProvider (family)  ├── pixelCatRendererProvider     │
 │  ├── catByHabitProvider (fam.) ├── catSpriteImageProvider (fam.)│
 │  ├── connectivityProvider      ├── coinBalanceProvider          │
-│  ├── isOfflineProvider         └── hasCheckedInTodayProvider    │
+│  ├── isOfflineProvider         ├── hasCheckedInTodayProvider    │
+│  ├── isAnonymousProvider       ├── ledgerServiceProvider        │
+│  ├── syncEngineProvider        └── newlyUnlockedProvider        │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services  (Data Layer — Firebase SDK isolation)               │
 │  ├── AuthService               ├── XpService (pure Dart)        │
@@ -58,7 +61,10 @@
 │  ├── CatFirestoreService       ├── RemoteConfigService          │
 │  ├── PixelCatRenderer          ├── FocusTimerService            │
 │  ├── PixelCatGenerationService ├── MigrationService             │
-│  ├── CoinService               └── AnalyticsService             │
+│  ├── CoinService               ├── AnalyticsService             │
+│  ├── LedgerService             ├── SyncEngine                   │
+│  ├── AchievementEvaluator      ├── LocalHabitRepository         │
+│  ├── LocalCatRepository        └── LocalSessionRepository       │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -82,7 +88,10 @@ Every concern in the system has exactly one authoritative source:
 
 | Concern | SSOT Location |
 |---------|--------------|
-| Business data | Firestore |
+| Business data (SSOT) | SQLite local tables (synced to Firestore via SyncEngine) |
+| Action ledger | `action_ledger` table in `local_database_service.dart` |
+| Materialized state (coins, etc.) | `materialized_state` table in `local_database_service.dart` |
+| Achievement records | `local_achievements` table in `local_database_service.dart` |
 | Authentication state | `authStateProvider` in `providers/auth_provider.dart` |
 | Cats list | `catsProvider` in `providers/cat_provider.dart` |
 | Cat sprites | `catSpriteImageProvider` in `providers/cat_sprite_provider.dart` |
@@ -118,7 +127,21 @@ Prefer `StreamProvider` and `ref.watch()` over one-shot `Future` fetches. State 
 
 Operations that span multiple documents (e.g., creating a habit + cat, logging a focus session) use Firestore **batch writes** to guarantee consistency. If any write fails, all writes roll back.
 
-### 6. Internationalization (i18n)
+### 6. Local-First Architecture
+
+Since v2.18.0, business data flows through a **local-first** pipeline:
+
+1. **Action Ledger** — Every data-mutating operation (focus complete, check-in, purchase, equip, habit CRUD) is recorded as an immutable `LedgerAction` in the `action_ledger` SQLite table. The ledger is the write-ahead log.
+
+2. **Materialized State** — Derived aggregates (coin balance, check-in status) are cached in the `materialized_state` key-value table, updated atomically within the same SQLite transaction as the ledger write.
+
+3. **Local Tables** — `local_habits`, `local_cats`, `local_sessions`, `local_monthly_checkins`, `local_achievements` mirror the Firestore schema but are the runtime SSOT. Providers read from these tables, not Firestore.
+
+4. **Sync Engine** — `SyncEngine` runs in the background, uploading unsynced ledger actions to Firestore in batches. Triggered on: auth complete, offline->online transition, new ledger write (debounced 2s). Uses exponential backoff retry. 90-day ledger cleanup.
+
+5. **Achievement Evaluator** — `AchievementEvaluator` listens to the ledger change stream and automatically evaluates achievement criteria, replacing manual trigger calls.
+
+### 7. Internationalization (i18n)
 
 All user-facing strings are externalized into ARB files (`lib/l10n/app_en.arb`, `lib/l10n/app_zh.arb`) and compiled to Dart via `flutter gen-l10n`. Hard-coded user-facing strings are not permitted in screens or widgets. See [localization.md](localization.md) for the full workflow.
 
@@ -129,15 +152,16 @@ All user-facing strings are externalized into ARB files (`lib/l10n/app_en.arb`, 
 The app uses Flutter's `Navigator 1.0` with named routes managed by `AppRouter`:
 
 ```
-/login              -> LoginScreen
-/home               -> HomeScreen (4-tab NavigationBar shell)
+/login              -> LoginScreen         (args: linkMode: bool)
+/home               -> HomeScreen (3-tab NavigationBar + Drawer)
+                       Tabs: Today, CatRoom, Achievement
+                       Profile is in the Drawer (via AppDrawer widget)
 /adoption           -> AdoptionFlowScreen  (args: isFirstHabit: bool)
 /focus-setup        -> FocusSetupScreen    (args: habitId: String)
 /timer              -> TimerScreen         (args: habitId: String)
 /focus-complete     -> FocusCompleteScreen (args: Map<String, dynamic>)
 /habit-detail       -> HabitDetailScreen   (args: habitId: String)
 /cat-detail         -> CatDetailScreen     (args: catId: String)
-/profile            -> ProfileScreen
 /ai-settings        -> AiSettingsPage
 ```
 
@@ -161,11 +185,16 @@ AuthGate
             │
             ▼
         Firebase Auth stream
-            ├── user == null -> LoginScreen
+            ├── user == null -> auto signInAnonymously() (guest mode)
+            │       └── success -> _FirstHabitGate
             └── user != null -> _FirstHabitGate
                     ├── habits.isEmpty -> AdoptionFlow (isFirstHabit: true)
                     └── habits.any -> HomeScreen
 ```
+
+**Guest Mode:** New users automatically receive an anonymous Firebase Auth account. They can upgrade to a full account (Google or email) at any time via the Drawer -> guest upgrade prompt. Account linking uses `linkWithCredential()` to preserve all data.
+
+**AuthService** now supports: `signInAnonymously()`, `linkWithGoogle()`, `linkWithEmail()`, and an `isAnonymous` getter.
 
 ---
 

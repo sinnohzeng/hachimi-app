@@ -2197,6 +2197,85 @@ class SZh extends S {
 
   @override
   String get deleteAccountSuccess => '账号已删除';
+
+  @override
+  String get drawerGuest => '访客';
+
+  @override
+  String get drawerLinkAccountHint => '关联账号以解锁 AI 功能并保护数据';
+
+  @override
+  String get drawerLinkAccount => '关联账号';
+
+  @override
+  String get drawerMilestones => '里程碑';
+
+  @override
+  String drawerMilestoneFocus(int hours, int minutes) {
+    return '累计专注：${hours}h ${minutes}m';
+  }
+
+  @override
+  String drawerMilestoneCats(int count) {
+    return '猫咪家族：$count 只';
+  }
+
+  @override
+  String drawerMilestoneQuests(int count) {
+    return '进行中任务：$count 个';
+  }
+
+  @override
+  String get drawerMySection => '我的';
+
+  @override
+  String get drawerSessionHistory => '专注历史';
+
+  @override
+  String get drawerCheckInCalendar => '签到日历';
+
+  @override
+  String get drawerAccountSection => '账号';
+
+  @override
+  String get drawerGuestLogout => '退出（访客数据将丢失）';
+
+  @override
+  String get drawerGuestLogoutTitle => '退出访客模式？';
+
+  @override
+  String get drawerGuestLogoutMessage => '退出后，当前数据将无法恢复。建议先关联账号以保留进度。';
+
+  @override
+  String get drawerGuestLogoutConfirm => '仍然退出';
+
+  @override
+  String get guestUpgradeTitle => '保护你的数据';
+
+  @override
+  String get guestUpgradeMessage => '关联账号可备份进度、解锁 AI 日记和聊天功能，并在多设备间同步。';
+
+  @override
+  String get guestUpgradeLinkButton => '关联账号';
+
+  @override
+  String get guestUpgradeLater => '以后再说';
+
+  @override
+  String get loginLinkTagline => '关联账号以保护你的数据';
+
+  @override
+  String get aiTeaserTitle => '猫猫日记';
+
+  @override
+  String aiTeaserPreview(String catName) {
+    return '今天和主人一起学习了…$catName感觉自己又变聪明了喵~';
+  }
+
+  @override
+  String aiTeaserCta(String catName) {
+    return '关联账号，看看$catName想说什么';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4392,4 +4471,83 @@ class SZhHant extends SZh {
 
   @override
   String get deleteAccountSuccess => '帳號已刪除';
+
+  @override
+  String get drawerGuest => '訪客';
+
+  @override
+  String get drawerLinkAccountHint => '關聯帳號以解鎖 AI 功能並保護資料';
+
+  @override
+  String get drawerLinkAccount => '關聯帳號';
+
+  @override
+  String get drawerMilestones => '里程碑';
+
+  @override
+  String drawerMilestoneFocus(int hours, int minutes) {
+    return '累計專注：${hours}h ${minutes}m';
+  }
+
+  @override
+  String drawerMilestoneCats(int count) {
+    return '貓咪家族：$count 隻';
+  }
+
+  @override
+  String drawerMilestoneQuests(int count) {
+    return '進行中任務：$count 個';
+  }
+
+  @override
+  String get drawerMySection => '我的';
+
+  @override
+  String get drawerSessionHistory => '專注歷史';
+
+  @override
+  String get drawerCheckInCalendar => '簽到日曆';
+
+  @override
+  String get drawerAccountSection => '帳號';
+
+  @override
+  String get drawerGuestLogout => '退出（訪客資料將遺失）';
+
+  @override
+  String get drawerGuestLogoutTitle => '退出訪客模式？';
+
+  @override
+  String get drawerGuestLogoutMessage => '退出後，當前資料將無法恢復。建議先關聯帳號以保留進度。';
+
+  @override
+  String get drawerGuestLogoutConfirm => '仍然退出';
+
+  @override
+  String get guestUpgradeTitle => '保護你的資料';
+
+  @override
+  String get guestUpgradeMessage => '關聯帳號可備份進度、解鎖 AI 日記和聊天功能，並在多裝置間同步。';
+
+  @override
+  String get guestUpgradeLinkButton => '關聯帳號';
+
+  @override
+  String get guestUpgradeLater => '以後再說';
+
+  @override
+  String get loginLinkTagline => '關聯帳號以保護你的資料';
+
+  @override
+  String get aiTeaserTitle => '貓貓日記';
+
+  @override
+  String aiTeaserPreview(String catName) {
+    return '今天和主人一起學習了…$catName覺得自己又變聰明了喵~';
+  }
+
+  @override
+  String aiTeaserCta(String catName) {
+    return '關聯帳號，看看$catName想說什麼';
+  }
 }

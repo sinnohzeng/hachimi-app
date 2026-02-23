@@ -68,6 +68,41 @@ class AuthService {
     await user.reload();
   }
 
+  /// 是否是匿名用户（访客模式）。
+  bool get isAnonymous => _auth.currentUser?.isAnonymous ?? false;
+
+  /// 匿名登录（访客模式）。
+  Future<UserCredential> signInAnonymously() async {
+    return await _auth.signInAnonymously();
+  }
+
+  /// 将匿名账号关联 Google 凭证，升级为正式用户。
+  /// 关联成功后 isAnonymous 变为 false。
+  Future<UserCredential?> linkWithGoogle() async {
+    try {
+      await _googleSignIn.initialize();
+      final googleUser = await _googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      return await _auth.currentUser?.linkWithCredential(credential);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      rethrow;
+    }
+  }
+
+  /// 将匿名账号关联 Email/Password 凭证，升级为正式用户。
+  Future<UserCredential?> linkWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    return await _auth.currentUser?.linkWithCredential(credential);
+  }
+
   /// Delete the current user's account.
   /// May throw a FirebaseAuthException requiring re-authentication.
   Future<void> deleteAccount() async {

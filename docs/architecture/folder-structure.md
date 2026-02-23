@@ -55,7 +55,8 @@ hachimi-app/
 │   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
 │   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
 │   │   │   ├── streak_utils.dart           # StreakUtils — streak calculation logic
-│   │   │   └── background_color_utils.dart # Mesh gradient color extraction from cat stage/pelt
+│   │   │   ├── background_color_utils.dart # Mesh gradient color extraction from cat stage/pelt
+│   │   │   └── guest_id_generator.dart    # 10-char secure random guest ID generator
 │   │   ├── router/
 │   │   │   └── app_router.dart             # Named route registry + route constants
 │   │   └── theme/
@@ -76,7 +77,9 @@ hachimi-app/
 │   │   ├── focus_session.dart              # FocusSession — session history record
 │   │   ├── check_in.dart                   # CheckInEntry — daily check-in entry (legacy compat)
 │   │   ├── diary_entry.dart                # DiaryEntry — local SQLite model (AI diary)
-│   │   └── chat_message.dart               # ChatMessage — local SQLite model (AI chat)
+│   │   ├── chat_message.dart               # ChatMessage — local SQLite model (AI chat)
+│   │   ├── ledger_action.dart             # LedgerAction + ActionType — action ledger event model
+│   │   └── unlocked_achievement.dart      # UnlockedAchievement — local achievement record
 │   │
 │   ├── services/                           # Firebase SDK isolation layer (no UI, no BuildContext)
 │   │   ├── analytics_service.dart          # Firebase Analytics wrapper — log events
@@ -99,11 +102,17 @@ hachimi-app/
 │   │   │   └── sse_parser.dart             # SSE stream parser with pluggable token extractors
 │   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
 │   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
-││   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
+│   │   ├── local_database_service.dart    # SQLite initialization (diary + chat tables)
+│   │   ├── ledger_service.dart            # Action ledger write + broadcast stream + materialized state
+│   │   ├── local_habit_repository.dart    # Local habit CRUD + ledger writes
+│   │   ├── local_cat_repository.dart      # Local cat CRUD + ledger writes
+│   │   ├── local_session_repository.dart  # Local session CRUD + ledger writes
+│   │   ├── sync_engine.dart               # Background Firestore sync (debounced, exponential backoff)
+│   │   └── achievement_evaluator.dart     # Event-driven achievement evaluation (listens to ledger)
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
-│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider (re-exports service_providers)
+│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider, isAnonymousProvider
 │   │   ├── service_providers.dart          # Non-auth service singletons (Firestore, Analytics, Coin, XP, etc.)
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
@@ -122,7 +131,9 @@ hachimi-app/
 │   │
 │   ├── screens/                            # Full-page widgets (consume providers, no business logic)
 │   │   ├── auth/
-│   │   │   └── login_screen.dart           # Login + Register (email/password + Google)
+│   │   │   ├── login_screen.dart           # Login + Register + Guest link mode
+│   │   │   └── components/
+│   │   │       └── email_auth_screen.dart  # Email auth form (signup/login/link mode)
 │   │   ├── cat_detail/
 │   │   │   ├── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
 │   │   │   ├── cat_diary_screen.dart     # AI-generated diary list page
@@ -142,7 +153,7 @@ hachimi-app/
 │   │   ├── habits/
 │   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + 3-cat adoption choice
 │   │   ├── home/
-│   │   │   └── home_screen.dart            # 4-tab NavigationBar shell + Today tab
+│   │   │   └── home_screen.dart            # 3-tab NavigationBar + Drawer shell
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3-page intro carousel
 │   │   ├── profile/
@@ -185,7 +196,10 @@ hachimi-app/
 │       ├── streak_indicator.dart           # Fire badge showing current streak count
 │       ├── staggered_list_item.dart       # Stagger animation wrapper for list/grid items (fade+slide)
 │       ├── animated_mesh_background.dart  # Reusable animated mesh gradient background with toggle
-│       └── particle_overlay.dart          # Floating particle overlay (firefly/dust presets)
+│       ├── particle_overlay.dart          # Floating particle overlay (firefly/dust presets)
+│       ├── app_drawer.dart               # M3 NavigationDrawer (guest upgrade, milestones, settings)
+│       ├── guest_upgrade_prompt.dart      # Guest account upgrade bottom sheet prompt
+│       └── content_width_constraint.dart  # Tablet-responsive max-width wrapper
 │
 ├── assets/
 │   ├── pixel_cat/                          # Pixel-cat-maker sprite layers

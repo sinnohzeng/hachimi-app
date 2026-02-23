@@ -7,7 +7,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/achievements/achievement_screen.dart';
-import 'package:hachimi_app/screens/profile/profile_screen.dart';
+import 'package:hachimi_app/widgets/app_drawer.dart';
 
 import 'components/today_tab.dart';
 
@@ -25,13 +25,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     TodayTab(),
     CatRoomScreen(),
     AchievementScreen(),
-    ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    // 成就庆祝已移至全局 AchievementCelebrationLayer（app.dart）
-
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= AppBreakpoints.compact) {
@@ -46,6 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCompactLayout(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       body: _buildBody(),
       floatingActionButton: _buildFab(context),
       bottomNavigationBar: NavigationBar(
@@ -60,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildMediumLayout(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Row(
         children: [
           NavigationRail(
@@ -126,11 +125,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         selectedIcon: const Icon(Icons.emoji_events),
         label: l10n.homeTabAchievements,
       ),
-      NavigationDestination(
-        icon: const Icon(Icons.person_outline),
-        selectedIcon: const Icon(Icons.person),
-        label: l10n.homeTabProfile,
-      ),
     ];
   }
 
@@ -151,11 +145,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         icon: const Icon(Icons.emoji_events_outlined),
         selectedIcon: const Icon(Icons.emoji_events),
         label: Text(l10n.homeTabAchievements),
-      ),
-      NavigationRailDestination(
-        icon: const Icon(Icons.person_outline),
-        selectedIcon: const Icon(Icons.person),
-        label: Text(l10n.homeTabProfile),
       ),
     ];
   }

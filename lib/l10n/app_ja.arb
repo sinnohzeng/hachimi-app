@@ -759,5 +759,50 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "deleteAccountProgress": "アカウントを削除中...",
-  "deleteAccountSuccess": "アカウントが削除されました"
+  "deleteAccountSuccess": "アカウントが削除されました",
+
+  "drawerGuest": "ゲスト",
+  "drawerLinkAccountHint": "アカウントを連携してAI機能を解除し、データを保護しましょう",
+  "drawerLinkAccount": "アカウント連携",
+  "drawerMilestones": "マイルストーン",
+  "drawerMilestoneFocus": "合計集中：{hours}h {minutes}m",
+  "@drawerMilestoneFocus": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "drawerMilestoneCats": "ネコ家族：{count}匹",
+  "@drawerMilestoneCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMilestoneQuests": "進行中クエスト：{count}個",
+  "@drawerMilestoneQuests": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMySection": "マイ",
+  "drawerSessionHistory": "集中履歴",
+  "drawerCheckInCalendar": "チェックインカレンダー",
+  "drawerAccountSection": "アカウント",
+  "drawerGuestLogout": "ログアウト（ゲストデータは失われます）",
+  "drawerGuestLogoutTitle": "ゲストとしてログアウトしますか？",
+  "drawerGuestLogoutMessage": "ログアウト後、現在のデータは復元できません。先にアカウントを連携して進捗を保存しましょう。",
+  "drawerGuestLogoutConfirm": "ログアウトする",
+
+  "guestUpgradeTitle": "データを保護する",
+  "guestUpgradeMessage": "アカウント連携で進捗をバックアップし、AI日記やチャット機能を解除し、デバイス間で同期できます。",
+  "guestUpgradeLinkButton": "アカウント連携",
+  "guestUpgradeLater": "あとで",
+
+  "loginLinkTagline": "アカウントを連携してデータを保護する",
+
+  "aiTeaserTitle": "ネコ日記",
+  "aiTeaserPreview": "今日もご主人と一緒に勉強した…{catName}はまた賢くなった気がするにゃ〜",
+  "@aiTeaserPreview": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "aiTeaserCta": "アカウントを連携して、{catName}が何を言いたいか見てみよう",
+  "@aiTeaserCta": {
+    "placeholders": { "catName": { "type": "String" } }
+  }
 }

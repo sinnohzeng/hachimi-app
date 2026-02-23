@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
 
@@ -129,6 +131,56 @@ class Habit {
       'targetCompleted': targetCompleted,
       'createdAt': Timestamp.fromDate(createdAt),
     };
+  }
+
+  /// SQLite 序列化 — 对应 local_habits 表。
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'id': id,
+      'uid': uid,
+      'name': name,
+      'target_hours': targetHours,
+      'goal_minutes': goalMinutes,
+      'reminders': jsonEncode(reminders.map((r) => r.toMap()).toList()),
+      'motivation_text': motivationText,
+      'cat_id': catId,
+      'is_active': isActive ? 1 : 0,
+      'total_minutes': totalMinutes,
+      'last_check_in_date': lastCheckInDate,
+      'total_check_in_days': totalCheckInDays,
+      'deadline_date': deadlineDate?.millisecondsSinceEpoch,
+      'target_completed': targetCompleted ? 1 : 0,
+      'created_at': createdAt.millisecondsSinceEpoch,
+    };
+  }
+
+  /// 从 SQLite 行反序列化。
+  factory Habit.fromSqlite(Map<String, dynamic> map) {
+    final rawReminders = map['reminders'] as String? ?? '[]';
+    final remindersList = (jsonDecode(rawReminders) as List<dynamic>)
+        .whereType<Map<String, dynamic>>()
+        .map(ReminderConfig.tryFromMap)
+        .whereType<ReminderConfig>()
+        .toList();
+
+    return Habit(
+      id: map['id'] as String,
+      name: map['name'] as String? ?? '',
+      targetHours: map['target_hours'] as int?,
+      goalMinutes: map['goal_minutes'] as int? ?? 25,
+      reminders: remindersList,
+      motivationText: map['motivation_text'] as String?,
+      catId: map['cat_id'] as String?,
+      isActive: (map['is_active'] as int? ?? 1) == 1,
+      totalMinutes: map['total_minutes'] as int? ?? 0,
+      lastCheckInDate: map['last_check_in_date'] as String?,
+      totalCheckInDays: map['total_check_in_days'] as int? ?? 0,
+      deadlineDate: map['deadline_date'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['deadline_date'] as int)
+          : null,
+      targetCompleted: (map['target_completed'] as int? ?? 0) == 1,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+    );
   }
 
   Habit copyWith({

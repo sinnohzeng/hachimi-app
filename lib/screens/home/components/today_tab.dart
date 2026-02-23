@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
-import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/check_in_banner.dart';
 import 'package:hachimi_app/widgets/empty_state.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
@@ -19,7 +17,6 @@ import 'package:hachimi_app/widgets/skeleton_loader.dart';
 
 import 'featured_cat_card.dart';
 import 'habit_row.dart';
-import 'summary_item.dart';
 
 /// Today tab -- shows coin balance, featured cat card and habit list.
 class TodayTab extends ConsumerWidget {
@@ -30,9 +27,7 @@ class TodayTab extends ConsumerWidget {
     final habitsAsync = ref.watch(habitsProvider);
     final todayMinutes = ref.watch(todayMinutesPerHabitProvider);
     final catsAsync = ref.watch(catsProvider);
-    final stats = ref.watch(statsProvider);
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
     final l10n = context.l10n;
@@ -63,40 +58,6 @@ class TodayTab extends ConsumerWidget {
 
           // Daily check-in trigger
           const SliverToBoxAdapter(child: CheckInBanner()),
-
-          // Today summary
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Card(
-                color: colorScheme.primaryContainer,
-                child: Padding(
-                  padding: AppSpacing.paddingBase,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SummaryItem(
-                        label: l10n.todaySummaryMinutes,
-                        value:
-                            '${todayMinutes.values.fold(0, (a, b) => a + b)}min',
-                        icon: Icons.timer_outlined,
-                      ),
-                      SummaryItem(
-                        label: l10n.todaySummaryTotal,
-                        value: '${stats.totalHoursLogged}h',
-                        icon: Icons.hourglass_bottom,
-                      ),
-                      SummaryItem(
-                        label: l10n.todaySummaryCats,
-                        value: '${catsAsync.value?.length ?? 0}',
-                        icon: Icons.pets,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
 
           // Section header
           SliverToBoxAdapter(

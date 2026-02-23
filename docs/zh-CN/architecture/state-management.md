@@ -27,6 +27,26 @@ Firebase Auth 流 ──────────────► authStateProvide
          (Provider<Map<String, int>>)
 
 
+本地优先基础设施（SQLite 支持，事件溯源）：
+
+  LedgerService ──► ledgerServiceProvider (Provider<LedgerService>)
+                          │
+                          ├──► localHabitRepositoryProvider (Provider<LocalHabitRepository>)
+                          ├──► localCatRepositoryProvider (Provider<LocalCatRepository>)
+                          └──► localSessionRepositoryProvider (Provider<LocalSessionRepository>)
+
+  SyncEngine ──► syncEngineProvider (Provider<SyncEngine>)
+
+  成就评估器（事件驱动，监听台账变更）：
+
+         newlyUnlockedProvider (StateProvider<List<String>>)
+
+
+访客模式：
+
+         isAnonymousProvider (Provider<bool>)
+
+
 像素猫渲染（单例 + 按猫缓存）：
 
          pixelCatRendererProvider (Provider<PixelCatRenderer>)
@@ -87,7 +107,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`StreamProvider<List<Habit>>`
 - **文件**：`lib/providers/habits_provider.dart`
-- **数据源**：`FirestoreService.watchHabits(uid)` —— 实时 Firestore 流
+- **数据源**：`LocalHabitRepository` —— `async*` 生成器监听 `LedgerService.changes` 广播流。从 `local_habits` SQLite 表读取。
 - **消费者**：`HomeScreen`（习惯列表）、`StatsScreen`、`_FirstHabitGate`、`statsProvider`
 - **SSOT**：用户的完整习惯列表，始终与 Firestore 保持同步
 
@@ -121,7 +141,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`StreamProvider<List<Cat>>`
 - **文件**：`lib/providers/cat_provider.dart`
-- **数据源**：`CatFirestoreService.watchCats(uid)` —— 仅流式传输 `state == "active"` 的猫咪
+- **数据源**：`LocalCatRepository` —— `async*` 生成器监听 `LedgerService.changes`。从 `local_cats` SQLite 表读取，过滤 `state == "active"`。
 - **消费者**：`CatRoomScreen`（CatHouse 网格）、`HomeScreen`（习惯列表中的猫咪头像）、`ProfileScreen`
 - **SSOT**：用户的活跃猫咪，始终保持最新
 
@@ -198,7 +218,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`StreamProvider<int>`
 - **文件**：`lib/providers/coin_provider.dart`
-- **数据源**：`CoinService.watchBalance(uid)` —— 用户 `coins` 字段的实时流
+- **数据源**：派生自 `materialized_state` SQLite 表，通过 `LedgerService` 读取。键名：`coin_balance`。
 - **消费者**：`CatDetailScreen`（配饰商店余额）、`CheckInBanner`、`ProfileScreen`
 - **SSOT**：用户当前金币余额，始终与 Firestore 保持同步
 
@@ -508,6 +528,66 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **数据源**：Firestore `users/{uid}` 文档——通过 `FirestoreService.watchAvatarId()` 读取 `avatarId` 字段
 - **消费者**：`ProfileScreen`（头像展示）、`AvatarPickerSheet`（当前选中状态）
 - **SSOT**：当前用户选择的资料头像 ID（null = 首字母缩写兜底）
+
+---
+
+### 本地优先基础设施 Provider
+
+#### `ledgerServiceProvider`
+
+- **类型**：`Provider<LedgerService>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：使用 `LocalDatabaseService` 实例初始化 `LedgerService`
+- **消费者**：所有本地 Repository、`SyncEngine`、`AchievementEvaluator`
+- **SSOT**：行为台账写入服务及变更广播流
+
+#### `localHabitRepositoryProvider`
+
+- **类型**：`Provider<LocalHabitRepository>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：使用 `LedgerService` 初始化 `LocalHabitRepository`
+- **消费者**：`habitsProvider`
+- **SSOT**：本地习惯 CRUD 操作 + 台账写入
+
+#### `localCatRepositoryProvider`
+
+- **类型**：`Provider<LocalCatRepository>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：使用 `LedgerService` 初始化 `LocalCatRepository`
+- **消费者**：`catsProvider`、`allCatsProvider`
+- **SSOT**：本地猫咪 CRUD 操作 + 台账写入
+
+#### `localSessionRepositoryProvider`
+
+- **类型**：`Provider<LocalSessionRepository>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：使用 `LedgerService` 初始化 `LocalSessionRepository`
+- **消费者**：`todaySessionsProvider`、会话统计 Provider
+- **SSOT**：本地会话 CRUD 操作 + 台账写入
+
+#### `syncEngineProvider`
+
+- **类型**：`Provider<SyncEngine>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：使用 `LedgerService` 初始化 `SyncEngine`
+- **消费者**：`_FirstHabitGateState`（`app.dart`，生命周期管理）
+- **SSOT**：未同步台账操作到 Firestore 的后台同步
+
+#### `isAnonymousProvider`
+
+- **类型**：`Provider<bool>`
+- **文件**：`lib/providers/auth_provider.dart`
+- **数据源**：`AuthService.isAnonymous` —— 检查当前 Firebase 用户是否为匿名用户
+- **消费者**：`AppDrawer`、`CatDetailScreen`（AI 体验入口门控）、`LoginScreen`（关联模式）
+- **SSOT**：当前用户是否为访客（匿名）账户
+
+#### `newlyUnlockedProvider`
+
+- **类型**：`StateProvider<List<String>>`
+- **文件**：`lib/providers/achievement_provider.dart`
+- **数据源**：由 `AchievementEvaluator.onUnlocked` 回调填充，由 `AchievementCelebrationLayer` 消费
+- **消费者**：`AchievementCelebrationLayer`（显示全屏解锁庆祝动画）
+- **SSOT**：刚解锁的成就 ID 队列，等待庆祝展示
 
 ---
 

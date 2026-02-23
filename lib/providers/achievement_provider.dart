@@ -1,19 +1,46 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
-import 'package:hachimi_app/models/achievement.dart';
+import 'package:hachimi_app/models/unlocked_achievement.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
 
-/// 已解锁成就实时流
-final unlockedAchievementsProvider = StreamProvider<List<UnlockedAchievement>>((
+/// 已解锁成就列表 — 从 SQLite local_achievements 读取。
+final unlockedAchievementsProvider = StreamProvider<List<LocalAchievement>>((
   ref,
-) {
+) async* {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-  return ref.watch(achievementServiceProvider).watchUnlocked(uid);
+  if (uid == null) {
+    yield [];
+    return;
+  }
+
+  final ledger = ref.watch(ledgerServiceProvider);
+  yield await _readUnlockedAchievements(ledger, uid);
+
+  await for (final change in ledger.changes) {
+    if (change.type == 'achievement_unlocked' ||
+        change.type == 'achievement_claimed') {
+      yield await _readUnlockedAchievements(ledger, uid);
+    }
+  }
 });
+
+Future<List<LocalAchievement>> _readUnlockedAchievements(
+  LedgerService ledger,
+  String uid,
+) async {
+  final db = await ledger.database;
+  final rows = await db.query(
+    'local_achievements',
+    where: 'uid = ? AND unlocked_at IS NOT NULL',
+    whereArgs: [uid],
+    orderBy: 'unlocked_at DESC',
+  );
+  return rows.map(LocalAchievement.fromSqlite).toList();
+}
 
 /// 已解锁成就 ID 集合（同步快速查询）
 final unlockedIdsProvider = Provider<Set<String>>((ref) {
@@ -32,7 +59,6 @@ final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
 
   final result = <String, AchievementProgress>{};
 
-  // 汇总数据
   final activeHabits = habits.where((h) => h.isActive).toList();
   final maxCheckInDays = habits.fold(
     0,
@@ -51,7 +77,6 @@ final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
       continue;
     }
 
-    // 计算各类成就的进度
     int current = 0;
     int target = def.targetValue ?? 1;
 
@@ -70,7 +95,7 @@ final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
             );
             current = maxMinutes;
           case 'quest_marathon':
-            current = 0; // 由单次 session 触发
+            current = 0;
           default:
             current = 0;
             target = 1;

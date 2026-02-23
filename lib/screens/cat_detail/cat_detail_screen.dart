@@ -22,6 +22,7 @@ import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
+import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
 
 import 'components/focus_stats_card.dart';
 import 'components/reminder_card.dart';
@@ -204,6 +205,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   /// 右栏 — FocusStats, Diary, Chat, Reminder, Heatmap, Accessories, CatInfo
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
+    final isGuest = ref.watch(isAnonymousProvider);
 
     return Column(
       children: [
@@ -215,6 +217,9 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           DiaryPreviewCard(catId: cat.id),
           const SizedBox(height: AppSpacing.base),
           ChatEntryCard(catId: cat.id, catName: cat.name),
+          const SizedBox(height: AppSpacing.base),
+        ] else if (isGuest) ...[
+          _AiTeaserCard(catName: cat.name, context: context),
           const SizedBox(height: AppSpacing.base),
         ],
         if (habit != null) ...[
@@ -383,6 +388,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
+    final isGuest = ref.watch(isAnonymousProvider);
 
     return [
       StaggeredListItem(
@@ -408,6 +414,12 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         StaggeredListItem(
           index: 4,
           child: ChatEntryCard(catId: cat.id, catName: cat.name),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ] else if (isGuest) ...[
+        StaggeredListItem(
+          index: 3,
+          child: _AiTeaserCard(catName: cat.name, context: context),
         ),
         const SizedBox(height: AppSpacing.base),
       ],
@@ -588,6 +600,78 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             child: Text(context.l10n.catDetailRename),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// AI 功能 Teaser 卡 — 访客用户看到的虚化预览引导。
+class _AiTeaserCard extends ConsumerWidget {
+  final String catName;
+  final BuildContext context;
+
+  const _AiTeaserCard({required this.catName, required this.context});
+
+  @override
+  Widget build(BuildContext innerContext, WidgetRef ref) {
+    final colorScheme = Theme.of(innerContext).colorScheme;
+    final textTheme = Theme.of(innerContext).textTheme;
+    final l10n = innerContext.l10n;
+
+    return Card.outlined(
+      child: InkWell(
+        borderRadius: AppShape.borderMedium,
+        onTap: () => showGuestUpgradePrompt(innerContext, ref),
+        child: Padding(
+          padding: AppSpacing.paddingBase,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.auto_stories,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    l10n.aiTeaserTitle,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              // 虚化预览区
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.white, Colors.white.withValues(alpha: 0)],
+                  stops: const [0.3, 1.0],
+                ).createShader(bounds),
+                child: Text(
+                  l10n.aiTeaserPreview(catName),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l10n.aiTeaserCta(catName),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

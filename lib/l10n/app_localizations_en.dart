@@ -2228,4 +2228,86 @@ class SEn extends S {
 
   @override
   String get deleteAccountSuccess => 'Account deleted';
+
+  @override
+  String get drawerGuest => 'Guest';
+
+  @override
+  String get drawerLinkAccountHint =>
+      'Link an account to unlock AI features and protect your data';
+
+  @override
+  String get drawerLinkAccount => 'Link account';
+
+  @override
+  String get drawerMilestones => 'Milestones';
+
+  @override
+  String drawerMilestoneFocus(int hours, int minutes) {
+    return 'Total focus: ${hours}h ${minutes}m';
+  }
+
+  @override
+  String drawerMilestoneCats(int count) {
+    return 'Cat family: $count';
+  }
+
+  @override
+  String drawerMilestoneQuests(int count) {
+    return 'Active quests: $count';
+  }
+
+  @override
+  String get drawerMySection => 'My';
+
+  @override
+  String get drawerSessionHistory => 'Focus history';
+
+  @override
+  String get drawerCheckInCalendar => 'Check-in calendar';
+
+  @override
+  String get drawerAccountSection => 'Account';
+
+  @override
+  String get drawerGuestLogout => 'Log out (guest data will be lost)';
+
+  @override
+  String get drawerGuestLogoutTitle => 'Log out as guest?';
+
+  @override
+  String get drawerGuestLogoutMessage =>
+      'Your current data cannot be recovered after logging out. Link an account first to keep your progress.';
+
+  @override
+  String get drawerGuestLogoutConfirm => 'Log out anyway';
+
+  @override
+  String get guestUpgradeTitle => 'Protect your data';
+
+  @override
+  String get guestUpgradeMessage =>
+      'Link an account to back up your progress, unlock AI diary and chat features, and sync across devices.';
+
+  @override
+  String get guestUpgradeLinkButton => 'Link account';
+
+  @override
+  String get guestUpgradeLater => 'Maybe later';
+
+  @override
+  String get loginLinkTagline => 'Link an account to protect your data';
+
+  @override
+  String get aiTeaserTitle => 'Cat diary';
+
+  @override
+  String aiTeaserPreview(String catName) {
+    return 'Today I studied with my human again... $catName feels smarter every day~';
+  }
+
+  @override
+  String aiTeaserCta(String catName) {
+    return 'Link an account to see what $catName wants to say';
+  }
 }

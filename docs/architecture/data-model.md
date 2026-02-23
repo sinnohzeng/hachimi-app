@@ -282,7 +282,7 @@ All documents are fully isolated per `uid`. See [Security Rules](../firebase/sec
 - Users can only read/write documents under their own `users/{uid}` path.
 - No cross-user data access.
 - No public collections.
-- Anonymous access is denied for all paths.
+- Anonymous authenticated users have the same read/write access as regular users under their own `users/{uid}` path. Unauthenticated access is denied.
 
 **Firestore Security Rules — Field Validation:**
 
@@ -359,3 +359,160 @@ In addition to Firestore, the app uses local-only storage for AI-generated conte
 | `ai_selected_provider` | String | "minimax" | Active AI provider ID (`minimax` or `gemini`) |
 
 **Constants:** `lib/core/constants/ai_constants.dart` -> `class AiConstants`
+
+---
+
+### Database Version 2 — Local-First Tables (v2.18.0+)
+
+The database was upgraded from version 1 to version 2 to support the local-first architecture. These tables mirror the Firestore schema and serve as the runtime SSOT.
+
+#### Table: `action_ledger`
+
+The immutable append-only log of all data-mutating operations.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `type` | TEXT | NOT NULL | ActionType enum string (e.g. "focus_complete", "check_in", "purchase") |
+| `uid` | TEXT | NOT NULL | Firebase Auth UID |
+| `started_at` | INTEGER | NOT NULL | Unix timestamp of action start |
+| `ended_at` | INTEGER | | Unix timestamp of action end (null for instant actions) |
+| `payload` | TEXT | NOT NULL | JSON-encoded action input data |
+| `result` | TEXT | | JSON-encoded action output data |
+| `synced` | INTEGER | NOT NULL DEFAULT 0 | 0 = unsynced, 1 = synced to Firestore |
+| `synced_at` | INTEGER | | Unix timestamp of successful sync |
+| `sync_attempts` | INTEGER | NOT NULL DEFAULT 0 | Number of sync retry attempts |
+| `sync_error` | TEXT | | Last sync error message |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp of ledger entry creation |
+
+**Index:** `idx_ledger_synced` on `(synced, created_at)` for efficient sync queue queries.
+**Index:** `idx_ledger_type` on `(type, uid)` for type-filtered queries.
+
+**ActionType enum values:** `check_in`, `focus_complete`, `focus_abandon`, `purchase`, `equip`, `unequip`, `habit_create`, `habit_update`, `habit_delete`, `account_created`, `account_linked`, `achievement_unlocked`, `achievement_claimed`
+
+**Dart Model:** `lib/models/ledger_action.dart` -> `class LedgerAction`, `enum ActionType`
+
+#### Table: `local_habits`
+
+Local mirror of `users/{uid}/habits/{habitId}` Firestore documents.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | Habit ID |
+| `uid` | TEXT | NOT NULL | User UID |
+| `name` | TEXT | NOT NULL | Habit display name |
+| `cat_id` | TEXT | NOT NULL | Bound cat ID |
+| `goal_minutes` | INTEGER | NOT NULL | Daily focus goal minutes |
+| `target_hours` | INTEGER | | Cumulative target hours (null = unlimited) |
+| `total_minutes` | INTEGER | NOT NULL DEFAULT 0 | Total accumulated minutes |
+| `deadline_date` | TEXT | | ISO date string for milestone deadline |
+| `target_completed` | INTEGER | NOT NULL DEFAULT 0 | 1 if milestone target reached |
+| `last_check_in_date` | TEXT | | ISO date of last session |
+| `reminders` | TEXT | | JSON-encoded reminder list |
+| `motivation_text` | TEXT | | Note/memo text |
+| `is_active` | INTEGER | NOT NULL DEFAULT 1 | 0 = deactivated |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp |
+
+**Index:** `idx_habits_uid` on `(uid, is_active)`.
+
+#### Table: `local_cats`
+
+Local mirror of `users/{uid}/cats/{catId}` Firestore documents.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | Cat ID |
+| `uid` | TEXT | NOT NULL | User UID |
+| `name` | TEXT | NOT NULL | Cat name |
+| `appearance` | TEXT | NOT NULL | JSON-encoded CatAppearance |
+| `personality` | TEXT | NOT NULL | Personality ID |
+| `total_minutes` | INTEGER | NOT NULL DEFAULT 0 | Accumulated focus minutes |
+| `equipped_accessory` | TEXT | | Currently equipped accessory ID |
+| `bound_habit_id` | TEXT | NOT NULL | Bound habit ID |
+| `state` | TEXT | NOT NULL | "active", "dormant", "graduated" |
+| `last_session_at` | INTEGER | | Unix timestamp of last session |
+| `highest_stage` | TEXT | | Highest growth stage reached |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp |
+
+**Index:** `idx_cats_uid` on `(uid, state)`.
+
+#### Table: `local_sessions`
+
+Local mirror of focus session documents.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | Session ID |
+| `uid` | TEXT | NOT NULL | User UID |
+| `habit_id` | TEXT | NOT NULL | Parent habit ID |
+| `cat_id` | TEXT | NOT NULL | Cat that earned XP |
+| `started_at` | INTEGER | NOT NULL | Unix timestamp |
+| `ended_at` | INTEGER | NOT NULL | Unix timestamp |
+| `duration_minutes` | INTEGER | NOT NULL | Actual focused minutes |
+| `target_duration_minutes` | INTEGER | NOT NULL | Planned duration |
+| `paused_seconds` | INTEGER | NOT NULL | Cumulative paused time |
+| `status` | TEXT | NOT NULL | "completed", "abandoned", "interrupted" |
+| `completion_ratio` | REAL | NOT NULL | Actual / target ratio |
+| `xp_earned` | INTEGER | NOT NULL | XP awarded |
+| `coins_earned` | INTEGER | NOT NULL | Coins awarded |
+| `mode` | TEXT | NOT NULL | "countdown" or "stopwatch" |
+| `created_at` | INTEGER | NOT NULL | Unix timestamp |
+
+**Index:** `idx_sessions_uid_date` on `(uid, ended_at)`.
+**Index:** `idx_sessions_habit` on `(habit_id, ended_at)`.
+
+#### Table: `local_monthly_checkins`
+
+Local mirror of monthly check-in documents.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | "uid_YYYY-MM" composite key |
+| `uid` | TEXT | NOT NULL | User UID |
+| `month` | TEXT | NOT NULL | "YYYY-MM" format |
+| `checked_days` | TEXT | NOT NULL | JSON-encoded list of day numbers |
+| `total_coins` | INTEGER | NOT NULL DEFAULT 0 | Monthly cumulative coins |
+| `milestones_claimed` | TEXT | NOT NULL | JSON-encoded list of claimed thresholds |
+
+**Index:** `idx_checkins_uid` on `(uid, month)`.
+
+#### Table: `materialized_state`
+
+Key-value store for computed aggregates that are expensive to re-derive.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `key` | TEXT | PRIMARY KEY | State key (e.g. "coin_balance", "last_check_in_date") |
+| `value` | TEXT | NOT NULL | Serialized value |
+| `updated_at` | INTEGER | NOT NULL | Unix timestamp of last update |
+
+#### Table: `local_achievements`
+
+Local record of unlocked achievements.
+
+| Column | Type | Constraint | Description |
+|--------|------|-----------|-------------|
+| `id` | TEXT | PRIMARY KEY | Achievement ID |
+| `uid` | TEXT | NOT NULL | User UID |
+| `unlocked_at` | INTEGER | NOT NULL | Unix timestamp of unlock |
+| `claimed` | INTEGER | NOT NULL DEFAULT 0 | 1 if reward has been claimed |
+| `claimed_at` | INTEGER | | Unix timestamp of claim |
+
+**Index:** `idx_achievements_uid` on `(uid)`.
+
+**Dart Model:** `lib/models/unlocked_achievement.dart` -> `class UnlockedAchievement`
+
+---
+
+### Sync Strategy
+
+The local-first architecture uses a **ledger-based sync** pattern:
+
+1. All mutations write to `action_ledger` + update local tables in a single SQLite transaction
+2. `SyncEngine` processes unsynced actions (`synced = 0`) ordered by `created_at`
+3. Each action is translated to the corresponding Firestore batch write
+4. On success, `synced = 1` and `synced_at` is set
+5. On failure, `sync_attempts` is incremented with exponential backoff
+6. Actions older than 90 days with `synced = 1` are automatically cleaned up
+
+This ensures the app works fully offline, with automatic Firestore synchronization when connectivity is available.

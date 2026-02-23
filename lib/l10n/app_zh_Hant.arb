@@ -759,5 +759,50 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "deleteAccountProgress": "正在刪除帳號...",
-  "deleteAccountSuccess": "帳號已刪除"
+  "deleteAccountSuccess": "帳號已刪除",
+
+  "drawerGuest": "訪客",
+  "drawerLinkAccountHint": "關聯帳號以解鎖 AI 功能並保護資料",
+  "drawerLinkAccount": "關聯帳號",
+  "drawerMilestones": "里程碑",
+  "drawerMilestoneFocus": "累計專注：{hours}h {minutes}m",
+  "@drawerMilestoneFocus": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "drawerMilestoneCats": "貓咪家族：{count} 隻",
+  "@drawerMilestoneCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMilestoneQuests": "進行中任務：{count} 個",
+  "@drawerMilestoneQuests": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMySection": "我的",
+  "drawerSessionHistory": "專注歷史",
+  "drawerCheckInCalendar": "簽到日曆",
+  "drawerAccountSection": "帳號",
+  "drawerGuestLogout": "退出（訪客資料將遺失）",
+  "drawerGuestLogoutTitle": "退出訪客模式？",
+  "drawerGuestLogoutMessage": "退出後，當前資料將無法恢復。建議先關聯帳號以保留進度。",
+  "drawerGuestLogoutConfirm": "仍然退出",
+
+  "guestUpgradeTitle": "保護你的資料",
+  "guestUpgradeMessage": "關聯帳號可備份進度、解鎖 AI 日記和聊天功能，並在多裝置間同步。",
+  "guestUpgradeLinkButton": "關聯帳號",
+  "guestUpgradeLater": "以後再說",
+
+  "loginLinkTagline": "關聯帳號以保護你的資料",
+
+  "aiTeaserTitle": "貓貓日記",
+  "aiTeaserPreview": "今天和主人一起學習了…{catName}覺得自己又變聰明了喵~",
+  "@aiTeaserPreview": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "aiTeaserCta": "關聯帳號，看看{catName}想說什麼",
+  "@aiTeaserCta": {
+    "placeholders": { "catName": { "type": "String" } }
+  }
 }

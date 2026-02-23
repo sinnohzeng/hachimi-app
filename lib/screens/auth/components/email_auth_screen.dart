@@ -8,7 +8,14 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 class EmailAuthScreen extends ConsumerStatefulWidget {
   final bool startAsLogin;
 
-  const EmailAuthScreen({super.key, this.startAsLogin = false});
+  /// linkMode: 匿名用户关联 Email 账号（而非全新注册）。
+  final bool linkMode;
+
+  const EmailAuthScreen({
+    super.key,
+    this.startAsLogin = false,
+    this.linkMode = false,
+  });
 
   @override
   ConsumerState<EmailAuthScreen> createState() => _EmailAuthScreenState();
@@ -27,7 +34,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   @override
   void initState() {
     super.initState();
-    _isLogin = widget.startAsLogin;
+    // linkMode 总是"注册"形式（关联新凭证）
+    _isLogin = widget.linkMode ? false : widget.startAsLogin;
   }
 
   @override
@@ -47,7 +55,18 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       final authService = ref.read(authServiceProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
 
-      if (_isLogin) {
+      if (widget.linkMode) {
+        // 匿名用户关联 Email 账号
+        await authService.linkWithEmail(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+        await analyticsService.logSignUp(method: 'email_link');
+        final uid = authService.currentUser!.uid;
+        await ref
+            .read(firestoreServiceProvider)
+            .createUserProfile(uid: uid, email: _emailController.text.trim());
+      } else if (_isLogin) {
         await authService.signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
@@ -137,7 +156,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
                         // Toggle hint
                         Text(
-                          _isLogin
+                          widget.linkMode
+                              ? context.l10n.loginLinkTagline
+                              : _isLogin
                               ? context.l10n.loginWelcomeBack
                               : context.l10n.loginCreateAccount,
                           style: textTheme.bodyLarge?.copyWith(
@@ -278,45 +299,46 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // Toggle login/register
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              _isLogin
-                                  ? context.l10n.loginNoAccount
-                                  : context.l10n.loginAlreadyHaveAccount,
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onPrimary.withValues(
-                                  alpha: 0.7,
+                        // Toggle login/register (hidden in linkMode)
+                        if (!widget.linkMode)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _isLogin
+                                    ? context.l10n.loginNoAccount
+                                    : context.l10n.loginAlreadyHaveAccount,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onPrimary.withValues(
+                                    alpha: 0.7,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Semantics(
-                              button: true,
-                              label: _isLogin
-                                  ? context.l10n.loginRegister
-                                  : context.l10n.loginLogIn,
-                              child: GestureDetector(
-                                onTap: () =>
-                                    setState(() => _isLogin = !_isLogin),
-                                child: ExcludeSemantics(
-                                  child: Text(
-                                    _isLogin
-                                        ? context.l10n.loginRegister
-                                        : context.l10n.loginLogIn,
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onPrimary,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: colorScheme.onPrimary,
+                              Semantics(
+                                button: true,
+                                label: _isLogin
+                                    ? context.l10n.loginRegister
+                                    : context.l10n.loginLogIn,
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _isLogin = !_isLogin),
+                                  child: ExcludeSemantics(
+                                    child: Text(
+                                      _isLogin
+                                          ? context.l10n.loginRegister
+                                          : context.l10n.loginLogIn,
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onPrimary,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: colorScheme.onPrimary,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                         const SizedBox(height: AppSpacing.xl),
                       ],
                     ),

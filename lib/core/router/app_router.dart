@@ -47,7 +47,10 @@ class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        final linkMode = settings.arguments as bool? ?? false;
+        return MaterialPageRoute(
+          builder: (_) => LoginScreen(linkMode: linkMode),
+        );
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case addHabit:

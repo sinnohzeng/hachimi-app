@@ -1041,5 +1041,50 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "deleteAccountProgress": "Deleting account...",
-  "deleteAccountSuccess": "Account deleted"
+  "deleteAccountSuccess": "Account deleted",
+
+  "drawerGuest": "Guest",
+  "drawerLinkAccountHint": "Link an account to unlock AI features and protect your data",
+  "drawerLinkAccount": "Link account",
+  "drawerMilestones": "Milestones",
+  "drawerMilestoneFocus": "Total focus: {hours}h {minutes}m",
+  "@drawerMilestoneFocus": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "drawerMilestoneCats": "Cat family: {count}",
+  "@drawerMilestoneCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMilestoneQuests": "Active quests: {count}",
+  "@drawerMilestoneQuests": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMySection": "My",
+  "drawerSessionHistory": "Focus history",
+  "drawerCheckInCalendar": "Check-in calendar",
+  "drawerAccountSection": "Account",
+  "drawerGuestLogout": "Log out (guest data will be lost)",
+  "drawerGuestLogoutTitle": "Log out as guest?",
+  "drawerGuestLogoutMessage": "Your current data cannot be recovered after logging out. Link an account first to keep your progress.",
+  "drawerGuestLogoutConfirm": "Log out anyway",
+
+  "guestUpgradeTitle": "Protect your data",
+  "guestUpgradeMessage": "Link an account to back up your progress, unlock AI diary and chat features, and sync across devices.",
+  "guestUpgradeLinkButton": "Link account",
+  "guestUpgradeLater": "Maybe later",
+
+  "loginLinkTagline": "Link an account to protect your data",
+
+  "aiTeaserTitle": "Cat diary",
+  "aiTeaserPreview": "Today I studied with my human again... {catName} feels smarter every day~",
+  "@aiTeaserPreview": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "aiTeaserCta": "Link an account to see what {catName} wants to say",
+  "@aiTeaserCta": {
+    "placeholders": { "catName": { "type": "String" } }
+  }
 }

@@ -2202,4 +2202,85 @@ class SJa extends S {
 
   @override
   String get deleteAccountSuccess => 'アカウントが削除されました';
+
+  @override
+  String get drawerGuest => 'ゲスト';
+
+  @override
+  String get drawerLinkAccountHint => 'アカウントを連携してAI機能を解除し、データを保護しましょう';
+
+  @override
+  String get drawerLinkAccount => 'アカウント連携';
+
+  @override
+  String get drawerMilestones => 'マイルストーン';
+
+  @override
+  String drawerMilestoneFocus(int hours, int minutes) {
+    return '合計集中：${hours}h ${minutes}m';
+  }
+
+  @override
+  String drawerMilestoneCats(int count) {
+    return 'ネコ家族：$count匹';
+  }
+
+  @override
+  String drawerMilestoneQuests(int count) {
+    return '進行中クエスト：$count個';
+  }
+
+  @override
+  String get drawerMySection => 'マイ';
+
+  @override
+  String get drawerSessionHistory => '集中履歴';
+
+  @override
+  String get drawerCheckInCalendar => 'チェックインカレンダー';
+
+  @override
+  String get drawerAccountSection => 'アカウント';
+
+  @override
+  String get drawerGuestLogout => 'ログアウト（ゲストデータは失われます）';
+
+  @override
+  String get drawerGuestLogoutTitle => 'ゲストとしてログアウトしますか？';
+
+  @override
+  String get drawerGuestLogoutMessage =>
+      'ログアウト後、現在のデータは復元できません。先にアカウントを連携して進捗を保存しましょう。';
+
+  @override
+  String get drawerGuestLogoutConfirm => 'ログアウトする';
+
+  @override
+  String get guestUpgradeTitle => 'データを保護する';
+
+  @override
+  String get guestUpgradeMessage =>
+      'アカウント連携で進捗をバックアップし、AI日記やチャット機能を解除し、デバイス間で同期できます。';
+
+  @override
+  String get guestUpgradeLinkButton => 'アカウント連携';
+
+  @override
+  String get guestUpgradeLater => 'あとで';
+
+  @override
+  String get loginLinkTagline => 'アカウントを連携してデータを保護する';
+
+  @override
+  String get aiTeaserTitle => 'ネコ日記';
+
+  @override
+  String aiTeaserPreview(String catName) {
+    return '今日もご主人と一緒に勉強した…$catNameはまた賢くなった気がするにゃ〜';
+  }
+
+  @override
+  String aiTeaserCta(String catName) {
+    return 'アカウントを連携して、$catNameが何を言いたいか見てみよう';
+  }
 }

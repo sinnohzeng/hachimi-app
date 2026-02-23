@@ -8,18 +8,51 @@ final pixelCatGenerationServiceProvider = Provider<PixelCatGenerationService>(
   (ref) => PixelCatGenerationService(),
 );
 
-/// Active cats — streams active cats from Firestore via CatFirestoreService.
-final catsProvider = StreamProvider<List<Cat>>((ref) {
+/// Active cats — SSOT from local SQLite.
+/// 监听 LedgerService 变更事件自动刷新。
+final catsProvider = StreamProvider<List<Cat>>((ref) async* {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-  return ref.watch(catFirestoreServiceProvider).watchCats(uid);
+  if (uid == null) {
+    yield [];
+    return;
+  }
+
+  final catRepo = ref.watch(localCatRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  yield await catRepo.getActiveCats(uid);
+
+  await for (final change in ledger.changes) {
+    if (change.type.startsWith('habit_') ||
+        change.type == 'focus_complete' ||
+        change.type == 'equip' ||
+        change.type == 'unequip') {
+      yield await catRepo.getActiveCats(uid);
+    }
+  }
 });
 
 /// All cats — includes graduated and dormant cats for Cat Album.
-final allCatsProvider = StreamProvider<List<Cat>>((ref) {
+final allCatsProvider = StreamProvider<List<Cat>>((ref) async* {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-  return ref.watch(catFirestoreServiceProvider).watchAllCats(uid);
+  if (uid == null) {
+    yield [];
+    return;
+  }
+
+  final catRepo = ref.watch(localCatRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  yield await catRepo.getAllCats(uid);
+
+  await for (final change in ledger.changes) {
+    if (change.type.startsWith('habit_') ||
+        change.type == 'focus_complete' ||
+        change.type == 'equip' ||
+        change.type == 'unequip') {
+      yield await catRepo.getAllCats(uid);
+    }
+  }
 });
 
 /// Cat by habit ID — family provider for quick lookups.

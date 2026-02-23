@@ -27,6 +27,26 @@ Firebase Auth stream ───────────────────�
                    (Provider<Map<String, int>>)
 
 
+Local-first infrastructure (SQLite-backed, event-sourced):
+
+  LedgerService ──► ledgerServiceProvider (Provider<LedgerService>)
+                          │
+                          ├──► localHabitRepositoryProvider (Provider<LocalHabitRepository>)
+                          ├──► localCatRepositoryProvider (Provider<LocalCatRepository>)
+                          └──► localSessionRepositoryProvider (Provider<LocalSessionRepository>)
+
+  SyncEngine ──► syncEngineProvider (Provider<SyncEngine>)
+
+  Achievement evaluator (event-driven, listens to ledger changes):
+
+         newlyUnlockedProvider (StateProvider<List<String>>)
+
+
+Guest mode:
+
+         isAnonymousProvider (Provider<bool>)
+
+
 Pixel cat rendering (singleton + per-cat cache):
 
          pixelCatRendererProvider (Provider<PixelCatRenderer>)
@@ -87,7 +107,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<List<Habit>>`
 - **File**: `lib/providers/habits_provider.dart`
-- **Source**: `FirestoreService.watchHabits(uid)` — real-time Firestore stream
+- **Source**: `LocalHabitRepository` — `async*` generator listening to `LedgerService.changes` broadcast stream. Reads from `local_habits` SQLite table.
 - **Consumers**: `HomeScreen` (habit list), `StatsScreen`, `_FirstHabitGate`, `statsProvider`
 - **SSOT for**: The user's full habit list, always current with Firestore
 
@@ -121,7 +141,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<List<Cat>>`
 - **File**: `lib/providers/cat_provider.dart`
-- **Source**: `CatFirestoreService.watchCats(uid)` — streams only `state == "active"` cats
+- **Source**: `LocalCatRepository` — `async*` generator listening to `LedgerService.changes`. Reads from `local_cats` SQLite table, filtered to `state == "active"`.
 - **Consumers**: `CatRoomScreen` (CatHouse grid), `HomeScreen` (cat avatars in habit list), `ProfileScreen`
 - **SSOT for**: The user's active cats, always current
 
@@ -198,7 +218,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<int>`
 - **File**: `lib/providers/coin_provider.dart`
-- **Source**: `CoinService.watchBalance(uid)` — real-time stream of the user's `coins` field
+- **Source**: Derived from `materialized_state` SQLite table via `LedgerService`. Key: `coin_balance`.
 - **Consumers**: `CatDetailScreen` (accessory shop balance), `CheckInBanner`, `ProfileScreen`
 - **SSOT for**: The user's current coin balance, always current with Firestore
 
@@ -508,6 +528,66 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 - **Source**: Firestore `users/{uid}` document — reads `avatarId` field via `FirestoreService.watchAvatarId()`
 - **Consumers**: `ProfileScreen` (avatar display), `AvatarPickerSheet` (current selection)
 - **SSOT for**: The current user's selected profile avatar ID (null = initials fallback)
+
+---
+
+### Local-First Infrastructure Providers
+
+#### `ledgerServiceProvider`
+
+- **Type**: `Provider<LedgerService>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Instantiates `LedgerService` with `LocalDatabaseService` instance
+- **Consumers**: All local repositories, `SyncEngine`, `AchievementEvaluator`
+- **SSOT for**: The action ledger write service and change broadcast stream
+
+#### `localHabitRepositoryProvider`
+
+- **Type**: `Provider<LocalHabitRepository>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Instantiates `LocalHabitRepository` with `LedgerService`
+- **Consumers**: `habitsProvider`
+- **SSOT for**: Local habit CRUD operations + ledger writes
+
+#### `localCatRepositoryProvider`
+
+- **Type**: `Provider<LocalCatRepository>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Instantiates `LocalCatRepository` with `LedgerService`
+- **Consumers**: `catsProvider`, `allCatsProvider`
+- **SSOT for**: Local cat CRUD operations + ledger writes
+
+#### `localSessionRepositoryProvider`
+
+- **Type**: `Provider<LocalSessionRepository>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Instantiates `LocalSessionRepository` with `LedgerService`
+- **Consumers**: `todaySessionsProvider`, session stats providers
+- **SSOT for**: Local session CRUD operations + ledger writes
+
+#### `syncEngineProvider`
+
+- **Type**: `Provider<SyncEngine>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Instantiates `SyncEngine` with `LedgerService`
+- **Consumers**: `_FirstHabitGateState` in `app.dart` (lifecycle management)
+- **SSOT for**: Background sync of unsynced ledger actions to Firestore
+
+#### `isAnonymousProvider`
+
+- **Type**: `Provider<bool>`
+- **File**: `lib/providers/auth_provider.dart`
+- **Source**: `AuthService.isAnonymous` — checks if current Firebase user is anonymous
+- **Consumers**: `AppDrawer`, `CatDetailScreen` (AI teaser gate), `LoginScreen` (link mode)
+- **SSOT for**: Whether the current user is a guest (anonymous) account
+
+#### `newlyUnlockedProvider`
+
+- **Type**: `StateProvider<List<String>>`
+- **File**: `lib/providers/achievement_provider.dart`
+- **Source**: Populated by `AchievementEvaluator.onUnlocked` callback, consumed by `AchievementCelebrationLayer`
+- **Consumers**: `AchievementCelebrationLayer` (shows full-screen unlock celebration)
+- **SSOT for**: Queue of achievement IDs that were just unlocked and need celebration display
 
 ---
 

@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.0] - 2026-02-24
+
+### Added
+- **Local-first architecture**: Action Ledger (`action_ledger` table) records all data-mutating operations as immutable events; `materialized_state` caches derived aggregates; 7 new SQLite tables mirror Firestore schema as runtime SSOT
+- **Guest mode**: Auto anonymous sign-in on first launch; guest upgrade prompt in Drawer; account linking via `linkWithGoogle()` / `linkWithEmail()`
+- **Sync Engine**: Background Firestore synchronization with debounced triggers (2s), exponential backoff retry, and 90-day ledger cleanup
+- **Achievement Evaluator**: Event-driven achievement evaluation that listens to ledger changes, replacing manual trigger calls across screens
+- **App Drawer**: M3 NavigationDrawer with guest upgrade banner, milestone card, session history, settings, and account management
+- **AI teaser cards**: ShaderMask blur preview for guest users on CatDetailScreen, encouraging account upgrade
+- Guest ID generator (`guest_id_generator.dart`) for secure 10-char short IDs
+- `LedgerAction` and `ActionType` models for action ledger events
+- `UnlockedAchievement` model for local achievement records
+- `LedgerService` for ledger writes, broadcast stream, and materialized state CRUD
+- `LocalHabitRepository`, `LocalCatRepository`, `LocalSessionRepository` for SQLite-backed domain CRUD
+- `isAnonymousProvider` for guest mode detection across UI
+- `newlyUnlockedProvider` for achievement celebration queue
+- `syncEngineProvider` for background sync lifecycle management
+- Login screen and email auth screen support `linkMode` for guest account linking
+- 22 new L10N strings across 5 languages (EN, zh, zh-Hant, ja, ko) for Drawer, guest upgrade, and AI teaser
+
+### Changed
+- Navigation restructured: 4 Tab → 3 Tab (Today, CatRoom, Achievement) + Drawer; Profile moved to Drawer
+- AuthGate auto-signs-in anonymously instead of showing LoginScreen for unauthenticated users
+- `habitsProvider` now reads from `local_habits` SQLite table via `LedgerService.changes` stream
+- `catsProvider` now reads from `local_cats` SQLite table via `LedgerService.changes` stream
+- `coinBalanceProvider` now reads from `materialized_state` SQLite table
+- `CoinService` and `InventoryService` now delegate to `LedgerService` for atomic SQLite transactions
+- `LocalDatabaseService` upgraded from DB v1 to v2 with 7 new tables
+- Models (`Habit`, `Cat`, `FocusSession`, `MonthlyCheckIn`) now include `toSqlite()` / `fromSqlite()` methods
+- Architecture documentation updated across all 8 docs (EN + zh-CN) to reflect local-first architecture
+
+### Removed
+- SummaryItem triple from TodayTab (coin/cat/quest counts)
+- Direct Firestore dependency for runtime data reads (now via SQLite local tables)
+
 ## [2.18.1] - 2026-02-23
 
 ### Removed

@@ -66,6 +66,49 @@ class FocusSession {
     );
   }
 
+  /// SQLite 序列化 — 对应 local_sessions 表。
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'id': id,
+      'uid': uid,
+      'habit_id': habitId,
+      'cat_id': catId,
+      'started_at': startedAt.millisecondsSinceEpoch,
+      'ended_at': endedAt.millisecondsSinceEpoch,
+      'duration_minutes': durationMinutes,
+      'target_duration_minutes': targetDurationMinutes,
+      'paused_seconds': pausedSeconds,
+      'status': status,
+      'completion_ratio': completionRatio,
+      'xp_earned': xpEarned,
+      'coins_earned': coinsEarned,
+      'mode': mode,
+      'checksum': checksum,
+      'client_version': clientVersion,
+    };
+  }
+
+  /// 从 SQLite 行反序列化。
+  factory FocusSession.fromSqlite(Map<String, dynamic> map) {
+    return FocusSession(
+      id: map['id'] as String,
+      habitId: map['habit_id'] as String? ?? '',
+      catId: map['cat_id'] as String? ?? '',
+      startedAt: DateTime.fromMillisecondsSinceEpoch(map['started_at'] as int),
+      endedAt: DateTime.fromMillisecondsSinceEpoch(map['ended_at'] as int),
+      durationMinutes: map['duration_minutes'] as int? ?? 0,
+      targetDurationMinutes: map['target_duration_minutes'] as int? ?? 0,
+      pausedSeconds: map['paused_seconds'] as int? ?? 0,
+      status: map['status'] as String? ?? 'completed',
+      completionRatio: (map['completion_ratio'] as num?)?.toDouble() ?? 1.0,
+      xpEarned: map['xp_earned'] as int? ?? 0,
+      coinsEarned: map['coins_earned'] as int? ?? 0,
+      mode: map['mode'] as String? ?? 'countdown',
+      checksum: map['checksum'] as String?,
+      clientVersion: map['client_version'] as String? ?? '',
+    );
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'habitId': habitId,

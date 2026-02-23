@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// 月度签到记录 — 对应 Firestore 文档 users/{uid}/monthlyCheckIns/{YYYY-MM}。
@@ -41,6 +43,32 @@ class MonthlyCheckIn {
       checkedDays: const [],
       totalCoins: 0,
       milestonesClaimed: const [],
+    );
+  }
+
+  /// SQLite 序列化 — 对应 local_monthly_checkins 表。
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'uid': uid,
+      'month': month,
+      'checked_days': jsonEncode(checkedDays),
+      'total_coins': totalCoins,
+      'milestones_claimed': jsonEncode(milestonesClaimed),
+    };
+  }
+
+  /// 从 SQLite 行反序列化。
+  factory MonthlyCheckIn.fromSqlite(Map<String, dynamic> map) {
+    return MonthlyCheckIn(
+      month: map['month'] as String,
+      checkedDays: List<int>.from(
+        jsonDecode(map['checked_days'] as String? ?? '[]') as List<dynamic>,
+      ),
+      totalCoins: map['total_coins'] as int? ?? 0,
+      milestonesClaimed: List<int>.from(
+        jsonDecode(map['milestones_claimed'] as String? ?? '[]')
+            as List<dynamic>,
+      ),
     );
   }
 

@@ -55,7 +55,8 @@ hachimi-app/
 │   │   │   ├── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
 │   │   │   ├── date_utils.dart             # AppDateUtils — 统一日期字符串格式化
 │   │   │   ├── streak_utils.dart           # StreakUtils — 连续打卡计算逻辑
-│   │   │   └── background_color_utils.dart # 从猫咪阶段/毛色提取 mesh 渐变色
+│   │   │   ├── background_color_utils.dart # 从猫咪阶段/毛色提取 mesh 渐变色
+│   │   │   └── guest_id_generator.dart    # 10 字符安全随机访客 ID 生成器
 │   │   ├── router/
 │   │   │   └── app_router.dart             # 命名路由注册表 + 路由常量
 │   │   └── theme/
@@ -76,7 +77,9 @@ hachimi-app/
 │   │   ├── focus_session.dart              # FocusSession（专注会话）—— 会话历史记录
 │   │   ├── check_in.dart                   # CheckInEntry（打卡条目）—— 向后兼容
 │   │   ├── diary_entry.dart                # DiaryEntry — 本地 SQLite 模型（AI 日记）
-│   │   └── chat_message.dart               # ChatMessage — 本地 SQLite 模型（AI 聊天）
+│   │   ├── chat_message.dart               # ChatMessage — 本地 SQLite 模型（AI 聊天）
+│   │   ├── ledger_action.dart             # LedgerAction + ActionType —— 行为台账事件模型
+│   │   └── unlocked_achievement.dart      # UnlockedAchievement —— 本地成就解锁记录
 │   │
 │   ├── services/                           # Firebase SDK 封装层（无 UI，无 BuildContext）
 │   │   ├── analytics_service.dart          # Firebase Analytics（分析）封装 —— 记录事件
@@ -98,11 +101,17 @@ hachimi-app/
 │   │   │   └── sse_parser.dart              # SSE 流解析工具（可插拔 token 提取器）
 │   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
 │   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
-│   │   └── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
+│   │   ├── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
+│   │   ├── ledger_service.dart            # 行为台账写入 + 广播流 + 物化状态
+│   │   ├── local_habit_repository.dart    # 本地习惯 CRUD + 台账写入
+│   │   ├── local_cat_repository.dart      # 本地猫咪 CRUD + 台账写入
+│   │   ├── local_session_repository.dart  # 本地会话 CRUD + 台账写入
+│   │   ├── sync_engine.dart               # 后台 Firestore 同步（防抖、指数退避）
+│   │   └── achievement_evaluator.dart     # 事件驱动成就评估（监听台账）
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
 │   │   ├── app_info_provider.dart           # appInfoProvider（运行时从 package_info_plus 读取版本）
-│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider（re-exports service_providers）
+│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider、isAnonymousProvider
 │   │   ├── service_providers.dart          # 非认证 Service 单例（Firestore、Analytics、Coin、XP 等）
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider、catSpriteImageProvider (family)
@@ -121,7 +130,9 @@ hachimi-app/
 │   │
 │   ├── screens/                            # 全页界面（消费 Provider，无业务逻辑）
 │   │   ├── auth/
-│   │   │   └── login_screen.dart           # 登录 + 注册（邮箱/密码 + Google）
+│   │   │   ├── login_screen.dart           # 登录 + 注册 + 访客关联模式
+│   │   │   └── components/
+│   │   │       └── email_auth_screen.dart  # 邮箱认证表单（注册/登录/关联模式）
 │   │   ├── cat_detail/
 │   │   │   ├── cat_detail_screen.dart      # 猫咪信息、进度条、热力图、配饰
 │   │   │   ├── cat_diary_screen.dart     # AI 生成日记列表页
@@ -141,7 +152,7 @@ hachimi-app/
 │   │   ├── habits/
 │   │   │   └── adoption_flow_screen.dart   # 3 步习惯创建 + 3 猫选择领养
 │   │   ├── home/
-│   │   │   └── home_screen.dart            # 4 标签 NavigationBar 外壳 + 今日标签
+│   │   │   └── home_screen.dart            # 3 标签 NavigationBar + Drawer 外壳
 │   │   ├── onboarding/
 │   │   │   └── onboarding_screen.dart      # 3 页引导走马灯
 │   │   ├── profile/
@@ -183,7 +194,10 @@ hachimi-app/
 │       ├── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章
 │       ├── staggered_list_item.dart       # 列表/网格项交错入场动画封装（淡入+滑入）
 │       ├── animated_mesh_background.dart  # 可复用动态 mesh 渐变背景（含开关支持）
-│       └── particle_overlay.dart          # 浮动粒子覆盖层（萤火虫/浮尘预设）
+│       ├── particle_overlay.dart          # 浮动粒子覆盖层（萤火虫/浮尘预设）
+│       ├── app_drawer.dart               # M3 NavigationDrawer（访客升级、里程碑、设置）
+│       ├── guest_upgrade_prompt.dart      # 访客账户升级底部弹窗提示
+│       └── content_width_constraint.dart  # 平板响应式最大宽度约束封装
 │
 ├── assets/
 │   ├── pixel_cat/                          # pixel-cat-maker 精灵图层

@@ -4151,6 +4151,144 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Account deleted'**
   String get deleteAccountSuccess;
+
+  /// No description provided for @drawerGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get drawerGuest;
+
+  /// No description provided for @drawerLinkAccountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Link an account to unlock AI features and protect your data'**
+  String get drawerLinkAccountHint;
+
+  /// No description provided for @drawerLinkAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Link account'**
+  String get drawerLinkAccount;
+
+  /// No description provided for @drawerMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get drawerMilestones;
+
+  /// No description provided for @drawerMilestoneFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Total focus: {hours}h {minutes}m'**
+  String drawerMilestoneFocus(int hours, int minutes);
+
+  /// No description provided for @drawerMilestoneCats.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat family: {count}'**
+  String drawerMilestoneCats(int count);
+
+  /// No description provided for @drawerMilestoneQuests.
+  ///
+  /// In en, this message translates to:
+  /// **'Active quests: {count}'**
+  String drawerMilestoneQuests(int count);
+
+  /// No description provided for @drawerMySection.
+  ///
+  /// In en, this message translates to:
+  /// **'My'**
+  String get drawerMySection;
+
+  /// No description provided for @drawerSessionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus history'**
+  String get drawerSessionHistory;
+
+  /// No description provided for @drawerCheckInCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in calendar'**
+  String get drawerCheckInCalendar;
+
+  /// No description provided for @drawerAccountSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get drawerAccountSection;
+
+  /// No description provided for @drawerGuestLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out (guest data will be lost)'**
+  String get drawerGuestLogout;
+
+  /// No description provided for @drawerGuestLogoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out as guest?'**
+  String get drawerGuestLogoutTitle;
+
+  /// No description provided for @drawerGuestLogoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current data cannot be recovered after logging out. Link an account first to keep your progress.'**
+  String get drawerGuestLogoutMessage;
+
+  /// No description provided for @drawerGuestLogoutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out anyway'**
+  String get drawerGuestLogoutConfirm;
+
+  /// No description provided for @guestUpgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect your data'**
+  String get guestUpgradeTitle;
+
+  /// No description provided for @guestUpgradeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Link an account to back up your progress, unlock AI diary and chat features, and sync across devices.'**
+  String get guestUpgradeMessage;
+
+  /// No description provided for @guestUpgradeLinkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Link account'**
+  String get guestUpgradeLinkButton;
+
+  /// No description provided for @guestUpgradeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get guestUpgradeLater;
+
+  /// No description provided for @loginLinkTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Link an account to protect your data'**
+  String get loginLinkTagline;
+
+  /// No description provided for @aiTeaserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat diary'**
+  String get aiTeaserTitle;
+
+  /// No description provided for @aiTeaserPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Today I studied with my human again... {catName} feels smarter every day~'**
+  String aiTeaserPreview(String catName);
+
+  /// No description provided for @aiTeaserCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Link an account to see what {catName} wants to say'**
+  String aiTeaserCta(String catName);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -1,61 +1,89 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
 
-/// InventoryService — 道具箱装备/卸下操作。
-/// 所有写操作使用 transaction 保证原子性。
+/// InventoryService — 道具箱装备/卸下操作，委托 LedgerService。
 class InventoryService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final LedgerService _ledger;
 
-  DocumentReference _userRef(String uid) => _db.collection('users').doc(uid);
-
-  DocumentReference _catRef(String uid, String catId) =>
-      _db.collection('users').doc(uid).collection('cats').doc(catId);
-
-  /// 实时监听道具箱。
-  Stream<List<String>> watchInventory(String uid) {
-    return _userRef(uid).snapshots().map((doc) {
-      final data = doc.data() as Map<String, dynamic>?;
-      final list = data?['inventory'] as List<dynamic>?;
-      return list?.cast<String>() ?? const [];
-    });
-  }
+  InventoryService({required LedgerService ledger}) : _ledger = ledger;
 
   /// 装备配饰到猫。
-  /// 从 inventory 移除 accessoryId → 设置到 cat.equippedAccessory。
+  /// 从 inventory 移除 accessoryId → 设置到 cat equipped_accessory。
   /// 若猫已有装备，旧配饰自动返回 inventory。
   Future<void> equipAccessory({
     required String uid,
     required String catId,
     required String accessoryId,
   }) async {
-    final userRef = _userRef(uid);
-    final catRef = _catRef(uid, catId);
+    final db = await _ledger.database;
+    final now = DateTime.now();
 
     try {
-      await _db.runTransaction((tx) async {
-        final catDoc = await tx.get(catRef);
-        if (!catDoc.exists) {
-          throw StateError('Cat document $catId not found for user $uid');
+      await db.transaction((txn) async {
+        // 读取猫当前装备
+        final catRows = await txn.query(
+          'local_cats',
+          columns: ['equipped_accessory'],
+          where: 'id = ?',
+          whereArgs: [catId],
+          limit: 1,
+        );
+        if (catRows.isEmpty) {
+          throw StateError('Cat $catId not found');
         }
 
-        final catData = catDoc.data() as Map<String, dynamic>? ?? {};
-        final oldEquipped = catData['equippedAccessory'] as String?;
+        final oldEquipped = catRows.first['equipped_accessory'] as String?;
+
+        // 读取 inventory
+        final invRaw = await _ledger.getMaterializedInTxn(
+          txn,
+          uid,
+          'inventory',
+        );
+        final inventory = _decodeInventory(invRaw);
 
         // 从 inventory 移除新配饰
-        tx.update(userRef, {
-          'inventory': FieldValue.arrayRemove([accessoryId]),
-        });
+        inventory.remove(accessoryId);
 
         // 若猫已有装备，旧配饰返回 inventory
         if (oldEquipped != null && oldEquipped.isNotEmpty) {
-          tx.update(userRef, {
-            'inventory': FieldValue.arrayUnion([oldEquipped]),
-          });
+          inventory.add(oldEquipped);
         }
 
+        // 更新 inventory
+        await _ledger.setMaterializedInTxn(
+          txn,
+          uid,
+          'inventory',
+          jsonEncode(inventory),
+        );
+
         // 设置新装备
-        tx.update(catRef, {'equippedAccessory': accessoryId});
+        await txn.update(
+          'local_cats',
+          {'equipped_accessory': accessoryId},
+          where: 'id = ?',
+          whereArgs: [catId],
+        );
+
+        // 写台账
+        await _ledger.appendInTxn(
+          txn,
+          type: ActionType.equip,
+          uid: uid,
+          startedAt: now,
+          payload: {
+            'catId': catId,
+            'accessoryId': accessoryId,
+            'previousId': oldEquipped,
+          },
+        );
       });
+
+      _ledger.notifyChange(LedgerChange(type: 'equip', affectedIds: [catId]));
     } catch (e, stack) {
       ErrorHandler.record(
         e,
@@ -72,29 +100,60 @@ class InventoryService {
     required String uid,
     required String catId,
   }) async {
-    final userRef = _userRef(uid);
-    final catRef = _catRef(uid, catId);
+    final db = await _ledger.database;
+    final now = DateTime.now();
 
     try {
-      await _db.runTransaction((tx) async {
-        final catDoc = await tx.get(catRef);
-        if (!catDoc.exists) {
-          throw StateError('Cat document $catId not found for user $uid');
+      await db.transaction((txn) async {
+        // 读取猫当前装备
+        final catRows = await txn.query(
+          'local_cats',
+          columns: ['equipped_accessory'],
+          where: 'id = ?',
+          whereArgs: [catId],
+          limit: 1,
+        );
+        if (catRows.isEmpty) {
+          throw StateError('Cat $catId not found');
         }
 
-        final catData = catDoc.data() as Map<String, dynamic>? ?? {};
-        final equipped = catData['equippedAccessory'] as String?;
-
+        final equipped = catRows.first['equipped_accessory'] as String?;
         if (equipped == null || equipped.isEmpty) return;
 
         // 返回 inventory
-        tx.update(userRef, {
-          'inventory': FieldValue.arrayUnion([equipped]),
-        });
+        final invRaw = await _ledger.getMaterializedInTxn(
+          txn,
+          uid,
+          'inventory',
+        );
+        final inventory = _decodeInventory(invRaw);
+        inventory.add(equipped);
+        await _ledger.setMaterializedInTxn(
+          txn,
+          uid,
+          'inventory',
+          jsonEncode(inventory),
+        );
 
         // 清除装备
-        tx.update(catRef, {'equippedAccessory': null});
+        await txn.update(
+          'local_cats',
+          {'equipped_accessory': null},
+          where: 'id = ?',
+          whereArgs: [catId],
+        );
+
+        // 写台账
+        await _ledger.appendInTxn(
+          txn,
+          type: ActionType.unequip,
+          uid: uid,
+          startedAt: now,
+          payload: {'catId': catId, 'accessoryId': equipped},
+        );
       });
+
+      _ledger.notifyChange(LedgerChange(type: 'unequip', affectedIds: [catId]));
     } catch (e, stack) {
       ErrorHandler.record(
         e,
@@ -104,5 +163,12 @@ class InventoryService {
       );
       rethrow;
     }
+  }
+
+  List<String> _decodeInventory(String? raw) {
+    if (raw == null) return [];
+    final decoded = jsonDecode(raw);
+    if (decoded is List) return decoded.cast<String>();
+    return [];
   }
 }

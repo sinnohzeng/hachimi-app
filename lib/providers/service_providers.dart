@@ -5,6 +5,12 @@ import 'package:hachimi_app/services/firestore_service.dart';
 import 'package:hachimi_app/services/cat_firestore_service.dart';
 import 'package:hachimi_app/services/coin_service.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
+import 'package:hachimi_app/services/local_cat_repository.dart';
+import 'package:hachimi_app/services/local_database_service.dart';
+import 'package:hachimi_app/services/local_habit_repository.dart';
+import 'package:hachimi_app/services/local_session_repository.dart';
+import 'package:hachimi_app/services/sync_engine.dart';
 import 'package:hachimi_app/services/migration_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/services/account_deletion_service.dart';
@@ -29,10 +35,14 @@ final analyticsServiceProvider = Provider<AnalyticsService>(
 final catFirestoreServiceProvider = Provider<CatFirestoreService>(
   (ref) => CatFirestoreService(),
 );
-final coinServiceProvider = Provider<CoinService>((ref) => CoinService());
-final inventoryServiceProvider = Provider<InventoryService>(
-  (ref) => InventoryService(),
-);
+final coinServiceProvider = Provider<CoinService>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return CoinService(ledger: ledger);
+});
+final inventoryServiceProvider = Provider<InventoryService>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return InventoryService(ledger: ledger);
+});
 final migrationServiceProvider = Provider<MigrationService>(
   (ref) => MigrationService(),
 );
@@ -46,3 +56,29 @@ final achievementServiceProvider = Provider<AchievementService>(
 final accountDeletionServiceProvider = Provider<AccountDeletionService>(
   (ref) => AccountDeletionService(),
 );
+
+// ─── 本地优先架构 Providers ───
+
+final localDatabaseServiceProvider = Provider<LocalDatabaseService>(
+  (ref) => LocalDatabaseService(),
+);
+final ledgerServiceProvider = Provider<LedgerService>((ref) {
+  final localDb = ref.watch(localDatabaseServiceProvider);
+  return LedgerService(localDb: localDb);
+});
+final localHabitRepositoryProvider = Provider<LocalHabitRepository>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return LocalHabitRepository(ledger: ledger);
+});
+final localCatRepositoryProvider = Provider<LocalCatRepository>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return LocalCatRepository(ledger: ledger);
+});
+final localSessionRepositoryProvider = Provider<LocalSessionRepository>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return LocalSessionRepository(ledger: ledger);
+});
+final syncEngineProvider = Provider<SyncEngine>((ref) {
+  final ledger = ref.watch(ledgerServiceProvider);
+  return SyncEngine(ledger: ledger);
+});

@@ -16,11 +16,12 @@ import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/achievement_celebration_overlay.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
-import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
 // NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/providers/achievement_provider.dart';
+import 'package:hachimi_app/services/achievement_evaluator.dart';
 
 class HachimiApp extends ConsumerWidget {
   final Stopwatch? startupStopwatch;
@@ -93,8 +94,25 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
   }
 
+  bool _isAutoSigningIn = false;
+
   void _onOnboardingComplete() {
     setState(() => _onboardingComplete = true);
+  }
+
+  /// 自动匿名登录 — 无需用户操作即可使用应用核心功能。
+  Future<void> _autoSignInAnonymously() async {
+    if (_isAutoSigningIn) return;
+    _isAutoSigningIn = true;
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signInAnonymously();
+      debugPrint('[APP] auto anonymous sign-in complete');
+    } catch (e) {
+      debugPrint('[APP] auto anonymous sign-in failed: $e');
+    } finally {
+      _isAutoSigningIn = false;
+    }
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
@@ -154,9 +172,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       data: (user) {
         debugPrint('[APP] authState: data, user=${user?.uid}');
         if (user == null) {
-          // 用户已登出，清除缓存 UID
+          // 无用户 — 自动匿名登录（访客模式）
           prefs.remove(_kCachedUidKey);
-          return const LoginScreen();
+          _autoSignInAnonymously();
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         // [A4] 缓存 UID 以供下次冷启动乐观认证
         prefs.setString(_kCachedUidKey, user.uid);
@@ -184,7 +205,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       },
       error: (e, _) {
         debugPrint('[APP] authState: error=$e');
-        return const LoginScreen();
+        // 网络错误时也尝试匿名登录
+        _autoSignInAnonymously();
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }
@@ -309,11 +332,13 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   bool _checkedFirstHabit = false;
   bool _remindersScheduled = false;
   bool _deferredInitTriggered = false;
+  AchievementEvaluator? _evaluator;
 
   @override
   void initState() {
     super.initState();
     _checkInterruptedSession();
+    _startBackgroundEngines();
 
     // [A2] 延迟初始化：首帧后执行非关键任务
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -322,6 +347,31 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
         DeferredInit.run();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _evaluator?.stop();
+    ref.read(syncEngineProvider).stop();
+    super.dispose();
+  }
+
+  /// 启动后台引擎：同步引擎 + 成就评估器。
+  void _startBackgroundEngines() {
+    final uid = widget.uid;
+
+    // 同步引擎 — 将本地台账推送到 Firestore
+    ref.read(syncEngineProvider).start(uid);
+
+    // 成就评估器 — 监听台账变更自动评估
+    final ledger = ref.read(ledgerServiceProvider);
+    _evaluator = AchievementEvaluator(
+      ledger: ledger,
+      onUnlocked: (ids) {
+        ref.read(newlyUnlockedProvider.notifier).addAll(ids);
+      },
+    );
+    _evaluator!.start(uid);
   }
 
   Future<void> _checkInterruptedSession() async {

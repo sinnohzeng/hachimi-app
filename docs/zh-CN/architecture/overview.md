@@ -11,7 +11,7 @@
 | UI 框架 | Flutter | 3.41.x stable | 跨平台移动端（iOS + Android） |
 | 语言 | Dart | 3.11.x | 类型安全、空安全开发 |
 | 设计系统 | Material Design 3 | — | Google 对齐 UI 组件与主题 |
-| 状态管理 | Riverpod | 2.6.x | 响应式、编译期安全依赖注入 |
+| 状态管理 | Riverpod | 3.x | 响应式、编译期安全依赖注入 |
 | 认证 | Firebase Auth | 5.x | Google OAuth + 邮箱/密码 |
 | 数据库 | Cloud Firestore | 5.x | 实时 NoSQL，支持离线 |
 | 分析 | Firebase Analytics (GA4) | 11.x | 基于事件的行为分析 |
@@ -20,7 +20,9 @@
 | 后台计时 | flutter_foreground_task | 8.x | Android 前台服务保持计时器运行 |
 | A/B 测试 | Firebase Remote Config | 5.x | 动态配置、功能开关 |
 | 崩溃报告 | Firebase Crashlytics | 4.x | 生产环境错误监控 |
-| 网络连接 | connectivity_plus | 6.x | 设备网络状态监测 |
+| 网络连接 | connectivity_plus | 7.x | 设备网络状态监测 |
+| 本地数据库 | sqflite | 2.4.x | 本地优先 SQLite 存储（行为台账、物化状态） |
+| UUID | uuid | 4.5.x | 本地实体的确定性唯一 ID |
 | 国际化 | flutter_localizations + gen-l10n | — | 通过 ARB 文件进行编译期本地化 |
 | AI 提供商 | MiniMax M2.5 / Gemini 3 Flash | — | 云端大语言模型推理（策略模式，用户可切换，HTTP SSE 流式输出） |
 | 动态背景 | mesh_gradient | 1.3.x | GPU 加速流体 mesh 渐变（fragment shader） |
@@ -37,10 +39,9 @@
 │  Screens（UI 层——无业务逻辑）                                    │
 │  ├── OnboardingScreen          ├── CatRoomScreen                │
 │  ├── LoginScreen               ├── CatDetailScreen              │
-│  ├── HomeScreen（4 标签外壳）  ├── FocusSetupScreen             │
+│  ├── HomeScreen（3 标签 + Drawer） ├── FocusSetupScreen            │
 │  ├── AdoptionFlowScreen        ├── TimerScreen                  │
 │  ├── StatsScreen               ├── FocusCompleteScreen          │
-│  └── ProfileScreen                                              │
 ├─────────────────────────────────────────────────────────────────┤
 │  Providers（状态层——Riverpod，响应式 SSOT）                      │
 │  ├── authStateProvider         ├── focusTimerProvider           │
@@ -50,7 +51,9 @@
 │  ├── catByIdProvider（family） ├── pixelCatRendererProvider     │
 │  ├── catByHabitProvider（fam.）├── catSpriteImageProvider（fam.）│
 │  ├── connectivityProvider      ├── coinBalanceProvider          │
-│  ├── isOfflineProvider         └── hasCheckedInTodayProvider    │
+│  ├── isOfflineProvider         ├── hasCheckedInTodayProvider    │
+│  ├── isAnonymousProvider       ├── ledgerServiceProvider        │
+│  ├── syncEngineProvider        └── newlyUnlockedProvider        │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services（数据层——Firebase SDK 封装）                           │
 │  ├── AuthService               ├── XpService（纯 Dart）         │
@@ -58,7 +61,10 @@
 │  ├── CatFirestoreService       ├── RemoteConfigService          │
 │  ├── PixelCatRenderer          ├── FocusTimerService            │
 │  ├── PixelCatGenerationService ├── MigrationService             │
-│  ├── CoinService               └── AnalyticsService             │
+│  ├── CoinService               ├── AnalyticsService             │
+│  ├── LedgerService             ├── SyncEngine                   │
+│  ├── AchievementEvaluator      ├── LocalHabitRepository         │
+│  ├── LocalCatRepository        └── LocalSessionRepository       │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -82,7 +88,10 @@
 
 | 关注点 | SSOT 位置 |
 |--------|----------|
-| 业务数据 | Firestore |
+| 业务数据（SSOT） | SQLite 本地表（通过 SyncEngine 同步至 Firestore） |
+| 行为台账 | `action_ledger` 表（`local_database_service.dart`） |
+| 物化状态（金币等） | `materialized_state` 表（`local_database_service.dart`） |
+| 成就记录 | `local_achievements` 表（`local_database_service.dart`） |
 | 认证状态 | `authStateProvider`（`providers/auth_provider.dart`） |
 | 猫咪列表 | `catsProvider`（`providers/cat_provider.dart`） |
 | 猫咪精灵图 | `catSpriteImageProvider`（`providers/cat_sprite_provider.dart`） |
@@ -118,7 +127,21 @@ Screens -> Providers -> Services -> Firebase SDK
 
 跨多个文档的操作（如创建习惯 + 猫咪、记录专注会话）使用 Firestore **批量写入** 保证一致性。任意写入失败则全部回滚。
 
-### 6. 国际化（i18n）
+### 6. 本地优先架构
+
+自 v2.18.0 起，业务数据流经 **本地优先** 管道：
+
+1. **行为台账** — 每个数据变更操作（专注完成、签到、购买、装备、习惯 CRUD）记录为 `action_ledger` SQLite 表中的不可变 `LedgerAction`。台账是预写日志。
+
+2. **物化状态** — 派生聚合值（金币余额、签到状态）缓存在 `materialized_state` 键值表中，与台账写入在同一 SQLite 事务中原子更新。
+
+3. **本地表** — `local_habits`、`local_cats`、`local_sessions`、`local_monthly_checkins`、`local_achievements` 镜像 Firestore 模式，但作为运行时 SSOT。Provider 从这些表读取，而非 Firestore。
+
+4. **同步引擎** — `SyncEngine` 在后台运行，将未同步的台账操作批量上传至 Firestore。触发条件：认证完成后 / 离线→在线 / 新台账写入（2 秒防抖）。使用指数退避重试。90 天台账清理。
+
+5. **成就评估器** — `AchievementEvaluator` 监听台账变更流并自动评估成就条件，替代手动触发调用。
+
+### 7. 国际化（i18n）
 
 所有用户可见的字符串均外部化到 ARB 文件（`lib/l10n/app_en.arb`、`lib/l10n/app_zh.arb`）中，并通过 `flutter gen-l10n` 编译为 Dart 代码。Screen 和 Widget 中不允许硬编码用户可见的字符串。详见 [localization.md](localization.md) 完整工作流。
 
@@ -131,13 +154,12 @@ Screens -> Providers -> Services -> Firebase SDK
 | 路由 | 界面 | 参数 |
 |------|------|------|
 | `/login` | LoginScreen | — |
-| `/home` | HomeScreen（4 标签 NavigationBar 外壳） | — |
+| `/home` | HomeScreen（3 标签 NavigationBar + Drawer） | — |
 | `/adoption` | AdoptionFlowScreen | `isFirstHabit: bool` |
 | `/focus-setup` | FocusSetupScreen | `habitId: String` |
 | `/timer` | TimerScreen | `habitId: String` |
 | `/focus-complete` | FocusCompleteScreen | `Map<String, dynamic>` |
 | `/cat-detail` | CatDetailScreen | `catId: String` |
-| `/profile` | ProfileScreen | — |
 | `/ai-settings` | AiSettingsPage | — |
 
 **根路由** 由 `AuthGate` -> `_FirstHabitGate` 管理：
@@ -160,11 +182,16 @@ AuthGate
             │
             ▼
         Firebase Auth 流
-            ├── user == null -> LoginScreen
+            ├── user == null -> 自动 signInAnonymously()（访客模式）
+            │       └── success -> _FirstHabitGate
             └── user != null -> _FirstHabitGate
                     ├── habits.isEmpty -> AdoptionFlow（isFirstHabit: true）
                     └── habits.any -> HomeScreen
 ```
+
+**访客模式：** 新用户自动获取匿名 Firebase Auth 账户。可随时通过 Drawer → 账户升级提示升级为完整账户（Google 或邮箱）。账户关联使用 `linkWithCredential()` 保留所有数据。
+
+**AuthService** 现支持：`signInAnonymously()`、`linkWithGoogle()`、`linkWithEmail()`，以及 `isAnonymous` getter。
 
 ---
 

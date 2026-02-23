@@ -1002,5 +1002,50 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "deleteAccountProgress": "正在删除账号...",
-  "deleteAccountSuccess": "账号已删除"
+  "deleteAccountSuccess": "账号已删除",
+
+  "drawerGuest": "访客",
+  "drawerLinkAccountHint": "关联账号以解锁 AI 功能并保护数据",
+  "drawerLinkAccount": "关联账号",
+  "drawerMilestones": "里程碑",
+  "drawerMilestoneFocus": "累计专注：{hours}h {minutes}m",
+  "@drawerMilestoneFocus": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "drawerMilestoneCats": "猫咪家族：{count} 只",
+  "@drawerMilestoneCats": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMilestoneQuests": "进行中任务：{count} 个",
+  "@drawerMilestoneQuests": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "drawerMySection": "我的",
+  "drawerSessionHistory": "专注历史",
+  "drawerCheckInCalendar": "签到日历",
+  "drawerAccountSection": "账号",
+  "drawerGuestLogout": "退出（访客数据将丢失）",
+  "drawerGuestLogoutTitle": "退出访客模式？",
+  "drawerGuestLogoutMessage": "退出后，当前数据将无法恢复。建议先关联账号以保留进度。",
+  "drawerGuestLogoutConfirm": "仍然退出",
+
+  "guestUpgradeTitle": "保护你的数据",
+  "guestUpgradeMessage": "关联账号可备份进度、解锁 AI 日记和聊天功能，并在多设备间同步。",
+  "guestUpgradeLinkButton": "关联账号",
+  "guestUpgradeLater": "以后再说",
+
+  "loginLinkTagline": "关联账号以保护你的数据",
+
+  "aiTeaserTitle": "猫猫日记",
+  "aiTeaserPreview": "今天和主人一起学习了…{catName}感觉自己又变聪明了喵~",
+  "@aiTeaserPreview": {
+    "placeholders": { "catName": { "type": "String" } }
+  },
+  "aiTeaserCta": "关联账号，看看{catName}想说什么",
+  "@aiTeaserCta": {
+    "placeholders": { "catName": { "type": "String" } }
+  }
 }

@@ -8,7 +8,10 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'components/email_auth_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  /// linkMode: 匿名用户关联账号（而非全新登录）。
+  final bool linkMode;
+
+  const LoginScreen({super.key, this.linkMode = false});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -23,18 +26,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
-      final result = await authService.signInWithGoogle();
 
-      if (result != null && result.additionalUserInfo?.isNewUser == true) {
-        await analyticsService.logSignUp(method: 'google');
-        final uid = result.user!.uid;
-        await ref
-            .read(firestoreServiceProvider)
-            .createUserProfile(
-              uid: uid,
-              email: result.user!.email ?? '',
-              displayName: result.user!.displayName,
-            );
+      if (widget.linkMode) {
+        // 匿名用户关联 Google 账号
+        final result = await authService.linkWithGoogle();
+        if (result != null) {
+          final uid = result.user!.uid;
+          await ref
+              .read(firestoreServiceProvider)
+              .createUserProfile(
+                uid: uid,
+                email: result.user!.email ?? '',
+                displayName: result.user!.displayName,
+              );
+          await analyticsService.logSignUp(method: 'google_link');
+          if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+        }
+      } else {
+        final result = await authService.signInWithGoogle();
+        if (result != null && result.additionalUserInfo?.isNewUser == true) {
+          await analyticsService.logSignUp(method: 'google');
+          final uid = result.user!.uid;
+          await ref
+              .read(firestoreServiceProvider)
+              .createUserProfile(
+                uid: uid,
+                email: result.user!.email ?? '',
+                displayName: result.user!.displayName,
+              );
+        }
       }
       // AuthGate will automatically navigate to HomeScreen
     } on Exception catch (e) {
@@ -49,9 +69,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToEmailAuth() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const EmailAuthScreen()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => EmailAuthScreen(linkMode: widget.linkMode),
+      ),
+    );
   }
 
   @override
@@ -103,7 +125,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Tagline
                     Text(
-                      context.l10n.loginTagline,
+                      widget.linkMode
+                          ? context.l10n.loginLinkTagline
+                          : context.l10n.loginTagline,
                       style: textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       ),
@@ -163,43 +187,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: AppSpacing.base),
 
-                    // Login link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.l10n.loginAlreadyHaveAccount,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                    // Login link (hidden in linkMode)
+                    if (!widget.linkMode)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            context.l10n.loginAlreadyHaveAccount,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onPrimary.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
                           ),
-                        ),
-                        Semantics(
-                          button: true,
-                          label: context.l10n.loginLogIn,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const EmailAuthScreen(startAsLogin: true),
-                                ),
-                              );
-                            },
-                            child: ExcludeSemantics(
-                              child: Text(
-                                context.l10n.loginLogIn,
-                                style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onPrimary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: colorScheme.onPrimary,
+                          Semantics(
+                            button: true,
+                            label: context.l10n.loginLogIn,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const EmailAuthScreen(
+                                      startAsLogin: true,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: ExcludeSemantics(
+                                child: Text(
+                                  context.l10n.loginLogIn,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: colorScheme.onPrimary,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
                     const SizedBox(height: AppSpacing.xl),
                   ],

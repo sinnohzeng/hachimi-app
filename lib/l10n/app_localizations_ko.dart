@@ -2203,4 +2203,85 @@ class SKo extends S {
 
   @override
   String get deleteAccountSuccess => '계정이 삭제되었습니다';
+
+  @override
+  String get drawerGuest => '게스트';
+
+  @override
+  String get drawerLinkAccountHint => '계정을 연결하여 AI 기능을 잠금 해제하고 데이터를 보호하세요';
+
+  @override
+  String get drawerLinkAccount => '계정 연결';
+
+  @override
+  String get drawerMilestones => '마일스톤';
+
+  @override
+  String drawerMilestoneFocus(int hours, int minutes) {
+    return '총 집중: ${hours}h ${minutes}m';
+  }
+
+  @override
+  String drawerMilestoneCats(int count) {
+    return '고양이 가족: $count마리';
+  }
+
+  @override
+  String drawerMilestoneQuests(int count) {
+    return '진행 중 퀘스트: $count개';
+  }
+
+  @override
+  String get drawerMySection => '나의';
+
+  @override
+  String get drawerSessionHistory => '집중 기록';
+
+  @override
+  String get drawerCheckInCalendar => '출석 달력';
+
+  @override
+  String get drawerAccountSection => '계정';
+
+  @override
+  String get drawerGuestLogout => '로그아웃 (게스트 데이터 삭제됨)';
+
+  @override
+  String get drawerGuestLogoutTitle => '게스트로 로그아웃하시겠습니까?';
+
+  @override
+  String get drawerGuestLogoutMessage =>
+      '로그아웃 후 현재 데이터를 복구할 수 없습니다. 먼저 계정을 연결하여 진행 상황을 저장하세요.';
+
+  @override
+  String get drawerGuestLogoutConfirm => '그래도 로그아웃';
+
+  @override
+  String get guestUpgradeTitle => '데이터 보호';
+
+  @override
+  String get guestUpgradeMessage =>
+      '계정 연결로 진행 상황을 백업하고, AI 일기 및 채팅 기능을 잠금 해제하고, 기기 간 동기화할 수 있습니다.';
+
+  @override
+  String get guestUpgradeLinkButton => '계정 연결';
+
+  @override
+  String get guestUpgradeLater => '나중에';
+
+  @override
+  String get loginLinkTagline => '계정을 연결하여 데이터를 보호하세요';
+
+  @override
+  String get aiTeaserTitle => '고양이 일기';
+
+  @override
+  String aiTeaserPreview(String catName) {
+    return '오늘도 주인과 함께 공부했어... $catName은(는) 또 똑똑해진 것 같다냥~';
+  }
+
+  @override
+  String aiTeaserCta(String catName) {
+    return '계정을 연결하여 $catName이(가) 무슨 말을 하고 싶은지 확인하세요';
+  }
 }

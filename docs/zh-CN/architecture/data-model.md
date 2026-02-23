@@ -281,7 +281,7 @@ dormant --[习惯重新激活]--> active（未来功能）
 - 用户只能读写自己 `users/{uid}` 路径下的文档。
 - 无跨用户数据访问。
 - 无公共集合。
-- 匿名访问对所有路径均被拒绝。
+- 匿名认证用户在其 `users/{uid}` 路径下享有与普通用户相同的读写权限。未认证访问对所有路径均被拒绝。
 
 **Firestore 安全规则 — 字段校验：**
 
@@ -358,3 +358,160 @@ dormant --[习惯重新激活]--> active（未来功能）
 | `ai_selected_provider` | String | "minimax" | 当前 AI 提供商 ID（`minimax` 或 `gemini`） |
 
 **常量定义：** `lib/core/constants/ai_constants.dart` -> `class AiConstants`
+
+---
+
+### 数据库版本 2 — 本地优先表（v2.18.0+）
+
+数据库从版本 1 升级到版本 2，以支持本地优先架构。这些表镜像 Firestore 模式，作为运行时 SSOT。
+
+#### 表：`action_ledger`
+
+不可变的追加写入日志，记录所有数据变更操作。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | UUID |
+| `type` | TEXT | NOT NULL | ActionType 枚举字符串（如 "focus_complete"、"check_in"、"purchase"） |
+| `uid` | TEXT | NOT NULL | Firebase Auth UID |
+| `started_at` | INTEGER | NOT NULL | 操作开始的 Unix 时间戳 |
+| `ended_at` | INTEGER | | 操作结束的 Unix 时间戳（即时操作为 null） |
+| `payload` | TEXT | NOT NULL | JSON 编码的操作输入数据 |
+| `result` | TEXT | | JSON 编码的操作输出数据 |
+| `synced` | INTEGER | NOT NULL DEFAULT 0 | 0 = 未同步，1 = 已同步至 Firestore |
+| `synced_at` | INTEGER | | 同步成功的 Unix 时间戳 |
+| `sync_attempts` | INTEGER | NOT NULL DEFAULT 0 | 同步重试次数 |
+| `sync_error` | TEXT | | 最后一次同步错误信息 |
+| `created_at` | INTEGER | NOT NULL | 台账条目创建的 Unix 时间戳 |
+
+**索引：** `idx_ledger_synced`（`synced, created_at`）用于高效同步队列查询。
+**索引：** `idx_ledger_type`（`type, uid`）用于按类型过滤查询。
+
+**ActionType 枚举值：** `check_in`、`focus_complete`、`focus_abandon`、`purchase`、`equip`、`unequip`、`habit_create`、`habit_update`、`habit_delete`、`account_created`、`account_linked`、`achievement_unlocked`、`achievement_claimed`
+
+**Dart 模型：** `lib/models/ledger_action.dart` -> `class LedgerAction`、`enum ActionType`
+
+#### 表：`local_habits`
+
+`users/{uid}/habits/{habitId}` Firestore 文档的本地镜像。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | 习惯 ID |
+| `uid` | TEXT | NOT NULL | 用户 UID |
+| `name` | TEXT | NOT NULL | 习惯显示名称 |
+| `cat_id` | TEXT | NOT NULL | 绑定猫咪 ID |
+| `goal_minutes` | INTEGER | NOT NULL | 每日专注目标分钟数 |
+| `target_hours` | INTEGER | | 累计目标小时数（null = 永续模式） |
+| `total_minutes` | INTEGER | NOT NULL DEFAULT 0 | 总累计分钟数 |
+| `deadline_date` | TEXT | | 里程碑截止日期 ISO 字符串 |
+| `target_completed` | INTEGER | NOT NULL DEFAULT 0 | 1 表示里程碑目标已达成 |
+| `last_check_in_date` | TEXT | | 最近会话的 ISO 日期 |
+| `reminders` | TEXT | | JSON 编码的提醒列表 |
+| `motivation_text` | TEXT | | 备忘文本 |
+| `is_active` | INTEGER | NOT NULL DEFAULT 1 | 0 = 已停用 |
+| `created_at` | INTEGER | NOT NULL | Unix 时间戳 |
+
+**索引：** `idx_habits_uid`（`uid, is_active`）。
+
+#### 表：`local_cats`
+
+`users/{uid}/cats/{catId}` Firestore 文档的本地镜像。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | 猫咪 ID |
+| `uid` | TEXT | NOT NULL | 用户 UID |
+| `name` | TEXT | NOT NULL | 猫咪名字 |
+| `appearance` | TEXT | NOT NULL | JSON 编码的 CatAppearance |
+| `personality` | TEXT | NOT NULL | 性格 ID |
+| `total_minutes` | INTEGER | NOT NULL DEFAULT 0 | 累计专注分钟数 |
+| `equipped_accessory` | TEXT | | 当前装备的配饰 ID |
+| `bound_habit_id` | TEXT | NOT NULL | 绑定习惯 ID |
+| `state` | TEXT | NOT NULL | "active"、"dormant"、"graduated" |
+| `last_session_at` | INTEGER | | 最近会话的 Unix 时间戳 |
+| `highest_stage` | TEXT | | 曾达到的最高成长阶段 |
+| `created_at` | INTEGER | NOT NULL | Unix 时间戳 |
+
+**索引：** `idx_cats_uid`（`uid, state`）。
+
+#### 表：`local_sessions`
+
+专注会话文档的本地镜像。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | 会话 ID |
+| `uid` | TEXT | NOT NULL | 用户 UID |
+| `habit_id` | TEXT | NOT NULL | 父习惯 ID |
+| `cat_id` | TEXT | NOT NULL | 获得 XP 的猫咪 |
+| `started_at` | INTEGER | NOT NULL | Unix 时间戳 |
+| `ended_at` | INTEGER | NOT NULL | Unix 时间戳 |
+| `duration_minutes` | INTEGER | NOT NULL | 实际专注分钟数 |
+| `target_duration_minutes` | INTEGER | NOT NULL | 计划时长 |
+| `paused_seconds` | INTEGER | NOT NULL | 累计暂停时间 |
+| `status` | TEXT | NOT NULL | "completed"、"abandoned"、"interrupted" |
+| `completion_ratio` | REAL | NOT NULL | 实际 / 目标比率 |
+| `xp_earned` | INTEGER | NOT NULL | 奖励 XP |
+| `coins_earned` | INTEGER | NOT NULL | 奖励金币 |
+| `mode` | TEXT | NOT NULL | "countdown" 或 "stopwatch" |
+| `created_at` | INTEGER | NOT NULL | Unix 时间戳 |
+
+**索引：** `idx_sessions_uid_date`（`uid, ended_at`）。
+**索引：** `idx_sessions_habit`（`habit_id, ended_at`）。
+
+#### 表：`local_monthly_checkins`
+
+月度签到文档的本地镜像。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | "uid_YYYY-MM" 组合键 |
+| `uid` | TEXT | NOT NULL | 用户 UID |
+| `month` | TEXT | NOT NULL | "YYYY-MM" 格式 |
+| `checked_days` | TEXT | NOT NULL | JSON 编码的已签到日期号列表 |
+| `total_coins` | INTEGER | NOT NULL DEFAULT 0 | 月度累计金币 |
+| `milestones_claimed` | TEXT | NOT NULL | JSON 编码的已领取里程碑阈值列表 |
+
+**索引：** `idx_checkins_uid`（`uid, month`）。
+
+#### 表：`materialized_state`
+
+计算代价高昂的派生聚合值的键值存储。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `key` | TEXT | PRIMARY KEY | 状态键（如 "coin_balance"、"last_check_in_date"） |
+| `value` | TEXT | NOT NULL | 序列化值 |
+| `updated_at` | INTEGER | NOT NULL | 最后更新的 Unix 时间戳 |
+
+#### 表：`local_achievements`
+
+已解锁成就的本地记录。
+
+| 列名 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| `id` | TEXT | PRIMARY KEY | 成就 ID |
+| `uid` | TEXT | NOT NULL | 用户 UID |
+| `unlocked_at` | INTEGER | NOT NULL | 解锁的 Unix 时间戳 |
+| `claimed` | INTEGER | NOT NULL DEFAULT 0 | 1 表示奖励已领取 |
+| `claimed_at` | INTEGER | | 领取的 Unix 时间戳 |
+
+**索引：** `idx_achievements_uid`（`uid`）。
+
+**Dart 模型：** `lib/models/unlocked_achievement.dart` -> `class UnlockedAchievement`
+
+---
+
+### 同步策略
+
+本地优先架构使用 **基于台账的同步** 模式：
+
+1. 所有变更写入 `action_ledger` + 更新本地表，在同一 SQLite 事务中完成
+2. `SyncEngine` 处理未同步的操作（`synced = 0`），按 `created_at` 排序
+3. 每个操作被转换为对应的 Firestore 批量写入
+4. 成功后设置 `synced = 1` 和 `synced_at`
+5. 失败时递增 `sync_attempts`，使用指数退避重试
+6. `synced = 1` 且超过 90 天的操作自动清理
+
+这确保应用在完全离线状态下正常运行，在网络可用时自动同步至 Firestore。
