@@ -4,14 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/widgets/growth_path_card.dart';
+import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
 
-/// Modal bottom sheet for editing quest: name, goal, target, motivation.
+/// 全屏编辑 Quest 页面 — 字段顺序与创建流程一致。
 class EditQuestSheet extends ConsumerStatefulWidget {
   final Habit habit;
+  final Cat cat;
 
-  const EditQuestSheet({super.key, required this.habit});
+  const EditQuestSheet({super.key, required this.habit, required this.cat});
 
   @override
   ConsumerState<EditQuestSheet> createState() => _EditQuestSheetState();
@@ -25,6 +30,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   late bool _isUnlimitedMode;
   late bool _isCustomGoal;
   late bool _isCustomTarget;
+  late List<ReminderConfig> _reminders;
   DateTime? _deadlineDate;
   bool _isSaving = false;
 
@@ -42,8 +48,8 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     _selectedTarget = widget.habit.targetHours;
     _isUnlimitedMode = widget.habit.isUnlimited;
     _deadlineDate = widget.habit.deadlineDate;
+    _reminders = [...widget.habit.reminders];
 
-    // 判断当前值是否为自定义值
     _isCustomGoal = !_defaultGoalOptions.contains(_selectedGoal);
     _isCustomTarget =
         _selectedTarget != null &&
@@ -64,237 +70,351 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final colorScheme = theme.colorScheme;
     final isTargetCompleted = widget.habit.targetCompleted;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.base),
-
-            Text(
-              context.l10n.catDetailEditQuestTitle,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Name field
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: context.l10n.catDetailQuestName,
-                prefixIcon: const Icon(Icons.label_outline),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // 目标模式切换
-            Text(context.l10n.adoptionGoals, style: textTheme.labelLarge),
-            const SizedBox(height: AppSpacing.sm),
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(
-                  value: true,
-                  label: Text(context.l10n.adoptionUnlimitedMode),
-                  icon: const Icon(Icons.all_inclusive, size: 18),
-                ),
-                ButtonSegment(
-                  value: false,
-                  label: Text(context.l10n.adoptionMilestoneMode),
-                  icon: const Icon(Icons.flag_outlined, size: 18),
-                  enabled: !isTargetCompleted,
-                ),
-              ],
-              selected: {_isUnlimitedMode},
-              onSelectionChanged: isTargetCompleted
-                  ? null
-                  : (selected) => setState(() {
-                      _isUnlimitedMode = selected.first;
-                      if (!_isUnlimitedMode) {
-                        _selectedTarget ??= 100;
-                      }
-                    }),
-            ),
-            if (isTargetCompleted) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.catDetailTargetCompletedHint,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.primary,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-
-            // 里程碑模式：目标小时数 + 截止日期
-            if (!_isUnlimitedMode) ...[
-              Text(
-                context.l10n.catDetailTargetTotalHours,
-                style: textTheme.labelLarge,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: 8,
+    return Scaffold(
+      appBar: AppBar(title: Text(context.l10n.catDetailEditQuestTitle)),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: AppSpacing.paddingBase,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ..._defaultTargetOptions.map((hrs) {
-                    final isSelected =
-                        !_isCustomTarget && _selectedTarget == hrs;
-                    return ChoiceChip(
-                      label: Text('$hrs'),
-                      selected: isSelected,
-                      onSelected: (_) => setState(() {
-                        _selectedTarget = hrs;
-                        _isCustomTarget = false;
-                      }),
-                    );
-                  }),
-                  if (_isCustomTarget)
-                    ChoiceChip(
-                      label: Text('${_selectedTarget}h'),
-                      selected: true,
-                      onSelected: (_) => _showCustomTargetDialog(),
-                    )
-                  else
-                    ActionChip(
-                      label: Text(context.l10n.adoptionCustom),
-                      avatar: const Icon(Icons.tune, size: 18),
-                      onPressed: _showCustomTargetDialog,
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-
-              // 截止日期
-              Row(
-                children: [
-                  Icon(
-                    Icons.event,
-                    size: 20,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
+                  // ── 基础信息 ──
                   Text(
-                    context.l10n.adoptionDeadlineLabel,
-                    style: textTheme.labelLarge,
+                    context.l10n.adoptionBasicInfo,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const Spacer(),
-                  if (_deadlineDate != null) ...[
-                    Text(
-                      _formatDate(_deadlineDate!),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.adoptionQuestName,
+                      prefixIcon: const Icon(Icons.edit_outlined),
+                    ),
+                    textInputAction: TextInputAction.done,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextFormField(
+                    controller: _motivationController,
+                    maxLength: 240,
+                    maxLines: 4,
+                    minLines: 2,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.adoptionMotivationLabel,
+                      hintText: context.l10n.adoptionMotivationHint,
+                      prefixIcon: const Icon(Icons.format_quote),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.refresh),
+                        tooltip: context.l10n.adoptionMotivationSwap,
+                        onPressed: () {
+                          final current = _motivationController.text;
+                          final locale = Localizations.localeOf(context);
+                          _motivationController.text = randomMotivationQuote(
+                            locale,
+                            exclude: current.isNotEmpty ? current : null,
+                          );
+                        },
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 18),
-                      onPressed: () => setState(() => _deadlineDate = null),
-                      visualDensity: VisualDensity.compact,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── 目标设置 ──
+                  Text(
+                    context.l10n.adoptionGoals,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                  ] else
-                    TextButton(
-                      onPressed: _pickDeadlineDate,
-                      child: Text(context.l10n.adoptionDeadlineNone),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    context.l10n.adoptionGrowthHint,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 目标模式切换
+                  _buildModeToggle(theme, isTargetCompleted),
+                  if (isTargetCompleted) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      context.l10n.catDetailTargetCompletedHint,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.primary,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 里程碑模式：目标小时数 + 截止日期
+                  if (!_isUnlimitedMode) ...[
+                    Text(
+                      context.l10n.adoptionTotalTarget,
+                      style: textTheme.labelLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        ..._defaultTargetOptions.map((hours) {
+                          final isSelected =
+                              !_isCustomTarget && _selectedTarget == hours;
+                          return ChoiceChip(
+                            label: Text('${hours}h'),
+                            selected: isSelected,
+                            onSelected: (_) => setState(() {
+                              _selectedTarget = hours;
+                              _isCustomTarget = false;
+                            }),
+                          );
+                        }),
+                        if (_isCustomTarget)
+                          ChoiceChip(
+                            label: Text('${_selectedTarget}h'),
+                            selected: true,
+                            onSelected: (_) => _showCustomTargetDialog(),
+                          )
+                        else
+                          ActionChip(
+                            label: Text(context.l10n.adoptionCustom),
+                            avatar: const Icon(Icons.tune, size: 18),
+                            onPressed: _showCustomTargetDialog,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // 截止日期
+                    _buildDeadlinePicker(theme),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+
+                  // 每日目标
+                  Text(
+                    context.l10n.adoptionDailyGoalLabel,
+                    style: textTheme.labelLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ..._defaultGoalOptions.map((minutes) {
+                        final isSelected =
+                            !_isCustomGoal && _selectedGoal == minutes;
+                        return ChoiceChip(
+                          label: Text('${minutes}min'),
+                          selected: isSelected,
+                          onSelected: (_) => setState(() {
+                            _selectedGoal = minutes;
+                            _isCustomGoal = false;
+                          }),
+                        );
+                      }),
+                      if (_isCustomGoal)
+                        ChoiceChip(
+                          label: Text('${_selectedGoal}min'),
+                          selected: true,
+                          onSelected: (_) => _showCustomGoalDialog(),
+                        )
+                      else
+                        ActionChip(
+                          label: Text(context.l10n.adoptionCustom),
+                          avatar: const Icon(Icons.tune, size: 18),
+                          onPressed: _showCustomGoalDialog,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── 提醒 ──
+                  Text(
+                    context.l10n.adoptionReminderSection,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _buildReminderList(theme),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── 成长之路 ──
+                  const GrowthPathCard(),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
-
-            // Daily goal chips
-            Text(
-              context.l10n.catDetailDailyGoalMinutes,
-              style: textTheme.labelLarge,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: 8,
-              children: [
-                ..._defaultGoalOptions.map((mins) {
-                  final isSelected = !_isCustomGoal && _selectedGoal == mins;
-                  return ChoiceChip(
-                    label: Text('$mins'),
-                    selected: isSelected,
-                    onSelected: (_) => setState(() {
-                      _selectedGoal = mins;
-                      _isCustomGoal = false;
-                    }),
-                  );
-                }),
-                if (_isCustomGoal)
-                  ChoiceChip(
-                    label: Text('${_selectedGoal}min'),
-                    selected: true,
-                    onSelected: (_) => _showCustomGoalDialog(),
-                  )
-                else
-                  ActionChip(
-                    label: Text(context.l10n.adoptionCustom),
-                    avatar: const Icon(Icons.tune, size: 18),
-                    onPressed: _showCustomGoalDialog,
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
+          ),
 
-            // Motivation field
-            TextField(
-              controller: _motivationController,
-              maxLength: 240,
-              decoration: InputDecoration(
-                labelText: context.l10n.adoptionMotivationLabel,
-                hintText: context.l10n.adoptionMotivationHint,
-                prefixIcon: const Icon(Icons.format_quote),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.refresh),
-                  tooltip: context.l10n.adoptionMotivationSwap,
-                  onPressed: () {
-                    final current = _motivationController.text;
-                    final locale = Localizations.localeOf(context);
-                    _motivationController.text = randomMotivationQuote(
-                      locale,
-                      exclude: current.isNotEmpty ? current : null,
-                    );
-                  },
+          // 底部保存按钮
+          SafeArea(
+            child: Padding(
+              padding: AppSpacing.paddingBase,
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: FilledButton(
+                  onPressed: _isSaving ? null : _save,
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          context.l10n.commonSave,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Save button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton(
-                onPressed: _isSaving ? null : _save,
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(context.l10n.commonSave),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  // ─── 目标模式切换（与创建界面一致的 _ModeOption 卡片） ───
+
+  Widget _buildModeToggle(ThemeData theme, bool isTargetCompleted) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Column(
+      children: [
+        _ModeOption(
+          selected: _isUnlimitedMode,
+          icon: Icons.all_inclusive,
+          title: context.l10n.adoptionUnlimitedMode,
+          subtitle: context.l10n.adoptionUnlimitedDesc,
+          colorScheme: colorScheme,
+          textTheme: textTheme,
+          onTap: isTargetCompleted
+              ? null
+              : () => setState(() => _isUnlimitedMode = true),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _ModeOption(
+          selected: !_isUnlimitedMode,
+          icon: Icons.flag_outlined,
+          title: context.l10n.adoptionMilestoneMode,
+          subtitle: context.l10n.adoptionMilestoneDesc,
+          colorScheme: colorScheme,
+          textTheme: textTheme,
+          onTap: isTargetCompleted
+              ? null
+              : () => setState(() {
+                  _isUnlimitedMode = false;
+                  _selectedTarget ??= 100;
+                }),
+        ),
+      ],
+    );
+  }
+
+  // ─── 截止日期选择器 ───
+
+  Widget _buildDeadlinePicker(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final l10n = context.l10n;
+
+    return Row(
+      children: [
+        Icon(Icons.event, size: 20, color: colorScheme.onSurfaceVariant),
+        const SizedBox(width: AppSpacing.sm),
+        Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
+        const Spacer(),
+        if (_deadlineDate != null) ...[
+          Text(
+            _formatDate(_deadlineDate!),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 18),
+            onPressed: () => setState(() => _deadlineDate = null),
+            visualDensity: VisualDensity.compact,
+          ),
+        ] else
+          TextButton(
+            onPressed: _pickDeadlineDate,
+            child: Text(l10n.adoptionDeadlineNone),
+          ),
+      ],
+    );
+  }
+
+  // ─── 提醒列表 ───
+
+  Widget _buildReminderList(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final l10n = context.l10n;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < _reminders.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.notifications_active,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    _reminders[i].localizedDescription(l10n),
+                    style: textTheme.bodyMedium,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close, size: 18, color: colorScheme.error),
+                  onPressed: () => setState(() => _reminders.removeAt(i)),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+          ),
+        if (_reminders.length < 5)
+          TextButton.icon(
+            onPressed: _addReminder,
+            icon: const Icon(Icons.add_alarm, size: 18),
+            label: Text(l10n.reminderAddMore),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: Text(
+              l10n.reminderMaxReached,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _addReminder() async {
+    final result = await showReminderPickerSheet(context);
+    if (result != null) {
+      setState(() => _reminders.add(result));
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -428,6 +548,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final deadlineChanged = _deadlineDate != oldDeadline;
     final deadlineCleared = deadlineChanged && _deadlineDate == null;
 
+    // 判断提醒是否变化
+    final oldReminders = widget.habit.reminders;
+    final remindersChanged = !_remindersEqual(oldReminders, _reminders);
+
     HapticFeedback.mediumImpact();
     await ref
         .read(firestoreServiceProvider)
@@ -456,7 +580,29 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
               motivationChanged &&
               newMotivation.isEmpty &&
               oldMotivation.isNotEmpty,
+          reminders: remindersChanged && _reminders.isNotEmpty
+              ? _reminders
+              : null,
+          clearReminders: remindersChanged && _reminders.isEmpty,
         );
+
+    // 提醒变更时重新调度通知
+    if (remindersChanged && mounted) {
+      final notifService = ref.read(notificationServiceProvider);
+      if (_reminders.isEmpty) {
+        await notifService.cancelAllRemindersForHabit(widget.habit.id);
+      } else {
+        final l10n = context.l10n;
+        await notifService.scheduleReminders(
+          habitId: widget.habit.id,
+          habitName: name,
+          catName: widget.cat.name,
+          reminders: _reminders,
+          title: l10n.reminderNotificationTitle(widget.cat.name),
+          body: l10n.reminderNotificationBody(name),
+        );
+      }
+    }
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -467,5 +613,105 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
         ),
       );
     }
+  }
+
+  /// 比较两个提醒列表是否相同
+  bool _remindersEqual(List<ReminderConfig> a, List<ReminderConfig> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].toMap().toString() != b[i].toMap().toString()) return false;
+    }
+    return true;
+  }
+}
+
+/// 目标模式选项卡片（与创建界面共用样式）
+class _ModeOption extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final VoidCallback? onTap;
+
+  const _ModeOption({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.colorScheme,
+    required this.textTheme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final effectiveAlpha = enabled ? 1.0 : 0.5;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Opacity(
+          opacity: effectiveAlpha,
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: selected
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                selected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

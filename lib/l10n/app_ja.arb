@@ -494,9 +494,9 @@
   "adoptionDeadlineLabel": "期限",
   "adoptionDeadlineNone": "設定なし",
   "adoptionReminderSection": "リマインダー",
-  "adoptionMotivationLabel": "モチベーション",
-  "adoptionMotivationHint": "自分を励ます言葉を書こう",
-  "adoptionMotivationSwap": "別の言葉",
+  "adoptionMotivationLabel": "メモ",
+  "adoptionMotivationHint": "メモを書く...",
+  "adoptionMotivationSwap": "ランダム入力",
 
   "loginAppName": "Hachimi",
   "loginTagline": "ネコを育てて、クエストを達成しよう。",

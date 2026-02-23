@@ -6,12 +6,11 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
-import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
-/// 首页精选猫卡片 — 两行布局：
-/// 上行: Cat(56px) + Column(name, mood · quest name)
+/// 首页精选猫卡片 — 三行布局：
+/// 上行: Cat(56px) + Column(name, quest name, note)
 /// 下行: progress bar + label + Focus 按钮
 class FeaturedCatCard extends ConsumerWidget {
   final Cat cat;
@@ -78,16 +77,31 @@ class FeaturedCatCard extends ConsumerWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _buildSubtitle(context, habit),
-                            style: textTheme.bodySmall?.copyWith(
-                              fontStyle: FontStyle.italic,
-                              color: colorScheme.onSurfaceVariant,
+                          if (habit != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              habit.name,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          ],
+                          if (habit != null &&
+                              habit.motivationText != null &&
+                              habit.motivationText!.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              habit.motivationText!,
+                              style: textTheme.bodySmall?.copyWith(
+                                fontStyle: FontStyle.italic,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -143,14 +157,5 @@ class FeaturedCatCard extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  /// 构建副标题：mood · quest name
-  String _buildSubtitle(BuildContext context, Habit? habit) {
-    final mood = context.l10n.moodMessage(cat.personality, cat.computedMood);
-    if (habit != null) {
-      return '$mood  ·  ${habit.name}';
-    }
-    return mood;
   }
 }

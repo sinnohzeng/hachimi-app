@@ -1469,13 +1469,13 @@ class SKo extends S {
   String get adoptionReminderSection => '알림';
 
   @override
-  String get adoptionMotivationLabel => '동기부여 문구';
+  String get adoptionMotivationLabel => '메모';
 
   @override
-  String get adoptionMotivationHint => '자신을 격려하는 말을 적어보세요';
+  String get adoptionMotivationHint => '메모를 적어보세요...';
 
   @override
-  String get adoptionMotivationSwap => '다른 문구';
+  String get adoptionMotivationSwap => '랜덤 입력';
 
   @override
   String get loginAppName => '하치미';

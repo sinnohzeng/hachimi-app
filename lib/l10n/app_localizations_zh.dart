@@ -1465,13 +1465,13 @@ class SZh extends S {
   String get adoptionReminderSection => '提醒';
 
   @override
-  String get adoptionMotivationLabel => '激励语';
+  String get adoptionMotivationLabel => '备忘';
 
   @override
-  String get adoptionMotivationHint => '写一句话鼓励自己';
+  String get adoptionMotivationHint => '写点什么备忘...';
 
   @override
-  String get adoptionMotivationSwap => '换一句';
+  String get adoptionMotivationSwap => '随机填充';
 
   @override
   String get loginAppName => 'Hachimi';
@@ -3682,13 +3682,13 @@ class SZhHant extends SZh {
   String get adoptionReminderSection => '提醒';
 
   @override
-  String get adoptionMotivationLabel => '激勵語';
+  String get adoptionMotivationLabel => '備忘';
 
   @override
-  String get adoptionMotivationHint => '寫一句話鼓勵自己';
+  String get adoptionMotivationHint => '寫點什麼備忘...';
 
   @override
-  String get adoptionMotivationSwap => '換一句';
+  String get adoptionMotivationSwap => '隨機填充';
 
   @override
   String get loginAppName => 'Hachimi';

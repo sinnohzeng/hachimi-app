@@ -52,8 +52,8 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | `deadlineDate` | timestamp? | no | null | Optional deadline for milestone mode. Only meaningful when `targetHours` is set. |
 | `targetCompleted` | bool | yes | false | Whether the milestone target has been reached. When `true`, quest auto-converts to unlimited mode. |
 | `lastCheckInDate` | string | no | null | ISO date string "YYYY-MM-DD" of most recent session |
-| `reminderTime` | string | no | null | Daily reminder time in "HH:mm" 24-hour format, e.g. "08:30" |
-| `motivationText` | string | no | null | Motivational quote, max 40 characters |
+| `reminders` | list\<map\> | no | [] | Reminder list (up to 5). Each map contains `hour` (int), `minute` (int), `mode` (string: "daily", "weekdays", "weekends", "monday"–"sunday"). Parsed by `ReminderConfig.tryFromMap()`. |
+| `motivationText` | string | no | null | Note/memo text, max 240 characters |
 | `isActive` | bool | yes | true | `false` when habit is deactivated (cat becomes dormant) |
 | `createdAt` | timestamp | yes | — | Habit creation timestamp |
 
@@ -195,12 +195,12 @@ Batch includes:
 2. `UPDATE users/{uid}/cats/{catId}.state = "graduated"` — graduate the bound cat
 
 ### 4. Habit Update (Edit)
-**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, deadlineDate?, reminderTime?, clearReminder, motivationText?, clearMotivation})`
+**Method:** `FirestoreService.updateHabit(uid, habitId, {name?, goalMinutes?, targetHours?, clearTargetHours, reminders?, clearReminders, motivationText?, clearMotivation, deadlineDate?, clearDeadlineDate})`
 
 Single-document update:
-1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `deadlineDate`, `reminderTime`, `motivationText`; if `clearReminder == true`, set `reminderTime` to `null`; if `clearMotivation == true`, set `motivationText` to `null`)
+1. `UPDATE users/{uid}/habits/{habitId}` — set only the provided fields (`name`, `goalMinutes`, `targetHours`, `deadlineDate`, `reminders`, `motivationText`; if `clearTargetHours == true`, set `targetHours` to `null`; if `clearReminders == true`, set `reminders` to `[]`; if `clearMotivation == true`, set `motivationText` to `null`; if `clearDeadlineDate == true`, set `deadlineDate` to `null`)
 
-**Validation**: At least one field must be non-null or `clearReminder`/`clearMotivation` must be true. Empty strings are rejected.
+**Validation**: At least one field must be non-null or a clear flag must be true. Empty strings are rejected.
 
 > **Note:** Internal identifier remains `habit`. User-facing term is **Quest**.
 
@@ -291,7 +291,7 @@ The `firestore.rules` file enforces server-side field validation on write operat
 |-----------|-------|----------------|
 | `habits` | `targetHours` | `int` (optional, nullable), range `1–10000` when present |
 | `habits` | `goalMinutes` | `int` (optional), range `1–480` |
-| `habits` | `motivationText` | `string` (optional), length `0–40` characters |
+| `habits` | `motivationText` | `string` (optional), length `0–240` characters |
 | `cats` | `name` | `string`, length `1–30` characters |
 | `cats` | `state` | `string`, must be one of `['active', 'graduated', 'dormant']` |
 | `cats` | `totalMinutes` | `int`, `>= 0` |

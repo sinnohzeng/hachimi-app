@@ -75,14 +75,16 @@ ProfileScreen → CatDetailScreen (via Cat Album)
 
 ### Today Tab
 
-**Featured Cat Card** (top of scroll):
-- Cat sprite (large, ~100px), breed color tint
-- Cat name + personality badge
-- XP progress bar with "X XP to next stage" label
-- "Start Focus" `FilledButton` → FocusSetupScreen for bound habit
+**Featured Cat Card** (top of scroll) — 3-line header + progress row:
+- Row 1 (header): Cat sprite (56px) + right column with 3 lines:
+  - Line 1: Cat name (`titleMedium`, bold)
+  - Line 2: Quest name (`bodySmall`, maxLines: 2)
+  - Line 3: Note/memo (`bodySmall`, italic, maxLines: 2, only shown when non-empty)
+- Row 2 (progress): Growth progress bar + hours/stage label + "Focus" `FilledButton.tonal`
+- Gradient background tinted by cat's growth stage color
 
 **Habit List** (below featured card):
-- Each row: mini `CatSprite` (~40px) | habit name | streak badge | today's progress bar | "Start" button
+- Each row: mini `CatSprite` (~40px) | habit name | today's progress bar | "Start" button
 - "Start" → FocusSetupScreen(habitId)
 - Today's progress bar fills as minutes accumulate vs `goalMinutes`
 
@@ -99,13 +101,20 @@ ProfileScreen → CatDetailScreen (via Cat Album)
 ## S4: Adoption Flow Screen (3-Step Habit Creation)
 **File:** `lib/screens/habits/adoption_flow_screen.dart`
 
-### Step 1 — Define Habit
-- "New Habit" AppBar with close button
+### Step 1 — Define Quest
+- AppBar with title + back button
 - Progress indicator (step 1 of 3)
-- Habit name `TextField` (required)
-- Emoji icon picker grid (`EmojiPicker` widget, ~30 options)
-- Daily goal chip selector: `[15 min] [25 min] [40 min] [60 min] [Custom]`
-- Reminder time chips: `[7 AM] [8 AM] [9 PM] [None]`
+- **Basic Info** section header:
+  - Quest name `TextFormField` (required, prefixIcon: edit_outlined)
+  - Note/memo `TextFormField` (maxLength: 240, maxLines: 4, minLines: 2, with random-fill refresh button)
+- **Goals** section header:
+  - Hint text explaining growth ladder
+  - Mode toggle: `_ModeOption` cards (Unlimited / Milestone)
+  - [Milestone] Target hours chips `[50h] [100h] [200h] [500h] [Custom]` + deadline date picker
+  - Daily goal chips `[15min] [25min] [40min] [60min] [Custom]`
+- **Reminder** section header:
+  - Reminder list (up to 5) with delete buttons + "Add reminder" button → `showReminderPickerSheet`
+- **Growth Path** card (always fully expanded, no collapse) — shows 4-stage growth ladder + research tip
 - "Next" `FilledButton` (validates name is non-empty)
 
 ### Step 2 — Adopt Your Cat
@@ -229,9 +238,21 @@ ProfileScreen → CatDetailScreen (via Cat Album)
 1. **Hero section**: Large `CatSprite` (centered, ~180px) + stage label + shine effect for Shiny stage
 2. **Identity card**: Cat name | breed | rarity chip | personality badge + emoji
 3. **XP Progress card**: Current XP / next stage threshold + `LinearProgressIndicator` + "Stage X → Stage Y" labels
-4. **Habit card**: Bound habit icon + name + current streak + best streak
-5. **Activity Heatmap card**: `StreakHeatmap` widget — 91-day GitHub-style grid with stats row
-6. **Milestones card**: Stages unlocked (with dates), streak milestones reached
+4. **Focus Stats card**: Quest name + note + 2-column stats grid + "Edit" + "Start Focus" buttons
+5. **Reminder card**: Reminder list with add/remove actions
+6. **Activity Heatmap card**: `StreakHeatmap` widget — 91-day GitHub-style grid with stats row
+
+### Edit Quest (Full-Screen Page)
+**File:** `lib/screens/cat_detail/components/edit_quest_sheet.dart`
+
+Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layout is unified with AdoptionFlowScreen Step 1:
+
+- `Scaffold` + `AppBar` (title: edit quest, back button)
+- **Basic Info** section: Quest name + Note/memo (multiline)
+- **Goals** section: Mode toggle (`_ModeOption` cards) + target hours + deadline + daily goal
+- **Reminder** section: Reminder list with add/remove (persisted on save)
+- **Growth Path** card (always fully expanded)
+- Bottom: fixed-position "Save" `FilledButton`
 
 ### Analytics Events
 - No custom events (navigated from Cat Room or Profile — parent screens already track)

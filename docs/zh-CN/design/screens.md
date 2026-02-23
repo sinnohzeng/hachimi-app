@@ -75,16 +75,18 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 
 ### 今日标签
 
-**精选猫咪卡片**（滚动顶部）：
+**精选猫咪卡片**（滚动顶部）—— 3 行头部 + 进度行：
 
-- 猫咪精灵（大图，约 100px），品种颜色着色
-- 猫咪名字 + 性格徽章
-- XP 进度条，显示「距下一阶段还需 X XP」
-- 「开始专注」`FilledButton` → FocusSetupScreen（绑定习惯）
+- 第 1 行（头部）：猫咪精灵（56px）+ 右侧 3 行信息：
+  - 第 1 行：猫咪名字（`titleMedium`，粗体）
+  - 第 2 行：Quest 名称（`bodySmall`，最多 2 行）
+  - 第 3 行：备忘（`bodySmall`，斜体，最多 2 行，仅有内容时显示）
+- 第 2 行（进度）：成长进度条 + 时长/阶段标签 + 「专注」`FilledButton.tonal`
+- 渐变背景以猫咪成长阶段颜色着色
 
 **习惯列表**（精选卡片下方）：
 
-- 每行：小型 `CatSprite`（约 40px）| 习惯名称 | 连续记录徽章 | 今日进度条 | 「开始」按钮
+- 每行：小型 `CatSprite`（约 40px）| 习惯名称 | 今日进度条 | 「开始」按钮
 - 「开始」→ FocusSetupScreen(habitId)
 - 今日进度条随分钟积累对比 `goalMinutes` 填充
 
@@ -102,13 +104,20 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 ## S4：领养流程界面（3 步习惯创建）
 **文件：** `lib/screens/habits/adoption_flow_screen.dart`
 
-### 第 1 步 —— 定义习惯
-- 顶部「新建习惯」AppBar + 关闭按钮
+### 第 1 步 —— 定义 Quest
+- 顶部 AppBar（标题 + 返回按钮）
 - 步骤进度指示器（3 步中的第 1 步）
-- 习惯名称 `TextField`（必填）
-- Emoji 图标选择器网格（`EmojiPicker` 组件，约 30 个选项）
-- 每日目标片段：`[15 分钟] [25 分钟] [40 分钟] [60 分钟] [自定义]`
-- 提醒时间片段：`[7 点] [8 点] [21 点] [不提醒]`
+- **基础信息** 分区标题：
+  - Quest 名称 `TextFormField`（必填，prefixIcon：edit_outlined）
+  - 备忘 `TextFormField`（maxLength：240，maxLines：4，minLines：2，带随机填充刷新按钮）
+- **目标设置** 分区标题：
+  - 成长阶梯说明文字
+  - 模式切换：`_ModeOption` 卡片（永续模式 / 里程碑模式）
+  - 【里程碑】目标小时数片段 `[50h] [100h] [200h] [500h] [自定义]` + 截止日期选择器
+  - 每日目标片段 `[15min] [25min] [40min] [60min] [自定义]`
+- **提醒** 分区标题：
+  - 提醒列表（上限 5 个）+ 删除按钮 + 「添加提醒」按钮 → `showReminderPickerSheet`
+- **成长之路** 卡片（始终完整展示，无折叠）—— 展示 4 阶段成长阶梯 + 研究 tip
 - 「下一步」`FilledButton`（验证名称非空）
 
 ### 第 2 步 —— 领养猫咪
@@ -224,9 +233,21 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 1. **主角区域**：大型 `CatSprite`（居中，约 180px）+ 阶段标签，闪光猫阶段附带光芒效果
 2. **身份信息卡片**：猫咪名字 | 品种 | 稀有度片段 | 性格徽章 + Emoji
 3. **XP 进度卡片**：当前 XP / 下一阶段阈值 + `LinearProgressIndicator` + 「阶段 X → 阶段 Y」标签
-4. **习惯信息卡片**：绑定习惯的 Emoji 图标 + 名称 + 当前连续记录 + 历史最高连续记录
-5. **活动热力图卡片**：`StreakHeatmap` 组件 —— 91 天 GitHub 风格网格 + 统计行
-6. **里程碑卡片**：已解锁阶段（含日期）、达成的连续记录里程碑
+4. **专注统计卡片**：Quest 名称 + 备忘 + 2 列统计网格 + 「编辑」+ 「开始专注」按钮
+5. **提醒卡片**：提醒列表，支持添加/删除操作
+6. **活动热力图卡片**：`StreakHeatmap` 组件 —— 91 天 GitHub 风格网格 + 统计行
+
+### 编辑 Quest（全屏页面）
+**文件：** `lib/screens/cat_detail/components/edit_quest_sheet.dart`
+
+通过专注统计卡片中的「编辑」按钮以 `Navigator.push` 导航。布局与 AdoptionFlowScreen 第 1 步统一：
+
+- `Scaffold` + `AppBar`（标题：编辑 Quest，返回按钮）
+- **基础信息** 分区：Quest 名称 + 备忘（多行输入）
+- **目标设置** 分区：模式切换（`_ModeOption` 卡片）+ 目标小时数 + 截止日期 + 每日目标
+- **提醒** 分区：提醒列表，支持添加/删除（保存时持久化）
+- **成长之路** 卡片（始终完整展示）
+- 底部：固定位置「保存」`FilledButton`
 
 ---
 

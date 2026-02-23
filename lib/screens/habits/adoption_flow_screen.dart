@@ -348,6 +348,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           TextFormField(
             controller: _motivationController,
             maxLength: 240,
+            maxLines: 4,
+            minLines: 2,
             decoration: InputDecoration(
               labelText: context.l10n.adoptionMotivationLabel,
               hintText: context.l10n.adoptionMotivationHint,
@@ -366,9 +368,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          const Divider(),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.lg),
 
           // ── 目标设置 ──
           Text(
@@ -461,15 +461,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          const Divider(),
-          const SizedBox(height: AppSpacing.sm),
-
-          // ── 成长之路说明卡片 ──
-          GrowthPathCard(initiallyExpanded: widget.isFirstHabit),
-          const SizedBox(height: AppSpacing.sm),
-          const Divider(),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.lg),
 
           // ── 提醒 ──
           Text(
@@ -478,6 +470,10 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           _buildReminderList(theme),
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── 成长之路说明卡片 ──
+          const GrowthPathCard(),
         ],
       ),
     );

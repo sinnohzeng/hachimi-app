@@ -649,9 +649,9 @@
   "adoptionDeadlineLabel": "Deadline",
   "adoptionDeadlineNone": "Not set",
   "adoptionReminderSection": "Reminder",
-  "adoptionMotivationLabel": "Motivational quote",
-  "adoptionMotivationHint": "Write something to encourage yourself",
-  "adoptionMotivationSwap": "New quote",
+  "adoptionMotivationLabel": "Note",
+  "adoptionMotivationHint": "Write a note...",
+  "adoptionMotivationSwap": "Random fill",
 
   "loginAppName": "Hachimi",
   "loginTagline": "Raise cats. Complete quests.",

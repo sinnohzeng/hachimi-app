@@ -494,9 +494,9 @@
   "adoptionDeadlineLabel": "마감일",
   "adoptionDeadlineNone": "미설정",
   "adoptionReminderSection": "알림",
-  "adoptionMotivationLabel": "동기부여 문구",
-  "adoptionMotivationHint": "자신을 격려하는 말을 적어보세요",
-  "adoptionMotivationSwap": "다른 문구",
+  "adoptionMotivationLabel": "메모",
+  "adoptionMotivationHint": "메모를 적어보세요...",
+  "adoptionMotivationSwap": "랜덤 입력",
 
   "loginAppName": "하치미",
   "loginTagline": "고양이를 키우고, 퀘스트를 완료하세요.",

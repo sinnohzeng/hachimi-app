@@ -494,9 +494,9 @@
   "adoptionDeadlineLabel": "截止日期",
   "adoptionDeadlineNone": "不設",
   "adoptionReminderSection": "提醒",
-  "adoptionMotivationLabel": "激勵語",
-  "adoptionMotivationHint": "寫一句話鼓勵自己",
-  "adoptionMotivationSwap": "換一句",
+  "adoptionMotivationLabel": "備忘",
+  "adoptionMotivationHint": "寫點什麼備忘...",
+  "adoptionMotivationSwap": "隨機填充",
 
   "loginAppName": "Hachimi",
   "loginTagline": "養貓咪，完成任務。",

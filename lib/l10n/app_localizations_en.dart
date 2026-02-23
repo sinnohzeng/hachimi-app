@@ -1488,13 +1488,13 @@ class SEn extends S {
   String get adoptionReminderSection => 'Reminder';
 
   @override
-  String get adoptionMotivationLabel => 'Motivational quote';
+  String get adoptionMotivationLabel => 'Note';
 
   @override
-  String get adoptionMotivationHint => 'Write something to encourage yourself';
+  String get adoptionMotivationHint => 'Write a note...';
 
   @override
-  String get adoptionMotivationSwap => 'New quote';
+  String get adoptionMotivationSwap => 'Random fill';
 
   @override
   String get loginAppName => 'Hachimi';

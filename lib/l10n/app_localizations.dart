@@ -2841,19 +2841,19 @@ abstract class S {
   /// No description provided for @adoptionMotivationLabel.
   ///
   /// In en, this message translates to:
-  /// **'Motivational quote'**
+  /// **'Note'**
   String get adoptionMotivationLabel;
 
   /// No description provided for @adoptionMotivationHint.
   ///
   /// In en, this message translates to:
-  /// **'Write something to encourage yourself'**
+  /// **'Write a note...'**
   String get adoptionMotivationHint;
 
   /// No description provided for @adoptionMotivationSwap.
   ///
   /// In en, this message translates to:
-  /// **'New quote'**
+  /// **'Random fill'**
   String get adoptionMotivationSwap;
 
   /// No description provided for @loginAppName.

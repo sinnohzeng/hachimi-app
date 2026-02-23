@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2026-02-23
+### Changed
+- Quest creation and editing forms unified — identical field order, section headers, and component styles
+- Edit Quest upgraded from bottom sheet to full-screen Scaffold page with AppBar
+- Mode toggle in Edit Quest replaced from `SegmentedButton` to `_ModeOption` cards (matching creation flow)
+- Note/memo field (formerly "motivation") now supports multiline input (maxLines: 4, minLines: 2)
+- GrowthPathCard always fully expanded — removed `ExpansionTile` and `initiallyExpanded` parameter
+- GrowthPathCard moved to bottom of form (after reminders) in both creation and editing flows
+- Featured cat card on Today page upgraded to 3-line layout: cat name, quest name, and note/memo
+- "Motivational quote" renamed to "Note/memo" across all 5 languages (EN/ZH/ZH-Hant/JA/KO)
+- Dividers removed from adoption flow Step 1 — replaced with spacing for cleaner visual separation
+
+### Added
+- Reminder management in Edit Quest — add/remove reminders with persistence and notification rescheduling
+- GrowthPathCard displayed in Edit Quest page (was only in creation flow)
+
+### Fixed
+- Documentation sync: `screens.md` and `data-model.md` updated to reflect current implementation (EN + zh-CN)
+- `data-model.md` corrected stale `reminderTime` field to `reminders` list, `motivationText` max length 40 → 240
+
 ## [2.12.0] - 2026-02-23
 ### Added
 - Multi-reminder system — each quest supports up to 5 independent reminders with 9 scheduling modes (daily, weekdays, individual days)

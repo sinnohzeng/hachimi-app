@@ -186,13 +186,9 @@ class FocusStatsCard extends ConsumerWidget {
   }
 
   void _showEditQuestSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-        child: EditQuestSheet(habit: habit),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => EditQuestSheet(habit: habit, cat: cat),
       ),
     );
   }
