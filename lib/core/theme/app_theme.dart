@@ -99,6 +99,15 @@ class AppTheme {
         indicatorColor: colorScheme.secondaryContainer,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
+      navigationRailTheme: NavigationRailThemeData(
+        indicatorColor: colorScheme.secondaryContainer,
+        selectedIconTheme: IconThemeData(
+          color: colorScheme.onSecondaryContainer,
+        ),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        labelType: NavigationRailLabelType.all,
+        backgroundColor: colorScheme.surface,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         border: const OutlineInputBorder(),
         filled: true,

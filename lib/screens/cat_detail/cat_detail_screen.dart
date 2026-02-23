@@ -16,6 +16,7 @@ import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
+import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 
 import 'components/focus_stats_card.dart';
@@ -65,160 +66,163 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     );
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // [B2] SliverAppBar with FlexibleSpaceBar.title for smooth scroll-to-title
-          SliverAppBar(
-            expandedHeight: 280,
-            pinned: true,
-            systemOverlayStyle: Theme.of(context).brightness == Brightness.light
-                ? SystemUiOverlayStyle.dark
-                : SystemUiOverlayStyle.light,
-            actions: [
-              // [B3] 编辑入口移到 AppBar actions
-              IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () => _showRenameDialog(context, cat),
-                tooltip: context.l10n.catDetailRenameTooltip,
-              ),
-              // 聊天入口 — 仅当 AI 功能就绪时显示
-              if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
+      body: ContentWidthConstraint(
+        child: CustomScrollView(
+          slivers: [
+            // [B2] SliverAppBar with FlexibleSpaceBar.title for smooth scroll-to-title
+            SliverAppBar(
+              expandedHeight: 280,
+              pinned: true,
+              systemOverlayStyle:
+                  Theme.of(context).brightness == Brightness.light
+                  ? SystemUiOverlayStyle.dark
+                  : SystemUiOverlayStyle.light,
+              actions: [
+                // [B3] 编辑入口移到 AppBar actions
                 IconButton(
-                  icon: const Icon(Icons.chat_bubble_outline),
-                  onPressed: () {
-                    Navigator.of(
-                      context,
-                    ).pushNamed(AppRouter.catChat, arguments: widget.catId);
-                  },
-                  tooltip: context.l10n.catDetailChatTooltip,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _showRenameDialog(context, cat),
+                  tooltip: context.l10n.catDetailRenameTooltip,
                 ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              // [B2] 猫名作为 FlexibleSpaceBar.title，随滚动平滑过渡
-              title: Text(
-                cat.name,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
+                // 聊天入口 — 仅当 AI 功能就绪时显示
+                if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    onPressed: () {
+                      Navigator.of(
+                        context,
+                      ).pushNamed(AppRouter.catChat, arguments: widget.catId);
+                    },
+                    tooltip: context.l10n.catDetailChatTooltip,
+                  ),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                // [B2] 猫名作为 FlexibleSpaceBar.title，随滚动平滑过渡
+                title: Text(
+                  cat.name,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              centerTitle: true,
-              expandedTitleScale: 1.3,
-              // [B1] 粒子效果移入 FlexibleSpaceBar.background，随 AppBar 折叠消失
-              background: Stack(
-                children: [
-                  AnimatedMeshBackground(
-                    colors: meshColors,
-                    speed: 1.0,
-                    fadeIn: true,
-                    child: SafeArea(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: AppSpacing.xxl),
-                          // Tappable cat sprite with bounce animation + Hero
-                          Hero(
-                            tag: 'cat-${cat.id}',
-                            child: TappableCatSprite(cat: cat, size: 120),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          // 性格标签（猫名已移到 FlexibleSpaceBar.title）
-                          if (personality != null)
-                            Text(
-                              '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
+                centerTitle: true,
+                expandedTitleScale: 1.3,
+                // [B1] 粒子效果移入 FlexibleSpaceBar.background，随 AppBar 折叠消失
+                background: Stack(
+                  children: [
+                    AnimatedMeshBackground(
+                      colors: meshColors,
+                      speed: 1.0,
+                      fadeIn: true,
+                      child: SafeArea(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: AppSpacing.xxl),
+                            // Tappable cat sprite with bounce animation + Hero
+                            Hero(
+                              tag: 'cat-${cat.id}',
+                              child: TappableCatSprite(cat: cat, size: 120),
                             ),
-                          // 为 FlexibleSpaceBar.title 留出底部空间
-                          const SizedBox(height: AppSpacing.xxl),
-                        ],
+                            const SizedBox(height: AppSpacing.md),
+                            // 性格标签（猫名已移到 FlexibleSpaceBar.title）
+                            if (personality != null)
+                              Text(
+                                '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            // 为 FlexibleSpaceBar.title 留出底部空间
+                            const SizedBox(height: AppSpacing.xxl),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  // [B1] 粒子覆盖层
-                  const Positioned.fill(
-                    child: IgnorePointer(
-                      child: ParticleOverlay(
-                        mode: ParticleMode.firefly,
-                        child: SizedBox.expand(),
+                    // [B1] 粒子覆盖层
+                    const Positioned.fill(
+                      child: IgnorePointer(
+                        child: ParticleOverlay(
+                          mode: ParticleMode.firefly,
+                          child: SizedBox.expand(),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          SliverPadding(
-            padding: AppSpacing.paddingBase,
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                // Mood badge
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiaryContainer,
-                      borderRadius: AppShape.borderLarge,
-                    ),
-                    child: Text(
-                      '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-                      style: textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onTertiaryContainer,
+            SliverPadding(
+              padding: AppSpacing.paddingBase,
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  // Mood badge
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.tertiaryContainer,
+                        borderRadius: AppShape.borderLarge,
+                      ),
+                      child: Text(
+                        '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onTertiaryContainer,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
 
-                // Growth progress (time-based)
-                _buildGrowthCard(context, cat, stageClr),
-                const SizedBox(height: AppSpacing.base),
-
-                // Focus statistics card (replaces old "Bound Habit" card)
-                if (habit != null) ...[
-                  FocusStatsCard(habit: habit, cat: cat),
-                  const SizedBox(height: AppSpacing.base),
-                ],
-
-                // Hachimi Diary card — AI 日记预览
-                if (ref.watch(aiAvailabilityProvider) ==
-                    AiAvailability.ready) ...[
-                  DiaryPreviewCard(catId: cat.id),
+                  // Growth progress (time-based)
+                  _buildGrowthCard(context, cat, stageClr),
                   const SizedBox(height: AppSpacing.base),
 
-                  // 聊天入口卡片 — 提升可发现性
-                  ChatEntryCard(catId: cat.id, catName: cat.name),
+                  // Focus statistics card (replaces old "Bound Habit" card)
+                  if (habit != null) ...[
+                    FocusStatsCard(habit: habit, cat: cat),
+                    const SizedBox(height: AppSpacing.base),
+                  ],
+
+                  // Hachimi Diary card — AI 日记预览
+                  if (ref.watch(aiAvailabilityProvider) ==
+                      AiAvailability.ready) ...[
+                    DiaryPreviewCard(catId: cat.id),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // 聊天入口卡片 — 提升可发现性
+                    ChatEntryCard(catId: cat.id, catName: cat.name),
+                    const SizedBox(height: AppSpacing.base),
+                  ],
+
+                  // Reminder card
+                  if (habit != null) ...[
+                    ReminderCard(habit: habit, cat: cat),
+                    const SizedBox(height: AppSpacing.base),
+                  ],
+
+                  // Streak heatmap
+                  if (habit != null) HabitHeatmapCard(habitId: habit.id),
                   const SizedBox(height: AppSpacing.base),
-                ],
 
-                // Reminder card
-                if (habit != null) ...[
-                  ReminderCard(habit: habit, cat: cat),
+                  // Accessories card
+                  AccessoriesCard(cat: cat),
                   const SizedBox(height: AppSpacing.base),
-                ],
 
-                // Streak heatmap
-                if (habit != null) HabitHeatmapCard(habitId: habit.id),
-                const SizedBox(height: AppSpacing.base),
-
-                // Accessories card
-                AccessoriesCard(cat: cat),
-                const SizedBox(height: AppSpacing.base),
-
-                // Enhanced cat info card
-                EnhancedCatInfoCard(cat: cat),
-                const SizedBox(height: AppSpacing.xl),
-              ]),
+                  // Enhanced cat info card
+                  EnhancedCatInfoCard(cat: cat),
+                  const SizedBox(height: AppSpacing.xl),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

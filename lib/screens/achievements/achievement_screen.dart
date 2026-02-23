@@ -9,6 +9,7 @@ import 'package:hachimi_app/screens/achievements/components/achievement_card.dar
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_summary.dart';
 import 'package:hachimi_app/screens/achievements/components/overview_tab.dart';
+import 'package:hachimi_app/widgets/content_width_constraint.dart';
 
 /// 成就页面 — 底部导航 Tab 2，替代原 StatsScreen。
 /// 包含 4 个 Tab：概览、任务、猫咪、坚持。
@@ -40,42 +41,44 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
     final l10n = context.l10n;
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            floating: true,
-            pinned: true,
-            title: Text(l10n.achievementTitle),
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.history),
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(AppRouter.sessionHistory),
-                tooltip: l10n.historyTitle,
-              ),
-            ],
-            bottom: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              tabs: [
-                Tab(text: l10n.achievementTabOverview),
-                Tab(text: l10n.achievementTabQuest),
-                Tab(text: l10n.achievementTabCat),
-                Tab(text: l10n.achievementTabPersist),
+      body: ContentWidthConstraint(
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              floating: true,
+              pinned: true,
+              title: Text(l10n.achievementTitle),
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.history),
+                  onPressed: () =>
+                      Navigator.of(context).pushNamed(AppRouter.sessionHistory),
+                  tooltip: l10n.historyTitle,
+                ),
               ],
+              bottom: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabAlignment: TabAlignment.start,
+                tabs: [
+                  Tab(text: l10n.achievementTabOverview),
+                  Tab(text: l10n.achievementTabQuest),
+                  Tab(text: l10n.achievementTabCat),
+                  Tab(text: l10n.achievementTabPersist),
+                ],
+              ),
             ),
-          ),
-        ],
-        body: TabBarView(
-          controller: _tabController,
-          children: const [
-            OverviewTab(),
-            _AchievementListTab(category: AchievementCategory.quest),
-            _AchievementListTab(category: AchievementCategory.cat),
-            _AchievementListTab(category: AchievementCategory.persist),
           ],
+          body: TabBarView(
+            controller: _tabController,
+            children: const [
+              OverviewTab(),
+              _AchievementListTab(category: AchievementCategory.quest),
+              _AchievementListTab(category: AchievementCategory.cat),
+              _AchievementListTab(category: AchievementCategory.persist),
+            ],
+          ),
         ),
       ),
     );

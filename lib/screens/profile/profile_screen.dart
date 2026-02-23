@@ -16,6 +16,7 @@ import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/widgets/content_width_constraint.dart';
 
 import 'components/edit_name_dialog.dart';
 import 'components/avatar_picker_sheet.dart';
@@ -38,19 +39,28 @@ class ProfileScreen extends ConsumerWidget {
         l10n.profileFallbackUser;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildAppBar(context, ref, displayName, user?.email, avatarId, l10n),
-          _buildBody(
-            context,
-            ref,
-            stats: stats,
-            allCatsCount: allCats.length,
-            stageCounts: stageCounts,
-            theme: theme,
-            l10n: l10n,
-          ),
-        ],
+      body: ContentWidthConstraint(
+        child: CustomScrollView(
+          slivers: [
+            _buildAppBar(
+              context,
+              ref,
+              displayName,
+              user?.email,
+              avatarId,
+              l10n,
+            ),
+            _buildBody(
+              context,
+              ref,
+              stats: stats,
+              allCatsCount: allCats.length,
+              stageCounts: stageCounts,
+              theme: theme,
+              l10n: l10n,
+            ),
+          ],
+        ),
       ),
     );
   }
