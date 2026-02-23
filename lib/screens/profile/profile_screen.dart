@@ -17,6 +17,7 @@ import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/edit_name_dialog.dart';
 import 'components/avatar_picker_sheet.dart';
@@ -110,32 +111,44 @@ class ProfileScreen extends ConsumerWidget {
       padding: AppSpacing.paddingBase,
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          _AchievementChip(ref: ref, l10n: l10n),
+          StaggeredListItem(
+            index: 0,
+            child: _AchievementChip(ref: ref, l10n: l10n),
+          ),
           const SizedBox(height: AppSpacing.lg),
-          _JourneyCard(
-            stats: stats,
-            allCatsCount: allCatsCount,
-            stageCounts: stageCounts,
-            colorScheme: theme.colorScheme,
-            textTheme: theme.textTheme,
-            l10n: l10n,
+          StaggeredListItem(
+            index: 1,
+            child: _JourneyCard(
+              stats: stats,
+              allCatsCount: allCatsCount,
+              stageCounts: stageCounts,
+              colorScheme: theme.colorScheme,
+              textTheme: theme.textTheme,
+              l10n: l10n,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: Text(l10n.profileSettings),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRouter.settingsPage),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout, color: theme.colorScheme.error),
-            title: Text(
-              l10n.commonLogOut,
-              style: TextStyle(color: theme.colorScheme.error),
+          StaggeredListItem(
+            index: 2,
+            child: ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: Text(l10n.profileSettings),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRouter.settingsPage),
             ),
-            onTap: () => _confirmLogout(context, ref),
+          ),
+          StaggeredListItem(
+            index: 3,
+            child: ListTile(
+              leading: Icon(Icons.logout, color: theme.colorScheme.error),
+              title: Text(
+                l10n.commonLogOut,
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+              onTap: () => _confirmLogout(context, ref),
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
         ]),
@@ -220,34 +233,40 @@ class _ProfileHeader extends StatelessWidget {
 
   Widget _buildAvatar() {
     final avatar = avatarId != null ? AvatarConstants.byId(avatarId!) : null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onEditAvatar();
-        },
-        child: Stack(
-          children: [
-            _avatarCircle(avatar),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colorScheme.secondaryContainer,
-                ),
-                child: Icon(
-                  Icons.edit,
-                  size: 14,
-                  color: colorScheme.onSecondaryContainer,
+    return Semantics(
+      button: true,
+      label: 'Change avatar',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onEditAvatar();
+          },
+          child: Stack(
+            children: [
+              _avatarCircle(avatar),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: ExcludeSemantics(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colorScheme.secondaryContainer,
+                    ),
+                    child: Icon(
+                      Icons.edit,
+                      size: 14,
+                      color: colorScheme.onSecondaryContainer,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -275,31 +294,39 @@ class _ProfileHeader extends StatelessWidget {
   }
 
   Widget _buildNameRow() {
-    return InkWell(
-      borderRadius: AppShape.borderSmall,
-      onTap: onEditName,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                displayName,
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+    return Semantics(
+      button: true,
+      label: 'Edit display name: $displayName',
+      child: InkWell(
+        borderRadius: AppShape.borderSmall,
+        onTap: onEditName,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: ExcludeSemantics(
+                  child: Text(
+                    displayName,
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Icon(
-              Icons.edit_outlined,
-              size: 16,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ],
+              const SizedBox(width: AppSpacing.xs),
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.edit_outlined,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

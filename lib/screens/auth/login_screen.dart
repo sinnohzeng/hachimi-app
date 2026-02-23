@@ -84,6 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Icons.local_fire_department,
                   size: 80,
                   color: colorScheme.onPrimary,
+                  semanticLabel: 'Hachimi',
                 ),
                 const SizedBox(height: AppSpacing.base),
 
@@ -167,22 +168,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const EmailAuthScreen(startAsLogin: true),
+                    Semantics(
+                      button: true,
+                      label: context.l10n.loginLogIn,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const EmailAuthScreen(startAsLogin: true),
+                            ),
+                          );
+                        },
+                        child: ExcludeSemantics(
+                          child: Text(
+                            context.l10n.loginLogIn,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: colorScheme.onPrimary,
+                            ),
                           ),
-                        );
-                      },
-                      child: Text(
-                        context.l10n.loginLogIn,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                          decorationColor: colorScheme.onPrimary,
                         ),
                       ),
                     ),

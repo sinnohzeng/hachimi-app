@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_elevation.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -199,17 +200,10 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     final isGenerating = chatState.status == ChatStatus.generating;
     final canSend = habit != null && !isGenerating;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
+    return Material(
+      elevation: AppElevation.level2,
+      surfaceTintColor: colorScheme.surfaceTint,
+      color: colorScheme.surface,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -254,6 +248,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                         .stopGeneration();
                   },
                   icon: const Icon(Icons.stop),
+                  tooltip: 'Stop',
                   style: IconButton.styleFrom(
                     backgroundColor: colorScheme.errorContainer,
                     foregroundColor: colorScheme.onErrorContainer,
@@ -263,6 +258,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                 IconButton(
                   onPressed: canSend ? () => _send(cat, habit) : null,
                   icon: const Icon(Icons.send),
+                  tooltip: 'Send',
                   style: IconButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,

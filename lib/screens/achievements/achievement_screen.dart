@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
@@ -86,6 +87,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
 }
 
 /// 成就列表 Tab — 按分类显示成就卡片列表。
+/// 响应式网格：compact 1 列, medium 2 列, expanded 3 列。
 class _AchievementListTab extends ConsumerWidget {
   final String category;
 
@@ -95,33 +97,56 @@ class _AchievementListTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unlockedIds = ref.watch(unlockedIdsProvider);
     final progressMap = ref.watch(achievementProgressProvider);
-    final defs = AchievementDefinitions.byCategory(category);
+    final sorted = _sortedDefs(category, unlockedIds);
+    final columns = _gridColumns(context);
 
-    // 排序：已解锁在前，未解锁按 targetValue 排序
-    final sorted = List<AchievementDef>.from(defs)
-      ..sort((a, b) {
-        final aUnlocked = unlockedIds.contains(a.id);
-        final bUnlocked = unlockedIds.contains(b.id);
-        if (aUnlocked != bUnlocked) return aUnlocked ? -1 : 1;
-        return (a.targetValue ?? 0).compareTo(b.targetValue ?? 0);
-      });
-
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: 80),
-      itemCount: sorted.length + 1, // +1 for summary header
-      itemBuilder: (context, index) {
-        if (index == 0) return const AchievementSummary();
-
-        final def = sorted[index - 1];
-        return StaggeredListItem(
-          index: index - 1,
-          child: AchievementCard(
-            def: def,
-            isUnlocked: unlockedIds.contains(def.id),
-            progress: progressMap[def.id],
+    return CustomScrollView(
+      slivers: [
+        const SliverToBoxAdapter(child: AchievementSummary()),
+        SliverPadding(
+          padding: const EdgeInsets.only(top: 8, bottom: 80),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              // 成就卡高度约 100-140px，宽高比约 3:1
+              childAspectRatio: 3.0,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => StaggeredListItem(
+                index: index,
+                child: AchievementCard(
+                  def: sorted[index],
+                  isUnlocked: unlockedIds.contains(sorted[index].id),
+                  progress: progressMap[sorted[index].id],
+                ),
+              ),
+              childCount: sorted.length,
+            ),
           ),
-        );
-      },
+        ),
+      ],
     );
+  }
+
+  /// compact: 1, medium: 2, expanded: 3
+  static int _gridColumns(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width >= AppBreakpoints.expanded) return 3;
+    if (width >= AppBreakpoints.compact) return 2;
+    return 1;
+  }
+
+  static List<AchievementDef> _sortedDefs(
+    String category,
+    Set<String> unlockedIds,
+  ) {
+    return List<AchievementDef>.from(
+      AchievementDefinitions.byCategory(category),
+    )..sort((a, b) {
+      final aUnlocked = unlockedIds.contains(a.id);
+      final bUnlocked = unlockedIds.contains(b.id);
+      if (aUnlocked != bUnlocked) return aUnlocked ? -1 : 1;
+      return (a.targetValue ?? 0).compareTo(b.targetValue ?? 0);
+    });
   }
 }

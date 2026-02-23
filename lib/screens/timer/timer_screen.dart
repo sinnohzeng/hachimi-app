@@ -518,6 +518,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                             Icons.self_improvement,
                             size: 64,
                             color: colorScheme.onSurfaceVariant,
+                            semanticLabel: 'Focus meditation',
                           ),
                       ],
                     ),

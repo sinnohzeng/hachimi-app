@@ -213,9 +213,17 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
           // 半透明遮罩
           FadeTransition(
             opacity: _bgFade,
-            child: GestureDetector(
-              onTap: widget.onDismiss,
-              child: Container(color: Colors.black54),
+            child: Semantics(
+              button: true,
+              label: 'Dismiss',
+              child: GestureDetector(
+                onTap: widget.onDismiss,
+                child: Container(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.scrim.withValues(alpha: 0.54),
+                ),
+              ),
             ),
           ),
 

@@ -74,6 +74,7 @@ class ReminderCard extends ConsumerWidget {
                           color: colorScheme.error,
                         ),
                         onPressed: () => _removeReminder(context, ref, i),
+                        tooltip: l10n.catDetailRemoveReminder,
                         visualDensity: VisualDensity.compact,
                       ),
                     ],

@@ -155,30 +155,36 @@ class InventoryScreen extends ConsumerWidget {
                   itemCount: cats.length,
                   itemBuilder: (_, index) {
                     final cat = cats[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                        _equip(context, ref, cat.id, accessoryId);
-                      },
-                      child: Container(
-                        width: 80,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: AppShape.borderMedium,
-                          color: Theme.of(ctx).colorScheme.surfaceContainerLow,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PixelCatSprite.fromCat(cat: cat, size: 48),
-                            const SizedBox(height: 2),
-                            Text(
-                              cat.name,
-                              style: Theme.of(ctx).textTheme.labelSmall,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                    return Semantics(
+                      button: true,
+                      label: 'Equip to ${cat.name}',
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          _equip(context, ref, cat.id, accessoryId);
+                        },
+                        child: Container(
+                          width: 80,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            borderRadius: AppShape.borderMedium,
+                            color: Theme.of(
+                              ctx,
+                            ).colorScheme.surfaceContainerLow,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PixelCatSprite.fromCat(cat: cat, size: 48),
+                              const SizedBox(height: 2),
+                              Text(
+                                cat.name,
+                                style: Theme.of(ctx).textTheme.labelSmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

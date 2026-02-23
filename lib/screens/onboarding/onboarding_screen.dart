@@ -80,19 +80,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Stack(
         children: [
           // Page content with shared axis transition
-          PageTransitionSwitcher(
-            duration: AppMotion.durationMedium2,
-            reverse: !_isForward,
-            transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
-                SharedAxisTransition(
-                  animation: primaryAnimation,
-                  secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.horizontal,
-                  child: child,
-                ),
-            child: KeyedSubtree(
-              key: ValueKey<int>(_currentPage),
-              child: _OnboardingPage(data: pages[_currentPage]),
+          Semantics(
+            label: 'Page ${_currentPage + 1} of $_pageCount',
+            child: PageTransitionSwitcher(
+              duration: AppMotion.durationMedium2,
+              reverse: !_isForward,
+              transitionBuilder:
+                  (child, primaryAnimation, secondaryAnimation) =>
+                      SharedAxisTransition(
+                        animation: primaryAnimation,
+                        secondaryAnimation: secondaryAnimation,
+                        transitionType: SharedAxisTransitionType.horizontal,
+                        child: child,
+                      ),
+              child: KeyedSubtree(
+                key: ValueKey<int>(_currentPage),
+                child: _OnboardingPage(data: pages[_currentPage]),
+              ),
             ),
           ),
 
@@ -124,20 +128,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Page indicator dots
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        pages.length,
-                        (index) => AnimatedContainer(
-                          duration: AppMotion.durationMedium2,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: _currentPage == index ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: _currentPage == index
-                                ? onColor
-                                : onColor.withValues(alpha: 0.38),
-                            borderRadius: AppShape.borderExtraSmall,
+                    Semantics(
+                      label: 'Page ${_currentPage + 1} of ${pages.length}',
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          pages.length,
+                          (index) => ExcludeSemantics(
+                            child: AnimatedContainer(
+                              duration: AppMotion.durationMedium2,
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _currentPage == index ? 24 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _currentPage == index
+                                    ? onColor
+                                    : onColor.withValues(alpha: 0.38),
+                                borderRadius: AppShape.borderExtraSmall,
+                              ),
+                            ),
                           ),
                         ),
                       ),

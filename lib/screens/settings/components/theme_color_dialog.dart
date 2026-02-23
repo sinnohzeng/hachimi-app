@@ -36,25 +36,35 @@ class ThemeColorDialog extends ConsumerWidget {
             final isSelected =
                 !isDynamic &&
                 color.toARGB32() == themeSettings.seedColor.toARGB32();
-            return GestureDetector(
-              onTap: () {
-                ref.read(themeProvider.notifier).setDynamicColor(false);
-                ref.read(themeProvider.notifier).setSeedColor(color);
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                  border: isSelected
-                      ? Border.all(color: colorScheme.onSurface, width: 3)
+            return Semantics(
+              button: true,
+              label: isSelected ? 'Theme color, selected' : 'Theme color',
+              selected: isSelected,
+              child: GestureDetector(
+                onTap: () {
+                  ref.read(themeProvider.notifier).setDynamicColor(false);
+                  ref.read(themeProvider.notifier).setSeedColor(color);
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: isSelected
+                        ? Border.all(color: colorScheme.onSurface, width: 3)
+                        : null,
+                  ),
+                  child: isSelected
+                      ? Icon(
+                          Icons.check,
+                          color: colorScheme.onPrimary,
+                          size: 24,
+                          semanticLabel: 'Selected',
+                        )
                       : null,
                 ),
-                child: isSelected
-                    ? const Icon(Icons.check, color: Colors.white, size: 24)
-                    : null,
               ),
             );
           }),
@@ -86,48 +96,61 @@ class _DynamicColorOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const SweepGradient(
-                colors: [
-                  Color(0xFF4285F4),
-                  Color(0xFF34A853),
-                  Color(0xFFFBBC05),
-                  Color(0xFFEA4335),
-                  Color(0xFF4285F4),
-                ],
+    return Semantics(
+      button: true,
+      label: label,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const SweepGradient(
+                  colors: [
+                    Color(0xFF4285F4),
+                    Color(0xFF34A853),
+                    Color(0xFFFBBC05),
+                    Color(0xFFEA4335),
+                    Color(0xFF4285F4),
+                  ],
+                ),
+                border: isSelected
+                    ? Border.all(color: colorScheme.onSurface, width: 3)
+                    : null,
               ),
-              border: isSelected
-                  ? Border.all(color: colorScheme.onSurface, width: 3)
-                  : null,
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      color: colorScheme.onPrimary,
+                      size: 24,
+                      semanticLabel: 'Selected',
+                    )
+                  : Icon(
+                      Icons.wallpaper_outlined,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.9),
+                      size: 22,
+                      semanticLabel: 'Dynamic wallpaper color',
+                    ),
             ),
-            child: isSelected
-                ? const Icon(Icons.check, color: Colors.white, size: 24)
-                : Icon(
-                    Icons.wallpaper_outlined,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    size: 22,
-                  ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: isSelected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            const SizedBox(height: 4),
+            ExcludeSemantics(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

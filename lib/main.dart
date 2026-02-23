@@ -96,7 +96,12 @@ class _InitErrorApp extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.red,
+                  semanticLabel: 'Error',
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Failed to initialize',

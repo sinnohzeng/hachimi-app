@@ -36,7 +36,7 @@ class AccessoryCard extends StatelessWidget {
                 // 饰品图标（类别对应 emoji）
                 Text(
                   _categoryEmoji(info.category),
-                  style: const TextStyle(fontSize: 28),
+                  style: theme.textTheme.headlineSmall,
                 ),
                 const SizedBox(height: AppSpacing.xs),
 

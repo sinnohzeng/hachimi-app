@@ -105,6 +105,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
                   onPressed: () => Navigator.of(context).pop(),
+                  tooltip: context.l10n.adoptionBack,
                 ),
               ),
 
@@ -122,6 +123,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                           Icons.local_fire_department,
                           size: 56,
                           color: colorScheme.onPrimary,
+                          semanticLabel: 'Hachimi',
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
@@ -187,6 +189,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                               onPressed: () => setState(
                                 () => _obscurePassword = !_obscurePassword,
                               ),
+                              tooltip: _obscurePassword
+                                  ? 'Show password'
+                                  : 'Hide password',
                             ),
                           ),
                           validator: (value) {
@@ -224,6 +229,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                   () => _obscureConfirmPassword =
                                       !_obscureConfirmPassword,
                                 ),
+                                tooltip: _obscureConfirmPassword
+                                    ? 'Show password'
+                                    : 'Hide password',
                               ),
                             ),
                             validator: (value) {
@@ -284,17 +292,26 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                 ),
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () => setState(() => _isLogin = !_isLogin),
-                              child: Text(
-                                _isLogin
-                                    ? context.l10n.loginRegister
-                                    : context.l10n.loginLogIn,
-                                style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onPrimary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: colorScheme.onPrimary,
+                            Semantics(
+                              button: true,
+                              label: _isLogin
+                                  ? context.l10n.loginRegister
+                                  : context.l10n.loginLogIn,
+                              child: GestureDetector(
+                                onTap: () =>
+                                    setState(() => _isLogin = !_isLogin),
+                                child: ExcludeSemantics(
+                                  child: Text(
+                                    _isLogin
+                                        ? context.l10n.loginRegister
+                                        : context.l10n.loginLogIn,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: colorScheme.onPrimary,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

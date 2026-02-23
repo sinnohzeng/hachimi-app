@@ -1,4 +1,6 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/habits/adoption_flow_screen.dart';
@@ -100,14 +102,31 @@ class AppRouter {
       case catChat:
         final catId = settings.arguments as String;
         return MaterialPageRoute(builder: (_) => CatChatScreen(catId: catId));
+      // Settings sub-pages use Shared Axis transition (horizontal)
       case aiSettings:
-        return MaterialPageRoute(builder: (_) => const AiSettingsPage());
+        return _sharedAxisRoute((_) => const AiSettingsPage());
       case modelTestChat:
-        return MaterialPageRoute(builder: (_) => const ModelTestChatScreen());
+        return _sharedAxisRoute((_) => const ModelTestChatScreen());
       case sessionHistory:
-        return MaterialPageRoute(builder: (_) => const SessionHistoryScreen());
+        return _sharedAxisRoute((_) => const SessionHistoryScreen());
       default:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
+  }
+
+  /// M3 Shared Axis transition (horizontal) for same-level navigation.
+  static Route<T> _sharedAxisRoute<T>(WidgetBuilder builder) {
+    return PageRouteBuilder<T>(
+      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            child: child,
+          ),
+      transitionDuration: AppMotion.durationMedium2,
+      reverseTransitionDuration: AppMotion.durationMedium2,
+    );
   }
 }

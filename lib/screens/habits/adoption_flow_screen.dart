@@ -245,6 +245,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: _previousStep,
+                tooltip: context.l10n.adoptionBack,
               )
             : null,
       ),
@@ -500,6 +501,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                   Icons.notifications_active,
                   size: 20,
                   color: colorScheme.primary,
+                  semanticLabel: 'Reminder',
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -511,6 +513,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: colorScheme.error),
                   onPressed: () => setState(() => _reminders.removeAt(i)),
+                  tooltip: context.l10n.catDetailRemoveReminder,
                   visualDensity: VisualDensity.compact,
                 ),
               ],
@@ -553,34 +556,36 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   // ─── 目标模式切换 ───
 
   Widget _buildModeToggle(ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 永续模式
-        _ModeOption(
-          selected: _isUnlimitedMode,
-          icon: Icons.all_inclusive,
-          title: context.l10n.adoptionUnlimitedMode,
-          subtitle: context.l10n.adoptionUnlimitedDesc,
-          colorScheme: colorScheme,
-          textTheme: textTheme,
-          onTap: () => setState(() => _isUnlimitedMode = true),
+        SegmentedButton<bool>(
+          segments: [
+            ButtonSegment<bool>(
+              value: true,
+              label: Text(context.l10n.adoptionUnlimitedMode),
+              icon: const Icon(Icons.all_inclusive),
+            ),
+            ButtonSegment<bool>(
+              value: false,
+              label: Text(context.l10n.adoptionMilestoneMode),
+              icon: const Icon(Icons.flag_outlined),
+            ),
+          ],
+          selected: {_isUnlimitedMode},
+          onSelectionChanged: (modes) => setState(() {
+            _isUnlimitedMode = modes.first;
+            if (!_isUnlimitedMode) _targetHours ??= 100;
+          }),
         ),
         const SizedBox(height: AppSpacing.sm),
-        // 里程碑模式
-        _ModeOption(
-          selected: !_isUnlimitedMode,
-          icon: Icons.flag_outlined,
-          title: context.l10n.adoptionMilestoneMode,
-          subtitle: context.l10n.adoptionMilestoneDesc,
-          colorScheme: colorScheme,
-          textTheme: textTheme,
-          onTap: () => setState(() {
-            _isUnlimitedMode = false;
-            _targetHours ??= 100;
-          }),
+        Text(
+          _isUnlimitedMode
+              ? context.l10n.adoptionUnlimitedDesc
+              : context.l10n.adoptionMilestoneDesc,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -595,7 +600,12 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
     return Row(
       children: [
-        Icon(Icons.event, size: 20, color: colorScheme.onSurfaceVariant),
+        Icon(
+          Icons.event,
+          size: 20,
+          color: colorScheme.onSurfaceVariant,
+          semanticLabel: 'Deadline',
+        ),
         const SizedBox(width: AppSpacing.sm),
         Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
         const Spacer(),
@@ -610,6 +620,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           IconButton(
             icon: const Icon(Icons.close, size: 18),
             onPressed: () => setState(() => _deadlineDate = null),
+            tooltip: 'Clear deadline',
             visualDensity: VisualDensity.compact,
           ),
         ] else
@@ -806,64 +817,77 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: GestureDetector(
-                  onTap: () => setState(() => _selectedCatIndex = index),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      AnimatedContainer(
-                        duration: AppMotion.durationShort4,
-                        width: 80,
-                        height: 96,
-                        padding: AppSpacing.paddingXs,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? colorScheme.primaryContainer
-                              : colorScheme.surfaceContainerHighest,
-                          borderRadius: AppShape.borderMedium,
-                          border: isSelected
-                              ? Border.all(color: colorScheme.primary, width: 2)
-                              : null,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PixelCatSprite.fromCat(cat: previewCat, size: 56),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              previewCat.name,
-                              style: textTheme.labelSmall,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Refresh single cat icon
-                      Positioned(
-                        top: -6,
-                        right: -6,
-                        child: GestureDetector(
-                          onTap: () => _regenerateSingleCat(index),
-                          child: Container(
-                            width: 22,
-                            height: 22,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: colorScheme.surfaceContainerHighest,
-                              border: Border.all(
-                                color: colorScheme.outlineVariant,
+                child: Semantics(
+                  button: true,
+                  label: isSelected
+                      ? '${previewCat.name}, selected'
+                      : '${previewCat.name}, tap to select',
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedCatIndex = index),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        AnimatedContainer(
+                          duration: AppMotion.durationShort4,
+                          width: 80,
+                          height: 96,
+                          padding: AppSpacing.paddingXs,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? colorScheme.primaryContainer
+                                : colorScheme.surfaceContainerHighest,
+                            borderRadius: AppShape.borderMedium,
+                            border: isSelected
+                                ? Border.all(
+                                    color: colorScheme.primary,
+                                    width: 2,
+                                  )
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PixelCatSprite.fromCat(cat: previewCat, size: 56),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                previewCat.name,
+                                style: textTheme.labelSmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            child: Icon(
-                              Icons.refresh,
-                              size: 14,
-                              color: colorScheme.onSurfaceVariant,
+                            ],
+                          ),
+                        ),
+                        // Refresh single cat icon
+                        Positioned(
+                          top: -6,
+                          right: -6,
+                          child: Semantics(
+                            button: true,
+                            label: 'Regenerate ${previewCat.name}',
+                            child: GestureDetector(
+                              onTap: () => _regenerateSingleCat(index),
+                              child: Container(
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: colorScheme.surfaceContainerHighest,
+                                  border: Border.all(
+                                    color: colorScheme.outlineVariant,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.refresh,
+                                  size: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -951,91 +975,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// 目标模式选项卡片
-class _ModeOption extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final VoidCallback onTap;
-
-  const _ModeOption({
-    required this.selected,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.colorScheme,
-    required this.textTheme,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.durationShort4,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? colorScheme.primaryContainer.withValues(alpha: 0.5)
-              : Colors.transparent,
-          borderRadius: AppShape.borderMedium,
-          border: Border.all(
-            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: selected
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_unchecked,
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-              size: 22,
-            ),
-          ],
-        ),
       ),
     );
   }

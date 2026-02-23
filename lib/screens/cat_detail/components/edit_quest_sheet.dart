@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/motivation_quotes.dart';
-import 'package:hachimi_app/core/theme/app_motion.dart';
-import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -286,36 +284,38 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   // ─── 目标模式切换（与创建界面一致的 _ModeOption 卡片） ───
 
   Widget _buildModeToggle(ThemeData theme, bool isTargetCompleted) {
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ModeOption(
-          selected: _isUnlimitedMode,
-          icon: Icons.all_inclusive,
-          title: context.l10n.adoptionUnlimitedMode,
-          subtitle: context.l10n.adoptionUnlimitedDesc,
-          colorScheme: colorScheme,
-          textTheme: textTheme,
-          onTap: isTargetCompleted
+        SegmentedButton<bool>(
+          segments: [
+            ButtonSegment<bool>(
+              value: true,
+              label: Text(context.l10n.adoptionUnlimitedMode),
+              icon: const Icon(Icons.all_inclusive),
+            ),
+            ButtonSegment<bool>(
+              value: false,
+              label: Text(context.l10n.adoptionMilestoneMode),
+              icon: const Icon(Icons.flag_outlined),
+            ),
+          ],
+          selected: {_isUnlimitedMode},
+          onSelectionChanged: isTargetCompleted
               ? null
-              : () => setState(() => _isUnlimitedMode = true),
+              : (modes) => setState(() {
+                  _isUnlimitedMode = modes.first;
+                  if (!_isUnlimitedMode) _selectedTarget ??= 100;
+                }),
         ),
         const SizedBox(height: AppSpacing.sm),
-        _ModeOption(
-          selected: !_isUnlimitedMode,
-          icon: Icons.flag_outlined,
-          title: context.l10n.adoptionMilestoneMode,
-          subtitle: context.l10n.adoptionMilestoneDesc,
-          colorScheme: colorScheme,
-          textTheme: textTheme,
-          onTap: isTargetCompleted
-              ? null
-              : () => setState(() {
-                  _isUnlimitedMode = false;
-                  _selectedTarget ??= 100;
-                }),
+        Text(
+          _isUnlimitedMode
+              ? context.l10n.adoptionUnlimitedDesc
+              : context.l10n.adoptionMilestoneDesc,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -330,7 +330,12 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
 
     return Row(
       children: [
-        Icon(Icons.event, size: 20, color: colorScheme.onSurfaceVariant),
+        Icon(
+          Icons.event,
+          size: 20,
+          color: colorScheme.onSurfaceVariant,
+          semanticLabel: 'Deadline',
+        ),
         const SizedBox(width: AppSpacing.sm),
         Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
         const Spacer(),
@@ -345,6 +350,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           IconButton(
             icon: const Icon(Icons.close, size: 18),
             onPressed: () => setState(() => _deadlineDate = null),
+            tooltip: 'Clear deadline',
             visualDensity: VisualDensity.compact,
           ),
         ] else
@@ -386,6 +392,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
                 IconButton(
                   icon: Icon(Icons.close, size: 18, color: colorScheme.error),
                   onPressed: () => setState(() => _reminders.removeAt(i)),
+                  tooltip: context.l10n.catDetailRemoveReminder,
                   visualDensity: VisualDensity.compact,
                 ),
               ],
@@ -624,96 +631,5 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
       if (a[i].toMap().toString() != b[i].toMap().toString()) return false;
     }
     return true;
-  }
-}
-
-/// 目标模式选项卡片（与创建界面共用样式）
-class _ModeOption extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final ColorScheme colorScheme;
-  final TextTheme textTheme;
-  final VoidCallback? onTap;
-
-  const _ModeOption({
-    required this.selected,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.colorScheme,
-    required this.textTheme,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onTap != null;
-    final effectiveAlpha = enabled ? 1.0 : 0.5;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: AppMotion.durationShort4,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? colorScheme.primaryContainer.withValues(alpha: 0.5)
-              : Colors.transparent,
-          borderRadius: AppShape.borderMedium,
-          border: Border.all(
-            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Opacity(
-          opacity: effectiveAlpha,
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-                size: 22,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: selected
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                selected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-                size: 22,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

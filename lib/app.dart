@@ -255,12 +255,11 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🐱', style: TextStyle(fontSize: 64)),
+                Text('🐱', style: Theme.of(context).textTheme.displayLarge),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   context.l10n.migrationTitle,
-                  style: const TextStyle(
-                    fontSize: 22,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -268,7 +267,9 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
                 Text(
                   context.l10n.migrationMessage,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 15, color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 if (_clearing)

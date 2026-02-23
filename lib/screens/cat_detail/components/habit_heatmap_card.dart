@@ -156,7 +156,7 @@ class StageMilestone extends StatelessWidget {
                   ),
           ),
           child: isReached
-              ? const Icon(Icons.check, size: 14, color: Colors.white)
+              ? Icon(Icons.check, size: 14, color: colorScheme.onPrimary)
               : null,
         ),
         const SizedBox(height: AppSpacing.xs),

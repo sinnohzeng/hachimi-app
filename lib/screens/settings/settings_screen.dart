@@ -10,6 +10,7 @@ import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/delete_account_flow.dart';
 import 'components/notification_settings_dialog.dart';
@@ -37,148 +38,196 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           children: [
             // General section
-            SectionHeader(
-              title: l10n.settingsGeneral,
-              colorScheme: colorScheme,
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications_outlined),
-              title: Text(l10n.settingsNotifications),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showNotificationSettings(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(l10n.settingsLanguage),
-              subtitle: Text(
-                _localeName(locale, l10n),
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            StaggeredListItem(
+              index: 0,
+              child: SectionHeader(
+                title: l10n.settingsGeneral,
+                colorScheme: colorScheme,
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showLanguageSettings(context, ref),
+            ),
+            StaggeredListItem(
+              index: 1,
+              child: ListTile(
+                leading: const Icon(Icons.notifications_outlined),
+                title: Text(l10n.settingsNotifications),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showNotificationSettings(context),
+              ),
+            ),
+            StaggeredListItem(
+              index: 2,
+              child: ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(l10n.settingsLanguage),
+                subtitle: Text(
+                  _localeName(locale, l10n),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showLanguageSettings(context, ref),
+              ),
             ),
 
             const SizedBox(height: AppSpacing.sm),
             const Divider(),
 
             // Appearance section
-            SectionHeader(
-              title: l10n.settingsAppearance,
-              colorScheme: colorScheme,
-            ),
-            ListTile(
-              leading: const Icon(Icons.dark_mode_outlined),
-              title: Text(l10n.settingsThemeMode),
-              subtitle: Text(
-                _themeModeName(themeSettings.mode, l10n),
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            StaggeredListItem(
+              index: 3,
+              child: SectionHeader(
+                title: l10n.settingsAppearance,
+                colorScheme: colorScheme,
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showThemeModeSettings(context, ref),
             ),
-            ListTile(
-              leading: const Icon(Icons.palette_outlined),
-              title: Text(l10n.settingsThemeColor),
-              subtitle: themeSettings.useDynamicColor
-                  ? Text(
-                      l10n.settingsThemeColorDynamic,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    )
-                  : null,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (themeSettings.useDynamicColor)
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: SweepGradient(
-                          colors: [
-                            Color(0xFF4285F4),
-                            Color(0xFF34A853),
-                            Color(0xFFFBBC05),
-                            Color(0xFFEA4335),
-                            Color(0xFF4285F4),
-                          ],
+            StaggeredListItem(
+              index: 4,
+              child: ListTile(
+                leading: const Icon(Icons.dark_mode_outlined),
+                title: Text(l10n.settingsThemeMode),
+                subtitle: Text(
+                  _themeModeName(themeSettings.mode, l10n),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showThemeModeSettings(context, ref),
+              ),
+            ),
+            StaggeredListItem(
+              index: 5,
+              child: ListTile(
+                leading: const Icon(Icons.palette_outlined),
+                title: Text(l10n.settingsThemeColor),
+                subtitle: themeSettings.useDynamicColor
+                    ? Text(
+                        l10n.settingsThemeColorDynamic,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      )
+                    : null,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (themeSettings.useDynamicColor)
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: SweepGradient(
+                            colors: [
+                              Color(0xFF4285F4),
+                              Color(0xFF34A853),
+                              Color(0xFFFBBC05),
+                              Color(0xFFEA4335),
+                              Color(0xFF4285F4),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: themeSettings.seedColor,
+                          shape: BoxShape.circle,
                         ),
                       ),
-                    )
-                  else
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: themeSettings.seedColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  const SizedBox(width: AppSpacing.sm),
-                  const Icon(Icons.chevron_right),
-                ],
-              ),
-              onTap: () => _showThemeColorSettings(context),
-            ),
-            SwitchListTile(
-              secondary: const Icon(Icons.auto_awesome_outlined),
-              title: Text(l10n.settingsBackgroundAnimation),
-              subtitle: Text(
-                l10n.settingsBackgroundAnimationSubtitle,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                    const SizedBox(width: AppSpacing.sm),
+                    const Icon(Icons.chevron_right),
+                  ],
                 ),
+                onTap: () => _showThemeColorSettings(context),
               ),
-              value: themeSettings.enableBackgroundAnimation,
-              onChanged: (value) {
-                ref.read(themeProvider.notifier).setBackgroundAnimation(value);
-              },
+            ),
+            StaggeredListItem(
+              index: 6,
+              child: SwitchListTile(
+                secondary: const Icon(Icons.auto_awesome_outlined),
+                title: Text(l10n.settingsBackgroundAnimation),
+                subtitle: Text(
+                  l10n.settingsBackgroundAnimationSubtitle,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                value: themeSettings.enableBackgroundAnimation,
+                onChanged: (value) {
+                  ref
+                      .read(themeProvider.notifier)
+                      .setBackgroundAnimation(value);
+                },
+              ),
             ),
 
             const SizedBox(height: AppSpacing.sm),
             const Divider(),
 
             // AI Model section
-            SectionHeader(
-              title: l10n.settingsAiModel,
-              colorScheme: colorScheme,
+            StaggeredListItem(
+              index: 7,
+              child: SectionHeader(
+                title: l10n.settingsAiModel,
+                colorScheme: colorScheme,
+              ),
             ),
-            _buildAiListTile(context, ref, l10n, colorScheme, textTheme),
+            StaggeredListItem(
+              index: 8,
+              child: _buildAiListTile(
+                context,
+                ref,
+                l10n,
+                colorScheme,
+                textTheme,
+              ),
+            ),
 
             const SizedBox(height: AppSpacing.sm),
             const Divider(),
 
             // About section
-            SectionHeader(title: l10n.settingsAbout, colorScheme: colorScheme),
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: Text(l10n.settingsVersion),
-              subtitle: ref
-                  .watch(appInfoProvider)
-                  .when(
-                    data: (info) => Text(info.version),
-                    loading: () => const Text('...'),
-                    error: (_, _) => const Text('?'),
-                  ),
+            StaggeredListItem(
+              index: 9,
+              child: SectionHeader(
+                title: l10n.settingsAbout,
+                colorScheme: colorScheme,
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.description_outlined),
-              title: Text(l10n.settingsLicenses),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                final version = ref.read(appInfoProvider).value?.version ?? '';
-                showLicensePage(
-                  context: context,
-                  applicationName: 'Hachimi',
-                  applicationVersion: version,
-                );
-              },
+            StaggeredListItem(
+              index: 10,
+              child: ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(l10n.settingsVersion),
+                subtitle: ref
+                    .watch(appInfoProvider)
+                    .when(
+                      data: (info) => Text(info.version),
+                      loading: () => const Text('...'),
+                      error: (_, _) => const Text('?'),
+                    ),
+              ),
+            ),
+            StaggeredListItem(
+              index: 11,
+              child: ListTile(
+                leading: const Icon(Icons.description_outlined),
+                title: Text(l10n.settingsLicenses),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  final version =
+                      ref.read(appInfoProvider).value?.version ?? '';
+                  showLicensePage(
+                    context: context,
+                    applicationName: 'Hachimi',
+                    applicationVersion: version,
+                  );
+                },
+              ),
             ),
 
             // Spacing to push account section to bottom
@@ -186,31 +235,40 @@ class SettingsScreen extends ConsumerWidget {
             const Divider(),
 
             // Account section (danger zone)
-            SectionHeader(
-              title: l10n.settingsAccount,
-              colorScheme: colorScheme,
-            ),
-            ListTile(
-              leading: Icon(Icons.logout, color: colorScheme.error),
-              title: Text(
-                l10n.commonLogOut,
-                style: TextStyle(color: colorScheme.error),
+            StaggeredListItem(
+              index: 12,
+              child: SectionHeader(
+                title: l10n.settingsAccount,
+                colorScheme: colorScheme,
               ),
-              onTap: () => _confirmLogout(context, ref),
             ),
-            ListTile(
-              leading: Icon(Icons.delete_forever, color: colorScheme.error),
-              title: Text(
-                l10n.commonDeleteAccount,
-                style: TextStyle(color: colorScheme.error),
-              ),
-              subtitle: Text(
-                l10n.deleteAccountWarning,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+            StaggeredListItem(
+              index: 13,
+              child: ListTile(
+                leading: Icon(Icons.logout, color: colorScheme.error),
+                title: Text(
+                  l10n.commonLogOut,
+                  style: TextStyle(color: colorScheme.error),
                 ),
+                onTap: () => _confirmLogout(context, ref),
               ),
-              onTap: () => _confirmDeleteAccount(context, ref),
+            ),
+            StaggeredListItem(
+              index: 14,
+              child: ListTile(
+                leading: Icon(Icons.delete_forever, color: colorScheme.error),
+                title: Text(
+                  l10n.commonDeleteAccount,
+                  style: TextStyle(color: colorScheme.error),
+                ),
+                subtitle: Text(
+                  l10n.deleteAccountWarning,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                onTap: () => _confirmDeleteAccount(context, ref),
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
           ],

@@ -102,42 +102,52 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return GestureDetector(
-      onPanStart: (details) => _handlePanStart(details.localPosition),
-      onPanUpdate: (details) => _handlePan(details.localPosition),
-      onPanEnd: (_) => _previousAngle = null,
-      onTapDown: (details) => _handleTap(details.localPosition),
-      child: SizedBox(
-        width: widget.size,
-        height: widget.size,
-        child: CustomPaint(
-          painter: _DurationPickerPainter(
-            value: widget.value,
-            maxMinutes: _maxMinutes,
-            trackColor: colorScheme.surfaceContainerHighest,
-            activeColor: colorScheme.primary,
-            thumbColor: colorScheme.primary,
-            tickColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-            majorTickColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${widget.value}',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
+    return Semantics(
+      label: 'Duration picker, ${widget.value} minutes',
+      value: '${widget.value} minutes',
+      slider: true,
+      child: GestureDetector(
+        onPanStart: (details) => _handlePanStart(details.localPosition),
+        onPanUpdate: (details) => _handlePan(details.localPosition),
+        onPanEnd: (_) => _previousAngle = null,
+        onTapDown: (details) => _handleTap(details.localPosition),
+        child: SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: CustomPaint(
+            painter: _DurationPickerPainter(
+              value: widget.value,
+              maxMinutes: _maxMinutes,
+              trackColor: colorScheme.surfaceContainerHighest,
+              activeColor: colorScheme.primary,
+              thumbColor: colorScheme.primary,
+              thumbInnerColor: colorScheme.surface,
+              tickColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+              majorTickColor: colorScheme.onSurfaceVariant.withValues(
+                alpha: 0.6,
+              ),
+            ),
+            child: Center(
+              child: ExcludeSemantics(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${widget.value}',
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      context.l10n.pickerMinUnit,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  context.l10n.pickerMinUnit,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -152,6 +162,7 @@ class _DurationPickerPainter extends CustomPainter {
   final Color trackColor;
   final Color activeColor;
   final Color thumbColor;
+  final Color thumbInnerColor;
   final Color tickColor;
   final Color majorTickColor;
 
@@ -164,6 +175,7 @@ class _DurationPickerPainter extends CustomPainter {
     required this.trackColor,
     required this.activeColor,
     required this.thumbColor,
+    required this.thumbInnerColor,
     required this.tickColor,
     required this.majorTickColor,
   });
@@ -239,7 +251,7 @@ class _DurationPickerPainter extends CustomPainter {
     canvas.drawCircle(
       thumbCenter,
       _thumbRadius - 4,
-      Paint()..color = Colors.white,
+      Paint()..color = thumbInnerColor,
     );
   }
 

@@ -120,7 +120,12 @@ class AchievementCard extends StatelessWidget {
             // 奖励/状态
             const SizedBox(width: AppSpacing.sm),
             if (isUnlocked)
-              Icon(Icons.check_circle, color: colorScheme.primary, size: 24)
+              Icon(
+                Icons.check_circle,
+                color: colorScheme.primary,
+                size: 24,
+                semanticLabel: 'Unlocked',
+              )
             else
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

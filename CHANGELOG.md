@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] - 2026-02-23
+
+### Added
+- Hero flight animation for cat sprites and names during CatHouse → CatDetail transitions
+- Tablet-optimized responsive layouts for CatDetail (2-column) and Achievement (adaptive grid) screens
+- `AppIconSize` design token system for consistent icon sizing across the app
+- `SegmentedButton` for quest mode selection in adoption and edit flows (replacing custom cards)
+- `SharedAxisTransition` for same-level navigation routes (AI Settings, Test Chat, Session History)
+- Comprehensive accessibility: `Semantics` labels, `semanticLabel` on icons, tooltips on all `IconButton`s
+- `StaggeredListItem` stagger animations extended to Profile, Settings, and CatDetail screens
+
+### Changed
+- Onboarding copy refreshed: removed outdated XP/streak references, aligned with cumulative time growth model
+- All hardcoded `Colors.*` in UI body areas replaced with `ColorScheme` semantic tokens (8 locations, 6 files)
+- Bare `TextStyle()` constructors replaced with `textTheme.*` base styles (migration screen, accessory card)
+- Chat bubble `BoxShadow` replaced with `Material(elevation:)` for M3 tonal elevation (2 chat screens)
+- Component themes added: `FilledButton`, `OutlinedButton`, `TextButton`, `IconButton`, `Dialog` + global `MaterialTapTargetSize.padded`
+- Quest mode toggle upgraded from custom `_ModeOption` cards to native M3 `SegmentedButton`
+- CatDetail screen refactored with `LayoutBuilder` for phone (single column) and tablet (2-column) layouts
+- Achievement grid columns adapt to screen width: 1 (compact), 2 (medium), 3 (expanded)
+
+### Removed
+- Custom `_ModeOption` widget class from adoption flow and edit quest sheet (replaced by `SegmentedButton`)
+
 ## [2.16.0] - 2026-02-23
 
 ### Added

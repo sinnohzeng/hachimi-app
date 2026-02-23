@@ -1,7 +1,8 @@
-Multi-provider AI support! Choose between MiniMax M2.5 or Google Gemini 3 Flash as your AI companion. Chat with your cats and get auto-generated daily diaries powered by cloud AI.
+Polished Material Design 3 experience with Hero animations, tablet support, and enhanced accessibility.
 
-New in v2.15.0:
-- Added Gemini 3 Flash as a second AI provider option
-- Upgraded MiniMax to M2.5 for better conversations
-- Provider selection in AI settings
-- Privacy disclosure on first AI enable
+New in v2.17.0:
+- Cat sprites and names now fly smoothly between screens
+- Tablet-optimized layouts for Cat Detail and Achievements
+- Refreshed onboarding copy aligned with growth model
+- Improved accessibility with screen reader support
+- Quest mode selection upgraded to native M3 controls

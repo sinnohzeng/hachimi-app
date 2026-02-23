@@ -33,9 +33,10 @@ class ParticleOverlay extends ConsumerWidget {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     final particleColor = isDark
-        ? Colors.white.withValues(alpha: 0.25)
-        : Colors.white.withValues(alpha: 0.5);
+        ? onSurface.withValues(alpha: 0.25)
+        : onSurface.withValues(alpha: 0.5);
 
     switch (mode) {
       case ParticleMode.firefly:

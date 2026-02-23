@@ -228,7 +228,12 @@ class _AccessoryGrid extends ConsumerWidget {
         content: Row(
           children: [
             if (success)
-              const Icon(Icons.check_circle, color: Colors.white, size: 20),
+              Icon(
+                Icons.check_circle,
+                color: Theme.of(context).colorScheme.onPrimary,
+                size: 20,
+                semanticLabel: 'Success',
+              ),
             if (success) const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(

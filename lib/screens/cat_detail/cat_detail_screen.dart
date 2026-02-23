@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_breakpoints.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -18,6 +21,7 @@ import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/focus_stats_card.dart';
 import 'components/reminder_card.dart';
@@ -38,12 +42,28 @@ class CatDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
+  late final ScrollController _scrollController;
+  bool _showAppBarTitle = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final show = _scrollController.hasClients && _scrollController.offset > 200;
+    if (show != _showAppBarTitle) setState(() => _showAppBarTitle = show);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-
     final cat = ref.watch(catByIdProvider(widget.catId));
     if (cat == null) {
       return Scaffold(
@@ -57,8 +77,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
     final stageClr = stageColor(cat.displayStage);
-
-    // Mesh gradient colors derived from cat appearance
+    final colorScheme = Theme.of(context).colorScheme;
     final meshColors = catMeshColors(
       cat.displayStage,
       cat.appearance.peltColor,
@@ -66,162 +85,369 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     );
 
     return Scaffold(
-      body: ContentWidthConstraint(
-        child: CustomScrollView(
-          slivers: [
-            // [B2] SliverAppBar with FlexibleSpaceBar.title for smooth scroll-to-title
-            SliverAppBar(
-              expandedHeight: 280,
-              pinned: true,
-              systemOverlayStyle:
-                  Theme.of(context).brightness == Brightness.light
-                  ? SystemUiOverlayStyle.dark
-                  : SystemUiOverlayStyle.light,
-              actions: [
-                // [B3] 编辑入口移到 AppBar actions
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  onPressed: () => _showRenameDialog(context, cat),
-                  tooltip: context.l10n.catDetailRenameTooltip,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= AppBreakpoints.expanded;
+          if (isWide) {
+            return _buildWideLayout(
+              context,
+              cat: cat,
+              habit: habit,
+              personality: personality,
+              moodData: moodData,
+              stageClr: stageClr,
+              meshColors: meshColors,
+            );
+          }
+          return _buildNarrowLayout(
+            context,
+            cat: cat,
+            habit: habit,
+            personality: personality,
+            moodData: moodData,
+            stageClr: stageClr,
+            meshColors: meshColors,
+          );
+        },
+      ),
+    );
+  }
+
+  // ─── Narrow layout (phone) ─────────────────────────────────────
+
+  Widget _buildNarrowLayout(
+    BuildContext context, {
+    required Cat cat,
+    required Habit? habit,
+    required CatPersonality? personality,
+    required CatMood moodData,
+    required Color stageClr,
+    required List<Color> meshColors,
+  }) {
+    return ContentWidthConstraint(
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          _buildSliverAppBar(context, cat, personality, meshColors),
+          SliverPadding(
+            padding: AppSpacing.paddingBase,
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                _buildAllCards(context, cat, habit, moodData, stageClr),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Wide layout (tablet >= 840dp) ─────────────────────────────
+
+  Widget _buildWideLayout(
+    BuildContext context, {
+    required Cat cat,
+    required Habit? habit,
+    required CatPersonality? personality,
+    required CatMood moodData,
+    required Color stageClr,
+    required List<Color> meshColors,
+  }) {
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        _buildSliverAppBar(context, cat, personality, meshColors),
+        SliverPadding(
+          padding: AppSpacing.paddingBase,
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 左栏：心情 + 成长卡
+                Expanded(
+                  flex: 2,
+                  child: _buildLeftColumn(context, cat, moodData, stageClr),
                 ),
-                // 聊天入口 — 仅当 AI 功能就绪时显示
-                if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
-                  IconButton(
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    onPressed: () {
-                      Navigator.of(
-                        context,
-                      ).pushNamed(AppRouter.catChat, arguments: widget.catId);
-                    },
-                    tooltip: context.l10n.catDetailChatTooltip,
-                  ),
+                const SizedBox(width: AppSpacing.base),
+                // 右栏：功能卡片
+                Expanded(
+                  flex: 3,
+                  child: _buildRightColumn(context, cat, habit),
+                ),
               ],
-              flexibleSpace: FlexibleSpaceBar(
-                // [B2] 猫名作为 FlexibleSpaceBar.title，随滚动平滑过渡
-                title: Text(
-                  cat.name,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                centerTitle: true,
-                expandedTitleScale: 1.3,
-                // [B1] 粒子效果移入 FlexibleSpaceBar.background，随 AppBar 折叠消失
-                background: Stack(
-                  children: [
-                    AnimatedMeshBackground(
-                      colors: meshColors,
-                      speed: 1.0,
-                      fadeIn: true,
-                      child: SafeArea(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: AppSpacing.xxl),
-                            // Tappable cat sprite with bounce animation + Hero
-                            Hero(
-                              tag: 'cat-${cat.id}',
-                              child: TappableCatSprite(cat: cat, size: 120),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            // 性格标签（猫名已移到 FlexibleSpaceBar.title）
-                            if (personality != null)
-                              Text(
-                                '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
-                                style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            // 为 FlexibleSpaceBar.title 留出底部空间
-                            const SizedBox(height: AppSpacing.xxl),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // [B1] 粒子覆盖层
-                    const Positioned.fill(
-                      child: IgnorePointer(
-                        child: ParticleOverlay(
-                          mode: ParticleMode.firefly,
-                          child: SizedBox.expand(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
 
-            SliverPadding(
-              padding: AppSpacing.paddingBase,
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // Mood badge
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.tertiaryContainer,
-                        borderRadius: AppShape.borderLarge,
-                      ),
-                      child: Text(
-                        '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onTertiaryContainer,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
+  /// 左栏 — 心情徽章 + 成长进度卡
+  Widget _buildLeftColumn(
+    BuildContext context,
+    Cat cat,
+    CatMood moodData,
+    Color stageClr,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-                  // Growth progress (time-based)
-                  _buildGrowthCard(context, cat, stageClr),
-                  const SizedBox(height: AppSpacing.base),
+    return Column(
+      children: [
+        _buildMoodBadge(context, moodData, colorScheme, textTheme),
+        const SizedBox(height: AppSpacing.lg),
+        _buildGrowthCard(context, cat, stageClr),
+      ],
+    );
+  }
 
-                  // Focus statistics card (replaces old "Bound Habit" card)
-                  if (habit != null) ...[
-                    FocusStatsCard(habit: habit, cat: cat),
-                    const SizedBox(height: AppSpacing.base),
-                  ],
+  /// 右栏 — FocusStats, Diary, Chat, Reminder, Heatmap, Accessories, CatInfo
+  Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
+    final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
 
-                  // Hachimi Diary card — AI 日记预览
-                  if (ref.watch(aiAvailabilityProvider) ==
-                      AiAvailability.ready) ...[
-                    DiaryPreviewCard(catId: cat.id),
-                    const SizedBox(height: AppSpacing.base),
+    return Column(
+      children: [
+        if (habit != null) ...[
+          FocusStatsCard(habit: habit, cat: cat),
+          const SizedBox(height: AppSpacing.base),
+        ],
+        if (aiReady) ...[
+          DiaryPreviewCard(catId: cat.id),
+          const SizedBox(height: AppSpacing.base),
+          ChatEntryCard(catId: cat.id, catName: cat.name),
+          const SizedBox(height: AppSpacing.base),
+        ],
+        if (habit != null) ...[
+          ReminderCard(habit: habit, cat: cat),
+          const SizedBox(height: AppSpacing.base),
+          HabitHeatmapCard(habitId: habit.id),
+          const SizedBox(height: AppSpacing.base),
+        ],
+        AccessoriesCard(cat: cat),
+        const SizedBox(height: AppSpacing.base),
+        EnhancedCatInfoCard(cat: cat),
+        const SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
 
-                    // 聊天入口卡片 — 提升可发现性
-                    ChatEntryCard(catId: cat.id, catName: cat.name),
-                    const SizedBox(height: AppSpacing.base),
-                  ],
+  // ─── Shared SliverAppBar ───────────────────────────────────────
 
-                  // Reminder card
-                  if (habit != null) ...[
-                    ReminderCard(habit: habit, cat: cat),
-                    const SizedBox(height: AppSpacing.base),
-                  ],
+  SliverAppBar _buildSliverAppBar(
+    BuildContext context,
+    Cat cat,
+    CatPersonality? personality,
+    List<Color> meshColors,
+  ) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-                  // Streak heatmap
-                  if (habit != null) HabitHeatmapCard(habitId: habit.id),
-                  const SizedBox(height: AppSpacing.base),
+    return SliverAppBar(
+      expandedHeight: 280,
+      pinned: true,
+      systemOverlayStyle: Theme.of(context).brightness == Brightness.light
+          ? SystemUiOverlayStyle.dark
+          : SystemUiOverlayStyle.light,
+      title: AnimatedOpacity(
+        opacity: _showAppBarTitle ? 1.0 : 0.0,
+        duration: AppMotion.durationShort2,
+        child: Text(
+          cat.name,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+      ),
+      actions: _buildAppBarActions(context, cat),
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        background: _buildHeroBackground(
+          context,
+          cat,
+          personality,
+          meshColors,
+          colorScheme,
+          textTheme,
+        ),
+      ),
+    );
+  }
 
-                  // Accessories card
-                  AccessoriesCard(cat: cat),
-                  const SizedBox(height: AppSpacing.base),
+  List<Widget> _buildAppBarActions(BuildContext context, Cat cat) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.edit_outlined),
+        onPressed: () => _showRenameDialog(context, cat),
+        tooltip: context.l10n.catDetailRenameTooltip,
+      ),
+      if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
+        IconButton(
+          icon: const Icon(Icons.chat_bubble_outline),
+          onPressed: () {
+            Navigator.of(
+              context,
+            ).pushNamed(AppRouter.catChat, arguments: widget.catId);
+          },
+          tooltip: context.l10n.catDetailChatTooltip,
+        ),
+    ];
+  }
 
-                  // Enhanced cat info card
-                  EnhancedCatInfoCard(cat: cat),
-                  const SizedBox(height: AppSpacing.xl),
-                ]),
-              ),
+  Widget _buildHeroBackground(
+    BuildContext context,
+    Cat cat,
+    CatPersonality? personality,
+    List<Color> meshColors,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return Stack(
+      children: [
+        AnimatedMeshBackground(
+          colors: meshColors,
+          speed: 1.0,
+          fadeIn: true,
+          child: SafeArea(
+            child: _buildHeroContent(
+              context,
+              cat,
+              personality,
+              colorScheme,
+              textTheme,
             ),
-          ],
+          ),
+        ),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: ParticleOverlay(
+              mode: ParticleMode.firefly,
+              child: SizedBox.expand(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroContent(
+    BuildContext context,
+    Cat cat,
+    CatPersonality? personality,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: AppSpacing.xxl),
+        Hero(
+          tag: 'cat-${cat.id}',
+          child: TappableCatSprite(cat: cat, size: 120),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Hero(
+          tag: 'cat-name-${cat.id}',
+          child: Material(
+            type: MaterialType.transparency,
+            child: Text(
+              cat.name,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        if (personality != null)
+          Text(
+            '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ─── Narrow layout card list ───────────────────────────────────
+
+  /// 构建窄屏卡片列表（含 StaggeredListItem 动画）
+  List<Widget> _buildAllCards(
+    BuildContext context,
+    Cat cat,
+    Habit? habit,
+    CatMood moodData,
+    Color stageClr,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
+
+    return [
+      StaggeredListItem(
+        index: 0,
+        child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
+      ),
+      const SizedBox(height: AppSpacing.lg),
+      StaggeredListItem(
+        index: 1,
+        child: _buildGrowthCard(context, cat, stageClr),
+      ),
+      const SizedBox(height: AppSpacing.base),
+      if (habit != null) ...[
+        StaggeredListItem(
+          index: 2,
+          child: FocusStatsCard(habit: habit, cat: cat),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ],
+      if (aiReady) ...[
+        StaggeredListItem(index: 3, child: DiaryPreviewCard(catId: cat.id)),
+        const SizedBox(height: AppSpacing.base),
+        StaggeredListItem(
+          index: 4,
+          child: ChatEntryCard(catId: cat.id, catName: cat.name),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ],
+      if (habit != null) ...[
+        StaggeredListItem(
+          index: 5,
+          child: ReminderCard(habit: habit, cat: cat),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ],
+      if (habit != null)
+        StaggeredListItem(index: 6, child: HabitHeatmapCard(habitId: habit.id)),
+      const SizedBox(height: AppSpacing.base),
+      StaggeredListItem(index: 7, child: AccessoriesCard(cat: cat)),
+      const SizedBox(height: AppSpacing.base),
+      StaggeredListItem(index: 8, child: EnhancedCatInfoCard(cat: cat)),
+      const SizedBox(height: AppSpacing.xl),
+    ];
+  }
+
+  // ─── Mood badge widget ─────────────────────────────────────────
+
+  Widget _buildMoodBadge(
+    BuildContext context,
+    CatMood moodData,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: colorScheme.tertiaryContainer,
+          borderRadius: AppShape.borderLarge,
+        ),
+        child: Text(
+          '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
+          style: textTheme.labelLarge?.copyWith(
+            color: colorScheme.onTertiaryContainer,
+          ),
         ),
       ),
     );

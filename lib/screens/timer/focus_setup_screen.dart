@@ -118,6 +118,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.of(context).pop(),
+                      tooltip: 'Close',
                     ),
                     const Spacer(),
                     Text(

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/theme/app_elevation.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
@@ -218,7 +219,12 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_off, size: 48, color: colorScheme.error),
+              Icon(
+                Icons.cloud_off,
+                size: 48,
+                color: colorScheme.error,
+                semanticLabel: 'Connection error',
+              ),
               const SizedBox(height: AppSpacing.base),
               Text(
                 context.l10n.settingsConnectionFailed,
@@ -348,17 +354,10 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
     final isGenerating = _status == _TestChatStatus.generating;
     final canSend = _status == _TestChatStatus.ready;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
+    return Material(
+      elevation: AppElevation.level2,
+      surfaceTintColor: colorScheme.surfaceTint,
+      color: colorScheme.surface,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -396,6 +395,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
                 IconButton(
                   onPressed: _stopGeneration,
                   icon: const Icon(Icons.stop),
+                  tooltip: 'Stop',
                   style: IconButton.styleFrom(
                     backgroundColor: colorScheme.errorContainer,
                     foregroundColor: colorScheme.onErrorContainer,
@@ -405,6 +405,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
                 IconButton(
                   onPressed: canSend ? _sendMessage : null,
                   icon: const Icon(Icons.send),
+                  tooltip: 'Send',
                   style: IconButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,

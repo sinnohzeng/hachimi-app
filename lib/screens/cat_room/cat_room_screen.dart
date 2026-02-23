@@ -46,6 +46,7 @@ class CatRoomScreen extends ConsumerWidget {
                   Icons.monetization_on,
                   size: 20,
                   color: theme.colorScheme.tertiary,
+                  semanticLabel: 'Coins',
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
@@ -292,68 +293,83 @@ class _CatHouseCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     final stageClr = stageColor(cat.displayStage);
 
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: Padding(
-        padding: AppSpacing.paddingMd,
-        child: Column(
-          children: [
-            // Pixel cat sprite
-            TappableCatSprite(cat: cat, size: 80, enableTap: false),
-            const SizedBox(height: AppSpacing.xs),
+    return Semantics(
+      label: habitName != null
+          ? '${cat.name}, $habitName, ${context.l10n.stageName(cat.displayStage)}'
+          : '${cat.name}, ${context.l10n.stageName(cat.displayStage)}',
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: AppSpacing.paddingMd,
+          child: Column(
+            children: [
+              // Pixel cat sprite — Hero flies to CatDetailScreen
+              Hero(
+                tag: 'cat-${cat.id}',
+                child: TappableCatSprite(cat: cat, size: 80, enableTap: false),
+              ),
+              const SizedBox(height: AppSpacing.xs),
 
-            // Name + habit (flexible to prevent overflow)
-            Flexible(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    cat.name,
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  if (habitName != null)
-                    Flexible(
-                      child: Text(
-                        habitName!,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+              // Name + habit (flexible to prevent overflow)
+              Flexible(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Hero(
+                      tag: 'cat-name-${cat.id}',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          cat.name,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                ],
+                    const SizedBox(height: 2),
+                    if (habitName != null)
+                      Flexible(
+                        child: Text(
+                          habitName!,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
+              const SizedBox(height: AppSpacing.xs),
 
-            // Growth progress bar
-            ClipRRect(
-              borderRadius: AppShape.borderExtraSmall,
-              child: LinearProgressIndicator(
-                value: cat.growthProgress,
-                minHeight: 6,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                valueColor: AlwaysStoppedAnimation(stageClr),
+              // Growth progress bar
+              ClipRRect(
+                borderRadius: AppShape.borderExtraSmall,
+                child: LinearProgressIndicator(
+                  value: cat.growthProgress,
+                  minHeight: 6,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation(stageClr),
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
+              const SizedBox(height: AppSpacing.xs),
 
-            // Stage label
-            Text(
-              context.l10n.stageName(cat.displayStage),
-              style: textTheme.labelSmall?.copyWith(
-                color: stageClr,
-                fontWeight: FontWeight.w600,
+              // Stage label
+              Text(
+                context.l10n.stageName(cat.displayStage),
+                style: textTheme.labelSmall?.copyWith(
+                  color: stageClr,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
