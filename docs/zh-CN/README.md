@@ -45,6 +45,16 @@
 
 ---
 
+## 指南
+
+| 文档 | 说明 |
+|------|------|
+| [开发工作流](guides/development-workflow.md) | 构建模式、热重载、调试工具、日常开发循环 |
+| [开发调试环境启动](guides/dev-debug-setup.md) | 设备连接、Firebase 凭证、安装故障排查 |
+| [Git Worktree](guides/git-worktree.md) | 使用 Git Worktree 和 Claude Code 进行并行开发 |
+
+---
+
 ## 贡献
 
 | 文档 | 说明 |

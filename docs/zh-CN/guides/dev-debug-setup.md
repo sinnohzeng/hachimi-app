@@ -4,7 +4,7 @@
 > **适用范围：** macOS 本地开发。测试机型：vivo V2405A（Android 16，API 36）。
 > **状态：** 有效
 > **证据来源：** `CLAUDE.md` 命令章节、`firestore.rules`、调试会话日志（2026-02-19）
-> **相关文档：** [firebase/security-rules.md](../firebase/security-rules.md) · [release/process.md](../release/process.md)
+> **相关文档：** [development-workflow.md](development-workflow.md) · [firebase/security-rules.md](../firebase/security-rules.md) · [release/process.md](../release/process.md)
 > **Changelog：** 2026-02-19 — 首次创建，整合首次调试会话的经验
 
 ---

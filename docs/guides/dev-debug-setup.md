@@ -4,7 +4,7 @@
 > **Scope:** Local development on macOS. Test device: vivo V2405A (Android 16, API 36).
 > **Status:** Active
 > **Evidence:** `CLAUDE.md` commands section, `firestore.rules`, session logs (2026-02-19)
-> **Related:** [firebase/security-rules.md](../firebase/security-rules.md) · [release/process.md](../release/process.md)
+> **Related:** [development-workflow.md](development-workflow.md) · [firebase/security-rules.md](../firebase/security-rules.md) · [release/process.md](../release/process.md)
 > **Changelog:** 2026-02-19 — Initial version, capturing lessons from first debug session
 
 ---

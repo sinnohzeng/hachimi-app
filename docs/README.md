@@ -45,6 +45,16 @@
 
 ---
 
+## Guides
+
+| Document | Description |
+|----------|-------------|
+| [Development Workflow](guides/development-workflow.md) | Build modes, hot reload, debugging tools, daily development cycle |
+| [Dev / Debug Setup](guides/dev-debug-setup.md) | Device connection, Firebase credentials, troubleshooting install failures |
+| [Git Worktree](guides/git-worktree.md) | Parallel development with Git worktrees and Claude Code |
+
+---
+
 ## Contributing
 
 | Document | Description |

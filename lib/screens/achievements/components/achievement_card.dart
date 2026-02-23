@@ -47,7 +47,7 @@ class AchievementCard extends StatelessWidget {
         : _resolveDesc(context, locale);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: AppShape.borderMedium,
