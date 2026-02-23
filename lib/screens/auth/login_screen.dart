@@ -73,131 +73,138 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: AppSpacing.paddingHLg,
-            child: Column(
-              children: [
-                const Spacer(flex: 3),
-
-                // App icon
-                Icon(
-                  Icons.local_fire_department,
-                  size: 80,
-                  color: colorScheme.onPrimary,
-                  semanticLabel: 'Hachimi',
-                ),
-                const SizedBox(height: AppSpacing.base),
-
-                // App name
-                Text(
-                  context.l10n.loginAppName,
-                  style: textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-
-                // Tagline
-                Text(
-                  context.l10n.loginTagline,
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                  ),
-                ),
-
-                const Spacer(flex: 4),
-
-                // Google sign-in button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: FilledButton.icon(
-                    onPressed: _isGoogleLoading ? null : _signInWithGoogle,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.onPrimary,
-                      foregroundColor: colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: AppShape.borderLarge,
-                      ),
-                    ),
-                    icon: _isGoogleLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Image.network(
-                            'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                            width: 20,
-                            height: 20,
-                            errorBuilder: (_, _, _) =>
-                                const Icon(Icons.g_mobiledata, size: 24),
-                          ),
-                    label: Text(context.l10n.loginContinueGoogle),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Email sign-in button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: FilledButton.icon(
-                    onPressed: _navigateToEmailAuth,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.onPrimary,
-                      foregroundColor: colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: AppShape.borderLarge,
-                      ),
-                    ),
-                    icon: const Icon(Icons.email_outlined, size: 20),
-                    label: Text(context.l10n.loginContinueEmail),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.base),
-
-                // Login link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Padding(
+                padding: AppSpacing.paddingHLg,
+                child: Column(
                   children: [
+                    const Spacer(flex: 3),
+
+                    // App icon
+                    Icon(
+                      Icons.local_fire_department,
+                      size: 80,
+                      color: colorScheme.onPrimary,
+                      semanticLabel: 'Hachimi',
+                    ),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // App name
                     Text(
-                      context.l10n.loginAlreadyHaveAccount,
-                      style: textTheme.bodyMedium?.copyWith(
+                      context.l10n.loginAppName,
+                      style: textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+
+                    // Tagline
+                    Text(
+                      context.l10n.loginTagline,
+                      style: textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       ),
                     ),
-                    Semantics(
-                      button: true,
-                      label: context.l10n.loginLogIn,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const EmailAuthScreen(startAsLogin: true),
-                            ),
-                          );
-                        },
-                        child: ExcludeSemantics(
-                          child: Text(
-                            context.l10n.loginLogIn,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              decorationColor: colorScheme.onPrimary,
+
+                    const Spacer(flex: 4),
+
+                    // Google sign-in button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: FilledButton.icon(
+                        onPressed: _isGoogleLoading ? null : _signInWithGoogle,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colorScheme.onPrimary,
+                          foregroundColor: colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppShape.borderLarge,
+                          ),
+                        ),
+                        icon: _isGoogleLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Image.network(
+                                'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                                width: 20,
+                                height: 20,
+                                errorBuilder: (_, _, _) =>
+                                    const Icon(Icons.g_mobiledata, size: 24),
+                              ),
+                        label: Text(context.l10n.loginContinueGoogle),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Email sign-in button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: FilledButton.icon(
+                        onPressed: _navigateToEmailAuth,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colorScheme.onPrimary,
+                          foregroundColor: colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppShape.borderLarge,
+                          ),
+                        ),
+                        icon: const Icon(Icons.email_outlined, size: 20),
+                        label: Text(context.l10n.loginContinueEmail),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.base),
+
+                    // Login link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          context.l10n.loginAlreadyHaveAccount,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        Semantics(
+                          button: true,
+                          label: context.l10n.loginLogIn,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const EmailAuthScreen(startAsLogin: true),
+                                ),
+                              );
+                            },
+                            child: ExcludeSemantics(
+                              child: Text(
+                                context.l10n.loginLogIn,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: colorScheme.onPrimary,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
+
+                    const SizedBox(height: AppSpacing.xl),
                   ],
                 ),
-
-                const SizedBox(height: AppSpacing.xl),
-              ],
+              ),
             ),
           ),
         ),

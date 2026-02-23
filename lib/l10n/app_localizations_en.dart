@@ -1583,24 +1583,24 @@ class SEn extends S {
       'Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!';
 
   @override
-  String get onboardTitle2 => 'Focus & Earn XP';
+  String get onboardTitle2 => 'Focus & Grow';
 
   @override
-  String get onboardSubtitle2 => 'Time fuels growth';
+  String get onboardSubtitle2 => 'Every minute counts';
 
   @override
   String get onboardBody2 =>
-      'Start a focus session and your cat earns XP.\nBuild streaks for bonus rewards.\nEvery minute counts toward evolution!';
+      'Start a focus session and your cat grows with you.\nThe more time you invest, the faster it evolves\nthrough each stage!';
 
   @override
   String get onboardTitle3 => 'Watch Them Evolve';
 
   @override
-  String get onboardSubtitle3 => 'Kitten → Shiny';
+  String get onboardSubtitle3 => '4 stages of growth';
 
   @override
   String get onboardBody3 =>
-      'Cats evolve through 4 stages as they grow.\nCollect different breeds, unlock rare cats,\nand fill your cozy cat room!';
+      'Cats evolve through 4 stages as they grow.\nCollect different breeds, discover unique personalities,\nand build your dream cat room!';
 
   @override
   String get onboardSkip => 'Skip';

@@ -1564,24 +1564,23 @@ class SJa extends S {
       '始めるクエストごとに子猫がやってきます。\n目標に集中して、小さな子猫が\n立派なネコに育つのを見届けましょう！';
 
   @override
-  String get onboardTitle2 => '集中してXPを獲得';
+  String get onboardTitle2 => '集中して成長しよう';
 
   @override
-  String get onboardSubtitle2 => '時間が成長の源';
+  String get onboardSubtitle2 => '1分1分が力になる';
 
   @override
-  String get onboardBody2 =>
-      '集中セッションを始めるとネコがXPを獲得します。\n連続ボーナスで報酬アップ。\n1分1分が進化につながります！';
+  String get onboardBody2 => '集中セッションを始めると、ネコも一緒に成長します。\n時間を重ねるほど、進化が早くなります！';
 
   @override
   String get onboardTitle3 => '進化を見届けよう';
 
   @override
-  String get onboardSubtitle3 => '子猫 → シャイニー';
+  String get onboardSubtitle3 => '4つの成長ステージ';
 
   @override
   String get onboardBody3 =>
-      'ネコは成長とともに4つのステージを経て進化します。\nさまざまな種類を集めて、レアネコを解放し、\n居心地のよいネコ部屋を作りましょう！';
+      'ネコは成長とともに4つのステージを経て進化します。\nさまざまな種類を集めて、ユニークな個性を発見し、\n理想のネコ部屋を作りましょう！';
 
   @override
   String get onboardSkip => 'スキップ';

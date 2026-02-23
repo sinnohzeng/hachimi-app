@@ -3027,19 +3027,19 @@ abstract class S {
   /// No description provided for @onboardTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Focus & Earn XP'**
+  /// **'Focus & Grow'**
   String get onboardTitle2;
 
   /// No description provided for @onboardSubtitle2.
   ///
   /// In en, this message translates to:
-  /// **'Time fuels growth'**
+  /// **'Every minute counts'**
   String get onboardSubtitle2;
 
   /// No description provided for @onboardBody2.
   ///
   /// In en, this message translates to:
-  /// **'Start a focus session and your cat earns XP.\nBuild streaks for bonus rewards.\nEvery minute counts toward evolution!'**
+  /// **'Start a focus session and your cat grows with you.\nThe more time you invest, the faster it evolves\nthrough each stage!'**
   String get onboardBody2;
 
   /// No description provided for @onboardTitle3.
@@ -3051,13 +3051,13 @@ abstract class S {
   /// No description provided for @onboardSubtitle3.
   ///
   /// In en, this message translates to:
-  /// **'Kitten → Shiny'**
+  /// **'4 stages of growth'**
   String get onboardSubtitle3;
 
   /// No description provided for @onboardBody3.
   ///
   /// In en, this message translates to:
-  /// **'Cats evolve through 4 stages as they grow.\nCollect different breeds, unlock rare cats,\nand fill your cozy cat room!'**
+  /// **'Cats evolve through 4 stages as they grow.\nCollect different breeds, discover unique personalities,\nand build your dream cat room!'**
   String get onboardBody3;
 
   /// No description provided for @onboardSkip.

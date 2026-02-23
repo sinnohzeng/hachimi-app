@@ -1565,24 +1565,23 @@ class SKo extends S {
       '시작하는 모든 퀘스트에 아기 고양이가 함께해요.\n목표에 집중하면 아기 고양이가\n멋진 고양이로 성장하는 걸 볼 수 있어요!';
 
   @override
-  String get onboardTitle2 => '집중하고 XP를 획득하세요';
+  String get onboardTitle2 => '집중이 곧 성장이에요';
 
   @override
-  String get onboardSubtitle2 => '시간이 성장의 원동력';
+  String get onboardSubtitle2 => '매분이 소중해요';
 
   @override
-  String get onboardBody2 =>
-      '집중 세션을 시작하면 고양이가 XP를 획득해요.\n연속 기록으로 보너스 보상을 받으세요.\n매분이 진화를 향한 한 걸음이에요!';
+  String get onboardBody2 => '집중을 시작하면 고양이가 함께 성장해요.\n투자하는 시간이 많을수록 더 빨리 진화해요!';
 
   @override
   String get onboardTitle3 => '진화를 지켜보세요';
 
   @override
-  String get onboardSubtitle3 => '아기 고양이 → 빛나는 고양이';
+  String get onboardSubtitle3 => '4단계 성장 여정';
 
   @override
   String get onboardBody3 =>
-      '고양이는 성장하며 4단계를 거쳐 진화해요.\n다양한 품종을 모으고, 희귀 고양이를 잠금 해제하고,\n아늑한 고양이 방을 채워보세요!';
+      '고양이는 성장하며 4단계를 거쳐 진화해요.\n다양한 품종을 모으고, 고유한 성격을 발견하고,\n꿈의 고양이 방을 만들어 보세요!';
 
   @override
   String get onboardSkip => '건너뛰기';

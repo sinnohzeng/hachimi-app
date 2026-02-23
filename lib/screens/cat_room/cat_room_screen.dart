@@ -1,6 +1,4 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -247,20 +245,19 @@ class CatRoomScreen extends ConsumerWidget {
 
         return StaggeredListItem(
           index: index,
-          child: OpenContainer(
-            transitionDuration: AppMotion.durationMedium4,
-            closedShape: AppShape.shapeMedium,
-            closedElevation: Theme.of(context).cardTheme.elevation ?? 1,
-            closedColor:
-                Theme.of(context).cardTheme.color ??
-                Theme.of(context).colorScheme.surfaceContainerLow,
-            openColor: Theme.of(context).colorScheme.surface,
-            openBuilder: (context, _) => CatDetailScreen(catId: cat.id),
-            closedBuilder: (context, openContainer) => _CatHouseCard(
+          child: Card(
+            clipBehavior: Clip.antiAlias,
+            child: _CatHouseCard(
               cat: cat,
               habitName: habit?.name,
               habitId: habit?.id,
-              onTap: openContainer,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CatDetailScreen(catId: cat.id),
+                  ),
+                );
+              },
               onLongPress: () => _showCatActions(context, ref, cat, habit),
             ),
           ),

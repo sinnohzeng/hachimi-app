@@ -7,6 +7,8 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
@@ -110,9 +112,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // Top bar
+              // Top bar — pinned
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                 child: Row(
                   children: [
                     IconButton(
@@ -128,113 +130,34 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
                       ),
                     ),
                     const Spacer(),
-                    const SizedBox(
-                      width: AppSpacing.xxl,
-                    ), // Balance close button
+                    const SizedBox(width: AppSpacing.xxl),
                   ],
                 ),
               ),
 
-              const Spacer(flex: 2),
-
-              // Cat display
-              if (cat != null) ...[
-                TappableCatSprite(cat: cat, size: 120),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  cat.name,
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+              // Scrollable content area
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: AppSpacing.lg),
+                      _buildCatSection(cat, habit, textTheme, colorScheme),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildDurationControls(textTheme, colorScheme),
+                      const SizedBox(height: AppSpacing.xl),
+                    ],
                   ),
-                ),
-                Text(
-                  context.l10n.moodMessage(cat.personality, cat.computedMood),
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                if (habit.motivationText != null &&
-                    habit.motivationText!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.sm),
-                    child: Text(
-                      '"${habit.motivationText}"',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-              ] else ...[
-                Icon(
-                  Icons.self_improvement,
-                  size: 64,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ],
-
-              const Spacer(flex: 1),
-
-              // Circular duration picker
-              CircularDurationPicker(
-                value: _selectedMinutes,
-                onChanged: (min) => setState(() {
-                  _selectedMinutes = min;
-                }),
-              ),
-              const SizedBox(height: AppSpacing.base),
-
-              // Preset chips
-              Padding(
-                padding: AppSpacing.paddingHLg,
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  alignment: WrapAlignment.center,
-                  children: presetOptions.map((min) {
-                    final isSelected = _selectedMinutes == min;
-                    return ChoiceChip(
-                      label: Text('$min'),
-                      selected: isSelected,
-                      onSelected: (_) => setState(() {
-                        _selectedMinutes = min;
-                      }),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Mode toggle
-              Padding(
-                padding: AppSpacing.paddingHLg,
-                child: SegmentedButton<TimerMode>(
-                  segments: [
-                    ButtonSegment(
-                      value: TimerMode.countdown,
-                      label: Text(context.l10n.focusSetupCountdown),
-                      icon: const Icon(Icons.hourglass_bottom, size: 18),
-                    ),
-                    ButtonSegment(
-                      value: TimerMode.stopwatch,
-                      label: Text(context.l10n.focusSetupStopwatch),
-                      icon: const Icon(Icons.timer, size: 18),
-                    ),
-                  ],
-                  selected: {_selectedMode},
-                  onSelectionChanged: (modes) => setState(() {
-                    _selectedMode = modes.first;
-                  }),
                 ),
               ),
 
-              const Spacer(flex: 2),
-
-              // Start button
+              // Start button — pinned at bottom
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -254,6 +177,114 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // ─── Cat companion display ───
+
+  Widget _buildCatSection(
+    Cat? cat,
+    Habit habit,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
+    if (cat == null) {
+      return Icon(
+        Icons.self_improvement,
+        size: 64,
+        color: colorScheme.onSurfaceVariant,
+      );
+    }
+
+    return Column(
+      children: [
+        TappableCatSprite(cat: cat, size: 120),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          cat.name,
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          context.l10n.moodMessage(cat.personality, cat.computedMood),
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        if (habit.motivationText != null && habit.motivationText!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: Text(
+              '"${habit.motivationText}"',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ─── Duration picker, preset chips, mode toggle ───
+
+  Widget _buildDurationControls(TextTheme textTheme, ColorScheme colorScheme) {
+    return Column(
+      children: [
+        CircularDurationPicker(
+          value: _selectedMinutes,
+          onChanged: (min) => setState(() {
+            _selectedMinutes = min;
+          }),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+
+        // Preset chips
+        Padding(
+          padding: AppSpacing.paddingHLg,
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            alignment: WrapAlignment.center,
+            children: presetOptions.map((min) {
+              final isSelected = _selectedMinutes == min;
+              return ChoiceChip(
+                label: Text('$min'),
+                selected: isSelected,
+                onSelected: (_) => setState(() {
+                  _selectedMinutes = min;
+                }),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.base),
+
+        // Mode toggle
+        Padding(
+          padding: AppSpacing.paddingHLg,
+          child: SegmentedButton<TimerMode>(
+            segments: [
+              ButtonSegment(
+                value: TimerMode.countdown,
+                label: Text(context.l10n.focusSetupCountdown),
+                icon: const Icon(Icons.hourglass_bottom, size: 18),
+              ),
+              ButtonSegment(
+                value: TimerMode.stopwatch,
+                label: Text(context.l10n.focusSetupStopwatch),
+                icon: const Icon(Icons.timer, size: 18),
+              ),
+            ],
+            selected: {_selectedMode},
+            onSelectionChanged: (modes) => setState(() {
+              _selectedMode = modes.first;
+            }),
+          ),
+        ),
+      ],
     );
   }
 }

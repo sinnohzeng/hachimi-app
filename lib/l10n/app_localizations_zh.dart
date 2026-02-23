@@ -1561,22 +1561,22 @@ class SZh extends S {
   String get onboardBody1 => '每个任务都会搭配一只小猫。\n专注你的目标，看着它们\n从小猫成长为闪亮的大猫！';
 
   @override
-  String get onboardTitle2 => '专注 & 赚取 XP';
+  String get onboardTitle2 => '专注就是成长';
 
   @override
-  String get onboardSubtitle2 => '时间驱动成长';
+  String get onboardSubtitle2 => '每一分钟都算数';
 
   @override
-  String get onboardBody2 => '开始专注，猫猫就能获得 XP。\n保持连续签到获取额外奖励。\n每一分钟都能促进进化！';
+  String get onboardBody2 => '开始专注，猫猫就和你一起成长。\n投入的时间越多，它进化得越快！';
 
   @override
   String get onboardTitle3 => '见证它们进化';
 
   @override
-  String get onboardSubtitle3 => '小猫 → 闪亮';
+  String get onboardSubtitle3 => '4 个成长阶段';
 
   @override
-  String get onboardBody3 => '猫猫在成长过程中会经历 4 个阶段。\n收集不同品种，解锁稀有猫猫，\n填满你温馨的猫房！';
+  String get onboardBody3 => '猫猫在成长过程中会经历 4 个阶段。\n收集不同品种，发现独特个性，\n打造你的梦想猫房！';
 
   @override
   String get onboardSkip => '跳过';
@@ -3756,22 +3756,22 @@ class SZhHant extends SZh {
   String get onboardBody1 => '每個任務都會配搭一隻小貓。\n專注你嘅目標，睇住佢哋\n由小貓成長為閃亮嘅大貓！';
 
   @override
-  String get onboardTitle2 => '專注同賺取 XP';
+  String get onboardTitle2 => '專注就係成長';
 
   @override
-  String get onboardSubtitle2 => '時間驅動成長';
+  String get onboardSubtitle2 => '每一分鐘都算數';
 
   @override
-  String get onboardBody2 => '開始專注，貓咪就可以獲得 XP。\n保持連續簽到嚟攞額外獎勵。\n每一分鐘都會促進進化！';
+  String get onboardBody2 => '開始專注，貓咪就同你一齊成長。\n投入嘅時間越多，佢進化得越快！';
 
   @override
   String get onboardTitle3 => '見證佢哋進化';
 
   @override
-  String get onboardSubtitle3 => '小貓 → 閃亮';
+  String get onboardSubtitle3 => '4 個成長階段';
 
   @override
-  String get onboardBody3 => '貓咪喺成長過程中會經歷 4 個階段。\n收集唔同品種，解鎖稀有貓咪，\n填滿你溫馨嘅貓屋！';
+  String get onboardBody3 => '貓咪喺成長過程中會經歷 4 個階段。\n收集唔同品種，發現獨特個性，\n打造你嘅夢想貓屋！';
 
   @override
   String get onboardSkip => '跳過';
