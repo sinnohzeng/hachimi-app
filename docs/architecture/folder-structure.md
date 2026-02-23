@@ -49,7 +49,7 @@ hachimi-app/
 │   │   │   ├── analytics_events.dart       # SSOT: all GA4 event names + params
 │   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
 │   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
-│   │   │   └── llm_constants.dart          # SSOT: LLM model metadata, prompts, inference params
+│   │   │   └── ai_constants.dart           # SSOT: AI config, prompts, inference params
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
 │   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
@@ -89,11 +89,13 @@ hachimi-app/
 │   │   ├── pixel_cat_renderer.dart         # 13-layer sprite compositor (pixel-cat-maker engine)
 │   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
 │   │   ├── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
-│   │   ├── llm_service.dart               # LLM engine wrapper (llama_cpp_dart Isolate API)
+│   │   ├── ai_service.dart                # AI facade service (routes to AiProvider, concurrency control)
+   │   ├── ai/                        # AI provider implementations
+   │   │   ├── minimax_provider.dart   # MiniMax cloud AI provider
+   │   │   └── sse_parser.dart         # SSE stream parser utility
 │   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
 │   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
-│   │   ├── model_manager_service.dart     # GGUF model download, verify, delete
-│   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
+││   │   └── local_database_service.dart    # SQLite initialization (diary + chat tables)
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
@@ -109,7 +111,7 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider (app language override)
 │   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
 │   │   ├── theme_provider.dart             # themeProvider (theme mode + seed color)
-│   │   ├── llm_provider.dart              # AI feature toggle, LLM availability, model download
+│   │   ├── ai_provider.dart               # AI feature toggle, availability, service wiring
 │   │   ├── diary_provider.dart            # diaryEntriesProvider, todayDiaryProvider (family)
 │   │   └── chat_provider.dart             # chatNotifierProvider (StateNotifier family)
 │   │
@@ -142,7 +144,7 @@ hachimi-app/
 │   │   │   └── profile_screen.dart         # Stats, cat album, settings entry
 │   │   ├── settings/
 │   │   │   ├── settings_screen.dart        # Notifications, language, about, account actions
-│   │   │   ├── model_test_chat_screen.dart # AI model test chat (verify LLM works)
+│   │   │   ├── model_test_chat_screen.dart # AI test chat (verify cloud AI connection)
 │   │   │   └── components/              # Extracted sub-widgets for SettingsScreen
 │   │   │       ├── notification_settings_dialog.dart
 │   │   │       ├── language_dialog.dart
@@ -206,7 +208,7 @@ hachimi-app/
 │   │   ├── stats_provider_test.dart       # HabitStats computed properties
 │   │   ├── focus_timer_provider_test.dart # FocusTimerState computed properties
 │   │   ├── chat_provider_test.dart        # ChatState defaults + copyWith
-│   │   └── llm_provider_test.dart         # LlmAvailability + ModelDownloadState
+│   │   └── ai_provider_test.dart          # AiAvailability + AI service tests
 │   ├── services/
 │   │   ├── chat_service_test.dart         # ChatRole + ChatMessage serialization
 │   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap roundtrip
@@ -218,7 +220,7 @@ hachimi-app/
 ├── android/                                # Android platform project
 │   ├── app/
 │   │   ├── google-services.json            # Firebase config (gitignored)
-│   │   ├── proguard-rules.pro              # R8/ProGuard keep rules (Firebase, FFI, llama_cpp_dart)
+│   │   ├── proguard-rules.pro              # R8/ProGuard keep rules (Firebase, FFI)
 │   │   └── src/main/
 │   │       ├── AndroidManifest.xml         # Permissions + service declarations
 │   │       └── kotlin/com/hachimi/hachimi_app/
@@ -231,12 +233,10 @@ hachimi-app/
 │       └── release.yml                    # CI/CD: tag-triggered release APK build + GitHub Release
 │
 ├── packages/                              # Vendored native packages (gitignored, see scripts/)
-│   └── llama_cpp_dart/                    # llama_cpp_dart + llama.cpp source (setup by script)
-│
+││
 ├── scripts/
 │   ├── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
-│   └── setup_llm_vendor.sh               # Clone llama_cpp_dart with pinned llama.cpp commit
-│
+││
 ├── dart_test.yaml                         # Test configuration (exclude golden tags)
 ├── firestore.rules                         # Deployed Firestore security rules
 ├── firebase.json                           # Firebase project configuration

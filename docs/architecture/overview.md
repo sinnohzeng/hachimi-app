@@ -22,7 +22,7 @@
 | Crash Reporting | Firebase Crashlytics | 4.x | Production error monitoring |
 | Connectivity | connectivity_plus | 6.x | Device network status monitoring |
 | i18n | flutter_localizations + gen-l10n | — | Compile-time localization via ARB files |
-| Local LLM | llama_cpp_dart | 0.2.x | On-device GGUF inference (Isolate + dart:ffi) |
+| Cloud AI | MiniMax API | - | Cloud LLM via AiProvider strategy pattern (dart:io HttpClient) |
 | Dynamic Background | mesh_gradient | 1.3.x | GPU-accelerated fluid mesh gradient via fragment shader |
 | Particle Effects | atmospheric_particles | 0.3.x | Lightweight floating particle overlay (Isolate-based) |
 

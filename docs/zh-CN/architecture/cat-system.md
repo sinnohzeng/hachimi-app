@@ -481,7 +481,7 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 - 指令：2-4 句话、第一人称、根据性格调整语气
 - 双语模板（根据 app locale 选择中文或英文）
 
-**常量定义：** `lib/core/constants/llm_constants.dart` -> `class DiaryPrompt`
+**常量定义：** `lib/core/constants/ai_constants.dart` -> `class DiaryPrompt`
 
 ### 猫咪详情页集成
 
@@ -508,7 +508,7 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 
 ### 入口
 
-`CatDetailScreen` AppBar 中的聊天图标按钮（仅在 `LlmAvailability.ready` 时可见）。
+`CatDetailScreen` AppBar 中的聊天图标按钮（仅在 `AiAvailability.ready` 时可见）。
 
 ### 聊天 UI
 
@@ -533,7 +533,7 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 
 使用 ChatML 格式，包含性格、心情、成长阶段和习惯上下文。规则：保持猫猫角色、回复简短（1-3 句话）、偶尔使用猫咪拟声词、鼓励习惯完成、不提及 AI 身份。
 
-**常量定义：** `lib/core/constants/llm_constants.dart` -> `class ChatPrompt`
+**常量定义：** `lib/core/constants/ai_constants.dart` -> `class ChatPrompt`
 
 ---
 
@@ -553,11 +553,11 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 | 角色 | 猫猫性格角色扮演 | 通用 AI 助手 |
 | 消息持久化 | SQLite（应用重启后保留） | 仅内存（退出即丢失） |
 | System prompt | 性格 + 心情 + 习惯上下文 | 简单的「helpful assistant」提示 |
-| 服务层 | ChatService（含历史记录） | 直接调用 LlmService.generateStream() |
+| 服务层 | ChatService（含历史记录） | 直接调用 AiService.generateStream() |
 
 ### 入口
 
-「测试模型」按钮仅在 `LlmAvailability == ready` 时显示于 AI 模型设置区块。导航至 `/model-test-chat` 路由。
+「测试模型」按钮仅在 `AiAvailability == ready` 时显示于 AI 模型设置区块。导航至 `/model-test-chat` 路由。
 
 ### System Prompt
 
@@ -571,7 +571,7 @@ You are a helpful AI assistant. Respond concisely in 1-2 sentences.
 <|im_start|>assistant
 ```
 
-**常量定义：** `lib/core/constants/llm_constants.dart` -> `class TestPrompt`
+**常量定义：** `lib/core/constants/ai_constants.dart` -> `class TestPrompt`
 
 ---
 

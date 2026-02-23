@@ -381,27 +381,29 @@ Device connectivity (independent of auth):
 
 ---
 
-### Local LLM Providers
+### AI Providers
 
 ```
-Model management + LLM engine (independent of auth — local-only):
+Cloud AI engine (independent of auth — uses MiniMax API):
 
-modelManagerProvider (Provider<ModelManagerService>)
-localDatabaseProvider (Provider<LocalDatabaseService>)
-llmServiceInstanceProvider (Provider<LlmService>)
-
-diaryServiceProvider (Provider<DiaryService>)
-chatServiceProvider (Provider<ChatService>)
+aiServiceProvider (Provider<AiService>)
+  └── holds MiniMaxProvider (AiProvider interface)
 
 aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
-  Source: SharedPreferences 'ai_features_enabled'
+  └── SharedPreferences persistence
 
-llmAvailabilityProvider (StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>)
-  enum: featureDisabled | modelNotDownloaded | modelLoading | ready | error
-  Depends on: aiFeatureEnabledProvider, modelManagerProvider
+aiAvailabilityProvider (StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>)
+  ├── reads: aiFeatureEnabledProvider
+  └── reads: aiServiceProvider
+  States: disabled | ready | error
 
-modelDownloadProvider (StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>)
-  Tracks download progress, status (idle/downloading/paused/completed/error)
+diaryServiceProvider (Provider<DiaryService>)
+  ├── watches: aiServiceProvider
+  └── watches: localDatabaseProvider
+
+chatServiceProvider (Provider<ChatService>)
+  ├── watches: aiServiceProvider
+  └── watches: localDatabaseProvider
 
 diaryEntriesProvider(catId) — FutureProvider.family<List<DiaryEntry>, String>
 todayDiaryProvider(catId) — FutureProvider.family<DiaryEntry?, String>
@@ -414,24 +416,24 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 ### `aiFeatureEnabledProvider`
 
 - **Type**: `StateNotifierProvider<AiFeatureNotifier, bool>`
-- **File**: `lib/providers/llm_provider.dart`
+- **File**: `lib/providers/ai_provider.dart`
 - **Source**: SharedPreferences `ai_features_enabled`
-- **Consumers**: `SettingsScreen` (AI toggle), `llmAvailabilityProvider`
+- **Consumers**: `SettingsScreen` (AI toggle), `aiAvailabilityProvider`
 - **SSOT for**: Whether AI features are enabled by the user
 
-### `llmAvailabilityProvider`
+### `aiAvailabilityProvider`
 
-- **Type**: `StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>`
-- **File**: `lib/providers/llm_provider.dart`
-- **Source**: Combines `aiFeatureEnabledProvider` + model download status
+- **Type**: `StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>`
+- **File**: `lib/providers/ai_provider.dart`
+- **Source**: Combines `aiFeatureEnabledProvider` + `aiServiceProvider` reachability
 - **Consumers**: `CatDetailScreen` (diary card, chat button), `FocusCompleteScreen` (diary trigger)
-- **SSOT for**: Whether the LLM engine is ready for inference
+- **SSOT for**: Whether the cloud AI service is ready (`disabled | ready | error`)
 
 ### `chatNotifierProvider`
 
 - **Type**: `StateNotifierProvider.autoDispose.family<ChatNotifier, ChatState, String>`
 - **File**: `lib/providers/chat_provider.dart`
-- **Source**: `ChatService` (SQLite history + LLM stream)
+- **Source**: `ChatService` (SQLite history + AI stream)
 - **Consumers**: `CatChatScreen`
 - **SSOT for**: Chat state for a specific cat — messages, generation status, partial response
 

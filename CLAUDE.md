@@ -27,6 +27,8 @@ Every concern in the system has exactly one authoritative source. Never duplicat
 | UI theme | `lib/core/theme/app_theme.dart` |
 | Analytics event names | `lib/core/constants/analytics_events.dart` |
 | Cat game metadata | `lib/core/constants/cat_constants.dart` |
+| AI config / prompts | `lib/core/constants/ai_constants.dart` |
+| AI provider interface | `lib/core/ai/ai_provider.dart` |
 | Named routes | `lib/core/router/app_router.dart` |
 | Firestore security rules | `firestore.rules` |
 | Website deployment & maintenance | `docs/website/deployment.md` |
@@ -70,7 +72,7 @@ Screens → Providers → Services → Firebase SDK
 - Install on vivo (release): `adb shell settings put global package_verifier_enable 0 && adb install -r -t -d build/app/outputs/flutter-apk/app-release.apk`
 - Deploy Firestore rules: `firebase deploy --only firestore:rules --project hachimi-ai`
 - Deploy indexes: `firebase deploy --only firestore:indexes --project hachimi-ai`
-- Setup LLM vendor: `bash scripts/setup_llm_vendor.sh`
+- Build with AI: `flutter build apk --release --dart-define=MINIMAX_API_KEY=xxx`
 - Tag release: `git tag -a v<VERSION> -m "v<VERSION>: <description>" && git push origin main --tags`
 
 ## Key Gotchas

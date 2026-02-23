@@ -358,4 +358,4 @@ dormant --[习惯重新激活]--> active（未来功能）
 | `ai_model_file_path` | String | "" | 模型文件的绝对路径 |
 | `ai_model_version` | String | "" | 模型版本标识（用于升级检测） |
 
-**常量定义：** `lib/core/constants/llm_constants.dart` -> `class LlmConstants`
+**常量定义：** `lib/core/constants/ai_constants.dart` -> `class AiConstants`

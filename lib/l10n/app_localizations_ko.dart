@@ -440,7 +440,7 @@ class SKo extends S {
   String get settingsAiFeatures => 'AI 기능';
 
   @override
-  String get settingsAiSubtitle => '온디바이스 AI 기반 고양이 일기와 채팅을 사용해 보세요';
+  String get settingsAiSubtitle => '클라우드 AI 기반 고양이 일기와 채팅을 사용해 보세요';
 
   @override
   String get settingsAbout => '정보';
@@ -453,19 +453,6 @@ class SKo extends S {
 
   @override
   String get settingsAccount => '계정';
-
-  @override
-  String get settingsDownloadModel => '모델 다운로드 (1.2 GB)';
-
-  @override
-  String get settingsDeleteModel => '모델 삭제';
-
-  @override
-  String get settingsDeleteModelTitle => '모델을 삭제할까요?';
-
-  @override
-  String get settingsDeleteModelMessage =>
-      '다운로드한 AI 모델(1.2 GB)이 삭제돼요. 나중에 다시 다운로드할 수 있어요.';
 
   @override
   String get logoutTitle => '로그아웃할까요?';
@@ -574,37 +561,13 @@ class SKo extends S {
   String get commonYes => '네';
 
   @override
-  String get testChatTitle => 'AI 모델 테스트';
+  String get testChatTitle => 'AI 테스트';
 
   @override
-  String get testChatLoadingModel => '모델 불러오는 중...';
+  String get testChatModelReady => 'AI 준비 완료';
 
   @override
-  String get testChatModelLoaded => '모델 로드 완료';
-
-  @override
-  String get testChatErrorLoading => '모델 로드 오류';
-
-  @override
-  String get testChatCouldNotLoad => '모델을 불러올 수 없어요';
-
-  @override
-  String get testChatFailedToLoad => '모델 로드에 실패했어요';
-
-  @override
-  String get testChatUnknownError => '알 수 없는 오류';
-
-  @override
-  String get testChatFileCorrupted => '모델 파일이 손상되었거나 불완전합니다. 다시 다운로드하세요.';
-
-  @override
-  String get testChatRedownload => '다시 다운로드';
-
-  @override
-  String get testChatModelReady => '모델 준비 완료';
-
-  @override
-  String get testChatSendToTest => '메시지를 보내 AI 모델을 테스트해 보세요.';
+  String get testChatSendToTest => '메시지를 보내 AI를 테스트해 보세요.';
 
   @override
   String get testChatGenerating => '생성 중...';
@@ -613,7 +576,7 @@ class SKo extends S {
   String get testChatTypeMessage => '메시지를 입력하세요...';
 
   @override
-  String get settingsAiPrivacyBadge => '온디바이스 AI — 모든 처리가 기기에서 이루어져요';
+  String get settingsAiCloudBadge => 'MiniMax 클라우드 AI 탑재 — 네트워크 연결 필요';
 
   @override
   String get settingsAiWhatYouGet => '제공되는 기능:';
@@ -625,13 +588,16 @@ class SKo extends S {
   String get settingsAiFeatureChat => '고양이 채팅 — 고양이와 대화해 보세요';
 
   @override
-  String get settingsRedownload => '다시 다운로드';
+  String get settingsTestConnection => '연결 테스트';
 
   @override
-  String get settingsTestModel => '모델 테스트';
+  String get settingsConnectionSuccess => '연결 성공';
 
   @override
-  String get settingsStatusDownloading => '다운로드 중';
+  String get settingsConnectionFailed => '연결 실패';
+
+  @override
+  String get settingsTestModel => '채팅 테스트';
 
   @override
   String get settingsStatusReady => '준비 완료';
@@ -640,13 +606,20 @@ class SKo extends S {
   String get settingsStatusError => '오류';
 
   @override
-  String get settingsStatusLoading => '불러오는 중';
-
-  @override
-  String get settingsStatusNotDownloaded => '미다운로드';
-
-  @override
   String get settingsStatusDisabled => '비활성화됨';
+
+  @override
+  String get aiPrivacyTitle => '클라우드 AI 개인정보 안내';
+
+  @override
+  String get aiPrivacyMessage =>
+      'AI 기능을 활성화하면 고양이의 이름, 성격, 집중 데이터가 클라우드 서버로 전송되어 일기와 채팅 응답 생성에 사용돼요. 인터넷 연결이 필요해요. AI 기능은 언제든지 비활성화할 수 있어요.';
+
+  @override
+  String get aiPrivacyAccept => '이해했어요';
+
+  @override
+  String get aiRequiresNetwork => '네트워크 연결 필요';
 
   @override
   String get catDetailNotFound => '고양이를 찾을 수 없어요';

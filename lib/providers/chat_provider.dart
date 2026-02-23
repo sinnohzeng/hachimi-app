@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 import 'package:hachimi_app/models/habit.dart';
-import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/services/chat_service.dart';
 
 /// 聊天状态。

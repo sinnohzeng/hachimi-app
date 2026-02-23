@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5"
-  background_downloader:
-    dependency: "direct main"
-    description:
-      name: background_downloader
-      sha256: "2ea5322fe836c0aaf96aefd29ef1936771c71927f687cf18168dcc119666a45f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.5.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -701,13 +693,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  llama_cpp_dart:
-    dependency: "direct main"
-    description:
-      path: "packages/llama_cpp_dart"
-      relative: true
-    source: path
-    version: "0.2.3"
   logging:
     dependency: transitive
     description:
@@ -1161,14 +1146,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  typed_isolate:
-    dependency: transitive
-    description:
-      name: typed_isolate
-      sha256: e245b87368104f9da13a75268e0bce16a2a8d4c9a4194a5eb50bb569be680c65
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
   uuid:
     dependency: "direct main"
     description:

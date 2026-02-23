@@ -11,7 +11,7 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
@@ -81,7 +81,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 tooltip: context.l10n.catDetailRenameTooltip,
               ),
               // 聊天入口 — 仅当 AI 功能就绪时显示
-              if (ref.watch(llmAvailabilityProvider) == LlmAvailability.ready)
+              if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
                 IconButton(
                   icon: const Icon(Icons.chat_bubble_outline),
                   onPressed: () {
@@ -186,8 +186,8 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 ],
 
                 // Hachimi Diary card — AI 日记预览
-                if (ref.watch(llmAvailabilityProvider) ==
-                    LlmAvailability.ready) ...[
+                if (ref.watch(aiAvailabilityProvider) ==
+                    AiAvailability.ready) ...[
                   DiaryPreviewCard(catId: cat.id),
                   const SizedBox(height: AppSpacing.base),
 

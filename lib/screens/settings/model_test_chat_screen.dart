@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hachimi_app/core/constants/llm_constants.dart';
+import 'package:hachimi_app/core/ai/ai_config.dart';
+import 'package:hachimi_app/core/constants/ai_constants.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/providers/ai_provider.dart';
 
 /// 内存消息模型 — 不持久化。
 class _TestMessage {
@@ -16,13 +17,10 @@ class _TestMessage {
   const _TestMessage({required this.content, required this.isUser});
 }
 
-/// 模型测试聊天状态。
-enum _TestChatStatus { loading, ready, generating, error }
+/// 测试聊天状态。
+enum _TestChatStatus { validating, ready, generating, error }
 
-/// 错误类型 — 区分"文件损坏（需重新下载）"与"普通加载失败（可重试）"。
-enum _ErrorKind { corrupted, generic }
-
-/// 模型测试聊天页面。
+/// AI 测试聊天页面 — 验证云端连接后可直接对话。
 class ModelTestChatScreen extends ConsumerStatefulWidget {
   const ModelTestChatScreen({super.key});
 
@@ -38,62 +36,29 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
 
   final List<_TestMessage> _messages = [];
   String _partialResponse = '';
-  _TestChatStatus _status = _TestChatStatus.loading;
+  _TestChatStatus _status = _TestChatStatus.validating;
   String? _errorMessage;
-  _ErrorKind _errorKind = _ErrorKind.generic;
-  StreamSubscription<String>? _streamSub;
 
   @override
   void initState() {
     super.initState();
-    _initModel();
+    _validateConnection();
   }
 
-  Future<void> _initModel() async {
-    final availability = ref.read(llmAvailabilityProvider);
-    if (availability == LlmAvailability.ready) {
-      final llm = ref.read(llmServiceInstanceProvider);
-      if (llm.isReady) {
-        setState(() => _status = _TestChatStatus.ready);
-        return;
-      }
-    }
-
-    // 尝试加载模型
-    setState(() => _status = _TestChatStatus.loading);
-    try {
-      await ref.read(llmAvailabilityProvider.notifier).loadModel();
-      final newAvailability = ref.read(llmAvailabilityProvider);
-      if (newAvailability == LlmAvailability.ready) {
-        setState(() => _status = _TestChatStatus.ready);
-      } else {
-        setState(() {
-          _status = _TestChatStatus.error;
-          _errorMessage = null;
-          _errorKind = _ErrorKind.generic;
-        });
-      }
-    } catch (e) {
-      final msg = e.toString();
-      final isCorrupted =
-          msg.contains('Could not load model') || msg.contains('incomplete');
-      // 自动修复后状态会变为 modelNotDownloaded，也属于文件损坏情况
-      final availability = ref.read(llmAvailabilityProvider);
-      final needsRedownload =
-          isCorrupted || availability == LlmAvailability.modelNotDownloaded;
-      setState(() {
-        _status = _TestChatStatus.error;
-        _errorMessage = needsRedownload ? null : msg;
-        _errorKind = needsRedownload
-            ? _ErrorKind.corrupted
-            : _ErrorKind.generic;
-      });
-    }
+  Future<void> _validateConnection() async {
+    setState(() => _status = _TestChatStatus.validating);
+    final ok = await ref
+        .read(aiAvailabilityProvider.notifier)
+        .validateConnection();
+    if (!mounted) return;
+    setState(() {
+      _status = ok ? _TestChatStatus.ready : _TestChatStatus.error;
+      _errorMessage = ok ? null : context.l10n.settingsConnectionFailed;
+    });
   }
 
   @override
   void dispose() {
-    _streamSub?.cancel();
     _textController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -116,10 +81,6 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
     final text = _textController.text.trim();
     if (text.isEmpty || _status != _TestChatStatus.ready) return;
 
-    // 取消旧 stream，防止快速连续发送导致泄漏
-    await _streamSub?.cancel();
-    _streamSub = null;
-
     _textController.clear();
     setState(() {
       _messages.add(_TestMessage(content: text, isUser: true));
@@ -128,62 +89,42 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
     });
     _scrollToBottom();
 
-    final llm = ref.read(llmServiceInstanceProvider);
-    final prompt = TestPrompt.buildPrompt(text);
+    final aiService = ref.read(aiServiceProvider);
+    final messages = TestPrompt.build(text);
 
     try {
-      final stream = llm.generateStream(prompt);
-      _streamSub = stream.listen(
-        (token) {
-          if (!mounted) return;
-          setState(() {
-            _partialResponse += token;
-          });
-          _scrollToBottom();
-        },
-        onError: (e) {
-          if (!mounted) return;
-          _finishResponse();
-        },
-        onDone: () {
-          if (!mounted) return;
-          _finishResponse();
-        },
-      );
-    } catch (e) {
-      _finishResponse();
+      final stream = aiService.generateStream(messages, AiRequestConfig.chat);
+      await for (final token in stream) {
+        if (!mounted) return;
+        setState(() => _partialResponse += token);
+        _scrollToBottom();
+      }
+    } catch (_) {
+      // 错误时保留已有的部分回复
     }
+
+    _finishResponse();
   }
 
   void _finishResponse() {
-    final cleaned = _cleanResponse(_partialResponse);
-    if (cleaned.isNotEmpty) {
+    if (!mounted) return;
+    final text = _partialResponse.trim();
+    if (text.isNotEmpty) {
       setState(() {
-        _messages.add(_TestMessage(content: cleaned, isUser: false));
+        _messages.add(_TestMessage(content: text, isUser: false));
       });
     }
     setState(() {
       _partialResponse = '';
       _status = _TestChatStatus.ready;
     });
-    _streamSub = null;
     _scrollToBottom();
   }
 
   Future<void> _stopGeneration() async {
-    await _streamSub?.cancel();
-    _streamSub = null;
-    final llm = ref.read(llmServiceInstanceProvider);
-    await llm.stopGeneration();
+    final aiService = ref.read(aiServiceProvider);
+    await aiService.cancel();
     _finishResponse();
-  }
-
-  String _cleanResponse(String text) {
-    return text
-        .replaceAll('<|im_end|>', '')
-        .replaceAll('<|im_start|>', '')
-        .replaceAll('<|endoftext|>', '')
-        .trim();
   }
 
   @override
@@ -196,14 +137,9 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
       appBar: AppBar(title: Text(context.l10n.testChatTitle)),
       body: Column(
         children: [
-          // 状态 Banner
           _buildStatusBanner(colorScheme, textTheme),
-
-          // 消息列表
           Expanded(child: _buildBody(colorScheme, textTheme)),
-
-          // 输入栏
-          if (_status != _TestChatStatus.loading &&
+          if (_status != _TestChatStatus.validating &&
               _status != _TestChatStatus.error)
             _buildInputBar(colorScheme, textTheme),
         ],
@@ -219,23 +155,21 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
     final Color fgColor;
 
     switch (_status) {
-      case _TestChatStatus.loading:
+      case _TestChatStatus.validating:
         icon = Icons.hourglass_top;
-        text = l10n.testChatLoadingModel;
+        text = l10n.settingsTestConnection;
         bgColor = colorScheme.secondaryContainer;
         fgColor = colorScheme.onSecondaryContainer;
       case _TestChatStatus.ready:
       case _TestChatStatus.generating:
         final brightness = Theme.of(context).brightness;
         icon = Icons.check_circle;
-        text = l10n.testChatModelLoaded;
+        text = l10n.settingsConnectionSuccess;
         bgColor = StatusColors.successContainer(brightness);
         fgColor = StatusColors.onSuccess(brightness);
       case _TestChatStatus.error:
         icon = Icons.error;
-        text = _errorKind == _ErrorKind.corrupted
-            ? l10n.testChatFileCorrupted
-            : (_errorMessage ?? l10n.testChatErrorLoading);
+        text = _errorMessage ?? l10n.settingsConnectionFailed;
         bgColor = colorScheme.errorContainer;
         fgColor = colorScheme.onErrorContainer;
     }
@@ -254,7 +188,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
               style: textTheme.bodySmall?.copyWith(color: fgColor),
             ),
           ),
-          if (_status == _TestChatStatus.loading)
+          if (_status == _TestChatStatus.validating)
             SizedBox(
               width: 16,
               height: 16,
@@ -262,14 +196,8 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
             ),
           if (_status == _TestChatStatus.error)
             TextButton(
-              onPressed: _errorKind == _ErrorKind.corrupted
-                  ? () => Navigator.of(context).pop()
-                  : _initModel,
-              child: Text(
-                _errorKind == _ErrorKind.corrupted
-                    ? l10n.testChatRedownload
-                    : l10n.commonRetry,
-              ),
+              onPressed: _validateConnection,
+              child: Text(l10n.commonRetry),
             ),
         ],
       ),
@@ -277,54 +205,39 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
   }
 
   Widget _buildBody(ColorScheme colorScheme, TextTheme textTheme) {
-    if (_status == _TestChatStatus.loading) {
+    if (_status == _TestChatStatus.validating) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (_status == _TestChatStatus.error) {
-      final l10n = context.l10n;
-      final isCorrupted = _errorKind == _ErrorKind.corrupted;
       return Center(
         child: Padding(
           padding: AppSpacing.paddingXl,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                isCorrupted ? Icons.broken_image_outlined : Icons.error_outline,
-                size: 48,
-                color: colorScheme.error,
-              ),
+              Icon(Icons.cloud_off, size: 48, color: colorScheme.error),
               const SizedBox(height: AppSpacing.base),
               Text(
-                l10n.testChatCouldNotLoad,
+                context.l10n.settingsConnectionFailed,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                isCorrupted
-                    ? l10n.testChatFileCorrupted
-                    : (_errorMessage ?? l10n.testChatUnknownError),
+                context.l10n.aiRequiresNetwork,
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.base),
-              if (isCorrupted)
-                FilledButton.tonalIcon(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.download_outlined),
-                  label: Text(l10n.testChatRedownload),
-                )
-              else
-                FilledButton.tonalIcon(
-                  onPressed: _initModel,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(l10n.commonRetry),
-                ),
+              FilledButton.tonalIcon(
+                onPressed: _validateConnection,
+                icon: const Icon(Icons.refresh),
+                label: Text(context.l10n.commonRetry),
+              ),
             ],
           ),
         ),
@@ -332,7 +245,6 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
     }
 
     if (_messages.isEmpty && _status != _TestChatStatus.generating) {
-      final l10n = context.l10n;
       return Center(
         child: Padding(
           padding: AppSpacing.paddingXl,
@@ -346,14 +258,14 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
               ),
               const SizedBox(height: AppSpacing.base),
               Text(
-                l10n.testChatModelReady,
+                context.l10n.testChatModelReady,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                l10n.testChatSendToTest,
+                context.l10n.testChatSendToTest,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -365,15 +277,14 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
       );
     }
 
-    final isGenerating = _status == _TestChatStatus.generating;
-    final showPartial = isGenerating && _partialResponse.isNotEmpty;
+    final showPartial =
+        _status == _TestChatStatus.generating && _partialResponse.isNotEmpty;
 
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: _messages.length + (showPartial ? 1 : 0),
       itemBuilder: (context, index) {
-        // 流式部分回复
         if (index == _messages.length) {
           return _buildBubble(
             content: '$_partialResponse\u258A',
@@ -382,7 +293,6 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
             textTheme: textTheme,
           );
         }
-
         final msg = _messages[index];
         return _buildBubble(
           content: msg.content,

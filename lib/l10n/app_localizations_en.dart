@@ -444,7 +444,7 @@ class SEn extends S {
 
   @override
   String get settingsAiSubtitle =>
-      'Enable cat diary and chat powered by on-device AI';
+      'Enable cat diary and chat powered by cloud AI';
 
   @override
   String get settingsAbout => 'About';
@@ -457,19 +457,6 @@ class SEn extends S {
 
   @override
   String get settingsAccount => 'Account';
-
-  @override
-  String get settingsDownloadModel => 'Download Model (1.2 GB)';
-
-  @override
-  String get settingsDeleteModel => 'Delete Model';
-
-  @override
-  String get settingsDeleteModelTitle => 'Delete model?';
-
-  @override
-  String get settingsDeleteModelMessage =>
-      'This will delete the downloaded AI model (1.2 GB). You can download it again later.';
 
   @override
   String get logoutTitle => 'Log out?';
@@ -579,38 +566,13 @@ class SEn extends S {
   String get commonYes => 'Yes';
 
   @override
-  String get testChatTitle => 'Test AI Model';
+  String get testChatTitle => 'Test AI';
 
   @override
-  String get testChatLoadingModel => 'Loading model...';
+  String get testChatModelReady => 'AI Ready';
 
   @override
-  String get testChatModelLoaded => 'Model loaded';
-
-  @override
-  String get testChatErrorLoading => 'Error loading model';
-
-  @override
-  String get testChatCouldNotLoad => 'Could not load model';
-
-  @override
-  String get testChatFailedToLoad => 'Failed to load model';
-
-  @override
-  String get testChatUnknownError => 'Unknown error';
-
-  @override
-  String get testChatFileCorrupted =>
-      'Model file is corrupted or incomplete. Please re-download.';
-
-  @override
-  String get testChatRedownload => 'Re-download';
-
-  @override
-  String get testChatModelReady => 'Model ready';
-
-  @override
-  String get testChatSendToTest => 'Send a message to test the AI model.';
+  String get testChatSendToTest => 'Send a message to test the AI.';
 
   @override
   String get testChatGenerating => 'Generating...';
@@ -619,8 +581,8 @@ class SEn extends S {
   String get testChatTypeMessage => 'Type a message...';
 
   @override
-  String get settingsAiPrivacyBadge =>
-      'Powered by on-device AI — all processing runs locally';
+  String get settingsAiCloudBadge =>
+      'Powered by MiniMax cloud AI — requires network';
 
   @override
   String get settingsAiWhatYouGet => 'What you get:';
@@ -634,13 +596,16 @@ class SEn extends S {
       'Cat Chat — Have conversations with your cat';
 
   @override
-  String get settingsRedownload => 'Redownload';
+  String get settingsTestConnection => 'Test Connection';
 
   @override
-  String get settingsTestModel => 'Test Model';
+  String get settingsConnectionSuccess => 'Connection successful';
 
   @override
-  String get settingsStatusDownloading => 'Downloading';
+  String get settingsConnectionFailed => 'Connection failed';
+
+  @override
+  String get settingsTestModel => 'Test Chat';
 
   @override
   String get settingsStatusReady => 'Ready';
@@ -649,13 +614,20 @@ class SEn extends S {
   String get settingsStatusError => 'Error';
 
   @override
-  String get settingsStatusLoading => 'Loading';
-
-  @override
-  String get settingsStatusNotDownloaded => 'Not downloaded';
-
-  @override
   String get settingsStatusDisabled => 'Disabled';
+
+  @override
+  String get aiPrivacyTitle => 'Cloud AI Privacy Notice';
+
+  @override
+  String get aiPrivacyMessage =>
+      'When AI features are enabled, your cat\'s name, personality, and focus data will be sent to cloud servers for generating diary entries and chat responses. An internet connection is required. You can disable AI features at any time.';
+
+  @override
+  String get aiPrivacyAccept => 'I understand';
+
+  @override
+  String get aiRequiresNetwork => 'Requires network connection';
 
   @override
   String get catDetailNotFound => 'Cat not found';

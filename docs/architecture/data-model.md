@@ -359,4 +359,4 @@ In addition to Firestore, the app uses local-only storage for AI-generated conte
 | `ai_model_file_path` | String | "" | Absolute path to the downloaded model file |
 | `ai_model_version` | String | "" | Version identifier for model upgrade detection |
 
-**Constants:** `lib/core/constants/llm_constants.dart` -> `class LlmConstants`
+**Constants:** `lib/core/constants/ai_constants.dart` -> `class AiConstants`

@@ -440,7 +440,7 @@ class SJa extends S {
   String get settingsAiFeatures => 'AI機能';
 
   @override
-  String get settingsAiSubtitle => 'オンデバイスAIによるネコ日記とチャットを有効にする';
+  String get settingsAiSubtitle => 'クラウドAIによるネコ日記とチャットを有効にする';
 
   @override
   String get settingsAbout => 'アプリについて';
@@ -453,19 +453,6 @@ class SJa extends S {
 
   @override
   String get settingsAccount => 'アカウント';
-
-  @override
-  String get settingsDownloadModel => 'モデルをダウンロード (1.2 GB)';
-
-  @override
-  String get settingsDeleteModel => 'モデルを削除';
-
-  @override
-  String get settingsDeleteModelTitle => 'モデルを削除しますか？';
-
-  @override
-  String get settingsDeleteModelMessage =>
-      'ダウンロード済みのAIモデル (1.2 GB) を削除します。後で再ダウンロードできます。';
 
   @override
   String get logoutTitle => 'ログアウトしますか？';
@@ -574,37 +561,13 @@ class SJa extends S {
   String get commonYes => 'はい';
 
   @override
-  String get testChatTitle => 'AIモデルをテスト';
+  String get testChatTitle => 'AIをテスト';
 
   @override
-  String get testChatLoadingModel => 'モデルを読み込み中...';
+  String get testChatModelReady => 'AI準備完了';
 
   @override
-  String get testChatModelLoaded => 'モデルを読み込みました';
-
-  @override
-  String get testChatErrorLoading => 'モデルの読み込みエラー';
-
-  @override
-  String get testChatCouldNotLoad => 'モデルを読み込めませんでした';
-
-  @override
-  String get testChatFailedToLoad => 'モデルの読み込みに失敗しました';
-
-  @override
-  String get testChatUnknownError => '不明なエラー';
-
-  @override
-  String get testChatFileCorrupted => 'モデルファイルが破損または不完全です。再ダウンロードしてください。';
-
-  @override
-  String get testChatRedownload => '再ダウンロード';
-
-  @override
-  String get testChatModelReady => 'モデル準備完了';
-
-  @override
-  String get testChatSendToTest => 'メッセージを送信してAIモデルをテストしてください。';
+  String get testChatSendToTest => 'メッセージを送信してAIをテストしてください。';
 
   @override
   String get testChatGenerating => '生成中...';
@@ -613,7 +576,7 @@ class SJa extends S {
   String get testChatTypeMessage => 'メッセージを入力...';
 
   @override
-  String get settingsAiPrivacyBadge => 'オンデバイスAI搭載 — すべての処理はローカルで実行されます';
+  String get settingsAiCloudBadge => 'MiniMaxクラウドAI搭載 — ネットワーク接続が必要です';
 
   @override
   String get settingsAiWhatYouGet => '利用できる機能:';
@@ -625,13 +588,16 @@ class SJa extends S {
   String get settingsAiFeatureChat => 'ネコチャット — ネコと会話しましょう';
 
   @override
-  String get settingsRedownload => '再ダウンロード';
+  String get settingsTestConnection => '接続テスト';
 
   @override
-  String get settingsTestModel => 'モデルをテスト';
+  String get settingsConnectionSuccess => '接続成功';
 
   @override
-  String get settingsStatusDownloading => 'ダウンロード中';
+  String get settingsConnectionFailed => '接続失敗';
+
+  @override
+  String get settingsTestModel => 'チャットテスト';
 
   @override
   String get settingsStatusReady => '準備完了';
@@ -640,13 +606,20 @@ class SJa extends S {
   String get settingsStatusError => 'エラー';
 
   @override
-  String get settingsStatusLoading => '読み込み中';
-
-  @override
-  String get settingsStatusNotDownloaded => '未ダウンロード';
-
-  @override
   String get settingsStatusDisabled => '無効';
+
+  @override
+  String get aiPrivacyTitle => 'クラウドAIプライバシー通知';
+
+  @override
+  String get aiPrivacyMessage =>
+      'AI機能を有効にすると、ネコの名前、性格、集中データがクラウドサーバーに送信され、日記やチャットの生成に使用されます。インターネット接続が必要です。AI機能はいつでも無効にできます。';
+
+  @override
+  String get aiPrivacyAccept => '了解しました';
+
+  @override
+  String get aiRequiresNetwork => 'ネットワーク接続が必要です';
 
   @override
   String get catDetailNotFound => 'ネコが見つかりません';

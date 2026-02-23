@@ -8,7 +8,7 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
-import 'package:hachimi_app/providers/llm_provider.dart';
+import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/screens/timer/components/stat_row.dart';
 import 'package:hachimi_app/services/diary_service.dart';
@@ -156,8 +156,8 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     if (cat == null || habit == null) return;
     if (widget.isAbandoned) return;
 
-    final availability = ref.read(llmAvailabilityProvider);
-    if (availability != LlmAvailability.ready) return;
+    final availability = ref.read(aiAvailabilityProvider);
+    if (availability != AiAvailability.ready) return;
 
     final locale = Localizations.localeOf(context);
     final diaryService = ref.read(diaryServiceProvider);

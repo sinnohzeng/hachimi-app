@@ -2,7 +2,7 @@ name: hachimi_app
 description: "Cat-parenting habit app. Adopt cats, build habits, earn XP. Built with Flutter + Firebase + Material Design 3."
 publish_to: 'none'
 
-version: 2.13.0+35
+version: 2.14.0+36
 
 environment:
   sdk: ^3.11.0
@@ -50,19 +50,13 @@ dependencies:
   # Timezone (for local notification scheduling)
   timezone: ^0.10.0
 
-  # Local LLM inference (vendored — see scripts/setup_llm_vendor.sh)
-  llama_cpp_dart:
-    path: packages/llama_cpp_dart
   path_provider: ^2.1.5
 
   # Local database (AI diary + chat storage)
   sqflite: ^2.4.2
   path: ^1.9.1
 
-  # Model download with background support
-  background_downloader: ^9.5.2
-
-  # SHA-256 model file verification
+  # SHA-256 session checksum
   crypto: ^3.0.6
   dynamic_color: ^1.8.1
   animations: ^2.1.1

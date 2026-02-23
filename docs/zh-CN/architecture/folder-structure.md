@@ -49,7 +49,7 @@ hachimi-app/
 │   │   │   ├── analytics_events.dart       # SSOT：所有 GA4 事件名 + 参数
 │   │   │   ├── cat_constants.dart          # SSOT：阶段、心情、性格
 │   │   │   ├── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
-│   │   │   └── llm_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
+│   │   │   └── ai_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
 │   │   │   ├── date_utils.dart             # AppDateUtils — 统一日期字符串格式化
@@ -89,10 +89,11 @@ hachimi-app/
 │   │   ├── pixel_cat_renderer.dart         # 13 层精灵图合成器（pixel-cat-maker 引擎）
 │   │   ├── remote_config_service.dart      # Remote Config（远程配置）—— 类型化 getter + 默认值
 │   │   ├── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
-│   │   ├── llm_service.dart               # LLM 引擎封装（llama_cpp_dart Isolate API）
+│   │   ├── ai/                             # AI 子模块
+│   │   │   ├── minimax_provider.dart        # MiniMax HTTP SSE 实现
+│   │   │   └── sse_parser.dart              # SSE 流解析工具
 │   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
 │   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
-│   │   ├── model_manager_service.dart     # GGUF 模型下载、校验、删除
 │   │   └── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
@@ -109,7 +110,7 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider（应用语言覆盖）
 │   │   ├── stats_provider.dart             # statsProvider（计算型 HabitStats）
 │   │   ├── theme_provider.dart             # themeProvider（主题模式 + 种子色）
-│   │   ├── llm_provider.dart              # AI 功能开关、LLM 可用性、模型下载
+│   │   ├── ai_provider.dart              # AI 功能开关、LLM 可用性、模型下载
 │   │   ├── diary_provider.dart            # diaryEntriesProvider、todayDiaryProvider（family）
 │   │   └── chat_provider.dart             # chatNotifierProvider（StateNotifier family）
 │   │
@@ -205,7 +206,7 @@ hachimi-app/
 │   │   ├── stats_provider_test.dart       # HabitStats 计算属性测试
 │   │   ├── focus_timer_provider_test.dart # FocusTimerState 计算属性测试
 │   │   ├── chat_provider_test.dart        # ChatState 默认值 + copyWith 测试
-│   │   └── llm_provider_test.dart         # LlmAvailability + ModelDownloadState 测试
+│   │   └── ai_provider_test.dart         # AiAvailability + ModelDownloadState 测试
 │   ├── services/
 │   │   ├── chat_service_test.dart         # ChatRole + ChatMessage 序列化测试
 │   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap 往返测试
@@ -217,7 +218,6 @@ hachimi-app/
 ├── android/                                # Android 平台项目
 │   ├── app/
 │   │   ├── google-services.json            # Firebase 配置（已 gitignore）
-│   │   ├── proguard-rules.pro              # R8/ProGuard 保留规则（Firebase、FFI、llama_cpp_dart）
 │   │   └── src/main/
 │   │       ├── AndroidManifest.xml         # 权限 + 服务声明
 │   │       └── kotlin/com/hachimi/hachimi_app/
@@ -230,11 +230,9 @@ hachimi-app/
 │       └── release.yml                    # CI/CD：tag 触发的 release APK 构建 + GitHub Release
 │
 ├── packages/                              # 本地化 native 包（gitignore 排除，参见 scripts/）
-│   └── llama_cpp_dart/                    # llama_cpp_dart + llama.cpp 源码（脚本安装）
 │
 ├── scripts/
 │   ├── setup-release-signing.sh           # 交互式配置：keystore 生成 + GitHub Secrets 输出
-│   └── setup_llm_vendor.sh               # 克隆 llama_cpp_dart 并 pin llama.cpp commit
 │
 ├── dart_test.yaml                         # 测试配置（排除 golden 标签）
 ├── firestore.rules                         # 已部署的 Firestore 安全规则

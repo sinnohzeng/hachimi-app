@@ -381,14 +381,13 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 ---
 
-### 本地 LLM Provider
+### AI 提供商 Provider
 
 ```
 模型管理 + LLM 引擎（独立于认证 — 仅本地）：
 
-modelManagerProvider (Provider<ModelManagerService>)
 localDatabaseProvider (Provider<LocalDatabaseService>)
-llmServiceInstanceProvider (Provider<LlmService>)
+aiServiceProvider (Provider<AiService>)
 
 diaryServiceProvider (Provider<DiaryService>)
 chatServiceProvider (Provider<ChatService>)
@@ -396,13 +395,9 @@ chatServiceProvider (Provider<ChatService>)
 aiFeatureEnabledProvider (StateNotifierProvider<AiFeatureNotifier, bool>)
   来源：SharedPreferences 'ai_features_enabled'
 
-llmAvailabilityProvider (StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>)
-  枚举：featureDisabled | modelNotDownloaded | modelLoading | ready | error
-  依赖：aiFeatureEnabledProvider, modelManagerProvider
-
-modelDownloadProvider (StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>)
-  追踪下载进度、状态（idle/downloading/paused/completed/error）
-
+aiAvailabilityProvider (StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>)
+  枚举：disabled | ready | error
+  依赖：aiFeatureEnabledProvider
 diaryEntriesProvider(catId) — FutureProvider.family<List<DiaryEntry>, String>
 todayDiaryProvider(catId) — FutureProvider.family<DiaryEntry?, String>
 
@@ -414,15 +409,15 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 ### `aiFeatureEnabledProvider`
 
 - **类型**：`StateNotifierProvider<AiFeatureNotifier, bool>`
-- **文件**：`lib/providers/llm_provider.dart`
+- **文件**：`lib/providers/ai_provider.dart`
 - **来源**：SharedPreferences `ai_features_enabled`
-- **消费者**：`SettingsScreen`（AI 开关）、`llmAvailabilityProvider`
+- **消费者**：`SettingsScreen`（AI 开关）、`aiAvailabilityProvider`
 - **SSOT**：用户是否启用了 AI 功能
 
-### `llmAvailabilityProvider`
+### `aiAvailabilityProvider`
 
-- **类型**：`StateNotifierProvider<LlmAvailabilityNotifier, LlmAvailability>`
-- **文件**：`lib/providers/llm_provider.dart`
+- **类型**：`StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>`
+- **文件**：`lib/providers/ai_provider.dart`
 - **来源**：组合 `aiFeatureEnabledProvider` + 模型下载状态
 - **消费者**：`CatDetailScreen`（日记卡片、聊天按钮）、`FocusCompleteScreen`（日记触发）
 - **SSOT**：LLM 引擎是否就绪可推理

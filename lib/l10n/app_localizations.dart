@@ -879,7 +879,7 @@ abstract class S {
   /// No description provided for @settingsAiSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enable cat diary and chat powered by on-device AI'**
+  /// **'Enable cat diary and chat powered by cloud AI'**
   String get settingsAiSubtitle;
 
   /// No description provided for @settingsAbout.
@@ -905,30 +905,6 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Account'**
   String get settingsAccount;
-
-  /// No description provided for @settingsDownloadModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Download Model (1.2 GB)'**
-  String get settingsDownloadModel;
-
-  /// No description provided for @settingsDeleteModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Model'**
-  String get settingsDeleteModel;
-
-  /// No description provided for @settingsDeleteModelTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete model?'**
-  String get settingsDeleteModelTitle;
-
-  /// No description provided for @settingsDeleteModelMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'This will delete the downloaded AI model (1.2 GB). You can download it again later.'**
-  String get settingsDeleteModelMessage;
 
   /// No description provided for @logoutTitle.
   ///
@@ -1137,67 +1113,19 @@ abstract class S {
   /// No description provided for @testChatTitle.
   ///
   /// In en, this message translates to:
-  /// **'Test AI Model'**
+  /// **'Test AI'**
   String get testChatTitle;
-
-  /// No description provided for @testChatLoadingModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading model...'**
-  String get testChatLoadingModel;
-
-  /// No description provided for @testChatModelLoaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Model loaded'**
-  String get testChatModelLoaded;
-
-  /// No description provided for @testChatErrorLoading.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading model'**
-  String get testChatErrorLoading;
-
-  /// No description provided for @testChatCouldNotLoad.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not load model'**
-  String get testChatCouldNotLoad;
-
-  /// No description provided for @testChatFailedToLoad.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load model'**
-  String get testChatFailedToLoad;
-
-  /// No description provided for @testChatUnknownError.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown error'**
-  String get testChatUnknownError;
-
-  /// No description provided for @testChatFileCorrupted.
-  ///
-  /// In en, this message translates to:
-  /// **'Model file is corrupted or incomplete. Please re-download.'**
-  String get testChatFileCorrupted;
-
-  /// No description provided for @testChatRedownload.
-  ///
-  /// In en, this message translates to:
-  /// **'Re-download'**
-  String get testChatRedownload;
 
   /// No description provided for @testChatModelReady.
   ///
   /// In en, this message translates to:
-  /// **'Model ready'**
+  /// **'AI Ready'**
   String get testChatModelReady;
 
   /// No description provided for @testChatSendToTest.
   ///
   /// In en, this message translates to:
-  /// **'Send a message to test the AI model.'**
+  /// **'Send a message to test the AI.'**
   String get testChatSendToTest;
 
   /// No description provided for @testChatGenerating.
@@ -1212,11 +1140,11 @@ abstract class S {
   /// **'Type a message...'**
   String get testChatTypeMessage;
 
-  /// No description provided for @settingsAiPrivacyBadge.
+  /// No description provided for @settingsAiCloudBadge.
   ///
   /// In en, this message translates to:
-  /// **'Powered by on-device AI — all processing runs locally'**
-  String get settingsAiPrivacyBadge;
+  /// **'Powered by MiniMax cloud AI — requires network'**
+  String get settingsAiCloudBadge;
 
   /// No description provided for @settingsAiWhatYouGet.
   ///
@@ -1236,23 +1164,29 @@ abstract class S {
   /// **'Cat Chat — Have conversations with your cat'**
   String get settingsAiFeatureChat;
 
-  /// No description provided for @settingsRedownload.
+  /// No description provided for @settingsTestConnection.
   ///
   /// In en, this message translates to:
-  /// **'Redownload'**
-  String get settingsRedownload;
+  /// **'Test Connection'**
+  String get settingsTestConnection;
+
+  /// No description provided for @settingsConnectionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection successful'**
+  String get settingsConnectionSuccess;
+
+  /// No description provided for @settingsConnectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get settingsConnectionFailed;
 
   /// No description provided for @settingsTestModel.
   ///
   /// In en, this message translates to:
-  /// **'Test Model'**
+  /// **'Test Chat'**
   String get settingsTestModel;
-
-  /// No description provided for @settingsStatusDownloading.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloading'**
-  String get settingsStatusDownloading;
 
   /// No description provided for @settingsStatusReady.
   ///
@@ -1266,23 +1200,35 @@ abstract class S {
   /// **'Error'**
   String get settingsStatusError;
 
-  /// No description provided for @settingsStatusLoading.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading'**
-  String get settingsStatusLoading;
-
-  /// No description provided for @settingsStatusNotDownloaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Not downloaded'**
-  String get settingsStatusNotDownloaded;
-
   /// No description provided for @settingsStatusDisabled.
   ///
   /// In en, this message translates to:
   /// **'Disabled'**
   String get settingsStatusDisabled;
+
+  /// No description provided for @aiPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI Privacy Notice'**
+  String get aiPrivacyTitle;
+
+  /// No description provided for @aiPrivacyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'When AI features are enabled, your cat\'s name, personality, and focus data will be sent to cloud servers for generating diary entries and chat responses. An internet connection is required. You can disable AI features at any time.'**
+  String get aiPrivacyMessage;
+
+  /// No description provided for @aiPrivacyAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get aiPrivacyAccept;
+
+  /// No description provided for @aiRequiresNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires network connection'**
+  String get aiRequiresNetwork;
 
   /// No description provided for @catDetailNotFound.
   ///

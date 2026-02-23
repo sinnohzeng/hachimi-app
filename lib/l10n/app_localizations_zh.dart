@@ -438,7 +438,7 @@ class SZh extends S {
   String get settingsAiFeatures => 'AI 功能';
 
   @override
-  String get settingsAiSubtitle => '启用由设备端 AI 驱动的猫猫日记和聊天';
+  String get settingsAiSubtitle => '启用由云端 AI 驱动的猫猫日记和聊天';
 
   @override
   String get settingsAbout => '关于';
@@ -451,18 +451,6 @@ class SZh extends S {
 
   @override
   String get settingsAccount => '账号';
-
-  @override
-  String get settingsDownloadModel => '下载模型（1.2 GB）';
-
-  @override
-  String get settingsDeleteModel => '删除模型';
-
-  @override
-  String get settingsDeleteModelTitle => '删除模型？';
-
-  @override
-  String get settingsDeleteModelMessage => '这将删除已下载的 AI 模型（1.2 GB）。你可以稍后重新下载。';
 
   @override
   String get logoutTitle => '退出登录？';
@@ -571,37 +559,13 @@ class SZh extends S {
   String get commonYes => '是';
 
   @override
-  String get testChatTitle => '测试 AI 模型';
+  String get testChatTitle => '测试 AI';
 
   @override
-  String get testChatLoadingModel => '模型加载中...';
+  String get testChatModelReady => 'AI 就绪';
 
   @override
-  String get testChatModelLoaded => '模型已加载';
-
-  @override
-  String get testChatErrorLoading => '模型加载失败';
-
-  @override
-  String get testChatCouldNotLoad => '无法加载模型';
-
-  @override
-  String get testChatFailedToLoad => '模型加载失败';
-
-  @override
-  String get testChatUnknownError => '未知错误';
-
-  @override
-  String get testChatFileCorrupted => '模型文件损坏或不完整，请重新下载。';
-
-  @override
-  String get testChatRedownload => '重新下载';
-
-  @override
-  String get testChatModelReady => '模型就绪';
-
-  @override
-  String get testChatSendToTest => '发送消息来测试 AI 模型。';
+  String get testChatSendToTest => '发送消息来测试 AI。';
 
   @override
   String get testChatGenerating => '生成中...';
@@ -610,7 +574,7 @@ class SZh extends S {
   String get testChatTypeMessage => '输入消息...';
 
   @override
-  String get settingsAiPrivacyBadge => '由设备端 AI 驱动 — 所有处理均在本地运行';
+  String get settingsAiCloudBadge => '由 MiniMax 云端 AI 驱动 — 需要网络连接';
 
   @override
   String get settingsAiWhatYouGet => '你将获得：';
@@ -622,13 +586,16 @@ class SZh extends S {
   String get settingsAiFeatureChat => '猫猫聊天 — 和你的猫猫对话';
 
   @override
-  String get settingsRedownload => '重新下载';
+  String get settingsTestConnection => '测试连接';
 
   @override
-  String get settingsTestModel => '测试模型';
+  String get settingsConnectionSuccess => '连接成功';
 
   @override
-  String get settingsStatusDownloading => '下载中';
+  String get settingsConnectionFailed => '连接失败';
+
+  @override
+  String get settingsTestModel => '测试聊天';
 
   @override
   String get settingsStatusReady => '就绪';
@@ -637,13 +604,20 @@ class SZh extends S {
   String get settingsStatusError => '错误';
 
   @override
-  String get settingsStatusLoading => '加载中';
-
-  @override
-  String get settingsStatusNotDownloaded => '未下载';
-
-  @override
   String get settingsStatusDisabled => '已停用';
+
+  @override
+  String get aiPrivacyTitle => '云端 AI 隐私说明';
+
+  @override
+  String get aiPrivacyMessage =>
+      '启用 AI 功能后，猫猫的名字、性格和专注数据将发送到云端服务器，用于生成日记和聊天回复。需要网络连接。你可以随时停用 AI 功能。';
+
+  @override
+  String get aiPrivacyAccept => '我了解了';
+
+  @override
+  String get aiRequiresNetwork => '需要网络连接';
 
   @override
   String get catDetailNotFound => '未找到猫猫';
@@ -2654,7 +2628,7 @@ class SZhHant extends SZh {
   String get settingsAiFeatures => 'AI 功能';
 
   @override
-  String get settingsAiSubtitle => '啟用由裝置端 AI 驅動嘅貓咪日記同聊天';
+  String get settingsAiSubtitle => '啟用由雲端 AI 驅動嘅貓咪日記同聊天';
 
   @override
   String get settingsAbout => '關於';
@@ -2667,19 +2641,6 @@ class SZhHant extends SZh {
 
   @override
   String get settingsAccount => '帳號';
-
-  @override
-  String get settingsDownloadModel => '下載模型（1.2 GB）';
-
-  @override
-  String get settingsDeleteModel => '刪除模型';
-
-  @override
-  String get settingsDeleteModelTitle => '刪除模型？';
-
-  @override
-  String get settingsDeleteModelMessage =>
-      '呢個操作會刪除已下載嘅 AI 模型（1.2 GB）。你可以之後再下載。';
 
   @override
   String get logoutTitle => '登出？';
@@ -2788,37 +2749,13 @@ class SZhHant extends SZh {
   String get commonYes => '係';
 
   @override
-  String get testChatTitle => '測試 AI 模型';
+  String get testChatTitle => '測試 AI';
 
   @override
-  String get testChatLoadingModel => '模型載入中⋯';
+  String get testChatModelReady => 'AI 就緒';
 
   @override
-  String get testChatModelLoaded => '模型已載入';
-
-  @override
-  String get testChatErrorLoading => '模型載入失敗';
-
-  @override
-  String get testChatCouldNotLoad => '無法載入模型';
-
-  @override
-  String get testChatFailedToLoad => '模型載入失敗';
-
-  @override
-  String get testChatUnknownError => '未知錯誤';
-
-  @override
-  String get testChatFileCorrupted => '模型文件損毀或不完整，請重新下載。';
-
-  @override
-  String get testChatRedownload => '重新下載';
-
-  @override
-  String get testChatModelReady => '模型就緒';
-
-  @override
-  String get testChatSendToTest => '傳送訊息嚟測試 AI 模型。';
+  String get testChatSendToTest => '傳送訊息嚟測試 AI。';
 
   @override
   String get testChatGenerating => '產生中⋯';
@@ -2827,7 +2764,7 @@ class SZhHant extends SZh {
   String get testChatTypeMessage => '輸入訊息⋯';
 
   @override
-  String get settingsAiPrivacyBadge => '由裝置端 AI 驅動——所有處理均喺本地運行';
+  String get settingsAiCloudBadge => '由 MiniMax 雲端 AI 驅動——需要網絡連接';
 
   @override
   String get settingsAiWhatYouGet => '你會獲得：';
@@ -2839,13 +2776,16 @@ class SZhHant extends SZh {
   String get settingsAiFeatureChat => '貓咪聊天——同你嘅貓咪傾偈';
 
   @override
-  String get settingsRedownload => '重新下載';
+  String get settingsTestConnection => '測試連接';
 
   @override
-  String get settingsTestModel => '測試模型';
+  String get settingsConnectionSuccess => '連接成功';
 
   @override
-  String get settingsStatusDownloading => '下載中';
+  String get settingsConnectionFailed => '連接失敗';
+
+  @override
+  String get settingsTestModel => '測試聊天';
 
   @override
   String get settingsStatusReady => '就緒';
@@ -2854,13 +2794,20 @@ class SZhHant extends SZh {
   String get settingsStatusError => '錯誤';
 
   @override
-  String get settingsStatusLoading => '載入中';
-
-  @override
-  String get settingsStatusNotDownloaded => '未下載';
-
-  @override
   String get settingsStatusDisabled => '已停用';
+
+  @override
+  String get aiPrivacyTitle => '雲端 AI 私隱聲明';
+
+  @override
+  String get aiPrivacyMessage =>
+      '啟用 AI 功能後，貓咪嘅名、性格同專注數據會傳送到雲端伺服器，用嚟產生日記同聊天回覆。需要網絡連接。你可以隨時停用 AI 功能。';
+
+  @override
+  String get aiPrivacyAccept => '我明白了';
+
+  @override
+  String get aiRequiresNetwork => '需要網絡連接';
 
   @override
   String get catDetailNotFound => '搵唔到貓咪';

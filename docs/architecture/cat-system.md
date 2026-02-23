@@ -459,7 +459,7 @@ The `CheckInScreen` (`/check-in` route) displays full monthly check-in details:
 
 ## Hachimi Diary (AI Cat Diary)
 
-The Hachimi Diary gives each cat the ability to write daily diary entries based on the user's habit completion, the cat's personality, and mood. Diary generation requires the local LLM model to be downloaded and AI features enabled.
+The Hachimi Diary gives each cat the ability to write daily diary entries based on the user's habit completion, the cat's personality, and mood. Diary generation requires the cloud AI to be configured and AI features enabled.
 
 ### Generation Trigger
 
@@ -477,7 +477,7 @@ The diary prompt uses ChatML format (`<|im_start|>system/assistant<|im_end|>`) a
 - Instruction: 2-4 sentences, first person, personality-adjusted tone
 - Bilingual templates (English and Chinese based on app locale)
 
-**Constants:** `lib/core/constants/llm_constants.dart` -> `class DiaryPrompt`
+**Constants:** `lib/core/constants/ai_constants.dart` -> `class DiaryPrompt`
 
 ### Cat Detail Page Integration
 
@@ -500,11 +500,11 @@ Tapping "View all" navigates to `CatDiaryScreen` (`/cat-diary` route).
 
 ## Cat Chat (AI Chat)
 
-Users can have text conversations with their cat. The cat responds in character based on its personality. Chat requires the local LLM model to be downloaded and AI features enabled.
+Users can have text conversations with their cat. The cat responds in character based on its personality. Chat requires the cloud AI to be configured and AI features enabled.
 
 ### Entry Point
 
-Chat icon button in `CatDetailScreen` AppBar (only visible when `LlmAvailability.ready`).
+Chat icon button in `CatDetailScreen` AppBar (only visible when `AiAvailability.ready`).
 
 ### Chat UI
 
@@ -529,13 +529,13 @@ Messages beyond 20 are excluded via sliding window.
 
 Uses ChatML format with personality, mood, stage, and habit context. Rules: stay in cat character, keep replies short (1-3 sentences), use cat sounds occasionally, encourage habit completion, never mention being AI.
 
-**Constants:** `lib/core/constants/llm_constants.dart` -> `class ChatPrompt`
+**Constants:** `lib/core/constants/ai_constants.dart` -> `class ChatPrompt`
 
 ---
 
 ## Model Test Chat
 
-A lightweight chat screen accessible from **Settings → AI Model → "Test Model"** that lets users verify the local LLM is working correctly after download — without needing to navigate to a specific cat.
+A lightweight chat screen accessible from **Settings → AI → "Test Model"** that lets users verify the cloud AI connection is working correctly — without needing to navigate to a specific cat.
 
 ### Purpose
 
@@ -545,15 +545,15 @@ After downloading the 1.2 GB model, users need a quick way to confirm everything
 
 | Aspect | Cat Chat | Model Test Chat |
 |--------|----------|-----------------|
-| Entry point | CatDetailScreen AppBar | Settings → AI Model section |
+| Entry point | CatDetailScreen AppBar | Settings → AI section |
 | Persona | Cat personality role-play | Generic helpful AI assistant |
 | Message persistence | SQLite (survives app restart) | In-memory only (lost on exit) |
 | System prompt | Personality + mood + habit context | Simple "helpful assistant" prompt |
-| Service layer | ChatService (with history) | Direct LlmService.generateStream() |
+| Service layer | ChatService (with history) | AiService via AiProvider interface |
 
 ### Entry Point
 
-The "Test Model" button appears in the AI Model settings section only when `LlmAvailability == ready`. It navigates to `/model-test-chat`.
+The "Test Model" button appears in the AI settings section only when `AiAvailability == ready`. It navigates to `/model-test-chat`.
 
 ### System Prompt
 
@@ -567,7 +567,7 @@ You are a helpful AI assistant. Respond concisely in 1-2 sentences.
 <|im_start|>assistant
 ```
 
-**Constants:** `lib/core/constants/llm_constants.dart` -> `class TestPrompt`
+**Constants:** `lib/core/constants/ai_constants.dart` -> `class TestPrompt`
 
 ---
 

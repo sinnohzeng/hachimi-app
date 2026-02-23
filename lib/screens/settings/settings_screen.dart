@@ -13,7 +13,7 @@ import 'components/notification_settings_dialog.dart';
 import 'components/language_dialog.dart';
 import 'components/theme_mode_dialog.dart';
 import 'components/theme_color_dialog.dart';
-import 'components/ai_model_section.dart';
+import 'components/ai_settings_section.dart';
 import 'components/section_header.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -140,7 +140,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // AI Model section
           SectionHeader(title: l10n.settingsAiModel, colorScheme: colorScheme),
-          AiModelSection(colorScheme: colorScheme, textTheme: textTheme),
+          AiSettingsSection(colorScheme: colorScheme, textTheme: textTheme),
 
           const SizedBox(height: AppSpacing.sm),
           const Divider(),

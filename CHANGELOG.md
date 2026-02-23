@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0] - 2026-02-23
+### Changed
+- AI system migrated from local LLM (Qwen-1.7B via llama_cpp_dart) to cloud-based MiniMax API
+- Provider-agnostic architecture: abstract `AiProvider` interface with Strategy Pattern for future provider support
+- AI availability simplified from 5-state to 3-state model (disabled/ready/error)
+- Prompt format migrated from ChatML strings to structured `List<AiMessage>` (OpenAI messages format)
+- Settings AI section rewritten: removed model download UI, added cloud badge, connection test, and privacy dialog
+- Test chat screen simplified: removed model loading/corruption handling, validates cloud connection directly
+
+### Added
+- `AiProvider` abstract interface (`core/ai/`) — supports generate, generateStream, cancel, validateConnection
+- `MiniMaxProvider` implementation with SSE streaming, MiniMax-specific error mapping, and dart:io HttpClient
+- `SseParser` reusable SSE stream parser for all OpenAI-compatible providers
+- `AiService` facade with Completer-based mutex for concurrency control
+- Privacy disclosure dialog on first AI enable (persisted via SharedPreferences)
+- `AiRequestConfig` with static presets (chat, diary, validation)
+- `AiException` typed error hierarchy (network, auth, rate limit, balance, server, cancelled, unconfigured)
+- New L10N keys for cloud AI UI across all 5 languages (EN/ZH/ZH-Hant/JA/KO)
+
+### Removed
+- `llama_cpp_dart` vendored package and all local model infrastructure
+- `background_downloader` dependency (was used for model download)
+- `LlmService`, `ModelManagerService`, `llm_constants.dart`, `llm_provider.dart`
+- Model download progress UI, pause/resume/cancel buttons, model deletion dialog
+- `scripts/setup_llm_vendor.sh` build script
+
 ## [2.13.0] - 2026-02-23
 ### Changed
 - Quest creation and editing forms unified — identical field order, section headers, and component styles

@@ -6,7 +6,7 @@
 #
 # Required GitHub Secrets:
 #   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD,
-#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART
+#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART, MINIMAX_API_KEY
 # ---
 
 name: Build & Release APK
@@ -67,17 +67,13 @@ jobs:
           storeFile=${{ github.workspace }}/android/app/hachimi-release.jks
           EOF
 
-      # Accept Android SDK licenses (needed for NDK 29 used by llama_cpp_dart)
+      # Accept Android SDK licenses
       - name: Accept Android SDK licenses
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
 
       # Create empty asset directories (git doesn't track empty dirs)
       - name: Create empty asset directories
         run: mkdir -p assets/sprites assets/room
-
-      # Setup llama_cpp_dart vendor BEFORE pub get (path dependency must exist)
-      - name: Setup llama_cpp_dart vendor
-        run: bash scripts/setup_llm_vendor.sh
 
       - name: Get dependencies
         run: flutter pub get
@@ -101,7 +97,7 @@ jobs:
         run: flutter test --exclude-tags golden
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }}
 
       - name: Report APK size
         run: |
