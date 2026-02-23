@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 
 /// SkeletonLoader — generic shimmer placeholder block.
@@ -33,7 +34,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: AppMotion.durationShimmer,
     )..repeat();
   }
 

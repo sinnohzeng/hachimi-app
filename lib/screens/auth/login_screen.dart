@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -116,7 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       backgroundColor: colorScheme.onPrimary,
                       foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppShape.borderLarge,
                       ),
                     ),
                     icon: _isGoogleLoading
@@ -147,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       backgroundColor: colorScheme.onPrimary,
                       foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppShape.borderLarge,
                       ),
                     ),
                     icon: const Icon(Icons.email_outlined, size: 20),

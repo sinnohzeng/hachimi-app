@@ -61,7 +61,9 @@ hachimi-app/
 │   │   └── theme/
 │   │       ├── app_theme.dart              # SSOT: Material 3 theme (seed color, typography)
 │   │       ├── app_spacing.dart            # M3 spacing tokens (xs/sm/md/base/lg/xl/xxl)
-│   │       └── app_motion.dart             # M3 motion tokens (durations + easing curves)
+│   │       ├── app_motion.dart             # M3 motion tokens (durations + easing curves)
+│   │       ├── app_shape.dart              # M3 shape scale tokens (borderRadius presets)
+│   │       └── app_elevation.dart          # M3 elevation scale tokens (level0–level5)
 │   │
 │   ├── l10n/                               # Localization ARB source files
 │   │   ├── app_en.arb                      # English strings (primary)
@@ -181,6 +183,7 @@ hachimi-app/
 │       ├── error_state.dart               # Unified error state (icon + message + retry button)
 │       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
 │       ├── streak_indicator.dart           # Fire badge showing current streak count
+│       ├── staggered_list_item.dart       # Stagger animation wrapper for list/grid items (fade+slide)
 │       ├── animated_mesh_background.dart  # Reusable animated mesh gradient background with toggle
 │       └── particle_overlay.dart          # Floating particle overlay (firefly/dust presets)
 │

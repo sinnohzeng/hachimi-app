@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
@@ -60,7 +61,7 @@ class AccessoryCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: colorScheme.primary,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppShape.borderSmall,
                     ),
                     child: Text(
                       context.l10n.accessoryEquipped,
@@ -78,7 +79,7 @@ class AccessoryCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: colorScheme.tertiaryContainer,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: AppShape.borderSmall,
                     ),
                     child: Text(
                       context.l10n.accessoryOwned,

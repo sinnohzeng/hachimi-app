@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -154,7 +155,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     LinearProgressIndicator(
                       value: stats.overallProgress,
                       minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: AppShape.borderExtraSmall,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(

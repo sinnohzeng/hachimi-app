@@ -6,14 +6,16 @@
 
 | Concern | Value |
 |---------|-------|
-| Release platform | GitHub Releases (`sinnohzeng/hachimi-app`) |
+| Release platform | GitHub Releases + Google Play Store |
 | APK type | Release-signed APK (AOT compiled, minified) |
+| AAB type | Release-signed AAB (for Google Play) |
 | Build method | Automated via GitHub Actions (tag-triggered) |
-| Signing | Production keystore (`hachimi-release.jks`) |
+| Signing | Production keystore (`hachimi-release.jks`) as upload key; Google Play App Signing manages distribution key |
 | Versioning | `pubspec.yaml` version field (`major.minor.patch+buildNumber`) |
-| Release URL | https://github.com/sinnohzeng/hachimi-app/releases |
+| GitHub Release URL | https://github.com/sinnohzeng/hachimi-app/releases |
+| Google Play URL | https://play.google.com/store/apps/details?id=com.hachimi.hachimi_app |
 
-> **Note**: The download button on https://hachimi.ai links directly to this releases page.
+> **Note**: The download button on https://hachimi.ai links to both GitHub Releases and Google Play.
 
 ## Version Naming Convention
 
@@ -75,9 +77,12 @@ GitHub Actions (`.github/workflows/release.yml`) will:
 5. Check formatting (`dart format --set-exit-if-changed lib/ test/`)
 6. Run `dart analyze lib/`
 7. Run tests (`flutter test --exclude-tags golden`)
-8. Build a release-signed APK (`flutter build apk --release`)
-9. Rename the APK to `hachimi-vX.Y.Z.apk`
-10. Create a GitHub Release with the APK attached
+8. Build a release-signed AAB (`flutter build appbundle --release`)
+9. Build a release-signed APK (`flutter build apk --release`)
+10. Report APK + AAB build sizes
+11. Upload AAB to Google Play internal track via `r0adkll/upload-google-play`
+12. Rename the APK to `hachimi-vX.Y.Z.apk`
+13. Create a GitHub Release with the APK attached
 
 ### Step 3.5 — Monitor CI build
 
@@ -129,10 +134,23 @@ Use `gh release create` with a user-facing release body. The release page is wha
 1. Open https://github.com/sinnohzeng/hachimi-app/releases
 2. Confirm the release tag, title, description, and APK asset appear correctly
 3. Download and install the APK to verify it works
+4. Check Google Play Console — verify AAB arrived in the internal track
+
+### Step 6 — Promote to production (manual)
+
+CI uploads to the **internal** track only. To release to production:
+
+1. Open [Google Play Console](https://play.google.com/console) → Hachimi → Release → Production
+2. Create a new production release
+3. Add the AAB from the internal track
+4. Review and roll out
+
+> **Note**: Organization accounts are exempt from the 12-tester × 14-day closed testing requirement. You can promote directly to production after internal verification.
 
 ## Checklist
 
 - [ ] `CHANGELOG.md` updated with new entry
+- [ ] `distribution/whatsnew/en-US` updated with Play Store release notes (≤500 chars)
 - [ ] Version bumped in `pubspec.yaml` (semver + build number)
 - [ ] `dart format lib/ test/` applied to entire codebase
 - [ ] `dart analyze lib/` passes with no errors
@@ -142,6 +160,8 @@ Use `gh release create` with a user-facing release body. The release page is wha
 - [ ] GitHub Actions workflow monitored and completed successfully
 - [ ] GitHub Release created with user-facing description and APK attached
 - [ ] APK installs and runs correctly on test device
+- [ ] AAB uploaded to Google Play internal track
+- [ ] Promoted to production on Play Console (if applicable)
 
 ## Release Signing
 
@@ -171,14 +191,49 @@ The CI workflow requires these secrets configured in the repository:
 | `KEY_PASSWORD` | Key password |
 | `GOOGLE_SERVICES_JSON` | Base64-encoded `google-services.json` |
 | `FIREBASE_OPTIONS_DART` | Base64-encoded `firebase_options.dart` |
+| `MINIMAX_API_KEY` | MiniMax API key for AI features |
+| `GEMINI_API_KEY` | Google Gemini API key for AI features |
+| `WIF_PROVIDER` | Workload Identity Federation provider full name |
+| `WIF_SERVICE_ACCOUNT` | Google Cloud service account email for Play Store uploads |
 
-Run `scripts/setup-release-signing.sh` to generate these values.
+Run `scripts/setup-release-signing.sh` to generate keystore-related values.
+
+## Google Play Store
+
+> For the complete step-by-step setup guide (WIF, service account, Play Console configuration), see [`docs/release/google-play-setup.md`](google-play-setup.md).
+
+### Overview
+
+The app is published to Google Play under the package name `com.hachimi.hachimi_app`. CI automatically uploads AAB to the **internal** track on each tag push. Promotion to production is done manually via Play Console.
+
+### App Signing
+
+Google Play App Signing is mandatory for all AAB uploads. The existing keystore (`hachimi-release.jks`) serves as the **upload key**. Google manages the actual distribution signing key.
+
+### Play Store "What's New" Text
+
+The file `distribution/whatsnew/en-US` contains the Play Store release notes. Update this file before each release. Maximum 500 characters.
+
+### Authentication: Workload Identity Federation
+
+CI authenticates to Google Cloud via **Workload Identity Federation (WIF)** — no long-lived service account keys. GitHub Actions requests a short-lived OIDC token, Google Cloud verifies it and issues temporary credentials.
+
+Setup steps:
+1. Create a Workload Identity Pool and OIDC Provider in Google Cloud (bound to `sinnohzeng/hachimi-app`)
+2. Create a service account with **Release manager** permissions in Play Console
+3. Grant the service account `roles/iam.workloadIdentityUser` to the WIF pool
+4. Store the provider full name as `WIF_PROVIDER` and the service account email as `WIF_SERVICE_ACCOUNT` in GitHub Secrets
+
+See [Google Cloud Workload Identity Federation docs](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines) for detailed setup.
+
+### First Release
+
+The first AAB must be uploaded manually via Play Console before the API can be used. After the initial manual upload, CI handles all subsequent uploads.
 
 ## Relationship to the Website
 
-The download button on https://hachimi.ai links to:
-```
-https://github.com/sinnohzeng/hachimi-app/releases
-```
+The download button on https://hachimi.ai links to both:
+- GitHub Releases: https://github.com/sinnohzeng/hachimi-app/releases
+- Google Play: https://play.google.com/store/apps/details?id=com.hachimi.hachimi_app
 
-GitHub automatically shows the latest release at the top. No change to the website is needed when publishing new releases.
+GitHub automatically shows the latest release at the top. Google Play updates are managed through the Play Console promotion flow.

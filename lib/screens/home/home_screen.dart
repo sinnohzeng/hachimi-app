@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animations/animations.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
@@ -32,7 +33,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: PageTransitionSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: AppMotion.durationMedium2,
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
           return FadeThroughTransition(
             animation: primaryAnimation,

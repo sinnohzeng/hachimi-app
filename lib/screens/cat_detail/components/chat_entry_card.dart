@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 
@@ -21,7 +22,7 @@ class ChatEntryCard extends StatelessWidget {
         onTap: () {
           Navigator.of(context).pushNamed(AppRouter.catChat, arguments: catId);
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         child: Padding(
           padding: AppSpacing.paddingBase,
           child: Row(

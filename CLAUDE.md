@@ -33,6 +33,7 @@ Every concern in the system has exactly one authoritative source. Never duplicat
 | Firestore security rules | `firestore.rules` |
 | Website deployment & maintenance | `docs/website/deployment.md` |
 | App release process | `docs/release/process.md` |
+| Google Play CI/CD setup | `docs/release/google-play-setup.md` |
 | License | `LICENSE` |
 
 **When adding a new provider, service, model, route, or widget:**
@@ -72,6 +73,7 @@ Screens → Providers → Services → Firebase SDK
 - Install on vivo (release): `adb shell settings put global package_verifier_enable 0 && adb install -r -t -d build/app/outputs/flutter-apk/app-release.apk`
 - Deploy Firestore rules: `firebase deploy --only firestore:rules --project hachimi-ai`
 - Deploy indexes: `firebase deploy --only firestore:indexes --project hachimi-ai`
+- Build release AAB: `flutter build appbundle --release --dart-define=MINIMAX_API_KEY=xxx --dart-define=GEMINI_API_KEY=xxx`
 - Build with AI (env file): `flutter run --dart-define-from-file=.env`
 - Build with AI (manual): `flutter build apk --release --dart-define=MINIMAX_API_KEY=xxx --dart-define=GEMINI_API_KEY=xxx`
 - Tag release: `git tag -a v<VERSION> -m "v<VERSION>: <description>" && git push origin main --tags`

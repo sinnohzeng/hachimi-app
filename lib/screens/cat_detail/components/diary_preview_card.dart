@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/diary_provider.dart';
@@ -23,7 +24,7 @@ class DiaryPreviewCard extends ConsumerWidget {
         onTap: () {
           Navigator.of(context).pushNamed(AppRouter.catDiary, arguments: catId);
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         child: Padding(
           padding: AppSpacing.paddingBase,
           child: Column(

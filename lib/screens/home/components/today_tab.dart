@@ -11,6 +11,7 @@ import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/widgets/check_in_banner.dart';
 import 'package:hachimi_app/widgets/empty_state.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/widgets/error_state.dart';
 import 'package:hachimi_app/widgets/offline_banner.dart';
 import 'package:hachimi_app/widgets/skeleton_loader.dart';
@@ -141,15 +142,18 @@ class TodayTab extends ConsumerWidget {
                     : null;
                 final minutes = todayMinutes[habit.id] ?? 0;
 
-                return HabitRow(
-                  habit: habit,
-                  cat: cat,
-                  todayMinutes: minutes,
-                  onTap: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRouter.focusSetup, arguments: habit.id),
-                  onDelete: () =>
-                      _confirmDelete(context, ref, habit.id, habit.name),
+                return StaggeredListItem(
+                  index: index,
+                  child: HabitRow(
+                    habit: habit,
+                    cat: cat,
+                    todayMinutes: minutes,
+                    onTap: () => Navigator.of(
+                      context,
+                    ).pushNamed(AppRouter.focusSetup, arguments: habit.id),
+                    onDelete: () =>
+                        _confirmDelete(context, ref, habit.id, habit.name),
+                  ),
                 );
               }, childCount: habits.length),
             );

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/motivation_quotes.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -653,13 +655,13 @@ class _ModeOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppMotion.durationShort4,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: selected
               ? colorScheme.primaryContainer.withValues(alpha: 0.5)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
           border: Border.all(
             color: selected ? colorScheme.primary : colorScheme.outlineVariant,
             width: selected ? 1.5 : 1,

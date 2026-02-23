@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -112,7 +113,7 @@ class CatDiaryScreen extends ConsumerWidget {
                             ),
                             decoration: BoxDecoration(
                               color: colorScheme.tertiaryContainer,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppShape.borderMedium,
                             ),
                             child: Text(
                               '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',

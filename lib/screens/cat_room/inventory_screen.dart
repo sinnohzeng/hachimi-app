@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -129,6 +130,7 @@ class InventoryScreen extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
+      showDragHandle: true,
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: AppSpacing.paddingBase,
@@ -160,7 +162,7 @@ class InventoryScreen extends ConsumerWidget {
                         width: 80,
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppShape.borderMedium,
                           color: Theme.of(ctx).colorScheme.surfaceContainerLow,
                         ),
                         child: Column(

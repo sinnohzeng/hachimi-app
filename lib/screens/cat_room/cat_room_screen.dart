@@ -1,4 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +15,8 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/screens/cat_detail/cat_detail_screen.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/skeleton_loader.dart';
 import 'package:hachimi_app/widgets/empty_state.dart';
@@ -96,6 +101,7 @@ class CatRoomScreen extends ConsumerWidget {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
+      showDragHandle: true,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -236,14 +242,25 @@ class CatRoomScreen extends ConsumerWidget {
         final habits = ref.watch(habitsProvider).value ?? [];
         final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
 
-        return _CatHouseCard(
-          cat: cat,
-          habitName: habit?.name,
-          habitId: habit?.id,
-          onTap: () => Navigator.of(
-            context,
-          ).pushNamed(AppRouter.catDetail, arguments: cat.id),
-          onLongPress: () => _showCatActions(context, ref, cat, habit),
+        return StaggeredListItem(
+          index: index,
+          child: OpenContainer(
+            transitionDuration: AppMotion.durationMedium4,
+            closedShape: AppShape.shapeMedium,
+            closedElevation: Theme.of(context).cardTheme.elevation ?? 1,
+            closedColor:
+                Theme.of(context).cardTheme.color ??
+                Theme.of(context).colorScheme.surfaceContainerLow,
+            openColor: Theme.of(context).colorScheme.surface,
+            openBuilder: (context, _) => CatDetailScreen(catId: cat.id),
+            closedBuilder: (context, openContainer) => _CatHouseCard(
+              cat: cat,
+              habitName: habit?.name,
+              habitId: habit?.id,
+              onTap: openContainer,
+              onLongPress: () => _showCatActions(context, ref, cat, habit),
+            ),
+          ),
         );
       },
     );
@@ -273,74 +290,68 @@ class _CatHouseCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     final stageClr = stageColor(cat.displayStage);
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Padding(
-          padding: AppSpacing.paddingMd,
-          child: Column(
-            children: [
-              // Pixel cat sprite
-              Hero(
-                tag: 'cat-${cat.id}',
-                child: TappableCatSprite(cat: cat, size: 80, enableTap: false),
-              ),
-              const SizedBox(height: AppSpacing.xs),
+    return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: AppSpacing.paddingMd,
+        child: Column(
+          children: [
+            // Pixel cat sprite
+            TappableCatSprite(cat: cat, size: 80, enableTap: false),
+            const SizedBox(height: AppSpacing.xs),
 
-              // Name + habit (flexible to prevent overflow)
-              Flexible(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      cat.name,
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+            // Name + habit (flexible to prevent overflow)
+            Flexible(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    cat.name,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 2),
-                    if (habitName != null)
-                      Flexible(
-                        child: Text(
-                          habitName!,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  if (habitName != null)
+                    Flexible(
+                      child: Text(
+                        habitName!,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.xs),
+            ),
+            const SizedBox(height: AppSpacing.xs),
 
-              // Growth progress bar
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: cat.growthProgress,
-                  minHeight: 6,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation(stageClr),
-                ),
+            // Growth progress bar
+            ClipRRect(
+              borderRadius: AppShape.borderExtraSmall,
+              child: LinearProgressIndicator(
+                value: cat.growthProgress,
+                minHeight: 6,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                valueColor: AlwaysStoppedAnimation(stageClr),
               ),
-              const SizedBox(height: AppSpacing.xs),
+            ),
+            const SizedBox(height: AppSpacing.xs),
 
-              // Stage label
-              Text(
-                context.l10n.stageName(cat.displayStage),
-                style: textTheme.labelSmall?.copyWith(
-                  color: stageClr,
-                  fontWeight: FontWeight.w600,
-                ),
+            // Stage label
+            Text(
+              context.l10n.stageName(cat.displayStage),
+              style: textTheme.labelSmall?.copyWith(
+                color: stageClr,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

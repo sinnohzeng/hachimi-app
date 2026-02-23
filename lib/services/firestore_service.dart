@@ -44,7 +44,17 @@ class FirestoreService {
     if (displayName != null) updates['displayName'] = displayName;
     if (avatarId != null) updates['avatarId'] = avatarId;
     if (updates.isEmpty) return;
-    await _db.collection('users').doc(uid).update(updates);
+    try {
+      await _db.collection('users').doc(uid).update(updates);
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'FirestoreService',
+        operation: 'updateUserProfile',
+      );
+      rethrow;
+    }
   }
 
   /// 监听用户头像 ID。返回 null 表示未设置头像（使用首字母兜底）。

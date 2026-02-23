@@ -6,6 +6,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_card.dart';
+import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_summary.dart';
 import 'package:hachimi_app/screens/achievements/components/overview_tab.dart';
 
@@ -109,10 +110,13 @@ class _AchievementListTab extends ConsumerWidget {
         if (index == 0) return const AchievementSummary();
 
         final def = sorted[index - 1];
-        return AchievementCard(
-          def: def,
-          isUnlocked: unlockedIds.contains(def.id),
-          progress: progressMap[def.id],
+        return StaggeredListItem(
+          index: index - 1,
+          child: AchievementCard(
+            def: def,
+            isUnlocked: unlockedIds.contains(def.id),
+            progress: progressMap[def.id],
+          ),
         );
       },
     );

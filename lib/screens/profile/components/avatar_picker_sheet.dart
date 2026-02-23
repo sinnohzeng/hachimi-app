@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -81,11 +82,23 @@ class _AvatarPickerContent extends StatelessWidget {
     final uid = parentRef.read(currentUidProvider);
     if (uid == null) return;
 
-    await parentRef
-        .read(firestoreServiceProvider)
-        .updateUserProfile(uid: uid, avatarId: avatarId);
+    try {
+      await parentRef
+          .read(firestoreServiceProvider)
+          .updateUserProfile(uid: uid, avatarId: avatarId);
 
-    if (context.mounted) Navigator.of(context).pop();
+      if (context.mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (context.mounted) {
+        final l10n = context.l10n;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.commonError),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -104,45 +117,49 @@ class _AvatarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isSelected
-              ? colorScheme.primaryContainer
-              : avatar.color.withValues(alpha: 0.15),
-          border: isSelected
-              ? Border.all(color: colorScheme.primary, width: 2)
-              : null,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(
-              avatar.icon,
-              size: 28,
-              color: isSelected ? colorScheme.primary : avatar.color,
-            ),
-            if (isSelected)
-              Positioned(
-                right: 4,
-                bottom: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colorScheme.primary,
-                  ),
-                  child: Icon(
-                    Icons.check,
-                    size: 12,
-                    color: colorScheme.onPrimary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: AppMotion.durationShort4,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isSelected
+                ? colorScheme.primaryContainer
+                : avatar.color.withValues(alpha: 0.15),
+            border: isSelected
+                ? Border.all(color: colorScheme.primary, width: 2)
+                : null,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                avatar.icon,
+                size: 28,
+                color: isSelected ? colorScheme.primary : avatar.color,
+              ),
+              if (isSelected)
+                Positioned(
+                  right: 4,
+                  bottom: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colorScheme.primary,
+                    ),
+                    child: Icon(
+                      Icons.check,
+                      size: 12,
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

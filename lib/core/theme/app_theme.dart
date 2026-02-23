@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'app_elevation.dart';
+import 'app_shape.dart';
+
 /// App Theme — Single Source of Truth for all UI styling.
 /// All screens and widgets MUST use Theme.of(context) to access colors and text styles.
 /// No hardcoded colors, fonts, or spacing values anywhere else.
@@ -70,15 +73,17 @@ class AppTheme {
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
-        elevation: 0,
+        elevation: AppElevation.level0,
       ),
       cardTheme: CardThemeData(
-        elevation: colorScheme.brightness == Brightness.dark ? 0 : 1,
+        elevation: colorScheme.brightness == Brightness.dark
+            ? AppElevation.level0
+            : AppElevation.level1,
         color: colorScheme.brightness == Brightness.dark
             ? colorScheme.surfaceContainerHigh
             : colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
           side: colorScheme.brightness == Brightness.dark
               ? BorderSide(
                   color: colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -92,7 +97,7 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         indicatorColor: colorScheme.secondaryContainer,
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: const OutlineInputBorder(),
@@ -103,7 +108,7 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
       ),
     );
   }

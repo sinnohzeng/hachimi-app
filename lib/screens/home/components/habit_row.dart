@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -30,7 +31,7 @@ class HabitRow extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         onTap: onTap,
         child: Padding(
           padding: AppSpacing.paddingMd,
@@ -105,7 +106,7 @@ class HabitRow extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppShape.borderMedium,
                   ),
                   child: Text(
                     '${habit.totalCheckInDays}d',

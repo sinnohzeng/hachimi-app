@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 
 /// StreakIndicator — badge showing consecutive check-in days.
 class StreakIndicator extends StatelessWidget {
@@ -17,7 +18,7 @@ class StreakIndicator extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: colorScheme.tertiaryContainer,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
@@ -33,36 +34,53 @@ Future<void> showEditNameDialog(BuildContext context, WidgetRef ref) {
           child: Text(l10n.commonCancel),
         ),
         FilledButton(
-          onPressed: () async {
-            final newName = controller.text.trim();
-            if (newName.isEmpty) return;
-
-            final uid = ref.read(currentUidProvider);
-            if (uid == null) return;
-
-            HapticFeedback.mediumImpact();
-
-            // 同时更新 Firebase Auth + Firestore
-            await Future.wait([
-              ref.read(authServiceProvider).updateDisplayName(newName),
-              ref
-                  .read(firestoreServiceProvider)
-                  .updateUserProfile(uid: uid, displayName: newName),
-            ]);
-
-            if (ctx.mounted) {
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.profileSaved),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          },
+          onPressed: () => _saveName(ctx, ref, controller, l10n),
           child: Text(l10n.commonSave),
         ),
       ],
     ),
   );
+}
+
+Future<void> _saveName(
+  BuildContext ctx,
+  WidgetRef ref,
+  TextEditingController controller,
+  S l10n,
+) async {
+  final newName = controller.text.trim();
+  if (newName.isEmpty) return;
+
+  final uid = ref.read(currentUidProvider);
+  if (uid == null) return;
+
+  HapticFeedback.mediumImpact();
+
+  try {
+    await Future.wait([
+      ref.read(authServiceProvider).updateDisplayName(newName),
+      ref
+          .read(firestoreServiceProvider)
+          .updateUserProfile(uid: uid, displayName: newName),
+    ]);
+
+    if (ctx.mounted) {
+      Navigator.of(ctx).pop();
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(
+          content: Text(l10n.profileSaved),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  } catch (_) {
+    if (ctx.mounted) {
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(
+          content: Text(l10n.commonError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 }

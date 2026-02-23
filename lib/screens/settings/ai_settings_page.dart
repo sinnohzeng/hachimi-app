@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -400,10 +401,7 @@ class _StatusChip extends StatelessWidget {
     final (String label, Color bg, Color fg) = _chipData(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: AppShape.borderMedium),
       child: Text(
         label,
         style: textTheme.labelSmall?.copyWith(

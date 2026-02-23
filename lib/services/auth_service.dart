@@ -62,8 +62,10 @@ class AuthService {
   /// 更新当前用户的显示名称。
   /// 更新 Firebase Auth profile 后 reload，确保 authStateChanges 发出更新后的 User。
   Future<void> updateDisplayName(String name) async {
-    await _auth.currentUser?.updateDisplayName(name);
-    await _auth.currentUser?.reload();
+    final user = _auth.currentUser;
+    if (user == null) return;
+    await user.updateDisplayName(name);
+    await user.reload();
   }
 
   /// Delete the current user's account.

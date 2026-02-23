@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -70,8 +72,8 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          duration: AppMotion.durationMedium2,
+          curve: AppMotion.standardDecelerate,
         );
       }
     });
@@ -374,7 +376,7 @@ class _ModelTestChatScreenState extends ConsumerState<ModelTestChatScreen> {
                         ? context.l10n.testChatGenerating
                         : context.l10n.testChatTypeMessage,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: AppShape.borderExtraLarge,
                       borderSide: BorderSide.none,
                     ),
                     filled: true,

@@ -61,7 +61,9 @@ hachimi-app/
 │   │   └── theme/
 │   │       ├── app_theme.dart              # SSOT：Material 3 主题（种子色、排版）
 │   │       ├── app_spacing.dart            # M3 间距 Token（xs/sm/md/base/lg/xl/xxl）
-│   │       └── app_motion.dart             # M3 动效 Token（时长 + 缓动曲线）
+│   │       ├── app_motion.dart             # M3 动效 Token（时长 + 缓动曲线）
+│   │       ├── app_shape.dart              # M3 形状尺度 Token（borderRadius 预设）
+│   │       └── app_elevation.dart          # M3 高度尺度 Token（level0–level5）
 │   │
 │   ├── l10n/                               # 本地化 ARB 源文件
 │   │   ├── app_en.arb                      # 英文字符串（主要）
@@ -179,6 +181,7 @@ hachimi-app/
 │       ├── error_state.dart               # 统一错误状态（图标 + 消息 + 重试按钮）
 │       ├── streak_heatmap.dart             # 91 天 GitHub 风格活动热力图
 │       ├── streak_indicator.dart           # 展示当前连续记录天数的火焰徽章
+│       ├── staggered_list_item.dart       # 列表/网格项交错入场动画封装（淡入+滑入）
 │       ├── animated_mesh_background.dart  # 可复用动态 mesh 渐变背景（含开关支持）
 │       └── particle_overlay.dart          # 浮动粒子覆盖层（萤火虫/浮尘预设）
 │

@@ -2,6 +2,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -295,7 +296,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                                               ? 0.30
                                               : 0.15,
                                         ),
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: AppShape.borderLarge,
                                   ),
                                   child: Text(
                                     l10n.focusCompleteEvolvedTo(
@@ -400,7 +401,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                         padding: const EdgeInsets.only(top: 12),
                         child: AnimatedOpacity(
                           opacity: _diarySuccess ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
+                          duration: AppMotion.durationLong2,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

@@ -128,6 +128,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
 
     showModalBottomSheet<void>(
       context: context,
+      showDragHandle: true,
       builder: (ctx) {
         final locale = Localizations.localeOf(context).toString();
         return SafeArea(
@@ -185,6 +186,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
 
     showModalBottomSheet<void>(
       context: context,
+      showDragHandle: true,
       builder: (ctx) {
         return SafeArea(
           child: Column(

@@ -28,6 +28,10 @@ class AppMotion {
   static const Duration durationLong1 = Duration(milliseconds: 450);
   static const Duration durationLong2 = Duration(milliseconds: 500);
 
+  // --- Special-purpose durations (beyond M3 standard range) ---
+  static const Duration durationShimmer = Duration(milliseconds: 1500);
+  static const Duration durationParticle = Duration(milliseconds: 3000);
+
   // --- Easing tokens (M3 spec) ---
   static const Curve emphasized = Curves.easeInOutCubicEmphasized;
   static const Curve emphasizedDecelerate = Curves.easeOutCubic;

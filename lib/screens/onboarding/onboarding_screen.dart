@@ -1,4 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/services/analytics_service.dart';
@@ -15,8 +18,8 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _pageController = PageController();
   int _currentPage = 0;
+  bool _isForward = true;
 
   List<_OnboardingPageData> _buildPages(BuildContext context) => [
     _OnboardingPageData(
@@ -46,10 +49,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _next() {
     if (_currentPage < _pageCount - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      setState(() {
+        _isForward = true;
+        _currentPage++;
+      });
     } else {
       _finish();
     }
@@ -65,12 +68,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -82,13 +79,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Page view
-          PageView.builder(
-            controller: _pageController,
-            itemCount: pages.length,
-            onPageChanged: (index) => setState(() => _currentPage = index),
-            itemBuilder: (context, index) =>
-                _OnboardingPage(data: pages[index]),
+          // Page content with shared axis transition
+          PageTransitionSwitcher(
+            duration: AppMotion.durationMedium2,
+            reverse: !_isForward,
+            transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
+                SharedAxisTransition(
+                  animation: primaryAnimation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.horizontal,
+                  child: child,
+                ),
+            child: KeyedSubtree(
+              key: ValueKey<int>(_currentPage),
+              child: _OnboardingPage(data: pages[_currentPage]),
+            ),
           ),
 
           // Skip button (top right, hidden on last page)
@@ -124,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: List.generate(
                         pages.length,
                         (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                          duration: AppMotion.durationMedium2,
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           width: _currentPage == index ? 24 : 8,
                           height: 8,
@@ -132,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: _currentPage == index
                                 ? onColor
                                 : onColor.withValues(alpha: 0.38),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: AppShape.borderExtraSmall,
                           ),
                         ),
                       ),
@@ -151,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               .gradientColors(colorScheme)
                               .first,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: AppShape.borderLarge,
                           ),
                         ),
                         child: Text(

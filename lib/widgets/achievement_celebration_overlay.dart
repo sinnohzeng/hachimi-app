@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -129,28 +131,34 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
     // 背景渐入
     _bgController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: AppMotion.durationShort4,
     );
-    _bgFade = CurvedAnimation(parent: _bgController, curve: Curves.easeOut);
+    _bgFade = CurvedAnimation(
+      parent: _bgController,
+      curve: AppMotion.standardDecelerate,
+    );
 
     // 卡片弹入
     _cardController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: AppMotion.durationMedium4,
     );
     _cardScale = CurvedAnimation(
       parent: _cardController,
-      curve: Curves.elasticOut,
+      curve: Curves.elasticOut, // 庆祝弹性效果，M3 无等价物
     );
     _cardSlide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
         .animate(
-          CurvedAnimation(parent: _cardController, curve: Curves.easeOutCubic),
+          CurvedAnimation(
+            parent: _cardController,
+            curve: AppMotion.emphasizedDecelerate,
+          ),
         );
 
     // 粒子持续动画
     _particleController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: AppMotion.durationParticle,
     )..repeat();
 
     // 启动动画序列 + 震动
@@ -237,7 +245,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: AppShape.borderExtraLarge,
                     boxShadow: [
                       BoxShadow(
                         color: colorScheme.primary.withValues(alpha: 0.3),
@@ -285,7 +293,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
                         ),
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: AppShape.borderLarge,
                         ),
                         child: Text(
                           l10n.achievementCelebrationCoins(def.coinReward),
@@ -306,7 +314,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
                           ),
                           decoration: BoxDecoration(
                             color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppShape.borderMedium,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,

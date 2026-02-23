@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
     show computeSpriteIndex;
 import 'package:hachimi_app/models/cat.dart';
@@ -38,14 +39,17 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
     super.initState();
     _bounceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: AppMotion.durationShort4,
     );
     _bounceAnimation =
         TweenSequence<double>([
           TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
           TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
         ]).animate(
-          CurvedAnimation(parent: _bounceController, curve: Curves.easeOut),
+          CurvedAnimation(
+            parent: _bounceController,
+            curve: AppMotion.standardDecelerate,
+          ),
         );
   }
 

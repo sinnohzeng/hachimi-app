@@ -11,13 +11,6 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
-# ─── llama_cpp_dart — JNI / FFI ───
--keep class com.example.llama_cpp_dart.** { *; }
--keepclassmembers class * {
-    native <methods>;
-}
--keep class * extends java.lang.foreign.** { *; }
-
 # ─── Dart FFI ───
 -keep class dart.** { *; }
 

@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.0] - 2026-02-23
+
+### Added
+- M3 design token system: `AppShape` (shape scale), `AppElevation` (elevation scale)
+- `AppMotion` extended with `durationShimmer` and `durationParticle` special-purpose tokens
+- `StaggeredListItem` reusable widget for fade+slide stagger animations on lists and grids
+- Container Transform transitions (`OpenContainer`) for cat card → detail and featured card → focus navigation
+- Onboarding uses `SharedAxisTransition` (horizontal) for proper M3 step-based flow
+- Google Play Store distribution: CI now builds AAB and uploads to internal track via Workload Identity Federation
+- `distribution/whatsnew/` for Google Play release notes
+- Google Play setup guide (`docs/release/google-play-setup.md`, EN + zh-CN)
+
+### Changed
+- All hardcoded `BorderRadius.circular(N)` replaced with `AppShape` tokens across 29 files (49 replacements)
+- All hardcoded `Duration(milliseconds:)` and `Curves.*` replaced with `AppMotion` tokens across 12 files
+- All `showModalBottomSheet` calls now include `showDragHandle: true` (6 call sites)
+- NavigationBar `labelBehavior` changed from `onlyShowSelected` to `alwaysShow` (M3 spec for ≤4 destinations)
+- Achievement cards use Outlined Card variant; Profile Journey card uses Filled Card variant
+- Profile `_StageChip` refactored to M3 `Chip` widget; `_StatBadge` wrapped with surface container
+- `_CatHouseCard` Card wrapper removed — `OpenContainer` provides container styling
+- `app_theme.dart` consumes `AppShape` and `AppElevation` tokens for card, dialog, and bottom sheet theming
+- CI workflow updated: builds both APK and AAB, reports sizes for both, uploads to Google Play
+- Release process docs updated for Google Play dual-channel distribution (EN + zh-CN)
+- `auth_service.dart` null-safety improvement for `updateDisplayName`
+- `firestore_service.dart` `updateUserProfile` now records errors via `ErrorHandler`
+
+### Removed
+- Redundant `Hero` tags on FeaturedCatCard and CatHouseCard (replaced by OpenContainer container transform)
+- Manual drag handle bar in `reminder_picker_sheet.dart` (replaced by native `showDragHandle: true`)
+
 ## [2.15.0] - 2026-02-23
 ### Added
 - Gemini 3 Flash as second AI provider — user-selectable in AI settings

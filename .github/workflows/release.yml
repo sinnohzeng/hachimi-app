@@ -1,16 +1,18 @@
 # ---
-# CI/CD: Build release-signed APK and publish GitHub Release on tag push.
+# CI/CD: Build release APK + AAB, publish GitHub Release, and upload to Google Play.
 #
 # Trigger: push tag matching 'v*' (e.g. v1.5.0, v2.0.0-rc.1)
-# Output: GitHub Release with hachimi-vX.Y.Z.apk attached
+# Output:
+#   - GitHub Release with hachimi-vX.Y.Z.apk attached
+#   - AAB uploaded to Google Play internal track
 #
 # Required GitHub Secrets:
 #   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD,
 #   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART, MINIMAX_API_KEY,
-#   GEMINI_API_KEY
+#   GEMINI_API_KEY, WIF_PROVIDER, WIF_SERVICE_ACCOUNT
 # ---
 
-name: Build & Release APK
+name: Build & Release
 
 on:
   push:
@@ -26,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write  # Required for Workload Identity Federation OIDC
 
     steps:
       - name: Checkout
@@ -97,18 +100,48 @@ jobs:
       - name: Run tests
         run: flutter test --exclude-tags golden
 
+      # Build AAB for Google Play (before APK — fail fast on Play Store deliverable)
+      - name: Build release AAB
+        run: flutter build appbundle --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+
       - name: Build release APK
         run: flutter build apk --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
-      - name: Report APK size
+      - name: Report build sizes
         run: |
           APK="build/app/outputs/flutter-apk/app-release.apk"
-          SIZE=$(stat --format="%s" "$APK")
-          SIZE_MB=$(echo "scale=2; $SIZE / 1048576" | bc)
-          echo "### APK Size" >> $GITHUB_STEP_SUMMARY
-          echo "**${SIZE_MB} MB** (\`${SIZE}\` bytes)" >> $GITHUB_STEP_SUMMARY
+          AAB="build/app/outputs/bundle/release/app-release.aab"
+          APK_SIZE=$(stat --format="%s" "$APK")
+          APK_MB=$(echo "scale=2; $APK_SIZE / 1048576" | bc)
+          AAB_SIZE=$(stat --format="%s" "$AAB")
+          AAB_MB=$(echo "scale=2; $AAB_SIZE / 1048576" | bc)
+          echo "### Build Sizes" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| APK | **${APK_MB} MB** (\`${APK_SIZE}\` bytes) |" >> $GITHUB_STEP_SUMMARY
+          echo "| AAB | **${AAB_MB} MB** (\`${AAB_SIZE}\` bytes) |" >> $GITHUB_STEP_SUMMARY
         env:
           GRADLE_OPTS: "-Xmx4G -XX:MaxMetaspaceSize=2G"
+
+      # Authenticate to Google Cloud via Workload Identity Federation (keyless)
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      # Upload AAB to Google Play internal track
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
+          packageName: com.hachimi.hachimi_app
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: build/app/outputs/mapping/release/mapping.txt
 
       - name: Rename APK
         run: |

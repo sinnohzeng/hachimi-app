@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/motivation_quotes.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -101,8 +103,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     setState(() => _currentStep++);
     _pageController.animateToPage(
       _currentStep,
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
+      duration: AppMotion.durationMedium4,
+      curve: AppMotion.standard,
     );
   }
 
@@ -113,8 +115,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       setState(() => _currentStep--);
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
+        duration: AppMotion.durationMedium4,
+        curve: AppMotion.standard,
       );
     }
   }
@@ -771,7 +773,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppShape.borderLarge,
                 ),
                 child: Text(
                   '${cat.personalityData!.emoji} ${context.l10n.personalityName(cat.personalityData!.id)}',
@@ -810,7 +812,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                     clipBehavior: Clip.none,
                     children: [
                       AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: AppMotion.durationShort4,
                         width: 80,
                         height: 96,
                         padding: AppSpacing.paddingXs,
@@ -818,7 +820,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
                           color: isSelected
                               ? colorScheme.primaryContainer
                               : colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppShape.borderMedium,
                           border: isSelected
                               ? Border.all(color: colorScheme.primary, width: 2)
                               : null,
@@ -979,13 +981,13 @@ class _ModeOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: AppMotion.durationShort4,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: selected
               ? colorScheme.primaryContainer.withValues(alpha: 0.5)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
           border: Border.all(
             color: selected ? colorScheme.primary : colorScheme.outlineVariant,
             width: selected ? 1.5 : 1,

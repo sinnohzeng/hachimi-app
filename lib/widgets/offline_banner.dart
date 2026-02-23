@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/connectivity_provider.dart';
 
@@ -25,7 +26,7 @@ class OfflineBanner extends ConsumerWidget {
         margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
         decoration: BoxDecoration(
           color: colorScheme.errorContainer,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
         ),
         child: Row(
           children: [

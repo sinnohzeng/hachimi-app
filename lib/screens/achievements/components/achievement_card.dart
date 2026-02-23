@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
@@ -47,6 +48,12 @@ class AchievementCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppShape.borderMedium,
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      color: colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -57,7 +64,7 @@ class AchievementCard extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: iconBgColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppShape.borderMedium,
               ),
               child: Icon(icon, color: iconColor, size: 24),
             ),
@@ -119,7 +126,7 @@ class AchievementCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppShape.borderMedium,
                 ),
                 child: Text(
                   '+${def.coinReward}',

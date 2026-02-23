@@ -46,7 +46,9 @@ class AnimatedMeshBackground extends ConsumerStatefulWidget {
 class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeCtrl;
-  bool _listenerAttached = false;
+
+  /// 缓存路由动画引用，确保 dispose 时移除的是同一个对象。
+  Animation<double>? _routeAnimation;
 
   @override
   void initState() {
@@ -61,7 +63,7 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!widget.fadeIn || _listenerAttached) return;
+    if (!widget.fadeIn || _routeAnimation != null) return;
 
     final route = ModalRoute.of(context);
     if (route == null) {
@@ -75,8 +77,8 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
       // 转场已完成（如从后台恢复或热重载），或无动画
       _fadeCtrl.value = 1.0;
     } else {
+      _routeAnimation = animation;
       animation.addStatusListener(_onRouteAnimationStatus);
-      _listenerAttached = true;
     }
   }
 
@@ -88,11 +90,7 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
 
   @override
   void dispose() {
-    if (_listenerAttached) {
-      ModalRoute.of(
-        context,
-      )?.animation?.removeStatusListener(_onRouteAnimationStatus);
-    }
+    _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
     _fadeCtrl.dispose();
     super.dispose();
   }

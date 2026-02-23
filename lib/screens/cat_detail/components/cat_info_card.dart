@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/appearance_l10n.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
@@ -72,7 +73,7 @@ class EnhancedCatInfoCard extends StatelessWidget {
                 color: colorScheme.surfaceContainerHighest.withValues(
                   alpha: 0.5,
                 ),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppShape.borderSmall,
               ),
               child: Text(summary, style: textTheme.bodyMedium),
             ),

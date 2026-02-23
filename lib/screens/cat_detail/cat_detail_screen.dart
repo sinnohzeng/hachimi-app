@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -164,7 +165,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: colorScheme.tertiaryContainer,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppShape.borderLarge,
                     ),
                     child: Text(
                       '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
@@ -252,7 +253,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             ),
             const SizedBox(height: AppSpacing.md),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppShape.borderSmall,
               child: LinearProgressIndicator(
                 value: cat.growthProgress,
                 minHeight: 12,

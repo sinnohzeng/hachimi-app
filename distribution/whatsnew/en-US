@@ -1,0 +1,7 @@
+Multi-provider AI support! Choose between MiniMax M2.5 or Google Gemini 3 Flash as your AI companion. Chat with your cats and get auto-generated daily diaries powered by cloud AI.
+
+New in v2.15.0:
+- Added Gemini 3 Flash as a second AI provider option
+- Upgraded MiniMax to M2.5 for better conversations
+- Provider selection in AI settings
+- Privacy disclosure on first AI enable

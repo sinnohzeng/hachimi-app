@@ -13,6 +13,7 @@ Future<ReminderConfig?> showReminderPickerSheet(
   return showModalBottomSheet<ReminderConfig>(
     context: context,
     isScrollControlled: true,
+    showDragHandle: true,
     builder: (ctx) => _ReminderPickerSheet(initial: initial),
   );
 }
@@ -68,29 +69,15 @@ class _ReminderPickerSheetState extends State<_ReminderPickerSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final l10n = context.l10n;
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-
             // 标题
             Text(
               l10n.reminderPickerTitle,

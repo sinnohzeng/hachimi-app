@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
@@ -147,7 +148,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       child: Card(
         color: colorScheme.tertiaryContainer,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
           onTap: _isCheckingIn ? null : _tryCheckIn,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -209,7 +210,7 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       child: Card(
         color: colorScheme.secondaryContainer,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppShape.borderMedium,
           onTap: () => Navigator.of(context).pushNamed(AppRouter.checkIn),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -245,7 +246,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                               backgroundColor: colorScheme.onPrimary,
                               foregroundColor: colorScheme.primary,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: AppShape.borderLarge,
                               ),
                             ),
                             child: _isLoading
@@ -325,19 +326,19 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       prefixIcon: Icon(icon, color: onPrimary.withValues(alpha: 0.7)),
       suffixIcon: suffixIcon,
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         borderSide: BorderSide(color: onPrimary.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         borderSide: BorderSide(color: onPrimary),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         borderSide: BorderSide(color: colorScheme.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         borderSide: BorderSide(color: colorScheme.error),
       ),
       filled: true,
