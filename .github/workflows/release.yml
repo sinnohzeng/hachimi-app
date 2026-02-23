@@ -75,10 +75,6 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
 
-      # Create empty asset directories (git doesn't track empty dirs)
-      - name: Create empty asset directories
-        run: mkdir -p assets/sprites assets/room
-
       - name: Get dependencies
         run: flutter pub get
 
