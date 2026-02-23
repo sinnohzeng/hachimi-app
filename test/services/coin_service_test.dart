@@ -17,6 +17,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/test.dart';
 import 'package:hachimi_app/services/coin_service.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
+import 'package:hachimi_app/services/local_database_service.dart';
 
 void main() {
   late CoinService coinService;
@@ -28,7 +30,9 @@ void main() {
   });
 
   setUp(() {
-    coinService = CoinService();
+    final localDb = LocalDatabaseService();
+    final ledger = LedgerService(localDb: localDb);
+    coinService = CoinService(ledger: ledger);
   });
 
   group('CoinService.spendCoins assertions', () {
