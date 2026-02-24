@@ -190,6 +190,20 @@ class LocalCatRepository {
     _ledger.notifyChange(LedgerChange(type: 'unequip', affectedIds: [catId]));
   }
 
+  /// 更新猫的姿势偏好（纯本地，不写台账）。
+  Future<void> updateDisplayPose(String catId, int pose) async {
+    final db = await _ledger.database;
+    await db.update(
+      'local_cats',
+      {'display_pose': pose},
+      where: 'id = ?',
+      whereArgs: [catId],
+    );
+    _ledger.notifyChange(
+      LedgerChange(type: 'cat_update', affectedIds: [catId]),
+    );
+  }
+
   /// 将猫设为毕业状态。
   Future<void> graduate(String uid, String catId) async {
     final db = await _ledger.database;

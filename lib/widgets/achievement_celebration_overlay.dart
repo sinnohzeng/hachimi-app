@@ -7,6 +7,7 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
@@ -95,7 +96,7 @@ class _AchievementCelebrationLayerState
   }
 }
 
-/// 单个成就庆祝覆盖层（半透明遮罩 + 弹入卡片 + 粒子效果）。
+/// 单个成就庆祝覆盖层 — 全屏沉浸式设计。
 class _CelebrationOverlay extends StatefulWidget {
   final AchievementDef def;
   final int currentNumber;
@@ -118,11 +119,11 @@ class _CelebrationOverlay extends StatefulWidget {
 class _CelebrationOverlayState extends State<_CelebrationOverlay>
     with TickerProviderStateMixin {
   late final AnimationController _bgController;
-  late final AnimationController _cardController;
+  late final AnimationController _contentController;
   late final AnimationController _particleController;
   late final Animation<double> _bgFade;
-  late final Animation<double> _cardScale;
-  late final Animation<Offset> _cardSlide;
+  late final Animation<double> _contentScale;
+  late final Animation<Offset> _contentSlide;
 
   @override
   void initState() {
@@ -138,32 +139,32 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
       curve: AppMotion.standardDecelerate,
     );
 
-    // 卡片弹入
-    _cardController = AnimationController(
+    // 内容弹入
+    _contentController = AnimationController(
       vsync: this,
       duration: AppMotion.durationMedium4,
     );
-    _cardScale = CurvedAnimation(
-      parent: _cardController,
+    _contentScale = CurvedAnimation(
+      parent: _contentController,
       curve: Curves.elasticOut, // 庆祝弹性效果，M3 无等价物
     );
-    _cardSlide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
-        .animate(
+    _contentSlide =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
           CurvedAnimation(
-            parent: _cardController,
+            parent: _contentController,
             curve: AppMotion.emphasizedDecelerate,
           ),
         );
 
-    // 粒子持续动画
+    // 粒子单次播放（3s）
     _particleController = AnimationController(
       vsync: this,
       duration: AppMotion.durationParticle,
-    )..repeat();
+    )..forward();
 
     // 启动动画序列 + 震动
     _bgController.forward().then((_) {
-      _cardController.forward();
+      _contentController.forward();
     });
     HapticFeedback.heavyImpact();
   }
@@ -173,10 +174,13 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.def.id != widget.def.id) {
       // 新成就：重播动画
-      _cardController.reset();
+      _contentController.reset();
       _bgController.reset();
+      _particleController
+        ..reset()
+        ..forward();
       _bgController.forward().then((_) {
-        _cardController.forward();
+        _contentController.forward();
       });
       HapticFeedback.heavyImpact();
     }
@@ -185,7 +189,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
   @override
   void dispose() {
     _bgController.dispose();
-    _cardController.dispose();
+    _contentController.dispose();
     _particleController.dispose();
     super.dispose();
   }
@@ -210,18 +214,21 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
       type: MaterialType.transparency,
       child: Stack(
         children: [
-          // 半透明遮罩
+          // 全屏渐变背景
           FadeTransition(
             opacity: _bgFade,
-            child: Semantics(
-              button: true,
-              label: 'Dismiss',
-              child: GestureDetector(
-                onTap: widget.onDismiss,
-                child: Container(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.scrim.withValues(alpha: 0.54),
+            child: GestureDetector(
+              onTap: widget.onDismiss,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: const Alignment(0, -0.4),
+                    radius: 1.2,
+                    colors: [
+                      colorScheme.primary.withValues(alpha: 0.3),
+                      colorScheme.scrim.withValues(alpha: 0.85),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -242,144 +249,194 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
             ),
           ),
 
-          // 主卡片
-          Center(
+          // 全屏内容
+          SafeArea(
             child: SlideTransition(
-              position: _cardSlide,
+              position: _contentSlide,
               child: ScaleTransition(
-                scale: _cardScale,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    minWidth: 280,
-                    maxWidth: 360,
-                  ),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 32),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: AppShape.borderExtraLarge,
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.primary.withValues(alpha: 0.3),
-                          blurRadius: 32,
-                          spreadRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 成就图标（带光环）
-                        _GlowingIcon(
-                          icon: def.icon,
-                          color: colorScheme.primary,
-                          animation: _particleController,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // 成就名称
-                        Text(
-                          name,
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        if (desc.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            desc,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                        const SizedBox(height: 16),
-
-                        // 金币奖励
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.15),
-                            borderRadius: AppShape.borderLarge,
-                          ),
-                          child: Text(
-                            l10n.achievementCelebrationCoins(def.coinReward),
-                            style: textTheme.titleMedium?.copyWith(
-                              color: Colors.amber.shade700,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-
-                        // 称号（如有）
-                        if (hasTitle && titleName != null) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: AppShape.borderMedium,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.military_tech,
-                                  size: 18,
-                                  color: colorScheme.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l10n.achievementCelebrationTitle(titleName),
-                                  style: textTheme.labelLarge?.copyWith(
-                                    color: colorScheme.onPrimaryContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 24),
-
-                        // 确认按钮
-                        FilledButton(
-                          onPressed: widget.onDismiss,
-                          child: Text(l10n.achievementCelebrationDismiss),
-                        ),
-
-                        // 跳过全部（队列 > 1 时显示）
-                        if (widget.totalCount > 1) ...[
-                          const SizedBox(height: 8),
-                          TextButton(
-                            onPressed: widget.onSkipAll,
-                            child: Text(l10n.achievementCelebrationSkipAll),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            l10n.achievementCelebrationCounter(
-                              widget.currentNumber,
-                              widget.totalCount,
-                            ),
-                            style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+                scale: _contentScale,
+                child: _buildContent(
+                  colorScheme,
+                  textTheme,
+                  l10n,
+                  def,
+                  name,
+                  desc,
+                  hasTitle,
+                  titleName,
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    S l10n,
+    AchievementDef def,
+    String name,
+    String desc,
+    bool hasTitle,
+    String? titleName,
+  ) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Spacer(flex: 2),
+
+        // 成就图标（带光环）
+        _GlowingIcon(
+          icon: def.icon,
+          color: colorScheme.primary,
+          animation: _particleController,
+          size: 96,
+        ),
+        const SizedBox(height: 24),
+
+        // 成就名称
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            name,
+            style: textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (desc.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              desc,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+
+        // 金币奖励
+        _CoinRewardBadge(coinReward: def.coinReward, l10n: l10n),
+
+        // 称号（如有）
+        if (hasTitle && titleName != null) ...[
+          const SizedBox(height: 12),
+          _TitleRewardBadge(
+            titleName: titleName,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            l10n: l10n,
+          ),
+        ],
+
+        const Spacer(flex: 3),
+
+        // 确认按钮
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton(
+              onPressed: widget.onDismiss,
+              child: Text(l10n.achievementCelebrationDismiss),
+            ),
+          ),
+        ),
+
+        // 跳过全部（队列 > 1 时显示）
+        if (widget.totalCount > 1) ...[
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: widget.onSkipAll,
+            child: Text(l10n.achievementCelebrationSkipAll),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.achievementCelebrationCounter(
+              widget.currentNumber,
+              widget.totalCount,
+            ),
+            style: TextTheme.of(
+              context,
+            ).labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+        ],
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+}
+
+/// 金币奖励徽章。
+class _CoinRewardBadge extends StatelessWidget {
+  final int coinReward;
+  final S l10n;
+
+  const _CoinRewardBadge({required this.coinReward, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.amber.withValues(alpha: 0.15),
+        borderRadius: AppShape.borderLarge,
+      ),
+      child: Text(
+        l10n.achievementCelebrationCoins(coinReward),
+        style: textTheme.titleMedium?.copyWith(
+          color: Colors.amber.shade700,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+/// 称号奖励徽章。
+class _TitleRewardBadge extends StatelessWidget {
+  final String titleName;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final S l10n;
+
+  const _TitleRewardBadge({
+    required this.titleName,
+    required this.colorScheme,
+    required this.textTheme,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer,
+        borderRadius: AppShape.borderMedium,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.military_tech, size: 18, color: colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            l10n.achievementCelebrationTitle(titleName),
+            style: textTheme.labelLarge?.copyWith(
+              color: colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -393,11 +450,13 @@ class _GlowingIcon extends StatelessWidget {
   final IconData icon;
   final Color color;
   final Animation<double> animation;
+  final double size;
 
   const _GlowingIcon({
     required this.icon,
     required this.color,
     required this.animation,
+    this.size = 96,
   });
 
   @override
@@ -407,8 +466,8 @@ class _GlowingIcon extends StatelessWidget {
       builder: (context, child) {
         final pulse = 0.8 + 0.2 * sin(animation.value * 2 * pi);
         return Container(
-          width: 72,
-          height: 72,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: color.withValues(alpha: 0.12),
@@ -420,7 +479,7 @@ class _GlowingIcon extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(icon, size: 36, color: color),
+          child: Icon(icon, size: size * 0.5, color: color),
         );
       },
     );

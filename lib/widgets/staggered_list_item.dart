@@ -8,9 +8,13 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 /// 根据 [index] 自动计算延迟，首次构建时播放 fade + slideY 入场动画。
 /// 仅在首次出现时动画，后续 rebuild 不重播。
 ///
+/// 启用 [waitForRoute] 后，动画会等待路由转场完成才开始播放，
+/// 避免与 Hero 动画重叠。
+///
 /// ```dart
 /// itemBuilder: (context, index) => StaggeredListItem(
 ///   index: index,
+///   waitForRoute: true,
 ///   child: MyCard(...),
 /// ),
 /// ```
@@ -18,10 +22,14 @@ class StaggeredListItem extends StatefulWidget {
   final int index;
   final Widget child;
 
+  /// 是否等待路由转场完成后再启动动画（默认 false）。
+  final bool waitForRoute;
+
   const StaggeredListItem({
     super.key,
     required this.index,
     required this.child,
+    this.waitForRoute = false,
   });
 
   @override
@@ -34,6 +42,10 @@ class _StaggeredListItemState extends State<StaggeredListItem>
   late final Animation<double> _opacity;
   late final Animation<Offset> _slide;
   Timer? _delayTimer;
+
+  /// 缓存路由动画引用，确保 dispose 时移除的是同一个对象。
+  Animation<double>? _routeAnimation;
+  bool _started = false;
 
   @override
   void initState() {
@@ -54,7 +66,39 @@ class _StaggeredListItemState extends State<StaggeredListItem>
           ),
         );
 
-    // 延迟 = index * 50ms，上限 300ms
+    if (!widget.waitForRoute) {
+      _startDelayedAnimation();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!widget.waitForRoute || _started || _routeAnimation != null) return;
+
+    final route = ModalRoute.of(context);
+    if (route == null) {
+      _startDelayedAnimation();
+      return;
+    }
+
+    final animation = route.animation;
+    if (animation == null || animation.status == AnimationStatus.completed) {
+      _startDelayedAnimation();
+    } else {
+      _routeAnimation = animation;
+      animation.addStatusListener(_onRouteAnimationStatus);
+    }
+  }
+
+  void _onRouteAnimationStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed && mounted && !_started) {
+      _startDelayedAnimation();
+    }
+  }
+
+  void _startDelayedAnimation() {
+    _started = true;
     final delayMs = (widget.index * 50).clamp(0, 300);
     _delayTimer = Timer(Duration(milliseconds: delayMs), () {
       if (mounted) _controller.forward();
@@ -64,6 +108,7 @@ class _StaggeredListItemState extends State<StaggeredListItem>
   @override
   void dispose() {
     _delayTimer?.cancel();
+    _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
     _controller.dispose();
     super.dispose();
   }

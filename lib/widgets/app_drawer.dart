@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -135,19 +136,14 @@ class AppDrawer extends ConsumerWidget {
               leading: const Icon(Icons.bar_chart_outlined),
               title: Text(l10n.drawerSessionHistory),
               trailing: const Icon(Icons.chevron_right, size: 20),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed(AppRouter.sessionHistory);
-              },
+              onTap: () =>
+                  _navigateAfterClose(context, AppRouter.sessionHistory),
             ),
             ListTile(
               leading: const Icon(Icons.calendar_month_outlined),
               title: Text(l10n.drawerCheckInCalendar),
               trailing: const Icon(Icons.chevron_right, size: 20),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed(AppRouter.checkIn);
-              },
+              onTap: () => _navigateAfterClose(context, AppRouter.checkIn),
             ),
 
             const Divider(indent: 16, endIndent: 16),
@@ -157,10 +153,7 @@ class AppDrawer extends ConsumerWidget {
               leading: const Icon(Icons.settings_outlined),
               title: Text(l10n.profileSettings),
               trailing: const Icon(Icons.chevron_right, size: 20),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed(AppRouter.settingsPage);
-              },
+              onTap: () => _navigateAfterClose(context, AppRouter.settingsPage),
             ),
 
             const Divider(indent: 16, endIndent: 16),
@@ -196,69 +189,83 @@ class AppDrawer extends ConsumerWidget {
     );
   }
 
+  /// 关闭 Drawer 后等待关闭动画完成再导航到新页面。
+  void _navigateAfterClose(BuildContext context, String route) {
+    Navigator.of(context).pop();
+    Future.delayed(AppMotion.durationMedium1, () {
+      if (context.mounted) Navigator.of(context).pushNamed(route);
+    });
+  }
+
   void _confirmLogout(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     Navigator.of(context).pop(); // 关闭 Drawer
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logoutTitle),
-        content: Text(l10n.logoutMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(authServiceProvider).signOut();
-            },
-            child: Text(l10n.commonLogOut),
-          ),
-        ],
-      ),
-    );
+    Future.delayed(AppMotion.durationMedium1, () {
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l10n.logoutTitle),
+          content: Text(l10n.logoutMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonCancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await ref.read(authServiceProvider).signOut();
+              },
+              child: Text(l10n.commonLogOut),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _confirmGuestLogout(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     Navigator.of(context).pop(); // 关闭 Drawer
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        icon: Icon(
-          Icons.warning_rounded,
-          color: Theme.of(ctx).colorScheme.error,
-          size: 32,
-        ),
-        title: Text(l10n.drawerGuestLogoutTitle),
-        content: Text(l10n.drawerGuestLogoutMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
+    Future.delayed(AppMotion.durationMedium1, () {
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          icon: Icon(
+            Icons.warning_rounded,
+            color: Theme.of(ctx).colorScheme.error,
+            size: 32,
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              showGuestUpgradePrompt(context, ref);
-            },
-            child: Text(l10n.drawerLinkAccount),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(authServiceProvider).signOut();
-            },
-            child: Text(
-              l10n.drawerGuestLogoutConfirm,
-              style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+          title: Text(l10n.drawerGuestLogoutTitle),
+          content: Text(l10n.drawerGuestLogoutMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonCancel),
             ),
-          ),
-        ],
-      ),
-    );
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                showGuestUpgradePrompt(context, ref);
+              },
+              child: Text(l10n.drawerLinkAccount),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await ref.read(authServiceProvider).signOut();
+              },
+              child: Text(
+                l10n.drawerGuestLogoutConfirm,
+                style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 

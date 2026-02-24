@@ -8,6 +8,8 @@ import 'package:hachimi_app/models/cat_appearance.dart';
 /// Cat 数据模型 — 每只猫绑定一个习惯。
 /// 成长阶段基于固定时长阶梯（0/20/100/200h）计算，不依赖目标小时数。
 class Cat {
+  /// 猫名最大字符数。
+  static const maxNameLength = 20;
   final String id;
   final String name;
   final String personality;
@@ -20,6 +22,9 @@ class Cat {
   final String? highestStage; // 曾达到的最高阶段（单调递增）
   final DateTime createdAt;
   final DateTime? lastSessionAt;
+
+  /// 用户选择的姿势偏好（纯本地，不同步到 Firestore）。
+  final int? displayPose;
 
   const Cat({
     required this.id,
@@ -34,6 +39,7 @@ class Cat {
     this.highestStage,
     required this.createdAt,
     this.lastSessionAt,
+    this.displayPose,
   });
 
   /// 成长进度 (0.0 - 1.0)，基于固定阶梯：200h (12000min) = 1.0
@@ -58,10 +64,10 @@ class Cat {
   /// 当前阶段内的进度 (0.0 - 1.0)
   double get stageProgress => stageProgressInRange(growthProgress);
 
-  /// 当前 sprite 索引（根据阶段 + 变体 + 长毛）
+  /// 当前 sprite 索引（根据阶段 + 姿势偏好/变体 + 长毛）
   int get spriteIndex => computeSpriteIndex(
     stage: displayStage,
-    variant: appearance.spriteVariant,
+    variant: displayPose ?? appearance.spriteVariant,
     isLonghair: appearance.isLonghair,
   );
 
@@ -144,6 +150,7 @@ class Cat {
       'highest_stage': highestStage,
       'last_session_at': lastSessionAt?.millisecondsSinceEpoch,
       'created_at': createdAt.millisecondsSinceEpoch,
+      'display_pose': displayPose,
     };
   }
 
@@ -181,6 +188,7 @@ class Cat {
       lastSessionAt: map['last_session_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['last_session_at'] as int)
           : null,
+      displayPose: map['display_pose'] as int?,
     );
   }
 
@@ -197,6 +205,7 @@ class Cat {
     String? highestStage,
     DateTime? createdAt,
     DateTime? lastSessionAt,
+    int? displayPose,
   }) {
     return Cat(
       id: id ?? this.id,
@@ -211,6 +220,7 @@ class Cat {
       highestStage: highestStage ?? this.highestStage,
       createdAt: createdAt ?? this.createdAt,
       lastSessionAt: lastSessionAt ?? this.lastSessionAt,
+      displayPose: displayPose ?? this.displayPose,
     );
   }
 }

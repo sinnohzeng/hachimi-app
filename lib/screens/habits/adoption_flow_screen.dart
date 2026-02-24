@@ -951,6 +951,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
           const SizedBox(height: AppSpacing.base),
           TextFormField(
             controller: _catNameController,
+            maxLength: Cat.maxNameLength,
             decoration: InputDecoration(
               labelText: context.l10n.adoptionCatName,
               hintText: context.l10n.adoptionCatHint,

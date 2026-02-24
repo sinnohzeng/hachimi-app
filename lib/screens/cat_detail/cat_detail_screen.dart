@@ -196,9 +196,17 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
     return Column(
       children: [
-        _buildMoodBadge(context, moodData, colorScheme, textTheme),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: 0,
+          child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
+        ),
         const SizedBox(height: AppSpacing.lg),
-        _buildGrowthCard(context, cat, stageClr),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: 1,
+          child: _buildGrowthCard(context, cat, stageClr),
+        ),
       ],
     );
   }
@@ -207,31 +215,64 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
     final isGuest = ref.watch(isAnonymousProvider);
+    var idx = 2; // 左栏占 0、1
 
     return Column(
       children: [
         if (habit != null) ...[
-          FocusStatsCard(habit: habit, cat: cat),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: FocusStatsCard(habit: habit, cat: cat),
+          ),
           const SizedBox(height: AppSpacing.base),
         ],
         if (aiReady) ...[
-          DiaryPreviewCard(catId: cat.id),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: DiaryPreviewCard(catId: cat.id),
+          ),
           const SizedBox(height: AppSpacing.base),
-          ChatEntryCard(catId: cat.id, catName: cat.name),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: ChatEntryCard(catId: cat.id, catName: cat.name),
+          ),
           const SizedBox(height: AppSpacing.base),
         ] else if (isGuest) ...[
-          _AiTeaserCard(catName: cat.name, context: context),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: _AiTeaserCard(catName: cat.name, context: context),
+          ),
           const SizedBox(height: AppSpacing.base),
         ],
         if (habit != null) ...[
-          ReminderCard(habit: habit, cat: cat),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: ReminderCard(habit: habit, cat: cat),
+          ),
           const SizedBox(height: AppSpacing.base),
-          HabitHeatmapCard(habitId: habit.id),
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: HabitHeatmapCard(habitId: habit.id),
+          ),
           const SizedBox(height: AppSpacing.base),
         ],
-        AccessoriesCard(cat: cat),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: AccessoriesCard(cat: cat),
+        ),
         const SizedBox(height: AppSpacing.base),
-        EnhancedCatInfoCard(cat: cat),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: EnhancedCatInfoCard(cat: cat),
+        ),
         const SizedBox(height: AppSpacing.xl),
       ],
     );
@@ -325,6 +366,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           child: IgnorePointer(
             child: ParticleOverlay(
               mode: ParticleMode.firefly,
+              fadeIn: true,
               child: SizedBox.expand(),
             ),
           ),
@@ -359,8 +401,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
         ),
@@ -393,32 +434,41 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
     return [
       StaggeredListItem(
+        waitForRoute: true,
         index: 0,
         child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
       ),
       const SizedBox(height: AppSpacing.lg),
       StaggeredListItem(
+        waitForRoute: true,
         index: 1,
         child: _buildGrowthCard(context, cat, stageClr),
       ),
       const SizedBox(height: AppSpacing.base),
       if (habit != null) ...[
         StaggeredListItem(
+          waitForRoute: true,
           index: 2,
           child: FocusStatsCard(habit: habit, cat: cat),
         ),
         const SizedBox(height: AppSpacing.base),
       ],
       if (aiReady) ...[
-        StaggeredListItem(index: 3, child: DiaryPreviewCard(catId: cat.id)),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: 3,
+          child: DiaryPreviewCard(catId: cat.id),
+        ),
         const SizedBox(height: AppSpacing.base),
         StaggeredListItem(
+          waitForRoute: true,
           index: 4,
           child: ChatEntryCard(catId: cat.id, catName: cat.name),
         ),
         const SizedBox(height: AppSpacing.base),
       ] else if (isGuest) ...[
         StaggeredListItem(
+          waitForRoute: true,
           index: 3,
           child: _AiTeaserCard(catName: cat.name, context: context),
         ),
@@ -426,17 +476,30 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       ],
       if (habit != null) ...[
         StaggeredListItem(
+          waitForRoute: true,
           index: 5,
           child: ReminderCard(habit: habit, cat: cat),
         ),
         const SizedBox(height: AppSpacing.base),
       ],
       if (habit != null)
-        StaggeredListItem(index: 6, child: HabitHeatmapCard(habitId: habit.id)),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: 6,
+          child: HabitHeatmapCard(habitId: habit.id),
+        ),
       const SizedBox(height: AppSpacing.base),
-      StaggeredListItem(index: 7, child: AccessoriesCard(cat: cat)),
+      StaggeredListItem(
+        waitForRoute: true,
+        index: 7,
+        child: AccessoriesCard(cat: cat),
+      ),
       const SizedBox(height: AppSpacing.base),
-      StaggeredListItem(index: 8, child: EnhancedCatInfoCard(cat: cat)),
+      StaggeredListItem(
+        waitForRoute: true,
+        index: 8,
+        child: EnhancedCatInfoCard(cat: cat),
+      ),
       const SizedBox(height: AppSpacing.xl),
     ];
   }
@@ -567,6 +630,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         title: Text(context.l10n.catDetailRenameTitle),
         content: TextField(
           controller: controller,
+          maxLength: Cat.maxNameLength,
           decoration: InputDecoration(
             labelText: context.l10n.catDetailNewName,
             prefixIcon: const Icon(Icons.pets),

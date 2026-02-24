@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
     show computeSpriteIndex;
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 
 /// TappableCatSprite — 交互式像素猫组件。
 ///
 /// 点击切换 3 种动作姿势，带弹跳动画和触觉反馈。
+/// 姿势会持久化到本地 SQLite（display_pose 列）。
 /// [enableTap] 为 false 时退化为静态 PixelCatSprite。
-class TappableCatSprite extends StatefulWidget {
+class TappableCatSprite extends ConsumerStatefulWidget {
   final Cat cat;
   final double size;
   final bool enableTap;
@@ -23,12 +26,12 @@ class TappableCatSprite extends StatefulWidget {
   });
 
   @override
-  State<TappableCatSprite> createState() => _TappableCatSpriteState();
+  ConsumerState<TappableCatSprite> createState() => _TappableCatSpriteState();
 }
 
-class _TappableCatSpriteState extends State<TappableCatSprite>
+class _TappableCatSpriteState extends ConsumerState<TappableCatSprite>
     with SingleTickerProviderStateMixin {
-  /// Local-only display variant for pose cycling (not persisted).
+  /// 本次会话内的临时姿势（尚未写入 DB 前的即时反馈）。
   int? _displayVariant;
 
   late final AnimationController _bounceController;
@@ -60,18 +63,23 @@ class _TappableCatSpriteState extends State<TappableCatSprite>
   }
 
   void _cyclePose() {
-    final current = _displayVariant ?? widget.cat.appearance.spriteVariant;
-    setState(() {
-      _displayVariant = (current + 1) % 3;
-    });
+    final cat = widget.cat;
+    final current =
+        _displayVariant ?? cat.displayPose ?? cat.appearance.spriteVariant;
+    final newPose = (current + 1) % 3;
+    setState(() => _displayVariant = newPose);
     HapticFeedback.lightImpact();
     _bounceController.forward(from: 0);
+
+    // 持久化到 SQLite
+    ref.read(localCatRepositoryProvider).updateDisplayPose(cat.id, newPose);
   }
 
   @override
   Widget build(BuildContext context) {
     final cat = widget.cat;
-    final displayVariant = _displayVariant ?? cat.appearance.spriteVariant;
+    final displayVariant =
+        _displayVariant ?? cat.displayPose ?? cat.appearance.spriteVariant;
     final spriteIndex = computeSpriteIndex(
       stage: cat.displayStage,
       variant: displayVariant,

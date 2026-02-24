@@ -173,6 +173,7 @@ class CatRoomScreen extends ConsumerWidget {
         title: Text(context.l10n.catRoomRenameCat),
         content: TextField(
           controller: controller,
+          maxLength: Cat.maxNameLength,
           decoration: InputDecoration(
             labelText: context.l10n.catRoomNewName,
             prefixIcon: const Icon(Icons.pets),
@@ -327,6 +328,17 @@ class _CatHouseCard extends StatelessWidget {
                   children: [
                     Hero(
                       tag: 'cat-name-${cat.id}',
+                      flightShuttleBuilder: (_, _, _, _, _) => Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          cat.name,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                        ),
+                      ),
                       child: Material(
                         type: MaterialType.transparency,
                         child: Text(

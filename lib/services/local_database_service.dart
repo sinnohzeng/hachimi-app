@@ -9,7 +9,7 @@ import 'package:hachimi_app/models/chat_message.dart';
 /// 管理 AI 日记/聊天 + 行为台账 + 领域表的持久化存储。
 class LocalDatabaseService {
   static const _dbName = 'hachimi_local.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   Database? _db;
 
@@ -38,11 +38,17 @@ class LocalDatabaseService {
     if (version >= 2) {
       await _createV2Tables(db);
     }
+    if (version >= 3) {
+      await _createV3Columns(db);
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldV, int newV) async {
     if (oldV < 2) {
       await _createV2Tables(db);
+    }
+    if (oldV < 3) {
+      await _createV3Columns(db);
     }
   }
 
@@ -229,6 +235,11 @@ class LocalDatabaseService {
       'CREATE INDEX idx_achievements_uid '
       'ON local_achievements(uid, unlocked_at)',
     );
+  }
+
+  /// v3: 猫姿势偏好列（纯本地，不同步到 Firestore）。
+  Future<void> _createV3Columns(Database db) async {
+    await db.execute('ALTER TABLE local_cats ADD COLUMN display_pose INTEGER');
   }
 
   // ─── Diary CRUD ───

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.6] - 2026-02-24
+
+### Improved
+- **Drawer navigation**: Drawer close animation now completes before navigating to the next page, eliminating visual interruption
+- **Cat name Hero transition**: Cat names no longer flash ellipsis during Hero fly animation between CatHouse and CatDetail
+- **Cat name length limit**: All cat name inputs (adoption, rename) now enforce a 20-character maximum
+- **Particle overlay fade-in**: Floating particles on cat detail page now fade in after route transition completes, synchronized with mesh background
+- **Cat pose persistence**: Tapping a cat to change its pose is now saved to local SQLite and restored on re-entry (DB v3 migration)
+- **Achievement celebration full-screen**: Redesigned from a centered card to an immersive full-screen layout with radial gradient background, larger icon (96px), headline text, full-width button, and single-play confetti
+- **Cat detail entry animation**: All content cards now use staggered fade+slide animations that wait for route transition to complete before playing, including tablet wide layout
+
+### Changed
+- `ParticleOverlay` converted from `ConsumerWidget` to `ConsumerStatefulWidget` with `fadeIn` parameter
+- `StaggeredListItem` gains `waitForRoute` parameter to delay animation until route transition completes
+- `TappableCatSprite` converted to `ConsumerStatefulWidget` for SQLite persistence via `LocalCatRepository.updateDisplayPose`
+- Local database schema upgraded from v2 to v3 (`display_pose` column on `local_cats`)
+
 ## [2.19.5] - 2026-02-24
 
 ### Improved
