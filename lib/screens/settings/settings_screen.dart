@@ -30,7 +30,7 @@ class SettingsScreen extends ConsumerWidget {
     final textTheme = theme.textTheme;
     final themeSettings = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
-    final isGuest = ref.watch(isAnonymousProvider);
+    final isGuest = ref.watch(isGuestProvider);
 
     final l10n = context.l10n;
 

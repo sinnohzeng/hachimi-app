@@ -214,7 +214,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   /// 右栏 — FocusStats, Diary, Chat, Reminder, Heatmap, Accessories, CatInfo
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
-    final isGuest = ref.watch(isAnonymousProvider);
+    final isGuest = ref.watch(isGuestProvider);
     var idx = 2; // 左栏占 0、1
 
     return Column(
@@ -430,7 +430,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
-    final isGuest = ref.watch(isAnonymousProvider);
+    final isGuest = ref.watch(isGuestProvider);
 
     return [
       StaggeredListItem(

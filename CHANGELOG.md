@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.8] - 2026-02-25
+
+### Fixed
+- **Guest visibility bug**: Guest users no longer see "Log out" and "Delete account" in Drawer and Settings menus
+- **isGuestProvider SSOT**: Replaced `isAnonymousProvider` (which only checked Firebase anonymous auth) with reactive `isGuestProvider` that correctly detects both local guests and Firebase anonymous users
+- **Reactivity**: Guest state provider now watches `authStateProvider` stream, automatically re-evaluating when auth state changes (login, link credentials, sign out)
+
+### Removed
+- Dead code `isLocalGuestProvider` (defined but never consumed)
+
 ## [2.19.7] - 2026-02-25
 
 ### Improved

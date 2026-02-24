@@ -24,7 +24,7 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).value;
-    final isGuest = ref.watch(isAnonymousProvider);
+    final isGuest = ref.watch(isGuestProvider);
     final avatarId = ref.watch(avatarIdProvider).value;
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];

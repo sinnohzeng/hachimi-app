@@ -33,13 +33,17 @@ final currentUidProvider = Provider<String?>((ref) {
   );
 });
 
-/// 当前用户是否为本地访客（尚未完成 Firebase 认证）。
-final isLocalGuestProvider = Provider<bool>((ref) {
+/// 当前用户是否为访客（未关联正式凭证）。
+///
+/// 覆盖三种场景：
+/// 1. 本地访客 — Firebase 未认证，local_guest_uid 存在
+/// 2. Firebase 匿名 — signInAnonymously 成功，尚未关联凭证
+/// 3. 已注册用户 — 关联了 Google/Email 凭证 → 返回 false
+///
+/// 监听 [authStateProvider]，auth 状态变化时自动重算。
+final isGuestProvider = Provider<bool>((ref) {
+  final user = ref.watch(authStateProvider).value;
+  if (user != null) return user.isAnonymous;
   final prefs = ref.read(sharedPreferencesProvider);
   return prefs.getString('local_guest_uid') != null;
-});
-
-/// 当前用户是否为匿名（访客模式）。
-final isAnonymousProvider = Provider<bool>((ref) {
-  return ref.watch(authServiceProvider).isAnonymous;
 });
