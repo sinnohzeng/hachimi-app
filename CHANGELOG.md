@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.5] - 2026-02-24
+
+### Improved
+- **Focus timer dial**: Duration picker now snaps to 5-minute increments instead of 1-minute, reducing dial clutter and making selection faster
+- **Scroll conflict resolved**: Dragging the circular dial no longer causes the page to scroll simultaneously — scroll is disabled while touching the dial and restored on release
+- **Cleaner layout**: Removed preset duration chips (5/10/20/30/45/60/90/120) to reduce visual noise; the dial alone provides sufficient control
+
+### Changed
+- Default focus duration rounds to nearest 5 minutes (range 5–120)
+- `CircularDurationPicker` exposes `onDragStart`/`onDragEnd` callbacks for parent gesture coordination
+
 ## [2.19.4] - 2026-02-24
 
 ### Fixed

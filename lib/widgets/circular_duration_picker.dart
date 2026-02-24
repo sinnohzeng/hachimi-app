@@ -4,17 +4,25 @@ import 'package:flutter/services.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// Forest-style circular duration picker.
-/// Draggable ring that maps 0°–360° to 1–120 minutes.
+/// Draggable ring that maps 0°–360° to 5–120 minutes (5-minute steps).
 class CircularDurationPicker extends StatefulWidget {
-  final int value; // current minutes (1-120)
+  final int value; // current minutes (5-120)
   final ValueChanged<int> onChanged;
   final double size;
+
+  /// Called when the user starts dragging the dial.
+  final VoidCallback? onDragStart;
+
+  /// Called when the user stops dragging the dial.
+  final VoidCallback? onDragEnd;
 
   const CircularDurationPicker({
     super.key,
     required this.value,
     required this.onChanged,
     this.size = 220,
+    this.onDragStart,
+    this.onDragEnd,
   });
 
   @override
@@ -23,7 +31,8 @@ class CircularDurationPicker extends StatefulWidget {
 
 class _CircularDurationPickerState extends State<CircularDurationPicker> {
   static const int _maxMinutes = 120;
-  static const int _minMinutes = 1;
+  static const int _minMinutes = 5;
+  static const int _stepMinutes = 5;
 
   /// Track previous angle to detect boundary crossings during drag.
   double? _previousAngle;
@@ -41,8 +50,9 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
   }
 
   int _angleToMinutes(double angle) {
-    final minutes = (angle / (2 * pi) * _maxMinutes).round();
-    return minutes.clamp(_minMinutes, _maxMinutes);
+    final raw = angle / (2 * pi) * _maxMinutes;
+    final snapped = (raw / _stepMinutes).round() * _stepMinutes;
+    return snapped.clamp(_minMinutes, _maxMinutes);
   }
 
   void _handleTap(Offset localPosition) {
@@ -58,6 +68,7 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
 
   void _handlePanStart(Offset localPosition) {
     _previousAngle = _positionToAngle(localPosition);
+    widget.onDragStart?.call();
   }
 
   void _handlePan(Offset localPosition) {
@@ -109,7 +120,14 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
       child: GestureDetector(
         onPanStart: (details) => _handlePanStart(details.localPosition),
         onPanUpdate: (details) => _handlePan(details.localPosition),
-        onPanEnd: (_) => _previousAngle = null,
+        onPanEnd: (_) {
+          _previousAngle = null;
+          widget.onDragEnd?.call();
+        },
+        onPanCancel: () {
+          _previousAngle = null;
+          widget.onDragEnd?.call();
+        },
         onTapDown: (details) => _handleTap(details.localPosition),
         child: SizedBox(
           width: widget.size,

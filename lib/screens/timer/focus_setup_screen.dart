@@ -30,8 +30,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
   int _selectedMinutes = 25;
   TimerMode _selectedMode = TimerMode.countdown;
   bool _initialized = false;
-
-  static const List<int> presetOptions = [5, 10, 20, 30, 45, 60, 90, 120];
+  bool _isDraggingDial = false;
 
   void _startFocus() {
     final habits = ref.read(habitsProvider).value ?? [];
@@ -90,10 +89,11 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
       );
     }
 
-    // Set default to habit's goal minutes (clamped to 1-120)
+    // Set default to habit's goal minutes (rounded to 5, clamped to 5-120)
     if (!_initialized) {
       _initialized = true;
-      _selectedMinutes = habit.goalMinutes.clamp(1, 120);
+      final rounded = (habit.goalMinutes / 5).round() * 5;
+      _selectedMinutes = rounded.clamp(5, 120);
     }
 
     final bgColor = cat != null
@@ -138,6 +138,9 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
               // Scrollable content area
               Expanded(
                 child: SingleChildScrollView(
+                  physics: _isDraggingDial
+                      ? const NeverScrollableScrollPhysics()
+                      : const ClampingScrollPhysics(),
                   child: Column(
                     children: [
                       const SizedBox(height: AppSpacing.lg),
@@ -228,7 +231,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
     );
   }
 
-  // ─── Duration picker, preset chips, mode toggle ───
+  // ─── Duration picker and mode toggle ───
 
   Widget _buildDurationControls(TextTheme textTheme, ColorScheme colorScheme) {
     return Column(
@@ -238,27 +241,8 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           onChanged: (min) => setState(() {
             _selectedMinutes = min;
           }),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-
-        // Preset chips
-        Padding(
-          padding: AppSpacing.paddingHLg,
-          child: Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            alignment: WrapAlignment.center,
-            children: presetOptions.map((min) {
-              final isSelected = _selectedMinutes == min;
-              return ChoiceChip(
-                label: Text('$min'),
-                selected: isSelected,
-                onSelected: (_) => setState(() {
-                  _selectedMinutes = min;
-                }),
-              );
-            }).toList(),
-          ),
+          onDragStart: () => setState(() => _isDraggingDial = true),
+          onDragEnd: () => setState(() => _isDraggingDial = false),
         ),
         const SizedBox(height: AppSpacing.base),
 
