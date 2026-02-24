@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -22,6 +23,8 @@ import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/services/achievement_evaluator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class HachimiApp extends ConsumerWidget {
   final Stopwatch? startupStopwatch;
@@ -85,6 +88,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   static const _kLastOpenKey = 'last_app_open';
   static const _kConsecutiveDaysKey = 'consecutive_days';
   static const _kCachedUidKey = 'cached_uid';
+  static const _kLocalGuestUidKey = 'local_guest_uid';
 
   @override
   void initState() {
@@ -95,26 +99,51 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   bool _isAutoSigningIn = false;
-  bool _autoSignInFailed = false;
 
   void _onOnboardingComplete() {
+    _ensureLocalUid();
     setState(() => _onboardingComplete = true);
   }
 
-  /// 自动匿名登录 — 无需用户操作即可使用应用核心功能。
+  /// 同步生成本地访客 UID — 零网络依赖，保证引导完成后立即进入主页。
+  void _ensureLocalUid() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (prefs.getString(_kCachedUidKey) != null) return;
+    final guestUid = 'guest_${const Uuid().v4()}';
+    prefs.setString(_kLocalGuestUidKey, guestUid);
+    prefs.setString(_kCachedUidKey, guestUid);
+  }
+
+  /// 后台匿名登录 — 失败不影响 UI，下次联网再试。
   Future<void> _autoSignInAnonymously() async {
     if (_isAutoSigningIn) return;
     _isAutoSigningIn = true;
     try {
-      final authService = ref.read(authServiceProvider);
-      await authService.signInAnonymously();
-      debugPrint('[APP] auto anonymous sign-in complete');
+      await ref.read(authServiceProvider).signInAnonymously();
+      debugPrint('[APP] background sign-in complete');
     } catch (e) {
-      debugPrint('[APP] auto anonymous sign-in failed: $e');
-      if (mounted) setState(() => _autoSignInFailed = true);
+      debugPrint('[APP] background sign-in failed: $e');
     } finally {
       _isAutoSigningIn = false;
     }
+  }
+
+  /// Firebase 用户就绪后：缓存 UID、设置 Crashlytics、迁移访客数据。
+  void _handleFirebaseUser(User user, SharedPreferences prefs) {
+    prefs.setString(_kCachedUidKey, user.uid);
+    FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+    ErrorHandler.breadcrumb('auth_state: ${user.uid}');
+    _clearLocalGuestState(user.uid);
+  }
+
+  /// UID 迁移 — 将 guest_ 本地数据迁移至 Firebase UID。
+  Future<void> _clearLocalGuestState(String firebaseUid) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final localGuestUid = prefs.getString(_kLocalGuestUidKey);
+    if (localGuestUid == null || localGuestUid == firebaseUid) return;
+    final ledger = ref.read(ledgerServiceProvider);
+    await ledger.migrateUid(localGuestUid, firebaseUid);
+    await prefs.remove(_kLocalGuestUidKey);
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
@@ -159,89 +188,40 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         );
   }
 
-  Widget _buildSignInErrorScreen(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off, size: 48, color: colorScheme.error),
-            const SizedBox(height: 16),
-            Text(context.l10n.commonError),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                setState(() => _autoSignInFailed = false);
-                _autoSignInAnonymously();
-              },
-              child: Text(context.l10n.commonRetry),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Show onboarding if not completed
     if (!_onboardingComplete) {
       return OnboardingScreen(onComplete: _onOnboardingComplete);
     }
 
-    // Onboarding done — check auth state
-    final authState = ref.watch(authStateProvider);
     final prefs = ref.read(sharedPreferencesProvider);
+    final authState = ref.watch(authStateProvider);
 
-    return authState.when(
-      data: (user) {
-        debugPrint('[APP] authState: data, user=${user?.uid}');
-        if (user == null) {
-          // 无用户 — 自动匿名登录（访客模式）
-          prefs.remove(_kCachedUidKey);
-          if (_autoSignInFailed) {
-            return _buildSignInErrorScreen(context);
-          }
-          _autoSignInAnonymously();
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        // [A4] 缓存 UID 以供下次冷启动乐观认证
-        prefs.setString(_kCachedUidKey, user.uid);
-        FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
-        ErrorHandler.breadcrumb('auth_state: ${user.uid}');
-        _logAppOpened();
-        return _VersionGate(
-          uid: user.uid,
-          startupStopwatch: widget.startupStopwatch,
-        );
-      },
-      loading: () {
-        debugPrint('[APP] authState: loading');
-        // [A4] 乐观认证：cached UID 存在时直接渲染，无需等待 Auth stream
-        final cachedUid = prefs.getString(_kCachedUidKey);
-        if (cachedUid != null) {
-          debugPrint('[APP] using cached UID for optimistic auth: $cachedUid');
-          _logAppOpened();
-          return _VersionGate(
-            uid: cachedUid,
-            startupStopwatch: widget.startupStopwatch,
-          );
-        }
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      },
-      error: (e, _) {
-        debugPrint('[APP] authState: error=$e');
-        if (_autoSignInFailed) {
-          return _buildSignInErrorScreen(context);
-        }
-        // 网络错误时也尝试匿名登录
-        _autoSignInAnonymously();
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      },
-    );
+    // Firebase 已认证 → 使用 Firebase UID，迁移本地访客数据
+    final firebaseUser = authState.whenOrNull(data: (u) => u);
+    if (firebaseUser != null) {
+      _handleFirebaseUser(firebaseUser, prefs);
+      _logAppOpened();
+      return _VersionGate(
+        uid: firebaseUser.uid,
+        startupStopwatch: widget.startupStopwatch,
+      );
+    }
+
+    // Firebase 未就绪 → 使用缓存 UID（_ensureLocalUid 已保证存在）
+    final cachedUid = prefs.getString(_kCachedUidKey);
+    if (cachedUid != null) {
+      _autoSignInAnonymously();
+      _logAppOpened();
+      return _VersionGate(
+        uid: cachedUid,
+        startupStopwatch: widget.startupStopwatch,
+      );
+    }
+
+    // 理论上不可达（_ensureLocalUid 保证 cachedUid 存在）
+    _autoSignInAnonymously();
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
 
@@ -389,19 +369,18 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   }
 
   /// 启动后台引擎：数据水化 + 同步引擎 + 成就评估器。
+  /// guest_ UID 跳过 Firestore 水化/同步（纯本地模式）。
   void _startBackgroundEngines() {
     final uid = widget.uid;
 
-    // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
-    ref.read(syncEngineProvider).hydrateFromFirestore(uid).then((_) {
-      // 水化完成后启动同步引擎
-      ref.read(syncEngineProvider).start(uid);
-    });
+    if (!uid.startsWith('guest_')) {
+      // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
+      ref.read(syncEngineProvider).hydrateFromFirestore(uid).then((_) {
+        ref.read(syncEngineProvider).start(uid);
+      });
+    }
 
-    // 同步引擎 — 水化失败时也需启动（上面的 then 会在成功时启动）
-    // hydrateFromFirestore 内部 catch 不 rethrow，所以 then 始终执行
-
-    // 成就评估器 — 监听台账变更自动评估
+    // 成就评估器 — 纯本地，不需要网络
     final ledger = ref.read(ledgerServiceProvider);
     _evaluator = AchievementEvaluator(
       ledger: ledger,

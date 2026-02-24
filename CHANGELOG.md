@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.4] - 2026-02-24
+
+### Fixed
+- **Offline-first auth**: First-time install no longer requires network — local guest UID generated synchronously after onboarding, Firebase sign-in moved to non-blocking background task
+- **Error screen on first launch**: Removed the "something went wrong" error page that appeared when Firebase anonymous sign-in failed offline; app now enters main screen immediately
+- **UID migration**: When Firebase auth completes later, local guest data is atomically migrated to the Firebase UID via `LedgerService.migrateUid`
+- **SyncEngine guest guard**: SyncEngine and Firestore hydration skip entirely for local guest UIDs, preventing unnecessary network calls
+- **Onboarding back button placement**: Moved back button from bottom bar to top-left corner IconButton for better discoverability and consistent navigation pattern
+- **Achievement celebration width collapse**: Added `ConstrainedBox(minWidth: 280, maxWidth: 360)` to prevent card from collapsing on short achievement text
+
+### Changed
+- `currentUidProvider` now falls back to `local_guest_uid` in auth error/null states, ensuring all providers have a usable UID even fully offline
+- Added `isLocalGuestProvider` for downstream components to check local guest status
+
 ## [2.19.3] - 2026-02-24
 
 ### Fixed

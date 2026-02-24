@@ -16,19 +16,27 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 /// Current user UID — convenience provider.
-/// [A4] 在 auth loading 状态下使用缓存 UID 实现乐观认证。
+/// [A4] 在 auth loading/error 状态下使用缓存 UID 实现乐观认证。
+/// 增加本地访客 UID 回退，保证离线首次安装也能获取 UID。
 final currentUidProvider = Provider<String?>((ref) {
   final authState = ref.watch(authStateProvider);
+  final prefs = ref.read(sharedPreferencesProvider);
 
   return authState.when(
-    data: (user) => user?.uid,
-    loading: () {
-      // 乐观认证：auth stream 尚未 emit 时使用缓存 UID
-      final prefs = ref.read(sharedPreferencesProvider);
-      return prefs.getString('cached_uid');
-    },
-    error: (_, _) => null,
+    data: (user) =>
+        user?.uid ??
+        prefs.getString('local_guest_uid') ??
+        prefs.getString('cached_uid'),
+    loading: () => prefs.getString('cached_uid'),
+    error: (_, _) =>
+        prefs.getString('local_guest_uid') ?? prefs.getString('cached_uid'),
   );
+});
+
+/// 当前用户是否为本地访客（尚未完成 Firebase 认证）。
+final isLocalGuestProvider = Provider<bool>((ref) {
+  final prefs = ref.read(sharedPreferencesProvider);
+  return prefs.getString('local_guest_uid') != null;
 });
 
 /// 当前用户是否为匿名（访客模式）。

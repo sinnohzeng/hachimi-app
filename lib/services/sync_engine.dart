@@ -106,9 +106,13 @@ class SyncEngine {
     }
   }
 
-  /// 启动同步引擎。
+  /// 启动同步引擎。guest_ UID 跳过（纯本地模式）。
   void start(String uid) {
     _uid = uid;
+    if (uid.startsWith('guest_')) {
+      debugPrint('SyncEngine: skipping for local guest');
+      return;
+    }
 
     // 监听台账变更（debounce 2s）
     _ledgerSub = _ledger.changes.listen((_) => _scheduleSync());

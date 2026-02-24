@@ -182,6 +182,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         body: Stack(
           children: [
             _buildPageSwitcher(pages, (d) => _CompactOnboardingPage(data: d)),
+            if (_currentPage > 0) _buildCompactBackButton(context, onColor),
             if (_currentPage < pages.length - 1)
               _buildCompactSkipButton(context, onColor),
             _buildCompactBottomBar(
@@ -193,6 +194,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCompactBackButton(BuildContext context, Color onColor) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 8,
+      left: 8,
+      child: IconButton(
+        onPressed: _previous,
+        icon: Icon(Icons.arrow_back, color: onColor.withValues(alpha: 0.7)),
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
       ),
     );
   }
@@ -242,20 +255,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 backgroundColor: onColor,
                 foregroundColor: pageData.gradientColors(colorScheme).first,
               ),
-              if (_currentPage > 0) ...[
-                const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: TextButton(
-                    onPressed: _previous,
-                    child: Text(
-                      MaterialLocalizations.of(context).backButtonTooltip,
-                      style: TextStyle(color: onColor.withValues(alpha: 0.7)),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -309,7 +308,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTabletSkipRow(context, pages),
+              _buildTabletNavRow(context, pages),
               Expanded(
                 child: _buildPageSwitcher(
                   pages,
@@ -333,17 +332,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget _buildTabletSkipRow(
+  Widget _buildTabletNavRow(
     BuildContext context,
     List<_OnboardingPageData> pages,
   ) {
-    if (_currentPage >= pages.length - 1) return const SizedBox(height: 40);
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: _skip,
-        child: Text(context.l10n.onboardSkip),
-      ),
+    return Row(
+      children: [
+        if (_currentPage > 0)
+          IconButton(
+            onPressed: _previous,
+            icon: const Icon(Icons.arrow_back),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          )
+        else
+          const SizedBox(width: 48),
+        const Spacer(),
+        if (_currentPage < pages.length - 1)
+          TextButton(onPressed: _skip, child: Text(context.l10n.onboardSkip))
+        else
+          const SizedBox(height: 48),
+      ],
     );
   }
 }

@@ -248,129 +248,135 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
               position: _cardSlide,
               child: ScaleTransition(
                 scale: _cardScale,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 32),
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: AppShape.borderExtraLarge,
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 32,
-                        spreadRadius: 4,
-                      ),
-                    ],
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: 280,
+                    maxWidth: 360,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // 成就图标（带光环）
-                      _GlowingIcon(
-                        icon: def.icon,
-                        color: colorScheme.primary,
-                        animation: _particleController,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // 成就名称
-                      Text(
-                        name,
-                        style: textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: AppShape.borderExtraLarge,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                          blurRadius: 32,
+                          spreadRadius: 4,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (desc.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 成就图标（带光环）
+                        _GlowingIcon(
+                          icon: def.icon,
+                          color: colorScheme.primary,
+                          animation: _particleController,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // 成就名称
                         Text(
-                          desc,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                          name,
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      ],
-                      const SizedBox(height: 16),
-
-                      // 金币奖励
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.15),
-                          borderRadius: AppShape.borderLarge,
-                        ),
-                        child: Text(
-                          l10n.achievementCelebrationCoins(def.coinReward),
-                          style: textTheme.titleMedium?.copyWith(
-                            color: Colors.amber.shade700,
-                            fontWeight: FontWeight.bold,
+                        if (desc.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            desc,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                      ),
+                        ],
+                        const SizedBox(height: 16),
 
-                      // 称号（如有）
-                      if (hasTitle && titleName != null) ...[
-                        const SizedBox(height: 12),
+                        // 金币奖励
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 16,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            borderRadius: AppShape.borderMedium,
+                            color: Colors.amber.withValues(alpha: 0.15),
+                            borderRadius: AppShape.borderLarge,
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.military_tech,
-                                size: 18,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.achievementCelebrationTitle(titleName),
-                                style: textTheme.labelLarge?.copyWith(
-                                  color: colorScheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w600,
+                          child: Text(
+                            l10n.achievementCelebrationCoins(def.coinReward),
+                            style: textTheme.titleMedium?.copyWith(
+                              color: Colors.amber.shade700,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        // 称号（如有）
+                        if (hasTitle && titleName != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: AppShape.borderMedium,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.military_tech,
+                                  size: 18,
+                                  color: colorScheme.primary,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  l10n.achievementCelebrationTitle(titleName),
+                                  style: textTheme.labelLarge?.copyWith(
+                                    color: colorScheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                      const SizedBox(height: 24),
+                        ],
+                        const SizedBox(height: 24),
 
-                      // 确认按钮
-                      FilledButton(
-                        onPressed: widget.onDismiss,
-                        child: Text(l10n.achievementCelebrationDismiss),
-                      ),
+                        // 确认按钮
+                        FilledButton(
+                          onPressed: widget.onDismiss,
+                          child: Text(l10n.achievementCelebrationDismiss),
+                        ),
 
-                      // 跳过全部（队列 > 1 时显示）
-                      if (widget.totalCount > 1) ...[
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: widget.onSkipAll,
-                          child: Text(l10n.achievementCelebrationSkipAll),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.achievementCelebrationCounter(
-                            widget.currentNumber,
-                            widget.totalCount,
+                        // 跳过全部（队列 > 1 时显示）
+                        if (widget.totalCount > 1) ...[
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: widget.onSkipAll,
+                            child: Text(l10n.achievementCelebrationSkipAll),
                           ),
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.achievementCelebrationCounter(
+                              widget.currentNumber,
+                              widget.totalCount,
+                            ),
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
