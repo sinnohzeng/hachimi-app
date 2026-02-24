@@ -41,6 +41,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final outerScaffold = Scaffold.maybeOf(context);
 
     return Scaffold(
       body: NestedScrollView(
@@ -49,7 +50,15 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
             floating: true,
             pinned: true,
             title: Text(l10n.achievementTitle),
-            automaticallyImplyLeading: false,
+            leading: outerScaffold != null
+                ? IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => outerScaffold.openDrawer(),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).openAppDrawerTooltip,
+                  )
+                : null,
             actions: [
               IconButton(
                 icon: const Icon(Icons.history),
@@ -115,7 +124,7 @@ class _AchievementListTab extends ConsumerWidget {
               sliver: SliverGrid(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 360,
-                  mainAxisExtent: 100,
+                  mainAxisExtent: 116,
                   crossAxisSpacing: isExpanded ? 16 : 0,
                   mainAxisSpacing: 0,
                 ),

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.1] - 2026-02-24
+
+### Fixed
+- **Write path migration**: All data-mutating operations (create quest, timer completion, edit quest, reminders, delete, archive) now write to local SQLite instead of Firestore, completing the local-first architecture
+- **Firestore hydration**: Existing users' data is automatically pulled from Firestore into SQLite on first launch after upgrade (`SyncEngine.hydrateFromFirestore`)
+- **SyncEngine**: `_syncHabit` now reads full habit/cat data from SQLite and pushes to Firestore for `habitCreate` and `habitUpdate` actions
+- **Timer rewards**: Focus session completion now correctly updates habit progress, cat progress, and coin balance locally
+- **Heatmap data**: Activity heatmap reads from local SQLite sessions instead of Firestore
+- **Achievement card overflow**: Grid item height increased from 100 to 116px; progress section spacing tightened to prevent layout overflow on two-line descriptions
+- **Drawer button consistency**: CatRoom and Achievement screens now show menu button matching Today tab for consistent M3 navigation
+
+### Added
+- `CoinService.earnCoins()` for local coin increment (focus session rewards)
+- `LocalSessionRepository.getDailyMinutesForHabit()` for per-habit heatmap queries
+- `earnCoins` assertion tests in CoinService test suite
+
 ## [2.19.0] - 2026-02-24
 
 ### Added

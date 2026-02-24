@@ -51,6 +51,22 @@ void main() {
     });
   });
 
+  group('CoinService.earnCoins assertions', () {
+    test('amount <= 0 throws assertion error', () {
+      expect(
+        () => coinService.earnCoins(uid: 'test-uid', amount: 0),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('negative amount throws assertion error', () {
+      expect(
+        () => coinService.earnCoins(uid: 'test-uid', amount: -5),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+  });
+
   group('CoinService.purchaseAccessory assertions', () {
     test('empty accessoryId throws assertion error', () {
       expect(

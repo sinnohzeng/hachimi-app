@@ -132,9 +132,8 @@ class ReminderCard extends ConsumerWidget {
 
     try {
       final newReminders = [...habit.reminders, result];
-      await ref
-          .read(firestoreServiceProvider)
-          .updateHabit(uid: uid, habitId: habit.id, reminders: newReminders);
+      final updatedHabit = habit.copyWith(reminders: newReminders);
+      await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
 
       if (!context.mounted) return;
 
@@ -182,17 +181,14 @@ class ReminderCard extends ConsumerWidget {
     try {
       final newReminders = [...habit.reminders]..removeAt(index);
 
+      final updatedHabit = habit.copyWith(reminders: newReminders);
+      await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
+
       if (newReminders.isEmpty) {
-        await ref
-            .read(firestoreServiceProvider)
-            .updateHabit(uid: uid, habitId: habit.id, clearReminders: true);
         await ref
             .read(notificationServiceProvider)
             .cancelAllRemindersForHabit(habit.id);
       } else {
-        await ref
-            .read(firestoreServiceProvider)
-            .updateHabit(uid: uid, habitId: habit.id, reminders: newReminders);
         if (!context.mounted) return;
         final l10n = context.l10n;
         await ref

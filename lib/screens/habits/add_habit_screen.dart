@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class AddHabitScreen extends ConsumerStatefulWidget {
   const AddHabitScreen({super.key});
@@ -36,9 +38,14 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
       final name = _nameController.text.trim();
       final targetHours = int.parse(_hoursController.text.trim());
 
-      await ref
-          .read(firestoreServiceProvider)
-          .createHabit(uid: uid, name: name, targetHours: targetHours);
+      final habitId = const Uuid().v4();
+      final habit = Habit(
+        id: habitId,
+        name: name,
+        targetHours: targetHours,
+        createdAt: DateTime.now(),
+      );
+      await ref.read(localHabitRepositoryProvider).create(uid, habit);
 
       // Log analytics event
       await ref

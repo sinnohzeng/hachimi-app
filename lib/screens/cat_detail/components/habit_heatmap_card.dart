@@ -37,12 +37,8 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
       if (uid == null) return;
 
       final data = await ref
-          .read(firestoreServiceProvider)
-          .getDailyMinutesForHabit(
-            uid: uid,
-            habitId: widget.habitId,
-            lastNDays: 91,
-          );
+          .read(localSessionRepositoryProvider)
+          .getDailyMinutesForHabit(uid, widget.habitId, days: 91);
 
       if (mounted) {
         setState(() {

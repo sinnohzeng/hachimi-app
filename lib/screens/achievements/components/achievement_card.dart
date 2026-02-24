@@ -99,7 +99,7 @@ class AchievementCard extends StatelessWidget {
                       progress != null &&
                       def.targetValue != null &&
                       def.targetValue! > 1) ...[
-                    const SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: 4),
                     LinearProgressIndicator(
                       value: progress!.percent,
                       minHeight: 4,

@@ -356,12 +356,18 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     super.dispose();
   }
 
-  /// 启动后台引擎：同步引擎 + 成就评估器。
+  /// 启动后台引擎：数据水化 + 同步引擎 + 成就评估器。
   void _startBackgroundEngines() {
     final uid = widget.uid;
 
-    // 同步引擎 — 将本地台账推送到 Firestore
-    ref.read(syncEngineProvider).start(uid);
+    // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
+    ref.read(syncEngineProvider).hydrateFromFirestore(uid).then((_) {
+      // 水化完成后启动同步引擎
+      ref.read(syncEngineProvider).start(uid);
+    });
+
+    // 同步引擎 — 水化失败时也需启动（上面的 then 会在成功时启动）
+    // hydrateFromFirestore 内部 catch 不 rethrow，所以 then 始终执行
 
     // 成就评估器 — 监听台账变更自动评估
     final ledger = ref.read(ledgerServiceProvider);

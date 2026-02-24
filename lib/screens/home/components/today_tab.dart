@@ -209,8 +209,8 @@ class TodayTab extends ConsumerWidget {
               if (uid != null) {
                 HapticFeedback.mediumImpact();
                 await ref
-                    .read(firestoreServiceProvider)
-                    .deleteHabit(uid: uid, habitId: habitId);
+                    .read(localHabitRepositoryProvider)
+                    .delete(uid, habitId);
                 await ref
                     .read(analyticsServiceProvider)
                     .logHabitDeleted(habitName: habitName);

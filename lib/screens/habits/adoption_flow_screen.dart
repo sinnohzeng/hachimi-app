@@ -9,6 +9,7 @@ import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -16,6 +17,7 @@ import 'package:hachimi_app/widgets/growth_path_card.dart';
 import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
+import 'package:uuid/uuid.dart';
 import 'components/step_indicator.dart';
 
 /// 3-step adoption flow: Define Habit → Adopt Cat → Name Cat.
@@ -157,26 +159,38 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       final uid = ref.read(currentUidProvider);
       if (uid == null) return;
 
-      final selectedCat = _selectedCat!.copyWith(
-        name: _catNameController.text.trim(),
-      );
+      const uuid = Uuid();
+      final habitId = uuid.v4();
+      final catId = uuid.v4();
+      final now = DateTime.now();
 
       final motivationText = _motivationController.text.trim().isNotEmpty
           ? _motivationController.text.trim()
           : null;
 
-      final result = await ref
-          .read(firestoreServiceProvider)
-          .createHabitWithCat(
-            uid: uid,
-            name: _nameController.text.trim(),
-            targetHours: _isUnlimitedMode ? null : _targetHours,
-            goalMinutes: _goalMinutes,
-            reminders: _reminders.isNotEmpty ? _reminders : null,
-            motivationText: motivationText,
-            deadlineDate: _isUnlimitedMode ? null : _deadlineDate,
-            cat: selectedCat,
-          );
+      final cat = _selectedCat!.copyWith(
+        id: catId,
+        name: _catNameController.text.trim(),
+        boundHabitId: habitId,
+      );
+
+      final habit = Habit(
+        id: habitId,
+        name: _nameController.text.trim(),
+        targetHours: _isUnlimitedMode ? null : _targetHours,
+        goalMinutes: _goalMinutes,
+        reminders: _reminders,
+        motivationText: motivationText,
+        catId: catId,
+        deadlineDate: _isUnlimitedMode ? null : _deadlineDate,
+        createdAt: now,
+      );
+
+      // 先写猫（无独立通知），再写习惯（触发 habit_create 通知）
+      final catRepo = ref.read(localCatRepositoryProvider);
+      final habitRepo = ref.read(localHabitRepositoryProvider);
+      await catRepo.create(uid, cat);
+      await habitRepo.create(uid, habit);
 
       ErrorHandler.breadcrumb(
         'cat_adopted: ${_catNameController.text.trim()}, habit=${_nameController.text.trim()}',
@@ -198,7 +212,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         if (hasPermission && mounted) {
           final l10n = context.l10n;
           await notifService.scheduleReminders(
-            habitId: result.habitId,
+            habitId: habitId,
             habitName: _nameController.text.trim(),
             catName: _catNameController.text.trim(),
             reminders: _reminders,

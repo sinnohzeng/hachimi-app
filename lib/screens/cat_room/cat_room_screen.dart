@@ -29,9 +29,17 @@ class CatRoomScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final catsAsync = ref.watch(catsProvider);
+    final outerScaffold = Scaffold.maybeOf(context);
 
     return Scaffold(
       appBar: AppBar(
+        leading: outerScaffold != null
+            ? IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => outerScaffold.openDrawer(),
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              )
+            : null,
         title: Text(context.l10n.catRoomTitle),
         actions: [
           // Coin balance
@@ -181,9 +189,10 @@ class CatRoomScreen extends ConsumerWidget {
               if (newName.isEmpty) return;
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
+              final renamedCat = cat.copyWith(name: newName);
               await ref
-                  .read(catFirestoreServiceProvider)
-                  .renameCat(uid: uid, catId: cat.id, newName: newName);
+                  .read(localCatRepositoryProvider)
+                  .update(uid, renamedCat);
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
             child: Text(context.l10n.catRoomRename),
@@ -212,13 +221,11 @@ class CatRoomScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
-              await ref
-                  .read(catFirestoreServiceProvider)
-                  .archiveCat(uid: uid, catId: cat.id);
+              await ref.read(localCatRepositoryProvider).graduate(uid, cat.id);
               if (cat.boundHabitId.isNotEmpty) {
                 await ref
-                    .read(firestoreServiceProvider)
-                    .deleteHabit(uid: uid, habitId: cat.boundHabitId);
+                    .read(localHabitRepositoryProvider)
+                    .delete(uid, cat.boundHabitId);
               }
             },
             child: Text(context.l10n.catRoomArchive),

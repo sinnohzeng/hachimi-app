@@ -1,9 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart' show ConflictAlgorithm;
 
+import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 
@@ -21,6 +26,8 @@ class SyncEngine {
   bool _isSyncing = false;
   String? _uid;
 
+  static const _hydratedKey = 'local_data_hydrated_v1';
+
   SyncEngine({
     required LedgerService ledger,
     FirebaseFirestore? db,
@@ -28,6 +35,68 @@ class SyncEngine {
   }) : _ledger = ledger,
        _db = db ?? FirebaseFirestore.instance,
        _connectivity = connectivity ?? Connectivity();
+
+  /// 一次性数据水化：从 Firestore 拉取已有数据写入 SQLite。
+  /// 仅在首次迁移时执行（SharedPreferences 标记控制幂等）。
+  Future<void> hydrateFromFirestore(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_hydratedKey) ?? false) return;
+
+    try {
+      final userRef = _db.collection('users').doc(uid);
+      final db = await _ledger.database;
+
+      // 拉取 habits
+      final habitsSnap = await userRef.collection('habits').get();
+      for (final doc in habitsSnap.docs) {
+        final habit = Habit.fromFirestore(doc);
+        await db.insert(
+          'local_habits',
+          habit.toSqlite(uid),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+
+      // 拉取 cats
+      final catsSnap = await userRef.collection('cats').get();
+      for (final doc in catsSnap.docs) {
+        final cat = Cat.fromFirestore(doc);
+        await db.insert(
+          'local_cats',
+          cat.toSqlite(uid),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+
+      // 拉取用户文档：coins / lastCheckInDate / inventory
+      final userDoc = await userRef.get();
+      if (userDoc.exists) {
+        final data = userDoc.data()!;
+        final coins = data['coins'] as int? ?? 0;
+        final lastCheckIn = data['lastCheckInDate'] as String?;
+        final inventory = data['inventory'] as List<dynamic>?;
+
+        await _ledger.setMaterialized(uid, 'coins', coins.toString());
+        if (lastCheckIn != null) {
+          await _ledger.setMaterialized(uid, 'last_check_in_date', lastCheckIn);
+        }
+        if (inventory != null) {
+          await _ledger.setMaterialized(
+            uid,
+            'inventory',
+            jsonEncode(inventory.cast<String>()),
+          );
+        }
+      }
+
+      await prefs.setBool(_hydratedKey, true);
+      _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+      debugPrint('SyncEngine: hydration complete for $uid');
+    } catch (e) {
+      debugPrint('SyncEngine: hydration failed: $e');
+      // 水化失败不阻塞启动，下次仍会重试
+    }
+  }
 
   /// 启动同步引擎。
   void start(String uid) {
@@ -107,7 +176,7 @@ class SyncEngine {
         case ActionType.habitCreate:
         case ActionType.habitUpdate:
         case ActionType.habitDelete:
-          _syncHabit(batch, uid, action);
+          await _syncHabit(batch, uid, action);
         case ActionType.achievementUnlocked:
           _syncAchievement(batch, uid, action);
         case ActionType.accountCreated:
@@ -252,21 +321,58 @@ class SyncEngine {
     }
   }
 
-  void _syncHabit(WriteBatch batch, String uid, LedgerAction action) {
+  Future<void> _syncHabit(
+    WriteBatch batch,
+    String uid,
+    LedgerAction action,
+  ) async {
     final habitId = action.payload['habitId'] as String?;
     if (habitId == null) return;
 
-    final habitRef = _db
-        .collection('users')
-        .doc(uid)
-        .collection('habits')
-        .doc(habitId);
+    final userRef = _db.collection('users').doc(uid);
+    final habitRef = userRef.collection('habits').doc(habitId);
 
     switch (action.type) {
       case ActionType.habitCreate:
-        // 创建时从本地表读取完整数据来同步
-        // 简化处理：仅标记台账已同步，完整数据由对账补齐
-        break;
+        // 从本地表读取完整数据同步到 Firestore
+        final db = await _ledger.database;
+        final habitRows = await db.query(
+          'local_habits',
+          where: 'id = ?',
+          whereArgs: [habitId],
+          limit: 1,
+        );
+        if (habitRows.isNotEmpty) {
+          final habit = Habit.fromSqlite(habitRows.first);
+          batch.set(habitRef, habit.toFirestore());
+        }
+        // 同步关联猫
+        final catId = action.payload['catId'] as String?;
+        if (catId != null) {
+          final catRows = await db.query(
+            'local_cats',
+            where: 'id = ?',
+            whereArgs: [catId],
+            limit: 1,
+          );
+          if (catRows.isNotEmpty) {
+            final cat = Cat.fromSqlite(catRows.first);
+            batch.set(userRef.collection('cats').doc(catId), cat.toFirestore());
+          }
+        }
+      case ActionType.habitUpdate:
+        // 从本地表读取更新后数据同步到 Firestore
+        final db = await _ledger.database;
+        final rows = await db.query(
+          'local_habits',
+          where: 'id = ?',
+          whereArgs: [habitId],
+          limit: 1,
+        );
+        if (rows.isNotEmpty) {
+          final habit = Habit.fromSqlite(rows.first);
+          batch.set(habitRef, habit.toFirestore(), SetOptions(merge: true));
+        }
       case ActionType.habitDelete:
         batch.update(habitRef, {'isActive': false});
       default:

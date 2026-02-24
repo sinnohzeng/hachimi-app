@@ -542,58 +542,32 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 判断激励语是否变化
     final newMotivation = _motivationController.text.trim();
-    final oldMotivation = widget.habit.motivationText ?? '';
-    final motivationChanged = newMotivation != oldMotivation;
-
-    // 判断目标模式是否变化
-    final wasUnlimited = widget.habit.isUnlimited;
-    final switchedToUnlimited = !wasUnlimited && _isUnlimitedMode;
-    final switchedToMilestone = wasUnlimited && !_isUnlimitedMode;
-
-    // 判断截止日期是否变化
-    final oldDeadline = widget.habit.deadlineDate;
-    final deadlineChanged = _deadlineDate != oldDeadline;
-    final deadlineCleared = deadlineChanged && _deadlineDate == null;
 
     // 判断提醒是否变化
     final oldReminders = widget.habit.reminders;
     final remindersChanged = !_remindersEqual(oldReminders, _reminders);
 
     HapticFeedback.mediumImpact();
-    await ref
-        .read(firestoreServiceProvider)
-        .updateHabit(
-          uid: uid,
-          habitId: widget.habit.id,
-          name: name != widget.habit.name ? name : null,
-          goalMinutes: _selectedGoal != widget.habit.goalMinutes
-              ? _selectedGoal
-              : null,
-          targetHours:
-              switchedToMilestone ||
-                  (!_isUnlimitedMode &&
-                      _selectedTarget != widget.habit.targetHours)
-              ? _selectedTarget
-              : null,
-          clearTargetHours: switchedToUnlimited,
-          deadlineDate: !_isUnlimitedMode && deadlineChanged && !deadlineCleared
-              ? _deadlineDate
-              : null,
-          clearDeadlineDate: _isUnlimitedMode || deadlineCleared,
-          motivationText: motivationChanged && newMotivation.isNotEmpty
-              ? newMotivation
-              : null,
-          clearMotivation:
-              motivationChanged &&
-              newMotivation.isEmpty &&
-              oldMotivation.isNotEmpty,
-          reminders: remindersChanged && _reminders.isNotEmpty
-              ? _reminders
-              : null,
-          clearReminders: remindersChanged && _reminders.isEmpty,
-        );
+
+    // 构建完整的更新后 Habit — 直接用构造器确保所有字段正确
+    final updatedHabit = Habit(
+      id: widget.habit.id,
+      name: name,
+      targetHours: _isUnlimitedMode ? null : _selectedTarget,
+      goalMinutes: _selectedGoal,
+      reminders: _reminders,
+      motivationText: newMotivation.isNotEmpty ? newMotivation : null,
+      catId: widget.habit.catId,
+      isActive: widget.habit.isActive,
+      totalMinutes: widget.habit.totalMinutes,
+      lastCheckInDate: widget.habit.lastCheckInDate,
+      totalCheckInDays: widget.habit.totalCheckInDays,
+      deadlineDate: _isUnlimitedMode ? null : _deadlineDate,
+      targetCompleted: widget.habit.targetCompleted,
+      createdAt: widget.habit.createdAt,
+    );
+    await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
 
     // 提醒变更时重新调度通知
     if (remindersChanged && mounted) {

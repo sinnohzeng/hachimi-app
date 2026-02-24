@@ -245,6 +245,35 @@ class CoinService {
     }
   }
 
+  /// 增加金币（计时奖励用）。
+  Future<void> earnCoins({required String uid, required int amount}) async {
+    assert(amount > 0, 'amount must be positive');
+    final db = await _ledger.database;
+
+    try {
+      await db.transaction((txn) async {
+        final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
+        final balance = int.tryParse(raw ?? '0') ?? 0;
+        await _ledger.setMaterializedInTxn(
+          txn,
+          uid,
+          'coins',
+          (balance + amount).toString(),
+        );
+      });
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'CoinService',
+        operation: 'earnCoins',
+      );
+      rethrow;
+    } finally {
+      _ledger.notifyChange(const LedgerChange(type: 'coins_earned'));
+    }
+  }
+
   List<String> _decodeInventory(String? raw) {
     if (raw == null) return [];
     final decoded = jsonDecode(raw);

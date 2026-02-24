@@ -67,6 +67,33 @@ class LocalSessionRepository {
     return result;
   }
 
+  /// 获取指定习惯最近 N 天每日分钟数（用于单 habit 活动热力图）。
+  Future<Map<String, int>> getDailyMinutesForHabit(
+    String uid,
+    String habitId, {
+    int days = 91,
+  }) async {
+    final db = await _ledger.database;
+    final cutoff = DateTime.now()
+        .subtract(Duration(days: days))
+        .millisecondsSinceEpoch;
+    final rows = await db.rawQuery(
+      'SELECT started_at, duration_minutes '
+      'FROM local_sessions '
+      "WHERE uid = ? AND habit_id = ? AND started_at >= ? AND status = 'completed'",
+      [uid, habitId, cutoff],
+    );
+
+    final result = <String, int>{};
+    for (final row in rows) {
+      final ts = row['started_at'] as int;
+      final date = DateTime.fromMillisecondsSinceEpoch(ts);
+      final key = _dayFormat.format(date);
+      result[key] = (result[key] ?? 0) + (row['duration_minutes'] as int);
+    }
+    return result;
+  }
+
   /// 获取最近 N 条会话。
   Future<List<FocusSession>> getRecentSessions(
     String uid, {

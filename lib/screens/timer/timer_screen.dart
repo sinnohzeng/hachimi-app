@@ -21,9 +21,11 @@ import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show ServiceRequestFailure;
 import 'package:hachimi_app/services/focus_timer_service.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 // NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
+import 'package:uuid/uuid.dart';
 
 /// Focus timer in-progress screen.
 /// Full-screen immersive view with pixel cat, circular progress, and timer.
@@ -238,8 +240,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final packageInfo = ref.read(appInfoProvider).value;
     final clientVersion = packageInfo?.version ?? '';
 
+    final sessionId = const Uuid().v4();
     final session = FocusSession(
-      id: '',
+      id: sessionId,
       habitId: widget.habitId,
       catId: habit.catId ?? '',
       startedAt: startedAt,
@@ -265,9 +268,40 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     ErrorHandler.breadcrumb(
       'focus_completed: ${habit.name}, ${minutes}min, ${coinsEarned}coins',
     );
-    await ref
-        .read(firestoreServiceProvider)
-        .logFocusSession(uid: uid, session: session, habitName: habit.name);
+
+    // 写入本地 SQLite
+    final sessionRepo = ref.read(localSessionRepositoryProvider);
+    await sessionRepo.logSession(uid, session);
+
+    // 更新 habit 和 cat 的累计进度
+    if (isCompleted) {
+      final today = AppDateUtils.todayString();
+      await ref
+          .read(localHabitRepositoryProvider)
+          .updateProgress(
+            uid,
+            widget.habitId,
+            addMinutes: minutes,
+            checkInDate: today,
+          );
+      if (habit.catId != null) {
+        await ref
+            .read(localCatRepositoryProvider)
+            .updateProgress(
+              uid,
+              habit.catId!,
+              addMinutes: minutes,
+              sessionAt: DateTime.now(),
+            );
+      }
+    }
+
+    // 金币奖励写入本地
+    if (coinsEarned > 0) {
+      await ref
+          .read(coinServiceProvider)
+          .earnCoins(uid: uid, amount: coinsEarned);
+    }
 
     // Analytics: log session outcome
     final analytics = ref.read(analyticsServiceProvider);
