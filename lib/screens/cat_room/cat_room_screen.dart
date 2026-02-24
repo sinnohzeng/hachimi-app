@@ -37,7 +37,7 @@ class CatRoomScreen extends ConsumerWidget {
         leading: outerScaffold != null
             ? IconButton(
                 icon: const Icon(Icons.menu),
-                onPressed: () => outerScaffold.openDrawer(),
+                onPressed: outerScaffold.openDrawer,
                 tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
               )
             : null,

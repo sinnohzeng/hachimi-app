@@ -4152,23 +4152,17 @@ abstract class S {
   /// **'Account deleted'**
   String get deleteAccountSuccess;
 
-  /// No description provided for @drawerGuest.
+  /// No description provided for @drawerGuestLoginSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Guest'**
-  String get drawerGuest;
+  /// **'Sync data and unlock AI features'**
+  String get drawerGuestLoginSubtitle;
 
-  /// No description provided for @drawerLinkAccountHint.
+  /// No description provided for @drawerGuestSignIn.
   ///
   /// In en, this message translates to:
-  /// **'Link an account to unlock AI features and protect your data'**
-  String get drawerLinkAccountHint;
-
-  /// No description provided for @drawerLinkAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Link account'**
-  String get drawerLinkAccount;
+  /// **'Sign in'**
+  String get drawerGuestSignIn;
 
   /// No description provided for @drawerMilestones.
   ///
@@ -4218,29 +4212,23 @@ abstract class S {
   /// **'Account'**
   String get drawerAccountSection;
 
-  /// No description provided for @drawerGuestLogout.
+  /// No description provided for @settingsResetData.
   ///
   /// In en, this message translates to:
-  /// **'Log out (guest data will be lost)'**
-  String get drawerGuestLogout;
+  /// **'Reset all data'**
+  String get settingsResetData;
 
-  /// No description provided for @drawerGuestLogoutTitle.
+  /// No description provided for @settingsResetDataTitle.
   ///
   /// In en, this message translates to:
-  /// **'Log out as guest?'**
-  String get drawerGuestLogoutTitle;
+  /// **'Reset all data?'**
+  String get settingsResetDataTitle;
 
-  /// No description provided for @drawerGuestLogoutMessage.
+  /// No description provided for @settingsResetDataMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your current data cannot be recovered after logging out. Link an account first to keep your progress.'**
-  String get drawerGuestLogoutMessage;
-
-  /// No description provided for @drawerGuestLogoutConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Log out anyway'**
-  String get drawerGuestLogoutConfirm;
+  /// **'This will delete all local data and return to the welcome screen. This cannot be undone.'**
+  String get settingsResetDataMessage;
 
   /// No description provided for @guestUpgradeTitle.
   ///

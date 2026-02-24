@@ -28,13 +28,10 @@ class AppDrawer extends ConsumerWidget {
     final avatarId = ref.watch(avatarIdProvider).value;
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
     final l10n = context.l10n;
 
     final displayName = isGuest
-        ? l10n.drawerGuest
+        ? null
         : (user?.displayName ??
               user?.email?.split('@').first ??
               l10n.profileFallbackUser);
@@ -44,53 +41,18 @@ class AppDrawer extends ConsumerWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            // ─── 头像 + 用户信息 ───
-            _DrawerHeader(
-              displayName: displayName,
-              email: isGuest ? null : user?.email,
-              avatarId: avatarId,
-              isGuest: isGuest,
-              onEditAvatar: () => showAvatarPickerSheet(context, ref),
-              onEditName: () => showEditNameDialog(context, ref),
-            ),
-
-            // ─── 访客升级横幅 ───
+            // ─── 头部区域：访客 CTA / 已登录用户信息 ───
             if (isGuest)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Card(
-                  color: colorScheme.primaryContainer,
-                  child: InkWell(
-                    borderRadius: AppShape.borderMedium,
-                    onTap: () => showGuestUpgradePrompt(context, ref),
-                    child: Padding(
-                      padding: AppSpacing.paddingBase,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.link,
-                            color: colorScheme.onPrimaryContainer,
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Text(
-                              l10n.drawerLinkAccountHint,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          FilledButton(
-                            onPressed: () =>
-                                showGuestUpgradePrompt(context, ref),
-                            child: Text(l10n.drawerLinkAccount),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              _GuestLoginHeader(
+                onSignIn: () => showGuestUpgradePrompt(context, ref),
+              )
+            else
+              _DrawerHeader(
+                displayName: displayName!,
+                email: user?.email,
+                avatarId: avatarId,
+                onEditAvatar: () => showAvatarPickerSheet(context, ref),
+                onEditName: () => showEditNameDialog(context, ref),
               ),
 
             // ─── 里程碑 ───
@@ -99,7 +61,7 @@ class AppDrawer extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Card(
                 elevation: 0,
-                color: colorScheme.surfaceContainerHigh,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 child: Padding(
                   padding: AppSpacing.paddingBase,
                   child: Column(
@@ -156,28 +118,22 @@ class AppDrawer extends ConsumerWidget {
               onTap: () => _navigateAfterClose(context, AppRouter.settingsPage),
             ),
 
-            const Divider(indent: 16, endIndent: 16),
-
-            // ─── 账号 ───
-            _SectionHeader(label: l10n.drawerAccountSection),
-            if (isGuest)
+            // ─── 账号（仅已登录用户） ───
+            if (!isGuest) ...[
+              const Divider(indent: 16, endIndent: 16),
+              _SectionHeader(label: l10n.drawerAccountSection),
               ListTile(
-                leading: Icon(Icons.logout, color: colorScheme.error),
-                title: Text(
-                  l10n.drawerGuestLogout,
-                  style: TextStyle(color: colorScheme.error),
+                leading: Icon(
+                  Icons.logout,
+                  color: Theme.of(context).colorScheme.error,
                 ),
-                onTap: () => _confirmGuestLogout(context, ref),
-              )
-            else
-              ListTile(
-                leading: Icon(Icons.logout, color: colorScheme.error),
                 title: Text(
                   l10n.commonLogOut,
-                  style: TextStyle(color: colorScheme.error),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () => _confirmLogout(context, ref),
               ),
+            ],
 
             const SizedBox(height: AppSpacing.lg),
 
@@ -224,58 +180,87 @@ class AppDrawer extends ConsumerWidget {
       );
     });
   }
+}
 
-  void _confirmGuestLogout(BuildContext context, WidgetRef ref) {
+// ─── 访客登录引导卡片 ───
+
+class _GuestLoginHeader extends StatelessWidget {
+  final VoidCallback onSignIn;
+
+  const _GuestLoginHeader({required this.onSignIn});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final l10n = context.l10n;
-    Navigator.of(context).pop(); // 关闭 Drawer
-    Future.delayed(AppMotion.durationMedium1, () {
-      if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          icon: Icon(
-            Icons.warning_rounded,
-            color: Theme.of(ctx).colorScheme.error,
-            size: 32,
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Card(
+        color: colorScheme.primaryContainer,
+        child: InkWell(
+          borderRadius: AppShape.borderMedium,
+          onTap: onSignIn,
+          child: Padding(
+            padding: AppSpacing.paddingBase,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.shield_outlined,
+                      size: 36,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.guestUpgradeTitle,
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                          Text(
+                            l10n.drawerGuestLoginSubtitle,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onSignIn,
+                    icon: const Icon(Icons.login),
+                    label: Text(l10n.drawerGuestSignIn),
+                  ),
+                ),
+              ],
+            ),
           ),
-          title: Text(l10n.drawerGuestLogoutTitle),
-          content: Text(l10n.drawerGuestLogoutMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                showGuestUpgradePrompt(context, ref);
-              },
-              child: Text(l10n.drawerLinkAccount),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(ctx).pop();
-                await ref.read(authServiceProvider).signOut();
-              },
-              child: Text(
-                l10n.drawerGuestLogoutConfirm,
-                style: TextStyle(color: Theme.of(ctx).colorScheme.error),
-              ),
-            ),
-          ],
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
-// ─── 头部区域 ───
+// ─── 已登录用户头部区域 ───
 
 class _DrawerHeader extends StatelessWidget {
   final String displayName;
   final String? email;
   final String? avatarId;
-  final bool isGuest;
   final VoidCallback onEditAvatar;
   final VoidCallback onEditName;
 
@@ -283,7 +268,6 @@ class _DrawerHeader extends StatelessWidget {
     required this.displayName,
     this.email,
     this.avatarId,
-    required this.isGuest,
     required this.onEditAvatar,
     required this.onEditName,
   });
@@ -299,7 +283,7 @@ class _DrawerHeader extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: isGuest ? null : onEditAvatar,
+            onTap: onEditAvatar,
             child: _buildAvatar(avatar, colorScheme, textTheme),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -308,7 +292,7 @@ class _DrawerHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: isGuest ? null : onEditName,
+                  onTap: onEditName,
                   child: Text(
                     displayName,
                     style: textTheme.titleMedium?.copyWith(
@@ -345,17 +329,6 @@ class _DrawerHeader extends StatelessWidget {
         radius: 24,
         backgroundColor: avatar.color.withValues(alpha: 0.2),
         child: Icon(avatar.icon, size: 24, color: avatar.color),
-      );
-    }
-    if (isGuest) {
-      return CircleAvatar(
-        radius: 24,
-        backgroundColor: colorScheme.secondaryContainer,
-        child: Icon(
-          Icons.person_outline,
-          size: 24,
-          color: colorScheme.onSecondaryContainer,
-        ),
       );
     }
     return CircleAvatar(

@@ -1004,9 +1004,8 @@
   "deleteAccountProgress": "正在删除账号...",
   "deleteAccountSuccess": "账号已删除",
 
-  "drawerGuest": "访客",
-  "drawerLinkAccountHint": "关联账号以解锁 AI 功能并保护数据",
-  "drawerLinkAccount": "关联账号",
+  "drawerGuestLoginSubtitle": "同步数据，解锁 AI 功能",
+  "drawerGuestSignIn": "登录",
   "drawerMilestones": "里程碑",
   "drawerMilestoneFocus": "累计专注：{hours}h {minutes}m",
   "@drawerMilestoneFocus": {
@@ -1027,10 +1026,9 @@
   "drawerSessionHistory": "专注历史",
   "drawerCheckInCalendar": "签到日历",
   "drawerAccountSection": "账号",
-  "drawerGuestLogout": "退出（访客数据将丢失）",
-  "drawerGuestLogoutTitle": "退出访客模式？",
-  "drawerGuestLogoutMessage": "退出后，当前数据将无法恢复。建议先关联账号以保留进度。",
-  "drawerGuestLogoutConfirm": "仍然退出",
+  "settingsResetData": "清除所有数据",
+  "settingsResetDataTitle": "清除所有数据？",
+  "settingsResetDataMessage": "此操作将删除所有本地数据并返回欢迎页面，且无法撤销。",
 
   "guestUpgradeTitle": "保护你的数据",
   "guestUpgradeMessage": "关联账号可备份进度、解锁 AI 日记和聊天功能，并在多设备间同步。",

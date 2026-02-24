@@ -62,6 +62,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
       textTheme: textTheme,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       pageTransitionsTheme: const PageTransitionsTheme(

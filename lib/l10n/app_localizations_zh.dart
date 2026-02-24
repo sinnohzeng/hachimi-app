@@ -2199,13 +2199,10 @@ class SZh extends S {
   String get deleteAccountSuccess => '账号已删除';
 
   @override
-  String get drawerGuest => '访客';
+  String get drawerGuestLoginSubtitle => '同步数据，解锁 AI 功能';
 
   @override
-  String get drawerLinkAccountHint => '关联账号以解锁 AI 功能并保护数据';
-
-  @override
-  String get drawerLinkAccount => '关联账号';
+  String get drawerGuestSignIn => '登录';
 
   @override
   String get drawerMilestones => '里程碑';
@@ -2238,16 +2235,13 @@ class SZh extends S {
   String get drawerAccountSection => '账号';
 
   @override
-  String get drawerGuestLogout => '退出（访客数据将丢失）';
+  String get settingsResetData => '清除所有数据';
 
   @override
-  String get drawerGuestLogoutTitle => '退出访客模式？';
+  String get settingsResetDataTitle => '清除所有数据？';
 
   @override
-  String get drawerGuestLogoutMessage => '退出后，当前数据将无法恢复。建议先关联账号以保留进度。';
-
-  @override
-  String get drawerGuestLogoutConfirm => '仍然退出';
+  String get settingsResetDataMessage => '此操作将删除所有本地数据并返回欢迎页面，且无法撤销。';
 
   @override
   String get guestUpgradeTitle => '保护你的数据';
@@ -4473,13 +4467,10 @@ class SZhHant extends SZh {
   String get deleteAccountSuccess => '帳號已刪除';
 
   @override
-  String get drawerGuest => '訪客';
+  String get drawerGuestLoginSubtitle => '同步資料，解鎖 AI 功能';
 
   @override
-  String get drawerLinkAccountHint => '關聯帳號以解鎖 AI 功能並保護資料';
-
-  @override
-  String get drawerLinkAccount => '關聯帳號';
+  String get drawerGuestSignIn => '登入';
 
   @override
   String get drawerMilestones => '里程碑';
@@ -4512,16 +4503,13 @@ class SZhHant extends SZh {
   String get drawerAccountSection => '帳號';
 
   @override
-  String get drawerGuestLogout => '退出（訪客資料將遺失）';
+  String get settingsResetData => '清除所有資料';
 
   @override
-  String get drawerGuestLogoutTitle => '退出訪客模式？';
+  String get settingsResetDataTitle => '清除所有資料？';
 
   @override
-  String get drawerGuestLogoutMessage => '退出後，當前資料將無法恢復。建議先關聯帳號以保留進度。';
-
-  @override
-  String get drawerGuestLogoutConfirm => '仍然退出';
+  String get settingsResetDataMessage => '此操作將刪除所有本地資料並返回歡迎頁面，且無法撤銷。';
 
   @override
   String get guestUpgradeTitle => '保護你的資料';

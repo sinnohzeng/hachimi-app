@@ -10,6 +10,7 @@ import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
+import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/delete_account_flow.dart';
@@ -29,6 +30,7 @@ class SettingsScreen extends ConsumerWidget {
     final textTheme = theme.textTheme;
     final themeSettings = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
+    final isGuest = ref.watch(isAnonymousProvider);
 
     final l10n = context.l10n;
 
@@ -234,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xxl),
             const Divider(),
 
-            // Account section (danger zone)
+            // Account section
             StaggeredListItem(
               index: 12,
               child: SectionHeader(
@@ -242,34 +244,65 @@ class SettingsScreen extends ConsumerWidget {
                 colorScheme: colorScheme,
               ),
             ),
-            StaggeredListItem(
-              index: 13,
-              child: ListTile(
-                leading: Icon(Icons.logout, color: colorScheme.error),
-                title: Text(
-                  l10n.commonLogOut,
-                  style: TextStyle(color: colorScheme.error),
-                ),
-                onTap: () => _confirmLogout(context, ref),
-              ),
-            ),
-            StaggeredListItem(
-              index: 14,
-              child: ListTile(
-                leading: Icon(Icons.delete_forever, color: colorScheme.error),
-                title: Text(
-                  l10n.commonDeleteAccount,
-                  style: TextStyle(color: colorScheme.error),
-                ),
-                subtitle: Text(
-                  l10n.deleteAccountWarning,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+            if (isGuest) ...[
+              // 访客：登录入口 + 清除数据
+              StaggeredListItem(
+                index: 13,
+                child: ListTile(
+                  leading: Icon(Icons.login, color: colorScheme.primary),
+                  title: Text(
+                    l10n.drawerGuestSignIn,
+                    style: TextStyle(color: colorScheme.primary),
                   ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => showGuestUpgradePrompt(context, ref),
                 ),
-                onTap: () => _confirmDeleteAccount(context, ref),
               ),
-            ),
+              StaggeredListItem(
+                index: 14,
+                child: ListTile(
+                  leading: Icon(
+                    Icons.delete_sweep_outlined,
+                    color: colorScheme.error,
+                  ),
+                  title: Text(
+                    l10n.settingsResetData,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  onTap: () => _confirmResetData(context, ref),
+                ),
+              ),
+            ] else ...[
+              // 已登录：退出 + 删除账号
+              StaggeredListItem(
+                index: 13,
+                child: ListTile(
+                  leading: Icon(Icons.logout, color: colorScheme.error),
+                  title: Text(
+                    l10n.commonLogOut,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  onTap: () => _confirmLogout(context, ref),
+                ),
+              ),
+              StaggeredListItem(
+                index: 14,
+                child: ListTile(
+                  leading: Icon(Icons.delete_forever, color: colorScheme.error),
+                  title: Text(
+                    l10n.commonDeleteAccount,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  subtitle: Text(
+                    l10n.deleteAccountWarning,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  onTap: () => _confirmDeleteAccount(context, ref),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
           ],
         ),
@@ -423,6 +456,45 @@ class SettingsScreen extends ConsumerWidget {
               await ref.read(authServiceProvider).signOut();
             },
             child: Text(l10n.commonLogOut),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmResetData(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: Icon(
+          Icons.warning_rounded,
+          color: Theme.of(ctx).colorScheme.error,
+          size: 32,
+        ),
+        title: Text(l10n.settingsResetDataTitle),
+        content: Text(l10n.settingsResetDataMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              showGuestUpgradePrompt(context, ref);
+            },
+            child: Text(l10n.guestUpgradeLinkButton),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(authServiceProvider).signOut();
+            },
+            child: Text(
+              l10n.settingsResetData,
+              style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+            ),
           ),
         ],
       ),

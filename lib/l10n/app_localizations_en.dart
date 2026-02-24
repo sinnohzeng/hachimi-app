@@ -2230,14 +2230,10 @@ class SEn extends S {
   String get deleteAccountSuccess => 'Account deleted';
 
   @override
-  String get drawerGuest => 'Guest';
+  String get drawerGuestLoginSubtitle => 'Sync data and unlock AI features';
 
   @override
-  String get drawerLinkAccountHint =>
-      'Link an account to unlock AI features and protect your data';
-
-  @override
-  String get drawerLinkAccount => 'Link account';
+  String get drawerGuestSignIn => 'Sign in';
 
   @override
   String get drawerMilestones => 'Milestones';
@@ -2270,17 +2266,14 @@ class SEn extends S {
   String get drawerAccountSection => 'Account';
 
   @override
-  String get drawerGuestLogout => 'Log out (guest data will be lost)';
+  String get settingsResetData => 'Reset all data';
 
   @override
-  String get drawerGuestLogoutTitle => 'Log out as guest?';
+  String get settingsResetDataTitle => 'Reset all data?';
 
   @override
-  String get drawerGuestLogoutMessage =>
-      'Your current data cannot be recovered after logging out. Link an account first to keep your progress.';
-
-  @override
-  String get drawerGuestLogoutConfirm => 'Log out anyway';
+  String get settingsResetDataMessage =>
+      'This will delete all local data and return to the welcome screen. This cannot be undone.';
 
   @override
   String get guestUpgradeTitle => 'Protect your data';

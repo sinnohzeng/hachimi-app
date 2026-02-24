@@ -1043,9 +1043,8 @@
   "deleteAccountProgress": "Deleting account...",
   "deleteAccountSuccess": "Account deleted",
 
-  "drawerGuest": "Guest",
-  "drawerLinkAccountHint": "Link an account to unlock AI features and protect your data",
-  "drawerLinkAccount": "Link account",
+  "drawerGuestLoginSubtitle": "Sync data and unlock AI features",
+  "drawerGuestSignIn": "Sign in",
   "drawerMilestones": "Milestones",
   "drawerMilestoneFocus": "Total focus: {hours}h {minutes}m",
   "@drawerMilestoneFocus": {
@@ -1066,10 +1065,9 @@
   "drawerSessionHistory": "Focus history",
   "drawerCheckInCalendar": "Check-in calendar",
   "drawerAccountSection": "Account",
-  "drawerGuestLogout": "Log out (guest data will be lost)",
-  "drawerGuestLogoutTitle": "Log out as guest?",
-  "drawerGuestLogoutMessage": "Your current data cannot be recovered after logging out. Link an account first to keep your progress.",
-  "drawerGuestLogoutConfirm": "Log out anyway",
+  "settingsResetData": "Reset all data",
+  "settingsResetDataTitle": "Reset all data?",
+  "settingsResetDataMessage": "This will delete all local data and return to the welcome screen. This cannot be undone.",
 
   "guestUpgradeTitle": "Protect your data",
   "guestUpgradeMessage": "Link an account to back up your progress, unlock AI diary and chat features, and sync across devices.",

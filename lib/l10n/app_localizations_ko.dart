@@ -2205,13 +2205,10 @@ class SKo extends S {
   String get deleteAccountSuccess => '계정이 삭제되었습니다';
 
   @override
-  String get drawerGuest => '게스트';
+  String get drawerGuestLoginSubtitle => '데이터 동기화, AI 기능 잠금 해제';
 
   @override
-  String get drawerLinkAccountHint => '계정을 연결하여 AI 기능을 잠금 해제하고 데이터를 보호하세요';
-
-  @override
-  String get drawerLinkAccount => '계정 연결';
+  String get drawerGuestSignIn => '로그인';
 
   @override
   String get drawerMilestones => '마일스톤';
@@ -2244,17 +2241,14 @@ class SKo extends S {
   String get drawerAccountSection => '계정';
 
   @override
-  String get drawerGuestLogout => '로그아웃 (게스트 데이터 삭제됨)';
+  String get settingsResetData => '모든 데이터 초기화';
 
   @override
-  String get drawerGuestLogoutTitle => '게스트로 로그아웃하시겠습니까?';
+  String get settingsResetDataTitle => '모든 데이터를 초기화하시겠습니까?';
 
   @override
-  String get drawerGuestLogoutMessage =>
-      '로그아웃 후 현재 데이터를 복구할 수 없습니다. 먼저 계정을 연결하여 진행 상황을 저장하세요.';
-
-  @override
-  String get drawerGuestLogoutConfirm => '그래도 로그아웃';
+  String get settingsResetDataMessage =>
+      '모든 로컬 데이터가 삭제되고 환영 화면으로 돌아갑니다. 이 작업은 되돌릴 수 없습니다.';
 
   @override
   String get guestUpgradeTitle => '데이터 보호';

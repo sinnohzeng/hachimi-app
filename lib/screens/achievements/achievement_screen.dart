@@ -53,7 +53,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
             leading: outerScaffold != null
                 ? IconButton(
                     icon: const Icon(Icons.menu),
-                    onPressed: () => outerScaffold.openDrawer(),
+                    onPressed: outerScaffold.openDrawer,
                     tooltip: MaterialLocalizations.of(
                       context,
                     ).openAppDrawerTooltip,

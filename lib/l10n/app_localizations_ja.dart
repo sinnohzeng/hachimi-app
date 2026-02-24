@@ -2204,13 +2204,10 @@ class SJa extends S {
   String get deleteAccountSuccess => 'アカウントが削除されました';
 
   @override
-  String get drawerGuest => 'ゲスト';
+  String get drawerGuestLoginSubtitle => 'データ同期、AI機能を解除';
 
   @override
-  String get drawerLinkAccountHint => 'アカウントを連携してAI機能を解除し、データを保護しましょう';
-
-  @override
-  String get drawerLinkAccount => 'アカウント連携';
+  String get drawerGuestSignIn => 'ログイン';
 
   @override
   String get drawerMilestones => 'マイルストーン';
@@ -2243,17 +2240,14 @@ class SJa extends S {
   String get drawerAccountSection => 'アカウント';
 
   @override
-  String get drawerGuestLogout => 'ログアウト（ゲストデータは失われます）';
+  String get settingsResetData => 'すべてのデータをリセット';
 
   @override
-  String get drawerGuestLogoutTitle => 'ゲストとしてログアウトしますか？';
+  String get settingsResetDataTitle => 'すべてのデータをリセットしますか？';
 
   @override
-  String get drawerGuestLogoutMessage =>
-      'ログアウト後、現在のデータは復元できません。先にアカウントを連携して進捗を保存しましょう。';
-
-  @override
-  String get drawerGuestLogoutConfirm => 'ログアウトする';
+  String get settingsResetDataMessage =>
+      'ローカルデータがすべて削除され、ウェルカム画面に戻ります。この操作は取り消せません。';
 
   @override
   String get guestUpgradeTitle => 'データを保護する';

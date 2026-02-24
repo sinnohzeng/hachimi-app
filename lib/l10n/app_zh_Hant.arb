@@ -761,9 +761,8 @@
   "deleteAccountProgress": "正在刪除帳號...",
   "deleteAccountSuccess": "帳號已刪除",
 
-  "drawerGuest": "訪客",
-  "drawerLinkAccountHint": "關聯帳號以解鎖 AI 功能並保護資料",
-  "drawerLinkAccount": "關聯帳號",
+  "drawerGuestLoginSubtitle": "同步資料，解鎖 AI 功能",
+  "drawerGuestSignIn": "登入",
   "drawerMilestones": "里程碑",
   "drawerMilestoneFocus": "累計專注：{hours}h {minutes}m",
   "@drawerMilestoneFocus": {
@@ -784,10 +783,9 @@
   "drawerSessionHistory": "專注歷史",
   "drawerCheckInCalendar": "簽到日曆",
   "drawerAccountSection": "帳號",
-  "drawerGuestLogout": "退出（訪客資料將遺失）",
-  "drawerGuestLogoutTitle": "退出訪客模式？",
-  "drawerGuestLogoutMessage": "退出後，當前資料將無法恢復。建議先關聯帳號以保留進度。",
-  "drawerGuestLogoutConfirm": "仍然退出",
+  "settingsResetData": "清除所有資料",
+  "settingsResetDataTitle": "清除所有資料？",
+  "settingsResetDataMessage": "此操作將刪除所有本地資料並返回歡迎頁面，且無法撤銷。",
 
   "guestUpgradeTitle": "保護你的資料",
   "guestUpgradeMessage": "關聯帳號可備份進度、解鎖 AI 日記和聊天功能，並在多裝置間同步。",

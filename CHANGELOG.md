@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.7] - 2026-02-25
+
+### Improved
+- **Guest drawer redesign**: Replaced passive "Guest / Tap to sign in" header and redundant upgrade banner with a single CTA card featuring shield icon, subtitle, and sign-in button
+- **Guest settings account area**: Guest users now see "Sign in" (primary) and "Reset all data" (error) instead of the misleading "Log out" and "Delete account"
+- **Reset data confirmation**: Three-action dialog (Cancel / Link account / Reset) with warning icon, replacing the old guest logout flow
+- **Drawer cleanup**: Account section (logout) is now hidden entirely for guest users, reducing visual noise
+
+### Removed
+- Guest upgrade banner card in drawer (consolidated into header CTA)
+- `_confirmGuestLogout` method and 8 associated L10N keys (`drawerGuest`, `drawerGuestTapToLink`, `drawerLinkAccountHint`, `drawerLinkAccount`, `drawerGuestLogout*`)
+
+### Fixed
+- Scaffold background color now explicitly uses `colorScheme.surface` for consistency
+- Drawer `openDrawer` callback simplified (tear-off instead of lambda)
+
 ## [2.19.6] - 2026-02-24
 
 ### Improved

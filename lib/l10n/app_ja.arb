@@ -761,9 +761,8 @@
   "deleteAccountProgress": "アカウントを削除中...",
   "deleteAccountSuccess": "アカウントが削除されました",
 
-  "drawerGuest": "ゲスト",
-  "drawerLinkAccountHint": "アカウントを連携してAI機能を解除し、データを保護しましょう",
-  "drawerLinkAccount": "アカウント連携",
+  "drawerGuestLoginSubtitle": "データ同期、AI機能を解除",
+  "drawerGuestSignIn": "ログイン",
   "drawerMilestones": "マイルストーン",
   "drawerMilestoneFocus": "合計集中：{hours}h {minutes}m",
   "@drawerMilestoneFocus": {
@@ -784,10 +783,9 @@
   "drawerSessionHistory": "集中履歴",
   "drawerCheckInCalendar": "チェックインカレンダー",
   "drawerAccountSection": "アカウント",
-  "drawerGuestLogout": "ログアウト（ゲストデータは失われます）",
-  "drawerGuestLogoutTitle": "ゲストとしてログアウトしますか？",
-  "drawerGuestLogoutMessage": "ログアウト後、現在のデータは復元できません。先にアカウントを連携して進捗を保存しましょう。",
-  "drawerGuestLogoutConfirm": "ログアウトする",
+  "settingsResetData": "すべてのデータをリセット",
+  "settingsResetDataTitle": "すべてのデータをリセットしますか？",
+  "settingsResetDataMessage": "ローカルデータがすべて削除され、ウェルカム画面に戻ります。この操作は取り消せません。",
 
   "guestUpgradeTitle": "データを保護する",
   "guestUpgradeMessage": "アカウント連携で進捗をバックアップし、AI日記やチャット機能を解除し、デバイス間で同期できます。",
