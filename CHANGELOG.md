@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.3] - 2026-02-24
+
+### Fixed
+- **Onboarding navigation crash**: `late final` field in AuthGate was reassigned on "Let's go" tap, causing `LateInitializationError` that permanently blocked users on the onboarding screen
+- **Anonymous sign-in failure**: Users stuck on infinite spinner when network unavailable during auto sign-in; now shows error screen with retry button
+- **Onboarding async gap**: `_finish()` used raw `SharedPreferences.getInstance()` introducing unnecessary async delay; replaced with synchronous provider access
+- **Android back key on onboarding**: No `PopScope` handling caused back key to exit the app; now navigates to previous onboarding page
+- **No back navigation in onboarding**: Added back button and `_previous()` method so users can review earlier pages
+
 ## [2.19.2] - 2026-02-24
 
 ### Fixed

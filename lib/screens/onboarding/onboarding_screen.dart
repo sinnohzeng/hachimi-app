@@ -1,24 +1,25 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/services/analytics_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/app.dart' show kOnboardingCompleteKey;
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback onComplete;
 
   const OnboardingScreen({super.key, required this.onComplete});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _currentPage = 0;
   bool _isForward = true;
 
@@ -59,11 +60,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  void _previous() {
+    if (_currentPage > 0) {
+      setState(() {
+        _isForward = false;
+        _currentPage--;
+      });
+    }
+  }
+
   void _skip() => _finish();
 
-  Future<void> _finish() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(kOnboardingCompleteKey, true);
+  void _finish() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    prefs.setBool(kOnboardingCompleteKey, true);
     AnalyticsService().logOnboardingCompleted();
     widget.onComplete();
   }
@@ -163,20 +173,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final pageData = pages[_currentPage];
     final onColor = pageData.onColor(colorScheme);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildPageSwitcher(pages, (d) => _CompactOnboardingPage(data: d)),
-          if (_currentPage < pages.length - 1)
-            _buildCompactSkipButton(context, onColor),
-          _buildCompactBottomBar(
-            context,
-            pages,
-            pageData,
-            onColor,
-            colorScheme,
-          ),
-        ],
+    return PopScope(
+      canPop: _currentPage == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _previous();
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            _buildPageSwitcher(pages, (d) => _CompactOnboardingPage(data: d)),
+            if (_currentPage < pages.length - 1)
+              _buildCompactSkipButton(context, onColor),
+            _buildCompactBottomBar(
+              context,
+              pages,
+              pageData,
+              onColor,
+              colorScheme,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -226,6 +242,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 backgroundColor: onColor,
                 foregroundColor: pageData.gradientColors(colorScheme).first,
               ),
+              if (_currentPage > 0) ...[
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: TextButton(
+                    onPressed: _previous,
+                    child: Text(
+                      MaterialLocalizations.of(context).backButtonTooltip,
+                      style: TextStyle(color: onColor.withValues(alpha: 0.7)),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -239,15 +269,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     BuildContext context,
     List<_OnboardingPageData> pages,
   ) {
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: _buildPageSwitcher(pages, (d) => _TabletLeftPane(data: d)),
-          ),
-          Expanded(flex: 3, child: _buildTabletRightPane(context, pages)),
-        ],
+    return PopScope(
+      canPop: _currentPage == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _previous();
+      },
+      child: Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildPageSwitcher(pages, (d) => _TabletLeftPane(data: d)),
+            ),
+            Expanded(flex: 3, child: _buildTabletRightPane(context, pages)),
+          ],
+        ),
       ),
     );
   }

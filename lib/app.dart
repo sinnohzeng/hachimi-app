@@ -79,7 +79,7 @@ class AuthGate extends ConsumerStatefulWidget {
 }
 
 class _AuthGateState extends ConsumerState<AuthGate> {
-  late final bool _onboardingComplete;
+  bool _onboardingComplete = false;
   bool _appOpenLogged = false;
 
   static const _kLastOpenKey = 'last_app_open';
@@ -95,6 +95,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   }
 
   bool _isAutoSigningIn = false;
+  bool _autoSignInFailed = false;
 
   void _onOnboardingComplete() {
     setState(() => _onboardingComplete = true);
@@ -110,6 +111,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       debugPrint('[APP] auto anonymous sign-in complete');
     } catch (e) {
       debugPrint('[APP] auto anonymous sign-in failed: $e');
+      if (mounted) setState(() => _autoSignInFailed = true);
     } finally {
       _isAutoSigningIn = false;
     }
@@ -157,6 +159,30 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         );
   }
 
+  Widget _buildSignInErrorScreen(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off, size: 48, color: colorScheme.error),
+            const SizedBox(height: 16),
+            Text(context.l10n.commonError),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () {
+                setState(() => _autoSignInFailed = false);
+                _autoSignInAnonymously();
+              },
+              child: Text(context.l10n.commonRetry),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Show onboarding if not completed
@@ -174,6 +200,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         if (user == null) {
           // 无用户 — 自动匿名登录（访客模式）
           prefs.remove(_kCachedUidKey);
+          if (_autoSignInFailed) {
+            return _buildSignInErrorScreen(context);
+          }
           _autoSignInAnonymously();
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -205,6 +234,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       },
       error: (e, _) {
         debugPrint('[APP] authState: error=$e');
+        if (_autoSignInFailed) {
+          return _buildSignInErrorScreen(context);
+        }
         // 网络错误时也尝试匿名登录
         _autoSignInAnonymously();
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
