@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 /// 显示名称编辑对话框（MD3 AlertDialog）。
@@ -57,12 +58,22 @@ Future<void> _saveName(
   HapticFeedback.mediumImpact();
 
   try {
-    await Future.wait([
-      ref.read(authServiceProvider).updateDisplayName(newName),
-      ref
+    // Firebase Auth displayName（Auth SSOT）
+    await ref.read(authServiceProvider).updateDisplayName(newName);
+
+    // 本地 materialized_state（本地 SSOT）
+    final ledger = ref.read(ledgerServiceProvider);
+    await ledger.setMaterialized(uid, 'display_name', newName);
+    ledger.notifyChange(const LedgerChange(type: 'profile_update'));
+
+    // Firestore best-effort 同步
+    try {
+      await ref
           .read(firestoreServiceProvider)
-          .updateUserProfile(uid: uid, displayName: newName),
-    ]);
+          .updateUserProfile(uid: uid, displayName: newName);
+    } catch (_) {
+      // Firestore 写入失败不阻塞 UI
+    }
 
     if (ctx.mounted) {
       Navigator.of(ctx).pop();

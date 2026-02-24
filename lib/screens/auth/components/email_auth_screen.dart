@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {
@@ -46,6 +47,15 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     super.dispose();
   }
 
+  /// 初始化本地 materialized_state（注册时调用）。
+  Future<void> _initLocalState(String uid) async {
+    final ledger = ref.read(ledgerServiceProvider);
+    await ledger.setMaterialized(uid, 'coins', '0');
+    await ledger.setMaterialized(uid, 'last_check_in_date', '');
+    await ledger.setMaterialized(uid, 'inventory', '[]');
+    ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -66,6 +76,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         await ref
             .read(firestoreServiceProvider)
             .createUserProfile(uid: uid, email: _emailController.text.trim());
+        await _initLocalState(uid);
       } else if (_isLogin) {
         await authService.signIn(
           email: _emailController.text.trim(),
@@ -82,6 +93,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         await ref
             .read(firestoreServiceProvider)
             .createUserProfile(uid: uid, email: _emailController.text.trim());
+        await _initLocalState(uid);
       }
       // AuthGate will automatically navigate to HomeScreen.
       // Pop this screen so we don't leave it on the stack.

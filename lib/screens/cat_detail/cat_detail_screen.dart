@@ -12,6 +12,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -584,9 +585,13 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               final uid = ref.read(currentUidProvider);
               if (uid == null) return;
               HapticFeedback.mediumImpact();
+              final renamedCat = cat.copyWith(name: newName);
               await ref
-                  .read(catFirestoreServiceProvider)
-                  .renameCat(uid: uid, catId: cat.id, newName: newName);
+                  .read(localCatRepositoryProvider)
+                  .update(uid, renamedCat);
+              ref
+                  .read(ledgerServiceProvider)
+                  .notifyChange(const LedgerChange(type: 'cat_update'));
               if (ctx.mounted) {
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(ctx).showSnackBar(

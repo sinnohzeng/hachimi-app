@@ -68,13 +68,15 @@ class SyncEngine {
         );
       }
 
-      // 拉取用户文档：coins / lastCheckInDate / inventory
+      // 拉取用户文档：coins / lastCheckInDate / inventory / avatarId / displayName
       final userDoc = await userRef.get();
       if (userDoc.exists) {
         final data = userDoc.data()!;
         final coins = data['coins'] as int? ?? 0;
         final lastCheckIn = data['lastCheckInDate'] as String?;
         final inventory = data['inventory'] as List<dynamic>?;
+        final avatarId = data['avatarId'] as String?;
+        final displayName = data['displayName'] as String?;
 
         await _ledger.setMaterialized(uid, 'coins', coins.toString());
         if (lastCheckIn != null) {
@@ -86,6 +88,12 @@ class SyncEngine {
             'inventory',
             jsonEncode(inventory.cast<String>()),
           );
+        }
+        if (avatarId != null) {
+          await _ledger.setMaterialized(uid, 'avatar_id', avatarId);
+        }
+        if (displayName != null) {
+          await _ledger.setMaterialized(uid, 'display_name', displayName);
         }
       }
 

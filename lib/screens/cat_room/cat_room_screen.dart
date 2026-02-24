@@ -10,6 +10,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
@@ -193,6 +194,9 @@ class CatRoomScreen extends ConsumerWidget {
               await ref
                   .read(localCatRepositoryProvider)
                   .update(uid, renamedCat);
+              ref
+                  .read(ledgerServiceProvider)
+                  .notifyChange(const LedgerChange(type: 'cat_update'));
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
             child: Text(context.l10n.catRoomRename),

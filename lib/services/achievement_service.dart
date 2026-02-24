@@ -5,6 +5,11 @@ import 'package:hachimi_app/models/achievement.dart';
 
 /// AchievementService — 成就评估引擎 + Firestore CRUD。
 /// 评估成就条件，解锁成就并发放奖励。
+///
+/// @deprecated evaluate / watchUnlocked / getUnlockedIds / updateCurrentTitle
+/// 已被本地 AchievementEvaluator + LedgerService 驱动的等价物替代。
+/// 保留仅供 SyncEngine 同步使用，将在后续版本中移除。
+@Deprecated('Firestore-based achievement methods replaced by local equivalents')
 class AchievementService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 

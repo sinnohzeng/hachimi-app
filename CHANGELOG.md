@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.2] - 2026-02-24
+
+### Fixed
+- **Cat rename**: CatDetailScreen and CatRoomScreen now write to local SQLite instead of Firestore, with `cat_update` ledger notification for instant UI refresh
+- **Account deletion order**: Firestore cleanup now executes before Auth deletion, preventing `permission-denied` errors on orphaned data cleanup
+- **Account deletion data summary**: `getUserDataSummary` reads from local SQLite first, with Firestore fallback
+- **Avatar picker**: Writes to local `materialized_state` (SSOT) with best-effort Firestore sync
+- **Nickname edit**: Writes to local `materialized_state` alongside Firebase Auth, Firestore becomes best-effort
+- **Registration init**: New accounts initialize local `materialized_state` (coins, inventory, check-in date) immediately after profile creation
+- **Avatar hydration**: `SyncEngine.hydrateFromFirestore` now pulls `avatarId` and `displayName` into local state
+- **Avatar provider**: `avatarIdProvider` reads from local SQLite instead of Firestore Stream
+
+### Changed
+- `AchievementService` and `triggerAchievementEvaluation` marked `@Deprecated` — replaced by ledger-driven `AchievementEvaluator`
+
 ## [2.19.1] - 2026-02-24
 
 ### Fixed

@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 
 import 'components/email_auth_screen.dart';
 
@@ -39,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 email: result.user!.email ?? '',
                 displayName: result.user!.displayName,
               );
+          await _initLocalState(uid, result.user!.displayName);
           await analyticsService.logSignUp(method: 'google_link');
           if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
         }
@@ -54,6 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 email: result.user!.email ?? '',
                 displayName: result.user!.displayName,
               );
+          await _initLocalState(uid, result.user!.displayName);
         }
       }
       // AuthGate will automatically navigate to HomeScreen
@@ -66,6 +69,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isGoogleLoading = false);
     }
+  }
+
+  /// 初始化本地 materialized_state（注册时调用）。
+  Future<void> _initLocalState(String uid, String? displayName) async {
+    final ledger = ref.read(ledgerServiceProvider);
+    await ledger.setMaterialized(uid, 'coins', '0');
+    await ledger.setMaterialized(uid, 'last_check_in_date', '');
+    await ledger.setMaterialized(uid, 'inventory', '[]');
+    if (displayName != null) {
+      await ledger.setMaterialized(uid, 'display_name', displayName);
+    }
+    ledger.notifyChange(const LedgerChange(type: 'hydrate'));
   }
 
   void _navigateToEmailAuth() {

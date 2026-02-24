@@ -9,6 +9,10 @@ import 'package:hachimi_app/providers/inventory_provider.dart';
 
 /// 成就触发辅助 — 从 Provider 快照构建 AchievementEvalContext 并触发评估。
 /// 各 Screen 在关键操作后调用此方法。
+///
+/// @deprecated 已被 AchievementEvaluator（ledger 驱动）完全替代，无调用方。
+/// 保留仅供参考，将在后续版本中移除。
+@Deprecated('Use AchievementEvaluator (ledger-driven) instead')
 Future<void> triggerAchievementEvaluation(
   WidgetRef ref,
   AchievementTrigger trigger, {

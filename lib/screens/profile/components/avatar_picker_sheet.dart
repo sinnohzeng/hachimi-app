@@ -6,6 +6,7 @@ import 'package:hachimi_app/core/constants/avatar_constants.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 
@@ -85,9 +86,19 @@ class _AvatarPickerContent extends StatelessWidget {
     if (uid == null) return;
 
     try {
-      await parentRef
-          .read(firestoreServiceProvider)
-          .updateUserProfile(uid: uid, avatarId: avatarId);
+      // SSOT: 写入本地 materialized_state
+      final ledger = parentRef.read(ledgerServiceProvider);
+      await ledger.setMaterialized(uid, 'avatar_id', avatarId);
+      ledger.notifyChange(const LedgerChange(type: 'profile_update'));
+
+      // Best-effort: 同步到 Firestore
+      try {
+        await parentRef
+            .read(firestoreServiceProvider)
+            .updateUserProfile(uid: uid, avatarId: avatarId);
+      } catch (_) {
+        // Firestore 写入失败不阻塞 UI
+      }
 
       if (context.mounted) Navigator.of(context).pop();
     } catch (_) {

@@ -45,7 +45,11 @@ class DeleteAccountFlow {
     final l10n = context.l10n;
 
     // 获取数据摘要
-    final summary = await _deletionService.getUserDataSummary(uid);
+    final ledger = ref.read(ledgerServiceProvider);
+    final summary = await _deletionService.getUserDataSummary(
+      uid,
+      ledger: ledger,
+    );
     if (!context.mounted) return false;
 
     return showDialog<bool>(

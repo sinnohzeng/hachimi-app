@@ -3,10 +3,24 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 
 /// 监听当前用户的 avatarId。
 ///
-/// SSOT 分离：displayName 由 [authStateProvider]（Firebase Auth）提供，
-/// avatarId 由 Firestore `users/{uid}.avatarId` 提供。
-final avatarIdProvider = StreamProvider<String?>((ref) {
+/// SSOT: 本地 materialized_state（SQLite）。
+/// 监听 LedgerService 的 'profile_update' 变更事件自动刷新。
+final avatarIdProvider = StreamProvider<String?>((ref) async* {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value(null);
-  return ref.watch(firestoreServiceProvider).watchAvatarId(uid);
+  if (uid == null) {
+    yield null;
+    return;
+  }
+
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  // 初始读取
+  yield await ledger.getMaterialized(uid, 'avatar_id');
+
+  // 监听变更
+  await for (final change in ledger.changes) {
+    if (change.type == 'profile_update' || change.type == 'hydrate') {
+      yield await ledger.getMaterialized(uid, 'avatar_id');
+    }
+  }
 });

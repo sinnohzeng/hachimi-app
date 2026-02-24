@@ -24,6 +24,7 @@ final catsProvider = StreamProvider<List<Cat>>((ref) async* {
 
   await for (final change in ledger.changes) {
     if (change.type.startsWith('habit_') ||
+        change.type == 'cat_update' ||
         change.type == 'focus_complete' ||
         change.type == 'equip' ||
         change.type == 'unequip') {
@@ -47,6 +48,7 @@ final allCatsProvider = StreamProvider<List<Cat>>((ref) async* {
 
   await for (final change in ledger.changes) {
     if (change.type.startsWith('habit_') ||
+        change.type == 'cat_update' ||
         change.type == 'focus_complete' ||
         change.type == 'equip' ||
         change.type == 'unequip') {
