@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.10] - 2026-02-25
+
+### Fixed
+- **Google sign-in admin-restricted-operation**: Removed `_ensureCurrentUser()` which called `signInAnonymously()` as fallback — fails when anonymous auth is disabled in Firebase Console. Link methods now gracefully degrade: if an anonymous user exists, link credentials; otherwise, sign in directly.
+- **Achievement celebration transparent background**: Background gradient Container had no explicit sizing in Stack, causing unreliable rendering. Replaced with `Positioned.fill` + `DecoratedBox` for guaranteed full-screen coverage. Added proper alpha values (0.92/0.96) for near-opaque overlay.
+- **Achievement celebration text invisible in light theme**: Text used `onSurface` colors (dark in light theme) against dark gradient background. Changed to white color scale (`Colors.white`, `Colors.white70`, `Colors.white54`) for reliable contrast.
+- **Achievement icon invisible**: Glow icon used `colorScheme.primary` which blended into the gradient center. Changed to `Colors.white`.
+
 ## [2.19.9] - 2026-02-25
 
 ### Fixed

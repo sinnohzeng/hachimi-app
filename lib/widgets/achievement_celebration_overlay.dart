@@ -214,20 +214,23 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
       type: MaterialType.transparency,
       child: Stack(
         children: [
-          // 全屏渐变背景
-          FadeTransition(
-            opacity: _bgFade,
-            child: GestureDetector(
-              onTap: widget.onDismiss,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(0, -0.4),
-                    radius: 1.2,
-                    colors: [
-                      colorScheme.primary.withValues(alpha: 0.3),
-                      colorScheme.scrim.withValues(alpha: 0.85),
-                    ],
+          // 全屏渐变背景（Positioned.fill 保证撑满 Stack）
+          Positioned.fill(
+            child: FadeTransition(
+              opacity: _bgFade,
+              child: GestureDetector(
+                onTap: widget.onDismiss,
+                behavior: HitTestBehavior.opaque,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.4),
+                      radius: 1.2,
+                      colors: [
+                        colorScheme.primary.withValues(alpha: 0.92),
+                        colorScheme.scrim.withValues(alpha: 0.96),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -291,7 +294,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
         // 成就图标（带光环）
         _GlowingIcon(
           icon: def.icon,
-          color: colorScheme.primary,
+          color: Colors.white,
           animation: _particleController,
           size: 96,
         ),
@@ -304,7 +307,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
             name,
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
@@ -315,9 +318,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               desc,
-              style: textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: textTheme.bodyLarge?.copyWith(color: Colors.white70),
               textAlign: TextAlign.center,
             ),
           ),
@@ -368,7 +369,7 @@ class _CelebrationOverlayState extends State<_CelebrationOverlay>
             ),
             style: TextTheme.of(
               context,
-            ).labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+            ).labelSmall?.copyWith(color: Colors.white54),
           ),
         ],
         const SizedBox(height: 32),
