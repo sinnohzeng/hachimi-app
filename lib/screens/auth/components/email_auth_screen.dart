@@ -67,12 +67,12 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
       if (widget.linkMode) {
         // 匿名用户关联 Email 账号
-        await authService.linkWithEmail(
+        final result = await authService.linkWithEmail(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
         await analyticsService.logSignUp(method: 'email_link');
-        final uid = authService.currentUser!.uid;
+        final uid = result.user!.uid;
         await ref
             .read(firestoreServiceProvider)
             .createUserProfile(uid: uid, email: _emailController.text.trim());

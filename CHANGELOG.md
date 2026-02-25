@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.9] - 2026-02-25
+
+### Fixed
+- **Guest Google sign-in stuck**: Guest users completing Google OAuth would see no response — the app silently failed because `_auth.currentUser` was null when anonymous sign-in hadn't finished yet. Added `_ensureCurrentUser()` guard that falls back to anonymous sign-in before credential linking.
+- **Email link assertion crash**: `email_auth_screen.dart` linkMode branch used `authService.currentUser!.uid` which could crash; now captures the `linkWithEmail()` return value directly.
+- **TOCTOU race in credential linking**: Both `linkWithGoogle()` and `linkWithEmail()` now capture a local `User` reference before the async credential operation, eliminating the check-then-use race condition.
+
 ## [2.19.8] - 2026-02-25
 
 ### Fixed

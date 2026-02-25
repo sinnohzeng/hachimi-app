@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 /// AuthService — wraps Firebase Auth operations.
@@ -76,15 +77,29 @@ class AuthService {
     return await _auth.signInAnonymously();
   }
 
+  /// 确保存在 Firebase 匿名用户。
+  /// 乐观认证下 _autoSignInAnonymously 可能尚未完成，此方法作为保底。
+  Future<User> _ensureCurrentUser() async {
+    final existing = _auth.currentUser;
+    if (existing != null) return existing;
+    debugPrint(
+      '[AUTH] currentUser is null, signing in anonymously before link',
+    );
+    final cred = await _auth.signInAnonymously();
+    return cred.user!;
+  }
+
   /// 将匿名账号关联 Google 凭证，升级为正式用户。
   /// 关联成功后 isAnonymous 变为 false。
+  /// 返回 null 仅当用户取消 Google 登录。
   Future<UserCredential?> linkWithGoogle() async {
+    final user = await _ensureCurrentUser();
     try {
       await _googleSignIn.initialize();
       final googleUser = await _googleSignIn.authenticate();
       final idToken = googleUser.authentication.idToken;
       final credential = GoogleAuthProvider.credential(idToken: idToken);
-      return await _auth.currentUser?.linkWithCredential(credential);
+      return await user.linkWithCredential(credential);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) return null;
       rethrow;
@@ -92,15 +107,16 @@ class AuthService {
   }
 
   /// 将匿名账号关联 Email/Password 凭证，升级为正式用户。
-  Future<UserCredential?> linkWithEmail({
+  Future<UserCredential> linkWithEmail({
     required String email,
     required String password,
   }) async {
+    final user = await _ensureCurrentUser();
     final credential = EmailAuthProvider.credential(
       email: email,
       password: password,
     );
-    return await _auth.currentUser?.linkWithCredential(credential);
+    return await user.linkWithCredential(credential);
   }
 
   /// Delete the current user's account.
