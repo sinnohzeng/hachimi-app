@@ -6,7 +6,6 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
-import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
@@ -78,7 +77,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
     final personality = personalityMap[cat.personality];
     final moodData = moodById(cat.computedMood);
-    final stageClr = stageColor(cat.displayStage);
     final colorScheme = Theme.of(context).colorScheme;
     final meshColors = catMeshColors(
       cat.displayStage,
@@ -97,7 +95,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
               habit: habit,
               personality: personality,
               moodData: moodData,
-              stageClr: stageClr,
               meshColors: meshColors,
             );
           }
@@ -107,7 +104,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             habit: habit,
             personality: personality,
             moodData: moodData,
-            stageClr: stageClr,
             meshColors: meshColors,
           );
         },
@@ -123,7 +119,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     required Habit? habit,
     required CatPersonality? personality,
     required CatMood moodData,
-    required Color stageClr,
     required List<Color> meshColors,
   }) {
     return ContentWidthConstraint(
@@ -135,7 +130,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             padding: AppSpacing.paddingBase,
             sliver: SliverList(
               delegate: SliverChildListDelegate(
-                _buildAllCards(context, cat, habit, moodData, stageClr),
+                _buildAllCards(context, cat, habit, moodData),
               ),
             ),
           ),
@@ -152,7 +147,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     required Habit? habit,
     required CatPersonality? personality,
     required CatMood moodData,
-    required Color stageClr,
     required List<Color> meshColors,
   }) {
     return CustomScrollView(
@@ -168,7 +162,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
                 // 左栏：心情 + 成长卡
                 Expanded(
                   flex: 2,
-                  child: _buildLeftColumn(context, cat, moodData, stageClr),
+                  child: _buildLeftColumn(context, cat, moodData),
                 ),
                 const SizedBox(width: AppSpacing.base),
                 // 右栏：功能卡片
@@ -184,13 +178,8 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     );
   }
 
-  /// 左栏 — 心情徽章 + 成长进度卡
-  Widget _buildLeftColumn(
-    BuildContext context,
-    Cat cat,
-    CatMood moodData,
-    Color stageClr,
-  ) {
+  /// 左栏 — 心情徽章
+  Widget _buildLeftColumn(BuildContext context, Cat cat, CatMood moodData) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -201,12 +190,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           index: 0,
           child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 1,
-          child: _buildGrowthCard(context, cat, stageClr),
-        ),
       ],
     );
   }
@@ -215,7 +198,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
     final isGuest = ref.watch(isGuestProvider);
-    var idx = 2; // 左栏占 0、1
+    var idx = 1; // 左栏占 0
 
     return Column(
       children: [
@@ -425,7 +408,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     Cat cat,
     Habit? habit,
     CatMood moodData,
-    Color stageClr,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -439,16 +421,10 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
       ),
       const SizedBox(height: AppSpacing.lg),
-      StaggeredListItem(
-        waitForRoute: true,
-        index: 1,
-        child: _buildGrowthCard(context, cat, stageClr),
-      ),
-      const SizedBox(height: AppSpacing.base),
       if (habit != null) ...[
         StaggeredListItem(
           waitForRoute: true,
-          index: 2,
+          index: 1,
           child: FocusStatsCard(habit: habit, cat: cat),
         ),
         const SizedBox(height: AppSpacing.base),
@@ -456,20 +432,20 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       if (aiReady) ...[
         StaggeredListItem(
           waitForRoute: true,
-          index: 3,
+          index: 2,
           child: DiaryPreviewCard(catId: cat.id),
         ),
         const SizedBox(height: AppSpacing.base),
         StaggeredListItem(
           waitForRoute: true,
-          index: 4,
+          index: 3,
           child: ChatEntryCard(catId: cat.id, catName: cat.name),
         ),
         const SizedBox(height: AppSpacing.base),
       ] else if (isGuest) ...[
         StaggeredListItem(
           waitForRoute: true,
-          index: 3,
+          index: 2,
           child: _AiTeaserCard(catName: cat.name, context: context),
         ),
         const SizedBox(height: AppSpacing.base),
@@ -477,7 +453,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       if (habit != null) ...[
         StaggeredListItem(
           waitForRoute: true,
-          index: 5,
+          index: 4,
           child: ReminderCard(habit: habit, cat: cat),
         ),
         const SizedBox(height: AppSpacing.base),
@@ -485,19 +461,19 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       if (habit != null)
         StaggeredListItem(
           waitForRoute: true,
-          index: 6,
+          index: 5,
           child: HabitHeatmapCard(habitId: habit.id),
         ),
       const SizedBox(height: AppSpacing.base),
       StaggeredListItem(
         waitForRoute: true,
-        index: 7,
+        index: 6,
         child: AccessoriesCard(cat: cat),
       ),
       const SizedBox(height: AppSpacing.base),
       StaggeredListItem(
         waitForRoute: true,
-        index: 8,
+        index: 7,
         child: EnhancedCatInfoCard(cat: cat),
       ),
       const SizedBox(height: AppSpacing.xl),
@@ -524,99 +500,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           style: textTheme.labelLarge?.copyWith(
             color: colorScheme.onTertiaryContainer,
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGrowthCard(BuildContext context, Cat cat, Color stageClr) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  context.l10n.catDetailGrowthTitle,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  context.l10n.stageName(cat.displayStage),
-                  style: textTheme.labelLarge?.copyWith(
-                    color: stageClr,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            ClipRRect(
-              borderRadius: AppShape.borderSmall,
-              child: LinearProgressIndicator(
-                value: cat.growthProgress,
-                minHeight: 12,
-                backgroundColor: colorScheme.outlineVariant.withValues(
-                  alpha: Theme.of(context).brightness == Brightness.dark
-                      ? 0.8
-                      : 0.5,
-                ),
-                valueColor: AlwaysStoppedAnimation(stageClr),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  '200h',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            // Stage milestones
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                StageMilestone(
-                  name: context.l10n.stageKitten,
-                  isReached: true,
-                  color: stageColor('kitten'),
-                ),
-                StageMilestone(
-                  name: context.l10n.stageAdolescent,
-                  isReached: stageOrder(cat.displayStage) >= 1,
-                  color: stageColor('adolescent'),
-                ),
-                StageMilestone(
-                  name: context.l10n.stageAdult,
-                  isReached: stageOrder(cat.displayStage) >= 2,
-                  color: stageColor('adult'),
-                ),
-                StageMilestone(
-                  name: context.l10n.stageSenior,
-                  isReached: stageOrder(cat.displayStage) >= 3,
-                  color: stageColor('senior'),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );

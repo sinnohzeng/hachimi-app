@@ -1002,6 +1002,15 @@
       "total": { "type": "int" }
     }
   },
+  "achievementUnlockedAt": "Unlocked on {date}",
+  "@achievementUnlockedAt": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "achievementLocked": "Not yet unlocked",
+  "achievementRewardCoins": "+{count} coins",
+  "@achievementRewardCoins": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "reminderModeDaily": "Every day",
   "reminderModeWeekdays": "Weekdays",

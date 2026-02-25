@@ -3978,6 +3978,24 @@ abstract class S {
   /// **'{current} / {total}'**
   String achievementCelebrationCounter(int current, int total);
 
+  /// No description provided for @achievementUnlockedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked on {date}'**
+  String achievementUnlockedAt(String date);
+
+  /// No description provided for @achievementLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet unlocked'**
+  String get achievementLocked;
+
+  /// No description provided for @achievementRewardCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} coins'**
+  String achievementRewardCoins(int count);
+
   /// No description provided for @reminderModeDaily.
   ///
   /// In en, this message translates to:

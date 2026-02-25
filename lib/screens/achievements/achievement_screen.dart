@@ -8,6 +8,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_card.dart';
+import 'package:hachimi_app/screens/achievements/components/achievement_detail_sheet.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_summary.dart';
 import 'package:hachimi_app/screens/achievements/components/overview_tab.dart';
@@ -105,6 +106,7 @@ class _AchievementListTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unlockedIds = ref.watch(unlockedIdsProvider);
     final progressMap = ref.watch(achievementProgressProvider);
+    final unlockedMap = ref.watch(unlockedAchievementMapProvider);
     final sorted = _sortedDefs(category, unlockedIds);
 
     return LayoutBuilder(
@@ -128,17 +130,25 @@ class _AchievementListTab extends ConsumerWidget {
                   crossAxisSpacing: isExpanded ? 16 : 0,
                   mainAxisSpacing: 0,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => StaggeredListItem(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final def = sorted[index];
+                  final unlocked = unlockedIds.contains(def.id);
+                  return StaggeredListItem(
                     index: index,
                     child: AchievementCard(
-                      def: sorted[index],
-                      isUnlocked: unlockedIds.contains(sorted[index].id),
-                      progress: progressMap[sorted[index].id],
+                      def: def,
+                      isUnlocked: unlocked,
+                      progress: progressMap[def.id],
+                      onTap: () => showAchievementDetailSheet(
+                        context,
+                        def: def,
+                        isUnlocked: unlocked,
+                        progress: progressMap[def.id],
+                        localAchievement: unlockedMap[def.id],
+                      ),
                     ),
-                  ),
-                  childCount: sorted.length,
-                ),
+                  );
+                }, childCount: sorted.length),
               ),
             ),
           ],

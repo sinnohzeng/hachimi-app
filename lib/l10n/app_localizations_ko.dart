@@ -2112,6 +2112,19 @@ class SKo extends S {
   }
 
   @override
+  String achievementUnlockedAt(String date) {
+    return '$date에 달성';
+  }
+
+  @override
+  String get achievementLocked => '아직 달성하지 못했습니다';
+
+  @override
+  String achievementRewardCoins(int count) {
+    return '+$count 코인';
+  }
+
+  @override
   String get reminderModeDaily => '매일';
 
   @override

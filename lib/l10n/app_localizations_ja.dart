@@ -2111,6 +2111,19 @@ class SJa extends S {
   }
 
   @override
+  String achievementUnlockedAt(String date) {
+    return '$date に解除';
+  }
+
+  @override
+  String get achievementLocked => 'まだ解除されていません';
+
+  @override
+  String achievementRewardCoins(int count) {
+    return '+$count コイン';
+  }
+
+  @override
   String get reminderModeDaily => '毎日';
 
   @override

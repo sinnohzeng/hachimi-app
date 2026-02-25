@@ -2106,6 +2106,19 @@ class SZh extends S {
   }
 
   @override
+  String achievementUnlockedAt(String date) {
+    return '解锁于 $date';
+  }
+
+  @override
+  String get achievementLocked => '尚未解锁';
+
+  @override
+  String achievementRewardCoins(int count) {
+    return '+$count 金币';
+  }
+
+  @override
   String get reminderModeDaily => '每天';
 
   @override
@@ -4371,6 +4384,19 @@ class SZhHant extends SZh {
   @override
   String achievementCelebrationCounter(int current, int total) {
     return '$current / $total';
+  }
+
+  @override
+  String achievementUnlockedAt(String date) {
+    return '解鎖於 $date';
+  }
+
+  @override
+  String get achievementLocked => '尚未解鎖';
+
+  @override
+  String achievementRewardCoins(int count) {
+    return '+$count 金幣';
   }
 
   @override

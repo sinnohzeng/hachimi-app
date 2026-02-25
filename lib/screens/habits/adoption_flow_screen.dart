@@ -41,7 +41,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
   late final TextEditingController _motivationController;
   int _goalMinutes = 25;
   int? _targetHours = 100; // null = 永续模式
-  bool _isUnlimitedMode = true; // 默认永续模式
+  bool _isUnlimitedMode = false; // 默认里程碑模式
   bool _isCustomGoal = false;
   bool _isCustomTarget = false;
   final List<ReminderConfig> _reminders = [];
@@ -341,18 +341,11 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             const SizedBox(height: AppSpacing.lg),
           ],
 
-          // ── 基础信息 ──
-          Text(
-            context.l10n.adoptionBasicInfo,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: AppSpacing.md),
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(
               labelText: context.l10n.adoptionQuestName,
               hintText: context.l10n.adoptionQuestHint,
-              prefixIcon: const Icon(Icons.edit_outlined),
             ),
             textInputAction: TextInputAction.done,
           ),
@@ -365,7 +358,6 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
             decoration: InputDecoration(
               labelText: context.l10n.adoptionMotivationLabel,
               hintText: context.l10n.adoptionMotivationHint,
-              prefixIcon: const Icon(Icons.format_quote),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.refresh),
                 tooltip: context.l10n.adoptionMotivationSwap,
@@ -571,14 +563,14 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
         SegmentedButton<bool>(
           segments: [
             ButtonSegment<bool>(
-              value: true,
-              label: Text(context.l10n.adoptionUnlimitedMode),
-              icon: const Icon(Icons.all_inclusive),
-            ),
-            ButtonSegment<bool>(
               value: false,
               label: Text(context.l10n.adoptionMilestoneMode),
               icon: const Icon(Icons.flag_outlined),
+            ),
+            ButtonSegment<bool>(
+              value: true,
+              label: Text(context.l10n.adoptionUnlimitedMode),
+              icon: const Icon(Icons.all_inclusive),
             ),
           ],
           selected: {_isUnlimitedMode},

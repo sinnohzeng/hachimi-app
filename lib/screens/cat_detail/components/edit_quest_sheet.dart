@@ -80,19 +80,10 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── 基础信息 ──
-                  Text(
-                    context.l10n.adoptionBasicInfo,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: context.l10n.adoptionQuestName,
-                      prefixIcon: const Icon(Icons.edit_outlined),
                     ),
                     textInputAction: TextInputAction.done,
                   ),
@@ -105,7 +96,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
                     decoration: InputDecoration(
                       labelText: context.l10n.adoptionMotivationLabel,
                       hintText: context.l10n.adoptionMotivationHint,
-                      prefixIcon: const Icon(Icons.format_quote),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.refresh),
                         tooltip: context.l10n.adoptionMotivationSwap,
@@ -290,14 +280,14 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
         SegmentedButton<bool>(
           segments: [
             ButtonSegment<bool>(
-              value: true,
-              label: Text(context.l10n.adoptionUnlimitedMode),
-              icon: const Icon(Icons.all_inclusive),
-            ),
-            ButtonSegment<bool>(
               value: false,
               label: Text(context.l10n.adoptionMilestoneMode),
               icon: const Icon(Icons.flag_outlined),
+            ),
+            ButtonSegment<bool>(
+              value: true,
+              label: Text(context.l10n.adoptionUnlimitedMode),
+              icon: const Icon(Icons.all_inclusive),
             ),
           ],
           selected: {_isUnlimitedMode},

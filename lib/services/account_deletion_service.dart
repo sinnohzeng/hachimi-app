@@ -96,9 +96,45 @@ class AccountDeletionService {
     void Function(double progress, String step)? onProgress,
   }) async {
     // 1: Firestore 全量清理（必须在认证态下执行，否则 permission-denied）
+    onProgress?.call(0.0, 'Deleting quests...');
+    await _deleteFirestoreData(uid, onProgress: onProgress);
+
+    // 2: 本地清理（SQLite + SharedPreferences + 通知 + 计时器）
+    onProgress?.call(0.7, 'Cleaning local data...');
+    await cleanLocalData();
+
+    // 3: 删除 Auth 账号（最后执行 — Firestore 已清理完毕）
+    onProgress?.call(0.9, 'Deleting account...');
+    await _auth.currentUser?.delete();
+
+    // 4: Google 登出
+    await _googleSignIn.signOut();
+
+    onProgress?.call(1.0, 'Done');
+  }
+
+  /// 清理访客数据：如为 Firebase 匿名用户，先清理 Firestore 数据并删除匿名账号；
+  /// 最后清理本地数据。
+  Future<void> deleteGuestData(String uid) async {
+    final user = _auth.currentUser;
+
+    // Firebase anonymous 用户：清理 Firestore + 删除 Auth 匿名账号
+    if (user != null && user.isAnonymous) {
+      await _deleteFirestoreData(uid);
+      await user.delete();
+    }
+
+    await cleanLocalData();
+  }
+
+  /// 清理 Firestore 用户数据：habits（含 sessions 子集合）、cats、achievements、
+  /// monthlyCheckIns、legacy checkIns，最后删除用户文档本身。
+  Future<void> _deleteFirestoreData(
+    String uid, {
+    void Function(double progress, String step)? onProgress,
+  }) async {
     final userRef = _db.collection('users').doc(uid);
 
-    onProgress?.call(0.0, 'Deleting quests...');
     final habitsSnap = await userRef.collection('habits').get();
     for (final habitDoc in habitsSnap.docs) {
       await _deleteSubcollection(habitDoc.reference.collection('sessions'));
@@ -121,23 +157,10 @@ class AccountDeletionService {
 
     onProgress?.call(0.6, 'Deleting user profile...');
     await userRef.delete();
-
-    // 2: 本地清理（SQLite + SharedPreferences + 通知 + 计时器）
-    onProgress?.call(0.7, 'Cleaning local data...');
-    await _cleanLocalData();
-
-    // 3: 删除 Auth 账号（最后执行 — Firestore 已清理完毕）
-    onProgress?.call(0.9, 'Deleting account...');
-    await _auth.currentUser?.delete();
-
-    // 4: Google 登出
-    await _googleSignIn.signOut();
-
-    onProgress?.call(1.0, 'Done');
   }
 
   /// 清理本地数据：SQLite、SharedPreferences、通知、计时器状态。
-  Future<void> _cleanLocalData() async {
+  Future<void> cleanLocalData() async {
     // SQLite
     try {
       final localDb = LocalDatabaseService();
@@ -191,7 +214,7 @@ class AccountDeletionService {
           e,
           stackTrace: stack,
           source: 'AccountDeletionService',
-          operation: '_deleteSubcollection',
+          operation: '_deleteSubcollection(${ref.path})',
         );
         rethrow;
       }

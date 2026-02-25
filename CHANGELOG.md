@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.11] - 2026-02-25
+
+### Fixed
+- **Account deletion permission-denied**: Authenticated users deleting their account would hit `permission-denied` on sessions and achievements subcollections. Split Firestore security rules to keep `update: if false` (immutability) while allowing `delete: if isOwner` for account cleanup.
+- **Guest "Reset data" incomplete**: Previously only called `signOut()`, leaving SQLite, SharedPreferences, notifications, and timer state as orphaned data. Now properly cleans all local data and (for Firebase anonymous guests) deletes Firestore data and Auth account.
+
+### Added
+- **Achievement detail sheet**: Tap any achievement card to view full details — unlock date, reward coins, and description in a bottom sheet.
+- **Cat info card**: Extracted cat information display into a reusable `CatInfoCard` component on the cat detail screen.
+- **Stage milestone widget**: Reusable `StageMilestone` widget for displaying growth stage progress.
+
+### Changed
+- **AccountDeletionService refactored**: Extracted shared Firestore cleanup into `_deleteFirestoreData()`, exposed `cleanLocalData()` as public, added `deleteGuestData()` for guest-specific flow.
+- **Achievement card**: Refactored to support tap-to-detail interaction.
+- **Cat detail screen**: Decomposed into smaller components (`CatInfoCard`), removed heatmap legend section.
+- **Adoption flow & quest edit**: Minor UI adjustments.
+
 ## [2.19.10] - 2026-02-25
 
 ### Fixed

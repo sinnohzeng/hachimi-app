@@ -489,6 +489,12 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
+              final uid = ref.read(currentUidProvider);
+              if (uid != null) {
+                await ref
+                    .read(accountDeletionServiceProvider)
+                    .deleteGuestData(uid);
+              }
               await ref.read(authServiceProvider).signOut();
             },
             child: Text(

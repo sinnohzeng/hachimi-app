@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/appearance_l10n.dart';
@@ -7,6 +8,7 @@ import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
+import 'package:hachimi_app/widgets/stage_milestone.dart';
 
 /// About card — personality, appearance summary, expandable details, status.
 class EnhancedCatInfoCard extends StatelessWidget {
@@ -37,6 +39,10 @@ class EnhancedCatInfoCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
+
+            // Growth progress
+            _GrowthSection(cat: cat),
+            const Divider(height: 24),
 
             // Personality
             if (personality != null) ...[
@@ -230,6 +236,122 @@ class InfoRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 成长进度区块 — 嵌入「关于猫猫」卡片中。
+class _GrowthSection extends StatelessWidget {
+  final Cat cat;
+
+  const _GrowthSection({required this.cat});
+
+  @override
+  Widget build(BuildContext context) {
+    final stageClr = stageColor(cat.displayStage);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildProgressHeader(context, stageClr),
+        const SizedBox(height: AppSpacing.sm),
+        _buildStatsRow(context),
+        const SizedBox(height: AppSpacing.md),
+        _buildMilestones(context),
+      ],
+    );
+  }
+
+  Widget _buildProgressHeader(BuildContext context, Color stageClr) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              context.l10n.catDetailGrowthTitle,
+              style: textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              context.l10n.stageName(cat.displayStage),
+              style: textTheme.labelLarge?.copyWith(
+                color: stageClr,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        ClipRRect(
+          borderRadius: AppShape.borderSmall,
+          child: LinearProgressIndicator(
+            value: cat.growthProgress,
+            minHeight: 10,
+            backgroundColor: colorScheme.outlineVariant.withValues(
+              alpha: Theme.of(context).brightness == Brightness.dark
+                  ? 0.8
+                  : 0.5,
+            ),
+            valueColor: AlwaysStoppedAnimation(stageClr),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsRow(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '${cat.totalMinutes ~/ 60}h ${cat.totalMinutes % 60}m',
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        Text(
+          '200h',
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMilestones(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        StageMilestone(
+          name: context.l10n.stageKitten,
+          isReached: true,
+          color: stageColor('kitten'),
+        ),
+        StageMilestone(
+          name: context.l10n.stageAdolescent,
+          isReached: stageOrder(cat.displayStage) >= 1,
+          color: stageColor('adolescent'),
+        ),
+        StageMilestone(
+          name: context.l10n.stageAdult,
+          isReached: stageOrder(cat.displayStage) >= 2,
+          color: stageColor('adult'),
+        ),
+        StageMilestone(
+          name: context.l10n.stageSenior,
+          isReached: stageOrder(cat.displayStage) >= 3,
+          color: stageColor('senior'),
+        ),
+      ],
     );
   }
 }

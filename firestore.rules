@@ -56,8 +56,9 @@ service cloud.firestore {
             && request.resource.data.coinsEarned <= request.resource.data.durationMinutes * 10
             && request.resource.data.mode in ['countdown', 'stopwatch']
             && request.resource.data.status in ['completed', 'abandoned', 'interrupted'];
-          // 会话记录不可修改/删除（审计日志）
-          allow update, delete: if false;
+          // 会话记录不可修改（审计日志）；所有者可删除（账号注销时清理数据）
+          allow update: if false;
+          allow delete: if isOwner(userId);
         }
       }
 
@@ -88,7 +89,9 @@ service cloud.firestore {
         allow create: if isOwner(userId)
           && request.resource.data.unlockedAt is timestamp
           && request.resource.data.rewardClaimed is bool;
-        allow update, delete: if false;
+        // 成就记录不可修改；所有者可删除（账号注销时清理数据）
+        allow update: if false;
+        allow delete: if isOwner(userId);
       }
     }
 

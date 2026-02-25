@@ -12,12 +12,14 @@ class AchievementCard extends StatelessWidget {
   final AchievementDef def;
   final bool isUnlocked;
   final AchievementProgress? progress;
+  final VoidCallback? onTap;
 
   const AchievementCard({
     super.key,
     required this.def,
     required this.isUnlocked,
     this.progress,
+    this.onTap,
   });
 
   @override
@@ -54,94 +56,101 @@ class AchievementCard extends StatelessWidget {
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
       color: colorScheme.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // 成就图标
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: AppShape.borderMedium,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppShape.borderMedium,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // 成就图标
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: AppShape.borderMedium,
+                ),
+                child: Icon(icon, color: iconColor, size: 24),
               ),
-              child: Icon(icon, color: iconColor, size: 24),
-            ),
-            const SizedBox(width: AppSpacing.md),
+              const SizedBox(width: AppSpacing.md),
 
-            // 名称 + 描述 + 进度条
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isUnlocked
-                          ? null
-                          : colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    desc,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // 进度条（有 targetValue 且未解锁时显示）
-                  if (!isUnlocked &&
-                      !isHiddenLocked &&
-                      progress != null &&
-                      def.targetValue != null &&
-                      def.targetValue! > 1) ...[
-                    const SizedBox(height: 4),
-                    LinearProgressIndicator(
-                      value: progress!.percent,
-                      minHeight: 4,
-                      borderRadius: BorderRadius.circular(2),
+              // 名称 + 描述 + 进度条
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isUnlocked
+                            ? null
+                            : colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${progress!.current}/${progress!.target}',
-                      style: textTheme.labelSmall?.copyWith(
+                      desc,
+                      style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    // 进度条（有 targetValue 且未解锁时显示）
+                    if (!isUnlocked &&
+                        !isHiddenLocked &&
+                        progress != null &&
+                        def.targetValue != null &&
+                        def.targetValue! > 1) ...[
+                      const SizedBox(height: 4),
+                      LinearProgressIndicator(
+                        value: progress!.percent,
+                        minHeight: 4,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${progress!.current}/${progress!.target}',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
-            ),
-
-            // 奖励/状态
-            const SizedBox(width: AppSpacing.sm),
-            if (isUnlocked)
-              Icon(
-                Icons.check_circle,
-                color: colorScheme.primary,
-                size: 24,
-                semanticLabel: 'Unlocked',
-              )
-            else
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: AppShape.borderMedium,
                 ),
-                child: Text(
-                  '+${def.coinReward}',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+              ),
+
+              // 奖励/状态
+              const SizedBox(width: AppSpacing.sm),
+              if (isUnlocked)
+                Icon(
+                  Icons.check_circle,
+                  color: colorScheme.primary,
+                  size: 24,
+                  semanticLabel: 'Unlocked',
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: AppShape.borderMedium,
+                  ),
+                  child: Text(
+                    '+${def.coinReward}',
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

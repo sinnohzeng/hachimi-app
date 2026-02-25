@@ -963,6 +963,9 @@
   "achievementCelebrationDismiss": "太棒了！",
   "achievementCelebrationSkipAll": "跳过全部",
   "achievementCelebrationCounter": "{current} / {total}",
+  "achievementUnlockedAt": "解锁于 {date}",
+  "achievementLocked": "尚未解锁",
+  "achievementRewardCoins": "+{count} 金币",
 
   "reminderModeDaily": "每天",
   "reminderModeWeekdays": "工作日",

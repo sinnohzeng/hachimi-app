@@ -720,6 +720,9 @@
   "achievementCelebrationDismiss": "대단해!",
   "achievementCelebrationSkipAll": "모두 건너뛰기",
   "achievementCelebrationCounter": "{current} / {total}",
+  "achievementUnlockedAt": "{date}에 달성",
+  "achievementLocked": "아직 달성하지 못했습니다",
+  "achievementRewardCoins": "+{count} 코인",
 
   "reminderModeDaily": "매일",
   "reminderModeWeekdays": "평일",

@@ -2135,6 +2135,19 @@ class SEn extends S {
   }
 
   @override
+  String achievementUnlockedAt(String date) {
+    return 'Unlocked on $date';
+  }
+
+  @override
+  String get achievementLocked => 'Not yet unlocked';
+
+  @override
+  String achievementRewardCoins(int count) {
+    return '+$count coins';
+  }
+
+  @override
   String get reminderModeDaily => 'Every day';
 
   @override

@@ -720,6 +720,9 @@
   "achievementCelebrationDismiss": "すごい！",
   "achievementCelebrationSkipAll": "すべてスキップ",
   "achievementCelebrationCounter": "{current} / {total}",
+  "achievementUnlockedAt": "{date} に解除",
+  "achievementLocked": "まだ解除されていません",
+  "achievementRewardCoins": "+{count} コイン",
 
   "reminderModeDaily": "毎日",
   "reminderModeWeekdays": "平日",

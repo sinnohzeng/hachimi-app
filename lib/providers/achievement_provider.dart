@@ -48,6 +48,14 @@ final unlockedIdsProvider = Provider<Set<String>>((ref) {
   return unlocked.map((a) => a.id).toSet();
 });
 
+/// ID → LocalAchievement 映射，用于 O(1) 查找 unlockedAt 等详情。
+final unlockedAchievementMapProvider = Provider<Map<String, LocalAchievement>>((
+  ref,
+) {
+  final unlocked = ref.watch(unlockedAchievementsProvider).value ?? [];
+  return {for (final a in unlocked) a.id: a};
+});
+
 /// 成就进度计算 — 每个成就的进度值
 final achievementProgressProvider = Provider<Map<String, AchievementProgress>>((
   ref,

@@ -270,7 +270,8 @@ All other queries use single-field default indexes.
 6. **`totalMinutes` is additive**: Always use `FieldValue.increment(delta)` — never overwrite with a calculated total (prevents race conditions).
 7. **Coins never go negative**: The `CoinService` must validate sufficient balance before deducting. The purchase batch write should fail gracefully if balance is insufficient.
 8. **Appearance is immutable**: The `appearance` map is set at cat creation and never modified afterward.
-9. **Sessions are immutable**: Once created, session documents cannot be updated or deleted. This ensures audit trail integrity.
+9. **Sessions are immutable during normal use**: Once created, session documents cannot be updated. Owners can delete their own sessions (for account deletion cleanup). This ensures audit trail integrity during normal operation.
+10. **Achievements are immutable during normal use**: Once created, achievement documents cannot be updated. Owners can delete their own achievements (for account deletion cleanup).
 
 ---
 
