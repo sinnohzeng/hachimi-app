@@ -1093,5 +1093,14 @@
   "aiTeaserCta": "Link an account to see what {catName} wants to say",
   "@aiTeaserCta": {
     "placeholders": { "catName": { "type": "String" } }
-  }
+  },
+
+  "authErrorEmailInUse": "This email is already registered",
+  "authErrorWrongPassword": "Incorrect email or password",
+  "authErrorUserNotFound": "No account found with this email",
+  "authErrorTooManyRequests": "Too many attempts. Try again later",
+  "authErrorNetwork": "Network error. Check your connection",
+  "authErrorAdminRestricted": "Sign-in is temporarily restricted",
+  "authErrorWeakPassword": "Password is too weak. Use at least 6 characters",
+  "authErrorGeneric": "Something went wrong. Try again"
 }

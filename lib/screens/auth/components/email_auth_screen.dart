@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {
   final bool startAsLogin;
@@ -47,15 +48,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     super.dispose();
   }
 
-  /// 初始化本地 materialized_state（注册时调用）。
-  Future<void> _initLocalState(String uid) async {
-    final ledger = ref.read(ledgerServiceProvider);
-    await ledger.setMaterialized(uid, 'coins', '0');
-    await ledger.setMaterialized(uid, 'last_check_in_date', '');
-    await ledger.setMaterialized(uid, 'inventory', '[]');
-    ledger.notifyChange(const LedgerChange(type: 'hydrate'));
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -64,6 +56,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
+      final notifier = ref.read(userProfileNotifierProvider.notifier);
 
       if (widget.linkMode) {
         // 匿名用户关联 Email 账号
@@ -72,11 +65,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
           password: _passwordController.text,
         );
         await analyticsService.logSignUp(method: 'email_link');
-        final uid = result.user!.uid;
-        await ref
-            .read(firestoreServiceProvider)
-            .createUserProfile(uid: uid, email: _emailController.text.trim());
-        await _initLocalState(uid);
+        await notifier.createProfile(
+          uid: result.user!.uid,
+          email: _emailController.text.trim(),
+        );
       } else if (_isLogin) {
         await authService.signIn(
           email: _emailController.text.trim(),
@@ -88,21 +80,20 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
           password: _passwordController.text,
         );
         await analyticsService.logSignUp();
-
-        final uid = authService.currentUser!.uid;
-        await ref
-            .read(firestoreServiceProvider)
-            .createUserProfile(uid: uid, email: _emailController.text.trim());
-        await _initLocalState(uid);
+        await notifier.createProfile(
+          uid: authService.currentUser!.uid,
+          email: _emailController.text.trim(),
+        );
       }
       // AuthGate will automatically navigate to HomeScreen.
       // Pop this screen so we don't leave it on the stack.
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
       if (mounted) {
+        final message = mapAuthError(e, context.l10n);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

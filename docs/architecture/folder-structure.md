@@ -51,8 +51,17 @@ hachimi-app/
 │   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
 │   │   │   ├── ai_constants.dart           # SSOT: AI config, prompts, inference params
 │   │   │   └── avatar_constants.dart      # SSOT: predefined avatar options (id, icon, color)
+│   │   ├── backend/                          # Multi-backend abstraction (Strategy Pattern)
+│   │   │   ├── auth_backend.dart             # AuthBackend — sign in/up/link/delete
+│   │   │   ├── sync_backend.dart             # SyncBackend — batch write/hydrate + SyncOperation
+│   │   │   ├── user_profile_backend.dart     # UserProfileBackend — create/sync profile
+│   │   │   ├── analytics_backend.dart        # AnalyticsBackend — log events/properties
+│   │   │   ├── crash_backend.dart            # CrashBackend — error recording/logging
+│   │   │   ├── remote_config_backend.dart    # RemoteConfigBackend — typed config getters
+│   │   │   └── backend_registry.dart         # BackendRegistry + BackendRegion enum
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
+│   │   │   ├── auth_error_mapper.dart       # Firebase Auth error code → L10N mapper
 │   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
 │   │   │   ├── streak_utils.dart           # StreakUtils — streak calculation logic
 │   │   │   ├── background_color_utils.dart # Mesh gradient color extraction from cat stage/pelt
@@ -81,12 +90,11 @@ hachimi-app/
 │   │   ├── ledger_action.dart             # LedgerAction + ActionType — action ledger event model
 │   │   └── unlocked_achievement.dart      # UnlockedAchievement — local achievement record
 │   │
-│   ├── services/                           # Firebase SDK isolation layer (no UI, no BuildContext)
-│   │   ├── analytics_service.dart          # Firebase Analytics wrapper — log events
-│   │   ├── auth_service.dart               # Firebase Auth wrapper — sign in/out/up
-│   │   ├── cat_firestore_service.dart      # Cat-specific Firestore CRUD (watchCats, watchAllCats)
+│   ├── services/                           # Data layer (no UI, no BuildContext)
+│   │   ├── analytics_service.dart          # Analytics facade — log events
+│   │   ├── auth_service.dart               # Auth facade — sign in/out/up
 │   │   ├── coin_service.dart               # Coin balance + accessory purchase operations
-│   │   ├── firestore_service.dart          # General Firestore CRUD + atomic batch operations
+│   │   ├── user_profile_service.dart       # User profile sync (delegates to UserProfileBackend)
 │   │   ├── atomic_island_service.dart      # vivo Atomic Island rich notification (MethodChannel)
 │   │   ├── focus_timer_service.dart        # Android foreground service wrapper
 │   │   ├── migration_service.dart          # Data migration for schema evolution (e.g. breed -> appearance)
@@ -100,6 +108,13 @@ hachimi-app/
 │   │   │   ├── minimax_provider.dart       # MiniMax M2.5 cloud AI provider
 │   │   │   ├── gemini_provider.dart        # Gemini 3 Flash cloud AI provider
 │   │   │   └── sse_parser.dart             # SSE stream parser with pluggable token extractors
+│   │   ├── firebase/                       # Firebase backend implementations
+│   │   │   ├── firebase_auth_backend.dart           # FirebaseAuthBackend — Firebase Auth + Google Sign-In
+│   │   │   ├── firebase_sync_backend.dart           # FirebaseSyncBackend — SyncOperation → WriteBatch
+│   │   │   ├── firebase_user_profile_backend.dart   # FirebaseUserProfileBackend — Firestore profile docs
+│   │   │   ├── firebase_analytics_backend.dart      # FirebaseAnalyticsBackend — Firebase Analytics
+│   │   │   ├── firebase_crash_backend.dart          # FirebaseCrashBackend — Firebase Crashlytics
+│   │   │   └── firebase_remote_config_backend.dart  # FirebaseRemoteConfigBackend — Firebase Remote Config
 │   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
 │   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
 │   │   ├── local_database_service.dart    # SQLite initialization (diary + chat tables)
@@ -124,7 +139,8 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider (app language override)
 │   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
 │   │   ├── theme_provider.dart             # themeProvider (theme mode + seed color)
-│   │   ├── user_profile_provider.dart      # avatarIdProvider (Firestore user avatar)
+│   │   ├── user_profile_provider.dart      # avatarIdProvider (local materialized_state avatar)
+│   │   ├── user_profile_notifier.dart     # UserProfileNotifier — unified profile operations
 │   │   ├── ai_provider.dart               # AI provider selection, feature toggle, availability, service wiring
 │   │   ├── diary_provider.dart            # diaryEntriesProvider, todayDiaryProvider (family)
 │   │   └── chat_provider.dart             # chatNotifierProvider (StateNotifier family)
@@ -282,7 +298,7 @@ hachimi-app/
 | Providers | `camelCase` + `Provider` suffix | `catsProvider`, `coinBalanceProvider` |
 | Screens | `PascalCase` + `Screen` suffix | `CatRoomScreen` |
 | Widgets | `PascalCase` descriptive noun | `PixelCatSprite`, `CatHouseCard` |
-| Services | `PascalCase` + `Service` suffix | `CatFirestoreService`, `CoinService` |
+| Services | `PascalCase` + `Service` suffix | `AuthService`, `CoinService` |
 | Models | `PascalCase` noun | `Cat`, `CatAppearance`, `Habit` |
 | Assets | `snake_case` | `body_tabby_0.png`, `room_day.png` |
 | Doc files | `kebab-case.md` | `data-model.md`, `cat-system.md` |

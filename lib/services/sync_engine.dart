@@ -95,6 +95,20 @@ class SyncEngine {
         if (displayName != null) {
           await _ledger.setMaterialized(uid, 'display_name', displayName);
         }
+
+        // 称号数据
+        final currentTitle = data['currentTitle'] as String?;
+        if (currentTitle != null) {
+          await _ledger.setMaterialized(uid, 'current_title', currentTitle);
+        }
+        final unlockedTitles = data['unlockedTitles'] as List<dynamic>?;
+        if (unlockedTitles != null) {
+          await _ledger.setMaterialized(
+            uid,
+            'unlocked_titles',
+            jsonEncode(unlockedTitles.cast<String>()),
+          );
+        }
       }
 
       await prefs.setBool(_hydratedKey, true);

@@ -805,5 +805,14 @@
   "aiTeaserCta": "アカウントを連携して、{catName}が何を言いたいか見てみよう",
   "@aiTeaserCta": {
     "placeholders": { "catName": { "type": "String" } }
-  }
+  },
+
+  "authErrorEmailInUse": "このメールアドレスは既に登録されています",
+  "authErrorWrongPassword": "メールアドレスまたはパスワードが正しくありません",
+  "authErrorUserNotFound": "このメールアドレスのアカウントが見つかりません",
+  "authErrorTooManyRequests": "試行回数が多すぎます。しばらくしてからお試しください",
+  "authErrorNetwork": "ネットワークエラーです。接続を確認してください",
+  "authErrorAdminRestricted": "ログインは一時的に制限されています",
+  "authErrorWeakPassword": "パスワードが弱すぎます。6文字以上にしてください",
+  "authErrorGeneric": "問題が発生しました。もう一度お試しください"
 }

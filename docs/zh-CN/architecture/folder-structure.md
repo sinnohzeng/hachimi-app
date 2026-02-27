@@ -51,8 +51,17 @@ hachimi-app/
 │   │   │   ├── pixel_cat_constants.dart    # SSOT：pixel-cat-maker 外观参数值集
 │   │   │   ├── ai_constants.dart          # SSOT：LLM 模型元数据、prompt 模板、推理参数
 │   │   │   └── avatar_constants.dart     # SSOT：预设头像选项（id、图标、颜色）
+│   │   ├── backend/                          # 多后端抽象（策略模式）
+│   │   │   ├── auth_backend.dart             # AuthBackend — 登录/注册/关联/删除
+│   │   │   ├── sync_backend.dart             # SyncBackend — 批量写入/水化 + SyncOperation
+│   │   │   ├── user_profile_backend.dart     # UserProfileBackend — 创建/同步用户资料
+│   │   │   ├── analytics_backend.dart        # AnalyticsBackend — 记录事件/属性
+│   │   │   ├── crash_backend.dart            # CrashBackend — 错误记录/日志
+│   │   │   ├── remote_config_backend.dart    # RemoteConfigBackend — 类型化配置读取
+│   │   │   └── backend_registry.dart         # BackendRegistry + BackendRegion 枚举
 │   │   ├── utils/
 │   │   │   ├── appearance_descriptions.dart # 猫咪外观参数的人类可读描述
+│   │   │   ├── auth_error_mapper.dart       # Firebase Auth 错误码 → L10N 映射器
 │   │   │   ├── date_utils.dart             # AppDateUtils — 统一日期字符串格式化
 │   │   │   ├── streak_utils.dart           # StreakUtils — 连续打卡计算逻辑
 │   │   │   ├── background_color_utils.dart # 从猫咪阶段/毛色提取 mesh 渐变色
@@ -81,12 +90,11 @@ hachimi-app/
 │   │   ├── ledger_action.dart             # LedgerAction + ActionType —— 行为台账事件模型
 │   │   └── unlocked_achievement.dart      # UnlockedAchievement —— 本地成就解锁记录
 │   │
-│   ├── services/                           # Firebase SDK 封装层（无 UI，无 BuildContext）
-│   │   ├── analytics_service.dart          # Firebase Analytics（分析）封装 —— 记录事件
-│   │   ├── auth_service.dart               # Firebase Auth（认证）封装 —— 登录/注销/注册
-│   │   ├── cat_firestore_service.dart      # 猫咪专属 Firestore CRUD（watchCats、watchAllCats）
+│   ├── services/                           # 数据层（无 UI，无 BuildContext）
+│   │   ├── analytics_service.dart          # 分析门面 —— 记录事件
+│   │   ├── auth_service.dart               # 认证门面 —— 登录/注销/注册
 │   │   ├── coin_service.dart               # 金币余额 + 配饰购买操作
-│   │   ├── firestore_service.dart          # 通用 Firestore CRUD + 原子批量操作
+│   │   ├── user_profile_service.dart       # 用户资料同步（委托 UserProfileBackend）
 │   │   ├── atomic_island_service.dart      # vivo 原子岛富通知（MethodChannel 封装）
 │   │   ├── focus_timer_service.dart        # Android 前台服务封装
 │   │   ├── migration_service.dart          # 模式演进的数据迁移（如 breed -> appearance）
@@ -95,10 +103,18 @@ hachimi-app/
 │   │   ├── pixel_cat_renderer.dart         # 13 层精灵图合成器（pixel-cat-maker 引擎）
 │   │   ├── remote_config_service.dart      # Remote Config（远程配置）—— 类型化 getter + 默认值
 │   │   ├── xp_service.dart                 # XP 计算（纯 Dart，无 Firebase 依赖）
-│   │   ├── ai/                             # AI 子模块
+│   │   ├── ai_service.dart                # AI 门面服务（路由到 AiProvider，并发控制）
+│   │   ├── ai/                             # AI 提供商实现
 │   │   │   ├── minimax_provider.dart        # MiniMax M2.5 HTTP SSE 实现
 │   │   │   ├── gemini_provider.dart        # Gemini 3 Flash HTTP SSE 实现
 │   │   │   └── sse_parser.dart              # SSE 流解析工具（可插拔 token 提取器）
+│   │   ├── firebase/                       # Firebase 后端实现
+│   │   │   ├── firebase_auth_backend.dart           # FirebaseAuthBackend — Firebase Auth + Google 登录
+│   │   │   ├── firebase_sync_backend.dart           # FirebaseSyncBackend — SyncOperation → WriteBatch
+│   │   │   ├── firebase_user_profile_backend.dart   # FirebaseUserProfileBackend — Firestore 用户文档
+│   │   │   ├── firebase_analytics_backend.dart      # FirebaseAnalyticsBackend — Firebase Analytics
+│   │   │   ├── firebase_crash_backend.dart          # FirebaseCrashBackend — Firebase Crashlytics
+│   │   │   └── firebase_remote_config_backend.dart  # FirebaseRemoteConfigBackend — Firebase Remote Config
 │   │   ├── diary_service.dart             # AI 日记生成 + SQLite 读写
 │   │   ├── chat_service.dart              # AI 聊天 prompt + 流式生成 + SQLite 读写
 │   │   ├── local_database_service.dart    # SQLite 初始化（日记 + 聊天表）
@@ -123,7 +139,8 @@ hachimi-app/
 │   │   ├── locale_provider.dart            # localeProvider（应用语言覆盖）
 │   │   ├── stats_provider.dart             # statsProvider（计算型 HabitStats）
 │   │   ├── theme_provider.dart             # themeProvider（主题模式 + 种子色）
-│   │   ├── user_profile_provider.dart     # avatarIdProvider（Firestore 用户头像）
+│   │   ├── user_profile_provider.dart     # avatarIdProvider（本地物化状态用户头像）
+│   │   ├── user_profile_notifier.dart    # UserProfileNotifier —— 统一资料操作入口
 │   │   ├── ai_provider.dart              # AI 提供商选择、功能开关、可用性、服务装配
 │   │   ├── diary_provider.dart            # diaryEntriesProvider、todayDiaryProvider（family）
 │   │   └── chat_provider.dart             # chatNotifierProvider（StateNotifier family）
@@ -279,7 +296,7 @@ hachimi-app/
 | Provider | `camelCase` + `Provider` 后缀 | `catsProvider`、`coinBalanceProvider` |
 | Screen | `PascalCase` + `Screen` 后缀 | `CatRoomScreen` |
 | Widget | `PascalCase` 描述性名词 | `PixelCatSprite`、`CatHouseCard` |
-| Service | `PascalCase` + `Service` 后缀 | `CatFirestoreService`、`CoinService` |
+| Service | `PascalCase` + `Service` 后缀 | `AuthService`、`CoinService` |
 | 模型 | `PascalCase` 名词 | `Cat`、`CatAppearance`、`Habit` |
 | 资源文件 | `snake_case` | `body_tabby_0.png`、`room_day.png` |
 | 文档文件 | `kebab-case.md` | `data-model.md`、`cat-system.md` |

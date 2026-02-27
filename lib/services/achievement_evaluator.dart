@@ -245,7 +245,7 @@ class AchievementEvaluator {
     );
   }
 
-  /// 复用现有 AchievementService._checkCondition 逻辑。
+  /// 检查单个成就的解锁条件。
   bool _checkCondition(
     AchievementDef def,
     AchievementTrigger trigger,

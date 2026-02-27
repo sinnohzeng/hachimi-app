@@ -2291,4 +2291,28 @@ class SKo extends S {
   String aiTeaserCta(String catName) {
     return '계정을 연결하여 $catName이(가) 무슨 말을 하고 싶은지 확인하세요';
   }
+
+  @override
+  String get authErrorEmailInUse => '이미 등록된 이메일입니다';
+
+  @override
+  String get authErrorWrongPassword => '이메일 또는 비밀번호가 올바르지 않습니다';
+
+  @override
+  String get authErrorUserNotFound => '해당 이메일로 등록된 계정이 없습니다';
+
+  @override
+  String get authErrorTooManyRequests => '시도 횟수가 너무 많습니다. 나중에 다시 시도해 주세요';
+
+  @override
+  String get authErrorNetwork => '네트워크 오류입니다. 연결을 확인해 주세요';
+
+  @override
+  String get authErrorAdminRestricted => '로그인이 일시적으로 제한되었습니다';
+
+  @override
+  String get authErrorWeakPassword => '비밀번호가 너무 약합니다. 6자 이상으로 설정해 주세요';
+
+  @override
+  String get authErrorGeneric => '문제가 발생했습니다. 다시 시도해 주세요';
 }

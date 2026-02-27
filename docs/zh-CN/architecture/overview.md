@@ -53,18 +53,30 @@
 │  ├── connectivityProvider      ├── coinBalanceProvider          │
 │  ├── isOfflineProvider         ├── hasCheckedInTodayProvider    │
 │  ├── isAnonymousProvider       ├── ledgerServiceProvider        │
-│  ├── syncEngineProvider        └── newlyUnlockedProvider        │
+│  ├── syncEngineProvider        ├── newlyUnlockedProvider        │
+│  ├── userProfileNotifierProv. └── avatarIdProvider              │
 ├─────────────────────────────────────────────────────────────────┤
-│  Services（数据层——Firebase SDK 封装）                           │
+│  Services（数据层——业务逻辑，无 UI）                              │
 │  ├── AuthService               ├── XpService（纯 Dart）         │
-│  ├── FirestoreService          ├── NotificationService          │
-│  ├── CatFirestoreService       ├── RemoteConfigService          │
-│  ├── PixelCatRenderer          ├── FocusTimerService            │
-│  ├── PixelCatGenerationService ├── MigrationService             │
-│  ├── CoinService               ├── AnalyticsService             │
-│  ├── LedgerService             ├── SyncEngine                   │
-│  ├── AchievementEvaluator      ├── LocalHabitRepository         │
-│  ├── LocalCatRepository        └── LocalSessionRepository       │
+│  ├── UserProfileService        ├── NotificationService          │
+│  ├── PixelCatRenderer          ├── RemoteConfigService          │
+│  ├── PixelCatGenerationService ├── FocusTimerService            │
+│  ├── CoinService               ├── MigrationService             │
+│  ├── LedgerService             ├── AnalyticsService             │
+│  ├── AchievementEvaluator      ├── SyncEngine                   │
+│  ├── LocalHabitRepository      ├── LocalCatRepository           │
+│  └── LocalSessionRepository                                     │
+├─────────────────────────────────────────────────────────────────┤
+│  后端抽象层（core/backend/ — 策略模式）                           │
+│  ├── AuthBackend               ├── AnalyticsBackend             │
+│  ├── SyncBackend               ├── CrashBackend                 │
+│  ├── UserProfileBackend        ├── RemoteConfigBackend          │
+│  └── BackendRegistry（region → global / china）                  │
+├─────────────────────────────────────────────────────────────────┤
+│  Firebase 实现（services/firebase/）                              │
+│  ├── FirebaseAuthBackend       ├── FirebaseAnalyticsBackend     │
+│  ├── FirebaseSyncBackend       ├── FirebaseCrashBackend         │
+│  ├── FirebaseUserProfileBackend├── FirebaseRemoteConfigBackend  │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -110,14 +122,15 @@
 ### 3. 严格依赖方向
 
 ```
-Screens -> Providers -> Services -> Firebase SDK
+Screens -> Providers -> Services -> 后端抽象 -> Firebase/CloudBase SDK
 ```
 
 **规则：**
 - Screens 只通过 `ref.watch` / `ref.read` 从 Providers 读取数据——不直接导入 Services
 - Providers 编排 Services 并暴露响应式状态——不直接访问 Firebase SDK
-- Services 封装所有 Firebase SDK 交互——不包含 UI 代码，不使用 BuildContext
-- 纯计算（XP、猫咪生成）放在无 Firebase 依赖的 Services 中
+- Services 依赖后端抽象（`core/backend/`），不直接依赖 Firebase SDK 类
+- Firebase 具体实现放在 `services/firebase/` 目录——唯一允许导入 Firebase SDK 的位置
+- 纯计算（XP、猫咪生成）放在无后端依赖的 Services 中
 
 ### 4. 响应式优于命令式
 
@@ -141,7 +154,27 @@ Screens -> Providers -> Services -> Firebase SDK
 
 5. **成就评估器** — `AchievementEvaluator` 监听台账变更流并自动评估成就条件，替代手动触发调用。
 
-### 7. 国际化（i18n）
+### 7. 多后端抽象
+
+自 v2.20.0 起，所有云 SDK 交互均通过 `lib/core/backend/` 中的抽象后端接口隔离。这实现了：
+
+- **区域切换** — 全球版（Firebase）和中国版（腾讯 CloudBase）共用一套代码
+- **可测试性** — Service 依赖抽象接口，而非 Firebase SDK 类
+- **可扩展性** — 新增后端只需实现接口，无需修改业务逻辑
+
+该模式参照已验证的 `AiProvider` 策略模式（`lib/core/ai/ai_provider.dart`）。`BackendRegistry` 持有当前区域的所有后端实例，通过 `backendRegistryProvider` 注入。各后端独立 Provider（`authBackendProvider`、`syncBackendProvider` 等）提供便捷访问。
+
+```
+BackendRegistry（backendRegionProvider → global | china）
+  ├── AuthBackend        ← 登录/注册/关联/删除
+  ├── SyncBackend        ← 批量写入/水化（SyncOperation 抽象）
+  ├── UserProfileBackend ← 创建/同步用户资料
+  ├── AnalyticsBackend   ← 记录事件/设置用户属性
+  ├── CrashBackend       ← 记录错误/日志
+  └── RemoteConfigBackend← 获取配置/激活
+```
+
+### 8. 国际化（i18n）
 
 所有用户可见的字符串均外部化到 ARB 文件（`lib/l10n/app_en.arb`、`lib/l10n/app_zh.arb`）中，并通过 `flutter gen-l10n` 编译为 Dart 代码。Screen 和 Widget 中不允许硬编码用户可见的字符串。详见 [localization.md](localization.md) 完整工作流。
 

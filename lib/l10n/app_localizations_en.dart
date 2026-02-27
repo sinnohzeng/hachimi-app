@@ -2316,4 +2316,29 @@ class SEn extends S {
   String aiTeaserCta(String catName) {
     return 'Link an account to see what $catName wants to say';
   }
+
+  @override
+  String get authErrorEmailInUse => 'This email is already registered';
+
+  @override
+  String get authErrorWrongPassword => 'Incorrect email or password';
+
+  @override
+  String get authErrorUserNotFound => 'No account found with this email';
+
+  @override
+  String get authErrorTooManyRequests => 'Too many attempts. Try again later';
+
+  @override
+  String get authErrorNetwork => 'Network error. Check your connection';
+
+  @override
+  String get authErrorAdminRestricted => 'Sign-in is temporarily restricted';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Password is too weak. Use at least 6 characters';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Try again';
 }

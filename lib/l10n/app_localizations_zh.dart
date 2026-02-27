@@ -2283,6 +2283,30 @@ class SZh extends S {
   String aiTeaserCta(String catName) {
     return '关联账号，看看$catName想说什么';
   }
+
+  @override
+  String get authErrorEmailInUse => '该邮箱已被注册';
+
+  @override
+  String get authErrorWrongPassword => '邮箱或密码不正确';
+
+  @override
+  String get authErrorUserNotFound => '未找到该邮箱对应的账号';
+
+  @override
+  String get authErrorTooManyRequests => '尝试次数过多，请稍后再试';
+
+  @override
+  String get authErrorNetwork => '网络异常，请检查连接';
+
+  @override
+  String get authErrorAdminRestricted => '登录暂时受限';
+
+  @override
+  String get authErrorWeakPassword => '密码强度不足，至少需要 6 个字符';
+
+  @override
+  String get authErrorGeneric => '出了点问题，请重试';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4564,4 +4588,28 @@ class SZhHant extends SZh {
   String aiTeaserCta(String catName) {
     return '關聯帳號，看看$catName想說什麼';
   }
+
+  @override
+  String get authErrorEmailInUse => '該電郵已被註冊';
+
+  @override
+  String get authErrorWrongPassword => '電郵或密碼不正確';
+
+  @override
+  String get authErrorUserNotFound => '未找到該電郵對應的帳號';
+
+  @override
+  String get authErrorTooManyRequests => '嘗試次數過多，請稍後再試';
+
+  @override
+  String get authErrorNetwork => '網路異常，請檢查連線';
+
+  @override
+  String get authErrorAdminRestricted => '登入暫時受限';
+
+  @override
+  String get authErrorWeakPassword => '密碼強度不足，至少需要 6 個字元';
+
+  @override
+  String get authErrorGeneric => '出了點問題，請重試';
 }

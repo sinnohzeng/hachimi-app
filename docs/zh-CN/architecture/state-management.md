@@ -115,7 +115,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`StreamProvider<List<FocusSession>>`
 - **文件**：`lib/providers/habits_provider.dart`
-- **数据源**：`FirestoreService.watchTodaySessions(uid)` —— 监听今日所有习惯的专注会话
+- **数据源**：`LocalSessionRepository` —— 监听今日所有习惯的专注会话（本地优先）
 - **消费者**：`HomeScreen`（今日各习惯进度）、`todayMinutesPerHabitProvider`
 - **SSOT**：今日所有专注会话
 
@@ -149,7 +149,7 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 - **类型**：`StreamProvider<List<Cat>>`
 - **文件**：`lib/providers/cat_provider.dart`
-- **数据源**：`CatFirestoreService.watchAllCats(uid)` —— 流式传输所有状态的猫咪
+- **数据源**：`LocalCatRepository` —— 从 `local_cats` SQLite 表读取所有猫咪，不限状态
 - **消费者**：猫咪相册（Profile 界面）
 - **SSOT**：完整的猫咪历史，包括休眠和已毕业猫咪
 
@@ -168,16 +168,6 @@ Firebase Auth 流 ──────────────► authStateProvide
 - **数据源**：派生自 `catsProvider` —— 按 `boundHabitId` 查找
 - **消费者**：`HomeScreen` 习惯行（小型猫咪头像）、`FocusSetupScreen`
 - **用法**：`ref.watch(catByHabitProvider(habitId))`
-
-### `catFirestoreServiceProvider`
-
-- **类型**：`Provider<CatFirestoreService>`
-- **文件**：`lib/providers/service_providers.dart`
-- **数据源**：使用 Firestore 实例初始化 `CatFirestoreService`
-- **消费者**：`catsProvider`、`allCatsProvider` 及任何需要读写猫咪文档的 Provider
-- **SSOT**：所有猫咪相关 Firestore 操作的单例服务实例
-
----
 
 ### `pixelCatRendererProvider`
 
@@ -525,9 +515,81 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 
 - **类型**：`StreamProvider<String?>`
 - **文件**：`lib/providers/user_profile_provider.dart`
-- **数据源**：Firestore `users/{uid}` 文档——通过 `FirestoreService.watchAvatarId()` 读取 `avatarId` 字段
+- **数据源**：本地 `materialized_state`（SQLite）—— 通过 `LedgerService.getMaterialized()` 读取 `avatar_id` 键
 - **消费者**：`ProfileScreen`（头像展示）、`AvatarPickerSheet`（当前选中状态）
 - **SSOT**：当前用户选择的资料头像 ID（null = 首字母缩写兜底）
+
+### `currentTitleProvider`
+
+- **类型**：`StreamProvider<String?>`
+- **文件**：`lib/providers/user_profile_provider.dart`
+- **数据源**：本地 `materialized_state`（SQLite）—— 通过 `LedgerService.getMaterialized()` 读取 `current_title` 键
+- **消费者**：`ProfileScreen`（称号展示）
+- **SSOT**：当前用户佩戴的称号 ID（null = 无称号）
+
+### `unlockedTitlesProvider`
+
+- **类型**：`StreamProvider<List<String>>`
+- **文件**：`lib/providers/user_profile_provider.dart`
+- **数据源**：本地 `materialized_state`（SQLite）—— 读取 `unlocked_titles` 键（JSON 数组）
+- **消费者**：`ProfileScreen`（称号选择器）、`AchievementScreen`
+- **SSOT**：用户已解锁的所有称号 ID
+
+### `userProfileNotifierProvider`
+
+- **类型**：`NotifierProvider<UserProfileNotifier, void>`
+- **文件**：`lib/providers/user_profile_notifier.dart`
+- **数据源**：编排 `AuthService`、`LedgerService` 和 `UserProfileService`
+- **消费者**：`LoginScreen`、`EmailAuthScreen`、`EditNameDialog`、`AvatarPickerSheet`、`ProfileScreen`、`SettingsScreen`
+- **SSOT**：所有用户资料变更操作（创建、修改名称、修改头像、修改称号、登出）
+- **设计**：操作型 Notifier（state = void），不持有状态；资料数据由 `avatarIdProvider`、`currentTitleProvider`、`authStateProvider` 等分别管理
+
+**`UserProfileNotifier` 方法：**
+
+| 方法 | 说明 |
+|------|------|
+| `createProfile(uid, email, displayName?)` | 注册后初始化用户资料（Firestore + 本地 Ledger） |
+| `updateDisplayName(name)` | Auth + Ledger + Firestore 同步 |
+| `updateAvatar(avatarId)` | Ledger + Firestore 同步 |
+| `updateTitle(titleId?)` | Ledger + Firestore 同步 |
+| `logout()` | 停止 SyncEngine + Auth 登出 |
+
+---
+
+### 多后端 Provider
+
+```
+backendRegionProvider (Provider<BackendRegion>)
+  └── 默认：BackendRegion.global（Firebase）
+
+backendRegistryProvider (Provider<BackendRegistry>)
+  └── 监听：backendRegionProvider
+  └── 为所选区域创建所有后端实例
+
+authBackendProvider (Provider<AuthBackend>)
+syncBackendProvider (Provider<SyncBackend>)
+userProfileBackendProvider (Provider<UserProfileBackend>)
+analyticsBackendProvider (Provider<AnalyticsBackend>)
+crashBackendProvider (Provider<CrashBackend>)
+remoteConfigBackendProvider (Provider<RemoteConfigBackend>)
+  └── 均派生自 backendRegistryProvider
+```
+
+### `backendRegistryProvider`
+
+- **类型**：`Provider<BackendRegistry>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：根据 `backendRegionProvider` 创建所有后端实现
+- **消费者**：各个独立的后端 Provider
+- **SSOT**：当前区域的完整后端实例集
+
+### `userProfileBackendProvider`
+
+- **类型**：`Provider<UserProfileBackend>`
+- **文件**：`lib/providers/service_providers.dart`
+- **数据源**：派生自 `backendRegistryProvider.userProfile`
+- **消费者**：`userProfileServiceProvider`
+- **SSOT**：当前区域的用户资料后端
 
 ---
 

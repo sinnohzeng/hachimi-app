@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.20.0] - 2026-02-27
+
+### Added
+- **Multi-backend abstraction layer**: Strategy Pattern abstractions in `lib/core/backend/` (AuthBackend, SyncBackend, UserProfileBackend, AnalyticsBackend, CrashBackend, RemoteConfigBackend) with Firebase implementations in `lib/services/firebase/`. Enables future China (Tencent CloudBase) deployment from a single codebase.
+- **BackendRegistry + region providers**: `backendRegionProvider`, `backendRegistryProvider`, and individual backend providers registered in `service_providers.dart`. Region switching UI is architecturally ready.
+- **Auth error mapping**: `auth_error_mapper.dart` translates Firebase Auth error codes to localized, user-friendly messages. Added 8 L10N keys across all 5 languages (EN, zh, zh-Hant, ja, ko).
+- **User title providers**: `currentTitleProvider` and `unlockedTitlesProvider` read from local materialized_state, completing local-first title management.
+- **Logout consolidation**: `UserProfileNotifier.logout()` unifies SyncEngine stop + Auth signOut. Profile and Settings screens share one code path.
+- **Title management**: `UserProfileNotifier.updateTitle()` writes to local ledger + fire-and-forget Firestore sync.
+
+### Removed
+- **CatFirestoreService** (135 lines): Dead code since local-first migration — zero runtime callers.
+- **AchievementService** (193 lines): Entirely replaced by local `AchievementEvaluator` — zero callers.
+- **AchievementTriggerHelper** (99 lines): Deprecated wrapper with zero callers.
+- **FirestoreService** (590 lines): Legacy monolithic service deleted in prior cleanup.
+
+### Changed
+- **UserProfileService**: Refactored from direct Firestore access to delegate via `UserProfileBackend` constructor injection.
+- **SyncEngine hydration**: Now pulls `currentTitle` and `unlockedTitles` from Firestore during hydration for pre-migration users.
+- **Architecture docs**: Updated all 6 architecture docs (EN + zh-CN) — overview, folder-structure, state-management — to reflect backend abstraction layer, removed deleted services, added new providers.
+
 ## [2.19.11] - 2026-02-25
 
 ### Fixed

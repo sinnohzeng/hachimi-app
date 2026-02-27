@@ -53,18 +53,30 @@
 │  ├── connectivityProvider      ├── coinBalanceProvider          │
 │  ├── isOfflineProvider         ├── hasCheckedInTodayProvider    │
 │  ├── isAnonymousProvider       ├── ledgerServiceProvider        │
-│  ├── syncEngineProvider        └── newlyUnlockedProvider        │
+│  ├── syncEngineProvider        ├── newlyUnlockedProvider        │
+│  ├── userProfileNotifierProv. └── avatarIdProvider              │
 ├─────────────────────────────────────────────────────────────────┤
-│  Services  (Data Layer — Firebase SDK isolation)               │
+│  Services  (Data Layer — business logic, no UI)                │
 │  ├── AuthService               ├── XpService (pure Dart)        │
-│  ├── FirestoreService          ├── NotificationService          │
-│  ├── CatFirestoreService       ├── RemoteConfigService          │
-│  ├── PixelCatRenderer          ├── FocusTimerService            │
-│  ├── PixelCatGenerationService ├── MigrationService             │
-│  ├── CoinService               ├── AnalyticsService             │
-│  ├── LedgerService             ├── SyncEngine                   │
-│  ├── AchievementEvaluator      ├── LocalHabitRepository         │
-│  ├── LocalCatRepository        └── LocalSessionRepository       │
+│  ├── UserProfileService        ├── NotificationService          │
+│  ├── PixelCatRenderer          ├── RemoteConfigService          │
+│  ├── PixelCatGenerationService ├── FocusTimerService            │
+│  ├── CoinService               ├── MigrationService             │
+│  ├── LedgerService             ├── AnalyticsService             │
+│  ├── AchievementEvaluator      ├── SyncEngine                   │
+│  ├── LocalHabitRepository      ├── LocalCatRepository           │
+│  └── LocalSessionRepository                                     │
+├─────────────────────────────────────────────────────────────────┤
+│  Backend Abstraction (core/backend/ — Strategy Pattern)         │
+│  ├── AuthBackend               ├── AnalyticsBackend             │
+│  ├── SyncBackend               ├── CrashBackend                 │
+│  ├── UserProfileBackend        ├── RemoteConfigBackend          │
+│  └── BackendRegistry (region → global / china)                  │
+├─────────────────────────────────────────────────────────────────┤
+│  Firebase Implementations (services/firebase/)                  │
+│  ├── FirebaseAuthBackend       ├── FirebaseAnalyticsBackend     │
+│  ├── FirebaseSyncBackend       ├── FirebaseCrashBackend         │
+│  ├── FirebaseUserProfileBackend├── FirebaseRemoteConfigBackend  │
 ├─────────────────────────────────────────────────────────────────┤
 │  Firebase SDK                                                   │
 │  ├── firebase_auth             ├── firebase_remote_config        │
@@ -110,14 +122,15 @@ Every concern in the system has exactly one authoritative source:
 ### 3. Strict Dependency Flow
 
 ```
-Screens  ->  Providers  ->  Services  ->  Firebase SDK
+Screens  ->  Providers  ->  Services  ->  Backend Abstractions  ->  Firebase/CloudBase SDK
 ```
 
 **Rules:**
 - Screens only read from Providers (via `ref.watch` / `ref.read`) — never import Services directly
 - Providers orchestrate Services and expose reactive state — never access Firebase SDK directly
-- Services encapsulate all Firebase SDK interactions — no UI code, no BuildContext
-- Pure computation (XP, cat generation) lives in Services with no Firebase dependency
+- Services depend on backend abstractions (`core/backend/`), not Firebase SDK classes directly
+- Firebase-specific implementations live in `services/firebase/` — the only directory that imports Firebase SDK
+- Pure computation (XP, cat generation) lives in Services with no backend dependency
 
 ### 4. Reactive over Imperative
 
@@ -141,7 +154,27 @@ Since v2.18.0, business data flows through a **local-first** pipeline:
 
 5. **Achievement Evaluator** — `AchievementEvaluator` listens to the ledger change stream and automatically evaluates achievement criteria, replacing manual trigger calls.
 
-### 7. Internationalization (i18n)
+### 7. Multi-Backend Abstraction
+
+Since v2.20.0, all cloud SDK interactions are isolated behind abstract backend interfaces in `lib/core/backend/`. This enables:
+
+- **Region switching** — Global (Firebase) and China (Tencent CloudBase) deployments from a single codebase
+- **Testability** — Services depend on abstractions, not Firebase SDK classes
+- **Future-proofing** — Adding a new backend requires implementing the interfaces without touching business logic
+
+The pattern follows the existing `AiProvider` Strategy Pattern (`lib/core/ai/ai_provider.dart`). A `BackendRegistry` holds all backend instances for the current region, injected via `backendRegistryProvider`. Individual backend providers (`authBackendProvider`, `syncBackendProvider`, etc.) provide convenient access.
+
+```
+BackendRegistry (backendRegionProvider → global | china)
+  ├── AuthBackend        ← signIn/signUp/link/delete
+  ├── SyncBackend        ← batch write/hydrate (SyncOperation abstraction)
+  ├── UserProfileBackend ← create/sync profile
+  ├── AnalyticsBackend   ← logEvent/setUserProperty
+  ├── CrashBackend       ← recordError/log
+  └── RemoteConfigBackend← getString/getBool/fetchAndActivate
+```
+
+### 8. Internationalization (i18n)
 
 All user-facing strings are externalized into ARB files (`lib/l10n/app_en.arb`, `lib/l10n/app_zh.arb`) and compiled to Dart via `flutter gen-l10n`. Hard-coded user-facing strings are not permitted in screens or widgets. See [localization.md](localization.md) for the full workflow.
 

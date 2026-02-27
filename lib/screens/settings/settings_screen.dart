@@ -6,6 +6,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -453,7 +454,7 @@ class SettingsScreen extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await ref.read(authServiceProvider).signOut();
+              await ref.read(userProfileNotifierProvider.notifier).logout();
             },
             child: Text(l10n.commonLogOut),
           ),

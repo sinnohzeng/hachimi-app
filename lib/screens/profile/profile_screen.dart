@@ -12,6 +12,7 @@ import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
@@ -171,7 +172,7 @@ class ProfileScreen extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await ref.read(authServiceProvider).signOut();
+              await ref.read(userProfileNotifierProvider.notifier).logout();
             },
             child: Text(l10n.commonLogOut),
           ),

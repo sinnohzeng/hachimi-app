@@ -4295,6 +4295,54 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Link an account to see what {catName} wants to say'**
   String aiTeaserCta(String catName);
+
+  /// No description provided for @authErrorEmailInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered'**
+  String get authErrorEmailInUse;
+
+  /// No description provided for @authErrorWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password'**
+  String get authErrorWrongPassword;
+
+  /// No description provided for @authErrorUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found with this email'**
+  String get authErrorUserNotFound;
+
+  /// No description provided for @authErrorTooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Try again later'**
+  String get authErrorTooManyRequests;
+
+  /// No description provided for @authErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection'**
+  String get authErrorNetwork;
+
+  /// No description provided for @authErrorAdminRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in is temporarily restricted'**
+  String get authErrorAdminRestricted;
+
+  /// No description provided for @authErrorWeakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is too weak. Use at least 6 characters'**
+  String get authErrorWeakPassword;
+
+  /// No description provided for @authErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again'**
+  String get authErrorGeneric;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

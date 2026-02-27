@@ -1,0 +1,162 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
+
+/// Firebase 认证后端实现。
+class FirebaseAuthBackend implements AuthBackend {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+
+  @override
+  String get id => 'firebase';
+
+  @override
+  String? get currentUid => _auth.currentUser?.uid;
+
+  @override
+  String? get currentEmail => _auth.currentUser?.email;
+
+  @override
+  String? get currentDisplayName => _auth.currentUser?.displayName;
+
+  @override
+  bool get isSignedIn => _auth.currentUser != null;
+
+  @override
+  bool get isAnonymous => _auth.currentUser?.isAnonymous ?? false;
+
+  @override
+  Stream<AuthUser?> get authStateChanges =>
+      _auth.authStateChanges().map(_mapUser);
+
+  @override
+  Future<void> initializeSocialLogin() async {
+    await _googleSignIn.initialize();
+  }
+
+  @override
+  Future<AuthResult> signUp({
+    required String email,
+    required String password,
+  }) async {
+    final result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _mapResult(result);
+  }
+
+  @override
+  Future<AuthResult> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final result = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _mapResult(result);
+  }
+
+  @override
+  Future<AuthResult?> signInWithGoogle() async {
+    try {
+      await _googleSignIn.initialize();
+      final googleUser = await _googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      final result = await _auth.signInWithCredential(credential);
+      return _mapResult(result);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<AuthResult> signInAnonymously() async {
+    final result = await _auth.signInAnonymously();
+    return _mapResult(result);
+  }
+
+  @override
+  Future<AuthResult?> linkWithGoogle() async {
+    try {
+      await _googleSignIn.initialize();
+      final googleUser = await _googleSignIn.authenticate();
+      final idToken = googleUser.authentication.idToken;
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+
+      final user = _auth.currentUser;
+      if (user != null) {
+        final result = await user.linkWithCredential(credential);
+        return _mapResult(result);
+      }
+      final result = await _auth.signInWithCredential(credential);
+      return _mapResult(result);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<AuthResult> linkWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    final user = _auth.currentUser;
+    if (user != null) {
+      final result = await user.linkWithCredential(credential);
+      return _mapResult(result);
+    }
+    final result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _mapResult(result);
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    await user.updateDisplayName(name);
+    await user.reload();
+  }
+
+  @override
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    await _googleSignIn.signOut();
+    await _auth.currentUser?.delete();
+  }
+
+  AuthResult _mapResult(UserCredential result) {
+    return AuthResult(
+      uid: result.user!.uid,
+      email: result.user?.email,
+      displayName: result.user?.displayName,
+      isNewUser: result.additionalUserInfo?.isNewUser ?? false,
+    );
+  }
+
+  AuthUser? _mapUser(User? user) {
+    if (user == null) return null;
+    return AuthUser(
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      isAnonymous: user.isAnonymous,
+    );
+  }
+}

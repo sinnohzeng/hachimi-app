@@ -1048,5 +1048,14 @@
   "aiTeaserCta": "关联账号，看看{catName}想说什么",
   "@aiTeaserCta": {
     "placeholders": { "catName": { "type": "String" } }
-  }
+  },
+
+  "authErrorEmailInUse": "该邮箱已被注册",
+  "authErrorWrongPassword": "邮箱或密码不正确",
+  "authErrorUserNotFound": "未找到该邮箱对应的账号",
+  "authErrorTooManyRequests": "尝试次数过多，请稍后再试",
+  "authErrorNetwork": "网络异常，请检查连接",
+  "authErrorAdminRestricted": "登录暂时受限",
+  "authErrorWeakPassword": "密码强度不足，至少需要 6 个字符",
+  "authErrorGeneric": "出了点问题，请重试"
 }

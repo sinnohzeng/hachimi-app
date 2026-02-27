@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
-import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
 import 'components/email_auth_screen.dart';
 
@@ -28,19 +29,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authService = ref.read(authServiceProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
 
+      final notifier = ref.read(userProfileNotifierProvider.notifier);
+
       if (widget.linkMode) {
         // 匿名用户关联 Google 账号
         final result = await authService.linkWithGoogle();
         if (result != null) {
           final uid = result.user!.uid;
-          await ref
-              .read(firestoreServiceProvider)
-              .createUserProfile(
-                uid: uid,
-                email: result.user!.email ?? '',
-                displayName: result.user!.displayName,
-              );
-          await _initLocalState(uid, result.user!.displayName);
+          await notifier.createProfile(
+            uid: uid,
+            email: result.user!.email ?? '',
+            displayName: result.user!.displayName,
+          );
           await analyticsService.logSignUp(method: 'google_link');
           if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
         }
@@ -49,38 +49,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (result != null && result.additionalUserInfo?.isNewUser == true) {
           await analyticsService.logSignUp(method: 'google');
           final uid = result.user!.uid;
-          await ref
-              .read(firestoreServiceProvider)
-              .createUserProfile(
-                uid: uid,
-                email: result.user!.email ?? '',
-                displayName: result.user!.displayName,
-              );
-          await _initLocalState(uid, result.user!.displayName);
+          await notifier.createProfile(
+            uid: uid,
+            email: result.user!.email ?? '',
+            displayName: result.user!.displayName,
+          );
         }
       }
       // AuthGate will automatically navigate to HomeScreen
     } on Exception catch (e) {
       if (mounted) {
+        final message = mapAuthError(e, context.l10n);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } finally {
       if (mounted) setState(() => _isGoogleLoading = false);
     }
-  }
-
-  /// 初始化本地 materialized_state（注册时调用）。
-  Future<void> _initLocalState(String uid, String? displayName) async {
-    final ledger = ref.read(ledgerServiceProvider);
-    await ledger.setMaterialized(uid, 'coins', '0');
-    await ledger.setMaterialized(uid, 'last_check_in_date', '');
-    await ledger.setMaterialized(uid, 'inventory', '[]');
-    if (displayName != null) {
-      await ledger.setMaterialized(uid, 'display_name', displayName);
-    }
-    ledger.notifyChange(const LedgerChange(type: 'hydrate'));
   }
 
   void _navigateToEmailAuth() {

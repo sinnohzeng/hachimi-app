@@ -115,7 +115,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<List<FocusSession>>`
 - **File**: `lib/providers/habits_provider.dart`
-- **Source**: `FirestoreService.watchTodaySessions(uid)` — monitors today's sessions across all habits
+- **Source**: `LocalSessionRepository` — monitors today's sessions across all habits (local-first)
 - **Consumers**: `HomeScreen` (today's progress per habit), `todayMinutesPerHabitProvider`
 - **SSOT for**: All focus sessions for today
 
@@ -149,7 +149,7 @@ Device connectivity (independent of auth):
 
 - **Type**: `StreamProvider<List<Cat>>`
 - **File**: `lib/providers/cat_provider.dart`
-- **Source**: `CatFirestoreService.watchAllCats(uid)` — streams all cats regardless of state
+- **Source**: `LocalCatRepository` — reads all cats from `local_cats` SQLite table regardless of state
 - **Consumers**: Cat Album (Profile screen)
 - **SSOT for**: Complete cat history including dormant and graduated cats
 
@@ -168,16 +168,6 @@ Device connectivity (independent of auth):
 - **Source**: Derived from `catsProvider` — finds by `boundHabitId`
 - **Consumers**: `HomeScreen` habit rows (mini cat avatar), `FocusSetupScreen`
 - **Usage**: `ref.watch(catByHabitProvider(habitId))`
-
-### `catFirestoreServiceProvider`
-
-- **Type**: `Provider<CatFirestoreService>`
-- **File**: `lib/providers/service_providers.dart`
-- **Source**: Instantiates `CatFirestoreService` with Firestore instance
-- **Consumers**: `catsProvider`, `allCatsProvider`, and any provider that needs to read/write cat documents
-- **SSOT for**: The singleton service instance for all cat-related Firestore operations
-
----
 
 ### `pixelCatRendererProvider`
 
@@ -525,9 +515,81 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 
 - **Type**: `StreamProvider<String?>`
 - **File**: `lib/providers/user_profile_provider.dart`
-- **Source**: Firestore `users/{uid}` document — reads `avatarId` field via `FirestoreService.watchAvatarId()`
+- **Source**: Local `materialized_state` (SQLite) — reads `avatar_id` key via `LedgerService.getMaterialized()`
 - **Consumers**: `ProfileScreen` (avatar display), `AvatarPickerSheet` (current selection)
 - **SSOT for**: The current user's selected profile avatar ID (null = initials fallback)
+
+### `currentTitleProvider`
+
+- **Type**: `StreamProvider<String?>`
+- **File**: `lib/providers/user_profile_provider.dart`
+- **Source**: Local `materialized_state` (SQLite) — reads `current_title` key via `LedgerService.getMaterialized()`
+- **Consumers**: `ProfileScreen` (title display)
+- **SSOT for**: The current user's equipped title ID (null = no title)
+
+### `unlockedTitlesProvider`
+
+- **Type**: `StreamProvider<List<String>>`
+- **File**: `lib/providers/user_profile_provider.dart`
+- **Source**: Local `materialized_state` (SQLite) — reads `unlocked_titles` key (JSON array)
+- **Consumers**: `ProfileScreen` (title picker), `AchievementScreen`
+- **SSOT for**: All title IDs the user has unlocked
+
+### `userProfileNotifierProvider`
+
+- **Type**: `NotifierProvider<UserProfileNotifier, void>`
+- **File**: `lib/providers/user_profile_notifier.dart`
+- **Source**: Orchestrates `AuthService`, `LedgerService`, and `UserProfileService`
+- **Consumers**: `LoginScreen`, `EmailAuthScreen`, `EditNameDialog`, `AvatarPickerSheet`, `ProfileScreen`, `SettingsScreen`
+- **SSOT for**: All user profile mutation operations (create, update name, update avatar, update title, logout)
+- **Design**: Operation-type Notifier (state = void). Does not hold state; profile data is read from `avatarIdProvider`, `currentTitleProvider`, `authStateProvider`, etc.
+
+**`UserProfileNotifier` methods:**
+
+| Method | Description |
+|--------|-------------|
+| `createProfile(uid, email, displayName?)` | Initialize user profile (Firestore + local Ledger) |
+| `updateDisplayName(name)` | Auth + Ledger + Firestore sync |
+| `updateAvatar(avatarId)` | Ledger + Firestore sync |
+| `updateTitle(titleId?)` | Ledger + Firestore sync |
+| `logout()` | Stop SyncEngine + Auth signOut |
+
+---
+
+### Multi-Backend Providers
+
+```
+backendRegionProvider (Provider<BackendRegion>)
+  └── Default: BackendRegion.global (Firebase)
+
+backendRegistryProvider (Provider<BackendRegistry>)
+  └── Watches: backendRegionProvider
+  └── Creates all backend instances for the selected region
+
+authBackendProvider (Provider<AuthBackend>)
+syncBackendProvider (Provider<SyncBackend>)
+userProfileBackendProvider (Provider<UserProfileBackend>)
+analyticsBackendProvider (Provider<AnalyticsBackend>)
+crashBackendProvider (Provider<CrashBackend>)
+remoteConfigBackendProvider (Provider<RemoteConfigBackend>)
+  └── All derived from backendRegistryProvider
+```
+
+### `backendRegistryProvider`
+
+- **Type**: `Provider<BackendRegistry>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Creates all backend implementations based on `backendRegionProvider`
+- **Consumers**: Individual backend providers
+- **SSOT for**: The complete set of backend implementations for the current region
+
+### `userProfileBackendProvider`
+
+- **Type**: `Provider<UserProfileBackend>`
+- **File**: `lib/providers/service_providers.dart`
+- **Source**: Derived from `backendRegistryProvider.userProfile`
+- **Consumers**: `userProfileServiceProvider`
+- **SSOT for**: The user profile backend for the current region
 
 ---
 

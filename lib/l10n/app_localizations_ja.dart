@@ -2290,4 +2290,28 @@ class SJa extends S {
   String aiTeaserCta(String catName) {
     return 'アカウントを連携して、$catNameが何を言いたいか見てみよう';
   }
+
+  @override
+  String get authErrorEmailInUse => 'このメールアドレスは既に登録されています';
+
+  @override
+  String get authErrorWrongPassword => 'メールアドレスまたはパスワードが正しくありません';
+
+  @override
+  String get authErrorUserNotFound => 'このメールアドレスのアカウントが見つかりません';
+
+  @override
+  String get authErrorTooManyRequests => '試行回数が多すぎます。しばらくしてからお試しください';
+
+  @override
+  String get authErrorNetwork => 'ネットワークエラーです。接続を確認してください';
+
+  @override
+  String get authErrorAdminRestricted => 'ログインは一時的に制限されています';
+
+  @override
+  String get authErrorWeakPassword => 'パスワードが弱すぎます。6文字以上にしてください';
+
+  @override
+  String get authErrorGeneric => '問題が発生しました。もう一度お試しください';
 }
