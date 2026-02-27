@@ -27,7 +27,7 @@ class MigrationService {
           .collection('users')
           .doc(uid)
           .collection('cats')
-          .limit(5)
+          .limit(50)
           .get()
           .timeout(const Duration(seconds: 5));
 

@@ -24,112 +24,16 @@ class CoinService {
     final now = DateTime.now();
     final today = AppDateUtils.todayString();
     final month = AppDateUtils.currentMonth();
-    final dayOfMonth = now.day;
-    final isWeekend =
-        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
-    final totalDaysInMonth = _daysInMonth(now);
 
     try {
       final db = await _ledger.database;
-
       return await db.transaction((txn) async {
-        // 1. 检查今日是否已签到
-        final lastDate = await _ledger.getMaterializedInTxn(
-          txn,
-          uid,
-          'last_check_in_date',
-        );
-        if (lastDate == today) return null;
+        final existing = await _loadMonthlyCheckIn(txn, uid, today, month);
+        if (existing == null) return null; // 今日已签到
 
-        // 2. 读取当月签到数据
-        final rows = await txn.query(
-          'local_monthly_checkins',
-          where: 'uid = ? AND month = ?',
-          whereArgs: [uid, month],
-          limit: 1,
-        );
-        final existing = rows.isNotEmpty
-            ? MonthlyCheckIn.fromSqlite(rows.first)
-            : MonthlyCheckIn.empty(month);
-
-        // 3. 计算每日奖励
-        final dailyCoins = isWeekend
-            ? checkInCoinsWeekend
-            : checkInCoinsWeekday;
-
-        // 4. 计算新的签到天数
-        final newDays = [...existing.checkedDays, dayOfMonth];
-        final newCount = newDays.length;
-
-        // 5. 检查里程碑
-        int milestoneBonus = 0;
-        final newMilestones = <int>[];
-
-        for (final entry in checkInMilestones.entries) {
-          if (newCount >= entry.key &&
-              !existing.milestonesClaimed.contains(entry.key)) {
-            milestoneBonus += entry.value;
-            newMilestones.add(entry.key);
-          }
-        }
-
-        // 6. 检查全月奖励
-        if (newCount == totalDaysInMonth &&
-            !existing.milestonesClaimed.contains(totalDaysInMonth)) {
-          milestoneBonus += checkInFullMonthBonus;
-          newMilestones.add(totalDaysInMonth);
-        }
-
-        final totalReward = dailyCoins + milestoneBonus;
-
-        // 7. 更新月度签到表
-        final allMilestones = [...existing.milestonesClaimed, ...newMilestones];
-        await txn.insert(
-          'local_monthly_checkins',
-          MonthlyCheckIn(
-            month: month,
-            checkedDays: newDays,
-            totalCoins: existing.totalCoins + totalReward,
-            milestonesClaimed: allMilestones,
-          ).toSqlite(uid),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-
-        // 8. 更新物化状态：金币 + lastCheckInDate
-        final currentCoins = await _ledger.getMaterializedInTxn(
-          txn,
-          uid,
-          'coins',
-        );
-        final newCoins = (int.tryParse(currentCoins ?? '0') ?? 0) + totalReward;
-        await _ledger.setMaterializedInTxn(
-          txn,
-          uid,
-          'coins',
-          newCoins.toString(),
-        );
-        await _ledger.setMaterializedInTxn(
-          txn,
-          uid,
-          'last_check_in_date',
-          today,
-        );
-
-        // 9. 写入行为台账
-        await _ledger.appendInTxn(
-          txn,
-          type: ActionType.checkIn,
-          uid: uid,
-          startedAt: now,
-          payload: {'month': month, 'day': dayOfMonth, 'isWeekend': isWeekend},
-          result: {'coins': totalReward, 'milestone': milestoneBonus},
-        );
-
-        return CheckInResult(
-          dailyCoins: dailyCoins,
-          milestoneBonus: milestoneBonus,
-          newMilestones: newMilestones,
-        );
+        final rewards = _calculateRewards(now, existing, month);
+        await _persistCheckIn(txn, uid, now, today, month, existing, rewards);
+        return rewards.toResult();
       });
     } catch (e, stack) {
       ErrorHandler.record(
@@ -142,6 +46,109 @@ class CoinService {
     } finally {
       _ledger.notifyChange(const LedgerChange(type: 'check_in'));
     }
+  }
+
+  /// 加载当月签到记录，若今日已签到返回 null。
+  Future<MonthlyCheckIn?> _loadMonthlyCheckIn(
+    Transaction txn,
+    String uid,
+    String today,
+    String month,
+  ) async {
+    final lastDate = await _ledger.getMaterializedInTxn(
+      txn,
+      uid,
+      'last_check_in_date',
+    );
+    if (lastDate == today) return null;
+
+    final rows = await txn.query(
+      'local_monthly_checkins',
+      where: 'uid = ? AND month = ?',
+      whereArgs: [uid, month],
+      limit: 1,
+    );
+    return rows.isNotEmpty
+        ? MonthlyCheckIn.fromSqlite(rows.first)
+        : MonthlyCheckIn.empty(month);
+  }
+
+  /// 纯计算：每日奖励 + 里程碑奖励。
+  _CheckInRewards _calculateRewards(
+    DateTime now,
+    MonthlyCheckIn existing,
+    String month,
+  ) {
+    final isWeekend =
+        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+    final dailyCoins = isWeekend ? checkInCoinsWeekend : checkInCoinsWeekday;
+    final newDays = [...existing.checkedDays, now.day];
+    final newCount = newDays.length;
+
+    int milestoneBonus = 0;
+    final newMilestones = <int>[];
+    for (final entry in checkInMilestones.entries) {
+      if (newCount >= entry.key &&
+          !existing.milestonesClaimed.contains(entry.key)) {
+        milestoneBonus += entry.value;
+        newMilestones.add(entry.key);
+      }
+    }
+
+    final totalDays = _daysInMonth(now);
+    if (newCount == totalDays &&
+        !existing.milestonesClaimed.contains(totalDays)) {
+      milestoneBonus += checkInFullMonthBonus;
+      newMilestones.add(totalDays);
+    }
+
+    return _CheckInRewards(
+      dailyCoins: dailyCoins,
+      milestoneBonus: milestoneBonus,
+      newMilestones: newMilestones,
+      newDays: newDays,
+      allMilestones: [...existing.milestonesClaimed, ...newMilestones],
+      totalCoins: existing.totalCoins + dailyCoins + milestoneBonus,
+    );
+  }
+
+  /// 持久化签到数据：月度表 + 物化状态 + 台账。
+  Future<void> _persistCheckIn(
+    Transaction txn,
+    String uid,
+    DateTime now,
+    String today,
+    String month,
+    MonthlyCheckIn existing,
+    _CheckInRewards rewards,
+  ) async {
+    await txn.insert(
+      'local_monthly_checkins',
+      MonthlyCheckIn(
+        month: month,
+        checkedDays: rewards.newDays,
+        totalCoins: rewards.totalCoins,
+        milestonesClaimed: rewards.allMilestones,
+      ).toSqlite(uid),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    final totalReward = rewards.dailyCoins + rewards.milestoneBonus;
+    final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
+    final newCoins = (int.tryParse(raw ?? '0') ?? 0) + totalReward;
+    await _ledger.setMaterializedInTxn(txn, uid, 'coins', newCoins.toString());
+    await _ledger.setMaterializedInTxn(txn, uid, 'last_check_in_date', today);
+
+    final isWeekend =
+        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+    await _ledger.appendInTxn(
+      txn,
+      type: ActionType.checkIn,
+      uid: uid,
+      startedAt: now,
+      payload: {'month': month, 'day': now.day, 'isWeekend': isWeekend},
+      result: {'coins': totalReward, 'milestone': rewards.milestoneBonus},
+    );
   }
 
   /// 扣减金币。余额不足返回 false。
@@ -281,7 +288,32 @@ class CoinService {
   List<String> _decodeInventory(String? raw) {
     if (raw == null) return [];
     final decoded = jsonDecode(raw);
-    if (decoded is List) return decoded.cast<String>();
+    if (decoded is List) return decoded.whereType<String>().toList();
     return [];
   }
+}
+
+/// 签到奖励计算结果（内部使用）。
+class _CheckInRewards {
+  final int dailyCoins;
+  final int milestoneBonus;
+  final List<int> newMilestones;
+  final List<int> newDays;
+  final List<int> allMilestones;
+  final int totalCoins;
+
+  const _CheckInRewards({
+    required this.dailyCoins,
+    required this.milestoneBonus,
+    required this.newMilestones,
+    required this.newDays,
+    required this.allMilestones,
+    required this.totalCoins,
+  });
+
+  CheckInResult toResult() => CheckInResult(
+    dailyCoins: dailyCoins,
+    milestoneBonus: milestoneBonus,
+    newMilestones: newMilestones,
+  );
 }

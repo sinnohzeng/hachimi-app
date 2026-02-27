@@ -29,6 +29,6 @@ Future<List<String>> _readInventory(LedgerService ledger, String uid) async {
   final raw = await ledger.getMaterialized(uid, 'inventory');
   if (raw == null) return const [];
   final decoded = jsonDecode(raw);
-  if (decoded is List) return decoded.cast<String>();
+  if (decoded is List) return decoded.whereType<String>().toList();
   return const [];
 }

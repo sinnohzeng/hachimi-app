@@ -293,31 +293,40 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     await ref.read(localSessionRepositoryProvider).logSession(uid, session);
 
     if (timerState.status == TimerStatus.completed) {
-      final today = AppDateUtils.todayString();
-      await ref
-          .read(localHabitRepositoryProvider)
-          .updateProgress(
-            uid,
-            widget.habitId,
-            addMinutes: minutes,
-            checkInDate: today,
-          );
-      if (habit.catId != null) {
-        await ref
-            .read(localCatRepositoryProvider)
-            .updateProgress(
-              uid,
-              habit.catId!,
-              addMinutes: minutes,
-              sessionAt: DateTime.now(),
-            );
-      }
+      await _updateHabitAndCatProgress(uid, habit, minutes);
     }
 
     if (rewards.coins > 0) {
       await ref
           .read(coinServiceProvider)
           .earnCoins(uid: uid, amount: rewards.coins);
+    }
+  }
+
+  /// 更新习惯和猫的累计进度（仅已完成 session 调用）。
+  Future<void> _updateHabitAndCatProgress(
+    String uid,
+    Habit habit,
+    int minutes,
+  ) async {
+    final today = AppDateUtils.todayString();
+    await ref
+        .read(localHabitRepositoryProvider)
+        .updateProgress(
+          uid,
+          widget.habitId,
+          addMinutes: minutes,
+          checkInDate: today,
+        );
+    if (habit.catId != null) {
+      await ref
+          .read(localCatRepositoryProvider)
+          .updateProgress(
+            uid,
+            habit.catId!,
+            addMinutes: minutes,
+            sessionAt: DateTime.now(),
+          );
     }
   }
 
@@ -690,25 +699,30 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   }
 
   Widget _buildRunningButtons(FocusTimerState timerState, ThemeData theme) {
-    final isStopwatch = timerState.mode == TimerMode.stopwatch;
+    if (timerState.mode != TimerMode.stopwatch) {
+      return _buildCountdownRunningButton(theme);
+    }
+    return _buildStopwatchRunningButtons(theme);
+  }
 
-    if (!isStopwatch) {
-      return SizedBox(
-        width: double.infinity,
-        height: 56,
-        child: FilledButton.tonalIcon(
-          onPressed: _pauseTimer,
-          icon: const Icon(Icons.pause, size: 28),
-          label: Text(
-            context.l10n.timerPause,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+  Widget _buildCountdownRunningButton(ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: FilledButton.tonalIcon(
+        onPressed: _pauseTimer,
+        icon: const Icon(Icons.pause, size: 28),
+        label: Text(
+          context.l10n.timerPause,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  Widget _buildStopwatchRunningButtons(ThemeData theme) {
     return Row(
       children: [
         Expanded(

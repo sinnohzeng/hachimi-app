@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.0] - 2026-02-27
+
+### Fixed
+- **CRITICAL: Achievement evaluation context**: Filled 3 unassigned `AchievementEvalContext` fields (`lastSessionMinutes`, `hasCompletedGoalOnTime`, `hasCompletedGoalAhead`). Achievements `quest_marathon`, `goal_on_time`, and `goal_ahead` can now be unlocked.
+- **9 unsafe `cast<String>()`**: Replaced `.cast<String>()` with `.whereType<String>().toList()` across sync, hydration, inventory, and profile providers. Prevents `TypeError` when Firestore returns non-string elements in lists.
+- **3 fire-and-forget error swallows**: `UserProfileNotifier` `updateDisplayName/updateAvatar/updateTitle` now log errors via `ErrorHandler.record()` instead of silently ignoring sync failures.
+- **Chat service error tracking**: `sendMessage()` catch block now records errors to Crashlytics instead of silently falling back.
+- **Titles JSON decode crash**: `_decodeTitles()` in `user_profile_provider.dart` now wrapped in try-catch, returning empty list on malformed data.
+- **Ledger deserialization safety**: New `LedgerAction.fromSqliteSafe()` factory with try-catch, used in `getUnsyncedActions()` to skip corrupted rows instead of crashing the sync loop.
+- **Migration service sampling**: `checkNeedsMigration()` now samples 50 docs (was 5), reducing false negatives for accounts with many cats.
+
+### Added
+- **`SyncConstants` materialization keys**: 7 key constants (`keyCoins`, `keyLastCheckInDate`, `keyInventory`, `keyAvatarId`, `keyDisplayName`, `keyCurrentTitle`, `keyUnlockedTitles`) eliminating magic strings.
+- **`ChipSelectorRow` reusable widget**: Shared chip selection UI extracted from `EditQuestSheet` and `AdoptionStep1Form`, removing ~80 lines of duplicated code.
+- **Schema version history comments**: `LocalDatabaseService` now documents v1/v2/v3 schema changes inline.
+- **Notification error isolation**: Each reminder in `scheduleReminders()` is now wrapped in individual try-catch, preventing one failed schedule from blocking subsequent reminders.
+
+### Changed
+- **Achievement evaluator**: 24-case switch replaced with static predicate map + persist fallback (3 branches total).
+- **`hydrateFromFirestore()` refactored** (86 → ~10 lines): Extracted `_hydrateCollection()`, `_hydrateUserProfile()`, `_hydrateListField()` helpers with declarative field mapping.
+- **`checkIn()` refactored** (120 → orchestrator + 3 helpers): `_loadMonthlyCheckIn()`, `_calculateRewards()`, `_persistCheckIn()`.
+- **`getUserDataSummary()` refactored**: Manual for-loop replaced with SQL `COALESCE(SUM())` + `COUNT()` aggregates.
+- **`getSessionHistory()` refactored**: Extracted `_buildHistoryQuery()` + `_parseMonthRange()` with month format validation.
+- **`scheduleReminders()` split** (71 → 4 methods): `_scheduleByMode()`, `_scheduleDaily()`, `_scheduleWeekdays()`, `_scheduleSpecificDay()`.
+- **`firebase_auth_backend.dart`**: Extracted `_getGoogleCredential()` shared by `signInWithGoogle()` and `linkWithGoogle()`.
+- **`notification_service.dart`**: Extracted `_androidPlugin` getter eliminating platform-check duplication.
+- **`timer_screen.dart`**: Split `_buildRunningButtons()` into `_buildCountdownRunningButton()` + `_buildStopwatchRunningButtons()`. Extracted `_updateHabitAndCatProgress()` from `_persistSession()`.
+
 ## [2.21.0] - 2026-02-27
 
 ### Fixed

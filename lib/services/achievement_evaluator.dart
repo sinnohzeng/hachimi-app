@@ -152,6 +152,8 @@ class AchievementEvaluator {
     );
     final invRaw = await _ledger.getMaterialized(uid, 'inventory');
     final unlockedIds = await _queryUnlockedIds(db, uid);
+    final lastMinutes = await _queryLastSessionMinutes(db, uid);
+    final goalStatus = _evaluateGoalStatus(habitData.rows);
 
     return AchievementEvalContext(
       totalSessionCount: sessionCount ?? 0,
@@ -167,8 +169,47 @@ class AchievementEvaluator {
       equippedAccessories: catData.equippedAccessories,
       allCatsHappy: catData.allHappy,
       allHabitsDoneToday: allDoneToday,
+      lastSessionMinutes: lastMinutes,
+      hasCompletedGoalOnTime: goalStatus.onTime,
+      hasCompletedGoalAhead: goalStatus.ahead,
       unlockedIds: unlockedIds,
     );
+  }
+
+  /// 查询最近一条已完成 session 的时长。
+  Future<int?> _queryLastSessionMinutes(Database db, String uid) async {
+    final rows = await db.query(
+      'local_sessions',
+      columns: ['duration_minutes'],
+      where: "uid = ? AND status = 'completed'",
+      whereArgs: [uid],
+      orderBy: 'started_at DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return rows.first['duration_minutes'] as int?;
+  }
+
+  /// 评估目标完成状态：是否有 habit 在截止日期前达成 / 提前 7+ 天达成。
+  _GoalStatus _evaluateGoalStatus(List<Map<String, Object?>> habitRows) {
+    bool onTime = false;
+    bool ahead = false;
+    final now = DateTime.now();
+
+    for (final row in habitRows) {
+      final targetHours = row['target_hours'] as int?;
+      if (targetHours == null) continue;
+      final totalMinutes = row['total_minutes'] as int? ?? 0;
+      final completed = row['target_completed'] as int? ?? 0;
+      if (completed != 1 || totalMinutes < targetHours * 60) continue;
+
+      onTime = true;
+      final deadlineMs = row['deadline_date'] as int?;
+      if (deadlineMs == null) continue;
+      final deadline = DateTime.fromMillisecondsSinceEpoch(deadlineMs);
+      if (deadline.difference(now).inDays >= 7) ahead = true;
+    }
+    return _GoalStatus(onTime: onTime, ahead: ahead);
   }
 
   /// 查询活跃习惯的累计数据。
@@ -270,63 +311,49 @@ class AchievementEvaluator {
     return rows.map((r) => r['id'] as String).toSet();
   }
 
-  /// 检查单个成就的解锁条件。
+  /// 成就解锁谓词表 — 替代 24-case switch，map 查表 + 1 个 persist 分支。
+  static final _predicates =
+      <String, bool Function(AchievementEvalContext, AchievementTrigger)>{
+        'quest_first_session': (ctx, _) => ctx.totalSessionCount >= 1,
+        'quest_100_sessions': (ctx, _) => ctx.totalSessionCount >= 100,
+        'quest_3_habits': (ctx, _) => ctx.activeHabitCount >= 3,
+        'quest_5_habits': (ctx, _) => ctx.activeHabitCount >= 5,
+        'quest_all_done': (ctx, _) =>
+            ctx.allHabitsDoneToday && ctx.activeHabitCount > 0,
+        'quest_5_workdays': (ctx, _) => ctx.habitCheckInDays.any((d) => d >= 5),
+        'quest_first_checkin': (_, t) =>
+            t == AchievementTrigger.checkInCompleted,
+        'quest_marathon': (ctx, _) =>
+            ctx.lastSessionMinutes != null && ctx.lastSessionMinutes! >= 120,
+        'hours_100': (ctx, _) => ctx.habitTotalMinutes.any((m) => m >= 6000),
+        'hours_1000': (ctx, _) => ctx.habitTotalMinutes.any((m) => m >= 60000),
+        'goal_on_time': (ctx, _) => ctx.hasCompletedGoalOnTime,
+        'goal_ahead': (ctx, _) => ctx.hasCompletedGoalAhead,
+        'cat_first_adopt': (ctx, _) => ctx.totalCatCount >= 1,
+        'cat_3_adopted': (ctx, _) => ctx.totalCatCount >= 3,
+        'cat_adolescent': (ctx, _) =>
+            ctx.catStages.contains('adolescent') ||
+            ctx.catStages.contains('adult'),
+        'cat_adult': (ctx, _) => ctx.catStages.contains('adult'),
+        'cat_senior': (ctx, _) => ctx.catProgresses.any((p) => p >= 1.0),
+        'cat_graduated': (ctx, _) => ctx.graduatedCatCount >= 1,
+        'cat_accessory': (ctx, _) => ctx.equippedAccessories.isNotEmpty,
+        'cat_5_accessories': (ctx, _) => ctx.accessoryCount >= 5,
+        'cat_all_happy': (ctx, _) => ctx.allCatsHappy && ctx.totalCatCount > 0,
+      };
+
+  /// 检查单个成就的解锁条件 — 谓词表查表，persist 类走通用分支。
   bool _checkCondition(
     AchievementDef def,
     AchievementTrigger trigger,
     AchievementEvalContext ctx,
   ) {
-    switch (def.id) {
-      case 'quest_first_session':
-        return ctx.totalSessionCount >= 1;
-      case 'quest_100_sessions':
-        return ctx.totalSessionCount >= 100;
-      case 'quest_3_habits':
-        return ctx.activeHabitCount >= 3;
-      case 'quest_5_habits':
-        return ctx.activeHabitCount >= 5;
-      case 'quest_all_done':
-        return ctx.allHabitsDoneToday && ctx.activeHabitCount > 0;
-      case 'quest_5_workdays':
-        return ctx.habitCheckInDays.any((d) => d >= 5);
-      case 'quest_first_checkin':
-        return trigger == AchievementTrigger.checkInCompleted;
-      case 'quest_marathon':
-        return ctx.lastSessionMinutes != null && ctx.lastSessionMinutes! >= 120;
-      case 'hours_100':
-        return ctx.habitTotalMinutes.any((m) => m >= 6000);
-      case 'hours_1000':
-        return ctx.habitTotalMinutes.any((m) => m >= 60000);
-      case 'goal_on_time':
-        return ctx.hasCompletedGoalOnTime;
-      case 'goal_ahead':
-        return ctx.hasCompletedGoalAhead;
-      case 'cat_first_adopt':
-        return ctx.totalCatCount >= 1;
-      case 'cat_3_adopted':
-        return ctx.totalCatCount >= 3;
-      case 'cat_adolescent':
-        return ctx.catStages.contains('adolescent') ||
-            ctx.catStages.contains('adult');
-      case 'cat_adult':
-        return ctx.catStages.contains('adult');
-      case 'cat_senior':
-        return ctx.catProgresses.any((p) => p >= 1.0);
-      case 'cat_graduated':
-        return ctx.graduatedCatCount >= 1;
-      case 'cat_accessory':
-        return ctx.equippedAccessories.isNotEmpty;
-      case 'cat_5_accessories':
-        return ctx.accessoryCount >= 5;
-      case 'cat_all_happy':
-        return ctx.allCatsHappy && ctx.totalCatCount > 0;
-      default:
-        if (def.category == AchievementCategory.persist) {
-          final target = def.targetValue ?? 0;
-          return ctx.habitCheckInDays.any((days) => days >= target);
-        }
-        return false;
+    final predicate = _predicates[def.id];
+    if (predicate != null) return predicate(ctx, trigger);
+    if (def.category == AchievementCategory.persist) {
+      return ctx.habitCheckInDays.any((d) => d >= (def.targetValue ?? 0));
     }
+    return false;
   }
 
   Map<String, dynamic> _buildSnapshotContext(LedgerChange change) {
@@ -356,7 +383,7 @@ class AchievementEvaluator {
   static List<String> _decodeInventory(String? raw) {
     if (raw == null) return [];
     final decoded = jsonDecode(raw);
-    if (decoded is List) return decoded.cast<String>();
+    if (decoded is List) return decoded.whereType<String>().toList();
     return [];
   }
 }
@@ -372,6 +399,14 @@ class _HabitData {
     required this.minutes,
     required this.checkInDays,
   });
+}
+
+/// 目标完成状态（内部使用）。
+class _GoalStatus {
+  final bool onTime;
+  final bool ahead;
+
+  const _GoalStatus({required this.onTime, required this.ahead});
 }
 
 /// 猫聚合数据（内部使用）。

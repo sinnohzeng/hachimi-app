@@ -61,10 +61,7 @@ class FirebaseAuthBackend implements AuthBackend {
   @override
   Future<AuthResult?> signInWithGoogle() async {
     try {
-      await _googleSignIn.initialize();
-      final googleUser = await _googleSignIn.authenticate();
-      final idToken = googleUser.authentication.idToken;
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      final credential = await _getGoogleCredential();
       final result = await _auth.signInWithCredential(credential);
       return _mapResult(result);
     } on GoogleSignInException catch (e) {
@@ -82,11 +79,7 @@ class FirebaseAuthBackend implements AuthBackend {
   @override
   Future<AuthResult?> linkWithGoogle() async {
     try {
-      await _googleSignIn.initialize();
-      final googleUser = await _googleSignIn.authenticate();
-      final idToken = googleUser.authentication.idToken;
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-
+      final credential = await _getGoogleCredential();
       final user = _auth.currentUser;
       if (user != null) {
         final result = await user.linkWithCredential(credential);
@@ -139,6 +132,14 @@ class FirebaseAuthBackend implements AuthBackend {
   Future<void> deleteAccount() async {
     await _googleSignIn.signOut();
     await _auth.currentUser?.delete();
+  }
+
+  /// Google 初始化 + 认证 + credential 获取（共享逻辑）。
+  Future<AuthCredential> _getGoogleCredential() async {
+    await _googleSignIn.initialize();
+    final googleUser = await _googleSignIn.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    return GoogleAuthProvider.credential(idToken: idToken);
   }
 
   AuthResult _mapResult(UserCredential result) {

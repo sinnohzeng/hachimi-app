@@ -7,6 +7,7 @@ import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/services/ai_service.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 
@@ -91,7 +92,13 @@ class ChatService {
           : response;
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, cleaned);
       return cleaned;
-    } catch (e) {
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'ChatService',
+        operation: 'sendMessage',
+      );
       final fallback = _fallbackResponse(chatCtx.isZhLocale);
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, fallback);
       return fallback;

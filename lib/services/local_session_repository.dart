@@ -119,6 +119,25 @@ class LocalSessionRepository {
     int offset = 0,
   }) async {
     final db = await _ledger.database;
+    final query = _buildHistoryQuery(uid, habitId: habitId, month: month);
+
+    final rows = await db.query(
+      'local_sessions',
+      where: query.where,
+      whereArgs: query.args,
+      orderBy: 'started_at DESC',
+      limit: limit,
+      offset: offset,
+    );
+    return rows.map(FocusSession.fromSqlite).toList();
+  }
+
+  /// 构建历史查询的 WHERE + 参数。
+  ({String where, List<dynamic> args}) _buildHistoryQuery(
+    String uid, {
+    String? habitId,
+    String? month,
+  }) {
     final where = StringBuffer('uid = ?');
     final args = <dynamic>[uid];
 
@@ -126,32 +145,27 @@ class LocalSessionRepository {
       where.write(' AND habit_id = ?');
       args.add(habitId);
     }
-    if (month != null) {
-      final parts = month.split('-');
-      if (parts.length == 2) {
-        final year = int.tryParse(parts[0]);
-        final mon = int.tryParse(parts[1]);
-        if (year != null && mon != null && mon >= 1 && mon <= 12) {
-          final start = DateTime(year, mon);
-          final end = DateTime(year, mon + 1);
-          where.write(' AND started_at >= ? AND started_at < ?');
-          args.addAll([
-            start.millisecondsSinceEpoch,
-            end.millisecondsSinceEpoch,
-          ]);
-        }
-      }
+
+    final range = month != null ? _parseMonthRange(month) : null;
+    if (range != null) {
+      where.write(' AND started_at >= ? AND started_at < ?');
+      args.addAll([range.startMs, range.endMs]);
     }
 
-    final rows = await db.query(
-      'local_sessions',
-      where: where.toString(),
-      whereArgs: args,
-      orderBy: 'started_at DESC',
-      limit: limit,
-      offset: offset,
+    return (where: where.toString(), args: args);
+  }
+
+  /// 解析 "yyyy-MM" 格式月份为毫秒时间范围，格式无效返回 null。
+  ({int startMs, int endMs})? _parseMonthRange(String month) {
+    final parts = month.split('-');
+    if (parts.length != 2) return null;
+    final year = int.tryParse(parts[0]);
+    final mon = int.tryParse(parts[1]);
+    if (year == null || mon == null || mon < 1 || mon > 12) return null;
+    return (
+      startMs: DateTime(year, mon).millisecondsSinceEpoch,
+      endMs: DateTime(year, mon + 1).millisecondsSinceEpoch,
     );
-    return rows.map(FocusSession.fromSqlite).toList();
   }
 
   /// 获取用户的总会话数。

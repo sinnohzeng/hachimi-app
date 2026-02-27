@@ -98,6 +98,15 @@ class LedgerAction {
     );
   }
 
+  /// 防御性反序列化 — 损坏数据返回 null 而非抛异常。
+  static LedgerAction? fromSqliteSafe(Map<String, dynamic> map) {
+    try {
+      return LedgerAction.fromSqlite(map);
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Map<String, dynamic> _decodeJson(dynamic raw) {
     if (raw is String) {
       final decoded = jsonDecode(raw);

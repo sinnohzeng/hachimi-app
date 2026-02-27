@@ -50,13 +50,15 @@ class FirebaseSyncBackend implements SyncBackend {
 
         final inventory = data['inventory'] as List<dynamic>?;
         if (inventory != null) {
-          userProfile['inventory'] = jsonEncode(inventory.cast<String>());
+          userProfile['inventory'] = jsonEncode(
+            inventory.whereType<String>().toList(),
+          );
         }
 
         final unlockedTitles = data['unlockedTitles'] as List<dynamic>?;
         if (unlockedTitles != null) {
           userProfile['unlockedTitles'] = jsonEncode(
-            unlockedTitles.cast<String>(),
+            unlockedTitles.whereType<String>().toList(),
           );
         }
       }

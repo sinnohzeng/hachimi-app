@@ -160,7 +160,10 @@ class LedgerService {
       orderBy: 'created_at ASC',
       limit: limit,
     );
-    return rows.map(LedgerAction.fromSqlite).toList();
+    return rows
+        .map(LedgerAction.fromSqliteSafe)
+        .whereType<LedgerAction>()
+        .toList();
   }
 
   /// 标记台账为已同步。

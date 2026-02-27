@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart' show ConflictAlgorithm;
+import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Database;
 
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -48,70 +48,19 @@ class SyncEngine {
       final userRef = _db.collection('users').doc(uid);
       final db = await _ledger.database;
 
-      // 拉取 habits
-      final habitsSnap = await userRef.collection('habits').get();
-      for (final doc in habitsSnap.docs) {
-        final habit = Habit.fromFirestore(doc);
-        await db.insert(
-          'local_habits',
-          habit.toSqlite(uid),
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
-      }
-
-      // 拉取 cats
-      final catsSnap = await userRef.collection('cats').get();
-      for (final doc in catsSnap.docs) {
-        final cat = Cat.fromFirestore(doc);
-        await db.insert(
-          'local_cats',
-          cat.toSqlite(uid),
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
-      }
-
-      // 拉取用户文档：coins / lastCheckInDate / inventory / avatarId / displayName
-      final userDoc = await userRef.get();
-      if (userDoc.exists) {
-        final data = userDoc.data()!;
-        final coins = data['coins'] as int? ?? 0;
-        final lastCheckIn = data['lastCheckInDate'] as String?;
-        final inventory = data['inventory'] as List<dynamic>?;
-        final avatarId = data['avatarId'] as String?;
-        final displayName = data['displayName'] as String?;
-
-        await _ledger.setMaterialized(uid, 'coins', coins.toString());
-        if (lastCheckIn != null) {
-          await _ledger.setMaterialized(uid, 'last_check_in_date', lastCheckIn);
-        }
-        if (inventory != null) {
-          await _ledger.setMaterialized(
-            uid,
-            'inventory',
-            jsonEncode(inventory.cast<String>()),
-          );
-        }
-        if (avatarId != null) {
-          await _ledger.setMaterialized(uid, 'avatar_id', avatarId);
-        }
-        if (displayName != null) {
-          await _ledger.setMaterialized(uid, 'display_name', displayName);
-        }
-
-        // 称号数据
-        final currentTitle = data['currentTitle'] as String?;
-        if (currentTitle != null) {
-          await _ledger.setMaterialized(uid, 'current_title', currentTitle);
-        }
-        final unlockedTitles = data['unlockedTitles'] as List<dynamic>?;
-        if (unlockedTitles != null) {
-          await _ledger.setMaterialized(
-            uid,
-            'unlocked_titles',
-            jsonEncode(unlockedTitles.cast<String>()),
-          );
-        }
-      }
+      await _hydrateCollection<Habit>(
+        userRef.collection('habits'),
+        'local_habits',
+        db,
+        (doc) => Habit.fromFirestore(doc).toSqlite(uid),
+      );
+      await _hydrateCollection<Cat>(
+        userRef.collection('cats'),
+        'local_cats',
+        db,
+        (doc) => Cat.fromFirestore(doc).toSqlite(uid),
+      );
+      await _hydrateUserProfile(userRef, uid);
 
       await prefs.setBool(_hydratedKey, true);
       _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
@@ -125,6 +74,74 @@ class SyncEngine {
       );
       // 水化失败不阻塞启动，下次仍会重试
     }
+  }
+
+  /// 泛型集合水化 — 从 Firestore 子集合拉取文档写入本地表。
+  Future<void> _hydrateCollection<T>(
+    CollectionReference collection,
+    String table,
+    Database db,
+    Map<String, dynamic> Function(QueryDocumentSnapshot) toSqlite,
+  ) async {
+    final snap = await collection.get();
+    for (final doc in snap.docs) {
+      await db.insert(
+        table,
+        toSqlite(doc),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  /// 用户文档水化 — 声明式字段映射，将 Firestore 字段写入物化状态。
+  Future<void> _hydrateUserProfile(
+    DocumentReference userRef,
+    String uid,
+  ) async {
+    final userDoc = await userRef.get();
+    if (!userDoc.exists) return;
+
+    final data = userDoc.data()! as Map<String, dynamic>;
+
+    // 简单字段映射：Firestore 字段名 → 物化键
+    const fieldMap = {
+      'coins': SyncConstants.keyCoins,
+      'lastCheckInDate': SyncConstants.keyLastCheckInDate,
+      'avatarId': SyncConstants.keyAvatarId,
+      'displayName': SyncConstants.keyDisplayName,
+      'currentTitle': SyncConstants.keyCurrentTitle,
+    };
+
+    for (final entry in fieldMap.entries) {
+      final value = data[entry.key];
+      if (value == null) continue;
+      await _ledger.setMaterialized(uid, entry.value, value.toString());
+    }
+
+    // List 字段需 JSON 编码
+    await _hydrateListField(data, 'inventory', SyncConstants.keyInventory, uid);
+    await _hydrateListField(
+      data,
+      'unlockedTitles',
+      SyncConstants.keyUnlockedTitles,
+      uid,
+    );
+  }
+
+  /// List 字段安全水化 — 从 Firestore `List<dynamic>` 安全转为 JSON 字符串。
+  Future<void> _hydrateListField(
+    Map<String, dynamic> data,
+    String firestoreKey,
+    String materializedKey,
+    String uid,
+  ) async {
+    final list = data[firestoreKey] as List<dynamic>?;
+    if (list == null) return;
+    await _ledger.setMaterialized(
+      uid,
+      materializedKey,
+      jsonEncode(list.whereType<String>().toList()),
+    );
   }
 
   /// 启动同步引擎。guest_ UID 跳过（纯本地模式）。

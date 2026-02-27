@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_10y.dart' as tz;
@@ -129,18 +130,18 @@ class NotificationService {
 
   // ─── Permission Management ───
 
-  /// Check if notification permission is currently granted.
-  Future<bool> isPermissionGranted() async {
-    if (Platform.isAndroid) {
-      final androidPlugin = _localNotifications
+  /// 获取 Android 平台插件（非 Android 返回 null）。
+  AndroidFlutterLocalNotificationsPlugin? get _androidPlugin =>
+      _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      if (androidPlugin != null) {
-        final granted = await androidPlugin.areNotificationsEnabled();
-        return granted ?? false;
-      }
-      return false;
+
+  /// Check if notification permission is currently granted.
+  Future<bool> isPermissionGranted() async {
+    if (Platform.isAndroid) {
+      final granted = await _androidPlugin?.areNotificationsEnabled();
+      return granted ?? false;
     } else if (Platform.isIOS) {
       final settings = await _messaging.getNotificationSettings();
       return settings.authorizationStatus == AuthorizationStatus.authorized;
@@ -151,15 +152,8 @@ class NotificationService {
   /// Request notification permission. Returns true if granted.
   Future<bool> requestPermission() async {
     if (Platform.isAndroid) {
-      final androidPlugin = _localNotifications
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
-      if (androidPlugin != null) {
-        final granted = await androidPlugin.requestNotificationsPermission();
-        return granted ?? false;
-      }
-      return false;
+      final granted = await _androidPlugin?.requestNotificationsPermission();
+      return granted ?? false;
     } else if (Platform.isIOS) {
       final settings = await _messaging.requestPermission(
         alert: true,
@@ -225,68 +219,115 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
-    // 先清理该 habit 所有已有通知
     await cancelAllRemindersForHabit(habitId);
-
     final base = habitId.hashCode.abs() % 100000;
 
     for (int i = 0; i < reminders.length; i++) {
-      final reminder = reminders[i];
-
-      switch (reminder.mode) {
-        case 'daily':
-          final id = base * 100 + i * 10;
-          await _localNotifications.zonedSchedule(
-            id: id,
-            scheduledDate: _nextInstanceOfTime(reminder.hour, reminder.minute),
-            notificationDetails: _reminderDetails,
-            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-            title: title,
-            body: body,
-            matchDateTimeComponents: DateTimeComponents.time,
-            payload: 'habit:$habitId',
-          );
-
-        case 'weekdays':
-          for (int d = 0; d < 5; d++) {
-            final weekday = DateTime.monday + d;
-            final id = base * 100 + i * 10 + d;
-            await _localNotifications.zonedSchedule(
-              id: id,
-              scheduledDate: _nextInstanceOfWeekdayTime(
-                weekday,
-                reminder.hour,
-                reminder.minute,
-              ),
-              notificationDetails: _reminderDetails,
-              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-              title: title,
-              body: body,
-              matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-              payload: 'habit:$habitId',
-            );
-          }
-
-        default:
-          final weekday = reminder.weekday;
-          if (weekday == null) continue;
-          final id = base * 100 + i * 10;
-          await _localNotifications.zonedSchedule(
-            id: id,
-            scheduledDate: _nextInstanceOfWeekdayTime(
-              weekday,
-              reminder.hour,
-              reminder.minute,
-            ),
-            notificationDetails: _reminderDetails,
-            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-            title: title,
-            body: body,
-            matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-            payload: 'habit:$habitId',
-          );
+      try {
+        await _scheduleByMode(
+          reminders[i],
+          base: base,
+          index: i,
+          habitId: habitId,
+          title: title,
+          body: body,
+        );
+      } catch (e, stack) {
+        ErrorHandler.record(
+          e,
+          stackTrace: stack,
+          source: 'NotificationService',
+          operation: 'scheduleReminders[$i]',
+        );
       }
     }
+  }
+
+  /// 按提醒模式分发调度。
+  Future<void> _scheduleByMode(
+    ReminderConfig reminder, {
+    required int base,
+    required int index,
+    required String habitId,
+    required String title,
+    required String body,
+  }) async {
+    switch (reminder.mode) {
+      case 'daily':
+        await _scheduleDaily(reminder, base, index, habitId, title, body);
+      case 'weekdays':
+        await _scheduleWeekdays(reminder, base, index, habitId, title, body);
+      default:
+        await _scheduleSpecificDay(reminder, base, index, habitId, title, body);
+    }
+  }
+
+  Future<void> _scheduleDaily(
+    ReminderConfig r,
+    int base,
+    int i,
+    String habitId,
+    String title,
+    String body,
+  ) async {
+    await _localNotifications.zonedSchedule(
+      id: base * 100 + i * 10,
+      scheduledDate: _nextInstanceOfTime(r.hour, r.minute),
+      notificationDetails: _reminderDetails,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      title: title,
+      body: body,
+      matchDateTimeComponents: DateTimeComponents.time,
+      payload: 'habit:$habitId',
+    );
+  }
+
+  Future<void> _scheduleWeekdays(
+    ReminderConfig r,
+    int base,
+    int i,
+    String habitId,
+    String title,
+    String body,
+  ) async {
+    for (int d = 0; d < 5; d++) {
+      await _localNotifications.zonedSchedule(
+        id: base * 100 + i * 10 + d,
+        scheduledDate: _nextInstanceOfWeekdayTime(
+          DateTime.monday + d,
+          r.hour,
+          r.minute,
+        ),
+        notificationDetails: _reminderDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        title: title,
+        body: body,
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        payload: 'habit:$habitId',
+      );
+    }
+  }
+
+  Future<void> _scheduleSpecificDay(
+    ReminderConfig r,
+    int base,
+    int i,
+    String habitId,
+    String title,
+    String body,
+  ) async {
+    final weekday = r.weekday;
+    if (weekday == null) return;
+    await _localNotifications.zonedSchedule(
+      id: base * 100 + i * 10,
+      scheduledDate: _nextInstanceOfWeekdayTime(weekday, r.hour, r.minute),
+      notificationDetails: _reminderDetails,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      title: title,
+      body: body,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      payload: 'habit:$habitId',
+    );
   }
 
   /// 取消该 habit 的所有提醒通知（最多 5 reminders × 10 slots each）。

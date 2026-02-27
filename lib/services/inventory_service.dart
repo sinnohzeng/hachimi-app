@@ -168,7 +168,7 @@ class InventoryService {
   List<String> _decodeInventory(String? raw) {
     if (raw == null) return [];
     final decoded = jsonDecode(raw);
-    if (decoded is List) return decoded.cast<String>();
+    if (decoded is List) return decoded.whereType<String>().toList();
     return [];
   }
 }

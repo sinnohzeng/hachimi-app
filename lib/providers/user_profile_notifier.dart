@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/services/user_profile_service.dart';
@@ -52,17 +53,18 @@ class UserProfileNotifier extends Notifier<void> {
     );
 
     // 2. Firebase Auth best-effort（fire-and-forget）
-    try {
-      await ref.read(authServiceProvider).updateDisplayName(newName);
-    } catch (_) {
-      // 离线时 Auth 更新失败不阻断，下次在线会通过 SyncEngine 同步
-    }
+    _syncBestEffort(
+      () => ref.read(authServiceProvider).updateDisplayName(newName),
+      'updateDisplayName(auth)',
+    );
 
     // 3. Firestore best-effort（fire-and-forget）
-    // ignore: unawaited_futures
-    ref
-        .read(userProfileServiceProvider)
-        .syncToFirestore(uid: uid, displayName: newName);
+    _syncBestEffort(
+      () => ref
+          .read(userProfileServiceProvider)
+          .syncToFirestore(uid: uid, displayName: newName),
+      'updateDisplayName(firestore)',
+    );
   }
 
   /// 登出 — 停止同步引擎 + 执行 Auth signOut。
@@ -90,10 +92,12 @@ class UserProfileNotifier extends Notifier<void> {
     );
 
     // 2. Firestore best-effort（fire-and-forget）
-    // ignore: unawaited_futures
-    ref
-        .read(userProfileServiceProvider)
-        .syncToFirestore(uid: uid, currentTitle: titleId);
+    _syncBestEffort(
+      () => ref
+          .read(userProfileServiceProvider)
+          .syncToFirestore(uid: uid, currentTitle: titleId),
+      'updateTitle',
+    );
   }
 
   /// 更新头像（本地优先 → Firestore fire-and-forget）。
@@ -112,10 +116,24 @@ class UserProfileNotifier extends Notifier<void> {
     );
 
     // 2. Firestore best-effort（fire-and-forget）
-    // ignore: unawaited_futures
-    ref
-        .read(userProfileServiceProvider)
-        .syncToFirestore(uid: uid, avatarId: avatarId);
+    _syncBestEffort(
+      () => ref
+          .read(userProfileServiceProvider)
+          .syncToFirestore(uid: uid, avatarId: avatarId),
+      'updateAvatar',
+    );
+  }
+
+  /// 尽力同步 — 失败时记录错误但不阻塞用户操作。
+  void _syncBestEffort(Future<void> Function() action, String operation) {
+    action().catchError((Object e, StackTrace stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'UserProfileNotifier',
+        operation: operation,
+      );
+    });
   }
 }
 

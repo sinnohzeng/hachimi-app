@@ -9,6 +9,12 @@ import 'package:hachimi_app/models/chat_message.dart';
 /// 管理 AI 日记/聊天 + 行为台账 + 领域表的持久化存储。
 class LocalDatabaseService {
   static const _dbName = 'hachimi_local.db';
+
+  /// Schema 版本历史：
+  /// - v1: diary_entries, chat_messages
+  /// - v2: action_ledger, local_habits, local_cats, local_sessions,
+  ///        local_monthly_checkins, materialized_state, local_achievements
+  /// - v3: local_cats.display_pose 列（纯本地，不同步）
   static const _dbVersion = 3;
 
   Database? _db;

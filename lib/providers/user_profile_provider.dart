@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 /// 监听当前用户的 avatarId。
@@ -71,7 +72,17 @@ final unlockedTitlesProvider = StreamProvider<List<String>>((ref) async* {
 
 List<String> _decodeTitles(String? raw) {
   if (raw == null || raw.isEmpty) return [];
-  final decoded = jsonDecode(raw);
-  if (decoded is List) return decoded.cast<String>();
-  return [];
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is List) return decoded.whereType<String>().toList();
+    return [];
+  } catch (e, stack) {
+    ErrorHandler.record(
+      e,
+      stackTrace: stack,
+      source: 'user_profile_provider',
+      operation: '_decodeTitles',
+    );
+    return [];
+  }
 }

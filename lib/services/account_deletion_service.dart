@@ -26,31 +26,9 @@ class AccountDeletionService {
     String uid, {
     LedgerService? ledger,
   }) async {
-    // 优先从本地 SQLite 读取
     if (ledger != null) {
       try {
-        final db = await ledger.database;
-        final habitRows = await db.query(
-          'local_habits',
-          where: 'uid = ? AND is_active = 1',
-          whereArgs: [uid],
-        );
-        final catRows = await db.query(
-          'local_cats',
-          where: 'uid = ?',
-          whereArgs: [uid],
-        );
-
-        int totalMinutes = 0;
-        for (final row in habitRows) {
-          totalMinutes += (row['total_minutes'] as int?) ?? 0;
-        }
-
-        return (
-          questCount: habitRows.length,
-          catCount: catRows.length,
-          totalHours: totalMinutes ~/ 60,
-        );
+        return await _getLocalSummary(ledger, uid);
       } catch (e, stack) {
         ErrorHandler.record(
           e,
@@ -60,16 +38,48 @@ class AccountDeletionService {
         );
       }
     }
+    return _getFirestoreSummary(uid);
+  }
 
-    // Firestore 兜底
+  /// 从 SQLite 聚合查询用户数据摘要。
+  Future<({int questCount, int catCount, int totalHours})> _getLocalSummary(
+    LedgerService ledger,
+    String uid,
+  ) async {
+    final db = await ledger.database;
+    final minutesResult = await db.rawQuery(
+      'SELECT COALESCE(SUM(total_minutes), 0) as total '
+      'FROM local_habits WHERE uid = ? AND is_active = 1',
+      [uid],
+    );
+    final questResult = await db.rawQuery(
+      'SELECT COUNT(*) as count '
+      'FROM local_habits WHERE uid = ? AND is_active = 1',
+      [uid],
+    );
+    final catResult = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM local_cats WHERE uid = ?',
+      [uid],
+    );
+
+    return (
+      questCount: (questResult.first['count'] as int?) ?? 0,
+      catCount: (catResult.first['count'] as int?) ?? 0,
+      totalHours: ((minutesResult.first['total'] as int?) ?? 0) ~/ 60,
+    );
+  }
+
+  /// Firestore 兜底获取用户数据摘要。
+  Future<({int questCount, int catCount, int totalHours})> _getFirestoreSummary(
+    String uid,
+  ) async {
     final userRef = _db.collection('users').doc(uid);
     final habitsSnap = await userRef.collection('habits').get();
     final catsSnap = await userRef.collection('cats').get();
 
     int totalMinutes = 0;
     for (final doc in habitsSnap.docs) {
-      final data = doc.data();
-      totalMinutes += (data['totalMinutes'] as int?) ?? 0;
+      totalMinutes += (doc.data()['totalMinutes'] as int?) ?? 0;
     }
 
     return (

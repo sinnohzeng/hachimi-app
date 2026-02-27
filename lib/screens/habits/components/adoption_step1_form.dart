@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
+import 'package:hachimi_app/widgets/chip_selector_row.dart';
 import 'package:hachimi_app/widgets/growth_path_card.dart';
 import 'package:hachimi_app/widgets/quest_form_dialogs.dart';
 import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
@@ -201,96 +202,34 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
   }
 
   Widget _buildTargetHoursChips(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.adoptionTotalTarget,
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: 8,
-          children: [
-            ...AdoptionStep1Form.targetHourOptions.map(_buildTargetChip),
-            _buildCustomTargetChip(),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTargetChip(int hours) {
-    final isSelected = !_isCustomTarget && targetHours == hours;
-    return ChoiceChip(
-      label: Text('${hours}h'),
-      selected: isSelected,
-      onSelected: (_) => setState(() {
-        targetHours = hours;
+    return ChipSelectorRow(
+      label: context.l10n.adoptionTotalTarget,
+      options: AdoptionStep1Form.targetHourOptions,
+      selected: targetHours,
+      isCustom: _isCustomTarget,
+      labelBuilder: (v) => '${v}h',
+      customLabel: context.l10n.adoptionCustom,
+      onSelected: (v) => setState(() {
+        targetHours = v;
         _isCustomTarget = false;
       }),
-    );
-  }
-
-  Widget _buildCustomTargetChip() {
-    if (_isCustomTarget) {
-      return ChoiceChip(
-        label: Text('${targetHours}h'),
-        selected: true,
-        onSelected: (_) => _showCustomTargetDialog(),
-      );
-    }
-    return ActionChip(
-      label: Text(context.l10n.adoptionCustom),
-      avatar: const Icon(Icons.tune, size: 18),
-      onPressed: _showCustomTargetDialog,
+      onCustom: _showCustomTargetDialog,
     );
   }
 
   Widget _buildDailyGoalChips(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.adoptionDailyGoalLabel,
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: 8,
-          children: [
-            ...AdoptionStep1Form.goalOptions.map(_buildGoalChip),
-            _buildCustomGoalChip(),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoalChip(int minutes) {
-    final isSelected = !_isCustomGoal && goalMinutes == minutes;
-    return ChoiceChip(
-      label: Text('${minutes}min'),
-      selected: isSelected,
-      onSelected: (_) => setState(() {
-        goalMinutes = minutes;
+    return ChipSelectorRow(
+      label: context.l10n.adoptionDailyGoalLabel,
+      options: AdoptionStep1Form.goalOptions,
+      selected: goalMinutes,
+      isCustom: _isCustomGoal,
+      labelBuilder: (v) => '${v}min',
+      customLabel: context.l10n.adoptionCustom,
+      onSelected: (v) => setState(() {
+        goalMinutes = v;
         _isCustomGoal = false;
       }),
-    );
-  }
-
-  Widget _buildCustomGoalChip() {
-    if (_isCustomGoal) {
-      return ChoiceChip(
-        label: Text('${goalMinutes}min'),
-        selected: true,
-        onSelected: (_) => _showCustomGoalDialog(),
-      );
-    }
-    return ActionChip(
-      label: Text(context.l10n.adoptionCustom),
-      avatar: const Icon(Icons.tune, size: 18),
-      onPressed: _showCustomGoalDialog,
+      onCustom: _showCustomGoalDialog,
     );
   }
 

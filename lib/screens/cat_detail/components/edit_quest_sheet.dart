@@ -8,6 +8,7 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/widgets/chip_selector_row.dart';
 import 'package:hachimi_app/widgets/growth_path_card.dart';
 import 'package:hachimi_app/widgets/quest_form_dialogs.dart';
 import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
@@ -217,82 +218,34 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   }
 
   Widget _buildTargetChips(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.adoptionTotalTarget,
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: 8,
-          children: [
-            ..._defaultTargetOptions.map((hours) {
-              final isSelected = !_isCustomTarget && _selectedTarget == hours;
-              return ChoiceChip(
-                label: Text('${hours}h'),
-                selected: isSelected,
-                onSelected: (_) => setState(() {
-                  _selectedTarget = hours;
-                  _isCustomTarget = false;
-                }),
-              );
-            }),
-            _isCustomTarget
-                ? ChoiceChip(
-                    label: Text('${_selectedTarget}h'),
-                    selected: true,
-                    onSelected: (_) => _onCustomTarget(),
-                  )
-                : ActionChip(
-                    label: Text(context.l10n.adoptionCustom),
-                    avatar: const Icon(Icons.tune, size: 18),
-                    onPressed: _onCustomTarget,
-                  ),
-          ],
-        ),
-      ],
+    return ChipSelectorRow(
+      label: context.l10n.adoptionTotalTarget,
+      options: _defaultTargetOptions,
+      selected: _selectedTarget,
+      isCustom: _isCustomTarget,
+      labelBuilder: (v) => '${v}h',
+      customLabel: context.l10n.adoptionCustom,
+      onSelected: (v) => setState(() {
+        _selectedTarget = v;
+        _isCustomTarget = false;
+      }),
+      onCustom: _onCustomTarget,
     );
   }
 
   Widget _buildDailyGoalChips(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.adoptionDailyGoalLabel,
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: 8,
-          children: [
-            ..._defaultGoalOptions.map((minutes) {
-              final isSelected = !_isCustomGoal && _selectedGoal == minutes;
-              return ChoiceChip(
-                label: Text('${minutes}min'),
-                selected: isSelected,
-                onSelected: (_) => setState(() {
-                  _selectedGoal = minutes;
-                  _isCustomGoal = false;
-                }),
-              );
-            }),
-            _isCustomGoal
-                ? ChoiceChip(
-                    label: Text('${_selectedGoal}min'),
-                    selected: true,
-                    onSelected: (_) => _onCustomGoal(),
-                  )
-                : ActionChip(
-                    label: Text(context.l10n.adoptionCustom),
-                    avatar: const Icon(Icons.tune, size: 18),
-                    onPressed: _onCustomGoal,
-                  ),
-          ],
-        ),
-      ],
+    return ChipSelectorRow(
+      label: context.l10n.adoptionDailyGoalLabel,
+      options: _defaultGoalOptions,
+      selected: _selectedGoal,
+      isCustom: _isCustomGoal,
+      labelBuilder: (v) => '${v}min',
+      customLabel: context.l10n.adoptionCustom,
+      onSelected: (v) => setState(() {
+        _selectedGoal = v;
+        _isCustomGoal = false;
+      }),
+      onCustom: _onCustomGoal,
     );
   }
 
