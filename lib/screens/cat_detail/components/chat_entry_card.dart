@@ -27,7 +27,9 @@ class ChatEntryCard extends StatelessWidget {
           padding: AppSpacing.paddingBase,
           child: Row(
             children: [
-              const Text('\u{1F4AC}', style: TextStyle(fontSize: 20)),
+              const ExcludeSemantics(
+                child: Text('\u{1F4AC}', style: TextStyle(fontSize: 20)),
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
@@ -48,7 +50,11 @@ class ChatEntryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+                semanticLabel: context.l10n.catDetailChatWith(catName),
+              ),
             ],
           ),
         ),

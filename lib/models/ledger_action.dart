@@ -15,7 +15,8 @@ enum ActionType {
   accountCreated('account_created'),
   accountLinked('account_linked'),
   achievementUnlocked('achievement_unlocked'),
-  achievementClaimed('achievement_claimed');
+  achievementClaimed('achievement_claimed'),
+  profileUpdate('profile_update');
 
   const ActionType(this.value);
   final String value;

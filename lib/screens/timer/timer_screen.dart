@@ -7,24 +7,25 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/models/focus_session.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/utils/session_checksum.dart';
-import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart'
-    show ServiceRequestFailure;
 import 'package:hachimi_app/services/focus_timer_service.dart';
+import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
-// NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart'
+    show ServiceRequestFailure;
 import 'package:uuid/uuid.dart';
 
 /// Focus timer in-progress screen.
@@ -49,7 +50,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     FocusTimerService.addActionListener(_onNotificationAction);
-    // Auto-start timer on entry — user already expressed intent on FocusSetupScreen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _startTimer();
     });
@@ -62,7 +62,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     super.dispose();
   }
 
-  /// Handle notification button presses from the foreground service isolate.
   void _onNotificationAction(Object data) {
     if (data is Map<String, dynamic>) {
       if (data['action'] == 'pause') {
@@ -89,23 +88,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     }
   }
 
+  // ─── Timer controls ───
+
   void _startTimer() async {
     final timerState = ref.read(focusTimerProvider);
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
 
-    // Check notification permission — request if not granted
-    final notifService = ref.read(notificationServiceProvider);
-    var hasPermission = await notifService.isPermissionGranted();
-    if (!hasPermission) {
-      hasPermission = await notifService.requestPermission();
-    }
-    if (!hasPermission && mounted) {
-      setState(() => _showPermissionBanner = true);
-    }
+    await _ensureNotificationPermission();
 
-    // Start foreground service FIRST, then start ticker — avoids race where
-    // ticker fires before the notification channel is ready.
     final result = await FocusTimerService.start(
       habitName: habit?.name ?? 'Focus',
       catEmoji: '🐱',
@@ -120,7 +111,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     ref.read(focusTimerProvider.notifier).start();
     setState(() => _hasStarted = true);
 
-    // Analytics: log focus session started
     ref
         .read(analyticsServiceProvider)
         .logFocusSessionStarted(
@@ -132,19 +122,21 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         );
   }
 
-  void _pauseTimer() {
-    ref.read(focusTimerProvider.notifier).pause();
+  Future<void> _ensureNotificationPermission() async {
+    final notifService = ref.read(notificationServiceProvider);
+    var hasPermission = await notifService.isPermissionGranted();
+    if (!hasPermission) {
+      hasPermission = await notifService.requestPermission();
+    }
+    if (!hasPermission && mounted) {
+      setState(() => _showPermissionBanner = true);
+    }
   }
 
-  void _resumeTimer() {
-    ref.read(focusTimerProvider.notifier).resume();
-  }
+  void _pauseTimer() => ref.read(focusTimerProvider.notifier).pause();
+  void _resumeTimer() => ref.read(focusTimerProvider.notifier).resume();
+  void _completeTimer() => ref.read(focusTimerProvider.notifier).complete();
 
-  void _completeTimer() {
-    ref.read(focusTimerProvider.notifier).complete();
-  }
-
-  /// Grace-period back: stop service, reset state, pop without confirmation.
   void _goBack() {
     FocusTimerService.stop();
     ref.read(focusTimerProvider.notifier).reset();
@@ -177,43 +169,61 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     }
   }
 
+  // ─── Session save ───
+
+  /// 监听计时器终态（完成/放弃），触发会话保存。
+  void _onTimerTerminated(FocusTimerState? prev, FocusTimerState next) {
+    if (_sessionSaved) return;
+    final isTerminal =
+        next.status == TimerStatus.completed ||
+        next.status == TimerStatus.abandoned;
+    if (!isTerminal) return;
+    _sessionSaved = true;
+    if (next.status == TimerStatus.completed) {
+      HapticFeedback.heavyImpact();
+    }
+    _saveSession(next);
+  }
+
   Future<void> _saveSession(FocusTimerState timerState) async {
-    // Stop foreground service
     FocusTimerService.stop();
 
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
     if (habit == null) return;
 
     final minutes = timerState.focusedMinutes;
-    final isCompleted = timerState.status == TimerStatus.completed;
     final isAbandoned = timerState.status == TimerStatus.abandoned;
 
-    // No reward if < 5 minutes and abandoned
     if (isAbandoned && minutes < 5) {
       if (mounted) Navigator.of(context).pop();
       return;
     }
 
-    // Calculate coins earned (durationMinutes × 10)
-    final coinsEarned = minutes * focusRewardCoinsPerMinute;
-
-    // Calculate XP (still used for display)
-    final xpService = ref.read(xpServiceProvider);
-    final todayMap = ref.read(todayMinutesPerHabitProvider);
-    final activeHabits = habits.where((h) => h.isActive).toList();
-    final allHabitsDone =
-        activeHabits.isNotEmpty &&
-        activeHabits.every((h) => (todayMap[h.id] ?? 0) >= h.goalMinutes);
-    final xpResult = xpService.calculateXp(
-      minutes: minutes,
-      allHabitsDone: allHabitsDone,
+    final rewards = _calculateRewards(minutes, habit);
+    final session = _buildSessionRecord(timerState, habit, minutes, rewards);
+    ErrorHandler.breadcrumb(
+      'focus_completed: ${habit.name}, ${minutes}min, ${rewards.coins}coins',
     );
 
-    // Check for stage-up (fixed hour ladder)
+    await _persistSession(uid, session, timerState, habit, minutes, rewards);
+    if (mounted) _navigateToResult(timerState, habit, minutes, rewards);
+  }
+
+  _SessionRewards _calculateRewards(int minutes, Habit habit) {
+    final coins = minutes * focusRewardCoinsPerMinute;
+    final xpService = ref.read(xpServiceProvider);
+    final todayMap = ref.read(todayMinutesPerHabitProvider);
+    final habits = ref.read(habitsProvider).value ?? [];
+    final activeHabits = habits.where((h) => h.isActive).toList();
+    final allDone =
+        activeHabits.isNotEmpty &&
+        activeHabits.every((h) => (todayMap[h.id] ?? 0) >= h.goalMinutes);
+
+    final xp = xpService.calculateXp(minutes: minutes, allHabitsDone: allDone);
+
     final cat = habit.catId != null
         ? ref.read(catByIdProvider(habit.catId!))
         : null;
@@ -224,7 +234,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           )
         : null;
 
-    // 构建增强版会话记录
+    return _SessionRewards(coins: coins, xp: xp, stageUp: stageUp);
+  }
+
+  FocusSession _buildSessionRecord(
+    FocusTimerState timerState,
+    Habit habit,
+    int minutes,
+    _SessionRewards rewards,
+  ) {
     final modeStr = timerState.mode == TimerMode.countdown
         ? 'countdown'
         : 'stopwatch';
@@ -235,14 +253,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? (minutes / targetMinutes).clamp(0.0, 1.0)
         : 1.0;
     final startedAt = timerState.startedAt ?? DateTime.now();
+    final clientVersion = ref.read(appInfoProvider).value?.version ?? '';
 
-    // 客户端版本号
-    final packageInfo = ref.read(appInfoProvider).value;
-    final clientVersion = packageInfo?.version ?? '';
-
-    final sessionId = const Uuid().v4();
-    final session = FocusSession(
-      id: sessionId,
+    return FocusSession(
+      id: const Uuid().v4(),
       habitId: widget.habitId,
       catId: habit.catId ?? '',
       startedAt: startedAt,
@@ -250,31 +264,35 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       durationMinutes: minutes,
       targetDurationMinutes: targetMinutes,
       pausedSeconds: timerState.totalPausedSeconds,
-      status: isCompleted ? 'completed' : 'abandoned',
+      status: timerState.status == TimerStatus.completed
+          ? 'completed'
+          : 'abandoned',
       completionRatio: completionRatio,
-      xpEarned: xpResult.totalXp,
-      coinsEarned: coinsEarned,
+      xpEarned: rewards.xp.totalXp,
+      coinsEarned: rewards.coins,
       mode: modeStr,
       checksum: SessionChecksum.compute(
         habitId: widget.habitId,
         durationMinutes: minutes,
-        coinsEarned: coinsEarned,
-        xpEarned: xpResult.totalXp,
+        coinsEarned: rewards.coins,
+        xpEarned: rewards.xp.totalXp,
         startedAt: startedAt,
       ),
       clientVersion: clientVersion,
     );
+  }
 
-    ErrorHandler.breadcrumb(
-      'focus_completed: ${habit.name}, ${minutes}min, ${coinsEarned}coins',
-    );
+  Future<void> _persistSession(
+    String uid,
+    FocusSession session,
+    FocusTimerState timerState,
+    Habit habit,
+    int minutes,
+    _SessionRewards rewards,
+  ) async {
+    await ref.read(localSessionRepositoryProvider).logSession(uid, session);
 
-    // 写入本地 SQLite
-    final sessionRepo = ref.read(localSessionRepositoryProvider);
-    await sessionRepo.logSession(uid, session);
-
-    // 更新 habit 和 cat 的累计进度
-    if (isCompleted) {
+    if (timerState.status == TimerStatus.completed) {
       final today = AppDateUtils.todayString();
       await ref
           .read(localHabitRepositoryProvider)
@@ -296,25 +314,77 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       }
     }
 
-    // 金币奖励写入本地
-    if (coinsEarned > 0) {
+    if (rewards.coins > 0) {
       await ref
           .read(coinServiceProvider)
-          .earnCoins(uid: uid, amount: coinsEarned);
+          .earnCoins(uid: uid, amount: rewards.coins);
+    }
+  }
+
+  void _navigateToResult(
+    FocusTimerState timerState,
+    Habit habit,
+    int minutes,
+    _SessionRewards rewards,
+  ) {
+    final isCompleted = timerState.status == TimerStatus.completed;
+    final isAbandoned = timerState.status == TimerStatus.abandoned;
+
+    _logSessionAnalytics(timerState, minutes, rewards);
+
+    if (isCompleted) {
+      final cat = habit.catId != null
+          ? ref.read(catByIdProvider(habit.catId!))
+          : null;
+      final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
+      ref
+          .read(notificationServiceProvider)
+          .showFocusComplete(
+            title: context.l10n.focusCompleteNotifTitle,
+            body: context.l10n.focusCompleteNotifBody(
+              catName,
+              rewards.xp.totalXp,
+              minutes,
+            ),
+          );
     }
 
-    // Analytics: log session outcome
+    Navigator.of(context).pushReplacementNamed(
+      AppRouter.focusComplete,
+      arguments: {
+        'habitId': widget.habitId,
+        'minutes': minutes,
+        'xpResult': rewards.xp,
+        'stageUp': rewards.stageUp,
+        'isAbandoned': isAbandoned,
+        'coinsEarned': rewards.coins,
+      },
+    );
+  }
+
+  void _logSessionAnalytics(
+    FocusTimerState timerState,
+    int minutes,
+    _SessionRewards rewards,
+  ) {
     final analytics = ref.read(analyticsServiceProvider);
-    if (isCompleted) {
+    final targetMinutes = timerState.mode == TimerMode.countdown
+        ? timerState.totalSeconds ~/ 60
+        : 0;
+    final completionRatio = targetMinutes > 0
+        ? (minutes / targetMinutes).clamp(0.0, 1.0)
+        : 1.0;
+
+    if (timerState.status == TimerStatus.completed) {
       analytics.logFocusSessionCompleted(
         habitId: widget.habitId,
         actualMinutes: minutes,
-        xpEarned: xpResult.totalXp,
+        xpEarned: rewards.xp.totalXp,
         targetDurationMinutes: targetMinutes,
         pausedSeconds: timerState.totalPausedSeconds,
         completionRatio: completionRatio,
       );
-    } else if (isAbandoned) {
+    } else {
       analytics.logFocusSessionAbandoned(
         habitId: widget.habitId,
         minutesCompleted: minutes,
@@ -325,47 +395,17 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    // Track coins earned from focus session
-    if (coinsEarned > 0) {
-      analytics.logCoinsEarned(amount: coinsEarned, source: 'focus_session');
-    }
-
-    if (mounted) {
-      // Send completion notification (only on successful completion)
-      if (isCompleted) {
-        final catName = cat?.name ?? context.l10n.focusCompleteYourCat;
-        ref
-            .read(notificationServiceProvider)
-            .showFocusComplete(
-              title: context.l10n.focusCompleteNotifTitle,
-              body: context.l10n.focusCompleteNotifBody(
-                catName,
-                xpResult.totalXp,
-                minutes,
-              ),
-            );
-      }
-
-      // Navigate to completion screen
-      Navigator.of(context).pushReplacementNamed(
-        AppRouter.focusComplete,
-        arguments: {
-          'habitId': widget.habitId,
-          'minutes': minutes,
-          'xpResult': xpResult,
-          'stageUp': stageUp,
-          'isAbandoned': isAbandoned,
-          'coinsEarned': coinsEarned,
-        },
-      );
+    if (rewards.coins > 0) {
+      analytics.logCoinsEarned(amount: rewards.coins, source: 'focus_session');
     }
   }
+
+  // ─── UI ───
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
 
     final timerState = ref.watch(focusTimerProvider);
     final habits = ref.watch(habitsProvider).value ?? [];
@@ -374,24 +414,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? ref.watch(catByIdProvider(habit!.catId!))
         : null;
 
-    // Notification updates are now driven by FocusTimerNotifier._onTick()
-    // so they work even when the app is in the background.
-
-    // Handle completed/abandoned state — guard with _sessionSaved to prevent
-    // multiple postFrameCallbacks being registered across successive builds.
-    if (!_sessionSaved &&
-        (timerState.status == TimerStatus.completed ||
-            timerState.status == TimerStatus.abandoned)) {
-      _sessionSaved = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          if (timerState.status == TimerStatus.completed) {
-            HapticFeedback.heavyImpact();
-          }
-          _saveSession(timerState);
-        }
-      });
-    }
+    // 监听终态变化，触发保存（替代 build() 内副作用）
+    ref.listen(focusTimerProvider, _onTimerTerminated);
 
     if (habit == null) {
       return Scaffold(
@@ -400,42 +424,33 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    // Use stage color for mesh gradient background
     final bgColor = cat != null
         ? stageColor(cat.displayStage)
         : colorScheme.primary;
     final meshColors = timerMeshColors(bgColor, colorScheme);
-
-    // Grace period: first 10 seconds allow free exit
     final isRunningOrPaused =
         timerState.status == TimerStatus.running ||
         timerState.status == TimerStatus.paused;
     final inGracePeriod = isRunningOrPaused && timerState.elapsedSeconds <= 10;
-    // Allow pop freely when idle/completed/abandoned or during grace period
-    final allowPop = !isRunningOrPaused || inGracePeriod;
 
     return PopScope(
-      canPop: allowPop,
+      canPop: !isRunningOrPaused || inGracePeriod,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) {
-          // Pop already happened — clean up if in grace period
           if (inGracePeriod) {
             FocusTimerService.stop();
             ref.read(focusTimerProvider.notifier).reset();
           }
           return;
         }
-        // didPop == false means canPop was false → past grace period
         _giveUp();
       },
       child: Scaffold(
         body: Stack(
           children: [
-            // Layer 1: Slow breathing mesh gradient
             Positioned.fill(
               child: AnimatedMeshBackground(colors: meshColors, speed: 0.3),
             ),
-            // Layer 2: Subtle floating dust particles
             const Positioned.fill(
               child: IgnorePointer(
                 child: ParticleOverlay(
@@ -444,194 +459,18 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                 ),
               ),
             ),
-            // Layer 3: Original content
             SafeArea(
               child: Column(
                 children: [
-                  // Notification permission banner
-                  if (_showPermissionBanner)
-                    MaterialBanner(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      content: Text(context.l10n.timerNotificationBanner),
-                      leading: const Icon(Icons.notifications_off_outlined),
-                      actions: [
-                        TextButton(
-                          onPressed: () =>
-                              setState(() => _showPermissionBanner = false),
-                          child: Text(context.l10n.timerNotificationDismiss),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final granted = await ref
-                                .read(notificationServiceProvider)
-                                .requestPermission();
-                            if (mounted) {
-                              setState(() => _showPermissionBanner = !granted);
-                            }
-                          },
-                          child: Text(context.l10n.timerNotificationEnable),
-                        ),
-                      ],
-                    ),
-
-                  // Top bar: habit name + streak
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          habit.name,
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (habit.totalCheckInDays > 0) ...[
-                          const SizedBox(width: AppSpacing.md),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.tertiaryContainer,
-                              borderRadius: AppShape.borderMedium,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.calendar_today, size: 14),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '${habit.totalCheckInDays}d',
-                                  style: textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
+                  if (_showPermissionBanner) _buildPermissionBanner(),
+                  _buildHabitHeader(habit, theme),
                   const Spacer(flex: 2),
-
-                  // Cat + circular progress
-                  SizedBox(
-                    width: 240,
-                    height: 240,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Progress ring
-                        ProgressRing(
-                          progress: timerState.progress,
-                          size: 240,
-                          strokeWidth: 8,
-                          child: const SizedBox(),
-                        ),
-                        // Cat sprite
-                        if (cat != null)
-                          TappableCatSprite(cat: cat, size: 100)
-                        else
-                          Icon(
-                            Icons.self_improvement,
-                            size: 64,
-                            color: colorScheme.onSurfaceVariant,
-                            semanticLabel: 'Focus meditation',
-                          ),
-                      ],
-                    ),
-                  ),
+                  _buildCatProgress(cat, timerState, colorScheme),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // Timer display
-                  Semantics(
-                    label: 'Timer: ${timerState.displayTime}',
-                    liveRegion: true,
-                    child: Text(
-                      timerState.displayTime,
-                      style: textTheme.displayLarge?.copyWith(
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  // Mode indicator
-                  Text(
-                    timerState.mode == TimerMode.countdown
-                        ? context.l10n.timerRemaining
-                        : context.l10n.timerElapsed,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-
-                  // Paused indicator
-                  if (timerState.status == TimerStatus.paused) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.errorContainer,
-                        borderRadius: AppShape.borderMedium,
-                      ),
-                      child: Text(
-                        context.l10n.timerPaused,
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.onErrorContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-
+                  _buildTimerDisplay(timerState, theme),
                   const Spacer(flex: 3),
-
-                  // Controls
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                    child: _buildControls(timerState, theme),
-                  ),
-
-                  // Bottom button: grace-period "返回" or "Give Up"
-                  if (_hasStarted &&
-                      timerState.status != TimerStatus.completed &&
-                      timerState.status != TimerStatus.abandoned)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: inGracePeriod
-                          ? TextButton(
-                              onPressed: _goBack,
-                              child: Text(
-                                context.l10n.timerGraceBack(
-                                  10 - timerState.elapsedSeconds,
-                                ),
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            )
-                          : TextButton(
-                              onPressed: _giveUp,
-                              child: Text(
-                                context.l10n.timerGiveUp,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                    ),
+                  _buildControls(timerState, theme),
+                  _buildGraceOrGiveUp(timerState, inGracePeriod, theme),
                 ],
               ),
             ),
@@ -641,114 +480,309 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
   }
 
-  Widget _buildControls(FocusTimerState timerState, ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-
-    switch (timerState.status) {
-      case TimerStatus.idle:
-        return SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FilledButton.icon(
-            onPressed: _startTimer,
-            icon: const Icon(Icons.play_arrow, size: 28),
-            label: Text(
-              context.l10n.timerStart,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        );
-
-      case TimerStatus.running:
-        // Stopwatch mode: show Pause + Done side-by-side
-        if (timerState.mode == TimerMode.stopwatch) {
-          return Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 56,
-                  child: FilledButton.tonalIcon(
-                    onPressed: _pauseTimer,
-                    icon: const Icon(Icons.pause, size: 28),
-                    label: Text(
-                      context.l10n.timerPause,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: SizedBox(
-                  height: 56,
-                  child: FilledButton.icon(
-                    onPressed: _completeTimer,
-                    icon: const Icon(Icons.check, size: 28),
-                    label: Text(
-                      context.l10n.timerDone,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-        // Countdown mode: only Pause
-        return SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FilledButton.tonalIcon(
-            onPressed: _pauseTimer,
-            icon: const Icon(Icons.pause, size: 28),
-            label: Text(
-              context.l10n.timerPause,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        );
-
-      case TimerStatus.paused:
-        return Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 56,
-                child: FilledButton.icon(
-                  onPressed: _resumeTimer,
-                  icon: const Icon(Icons.play_arrow),
-                  label: Text(context.l10n.timerResume),
-                ),
-              ),
-            ),
-            if (timerState.mode == TimerMode.stopwatch) ...[
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: SizedBox(
-                  height: 56,
-                  child: FilledButton.tonalIcon(
-                    onPressed: _completeTimer,
-                    icon: const Icon(Icons.check),
-                    label: Text(context.l10n.timerDone),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        );
-
-      default:
-        return const SizedBox.shrink();
-    }
+  Widget _buildPermissionBanner() {
+    return MaterialBanner(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      content: Text(context.l10n.timerNotificationBanner),
+      leading: const Icon(Icons.notifications_off_outlined),
+      actions: [
+        TextButton(
+          onPressed: () => setState(() => _showPermissionBanner = false),
+          child: Text(context.l10n.timerNotificationDismiss),
+        ),
+        TextButton(
+          onPressed: () async {
+            final granted = await ref
+                .read(notificationServiceProvider)
+                .requestPermission();
+            if (mounted) {
+              setState(() => _showPermissionBanner = !granted);
+            }
+          },
+          child: Text(context.l10n.timerNotificationEnable),
+        ),
+      ],
+    );
   }
+
+  Widget _buildHabitHeader(Habit habit, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            habit.name,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          if (habit.totalCheckInDays > 0) ...[
+            const SizedBox(width: AppSpacing.md),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: colorScheme.tertiaryContainer,
+                borderRadius: AppShape.borderMedium,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.calendar_today, size: 14),
+                  const SizedBox(width: 2),
+                  Text(
+                    '${habit.totalCheckInDays}d',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCatProgress(
+    dynamic cat,
+    FocusTimerState timerState,
+    ColorScheme colorScheme,
+  ) {
+    return SizedBox(
+      width: 240,
+      height: 240,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ProgressRing(
+            progress: timerState.progress,
+            size: 240,
+            strokeWidth: 8,
+            child: const SizedBox(),
+          ),
+          if (cat != null)
+            TappableCatSprite(cat: cat, size: 100)
+          else
+            Icon(
+              Icons.self_improvement,
+              size: 64,
+              color: colorScheme.onSurfaceVariant,
+              semanticLabel: 'Focus meditation',
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimerDisplay(FocusTimerState timerState, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Column(
+      children: [
+        Semantics(
+          label: 'Timer: ${timerState.displayTime}',
+          liveRegion: true,
+          child: Text(
+            timerState.displayTime,
+            style: textTheme.displayLarge?.copyWith(
+              fontWeight: FontWeight.w300,
+              letterSpacing: 2,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          timerState.mode == TimerMode.countdown
+              ? context.l10n.timerRemaining
+              : context.l10n.timerElapsed,
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        if (timerState.status == TimerStatus.paused) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer,
+              borderRadius: AppShape.borderMedium,
+            ),
+            child: Text(
+              context.l10n.timerPaused,
+              style: textTheme.labelMedium?.copyWith(
+                color: colorScheme.onErrorContainer,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildGraceOrGiveUp(
+    FocusTimerState timerState,
+    bool inGracePeriod,
+    ThemeData theme,
+  ) {
+    final isActive =
+        _hasStarted &&
+        timerState.status != TimerStatus.completed &&
+        timerState.status != TimerStatus.abandoned;
+    if (!isActive) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: inGracePeriod
+          ? TextButton(
+              onPressed: _goBack,
+              child: Text(
+                context.l10n.timerGraceBack(10 - timerState.elapsedSeconds),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            )
+          : TextButton(
+              onPressed: _giveUp,
+              child: Text(
+                context.l10n.timerGiveUp,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildControls(FocusTimerState timerState, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+      child: switch (timerState.status) {
+        TimerStatus.idle => _buildIdleButton(theme),
+        TimerStatus.running => _buildRunningButtons(timerState, theme),
+        TimerStatus.paused => _buildPausedButtons(timerState, theme),
+        _ => const SizedBox.shrink(),
+      },
+    );
+  }
+
+  Widget _buildIdleButton(ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: FilledButton.icon(
+        onPressed: _startTimer,
+        icon: const Icon(Icons.play_arrow, size: 28),
+        label: Text(
+          context.l10n.timerStart,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRunningButtons(FocusTimerState timerState, ThemeData theme) {
+    final isStopwatch = timerState.mode == TimerMode.stopwatch;
+
+    if (!isStopwatch) {
+      return SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: FilledButton.tonalIcon(
+          onPressed: _pauseTimer,
+          icon: const Icon(Icons.pause, size: 28),
+          label: Text(
+            context.l10n.timerPause,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: FilledButton.tonalIcon(
+              onPressed: _pauseTimer,
+              icon: const Icon(Icons.pause, size: 28),
+              label: Text(
+                context.l10n.timerPause,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: FilledButton.icon(
+              onPressed: _completeTimer,
+              icon: const Icon(Icons.check, size: 28),
+              label: Text(
+                context.l10n.timerDone,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPausedButtons(FocusTimerState timerState, ThemeData theme) {
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 56,
+            child: FilledButton.icon(
+              onPressed: _resumeTimer,
+              icon: const Icon(Icons.play_arrow),
+              label: Text(context.l10n.timerResume),
+            ),
+          ),
+        ),
+        if (timerState.mode == TimerMode.stopwatch) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: SizedBox(
+              height: 56,
+              child: FilledButton.tonalIcon(
+                onPressed: _completeTimer,
+                icon: const Icon(Icons.check),
+                label: Text(context.l10n.timerDone),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// 会话奖励计算结果 — 在 _saveSession 子方法间传递。
+class _SessionRewards {
+  final int coins;
+  final XpResult xp;
+  final StageUpResult? stageUp;
+
+  const _SessionRewards({required this.coins, required this.xp, this.stageUp});
 }

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart' show Database, Transaction;
+
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
@@ -64,52 +66,7 @@ class AchievementEvaluator {
         for (final def in AchievementDefinitions.all) {
           if (ctx.unlockedIds.contains(def.id)) continue;
           if (!_checkCondition(def, trigger, ctx)) continue;
-
-          final actionId = _uuid.v4();
-          final now = DateTime.now();
-
-          // 写入本地成就表
-          await txn.insert('local_achievements', {
-            'id': def.id,
-            'uid': uid,
-            'unlocked_at': now.millisecondsSinceEpoch,
-            'reward_coins': def.coinReward,
-            'reward_claimed': 1, // auto-claim
-            'reward_claimed_at': now.millisecondsSinceEpoch,
-            'title_reward': def.titleReward,
-            'trigger_action_id': actionId,
-            'context': jsonEncode(_buildSnapshotContext(change)),
-          });
-
-          // 发放金币奖励
-          if (def.coinReward > 0) {
-            final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
-            final coins = (int.tryParse(raw ?? '0') ?? 0) + def.coinReward;
-            await _ledger.setMaterializedInTxn(
-              txn,
-              uid,
-              'coins',
-              coins.toString(),
-            );
-          }
-
-          // 写台账
-          await _ledger.appendInTxn(
-            txn,
-            type: ActionType.achievementUnlocked,
-            uid: uid,
-            startedAt: now,
-            payload: {
-              'achievementId': def.id,
-              'trigger': trigger.name,
-              'triggerActionId': actionId,
-            },
-            result: {
-              if (def.coinReward > 0) 'coins': def.coinReward,
-              if (def.titleReward != null) 'title': def.titleReward,
-            },
-          );
-
+          await _unlockAchievement(txn, uid, def, trigger, change);
           newlyUnlocked.add(def.id);
         }
       });
@@ -124,125 +81,193 @@ class AchievementEvaluator {
         _onUnlocked(newlyUnlocked);
       }
     } catch (e, stack) {
-      debugPrint('AchievementEvaluator error: $e\n$stack');
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'AchievementEvaluator',
+        operation: '_evaluate',
+      );
     }
+  }
+
+  /// 解锁单个成就：写本地表 + 发放金币 + 写台账。
+  Future<void> _unlockAchievement(
+    Transaction txn,
+    String uid,
+    AchievementDef def,
+    AchievementTrigger trigger,
+    LedgerChange change,
+  ) async {
+    final actionId = _uuid.v4();
+    final now = DateTime.now();
+
+    await txn.insert('local_achievements', {
+      'id': def.id,
+      'uid': uid,
+      'unlocked_at': now.millisecondsSinceEpoch,
+      'reward_coins': def.coinReward,
+      'reward_claimed': 1,
+      'reward_claimed_at': now.millisecondsSinceEpoch,
+      'title_reward': def.titleReward,
+      'trigger_action_id': actionId,
+      'context': jsonEncode(_buildSnapshotContext(change)),
+    });
+
+    if (def.coinReward > 0) {
+      final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
+      final coins = (int.tryParse(raw ?? '0') ?? 0) + def.coinReward;
+      await _ledger.setMaterializedInTxn(txn, uid, 'coins', coins.toString());
+    }
+
+    await _ledger.appendInTxn(
+      txn,
+      type: ActionType.achievementUnlocked,
+      uid: uid,
+      startedAt: now,
+      payload: {
+        'achievementId': def.id,
+        'trigger': trigger.name,
+        'triggerActionId': actionId,
+      },
+      result: {
+        if (def.coinReward > 0) 'coins': def.coinReward,
+        if (def.titleReward != null) 'title': def.titleReward,
+      },
+    );
   }
 
   /// 从本地表构建评估上下文。
   Future<AchievementEvalContext> _buildContext(String uid) async {
     final db = await _ledger.database;
-
-    // 习惯数据
-    final habitRows = await db.query(
-      'local_habits',
-      where: 'uid = ? AND is_active = 1',
-      whereArgs: [uid],
-    );
-    final habitMinutes = <int>[];
-    final habitCheckInDays = <int>[];
-    for (final row in habitRows) {
-      habitMinutes.add(row['total_minutes'] as int? ?? 0);
-      habitCheckInDays.add(row['total_check_in_days'] as int? ?? 0);
-    }
-
-    // 猫数据
-    final catRows = await db.query(
-      'local_cats',
-      where: 'uid = ?',
-      whereArgs: [uid],
-    );
-    final catStages = <String>[];
-    final catProgresses = <double>[];
-    final equippedAccessories = <String>[];
-    int graduatedCount = 0;
-    bool allCatsHappy = catRows.isNotEmpty;
-
-    for (final row in catRows) {
-      final totalMin = row['total_minutes'] as int? ?? 0;
-      final progress = (totalMin / 12000.0).clamp(0.0, 1.0);
-      catProgresses.add(progress);
-
-      final stage = _computeStage(totalMin);
-      final highest = row['highest_stage'] as String?;
-      catStages.add(_higherStage(highest, stage));
-
-      final equipped = row['equipped_accessory'] as String?;
-      if (equipped != null && equipped.isNotEmpty) {
-        equippedAccessories.add(equipped);
-      }
-
-      if (row['state'] == 'graduated') graduatedCount++;
-
-      // 心情判断
-      final lastSessionAt = row['last_session_at'] as int?;
-      if (lastSessionAt != null) {
-        final hoursSince = DateTime.now()
-            .difference(DateTime.fromMillisecondsSinceEpoch(lastSessionAt))
-            .inHours;
-        if (hoursSince > 24) allCatsHappy = false;
-      }
-    }
-
-    // 会话数
+    final habitData = await _queryHabitData(db, uid);
+    final catData = await _queryCatData(db, uid);
     final sessionCount = await _ledger.getMaterializedInt(
       uid,
       'total_session_count',
     );
+    final allDoneToday = await _checkAllHabitsDoneToday(
+      db,
+      uid,
+      habitData.rows,
+    );
+    final invRaw = await _ledger.getMaterialized(uid, 'inventory');
+    final unlockedIds = await _queryUnlockedIds(db, uid);
 
-    // 今日各 habit 完成情况
-    final todayStart = DateTime.now();
-    final todayStartMs = DateTime(
-      todayStart.year,
-      todayStart.month,
-      todayStart.day,
+    return AchievementEvalContext(
+      totalSessionCount: sessionCount ?? 0,
+      activeHabitCount: habitData.rows.length,
+      habitCheckInDays: habitData.checkInDays,
+      habitTotalMinutes: habitData.minutes,
+      catStages: catData.stages,
+      catProgresses: catData.progresses,
+      totalCatCount: catData.totalCount,
+      graduatedCatCount: catData.graduatedCount,
+      accessoryCount:
+          _decodeInventory(invRaw).length + catData.equippedAccessories.length,
+      equippedAccessories: catData.equippedAccessories,
+      allCatsHappy: catData.allHappy,
+      allHabitsDoneToday: allDoneToday,
+      unlockedIds: unlockedIds,
+    );
+  }
+
+  /// 查询活跃习惯的累计数据。
+  Future<_HabitData> _queryHabitData(Database db, String uid) async {
+    final rows = await db.query(
+      'local_habits',
+      where: 'uid = ? AND is_active = 1',
+      whereArgs: [uid],
+    );
+    final minutes = <int>[];
+    final checkInDays = <int>[];
+    for (final row in rows) {
+      minutes.add(row['total_minutes'] as int? ?? 0);
+      checkInDays.add(row['total_check_in_days'] as int? ?? 0);
+    }
+    return _HabitData(rows: rows, minutes: minutes, checkInDays: checkInDays);
+  }
+
+  /// 查询猫进度、阶段、配饰、心情等聚合数据。
+  Future<_CatData> _queryCatData(Database db, String uid) async {
+    final rows = await db.query(
+      'local_cats',
+      where: 'uid = ?',
+      whereArgs: [uid],
+    );
+    final stages = <String>[];
+    final progresses = <double>[];
+    final equipped = <String>[];
+    int graduated = 0;
+    bool allHappy = rows.isNotEmpty;
+
+    for (final row in rows) {
+      final totalMin = row['total_minutes'] as int? ?? 0;
+      progresses.add((totalMin / 12000.0).clamp(0.0, 1.0));
+      stages.add(
+        _higherStage(row['highest_stage'] as String?, _computeStage(totalMin)),
+      );
+      final eq = row['equipped_accessory'] as String?;
+      if (eq != null && eq.isNotEmpty) equipped.add(eq);
+      if (row['state'] == 'graduated') graduated++;
+      final lastAt = row['last_session_at'] as int?;
+      if (lastAt != null) {
+        final hours = DateTime.now()
+            .difference(DateTime.fromMillisecondsSinceEpoch(lastAt))
+            .inHours;
+        if (hours > 24) allHappy = false;
+      }
+    }
+
+    return _CatData(
+      stages: stages,
+      progresses: progresses,
+      equippedAccessories: equipped,
+      graduatedCount: graduated,
+      allHappy: allHappy,
+      totalCount: rows.length,
+    );
+  }
+
+  /// 检查今日所有习惯是否都已完成每日目标。
+  Future<bool> _checkAllHabitsDoneToday(
+    Database db,
+    String uid,
+    List<Map<String, Object?>> habitRows,
+  ) async {
+    if (habitRows.isEmpty) return false;
+    final now = DateTime.now();
+    final todayMs = DateTime(
+      now.year,
+      now.month,
+      now.day,
     ).millisecondsSinceEpoch;
-    final todaySessions = await db.rawQuery(
+    final rows = await db.rawQuery(
       'SELECT habit_id, SUM(duration_minutes) as total '
       'FROM local_sessions '
       "WHERE uid = ? AND started_at >= ? AND status = 'completed' "
       'GROUP BY habit_id',
-      [uid, todayStartMs],
+      [uid, todayMs],
     );
     final todayMap = <String, int>{};
-    for (final row in todaySessions) {
+    for (final row in rows) {
       todayMap[row['habit_id'] as String] = row['total'] as int? ?? 0;
     }
-    final allDoneToday =
-        habitRows.isNotEmpty &&
-        habitRows.every((h) {
-          final goal = h['goal_minutes'] as int? ?? 25;
-          final done = todayMap[h['id'] as String] ?? 0;
-          return done >= goal;
-        });
+    return habitRows.every((h) {
+      final goal = h['goal_minutes'] as int? ?? 25;
+      final done = todayMap[h['id'] as String] ?? 0;
+      return done >= goal;
+    });
+  }
 
-    // inventory
-    final invRaw = await _ledger.getMaterialized(uid, 'inventory');
-    final inventoryCount = _decodeInventory(invRaw).length;
-
-    // 已解锁 IDs
-    final unlockedRows = await db.query(
+  /// 查询已解锁成就 ID 集合。
+  Future<Set<String>> _queryUnlockedIds(Database db, String uid) async {
+    final rows = await db.query(
       'local_achievements',
       columns: ['id'],
       where: 'uid = ? AND unlocked_at IS NOT NULL',
       whereArgs: [uid],
     );
-    final unlockedIds = unlockedRows.map((r) => r['id'] as String).toSet();
-
-    return AchievementEvalContext(
-      totalSessionCount: sessionCount ?? 0,
-      activeHabitCount: habitRows.length,
-      habitCheckInDays: habitCheckInDays,
-      habitTotalMinutes: habitMinutes,
-      catStages: catStages,
-      catProgresses: catProgresses,
-      totalCatCount: catRows.length,
-      graduatedCatCount: graduatedCount,
-      accessoryCount: inventoryCount + equippedAccessories.length,
-      equippedAccessories: equippedAccessories,
-      allCatsHappy: allCatsHappy,
-      allHabitsDoneToday: allDoneToday,
-      unlockedIds: unlockedIds,
-    );
+    return rows.map((r) => r['id'] as String).toSet();
   }
 
   /// 检查单个成就的解锁条件。
@@ -334,4 +359,36 @@ class AchievementEvaluator {
     if (decoded is List) return decoded.cast<String>();
     return [];
   }
+}
+
+/// 习惯聚合数据（内部使用）。
+class _HabitData {
+  final List<Map<String, Object?>> rows;
+  final List<int> minutes;
+  final List<int> checkInDays;
+
+  const _HabitData({
+    required this.rows,
+    required this.minutes,
+    required this.checkInDays,
+  });
+}
+
+/// 猫聚合数据（内部使用）。
+class _CatData {
+  final List<String> stages;
+  final List<double> progresses;
+  final List<String> equippedAccessories;
+  final int graduatedCount;
+  final bool allHappy;
+  final int totalCount;
+
+  const _CatData({
+    required this.stages,
+    required this.progresses,
+    required this.equippedAccessories,
+    required this.graduatedCount,
+    required this.allHappy,
+    required this.totalCount,
+  });
 }

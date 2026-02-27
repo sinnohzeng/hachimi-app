@@ -13,9 +13,12 @@ class LocalDatabaseService {
 
   Database? _db;
 
-  /// 获取数据库实例（懒初始化）。
+  /// 获取数据库实例（懒初始化 + 完整性检查）。
   Future<Database> get database async {
-    _db ??= await _initDatabase();
+    if (_db == null) {
+      _db = await _initDatabase();
+      await _verifyIntegrity(_db!);
+    }
     return _db!;
   }
 
@@ -29,6 +32,40 @@ class LocalDatabaseService {
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
+  }
+
+  /// SQLite 完整性校验 — 损坏时删库重建。
+  Future<void> _verifyIntegrity(Database db) async {
+    try {
+      final result = await db.rawQuery('PRAGMA integrity_check');
+      final status = result.first.values.first as String?;
+      if (status != 'ok') {
+        ErrorHandler.record(
+          StateError('SQLite integrity check failed: $status'),
+          source: 'LocalDatabaseService',
+          operation: '_verifyIntegrity',
+        );
+        await _resetCorruptedDatabase();
+      }
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'LocalDatabaseService',
+        operation: '_verifyIntegrity',
+      );
+      await _resetCorruptedDatabase();
+    }
+  }
+
+  /// 删除损坏的数据库并重建。
+  Future<void> _resetCorruptedDatabase() async {
+    await _db?.close();
+    _db = null;
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, _dbName);
+    await deleteDatabase(path);
+    _db = await _initDatabase();
   }
 
   // ─── Schema ───
@@ -90,7 +127,16 @@ class LocalDatabaseService {
 
   /// v2 表：行为台账 + 6 张领域表。
   Future<void> _createV2Tables(Database db) async {
-    // 行为台账：不可变事件日志
+    await _createActionLedgerTable(db);
+    await _createHabitsTable(db);
+    await _createCatsTable(db);
+    await _createSessionsTable(db);
+    await _createMonthlyCheckInsTable(db);
+    await _createMaterializedStateTable(db);
+    await _createAchievementsTable(db);
+  }
+
+  Future<void> _createActionLedgerTable(Database db) async {
     await db.execute('''
       CREATE TABLE action_ledger (
         id TEXT PRIMARY KEY,
@@ -107,7 +153,6 @@ class LocalDatabaseService {
         created_at INTEGER NOT NULL
       )
     ''');
-
     await db.execute(
       'CREATE INDEX idx_ledger_unsynced '
       'ON action_ledger(synced) WHERE synced = 0',
@@ -116,8 +161,9 @@ class LocalDatabaseService {
       'CREATE INDEX idx_ledger_uid_type '
       'ON action_ledger(uid, type, started_at)',
     );
+  }
 
-    // 习惯表
+  Future<void> _createHabitsTable(Database db) async {
     await db.execute('''
       CREATE TABLE local_habits (
         id TEXT PRIMARY KEY,
@@ -137,12 +183,12 @@ class LocalDatabaseService {
         created_at INTEGER NOT NULL
       )
     ''');
-
     await db.execute(
       'CREATE INDEX idx_habits_uid ON local_habits(uid, is_active)',
     );
+  }
 
-    // 猫表
+  Future<void> _createCatsTable(Database db) async {
     await db.execute('''
       CREATE TABLE local_cats (
         id TEXT PRIMARY KEY,
@@ -159,10 +205,10 @@ class LocalDatabaseService {
         created_at INTEGER NOT NULL
       )
     ''');
-
     await db.execute('CREATE INDEX idx_cats_uid ON local_cats(uid, state)');
+  }
 
-    // 会话表
+  Future<void> _createSessionsTable(Database db) async {
     await db.execute('''
       CREATE TABLE local_sessions (
         id TEXT PRIMARY KEY,
@@ -183,7 +229,6 @@ class LocalDatabaseService {
         client_version TEXT NOT NULL DEFAULT ''
       )
     ''');
-
     await db.execute(
       'CREATE INDEX idx_sessions_uid_habit '
       'ON local_sessions(uid, habit_id, started_at)',
@@ -192,8 +237,9 @@ class LocalDatabaseService {
       'CREATE INDEX idx_sessions_date '
       'ON local_sessions(uid, started_at)',
     );
+  }
 
-    // 月度签到表
+  Future<void> _createMonthlyCheckInsTable(Database db) async {
     await db.execute('''
       CREATE TABLE local_monthly_checkins (
         uid TEXT NOT NULL,
@@ -204,8 +250,9 @@ class LocalDatabaseService {
         PRIMARY KEY (uid, month)
       )
     ''');
+  }
 
-    // 标量状态表（key-value 物化存储）
+  Future<void> _createMaterializedStateTable(Database db) async {
     await db.execute('''
       CREATE TABLE materialized_state (
         uid TEXT NOT NULL,
@@ -215,8 +262,9 @@ class LocalDatabaseService {
         PRIMARY KEY (uid, key)
       )
     ''');
+  }
 
-    // 本地成就表
+  Future<void> _createAchievementsTable(Database db) async {
     await db.execute('''
       CREATE TABLE local_achievements (
         id TEXT PRIMARY KEY,
@@ -230,7 +278,6 @@ class LocalDatabaseService {
         context TEXT DEFAULT '{}'
       )
     ''');
-
     await db.execute(
       'CREATE INDEX idx_achievements_uid '
       'ON local_achievements(uid, unlocked_at)',

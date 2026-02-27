@@ -32,6 +32,9 @@ class ChatService {
   /// 滑动窗口：保留最近 10 轮对话（20 条消息）在 prompt 中。
   static const int maxHistoryMessages = 20;
 
+  /// 获取最近消息时的数据库拉取上限。
+  static const int recentMessagesFetchLimit = 50;
+
   /// 内部 token 转发控制器（broadcast 支持多个监听者）。
   final StreamController<String> _tokenController =
       StreamController<String>.broadcast();
@@ -49,7 +52,7 @@ class ChatService {
 
   /// 获取最近的聊天消息。
   Future<List<ChatMessage>> getRecentMessages(String catId) {
-    return _dbService.getRecentMessages(catId, limit: 50);
+    return _dbService.getRecentMessages(catId, limit: recentMessagesFetchLimit);
   }
 
   /// 获取聊天消息数量。

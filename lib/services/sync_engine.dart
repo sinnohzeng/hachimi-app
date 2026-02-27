@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart' show ConflictAlgorithm;
 
+import 'package:hachimi_app/core/constants/sync_constants.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
@@ -114,19 +116,25 @@ class SyncEngine {
       await prefs.setBool(_hydratedKey, true);
       _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
       debugPrint('SyncEngine: hydration complete for $uid');
-    } catch (e) {
-      debugPrint('SyncEngine: hydration failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'SyncEngine',
+        operation: 'hydrateFromFirestore',
+      );
       // 水化失败不阻塞启动，下次仍会重试
     }
   }
 
   /// 启动同步引擎。guest_ UID 跳过（纯本地模式）。
+  /// 自动检测未水化状态并重试水化。
   void start(String uid) {
     _uid = uid;
-    if (uid.startsWith('guest_')) {
-      debugPrint('SyncEngine: skipping for local guest');
-      return;
-    }
+    if (uid.startsWith('guest_')) return;
+
+    // 未水化时自动重试
+    _autoHydrateIfNeeded(uid);
 
     // 监听台账变更（debounce 2s）
     _ledgerSub = _ledger.changes.listen((_) => _scheduleSync());
@@ -139,6 +147,13 @@ class SyncEngine {
 
     // 首次启动立即同步
     _scheduleSync();
+  }
+
+  /// 若未水化则自动触发水化（幂等，hydrateFromFirestore 内部有标记）。
+  Future<void> _autoHydrateIfNeeded(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_hydratedKey) ?? false) return;
+    await hydrateFromFirestore(uid);
   }
 
   /// 停止同步引擎。
@@ -154,7 +169,7 @@ class SyncEngine {
 
   void _scheduleSync() {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(seconds: 2), _sync);
+    _debounce = Timer(SyncConstants.syncDebounceInterval, _sync);
   }
 
   Future<void> _sync() async {
@@ -162,7 +177,9 @@ class SyncEngine {
     _isSyncing = true;
 
     try {
-      final actions = await _ledger.getUnsyncedActions(limit: 20);
+      final actions = await _ledger.getUnsyncedActions(
+        limit: SyncConstants.syncBatchSize,
+      );
       if (actions.isEmpty) {
         await _ledger.cleanOldSyncedActions();
         return;
@@ -176,8 +193,13 @@ class SyncEngine {
       await _ledger.cleanOldSyncedActions();
 
       debugPrint('SyncEngine: synced ${actions.length} actions');
-    } catch (e) {
-      debugPrint('SyncEngine error: $e');
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'SyncEngine',
+        operation: '_sync',
+      );
     } finally {
       _isSyncing = false;
     }
@@ -205,6 +227,8 @@ class SyncEngine {
           await _syncHabit(batch, uid, action);
         case ActionType.achievementUnlocked:
           _syncAchievement(batch, uid, action);
+        case ActionType.profileUpdate:
+          _syncProfileUpdate(batch, uid, action);
         case ActionType.accountCreated:
         case ActionType.accountLinked:
         case ActionType.achievementClaimed:
@@ -218,7 +242,11 @@ class SyncEngine {
     } catch (e) {
       final attempts = action.syncAttempts + 1;
       await _ledger.markSyncFailed(action.id, e.toString(), attempts);
-      debugPrint('SyncEngine: failed to sync ${action.id}: $e');
+      ErrorHandler.record(
+        e,
+        source: 'SyncEngine',
+        operation: 'syncAction:${action.type.value}',
+      );
     }
   }
 
@@ -404,6 +432,15 @@ class SyncEngine {
       default:
         break;
     }
+  }
+
+  void _syncProfileUpdate(WriteBatch batch, String uid, LedgerAction action) {
+    final field = action.payload['field'] as String?;
+    final value = action.payload['value'] as String?;
+    if (field == null) return;
+
+    final userRef = _db.collection('users').doc(uid);
+    batch.update(userRef, {field: value});
   }
 
   void _syncAchievement(WriteBatch batch, String uid, LedgerAction action) {

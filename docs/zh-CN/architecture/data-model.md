@@ -53,6 +53,7 @@ users/{uid}                          <- 用户基本信息文档
 | `deadlineDate` | timestamp? | 否 | null | 里程碑模式的可选截止日期。仅在 `targetHours` 设置时有意义。 |
 | `targetCompleted` | bool | 是 | false | 里程碑目标是否已达成。为 `true` 时，任务自动转换为永续模式。 |
 | `lastCheckInDate` | string | 否 | null | 最近一次会话的 ISO 日期字符串 "YYYY-MM-DD" |
+| `totalCheckInDays` | int | 是 | 0 | 用户在此习惯上累计打卡的不同天数 |
 | `reminders` | list\<map\> | 否 | [] | 提醒列表（上限 5 个）。每个 map 包含 `hour`（int）、`minute`（int）、`mode`（string："daily"、"weekdays"、"weekends"、"monday"~"sunday"）。由 `ReminderConfig.tryFromMap()` 解析。 |
 | `motivationText` | string | 否 | null | 备忘文本，最长 240 字符 |
 | `isActive` | bool | 是 | true | `false` 表示习惯已停用（猫咪进入休眠状态） |

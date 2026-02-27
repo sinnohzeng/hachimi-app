@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -48,9 +47,11 @@ final chatServiceProvider = Provider<ChatService>((ref) {
 enum AiProviderId { minimax, gemini }
 
 /// AI 提供商选择 — 持久化到 SharedPreferences。
-class AiProviderSelectionNotifier extends StateNotifier<AiProviderId> {
-  AiProviderSelectionNotifier() : super(AiProviderId.minimax) {
+class AiProviderSelectionNotifier extends Notifier<AiProviderId> {
+  @override
+  AiProviderId build() {
     _load();
+    return AiProviderId.minimax;
   }
 
   Future<void> _load() async {
@@ -69,16 +70,18 @@ class AiProviderSelectionNotifier extends StateNotifier<AiProviderId> {
 }
 
 final aiProviderSelectionProvider =
-    StateNotifierProvider<AiProviderSelectionNotifier, AiProviderId>(
-      (ref) => AiProviderSelectionNotifier(),
+    NotifierProvider<AiProviderSelectionNotifier, AiProviderId>(
+      AiProviderSelectionNotifier.new,
     );
 
 // ─── AI Feature Toggle ───
 
 /// AI 功能总开关 — 持久化到 SharedPreferences。
-class AiFeatureNotifier extends StateNotifier<bool> {
-  AiFeatureNotifier() : super(false) {
+class AiFeatureNotifier extends Notifier<bool> {
+  @override
+  bool build() {
     _load();
+    return false;
   }
 
   Future<void> _load() async {
@@ -99,8 +102,8 @@ class AiFeatureNotifier extends StateNotifier<bool> {
   }
 }
 
-final aiFeatureEnabledProvider = StateNotifierProvider<AiFeatureNotifier, bool>(
-  (ref) => AiFeatureNotifier(),
+final aiFeatureEnabledProvider = NotifierProvider<AiFeatureNotifier, bool>(
+  AiFeatureNotifier.new,
 );
 
 // ─── AI Availability ───
@@ -118,32 +121,31 @@ enum AiAvailability {
 }
 
 /// AI 可用性状态机。
-class AiAvailabilityNotifier extends StateNotifier<AiAvailability> {
-  final Ref _ref;
-
-  AiAvailabilityNotifier(this._ref) : super(AiAvailability.disabled) {
-    _check();
+class AiAvailabilityNotifier extends Notifier<AiAvailability> {
+  @override
+  AiAvailability build() {
+    final enabled = ref.read(aiFeatureEnabledProvider);
+    if (!enabled) return AiAvailability.disabled;
+    final aiService = ref.read(aiServiceProvider);
+    return aiService.isConfigured ? AiAvailability.ready : AiAvailability.error;
   }
 
-  void _check() {
-    final enabled = _ref.read(aiFeatureEnabledProvider);
+  /// 重新检查可用性。
+  void refresh() {
+    final enabled = ref.read(aiFeatureEnabledProvider);
     if (!enabled) {
       state = AiAvailability.disabled;
       return;
     }
-
-    final aiService = _ref.read(aiServiceProvider);
+    final aiService = ref.read(aiServiceProvider);
     state = aiService.isConfigured
         ? AiAvailability.ready
         : AiAvailability.error;
   }
 
-  /// 重新检查可用性。
-  void refresh() => _check();
-
   /// 验证云端连接。
   Future<bool> validateConnection() async {
-    final aiService = _ref.read(aiServiceProvider);
+    final aiService = ref.read(aiServiceProvider);
     try {
       final ok = await aiService.validateConnection();
       state = ok ? AiAvailability.ready : AiAvailability.error;
@@ -165,6 +167,6 @@ class AiAvailabilityNotifier extends StateNotifier<AiAvailability> {
 }
 
 final aiAvailabilityProvider =
-    StateNotifierProvider<AiAvailabilityNotifier, AiAvailability>(
+    NotifierProvider<AiAvailabilityNotifier, AiAvailability>(
       AiAvailabilityNotifier.new,
     );

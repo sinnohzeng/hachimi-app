@@ -36,18 +36,27 @@ class UserProfileNotifier extends Notifier<void> {
     ledger.notifyChange(const LedgerChange(type: 'hydrate'));
   }
 
-  /// 更新显示名称（Auth + Ledger + Firestore sync）。
+  /// 更新显示名称（本地优先 → Auth + Firestore fire-and-forget）。
   Future<void> updateDisplayName(String newName) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. Firebase Auth SSOT
-    await ref.read(authServiceProvider).updateDisplayName(newName);
-
-    // 2. 本地 SSOT
+    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'display_name', newName);
-    ledger.notifyChange(const LedgerChange(type: 'profile_update'));
+    await ledger.append(
+      type: ActionType.profileUpdate,
+      uid: uid,
+      startedAt: DateTime.now(),
+      payload: {'field': 'displayName', 'value': newName},
+    );
+
+    // 2. Firebase Auth best-effort（fire-and-forget）
+    try {
+      await ref.read(authServiceProvider).updateDisplayName(newName);
+    } catch (_) {
+      // 离线时 Auth 更新失败不阻断，下次在线会通过 SyncEngine 同步
+    }
 
     // 3. Firestore best-effort（fire-and-forget）
     // ignore: unawaited_futures
@@ -65,15 +74,20 @@ class UserProfileNotifier extends Notifier<void> {
     await ref.read(authServiceProvider).signOut();
   }
 
-  /// 更新当前佩戴称号（Ledger + Firestore sync）。
+  /// 更新当前佩戴称号（本地优先 → Firestore fire-and-forget）。
   Future<void> updateTitle(String? titleId) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. 本地 SSOT
+    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'current_title', titleId ?? '');
-    ledger.notifyChange(const LedgerChange(type: 'profile_update'));
+    await ledger.append(
+      type: ActionType.profileUpdate,
+      uid: uid,
+      startedAt: DateTime.now(),
+      payload: {'field': 'currentTitle', 'value': titleId ?? ''},
+    );
 
     // 2. Firestore best-effort（fire-and-forget）
     // ignore: unawaited_futures
@@ -82,15 +96,20 @@ class UserProfileNotifier extends Notifier<void> {
         .syncToFirestore(uid: uid, currentTitle: titleId);
   }
 
-  /// 更新头像（Ledger + Firestore sync）。
+  /// 更新头像（本地优先 → Firestore fire-and-forget）。
   Future<void> updateAvatar(String avatarId) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. 本地 SSOT
+    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'avatar_id', avatarId);
-    ledger.notifyChange(const LedgerChange(type: 'profile_update'));
+    await ledger.append(
+      type: ActionType.profileUpdate,
+      uid: uid,
+      startedAt: DateTime.now(),
+      payload: {'field': 'avatarId', 'value': avatarId},
+    );
 
     // 2. Firestore best-effort（fire-and-forget）
     // ignore: unawaited_futures

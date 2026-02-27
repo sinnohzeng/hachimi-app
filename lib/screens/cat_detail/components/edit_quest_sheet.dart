@@ -9,6 +9,7 @@ import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/growth_path_card.dart';
+import 'package:hachimi_app/widgets/quest_form_dialogs.dart';
 import 'package:hachimi_app/widgets/reminder_picker_sheet.dart';
 
 /// 全屏编辑 Quest 页面 — 字段顺序与创建流程一致。
@@ -66,9 +67,6 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colorScheme = theme.colorScheme;
-    final isTargetCompleted = widget.habit.targetCompleted;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.catDetailEditQuestTitle)),
@@ -80,198 +78,105 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.adoptionQuestName,
-                    ),
-                    textInputAction: TextInputAction.done,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  TextFormField(
-                    controller: _motivationController,
-                    maxLength: 240,
-                    maxLines: 4,
-                    minLines: 2,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.adoptionMotivationLabel,
-                      hintText: context.l10n.adoptionMotivationHint,
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.refresh),
-                        tooltip: context.l10n.adoptionMotivationSwap,
-                        onPressed: () {
-                          final current = _motivationController.text;
-                          final locale = Localizations.localeOf(context);
-                          _motivationController.text = randomMotivationQuote(
-                            locale,
-                            exclude: current.isNotEmpty ? current : null,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                  _buildNameFields(theme),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // ── 目标设置 ──
-                  Text(
-                    context.l10n.adoptionGoals,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    context.l10n.adoptionGrowthHint,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // 目标模式切换
-                  _buildModeToggle(theme, isTargetCompleted),
-                  if (isTargetCompleted) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      context.l10n.catDetailTargetCompletedHint,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.primary,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.md),
-
-                  // 里程碑模式：目标小时数 + 截止日期
-                  if (!_isUnlimitedMode) ...[
-                    Text(
-                      context.l10n.adoptionTotalTarget,
-                      style: textTheme.labelLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        ..._defaultTargetOptions.map((hours) {
-                          final isSelected =
-                              !_isCustomTarget && _selectedTarget == hours;
-                          return ChoiceChip(
-                            label: Text('${hours}h'),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() {
-                              _selectedTarget = hours;
-                              _isCustomTarget = false;
-                            }),
-                          );
-                        }),
-                        if (_isCustomTarget)
-                          ChoiceChip(
-                            label: Text('${_selectedTarget}h'),
-                            selected: true,
-                            onSelected: (_) => _showCustomTargetDialog(),
-                          )
-                        else
-                          ActionChip(
-                            label: Text(context.l10n.adoptionCustom),
-                            avatar: const Icon(Icons.tune, size: 18),
-                            onPressed: _showCustomTargetDialog,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // 截止日期
-                    _buildDeadlinePicker(theme),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-
-                  // 每日目标
-                  Text(
-                    context.l10n.adoptionDailyGoalLabel,
-                    style: textTheme.labelLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ..._defaultGoalOptions.map((minutes) {
-                        final isSelected =
-                            !_isCustomGoal && _selectedGoal == minutes;
-                        return ChoiceChip(
-                          label: Text('${minutes}min'),
-                          selected: isSelected,
-                          onSelected: (_) => setState(() {
-                            _selectedGoal = minutes;
-                            _isCustomGoal = false;
-                          }),
-                        );
-                      }),
-                      if (_isCustomGoal)
-                        ChoiceChip(
-                          label: Text('${_selectedGoal}min'),
-                          selected: true,
-                          onSelected: (_) => _showCustomGoalDialog(),
-                        )
-                      else
-                        ActionChip(
-                          label: Text(context.l10n.adoptionCustom),
-                          avatar: const Icon(Icons.tune, size: 18),
-                          onPressed: _showCustomGoalDialog,
-                        ),
-                    ],
-                  ),
+                  _buildGoalSection(theme),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // ── 提醒 ──
-                  Text(
-                    context.l10n.adoptionReminderSection,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildReminderList(theme),
+                  _buildReminderSection(theme),
                   const SizedBox(height: AppSpacing.lg),
-
-                  // ── 成长之路 ──
                   const GrowthPathCard(),
                 ],
               ),
             ),
           ),
-
-          // 底部保存按钮
-          SafeArea(
-            child: Padding(
-              padding: AppSpacing.paddingBase,
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton(
-                  onPressed: _isSaving ? null : _save,
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          context.l10n.commonSave,
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ),
-            ),
-          ),
+          _buildSaveButton(theme),
         ],
       ),
     );
   }
 
-  // ─── 目标模式切换（与创建界面一致的 _ModeOption 卡片） ───
+  // ─── Form sections ───
+
+  Widget _buildNameFields(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _nameController,
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionQuestName,
+          ),
+          textInputAction: TextInputAction.done,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        TextFormField(
+          controller: _motivationController,
+          maxLength: 240,
+          maxLines: 4,
+          minLines: 2,
+          decoration: InputDecoration(
+            labelText: context.l10n.adoptionMotivationLabel,
+            hintText: context.l10n.adoptionMotivationHint,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: context.l10n.adoptionMotivationSwap,
+              onPressed: () {
+                final current = _motivationController.text;
+                final locale = Localizations.localeOf(context);
+                _motivationController.text = randomMotivationQuote(
+                  locale,
+                  exclude: current.isNotEmpty ? current : null,
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGoalSection(ThemeData theme) {
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+    final isTargetCompleted = widget.habit.targetCompleted;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.adoptionGoals,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          context.l10n.adoptionGrowthHint,
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _buildModeToggle(theme, isTargetCompleted),
+        if (isTargetCompleted) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            context.l10n.catDetailTargetCompletedHint,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.primary,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.md),
+        if (!_isUnlimitedMode) ...[
+          _buildTargetChips(theme),
+          const SizedBox(height: AppSpacing.md),
+          _buildDeadlinePicker(theme),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        _buildDailyGoalChips(theme),
+      ],
+    );
+  }
 
   Widget _buildModeToggle(ThemeData theme, bool isTargetCompleted) {
     return Column(
@@ -311,7 +216,85 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     );
   }
 
-  // ─── 截止日期选择器 ───
+  Widget _buildTargetChips(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.adoptionTotalTarget,
+          style: theme.textTheme.labelLarge,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: 8,
+          children: [
+            ..._defaultTargetOptions.map((hours) {
+              final isSelected = !_isCustomTarget && _selectedTarget == hours;
+              return ChoiceChip(
+                label: Text('${hours}h'),
+                selected: isSelected,
+                onSelected: (_) => setState(() {
+                  _selectedTarget = hours;
+                  _isCustomTarget = false;
+                }),
+              );
+            }),
+            _isCustomTarget
+                ? ChoiceChip(
+                    label: Text('${_selectedTarget}h'),
+                    selected: true,
+                    onSelected: (_) => _onCustomTarget(),
+                  )
+                : ActionChip(
+                    label: Text(context.l10n.adoptionCustom),
+                    avatar: const Icon(Icons.tune, size: 18),
+                    onPressed: _onCustomTarget,
+                  ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDailyGoalChips(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.adoptionDailyGoalLabel,
+          style: theme.textTheme.labelLarge,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: 8,
+          children: [
+            ..._defaultGoalOptions.map((minutes) {
+              final isSelected = !_isCustomGoal && _selectedGoal == minutes;
+              return ChoiceChip(
+                label: Text('${minutes}min'),
+                selected: isSelected,
+                onSelected: (_) => setState(() {
+                  _selectedGoal = minutes;
+                  _isCustomGoal = false;
+                }),
+              );
+            }),
+            _isCustomGoal
+                ? ChoiceChip(
+                    label: Text('${_selectedGoal}min'),
+                    selected: true,
+                    onSelected: (_) => _onCustomGoal(),
+                  )
+                : ActionChip(
+                    label: Text(context.l10n.adoptionCustom),
+                    avatar: const Icon(Icons.tune, size: 18),
+                    onPressed: _onCustomGoal,
+                  ),
+          ],
+        ),
+      ],
+    );
+  }
 
   Widget _buildDeadlinePicker(ThemeData theme) {
     final colorScheme = theme.colorScheme;
@@ -338,10 +321,9 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, size: 18),
+            icon: const Icon(Icons.close, size: 20),
             onPressed: () => setState(() => _deadlineDate = null),
             tooltip: 'Clear deadline',
-            visualDensity: VisualDensity.compact,
           ),
         ] else
           TextButton(
@@ -352,9 +334,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     );
   }
 
-  // ─── 提醒列表 ───
-
-  Widget _buildReminderList(ThemeData theme) {
+  Widget _buildReminderSection(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final l10n = context.l10n;
@@ -362,32 +342,13 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          l10n.adoptionReminderSection,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSpacing.md),
         for (int i = 0; i < _reminders.length; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.notifications_active,
-                  size: 20,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Text(
-                    _reminders[i].localizedDescription(l10n),
-                    style: textTheme.bodyMedium,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.close, size: 18, color: colorScheme.error),
-                  onPressed: () => setState(() => _reminders.removeAt(i)),
-                  tooltip: context.l10n.catDetailRemoveReminder,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-          ),
+          _buildReminderItem(theme, i),
         if (_reminders.length < 5)
           TextButton.icon(
             onPressed: _addReminder,
@@ -409,6 +370,92 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     );
   }
 
+  Widget _buildReminderItem(ThemeData theme, int index) {
+    final colorScheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        children: [
+          Icon(
+            Icons.notifications_active,
+            size: 20,
+            color: colorScheme.primary,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              _reminders[index].localizedDescription(context.l10n),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close, size: 20, color: colorScheme.error),
+            onPressed: () => setState(() => _reminders.removeAt(index)),
+            tooltip: context.l10n.catDetailRemoveReminder,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return SafeArea(
+      child: Padding(
+        padding: AppSpacing.paddingBase,
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: FilledButton(
+            onPressed: _isSaving ? null : _save,
+            child: _isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
+                    context.l10n.commonSave,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Interactions ───
+
+  void _onCustomGoal() {
+    showCustomGoalDialog(
+      context,
+      currentValue: _selectedGoal,
+      isCustom: _isCustomGoal,
+      onConfirm: (value) => setState(() {
+        _selectedGoal = value;
+        _isCustomGoal = true;
+      }),
+    );
+  }
+
+  void _onCustomTarget() {
+    showCustomTargetDialog(
+      context,
+      currentValue: _selectedTarget,
+      isCustom: _isCustomTarget,
+      onConfirm: (value) => setState(() {
+        _selectedTarget = value;
+        _isCustomTarget = true;
+      }),
+    );
+  }
+
   Future<void> _addReminder() async {
     final result = await showReminderPickerSheet(context);
     if (result != null) {
@@ -417,7 +464,8 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}'
+        '-${date.day.toString().padLeft(2, '0')}';
   }
 
   Future<void> _pickDeadlineDate() async {
@@ -433,115 +481,44 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
     }
   }
 
-  void _showCustomGoalDialog() {
-    final controller = TextEditingController(
-      text: _isCustomGoal ? '$_selectedGoal' : '',
-    );
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.adoptionCustomGoalTitle),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: context.l10n.adoptionMinutesPerDay,
-            hintText: context.l10n.adoptionMinutesHint,
-            suffixText: context.l10n.unitMinShort,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text.trim());
-              if (value == null || value < 5 || value > 180) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(context.l10n.adoptionValidMinutes)),
-                );
-                return;
-              }
-              setState(() {
-                _selectedGoal = value;
-                _isCustomGoal = true;
-              });
-              Navigator.of(ctx).pop();
-            },
-            child: Text(context.l10n.adoptionSet),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showCustomTargetDialog() {
-    final controller = TextEditingController(
-      text: _isCustomTarget ? '$_selectedTarget' : '',
-    );
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.adoptionCustomTargetTitle),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: context.l10n.adoptionTotalHours,
-            hintText: context.l10n.adoptionHoursHint,
-            suffixText: context.l10n.unitHourShort,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text.trim());
-              if (value == null || value < 10 || value > 2000) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(context.l10n.adoptionValidHours)),
-                );
-                return;
-              }
-              setState(() {
-                _selectedTarget = value;
-                _isCustomTarget = true;
-              });
-              Navigator.of(ctx).pop();
-            },
-            child: Text(context.l10n.adoptionSet),
-          ),
-        ],
-      ),
-    );
-  }
+  // ─── Save ───
 
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
 
     setState(() => _isSaving = true);
-
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    final newMotivation = _motivationController.text.trim();
-
-    // 判断提醒是否变化
-    final oldReminders = widget.habit.reminders;
-    final remindersChanged = !_remindersEqual(oldReminders, _reminders);
-
     HapticFeedback.mediumImpact();
 
-    // 构建完整的更新后 Habit — 直接用构造器确保所有字段正确
-    final updatedHabit = Habit(
+    final updatedHabit = _buildUpdatedHabit(name);
+    await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
+
+    final remindersChanged = !_remindersEqual(
+      widget.habit.reminders,
+      _reminders,
+    );
+    if (remindersChanged && mounted) {
+      await _rescheduleReminders(name);
+    }
+
+    if (mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.catDetailQuestUpdated),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Habit _buildUpdatedHabit(String name) {
+    final newMotivation = _motivationController.text.trim();
+
+    return Habit(
       id: widget.habit.id,
       name: name,
       targetHours: _isUnlimitedMode ? null : _selectedTarget,
@@ -557,38 +534,25 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
       targetCompleted: widget.habit.targetCompleted,
       createdAt: widget.habit.createdAt,
     );
-    await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
-
-    // 提醒变更时重新调度通知
-    if (remindersChanged && mounted) {
-      final notifService = ref.read(notificationServiceProvider);
-      if (_reminders.isEmpty) {
-        await notifService.cancelAllRemindersForHabit(widget.habit.id);
-      } else {
-        final l10n = context.l10n;
-        await notifService.scheduleReminders(
-          habitId: widget.habit.id,
-          habitName: name,
-          catName: widget.cat.name,
-          reminders: _reminders,
-          title: l10n.reminderNotificationTitle(widget.cat.name),
-          body: l10n.reminderNotificationBody(name),
-        );
-      }
-    }
-
-    if (mounted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.catDetailQuestUpdated),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
-  /// 比较两个提醒列表是否相同
+  Future<void> _rescheduleReminders(String habitName) async {
+    final notifService = ref.read(notificationServiceProvider);
+    if (_reminders.isEmpty) {
+      await notifService.cancelAllRemindersForHabit(widget.habit.id);
+      return;
+    }
+    final l10n = context.l10n;
+    await notifService.scheduleReminders(
+      habitId: widget.habit.id,
+      habitName: habitName,
+      catName: widget.cat.name,
+      reminders: _reminders,
+      title: l10n.reminderNotificationTitle(widget.cat.name),
+      body: l10n.reminderNotificationBody(habitName),
+    );
+  }
+
   bool _remindersEqual(List<ReminderConfig> a, List<ReminderConfig> b) {
     if (a.length != b.length) return false;
     for (int i = 0; i < a.length; i++) {

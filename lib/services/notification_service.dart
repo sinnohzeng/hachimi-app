@@ -47,11 +47,14 @@ class NotificationService {
   /// Safe to call at app startup.
   Future<void> initializePlugins() async {
     if (_pluginsInitialized) return;
-
-    // Initialize timezone data
     tz.initializeTimeZones();
+    await _initNotificationPlugin();
+    await _createNotificationChannels();
+    _pluginsInitialized = true;
+  }
 
-    // Initialize local notifications — do NOT request permissions on iOS here
+  /// 初始化本地通知插件（不请求权限）。
+  Future<void> _initNotificationPlugin() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -62,45 +65,43 @@ class NotificationService {
       android: androidInit,
       iOS: iosInit,
     );
-
     await _localNotifications.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
+  }
 
-    // Create notification channels (Android)
+  /// 创建 Android 通知通道 + 清理旧版本通道。
+  Future<void> _createNotificationChannels() async {
     final androidPlugin = _localNotifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-    if (androidPlugin != null) {
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          _channelId,
-          _channelName,
-          description: _channelDesc,
-          importance: Importance.defaultImportance,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          _focusChannelId,
-          _focusChannelName,
-          description: _focusChannelDesc,
-          importance: Importance.high,
-        ),
-      );
+    if (androidPlugin == null) return;
 
-      // Clean up old channel IDs from previous versions
-      await androidPlugin.deleteNotificationChannel(
-        channelId: 'hachimi_focus_timer',
-      );
-      await androidPlugin.deleteNotificationChannel(
-        channelId: 'hachimi_focus_timer_v2',
-      );
-    }
-
-    _pluginsInitialized = true;
+    await androidPlugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _channelId,
+        _channelName,
+        description: _channelDesc,
+        importance: Importance.defaultImportance,
+      ),
+    );
+    await androidPlugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _focusChannelId,
+        _focusChannelName,
+        description: _focusChannelDesc,
+        importance: Importance.high,
+      ),
+    );
+    // 清理旧版本通道
+    await androidPlugin.deleteNotificationChannel(
+      channelId: 'hachimi_focus_timer',
+    );
+    await androidPlugin.deleteNotificationChannel(
+      channelId: 'hachimi_focus_timer_v2',
+    );
   }
 
   /// Set up FCM — registers token and listens for foreground messages.

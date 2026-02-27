@@ -53,6 +53,7 @@ One document per user habit. `habitId` is a Firestore auto-generated ID.
 | `deadlineDate` | timestamp? | no | null | Optional deadline for milestone mode. Only meaningful when `targetHours` is set. |
 | `targetCompleted` | bool | yes | false | Whether the milestone target has been reached. When `true`, quest auto-converts to unlimited mode. |
 | `lastCheckInDate` | string | no | null | ISO date string "YYYY-MM-DD" of most recent session |
+| `totalCheckInDays` | int | yes | 0 | Total number of distinct days user has focused on this habit |
 | `reminders` | list\<map\> | no | [] | Reminder list (up to 5). Each map contains `hour` (int), `minute` (int), `mode` (string: "daily", "weekdays", "weekends", "monday"–"sunday"). Parsed by `ReminderConfig.tryFromMap()`. |
 | `motivationText` | string | no | null | Note/memo text, max 240 characters |
 | `isActive` | bool | yes | true | `false` when habit is deactivated (cat becomes dormant) |

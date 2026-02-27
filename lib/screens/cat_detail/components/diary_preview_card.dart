@@ -32,7 +32,9 @@ class DiaryPreviewCard extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  const Text('\u{1F4D6}', style: TextStyle(fontSize: 20)),
+                  const ExcludeSemantics(
+                    child: Text('\u{1F4D6}', style: TextStyle(fontSize: 20)),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     context.l10n.catDetailDiaryTitle,
@@ -44,6 +46,7 @@ class DiaryPreviewCard extends ConsumerWidget {
                   Icon(
                     Icons.chevron_right,
                     color: colorScheme.onSurfaceVariant,
+                    semanticLabel: context.l10n.catDetailDiaryTitle,
                   ),
                 ],
               ),

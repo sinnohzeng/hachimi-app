@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.0] - 2026-02-27
+
+### Fixed
+- **P0: CoinService assert → runtime validation**: Replaced 4 `assert` statements (stripped in release mode) with `ArgumentError` throws for coin amount and accessory validation. Prevents silent acceptance of invalid values in production.
+- **P0: Date parsing crash protection**: `int.parse()` in `LocalSessionRepository` replaced with `int.tryParse()` + range validation. Invalid dates now return empty results instead of crashing.
+- **P0: SyncEngine error reporting**: 6 `debugPrint()` calls replaced with `ErrorHandler.record()` / `ErrorHandler.breadcrumb()` for production-grade error tracking via Crashlytics.
+- **Account deletion transaction recovery**: Added SharedPreferences-based deletion progress markers with `resumeIfNeeded()` for automatic recovery if deletion is interrupted mid-process.
+- **SyncEngine auto-hydration**: `start()` now calls `_autoHydrateIfNeeded()` to ensure data is pulled from Firestore before sync begins, preventing empty-state sync issues.
+- **5 silent error swallows**: Replaced `debugPrint` / `catch(_)` in `AccountDeletionService` with `ErrorHandler.record` for proper error tracking.
+
+### Added
+- **Offline-first user profile updates**: Avatar, nickname, and title changes now write to local ledger + materialized_state first, then fire-and-forget sync to Firestore. Profile edits no longer silently lost when offline.
+- **SQLite integrity check**: Database initialization now runs `PRAGMA integrity_check`. Corrupted databases are automatically rebuilt with re-hydration flag.
+- **MigrationService timeout protection**: Firestore `.get()` calls wrapped with 5-second timeout to prevent migration hangs on poor connections.
+- **Sync constants**: New `SyncConstants` class centralizing `syncDebounceInterval` and `syncBatchSize` (previously magic numbers).
+- **Privacy policy & terms of service**: Draft templates in `docs/legal/` (EN + zh-CN) covering all data collection, third-party services, and user rights.
+- **`totalCheckInDays` documentation**: Added missing field to data-model.md (EN + zh-CN).
+
+### Changed
+- **adoption_flow_screen.dart split** (983 → 344 lines): Extracted 3 step components (`AdoptionStep1Form`, `AdoptionStep2CatPreview`, `AdoptionStep3NameCat`).
+- **timer_screen.dart refactored**: `build()` reduced from 277 → 45 lines via 6 private builder methods. Fixed `build()` side-effect by moving listener to `ref.listenManual` in `initState`.
+- **edit_quest_sheet.dart**: Extracted dialog helpers to `quest_form_dialogs.dart`.
+- **_createV2Tables() split** (147 → 8 lines): Orchestrator + 7 table-level methods in `LocalDatabaseService`.
+- **purchaseAccessory() split**: Extracted `_executePurchaseTxn()` for cleaner transaction handling.
+- **initializePlugins() split**: Extracted `_initNotificationPlugin()` + `_createNotificationChannels()`.
+- **AchievementEvaluator refactored**: `_evaluate()` and `_buildContext()` split into 6 sub-methods + 2 private data classes (`_HabitData`, `_CatData`).
+- **Riverpod Notifier migration**: 3 `StateNotifier` classes in `ai_provider.dart` migrated to modern `Notifier` pattern. Removed `legacy.dart` import.
+- **chat_service.dart**: Magic number `50` replaced with named constant `recentMessagesFetchLimit`.
+- **Accessibility improvements**: Removed `visualDensity: VisualDensity.compact` from IconButtons to ensure 48dp touch targets. Added `semanticLabel` to achievement icons, diary/chat chevrons. Wrapped decorative emojis in `ExcludeSemantics`.
+
 ## [2.20.0] - 2026-02-27
 
 ### Added

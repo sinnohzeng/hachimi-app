@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:sqflite/sqflite.dart' show ConflictAlgorithm;
+import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Transaction;
 
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -146,7 +146,8 @@ class CoinService {
 
   /// 扣减金币。余额不足返回 false。
   Future<bool> spendCoins({required String uid, required int amount}) async {
-    assert(amount > 0, 'amount must be positive');
+    if (amount <= 0)
+      throw ArgumentError('amount must be positive, got $amount');
     final db = await _ledger.database;
 
     try {
@@ -180,56 +181,16 @@ class CoinService {
     required String accessoryId,
     required int price,
   }) async {
-    assert(price > 0, 'price must be positive');
-    assert(accessoryId.isNotEmpty, 'accessoryId must not be empty');
+    if (price <= 0) throw ArgumentError('price must be positive, got $price');
+    if (accessoryId.isEmpty) {
+      throw ArgumentError('accessoryId must not be empty');
+    }
     final db = await _ledger.database;
-    final now = DateTime.now();
 
     try {
-      final result = await db.transaction((txn) async {
-        final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
-        final balance = int.tryParse(raw ?? '0') ?? 0;
-        if (balance < price) return false;
-
-        // 读取 inventory
-        final invRaw = await _ledger.getMaterializedInTxn(
-          txn,
-          uid,
-          'inventory',
-        );
-        final inventory = _decodeInventory(invRaw);
-        if (inventory.contains(accessoryId)) return false;
-
-        // 扣币
-        await _ledger.setMaterializedInTxn(
-          txn,
-          uid,
-          'coins',
-          (balance - price).toString(),
-        );
-
-        // 追加配饰
-        inventory.add(accessoryId);
-        await _ledger.setMaterializedInTxn(
-          txn,
-          uid,
-          'inventory',
-          jsonEncode(inventory),
-        );
-
-        // 写台账
-        await _ledger.appendInTxn(
-          txn,
-          type: ActionType.purchase,
-          uid: uid,
-          startedAt: now,
-          payload: {'accessoryId': accessoryId, 'price': price},
-          result: {'coins': -price},
-        );
-
-        return true;
-      });
-
+      final result = await db.transaction(
+        (txn) => _executePurchaseTxn(txn, uid, accessoryId, price),
+      );
       if (result) {
         _ledger.notifyChange(const LedgerChange(type: 'purchase'));
       }
@@ -245,9 +206,52 @@ class CoinService {
     }
   }
 
+  /// 购买事务：校验余额 → 校验库存 → 扣币 → 追加配饰 → 写台账。
+  Future<bool> _executePurchaseTxn(
+    Transaction txn,
+    String uid,
+    String accessoryId,
+    int price,
+  ) async {
+    final raw = await _ledger.getMaterializedInTxn(txn, uid, 'coins');
+    final balance = int.tryParse(raw ?? '0') ?? 0;
+    if (balance < price) return false;
+
+    final invRaw = await _ledger.getMaterializedInTxn(txn, uid, 'inventory');
+    final inventory = _decodeInventory(invRaw);
+    if (inventory.contains(accessoryId)) return false;
+
+    await _ledger.setMaterializedInTxn(
+      txn,
+      uid,
+      'coins',
+      (balance - price).toString(),
+    );
+
+    inventory.add(accessoryId);
+    await _ledger.setMaterializedInTxn(
+      txn,
+      uid,
+      'inventory',
+      jsonEncode(inventory),
+    );
+
+    await _ledger.appendInTxn(
+      txn,
+      type: ActionType.purchase,
+      uid: uid,
+      startedAt: DateTime.now(),
+      payload: {'accessoryId': accessoryId, 'price': price},
+      result: {'coins': -price},
+    );
+
+    return true;
+  }
+
   /// 增加金币（计时奖励用）。
   Future<void> earnCoins({required String uid, required int amount}) async {
-    assert(amount > 0, 'amount must be positive');
+    if (amount <= 0)
+      throw ArgumentError('amount must be positive, got $amount');
     final db = await _ledger.database;
 
     try {

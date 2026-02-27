@@ -129,12 +129,17 @@ class LocalSessionRepository {
     if (month != null) {
       final parts = month.split('-');
       if (parts.length == 2) {
-        final year = int.parse(parts[0]);
-        final mon = int.parse(parts[1]);
-        final start = DateTime(year, mon);
-        final end = DateTime(year, mon + 1);
-        where.write(' AND started_at >= ? AND started_at < ?');
-        args.addAll([start.millisecondsSinceEpoch, end.millisecondsSinceEpoch]);
+        final year = int.tryParse(parts[0]);
+        final mon = int.tryParse(parts[1]);
+        if (year != null && mon != null && mon >= 1 && mon <= 12) {
+          final start = DateTime(year, mon);
+          final end = DateTime(year, mon + 1);
+          where.write(' AND started_at >= ? AND started_at < ?');
+          args.addAll([
+            start.millisecondsSinceEpoch,
+            end.millisecondsSinceEpoch,
+          ]);
+        }
       }
     }
 

@@ -70,12 +70,11 @@ class ReminderCard extends ConsumerWidget {
                       IconButton(
                         icon: Icon(
                           Icons.close,
-                          size: 18,
+                          size: 20,
                           color: colorScheme.error,
                         ),
                         onPressed: () => _removeReminder(context, ref, i),
                         tooltip: l10n.catDetailRemoveReminder,
-                        visualDensity: VisualDensity.compact,
                       ),
                     ],
                   ),

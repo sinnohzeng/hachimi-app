@@ -71,7 +71,12 @@ class AchievementCard extends StatelessWidget {
                   color: iconBgColor,
                   borderRadius: AppShape.borderMedium,
                 ),
-                child: Icon(icon, color: iconColor, size: 24),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 24,
+                  semanticLabel: isHiddenLocked ? l10n.achievementHidden : name,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
 

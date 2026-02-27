@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -20,23 +22,29 @@ class MigrationService {
       return false;
     }
 
-    final catsSnapshot = await _db
-        .collection('users')
-        .doc(uid)
-        .collection('cats')
-        .limit(5)
-        .get();
+    try {
+      final catsSnapshot = await _db
+          .collection('users')
+          .doc(uid)
+          .collection('cats')
+          .limit(5)
+          .get()
+          .timeout(const Duration(seconds: 5));
 
-    for (final doc in catsSnapshot.docs) {
-      final data = doc.data();
-      if (data.containsKey('breed') && !data.containsKey('appearance')) {
-        return true;
+      for (final doc in catsSnapshot.docs) {
+        final data = doc.data();
+        if (data.containsKey('breed') && !data.containsKey('appearance')) {
+          return true;
+        }
       }
-    }
 
-    // 无需迁移，缓存结果
-    await prefs.setBool(_kSchemaCheckedKey, true);
-    return false;
+      // 无需迁移，缓存结果
+      await prefs.setBool(_kSchemaCheckedKey, true);
+      return false;
+    } on TimeoutException {
+      // 离线或网络慢 — 假设无需迁移，不阻塞启动
+      return false;
+    }
   }
 
   /// 迁移旧版 per-cat accessories 到 user-level inventory。
