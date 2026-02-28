@@ -2314,4 +2314,22 @@ class SJa extends S {
 
   @override
   String get authErrorGeneric => '問題が発生しました。もう一度お試しください';
+
+  @override
+  String get deleteAccountReauthEmail => '続けるにはパスワードを入力してください';
+
+  @override
+  String get deleteAccountReauthPasswordHint => 'パスワード';
+
+  @override
+  String get deleteAccountError => '問題が発生しました。あとでもう一度お試しください。';
+
+  @override
+  String get deleteAccountPermissionError => '権限エラーです。ログアウトしてから再度ログインしてください。';
+
+  @override
+  String get deleteAccountNetworkError => 'インターネットに接続されていません。ネットワークを確認してください。';
+
+  @override
+  String get deleteAccountRetainedData => '利用統計とクラッシュレポートは削除できません。';
 }

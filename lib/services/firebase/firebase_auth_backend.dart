@@ -134,6 +134,40 @@ class FirebaseAuthBackend implements AuthBackend {
     await _auth.currentUser?.delete();
   }
 
+  @override
+  List<String> get providerIds =>
+      _auth.currentUser?.providerData.map((i) => i.providerId).toList() ?? [];
+
+  @override
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return false;
+
+      final credential = await _getGoogleCredential();
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return false;
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> reauthenticateWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    await user.reauthenticateWithCredential(credential);
+  }
+
   /// Google 初始化 + 认证 + credential 获取（共享逻辑）。
   Future<AuthCredential> _getGoogleCredential() async {
     await _googleSignIn.initialize();

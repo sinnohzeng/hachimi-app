@@ -93,6 +93,17 @@ service cloud.firestore {
         allow update: if false;
         allow delete: if isOwner(userId);
       }
+
+      // Legacy checkIns（pre-v2.8.0）— 仅允许读取和删除（账号注销清理）
+      match /checkIns/{dateId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if false;
+
+        match /entries/{entryId} {
+          allow read, delete: if isOwner(userId);
+          allow create, update: if false;
+        }
+      }
     }
 
     // Deny all other access

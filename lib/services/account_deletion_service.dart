@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
@@ -10,66 +7,56 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
-/// 账号删除服务 — 负责重新认证、Firestore 全量清理、Auth 删除、本地清理。
+/// 删除阶段枚举 — 替代魔法数字 0/1/2。
+enum DeletionPhase {
+  firestore,
+  local,
+  auth,
+  done;
+
+  static DeletionPhase fromIndex(int index) =>
+      DeletionPhase.values.elementAtOrNull(index) ?? DeletionPhase.firestore;
+}
+
+/// 账号删除服务 — 负责 Firestore 全量清理、本地清理。
+///
+/// 重认证职责已归 [AuthBackend]，本服务仅负责数据删除。
+/// 构造注入依赖，支持测试时 mock。
 class AccountDeletionService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final FirebaseFirestore _db;
+  final LocalDatabaseService _localDb;
+  final NotificationService _notifications;
+
+  AccountDeletionService({
+    required LocalDatabaseService localDb,
+    required NotificationService notifications,
+    FirebaseFirestore? db,
+  }) : _localDb = localDb,
+       _notifications = notifications,
+       _db = db ?? FirebaseFirestore.instance;
 
   static const _kDeletionInProgress = 'deletion_in_progress';
   static const _kDeletionUid = 'deletion_uid';
   static const _kDeletionStep = 'deletion_step';
 
+  /// Firestore 用户数据拓扑 — 新增集合只需在此注册。
+  /// 格式：(集合名, [嵌套子集合名])
+  static const _userCollections = [
+    ('habits', ['sessions']),
+    ('cats', <String>[]),
+    ('achievements', <String>[]),
+    ('monthlyCheckIns', <String>[]),
+    ('checkIns', ['entries']),
+  ];
+
   /// 获取用户数据摘要（Quest 数、Cat 数、累计小时数）。
-  /// 优先从 SQLite 读取（本地优先架构），Firestore 作为兜底。
   Future<({int questCount, int catCount, int totalHours})> getUserDataSummary(
-    String uid, {
-    LedgerService? ledger,
-  }) async {
-    if (ledger != null) {
-      try {
-        return await _getLocalSummary(ledger, uid);
-      } catch (e, stack) {
-        ErrorHandler.record(
-          e,
-          stackTrace: stack,
-          source: 'AccountDeletionService',
-          operation: 'getUserDataSummary(local)',
-        );
-      }
-    }
+    String uid,
+  ) async {
     return _getFirestoreSummary(uid);
   }
 
-  /// 从 SQLite 聚合查询用户数据摘要。
-  Future<({int questCount, int catCount, int totalHours})> _getLocalSummary(
-    LedgerService ledger,
-    String uid,
-  ) async {
-    final db = await ledger.database;
-    final minutesResult = await db.rawQuery(
-      'SELECT COALESCE(SUM(total_minutes), 0) as total '
-      'FROM local_habits WHERE uid = ? AND is_active = 1',
-      [uid],
-    );
-    final questResult = await db.rawQuery(
-      'SELECT COUNT(*) as count '
-      'FROM local_habits WHERE uid = ? AND is_active = 1',
-      [uid],
-    );
-    final catResult = await db.rawQuery(
-      'SELECT COUNT(*) as count FROM local_cats WHERE uid = ?',
-      [uid],
-    );
-
-    return (
-      questCount: (questResult.first['count'] as int?) ?? 0,
-      catCount: (catResult.first['count'] as int?) ?? 0,
-      totalHours: ((minutesResult.first['total'] as int?) ?? 0) ~/ 60,
-    );
-  }
-
-  /// Firestore 兜底获取用户数据摘要。
+  /// Firestore 获取用户数据摘要。
   Future<({int questCount, int catCount, int totalHours})> _getFirestoreSummary(
     String uid,
   ) async {
@@ -89,26 +76,9 @@ class AccountDeletionService {
     );
   }
 
-  /// 重新认证 Google 用户。如果用户取消或失败，返回 false。
-  Future<bool> reauthenticateWithGoogle() async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) return false;
-
-      await _googleSignIn.initialize(); // 幂等
-      final googleUser = await _googleSignIn.authenticate();
-      final idToken = googleUser.authentication.idToken;
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-      await user.reauthenticateWithCredential(credential);
-      return true;
-    } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) return false;
-      rethrow;
-    }
-  }
-
-  /// 全量删除：Firestore（认证态下）→ 本地清理 → Auth 删除（最后）→ Google 登出。
-  /// 使用 SharedPreferences 标记删除进度，崩溃后可通过 [resumeIfNeeded] 恢复。
+  /// 全量删除：Firestore → 本地清理。
+  /// Auth 删除和 Google 登出由调用方负责（DeleteAccountFlow）。
+  /// 使用 SharedPreferences 标记删除进度，崩溃后可恢复。
   Future<void> deleteEverything(
     String uid, {
     void Function(double progress, String step)? onProgress,
@@ -116,82 +86,64 @@ class AccountDeletionService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kDeletionInProgress, true);
     await prefs.setString(_kDeletionUid, uid);
-    await prefs.setInt(_kDeletionStep, 0);
+    await prefs.setInt(_kDeletionStep, DeletionPhase.firestore.index);
 
-    // Step 1: Firestore 全量清理（认证态下）
-    onProgress?.call(0.0, 'Deleting quests...');
+    // Phase 1: Firestore 全量清理
+    onProgress?.call(0.0, 'firestore');
     await _deleteFirestoreData(uid, onProgress: onProgress);
-    await prefs.setInt(_kDeletionStep, 1);
+    await prefs.setInt(_kDeletionStep, DeletionPhase.local.index);
 
-    // Step 2: 本地清理（SQLite + SharedPreferences + 通知 + 计时器）
-    onProgress?.call(0.7, 'Cleaning local data...');
+    // Phase 2: 本地清理
+    onProgress?.call(0.7, 'local');
     await cleanLocalData();
-    // cleanLocalData 会清空 SharedPreferences，需重设标记
+    // cleanLocalData 清空 SharedPreferences，需重设标记
     await prefs.setBool(_kDeletionInProgress, true);
-    await prefs.setInt(_kDeletionStep, 2);
+    await prefs.setInt(_kDeletionStep, DeletionPhase.auth.index);
 
-    // Step 3: 删除 Auth 账号
-    onProgress?.call(0.9, 'Deleting account...');
-    await _auth.currentUser?.delete();
-
-    // Step 4: Google 登出 + 清除标记
-    await _googleSignIn.signOut();
-    await _clearDeletionMarkers(prefs);
-    onProgress?.call(1.0, 'Done');
+    onProgress?.call(1.0, 'done');
   }
 
-  /// 清理访客数据：如为 Firebase 匿名用户，先清理 Firestore 数据并删除匿名账号；
-  /// 最后清理本地数据。
+  /// 清理访客数据：Firestore（匿名用户）+ 本地。
   Future<void> deleteGuestData(String uid) async {
-    final user = _auth.currentUser;
-
-    // Firebase anonymous 用户：清理 Firestore + 删除 Auth 匿名账号
-    if (user != null && user.isAnonymous) {
-      await _deleteFirestoreData(uid);
-      await user.delete();
-    }
-
+    await _deleteFirestoreData(uid);
     await cleanLocalData();
   }
 
-  /// 清理 Firestore 用户数据：habits（含 sessions 子集合）、cats、achievements、
-  /// monthlyCheckIns、legacy checkIns，最后删除用户文档本身。
+  /// 声明式遍历引擎 — 按拓扑自动删除所有用户集合和嵌套子集合。
   Future<void> _deleteFirestoreData(
     String uid, {
     void Function(double progress, String step)? onProgress,
   }) async {
     final userRef = _db.collection('users').doc(uid);
+    final total = _userCollections.length;
 
-    final habitsSnap = await userRef.collection('habits').get();
-    for (final habitDoc in habitsSnap.docs) {
-      await _deleteSubcollection(habitDoc.reference.collection('sessions'));
-      await habitDoc.reference.delete();
+    for (var i = 0; i < total; i++) {
+      final (name, nested) = _userCollections[i];
+      final snap = await userRef.collection(name).get();
+      for (final doc in snap.docs) {
+        for (final sub in nested) {
+          await _deleteSubcollection(doc.reference.collection(sub));
+        }
+        await doc.reference.delete();
+      }
+      onProgress?.call((i + 1) / (total + 1), name);
     }
 
-    onProgress?.call(0.2, 'Deleting cats...');
-    await _deleteSubcollection(userRef.collection('cats'));
-
-    onProgress?.call(0.35, 'Deleting achievements...');
-    await _deleteSubcollection(userRef.collection('achievements'));
-
-    onProgress?.call(0.45, 'Deleting check-in history...');
-    await _deleteSubcollection(userRef.collection('monthlyCheckIns'));
-    final checkInsSnap = await userRef.collection('checkIns').get();
-    for (final dateDoc in checkInsSnap.docs) {
-      await _deleteSubcollection(dateDoc.reference.collection('entries'));
-      await dateDoc.reference.delete();
-    }
-
-    onProgress?.call(0.6, 'Deleting user profile...');
     await userRef.delete();
+    onProgress?.call(1.0, 'user');
   }
 
-  /// 清理本地数据：SQLite、SharedPreferences、通知、计时器状态。
+  /// 清理本地数据 — 拆分为 4 个子函数。
   Future<void> cleanLocalData() async {
-    // SQLite
+    await _cleanSqlite();
+    await _cleanPreferences();
+    await _cleanNotifications();
+    await _cleanTimerState();
+  }
+
+  Future<void> _cleanSqlite() async {
     try {
-      final localDb = LocalDatabaseService();
-      await localDb.close();
+      await _localDb.close();
       final dbPath = await getDatabasesPath();
       final path = p.join(dbPath, 'hachimi_local.db');
       await deleteDatabase(path);
@@ -203,8 +155,9 @@ class AccountDeletionService {
         operation: 'cleanLocalData(sqlite)',
       );
     }
+  }
 
-    // SharedPreferences
+  Future<void> _cleanPreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
@@ -216,10 +169,11 @@ class AccountDeletionService {
         operation: 'cleanLocalData(prefs)',
       );
     }
+  }
 
-    // 通知
+  Future<void> _cleanNotifications() async {
     try {
-      await NotificationService().cancelAll();
+      await _notifications.cancelAll();
     } catch (e, stack) {
       ErrorHandler.record(
         e,
@@ -228,8 +182,9 @@ class AccountDeletionService {
         operation: 'cleanLocalData(notifications)',
       );
     }
+  }
 
-    // 计时器状态
+  Future<void> _cleanTimerState() async {
     try {
       await FocusTimerNotifier.clearSavedState();
     } catch (e, stack) {
@@ -246,7 +201,7 @@ class AccountDeletionService {
 
   /// 检查并恢复未完成的账号删除（app 启动时调用）。
   /// 返回 true 表示检测到并处理了未完成删除。
-  static Future<bool> resumeIfNeeded() async {
+  Future<bool> resumeIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
     if (!(prefs.getBool(_kDeletionInProgress) ?? false)) return false;
 
@@ -266,30 +221,22 @@ class AccountDeletionService {
   }
 
   /// 从中断处继续执行删除。所有步骤都是幂等的。
-  static Future<void> _executeDeletionResume(SharedPreferences prefs) async {
-    final step = prefs.getInt(_kDeletionStep) ?? 0;
+  Future<void> _executeDeletionResume(SharedPreferences prefs) async {
+    final phase = DeletionPhase.fromIndex(prefs.getInt(_kDeletionStep) ?? 0);
     final uid = prefs.getString(_kDeletionUid);
-    final service = AccountDeletionService();
 
-    // Step 0: Firestore 可能未完成 — 需认证态
-    if (step < 1 && uid != null) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await service._deleteFirestoreData(uid);
-      }
+    if (phase.index < DeletionPhase.local.index && uid != null) {
+      await _deleteFirestoreData(uid);
     }
-    // Step 1: 本地清理
-    if (step < 2) {
-      await service.cleanLocalData();
+    if (phase.index < DeletionPhase.auth.index) {
+      await cleanLocalData();
       await prefs.setBool(_kDeletionInProgress, true);
-      await prefs.setInt(_kDeletionStep, 2);
+      await prefs.setInt(_kDeletionStep, DeletionPhase.auth.index);
     }
-    // Step 2: Auth + Google 登出
-    await FirebaseAuth.instance.currentUser?.delete();
-    await GoogleSignIn.instance.signOut();
+    // Auth 删除由调用方（app 启动逻辑）负责
   }
 
-  static Future<void> _clearDeletionMarkers(SharedPreferences prefs) async {
+  Future<void> _clearDeletionMarkers(SharedPreferences prefs) async {
     await prefs.remove(_kDeletionInProgress);
     await prefs.remove(_kDeletionUid);
     await prefs.remove(_kDeletionStep);

@@ -55,7 +55,10 @@ final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),
 );
 final accountDeletionServiceProvider = Provider<AccountDeletionService>(
-  (ref) => AccountDeletionService(),
+  (ref) => AccountDeletionService(
+    localDb: ref.watch(localDatabaseServiceProvider),
+    notifications: ref.watch(notificationServiceProvider),
+  ),
 );
 
 // ─── 本地优先架构 Providers ───

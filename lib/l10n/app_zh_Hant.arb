@@ -814,5 +814,12 @@
   "authErrorNetwork": "網路異常，請檢查連線",
   "authErrorAdminRestricted": "登入暫時受限",
   "authErrorWeakPassword": "密碼強度不足，至少需要 6 個字元",
-  "authErrorGeneric": "出了點問題，請重試"
+  "authErrorGeneric": "出了點問題，請重試",
+
+  "deleteAccountReauthEmail": "輸入密碼以繼續",
+  "deleteAccountReauthPasswordHint": "密碼",
+  "deleteAccountError": "出了點問題，稍後再試",
+  "deleteAccountPermissionError": "權限錯誤，嘗試重新登入",
+  "deleteAccountNetworkError": "無網絡連接，檢查網絡後再試",
+  "deleteAccountRetainedData": "使用統計和當機報告無法刪除"
 }

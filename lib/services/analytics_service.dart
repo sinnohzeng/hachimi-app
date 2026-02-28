@@ -383,6 +383,24 @@ class AnalyticsService {
     ),
   );
 
+  // ─── Account Deletion Events ───
+
+  Future<void> logAccountDeletionStarted() => _safeLog(
+    () => _analytics.logEvent(name: AnalyticsEvents.accountDeletionStarted),
+  );
+
+  Future<void> logAccountDeletionCompleted() => _safeLog(
+    () => _analytics.logEvent(name: AnalyticsEvents.accountDeletionCompleted),
+  );
+
+  Future<void> logAccountDeletionFailed({required String errorCode}) =>
+      _safeLog(
+        () => _analytics.logEvent(
+          name: AnalyticsEvents.accountDeletionFailed,
+          parameters: {AnalyticsEvents.paramErrorType: errorCode},
+        ),
+      );
+
   // ─── User Lifecycle Events ───
 
   Future<void> logOnboardingCompleted() => _safeLog(

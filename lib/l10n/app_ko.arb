@@ -814,5 +814,12 @@
   "authErrorNetwork": "네트워크 오류입니다. 연결을 확인해 주세요",
   "authErrorAdminRestricted": "로그인이 일시적으로 제한되었습니다",
   "authErrorWeakPassword": "비밀번호가 너무 약합니다. 6자 이상으로 설정해 주세요",
-  "authErrorGeneric": "문제가 발생했습니다. 다시 시도해 주세요"
+  "authErrorGeneric": "문제가 발생했습니다. 다시 시도해 주세요",
+
+  "deleteAccountReauthEmail": "계속하려면 비밀번호를 입력하세요",
+  "deleteAccountReauthPasswordHint": "비밀번호",
+  "deleteAccountError": "문제가 발생했습니다. 나중에 다시 시도해 주세요.",
+  "deleteAccountPermissionError": "권한 오류입니다. 로그아웃 후 다시 로그인해 주세요.",
+  "deleteAccountNetworkError": "인터넷에 연결되어 있지 않습니다. 네트워크를 확인해 주세요.",
+  "deleteAccountRetainedData": "사용 통계 및 오류 보고서는 삭제할 수 없습니다."
 }

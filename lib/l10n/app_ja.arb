@@ -814,5 +814,12 @@
   "authErrorNetwork": "ネットワークエラーです。接続を確認してください",
   "authErrorAdminRestricted": "ログインは一時的に制限されています",
   "authErrorWeakPassword": "パスワードが弱すぎます。6文字以上にしてください",
-  "authErrorGeneric": "問題が発生しました。もう一度お試しください"
+  "authErrorGeneric": "問題が発生しました。もう一度お試しください",
+
+  "deleteAccountReauthEmail": "続けるにはパスワードを入力してください",
+  "deleteAccountReauthPasswordHint": "パスワード",
+  "deleteAccountError": "問題が発生しました。あとでもう一度お試しください。",
+  "deleteAccountPermissionError": "権限エラーです。ログアウトしてから再度ログインしてください。",
+  "deleteAccountNetworkError": "インターネットに接続されていません。ネットワークを確認してください。",
+  "deleteAccountRetainedData": "利用統計とクラッシュレポートは削除できません。"
 }

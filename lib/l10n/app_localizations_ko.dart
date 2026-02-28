@@ -2315,4 +2315,22 @@ class SKo extends S {
 
   @override
   String get authErrorGeneric => '문제가 발생했습니다. 다시 시도해 주세요';
+
+  @override
+  String get deleteAccountReauthEmail => '계속하려면 비밀번호를 입력하세요';
+
+  @override
+  String get deleteAccountReauthPasswordHint => '비밀번호';
+
+  @override
+  String get deleteAccountError => '문제가 발생했습니다. 나중에 다시 시도해 주세요.';
+
+  @override
+  String get deleteAccountPermissionError => '권한 오류입니다. 로그아웃 후 다시 로그인해 주세요.';
+
+  @override
+  String get deleteAccountNetworkError => '인터넷에 연결되어 있지 않습니다. 네트워크를 확인해 주세요.';
+
+  @override
+  String get deleteAccountRetainedData => '사용 통계 및 오류 보고서는 삭제할 수 없습니다.';
 }

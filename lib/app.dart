@@ -23,7 +23,6 @@ import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/services/achievement_evaluator.dart';
-import 'package:hachimi_app/services/account_deletion_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -251,7 +250,9 @@ class _VersionGateState extends ConsumerState<_VersionGate> {
 
   Future<void> _checkMigration() async {
     // 检测并恢复未完成的账号删除
-    final resumed = await AccountDeletionService.resumeIfNeeded();
+    final resumed = await ref
+        .read(accountDeletionServiceProvider)
+        .resumeIfNeeded();
     if (resumed) return;
 
     try {

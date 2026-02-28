@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.23.0] - 2026-02-28
+
+### Fixed
+- **P0: Firestore checkIns permission-denied**: Added missing security rules for `checkIns/{dateId}` and `checkIns/{dateId}/entries/{entryId}` subcollections. Root cause: Firestore parent document rules don't cascade to subcollections.
+- **SyncEngine race condition**: Added `syncEngineProvider.stop()` before account deletion and guest data reset to prevent concurrent writes during cleanup.
+- **Raw error exposed to user**: Replaced `e.toString()` in deletion error handler with localized, human-friendly error messages via `_mapDeletionError()`.
+- **Reauthentication only supported Google**: Added multi-provider reauthentication — Google, Email/Password, and anonymous (skip). Email users can now delete their accounts.
+- **BuildContext stored as class field**: `DeleteAccountFlow` refactored from instance-based to pure static methods, eliminating retained `BuildContext` risk.
+
+### Added
+- **Declarative data topology**: `_userCollections` static registry replaces hardcoded per-collection deletion. New collections only need one line to register.
+- **`DeletionPhase` enum**: Type-safe deletion progress tracking replacing magic numbers `0/1/2`.
+- **Email reauthentication dialog**: Password input dialog for Email/Password provider users during account deletion.
+- **Retained data compliance notice**: Data summary dialog now discloses which data cannot be deleted (analytics, crash reports).
+- **Account deletion analytics**: 3 new events (`account_deletion_started`, `account_deletion_completed`, `account_deletion_failed`) for observability.
+- **`AuthBackend` reauthentication API**: `providerIds`, `reauthenticateWithGoogle()`, `reauthenticateWithEmail()` added to abstract interface and Firebase implementation.
+- **6 new L10N keys** across 5 languages (en, zh, zh-Hant, ja, ko): deletion error messages, reauth prompts, retained data notice.
+
+### Changed
+- **`AccountDeletionService` constructor injection**: Now accepts `LocalDatabaseService` and `NotificationService` via constructor, enabling unit testing with mocks.
+- **`cleanLocalData()` split into 4 sub-functions**: `_cleanSqlite()`, `_cleanPreferences()`, `_cleanNotifications()`, `_cleanTimerState()` (each ≤15 lines).
+- **`resumeIfNeeded()` instance method**: Changed from static to instance, accessed via `accountDeletionServiceProvider`.
+- **`DeleteAccountFlow` static-only**: Progress tracking via `ValueNotifier` + `ValueListenableBuilder` replacing mutable `_onProgress` field.
+- **Auth deletion moved to `DeleteAccountFlow`**: `deleteAccount()` + Google signout now called by the UI flow after data cleanup, not by the service.
+
 ## [2.22.0] - 2026-02-27
 
 ### Fixed

@@ -1057,5 +1057,12 @@
   "authErrorNetwork": "网络异常，请检查连接",
   "authErrorAdminRestricted": "登录暂时受限",
   "authErrorWeakPassword": "密码强度不足，至少需要 6 个字符",
-  "authErrorGeneric": "出了点问题，请重试"
+  "authErrorGeneric": "出了点问题，请重试",
+
+  "deleteAccountReauthEmail": "输入密码以继续",
+  "deleteAccountReauthPasswordHint": "密码",
+  "deleteAccountError": "出了点问题，稍后再试",
+  "deleteAccountPermissionError": "权限错误，尝试重新登录",
+  "deleteAccountNetworkError": "无网络连接，检查网络后再试",
+  "deleteAccountRetainedData": "使用统计和崩溃报告无法删除"
 }

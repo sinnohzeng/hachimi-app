@@ -2341,4 +2341,25 @@ class SEn extends S {
 
   @override
   String get authErrorGeneric => 'Something went wrong. Try again';
+
+  @override
+  String get deleteAccountReauthEmail => 'Enter your password to continue';
+
+  @override
+  String get deleteAccountReauthPasswordHint => 'Password';
+
+  @override
+  String get deleteAccountError => 'Something went wrong. Try again later.';
+
+  @override
+  String get deleteAccountPermissionError =>
+      'Permission error. Try signing out and back in.';
+
+  @override
+  String get deleteAccountNetworkError =>
+      'No internet connection. Check your network.';
+
+  @override
+  String get deleteAccountRetainedData =>
+      'Usage analytics and crash reports cannot be deleted.';
 }

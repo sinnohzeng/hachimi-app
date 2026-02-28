@@ -1102,5 +1102,12 @@
   "authErrorNetwork": "Network error. Check your connection",
   "authErrorAdminRestricted": "Sign-in is temporarily restricted",
   "authErrorWeakPassword": "Password is too weak. Use at least 6 characters",
-  "authErrorGeneric": "Something went wrong. Try again"
+  "authErrorGeneric": "Something went wrong. Try again",
+
+  "deleteAccountReauthEmail": "Enter your password to continue",
+  "deleteAccountReauthPasswordHint": "Password",
+  "deleteAccountError": "Something went wrong. Try again later.",
+  "deleteAccountPermissionError": "Permission error. Try signing out and back in.",
+  "deleteAccountNetworkError": "No internet connection. Check your network.",
+  "deleteAccountRetainedData": "Usage analytics and crash reports cannot be deleted."
 }

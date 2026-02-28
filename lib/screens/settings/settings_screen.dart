@@ -490,6 +490,7 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
+              ref.read(syncEngineProvider).stop();
               final uid = ref.read(currentUidProvider);
               if (uid != null) {
                 await ref
@@ -509,6 +510,6 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _confirmDeleteAccount(BuildContext context, WidgetRef ref) {
-    DeleteAccountFlow(context: context, ref: ref).start();
+    DeleteAccountFlow.start(context, ref);
   }
 }

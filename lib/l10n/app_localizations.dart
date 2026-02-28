@@ -4343,6 +4343,42 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Something went wrong. Try again'**
   String get authErrorGeneric;
+
+  /// No description provided for @deleteAccountReauthEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password to continue'**
+  String get deleteAccountReauthEmail;
+
+  /// No description provided for @deleteAccountReauthPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get deleteAccountReauthPasswordHint;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again later.'**
+  String get deleteAccountError;
+
+  /// No description provided for @deleteAccountPermissionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission error. Try signing out and back in.'**
+  String get deleteAccountPermissionError;
+
+  /// No description provided for @deleteAccountNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your network.'**
+  String get deleteAccountNetworkError;
+
+  /// No description provided for @deleteAccountRetainedData.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage analytics and crash reports cannot be deleted.'**
+  String get deleteAccountRetainedData;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

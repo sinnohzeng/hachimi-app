@@ -63,6 +63,11 @@ class AnalyticsEvents {
   // Achievements
   static const String achievementUnlocked = 'achievement_unlocked';
 
+  // Account deletion
+  static const String accountDeletionStarted = 'account_deletion_started';
+  static const String accountDeletionCompleted = 'account_deletion_completed';
+  static const String accountDeletionFailed = 'account_deletion_failed';
+
   // User lifecycle
   static const String onboardingCompleted = 'onboarding_completed';
   static const String firstSessionCompleted = 'first_session_completed';

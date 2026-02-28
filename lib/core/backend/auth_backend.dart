@@ -56,6 +56,18 @@ abstract class AuthBackend {
 
   /// 删除当前用户账号。
   Future<void> deleteAccount();
+
+  /// 当前用户的认证提供商 ID 列表（如 'google.com'、'password'）。
+  List<String> get providerIds;
+
+  /// 用 Google 凭证重新认证。用户取消返回 false。
+  Future<bool> reauthenticateWithGoogle();
+
+  /// 用 Email/Password 重新认证。密码错误抛异常。
+  Future<void> reauthenticateWithEmail({
+    required String email,
+    required String password,
+  });
 }
 
 /// 认证结果 — 平台无关的用户信息。

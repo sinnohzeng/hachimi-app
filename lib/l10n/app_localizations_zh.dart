@@ -2307,6 +2307,24 @@ class SZh extends S {
 
   @override
   String get authErrorGeneric => '出了点问题，请重试';
+
+  @override
+  String get deleteAccountReauthEmail => '输入密码以继续';
+
+  @override
+  String get deleteAccountReauthPasswordHint => '密码';
+
+  @override
+  String get deleteAccountError => '出了点问题，稍后再试';
+
+  @override
+  String get deleteAccountPermissionError => '权限错误，尝试重新登录';
+
+  @override
+  String get deleteAccountNetworkError => '无网络连接，检查网络后再试';
+
+  @override
+  String get deleteAccountRetainedData => '使用统计和崩溃报告无法删除';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4612,4 +4630,22 @@ class SZhHant extends SZh {
 
   @override
   String get authErrorGeneric => '出了點問題，請重試';
+
+  @override
+  String get deleteAccountReauthEmail => '輸入密碼以繼續';
+
+  @override
+  String get deleteAccountReauthPasswordHint => '密碼';
+
+  @override
+  String get deleteAccountError => '出了點問題，稍後再試';
+
+  @override
+  String get deleteAccountPermissionError => '權限錯誤，嘗試重新登入';
+
+  @override
+  String get deleteAccountNetworkError => '無網絡連接，檢查網絡後再試';
+
+  @override
+  String get deleteAccountRetainedData => '使用統計和當機報告無法刪除';
 }
