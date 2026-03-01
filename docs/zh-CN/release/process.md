@@ -150,7 +150,9 @@ CI 仅上传到 **internal** 轨道。推广到正式版的操作：
 ## 发布前检查清单
 
 - [ ] `CHANGELOG.md` 已更新新条目
-- [ ] `distribution/whatsnew/en-US` 已更新 Play Store 发布说明（≤500 字符）
+- [ ] `distribution/whatsnew/whatsnew-*` 已更新全部 5 种语言（每个 ≤500 字符）
+- [ ] Store Listing 文字已在 `docs/release/google-play-listing.md` 中审核（如功能有变化）
+- [ ] 官网 `hachimi-app-website` 仓库的 version badge 和 footer 已更新
 - [ ] `pubspec.yaml` 版本号已更新（语义版本 + 构建号）
 - [ ] `dart format lib/ test/` 已对整个代码库执行
 - [ ] `dart analyze lib/` 无错误
@@ -212,7 +214,22 @@ Google Play App Signing 对所有 AAB 上传强制要求。现有 keystore（`ha
 
 ### Play Store 更新说明
 
-文件 `distribution/whatsnew/en-US` 包含 Play Store 发布说明。每次发布前更新此文件。最多 500 字符。
+Release Notes 以纯文本文件形式存储在 `distribution/whatsnew/` 目录：
+
+```
+distribution/whatsnew/
+├── whatsnew-en-US
+├── whatsnew-zh-CN
+├── whatsnew-zh-TW
+├── whatsnew-ja-JP
+└── whatsnew-ko-KR
+```
+
+文件命名遵循 `r0adkll/upload-google-play@v1` 规范：`whatsnew-{BCP47 语言代码}`。每个文件不超过 500 字符。每次发布前更新全部 5 个文件。
+
+### Store Listing 文字
+
+所有商店上架文字（应用名称、简短描述、完整描述）维护在 [`docs/release/google-play-listing.md`](google-play-listing.md) 中作为 SSOT。当功能有重大变化时，更新 listing 文字并复制到 Play Console。
 
 ### 身份验证：Workload Identity Federation
 
@@ -230,7 +247,26 @@ CI 通过 **Workload Identity Federation（WIF）** 向 Google Cloud 认证 — 
 
 首个 AAB 必须通过 Play Console 网页手动上传，之后 CI 才能自动上传后续版本。
 
-## 与官网的关系
+## 官网同步
+
+官网（`hachimi-app-website` 仓库）每次发布时必须同步更新。以下 3 个硬编码位置需要更新版本号：
+
+| 文件 | 行号 | 内容 |
+|------|------|------|
+| `lib/i18n/en.ts` | 15 | Hero badge：`vX.Y.Z — Release highlight` |
+| `lib/i18n/zh.ts` | 15 | Hero badge（中文）：`vX.Y.Z — 发布亮点` |
+| `components/footer.tsx` | 70 | Footer 版本号：`vX.Y.Z` |
+
+更新后提交并推送到官网仓库：
+
+```bash
+cd /data/workspace/hachimi-app-website
+# 更新上述 3 个文件
+git add -A && git commit -m "feat: update version to vX.Y.Z"
+git push origin main
+```
+
+### 下载链接
 
 https://hachimi.ai 上的下载按钮同时链接到：
 - GitHub Releases：https://github.com/sinnohzeng/hachimi-app/releases

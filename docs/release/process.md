@@ -150,7 +150,9 @@ CI uploads to the **internal** track only. To release to production:
 ## Checklist
 
 - [ ] `CHANGELOG.md` updated with new entry
-- [ ] `distribution/whatsnew/en-US` updated with Play Store release notes (≤500 chars)
+- [ ] `distribution/whatsnew/whatsnew-*` updated for all 5 languages (≤500 chars each)
+- [ ] Store listing text reviewed in `docs/release/google-play-listing.md` (if features changed)
+- [ ] Website version badge and footer updated in `hachimi-app-website` repo
 - [ ] Version bumped in `pubspec.yaml` (semver + build number)
 - [ ] `dart format lib/ test/` applied to entire codebase
 - [ ] `dart analyze lib/` passes with no errors
@@ -212,7 +214,22 @@ Google Play App Signing is mandatory for all AAB uploads. The existing keystore 
 
 ### Play Store "What's New" Text
 
-The file `distribution/whatsnew/en-US` contains the Play Store release notes. Update this file before each release. Maximum 500 characters.
+Release notes are stored as plain text files in `distribution/whatsnew/`:
+
+```
+distribution/whatsnew/
+├── whatsnew-en-US
+├── whatsnew-zh-CN
+├── whatsnew-zh-TW
+├── whatsnew-ja-JP
+└── whatsnew-ko-KR
+```
+
+File naming follows `r0adkll/upload-google-play@v1` convention: `whatsnew-{BCP47_LOCALE}`. Each file must be ≤ 500 characters. Update all 5 files before each release.
+
+### Store Listing Text
+
+All store listing text (app name, short description, full description) is maintained in [`docs/release/google-play-listing.md`](google-play-listing.md) as the SSOT. When features change significantly, update the listing text and then copy to Play Console.
 
 ### Authentication: Workload Identity Federation
 
@@ -230,7 +247,26 @@ See [Google Cloud Workload Identity Federation docs](https://cloud.google.com/ia
 
 The first AAB must be uploaded manually via Play Console before the API can be used. After the initial manual upload, CI handles all subsequent uploads.
 
-## Relationship to the Website
+## Website Sync
+
+The website (`hachimi-app-website` repo) must be updated on every release. Three hardcoded locations need the new version:
+
+| File | Line | Content |
+|------|------|---------|
+| `lib/i18n/en.ts` | 15 | Hero badge: `vX.Y.Z — Release highlight` |
+| `lib/i18n/zh.ts` | 15 | Hero badge (Chinese): `vX.Y.Z — 发布亮点` |
+| `components/footer.tsx` | 70 | Footer version: `vX.Y.Z` |
+
+After updating, commit and push to the website repo:
+
+```bash
+cd /data/workspace/hachimi-app-website
+# Update the 3 files
+git add -A && git commit -m "feat: update version to vX.Y.Z"
+git push origin main
+```
+
+### Download Links
 
 The download button on https://hachimi.ai links to both:
 - GitHub Releases: https://github.com/sinnohzeng/hachimi-app/releases
