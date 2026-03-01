@@ -92,7 +92,6 @@ hachimi-app/
 │   │
 │   ├── services/                           # 数据层（无 UI，无 BuildContext）
 │   │   ├── analytics_service.dart          # 分析门面 —— 记录事件
-│   │   ├── auth_service.dart               # 认证门面 —— 登录/注销/注册
 │   │   ├── coin_service.dart               # 金币余额 + 配饰购买操作
 │   │   ├── user_profile_service.dart       # 用户资料同步（委托 UserProfileBackend）
 │   │   ├── atomic_island_service.dart      # vivo 原子岛富通知（MethodChannel 封装）
@@ -127,7 +126,7 @@ hachimi-app/
 │   │
 │   ├── providers/                          # Riverpod Provider —— 各领域的响应式 SSOT
 │   │   ├── app_info_provider.dart           # appInfoProvider（运行时从 package_info_plus 读取版本）
-│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider、isAnonymousProvider
+│   │   ├── auth_provider.dart              # authStateProvider、currentUidProvider、isGuestProvider
 │   │   ├── service_providers.dart          # 非认证 Service 单例（Firestore、Analytics、Coin、XP 等）
 │   │   ├── cat_provider.dart               # catsProvider、allCatsProvider、catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider、catSpriteImageProvider (family)
@@ -247,7 +246,8 @@ hachimi-app/
 │   │   ├── stats_provider_test.dart       # HabitStats 计算属性测试
 │   │   ├── focus_timer_provider_test.dart # FocusTimerState 计算属性测试
 │   │   ├── chat_provider_test.dart        # ChatState 默认值 + copyWith 测试
-│   │   └── ai_provider_test.dart         # AiAvailability + ModelDownloadState 测试
+│   │   ├── ai_provider_test.dart         # AiAvailability + AI 服务测试
+│   │   └── auth_provider_test.dart       # AuthUser/AuthResult 值语义 + currentUidProvider + isGuestProvider
 │   ├── services/
 │   │   ├── chat_service_test.dart         # ChatRole + ChatMessage 序列化测试
 │   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap 往返测试

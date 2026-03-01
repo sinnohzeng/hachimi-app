@@ -26,33 +26,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isGoogleLoading = true);
 
     try {
-      final authService = ref.read(authServiceProvider);
+      final authBackend = ref.read(authBackendProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
 
       final notifier = ref.read(userProfileNotifierProvider.notifier);
 
       if (widget.linkMode) {
         // 匿名用户关联 Google 账号
-        final result = await authService.linkWithGoogle();
+        final result = await authBackend.linkWithGoogle();
         if (result != null) {
-          final uid = result.user!.uid;
           await notifier.createProfile(
-            uid: uid,
-            email: result.user!.email ?? '',
-            displayName: result.user!.displayName,
+            uid: result.uid,
+            email: result.email ?? '',
+            displayName: result.displayName,
           );
           await analyticsService.logSignUp(method: 'google_link');
           if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
         }
       } else {
-        final result = await authService.signInWithGoogle();
-        if (result != null && result.additionalUserInfo?.isNewUser == true) {
+        final result = await authBackend.signInWithGoogle();
+        if (result != null && result.isNewUser) {
           await analyticsService.logSignUp(method: 'google');
-          final uid = result.user!.uid;
           await notifier.createProfile(
-            uid: uid,
-            email: result.user!.email ?? '',
-            displayName: result.user!.displayName,
+            uid: result.uid,
+            email: result.email ?? '',
+            displayName: result.displayName,
           );
         }
       }

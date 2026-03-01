@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/services/auth_service.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 
@@ -9,6 +8,9 @@ import 'package:hachimi_app/services/notification_service.dart';
 ///
 /// 幂等：多次调用 `run()` 只会执行一次初始化。
 /// 每个子任务独立 try-catch，单个失败不影响其他。
+///
+/// Google Sign-In 初始化已迁移至 `_AuthGateState.initState()`，
+/// 通过 `ref.read(authBackendProvider).initializeSocialLogin()` 调用。
 class DeferredInit {
   static Completer<void>? _completer;
   static bool _done = false;
@@ -25,28 +27,10 @@ class DeferredInit {
     _completer = Completer<void>();
 
     try {
-      await Future.wait([
-        _initGoogleSignIn(),
-        _initNotifications(),
-        _initFocusTimer(),
-      ]);
+      await Future.wait([_initNotifications(), _initFocusTimer()]);
     } finally {
       _done = true;
       _completer!.complete();
-    }
-  }
-
-  static Future<void> _initGoogleSignIn() async {
-    try {
-      await AuthService().initializeGoogleSignIn();
-    } catch (e, stack) {
-      debugPrint('[DeferredInit] GoogleSignIn init failed: $e');
-      ErrorHandler.record(
-        e,
-        stackTrace: stack,
-        source: 'DeferredInit',
-        operation: 'initGoogleSignIn',
-      );
     }
   }
 

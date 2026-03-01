@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
@@ -23,7 +24,7 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateProvider).value;
+    final AuthUser? user = ref.watch(authStateProvider).value;
     final isGuest = ref.watch(isGuestProvider);
     final avatarId = ref.watch(avatarIdProvider).value;
     final stats = ref.watch(statsProvider);
@@ -171,7 +172,7 @@ class AppDrawer extends ConsumerWidget {
             FilledButton(
               onPressed: () async {
                 Navigator.of(ctx).pop();
-                await ref.read(authServiceProvider).signOut();
+                await ref.read(authBackendProvider).signOut();
               },
               child: Text(l10n.commonLogOut),
             ),

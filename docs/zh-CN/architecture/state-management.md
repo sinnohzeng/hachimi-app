@@ -7,7 +7,7 @@
 ## Provider 图谱
 
 ```
-Firebase Auth 流 ──────────────► authStateProvider (StreamProvider<User?>)
+AuthBackend.authStateChanges ──► authStateProvider (StreamProvider<AuthUser?>)
                                           │
                                           ▼
                                  currentUidProvider (Provider<String?>)
@@ -87,19 +87,22 @@ Firebase Auth 流 ──────────────► authStateProvide
 
 ### `authStateProvider`
 
-- **类型**：`StreamProvider<User?>`
+- **类型**：`StreamProvider<AuthUser?>`
 - **文件**：`lib/providers/auth_provider.dart`
-- **数据源**：`FirebaseAuth.instance.authStateChanges()`
+- **数据源**：`ref.watch(authBackendProvider).authStateChanges` —— 通过 `AuthBackend` 抽象获取平台无关的认证状态流
 - **消费者**：`AuthGate`（`lib/app.dart`）—— 重定向至 `LoginScreen` 或 `_FirstHabitGate`
-- **SSOT**：用户是否已认证，以及 Firebase 的 `User` 对象
+- **SSOT**：用户是否已认证，以及 `AuthUser` 值对象（uid、email、displayName、isAnonymous）
 
 ### `currentUidProvider`
 
 - **类型**：`Provider<String?>`
 - **文件**：`lib/providers/auth_provider.dart`
-- **数据源**：派生自 `authStateProvider` —— `ref.watch(authStateProvider).value?.uid`
+- **数据源**：从 `authStateProvider` 派生的三态回退：
+  - `data` 状态：`AuthUser.uid` → `local_guest_uid`（SharedPreferences）→ `cached_uid`（SharedPreferences）
+  - `loading` 状态：`cached_uid`（SharedPreferences）
+  - `error` 状态：`local_guest_uid` → `cached_uid`
 - **消费者**：所有基于 Firestore 的 Provider（它们依赖 uid 才能工作）
-- **SSOT**：当前用户的 Firebase UID（用户唯一标识符）
+- **SSOT**：当前用户的 UID（覆盖 Firebase 认证、访客模式、离线缓存）
 
 ---
 
@@ -539,7 +542,7 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 
 - **类型**：`NotifierProvider<UserProfileNotifier, void>`
 - **文件**：`lib/providers/user_profile_notifier.dart`
-- **数据源**：编排 `AuthService`、`LedgerService` 和 `UserProfileService`
+- **数据源**：编排 `AuthBackend`、`LedgerService` 和 `UserProfileService`
 - **消费者**：`LoginScreen`、`EmailAuthScreen`、`EditNameDialog`、`AvatarPickerSheet`、`ProfileScreen`、`SettingsScreen`
 - **SSOT**：所有用户资料变更操作（创建、修改名称、修改头像、修改称号、登出）
 - **设计**：操作型 Notifier（state = void），不持有状态；资料数据由 `avatarIdProvider`、`currentTitleProvider`、`authStateProvider` 等分别管理
@@ -635,13 +638,13 @@ remoteConfigBackendProvider (Provider<RemoteConfigBackend>)
 - **消费者**：`_FirstHabitGateState`（`app.dart`，生命周期管理）
 - **SSOT**：未同步台账操作到 Firestore 的后台同步
 
-#### `isAnonymousProvider`
+#### `isGuestProvider`
 
 - **类型**：`Provider<bool>`
 - **文件**：`lib/providers/auth_provider.dart`
-- **数据源**：`AuthService.isAnonymous` —— 检查当前 Firebase 用户是否为匿名用户
-- **消费者**：`AppDrawer`、`CatDetailScreen`（AI 体验入口门控）、`LoginScreen`（关联模式）
-- **SSOT**：当前用户是否为访客（匿名）账户
+- **数据源**：派生自 `authStateProvider` —— 若 `AuthUser` 存在则返回 `isAnonymous`；若为 null 则检查 SharedPreferences 中的 `local_guest_uid`
+- **消费者**：`AppDrawer`、`CatDetailScreen`（AI 体验入口门控）、`LoginScreen`（关联模式）、`SettingsScreen`
+- **SSOT**：当前用户是否为访客（匿名 Firebase 用户或纯本地访客）
 
 #### `newlyUnlockedProvider`
 

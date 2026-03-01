@@ -1,18 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
-import 'package:hachimi_app/services/auth_service.dart';
 
 // Re-export service_providers so existing imports continue to work.
 export 'package:hachimi_app/providers/service_providers.dart';
 
-/// Auth service — singleton
-final authServiceProvider = Provider<AuthService>((ref) => AuthService());
-
 /// Auth state — SSOT for current user authentication.
-/// Streams from Firebase Auth state changes.
-final authStateProvider = StreamProvider<User?>((ref) {
-  return ref.watch(authServiceProvider).authStateChanges;
+/// Streams from AuthBackend auth state changes.
+final authStateProvider = StreamProvider<AuthUser?>((ref) {
+  return ref.watch(authBackendProvider).authStateChanges;
 });
 
 /// Current user UID — convenience provider.
@@ -42,7 +38,7 @@ final currentUidProvider = Provider<String?>((ref) {
 ///
 /// 监听 [authStateProvider]，auth 状态变化时自动重算。
 final isGuestProvider = Provider<bool>((ref) {
-  final user = ref.watch(authStateProvider).value;
+  final AuthUser? user = ref.watch(authStateProvider).value;
   if (user != null) return user.isAnonymous;
   final prefs = ref.read(sharedPreferencesProvider);
   return prefs.getString('local_guest_uid') != null;

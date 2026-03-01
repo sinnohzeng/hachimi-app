@@ -54,34 +54,34 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authService = ref.read(authServiceProvider);
+      final authBackend = ref.read(authBackendProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
       final notifier = ref.read(userProfileNotifierProvider.notifier);
 
       if (widget.linkMode) {
         // 匿名用户关联 Email 账号
-        final result = await authService.linkWithEmail(
+        final result = await authBackend.linkWithEmail(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
         await analyticsService.logSignUp(method: 'email_link');
         await notifier.createProfile(
-          uid: result.user!.uid,
+          uid: result.uid,
           email: _emailController.text.trim(),
         );
       } else if (_isLogin) {
-        await authService.signIn(
+        await authBackend.signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
       } else {
-        await authService.signUp(
+        final result = await authBackend.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
         await analyticsService.logSignUp();
         await notifier.createProfile(
-          uid: authService.currentUser!.uid,
+          uid: result.uid,
           email: _emailController.text.trim(),
         );
       }

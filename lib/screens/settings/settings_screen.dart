@@ -497,7 +497,7 @@ class SettingsScreen extends ConsumerWidget {
                     .read(accountDeletionServiceProvider)
                     .deleteGuestData(uid);
               }
-              await ref.read(authServiceProvider).signOut();
+              await ref.read(authBackendProvider).signOut();
             },
             child: Text(
               l10n.settingsResetData,

@@ -57,7 +57,7 @@
 │  ├── userProfileNotifierProv. └── avatarIdProvider              │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services（数据层——业务逻辑，无 UI）                              │
-│  ├── AuthService               ├── XpService（纯 Dart）         │
+│  ├── UserProfileService        ├── XpService（纯 Dart）         │
 │  ├── UserProfileService        ├── NotificationService          │
 │  ├── PixelCatRenderer          ├── RemoteConfigService          │
 │  ├── PixelCatGenerationService ├── FocusTimerService            │
@@ -224,7 +224,7 @@ AuthGate
 
 **访客模式：** 新用户自动获取匿名 Firebase Auth 账户。可随时通过 Drawer → 账户升级提示升级为完整账户（Google 或邮箱）。账户关联使用 `linkWithCredential()` 保留所有数据。
 
-**AuthService** 现支持：`signInAnonymously()`、`linkWithGoogle()`、`linkWithEmail()`，以及 `isAnonymous` getter。
+**AuthBackend**（通过 `authBackendProvider` 访问）支持：`signInAnonymously()`、`signInWithGoogle()`、`signInWithEmail()`、`linkWithGoogle()`、`linkWithEmail()`、`signOut()`、`updateDisplayName()`，以及返回 `AuthUser?` 的 `authStateChanges` 流。
 
 ---
 

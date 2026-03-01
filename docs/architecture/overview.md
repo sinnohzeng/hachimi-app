@@ -57,7 +57,7 @@
 │  ├── userProfileNotifierProv. └── avatarIdProvider              │
 ├─────────────────────────────────────────────────────────────────┤
 │  Services  (Data Layer — business logic, no UI)                │
-│  ├── AuthService               ├── XpService (pure Dart)        │
+│  ├── UserProfileService        ├── XpService (pure Dart)        │
 │  ├── UserProfileService        ├── NotificationService          │
 │  ├── PixelCatRenderer          ├── RemoteConfigService          │
 │  ├── PixelCatGenerationService ├── FocusTimerService            │
@@ -227,7 +227,7 @@ AuthGate
 
 **Guest Mode:** New users automatically receive an anonymous Firebase Auth account. They can upgrade to a full account (Google or email) at any time via the Drawer -> guest upgrade prompt. Account linking uses `linkWithCredential()` to preserve all data.
 
-**AuthService** now supports: `signInAnonymously()`, `linkWithGoogle()`, `linkWithEmail()`, and an `isAnonymous` getter.
+**AuthBackend** (via `authBackendProvider`) supports: `signInAnonymously()`, `signInWithGoogle()`, `signInWithEmail()`, `linkWithGoogle()`, `linkWithEmail()`, `signOut()`, `updateDisplayName()`, and `authStateChanges` stream returning `AuthUser?`.
 
 ---
 

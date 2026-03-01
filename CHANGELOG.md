@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.24.0] - 2026-03-01
+
+### Removed
+- **`AuthService` (126 lines)**: Entire service deleted. All auth operations now go through `AuthBackend` abstraction (`authBackendProvider`), eliminating the parallel implementation that caused consistency drift.
+- **Firebase `User` type leakage**: `firebase_auth` import removed from `auth_provider.dart` and `app.dart`. Firebase-specific types now confined to `firebase_auth_backend.dart` and `auth_error_mapper.dart` only.
+- **`authServiceProvider`**: Deleted — all 7 consumer files migrated to `authBackendProvider`.
+- **`DeferredInit` Google Sign-In**: Removed from static utility class; initialization moved to `_AuthGateState.initState()` where Provider context is available.
+
+### Added
+- **`AuthUser` / `AuthResult` value semantics**: `operator ==`, `hashCode`, and `toString()` implementations. Prevents unnecessary Riverpod rebuilds when auth state stream emits identical user data.
+- **`auth_provider_test.dart` (17 tests)**: First auth regression test suite — covers `AuthUser`/`AuthResult` value semantics, `currentUidProvider` three-state fallback, and `isGuestProvider` scenario coverage.
+- **Explicit `AuthUser?` type annotations**: Added to all 4 `authStateProvider` consumer sites for clarity and type safety.
+
+### Changed
+- **`authStateProvider`**: `StreamProvider<User?>` → `StreamProvider<AuthUser?>`, data source from `FirebaseAuth.instance.authStateChanges()` → `ref.watch(authBackendProvider).authStateChanges`.
+- **`isAnonymousProvider` → `isGuestProvider`**: Renamed for clarity. Now derives guest status from `AuthUser.isAnonymous` when authenticated, falls back to `local_guest_uid` check when unauthenticated.
+- **`UserProfileNotifier`**: `authServiceProvider` → `authBackendProvider` for `updateDisplayName()` and `signOut()`.
+- **`email_auth_screen.dart` signUp path**: Eliminated temporal coupling — uses `result.uid` from return value instead of `authService.currentUser!.uid`.
+- **Login/auth result access**: `result.user!.uid` → `result.uid`, `result.additionalUserInfo?.isNewUser` → `result.isNewUser` (flat `AuthResult` API).
+
 ## [2.23.0] - 2026-02-28
 
 ### Fixed

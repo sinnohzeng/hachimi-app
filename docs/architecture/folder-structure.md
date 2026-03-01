@@ -92,7 +92,6 @@ hachimi-app/
 │   │
 │   ├── services/                           # Data layer (no UI, no BuildContext)
 │   │   ├── analytics_service.dart          # Analytics facade — log events
-│   │   ├── auth_service.dart               # Auth facade — sign in/out/up
 │   │   ├── coin_service.dart               # Coin balance + accessory purchase operations
 │   │   ├── user_profile_service.dart       # User profile sync (delegates to UserProfileBackend)
 │   │   ├── atomic_island_service.dart      # vivo Atomic Island rich notification (MethodChannel)
@@ -127,7 +126,7 @@ hachimi-app/
 │   │
 │   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
 │   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
-│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider, isAnonymousProvider
+│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider, isGuestProvider
 │   │   ├── service_providers.dart          # Non-auth service singletons (Firestore, Analytics, Coin, XP, etc.)
 │   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
 │   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
@@ -248,7 +247,8 @@ hachimi-app/
 │   │   ├── stats_provider_test.dart       # HabitStats computed properties
 │   │   ├── focus_timer_provider_test.dart # FocusTimerState computed properties
 │   │   ├── chat_provider_test.dart        # ChatState defaults + copyWith
-│   │   └── ai_provider_test.dart          # AiAvailability + AI service tests
+│   │   ├── ai_provider_test.dart          # AiAvailability + AI service tests
+│   │   └── auth_provider_test.dart        # AuthUser/AuthResult value semantics + currentUidProvider + isGuestProvider
 │   ├── services/
 │   │   ├── chat_service_test.dart         # ChatRole + ChatMessage serialization
 │   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap roundtrip

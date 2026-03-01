@@ -7,7 +7,7 @@
 ## Provider Graph
 
 ```
-Firebase Auth stream ─────────────────────────► authStateProvider (StreamProvider<User?>)
+AuthBackend.authStateChanges ─────────────────► authStateProvider (StreamProvider<AuthUser?>)
                                                        │
                                                        ▼
                                               currentUidProvider (Provider<String?>)
@@ -87,19 +87,22 @@ Device connectivity (independent of auth):
 
 ### `authStateProvider`
 
-- **Type**: `StreamProvider<User?>`
+- **Type**: `StreamProvider<AuthUser?>`
 - **File**: `lib/providers/auth_provider.dart`
-- **Source**: `FirebaseAuth.instance.authStateChanges()`
+- **Source**: `ref.watch(authBackendProvider).authStateChanges` — platform-agnostic auth state stream via `AuthBackend` abstraction
 - **Consumers**: `AuthGate` (in `lib/app.dart`) — redirects to `LoginScreen` or `_FirstHabitGate`
-- **SSOT for**: Whether a user is authenticated, and the Firebase `User` object
+- **SSOT for**: Whether a user is authenticated, and the `AuthUser` value object (uid, email, displayName, isAnonymous)
 
 ### `currentUidProvider`
 
 - **Type**: `Provider<String?>`
 - **File**: `lib/providers/auth_provider.dart`
-- **Source**: Derived from `authStateProvider` — `ref.watch(authStateProvider).value?.uid`
+- **Source**: Three-state fallback derived from `authStateProvider`:
+  - `data` state: `AuthUser.uid` → `local_guest_uid` (SharedPreferences) → `cached_uid` (SharedPreferences)
+  - `loading` state: `cached_uid` (SharedPreferences)
+  - `error` state: `local_guest_uid` → `cached_uid`
 - **Consumers**: All Firestore-backed providers (they depend on knowing the uid)
-- **SSOT for**: The current user's Firebase UID
+- **SSOT for**: The current user's UID (works across Firebase auth, guest mode, and offline cache)
 
 ---
 
@@ -539,7 +542,7 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 
 - **Type**: `NotifierProvider<UserProfileNotifier, void>`
 - **File**: `lib/providers/user_profile_notifier.dart`
-- **Source**: Orchestrates `AuthService`, `LedgerService`, and `UserProfileService`
+- **Source**: Orchestrates `AuthBackend`, `LedgerService`, and `UserProfileService`
 - **Consumers**: `LoginScreen`, `EmailAuthScreen`, `EditNameDialog`, `AvatarPickerSheet`, `ProfileScreen`, `SettingsScreen`
 - **SSOT for**: All user profile mutation operations (create, update name, update avatar, update title, logout)
 - **Design**: Operation-type Notifier (state = void). Does not hold state; profile data is read from `avatarIdProvider`, `currentTitleProvider`, `authStateProvider`, etc.
@@ -635,13 +638,13 @@ remoteConfigBackendProvider (Provider<RemoteConfigBackend>)
 - **Consumers**: `_FirstHabitGateState` in `app.dart` (lifecycle management)
 - **SSOT for**: Background sync of unsynced ledger actions to Firestore
 
-#### `isAnonymousProvider`
+#### `isGuestProvider`
 
 - **Type**: `Provider<bool>`
 - **File**: `lib/providers/auth_provider.dart`
-- **Source**: `AuthService.isAnonymous` — checks if current Firebase user is anonymous
-- **Consumers**: `AppDrawer`, `CatDetailScreen` (AI teaser gate), `LoginScreen` (link mode)
-- **SSOT for**: Whether the current user is a guest (anonymous) account
+- **Source**: Derived from `authStateProvider` — if `AuthUser` is present, returns `isAnonymous`; if null, checks `local_guest_uid` in SharedPreferences
+- **Consumers**: `AppDrawer`, `CatDetailScreen` (AI teaser gate), `LoginScreen` (link mode), `SettingsScreen`
+- **SSOT for**: Whether the current user is a guest (anonymous Firebase user or local-only guest)
 
 #### `newlyUnlockedProvider`
 

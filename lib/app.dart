@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -96,6 +96,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     // [A1] 同步读取 onboarding 状态，不再 async
     final prefs = ref.read(sharedPreferencesProvider);
     _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
+
+    // Google Sign-In 延迟初始化（从 DeferredInit 迁移至此，通过 Provider 获取 AuthBackend）
+    Future.microtask(() async {
+      try {
+        await ref.read(authBackendProvider).initializeSocialLogin();
+      } catch (e) {
+        debugPrint('[APP] GoogleSignIn init failed: $e');
+      }
+    });
   }
 
   bool _isAutoSigningIn = false;
@@ -119,7 +128,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (_isAutoSigningIn) return;
     _isAutoSigningIn = true;
     try {
-      await ref.read(authServiceProvider).signInAnonymously();
+      await ref.read(authBackendProvider).signInAnonymously();
       debugPrint('[APP] background sign-in complete');
     } catch (e) {
       debugPrint('[APP] background sign-in failed: $e');
@@ -128,8 +137,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
   }
 
-  /// Firebase 用户就绪后：缓存 UID、设置 Crashlytics、迁移访客数据。
-  void _handleFirebaseUser(User user, SharedPreferences prefs) {
+  /// 认证用户就绪后：缓存 UID、设置 Crashlytics、迁移访客数据。
+  void _handleAuthUser(AuthUser user, SharedPreferences prefs) {
     prefs.setString(_kCachedUidKey, user.uid);
     FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
     ErrorHandler.breadcrumb('auth_state: ${user.uid}');
@@ -197,13 +206,13 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final prefs = ref.read(sharedPreferencesProvider);
     final authState = ref.watch(authStateProvider);
 
-    // Firebase 已认证 → 使用 Firebase UID，迁移本地访客数据
-    final firebaseUser = authState.whenOrNull(data: (u) => u);
-    if (firebaseUser != null) {
-      _handleFirebaseUser(firebaseUser, prefs);
+    // 已认证 → 使用认证 UID，迁移本地访客数据
+    final AuthUser? authUser = authState.whenOrNull(data: (u) => u);
+    if (authUser != null) {
+      _handleAuthUser(authUser, prefs);
       _logAppOpened();
       return _VersionGate(
-        uid: firebaseUser.uid,
+        uid: authUser.uid,
         startupStopwatch: widget.startupStopwatch,
       );
     }

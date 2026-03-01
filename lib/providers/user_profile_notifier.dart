@@ -54,7 +54,7 @@ class UserProfileNotifier extends Notifier<void> {
 
     // 2. Firebase Auth best-effort（fire-and-forget）
     _syncBestEffort(
-      () => ref.read(authServiceProvider).updateDisplayName(newName),
+      () => ref.read(authBackendProvider).updateDisplayName(newName),
       'updateDisplayName(auth)',
     );
 
@@ -73,7 +73,7 @@ class UserProfileNotifier extends Notifier<void> {
   /// 确保后端切换时只需改一处。
   Future<void> logout() async {
     ref.read(syncEngineProvider).stop();
-    await ref.read(authServiceProvider).signOut();
+    await ref.read(authBackendProvider).signOut();
   }
 
   /// 更新当前佩戴称号（本地优先 → Firestore fire-and-forget）。

@@ -83,6 +83,21 @@ class AuthResult {
     this.displayName,
     this.isNewUser = false,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthResult &&
+          uid == other.uid &&
+          email == other.email &&
+          displayName == other.displayName &&
+          isNewUser == other.isNewUser;
+
+  @override
+  int get hashCode => Object.hash(uid, email, displayName, isNewUser);
+
+  @override
+  String toString() => 'AuthResult($uid, new=$isNewUser)';
 }
 
 /// 认证用户 — 平台无关的用户快照。
@@ -98,4 +113,19 @@ class AuthUser {
     this.displayName,
     this.isAnonymous = false,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthUser &&
+          uid == other.uid &&
+          email == other.email &&
+          displayName == other.displayName &&
+          isAnonymous == other.isAnonymous;
+
+  @override
+  int get hashCode => Object.hash(uid, email, displayName, isAnonymous);
+
+  @override
+  String toString() => 'AuthUser($uid, anonymous=$isAnonymous)';
 }

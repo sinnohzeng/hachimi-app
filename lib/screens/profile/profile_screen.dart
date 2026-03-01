@@ -10,6 +10,7 @@ import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
@@ -28,7 +29,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authStateProvider).value;
+    final AuthUser? user = ref.watch(authStateProvider).value;
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];
     final avatarId = ref.watch(avatarIdProvider).value;

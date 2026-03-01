@@ -3,14 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
 /// 显示名称编辑对话框（MD3 AlertDialog）。
 ///
-/// 保存时同时更新 Firebase Auth displayName 和 Firestore users/{uid}.displayName。
+/// 保存时同时更新 Auth displayName 和 Firestore users/{uid}.displayName。
 Future<void> showEditNameDialog(BuildContext context, WidgetRef ref) {
-  final user = ref.read(authStateProvider).value;
+  final AuthUser? user = ref.read(authStateProvider).value;
   final currentName = user?.displayName ?? user?.email?.split('@').first ?? '';
   final controller = TextEditingController(text: currentName);
   final l10n = context.l10n;
