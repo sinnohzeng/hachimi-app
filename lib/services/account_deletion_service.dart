@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
@@ -35,9 +36,7 @@ class AccountDeletionService {
        _notifications = notifications,
        _db = db ?? FirebaseFirestore.instance;
 
-  static const _kDeletionInProgress = 'deletion_in_progress';
-  static const _kDeletionUid = 'deletion_uid';
-  static const _kDeletionStep = 'deletion_step';
+  // 删除恢复标记键名使用 AppPrefsKeys 集中管理。
 
   /// Firestore 用户数据拓扑 — 新增集合只需在此注册。
   /// 格式：(集合名, [嵌套子集合名])
@@ -84,21 +83,24 @@ class AccountDeletionService {
     void Function(double progress, String step)? onProgress,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kDeletionInProgress, true);
-    await prefs.setString(_kDeletionUid, uid);
-    await prefs.setInt(_kDeletionStep, DeletionPhase.firestore.index);
+    await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
+    await prefs.setString(AppPrefsKeys.deletionUid, uid);
+    await prefs.setInt(
+      AppPrefsKeys.deletionStep,
+      DeletionPhase.firestore.index,
+    );
 
     // Phase 1: Firestore 全量清理
     onProgress?.call(0.0, 'firestore');
     await _deleteFirestoreData(uid, onProgress: onProgress);
-    await prefs.setInt(_kDeletionStep, DeletionPhase.local.index);
+    await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.local.index);
 
     // Phase 2: 本地清理
     onProgress?.call(0.7, 'local');
     await cleanLocalData();
     // cleanLocalData 清空 SharedPreferences，需重设标记
-    await prefs.setBool(_kDeletionInProgress, true);
-    await prefs.setInt(_kDeletionStep, DeletionPhase.auth.index);
+    await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
+    await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.auth.index);
 
     onProgress?.call(1.0, 'done');
   }
@@ -160,7 +162,23 @@ class AccountDeletionService {
   Future<void> _cleanPreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // 保存恢复标记（防止 clear 与 re-set 之间崩溃导致丢失）
+      final savedProgress = prefs.getBool(AppPrefsKeys.deletionInProgress);
+      final savedUid = prefs.getString(AppPrefsKeys.deletionUid);
+      final savedStep = prefs.getInt(AppPrefsKeys.deletionStep);
+
       await prefs.clear();
+
+      // 恢复标记
+      if (savedProgress == true) {
+        await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
+        if (savedUid != null) {
+          await prefs.setString(AppPrefsKeys.deletionUid, savedUid);
+        }
+        if (savedStep != null) {
+          await prefs.setInt(AppPrefsKeys.deletionStep, savedStep);
+        }
+      }
     } catch (e, stack) {
       ErrorHandler.record(
         e,
@@ -203,7 +221,8 @@ class AccountDeletionService {
   /// 返回 true 表示检测到并处理了未完成删除。
   Future<bool> resumeIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(_kDeletionInProgress) ?? false)) return false;
+    if (!(prefs.getBool(AppPrefsKeys.deletionInProgress) ?? false))
+      return false;
 
     try {
       await _executeDeletionResume(prefs);
@@ -222,24 +241,26 @@ class AccountDeletionService {
 
   /// 从中断处继续执行删除。所有步骤都是幂等的。
   Future<void> _executeDeletionResume(SharedPreferences prefs) async {
-    final phase = DeletionPhase.fromIndex(prefs.getInt(_kDeletionStep) ?? 0);
-    final uid = prefs.getString(_kDeletionUid);
+    final phase = DeletionPhase.fromIndex(
+      prefs.getInt(AppPrefsKeys.deletionStep) ?? 0,
+    );
+    final uid = prefs.getString(AppPrefsKeys.deletionUid);
 
     if (phase.index < DeletionPhase.local.index && uid != null) {
       await _deleteFirestoreData(uid);
     }
     if (phase.index < DeletionPhase.auth.index) {
       await cleanLocalData();
-      await prefs.setBool(_kDeletionInProgress, true);
-      await prefs.setInt(_kDeletionStep, DeletionPhase.auth.index);
+      await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
+      await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.auth.index);
     }
     // Auth 删除由调用方（app 启动逻辑）负责
   }
 
   Future<void> _clearDeletionMarkers(SharedPreferences prefs) async {
-    await prefs.remove(_kDeletionInProgress);
-    await prefs.remove(_kDeletionUid);
-    await prefs.remove(_kDeletionStep);
+    await prefs.remove(AppPrefsKeys.deletionInProgress);
+    await prefs.remove(AppPrefsKeys.deletionUid);
+    await prefs.remove(AppPrefsKeys.deletionStep);
   }
 
   /// 批量删除一个集合下的所有文档。

@@ -1064,5 +1064,8 @@
   "deleteAccountError": "出了点问题，稍后再试",
   "deleteAccountPermissionError": "权限错误，尝试重新登录",
   "deleteAccountNetworkError": "无网络连接，检查网络后再试",
-  "deleteAccountRetainedData": "使用统计和崩溃报告无法删除"
+  "deleteAccountRetainedData": "使用统计和崩溃报告无法删除",
+  "deleteAccountStepCloud": "正在删除云端数据...",
+  "deleteAccountStepLocal": "正在清理本地数据...",
+  "deleteAccountStepDone": "已完成"
 }

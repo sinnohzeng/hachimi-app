@@ -2332,4 +2332,13 @@ class SJa extends S {
 
   @override
   String get deleteAccountRetainedData => '利用統計とクラッシュレポートは削除できません。';
+
+  @override
+  String get deleteAccountStepCloud => 'クラウドデータを削除中...';
+
+  @override
+  String get deleteAccountStepLocal => 'ローカルデータを削除中...';
+
+  @override
+  String get deleteAccountStepDone => '完了';
 }

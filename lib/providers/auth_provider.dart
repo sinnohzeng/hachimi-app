@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 
 // Re-export service_providers so existing imports continue to work.
@@ -21,11 +22,12 @@ final currentUidProvider = Provider<String?>((ref) {
   return authState.when(
     data: (user) =>
         user?.uid ??
-        prefs.getString('local_guest_uid') ??
-        prefs.getString('cached_uid'),
-    loading: () => prefs.getString('cached_uid'),
+        prefs.getString(AppPrefsKeys.localGuestUid) ??
+        prefs.getString(AppPrefsKeys.cachedUid),
+    loading: () => prefs.getString(AppPrefsKeys.cachedUid),
     error: (_, _) =>
-        prefs.getString('local_guest_uid') ?? prefs.getString('cached_uid'),
+        prefs.getString(AppPrefsKeys.localGuestUid) ??
+        prefs.getString(AppPrefsKeys.cachedUid),
   );
 });
 
@@ -41,5 +43,35 @@ final isGuestProvider = Provider<bool>((ref) {
   final AuthUser? user = ref.watch(authStateProvider).value;
   if (user != null) return user.isAnonymous;
   final prefs = ref.read(sharedPreferencesProvider);
-  return prefs.getString('local_guest_uid') != null;
+  return prefs.getString(AppPrefsKeys.localGuestUid) != null;
 });
+
+/// 引导完成状态 — 响应式，AuthGate 通过 watch 自动切换。
+///
+/// 遵循 [AiFeatureNotifier] 模式（NotifierProvider + SharedPreferences 持久化）。
+class OnboardingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return ref
+            .read(sharedPreferencesProvider)
+            .getBool(AppPrefsKeys.onboardingComplete) ??
+        false;
+  }
+
+  /// 引导完成 — 更新状态 + 持久化。
+  void complete() {
+    ref
+        .read(sharedPreferencesProvider)
+        .setBool(AppPrefsKeys.onboardingComplete, true);
+    state = true;
+  }
+
+  /// 登出/删号后重置 — 仅更新状态，SharedPreferences 由调用方清理。
+  void reset() {
+    state = false;
+  }
+}
+
+final onboardingCompleteProvider = NotifierProvider<OnboardingNotifier, bool>(
+  OnboardingNotifier.new,
+);

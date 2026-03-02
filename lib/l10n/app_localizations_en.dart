@@ -2362,4 +2362,13 @@ class SEn extends S {
   @override
   String get deleteAccountRetainedData =>
       'Usage analytics and crash reports cannot be deleted.';
+
+  @override
+  String get deleteAccountStepCloud => 'Deleting cloud data...';
+
+  @override
+  String get deleteAccountStepLocal => 'Clearing local data...';
+
+  @override
+  String get deleteAccountStepDone => 'Complete';
 }

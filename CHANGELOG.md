@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.25.0] - 2026-03-02
+
+### Fixed
+- **Logout not working**: Users could never reach "logged out" state because `cached_uid` was never cleared and AuthGate auto-signed-in anonymously. All 4 logout entry points now route through `UserProfileNotifier.logout()` which performs full cleanup.
+- **Account deletion state leak**: After deletion, app stayed on HomeScreen because onboarding state was a stale boolean in `initState`. Now uses reactive `onboardingCompleteProvider`.
+- **Account deletion recovery markers lost**: `prefs.clear()` could wipe recovery markers if crash occurred between clear and re-set. Markers are now preserved across clear.
+- **Delete progress showing raw English**: Progress steps ('firestore', 'local') now localized in all 5 languages.
+- **Singleton anti-pattern in onboarding**: `AnalyticsService()` constructor replaced with `analyticsServiceProvider`.
+- **Circular import risk**: `onboarding_screen.dart` no longer imports `app.dart` for the `kOnboardingCompleteKey` constant.
+
+### Added
+- **`onboardingCompleteProvider`**: Reactive `NotifierProvider<OnboardingNotifier, bool>` replacing stale boolean. AuthGate watches this to switch between OnboardingScreen and HomeScreen.
+- **`AppPrefsKeys`**: Centralized SharedPreferences key constants (`lib/core/constants/app_prefs_keys.dart`), eliminating string literals scattered across 10+ files.
+- **`UserProfileNotifier.resetGuestData()`**: Unified guest data reset (was 5-line manual assembly in settings).
+- **`DeleteAccountFlow._localizeStep()`**: Maps deletion progress steps to L10N strings.
+- **SyncEngine restart on deletion failure**: If account deletion fails, SyncEngine is restarted so the user can continue using the app.
+- **3 L10N keys × 5 languages**: `deleteAccountStepCloud`, `deleteAccountStepLocal`, `deleteAccountStepDone`.
+- **`logout_flow_test.dart` (5 tests)**: Covers `OnboardingNotifier` lifecycle and `AppPrefsKeys` uniqueness.
+
+### Changed
+- **`UserProfileNotifier.logout()`**: Now performs full cleanup — stop SyncEngine, clear auth cache (cachedUid, localGuestUid, dataHydrated, onboardingComplete), reset onboarding provider, then signOut.
+- **`app_drawer.dart`**: `authBackendProvider.signOut()` → `userProfileNotifierProvider.notifier.logout()`.
+- **`settings_screen.dart`**: 5-line manual guest reset → `notifier.resetGuestData()`.
+- **`delete_account_flow.dart`**: Added onboarding reset + `popUntil(isFirst)` after successful deletion.
+- **`sync_engine.dart`**: `_hydratedKey` → `AppPrefsKeys.dataHydrated`.
+- **`account_deletion_service.dart`**: `_kDeletion*` constants → `AppPrefsKeys.*`.
+
+### Removed
+- **`kOnboardingCompleteKey`** constant from `app.dart` (moved to `AppPrefsKeys.onboardingComplete`).
+- **`_onboardingComplete` stale boolean** from `_AuthGateState` (replaced by reactive provider).
+
 ## [2.24.0] - 2026-03-01
 
 ### Removed

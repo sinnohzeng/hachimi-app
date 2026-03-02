@@ -1,6 +1,7 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -82,20 +83,11 @@ class AuthGate extends ConsumerStatefulWidget {
 }
 
 class _AuthGateState extends ConsumerState<AuthGate> {
-  bool _onboardingComplete = false;
   bool _appOpenLogged = false;
-
-  static const _kLastOpenKey = 'last_app_open';
-  static const _kConsecutiveDaysKey = 'consecutive_days';
-  static const _kCachedUidKey = 'cached_uid';
-  static const _kLocalGuestUidKey = 'local_guest_uid';
 
   @override
   void initState() {
     super.initState();
-    // [A1] 同步读取 onboarding 状态，不再 async
-    final prefs = ref.read(sharedPreferencesProvider);
-    _onboardingComplete = prefs.getBool(kOnboardingCompleteKey) ?? false;
 
     // Google Sign-In 延迟初始化（从 DeferredInit 迁移至此，通过 Provider 获取 AuthBackend）
     Future.microtask(() async {
@@ -111,16 +103,16 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   void _onOnboardingComplete() {
     _ensureLocalUid();
-    setState(() => _onboardingComplete = true);
+    ref.read(onboardingCompleteProvider.notifier).complete();
   }
 
   /// 同步生成本地访客 UID — 零网络依赖，保证引导完成后立即进入主页。
   void _ensureLocalUid() {
     final prefs = ref.read(sharedPreferencesProvider);
-    if (prefs.getString(_kCachedUidKey) != null) return;
+    if (prefs.getString(AppPrefsKeys.cachedUid) != null) return;
     final guestUid = 'guest_${const Uuid().v4()}';
-    prefs.setString(_kLocalGuestUidKey, guestUid);
-    prefs.setString(_kCachedUidKey, guestUid);
+    prefs.setString(AppPrefsKeys.localGuestUid, guestUid);
+    prefs.setString(AppPrefsKeys.cachedUid, guestUid);
   }
 
   /// 后台匿名登录 — 失败不影响 UI，下次联网再试。
@@ -139,7 +131,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   /// 认证用户就绪后：缓存 UID、设置 Crashlytics、迁移访客数据。
   void _handleAuthUser(AuthUser user, SharedPreferences prefs) {
-    prefs.setString(_kCachedUidKey, user.uid);
+    prefs.setString(AppPrefsKeys.cachedUid, user.uid);
     FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
     ErrorHandler.breadcrumb('auth_state: ${user.uid}');
     _clearLocalGuestState(user.uid);
@@ -148,11 +140,11 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   /// UID 迁移 — 将 guest_ 本地数据迁移至 Firebase UID。
   Future<void> _clearLocalGuestState(String firebaseUid) async {
     final prefs = ref.read(sharedPreferencesProvider);
-    final localGuestUid = prefs.getString(_kLocalGuestUidKey);
+    final localGuestUid = prefs.getString(AppPrefsKeys.localGuestUid);
     if (localGuestUid == null || localGuestUid == firebaseUid) return;
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.migrateUid(localGuestUid, firebaseUid);
-    await prefs.remove(_kLocalGuestUidKey);
+    await prefs.remove(AppPrefsKeys.localGuestUid);
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
@@ -168,14 +160,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     int daysSinceLast = 0;
     int consecutiveDays = 1;
 
-    final lastOpenStr = prefs.getString(_kLastOpenKey);
+    final lastOpenStr = prefs.getString(AppPrefsKeys.lastAppOpen);
     if (lastOpenStr != null) {
       final lastOpen = DateTime.tryParse(lastOpenStr);
       if (lastOpen != null) {
         final lastDate = DateTime(lastOpen.year, lastOpen.month, lastOpen.day);
         daysSinceLast = today.difference(lastDate).inDays;
 
-        final savedConsecutive = prefs.getInt(_kConsecutiveDaysKey) ?? 1;
+        final savedConsecutive =
+            prefs.getInt(AppPrefsKeys.consecutiveDays) ?? 1;
         if (daysSinceLast == 1) {
           consecutiveDays = savedConsecutive + 1;
         } else if (daysSinceLast == 0) {
@@ -186,8 +179,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       }
     }
 
-    prefs.setString(_kLastOpenKey, today.toIso8601String());
-    prefs.setInt(_kConsecutiveDaysKey, consecutiveDays);
+    prefs.setString(AppPrefsKeys.lastAppOpen, today.toIso8601String());
+    prefs.setInt(AppPrefsKeys.consecutiveDays, consecutiveDays);
 
     ref
         .read(analyticsServiceProvider)
@@ -199,7 +192,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_onboardingComplete) {
+    final onboardingComplete = ref.watch(onboardingCompleteProvider);
+    if (!onboardingComplete) {
       return OnboardingScreen(onComplete: _onOnboardingComplete);
     }
 
@@ -218,7 +212,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
 
     // Firebase 未就绪 → 使用缓存 UID（_ensureLocalUid 已保证存在）
-    final cachedUid = prefs.getString(_kCachedUidKey);
+    final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
     if (cachedUid != null) {
       _autoSignInAnonymously();
       _logAppOpened();
@@ -228,8 +222,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       );
     }
 
-    // 理论上不可达（_ensureLocalUid 保证 cachedUid 存在）
-    _autoSignInAnonymously();
+    // 无认证 + 无缓存 = 已登出，等 onboardingCompleteProvider reset 触发重建
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
@@ -541,6 +534,3 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     return const HomeScreen();
   }
 }
-
-/// Key used in SharedPreferences to track onboarding completion.
-const String kOnboardingCompleteKey = 'onboarding_complete';

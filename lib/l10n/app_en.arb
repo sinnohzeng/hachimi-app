@@ -1109,5 +1109,8 @@
   "deleteAccountError": "Something went wrong. Try again later.",
   "deleteAccountPermissionError": "Permission error. Try signing out and back in.",
   "deleteAccountNetworkError": "No internet connection. Check your network.",
-  "deleteAccountRetainedData": "Usage analytics and crash reports cannot be deleted."
+  "deleteAccountRetainedData": "Usage analytics and crash reports cannot be deleted.",
+  "deleteAccountStepCloud": "Deleting cloud data...",
+  "deleteAccountStepLocal": "Clearing local data...",
+  "deleteAccountStepDone": "Complete"
 }

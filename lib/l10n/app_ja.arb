@@ -821,5 +821,8 @@
   "deleteAccountError": "問題が発生しました。あとでもう一度お試しください。",
   "deleteAccountPermissionError": "権限エラーです。ログアウトしてから再度ログインしてください。",
   "deleteAccountNetworkError": "インターネットに接続されていません。ネットワークを確認してください。",
-  "deleteAccountRetainedData": "利用統計とクラッシュレポートは削除できません。"
+  "deleteAccountRetainedData": "利用統計とクラッシュレポートは削除できません。",
+  "deleteAccountStepCloud": "クラウドデータを削除中...",
+  "deleteAccountStepLocal": "ローカルデータを削除中...",
+  "deleteAccountStepDone": "完了"
 }

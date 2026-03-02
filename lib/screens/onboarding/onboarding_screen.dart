@@ -7,8 +7,6 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
-import 'package:hachimi_app/services/analytics_service.dart';
-import 'package:hachimi_app/app.dart' show kOnboardingCompleteKey;
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback onComplete;
@@ -72,9 +70,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void _skip() => _finish();
 
   void _finish() {
-    final prefs = ref.read(sharedPreferencesProvider);
-    prefs.setBool(kOnboardingCompleteKey, true);
-    AnalyticsService().logOnboardingCompleted();
+    ref.read(analyticsServiceProvider).logOnboardingCompleted();
     widget.onComplete();
   }
 

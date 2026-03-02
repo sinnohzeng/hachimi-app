@@ -821,5 +821,8 @@
   "deleteAccountError": "出了點問題，稍後再試",
   "deleteAccountPermissionError": "權限錯誤，嘗試重新登入",
   "deleteAccountNetworkError": "無網絡連接，檢查網絡後再試",
-  "deleteAccountRetainedData": "使用統計和當機報告無法刪除"
+  "deleteAccountRetainedData": "使用統計和當機報告無法刪除",
+  "deleteAccountStepCloud": "正在刪除雲端資料...",
+  "deleteAccountStepLocal": "正在清理本機資料...",
+  "deleteAccountStepDone": "已完成"
 }

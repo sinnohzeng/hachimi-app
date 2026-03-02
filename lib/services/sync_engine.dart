@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Database;
 
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -28,7 +29,7 @@ class SyncEngine {
   bool _isSyncing = false;
   String? _uid;
 
-  static const _hydratedKey = 'local_data_hydrated_v1';
+  // 水化标记键名使用 AppPrefsKeys 集中管理。
 
   SyncEngine({
     required LedgerService ledger,
@@ -42,7 +43,7 @@ class SyncEngine {
   /// 仅在首次迁移时执行（SharedPreferences 标记控制幂等）。
   Future<void> hydrateFromFirestore(String uid) async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool(_hydratedKey) ?? false) return;
+    if (prefs.getBool(AppPrefsKeys.dataHydrated) ?? false) return;
 
     try {
       final userRef = _db.collection('users').doc(uid);
@@ -62,7 +63,7 @@ class SyncEngine {
       );
       await _hydrateUserProfile(userRef, uid);
 
-      await prefs.setBool(_hydratedKey, true);
+      await prefs.setBool(AppPrefsKeys.dataHydrated, true);
       _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
       debugPrint('SyncEngine: hydration complete for $uid');
     } catch (e, stack) {
@@ -169,7 +170,7 @@ class SyncEngine {
   /// 若未水化则自动触发水化（幂等，hydrateFromFirestore 内部有标记）。
   Future<void> _autoHydrateIfNeeded(String uid) async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool(_hydratedKey) ?? false) return;
+    if (prefs.getBool(AppPrefsKeys.dataHydrated) ?? false) return;
     await hydrateFromFirestore(uid);
   }
 

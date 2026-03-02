@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -67,13 +68,57 @@ class UserProfileNotifier extends Notifier<void> {
     );
   }
 
-  /// 登出 — 停止同步引擎 + 执行 Auth signOut。
+  /// 登出 — 完整清理，确保用户回到引导页。
   ///
-  /// 屏幕层调用此方法而非直接调用 authService.signOut()，
-  /// 确保后端切换时只需改一处。
+  /// 这是所有登出操作的唯一入口。屏幕层不得直接调用 authBackend.signOut()。
   Future<void> logout() async {
     ref.read(syncEngineProvider).stop();
-    await ref.read(authBackendProvider).signOut();
+    _clearAuthCache();
+    ref.read(onboardingCompleteProvider.notifier).reset();
+
+    try {
+      await ref.read(authBackendProvider).signOut();
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'UserProfileNotifier',
+        operation: 'logout',
+      );
+    }
+  }
+
+  /// 访客数据重置 — 清除数据后登出。
+  Future<void> resetGuestData() async {
+    ref.read(syncEngineProvider).stop();
+
+    final uid = ref.read(currentUidProvider);
+    if (uid != null) {
+      await ref.read(accountDeletionServiceProvider).deleteGuestData(uid);
+    }
+
+    _clearAuthCache();
+    ref.read(onboardingCompleteProvider.notifier).reset();
+
+    try {
+      await ref.read(authBackendProvider).signOut();
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'UserProfileNotifier',
+        operation: 'resetGuestData',
+      );
+    }
+  }
+
+  /// 清理 SharedPreferences 中的认证缓存。
+  void _clearAuthCache() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    prefs.remove(AppPrefsKeys.cachedUid);
+    prefs.remove(AppPrefsKeys.localGuestUid);
+    prefs.remove(AppPrefsKeys.dataHydrated);
+    prefs.remove(AppPrefsKeys.onboardingComplete);
   }
 
   /// 更新当前佩戴称号（本地优先 → Firestore fire-and-forget）。

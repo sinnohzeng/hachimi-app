@@ -44,7 +44,12 @@ AuthBackend.authStateChanges ──► authStateProvider (StreamProvider<AuthUse
 
 访客模式：
 
-         isAnonymousProvider (Provider<bool>)
+         isGuestProvider (Provider<bool>)
+
+
+引导生命周期：
+
+         onboardingCompleteProvider (NotifierProvider<OnboardingNotifier, bool>)
 
 
 像素猫渲染（单例 + 按猫缓存）：
@@ -555,7 +560,10 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 | `updateDisplayName(name)` | Auth + Ledger + Firestore 同步 |
 | `updateAvatar(avatarId)` | Ledger + Firestore 同步 |
 | `updateTitle(titleId?)` | Ledger + Firestore 同步 |
-| `logout()` | 停止 SyncEngine + Auth 登出 |
+| `logout()` | 停止 SyncEngine + 清理认证缓存 + 重置引导状态 + 登出（**唯一退出入口**） |
+| `resetGuestData()` | 删除访客数据 + 登出（访客数据重置流程） |
+
+> **退出规范**：所有屏幕必须调用 `notifier.logout()` 或 `notifier.resetGuestData()`，禁止直接调用 `authBackend.signOut()`。
 
 ---
 

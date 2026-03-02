@@ -288,17 +288,22 @@ class DeleteAccountFlow {
           .read(accountDeletionServiceProvider)
           .deleteEverything(
             uid,
-            onProgress: (p, step) => progress.value = (p, step),
+            onProgress: (p, step) =>
+                progress.value = (p, _localizeStep(step, l10n)),
           );
 
       // Auth 删除 + Google 登出
       await ref.read(authBackendProvider).deleteAccount();
 
+      // 重置引导状态 — 确保 AuthGate 回到 OnboardingScreen
+      ref.read(onboardingCompleteProvider.notifier).reset();
+
       // 记录删除成功
       ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
 
       if (context.mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(); // 关闭进度弹窗
+        Navigator.of(context).popUntil((route) => route.isFirst);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.deleteAccountSuccess),
@@ -307,6 +312,11 @@ class DeleteAccountFlow {
         );
       }
     } on Exception catch (e) {
+      // 删除失败 — 重启 SyncEngine
+      if (!uid.startsWith('guest_')) {
+        ref.read(syncEngineProvider).start(uid);
+      }
+
       // 记录删除失败
       final errorCode = e is FirebaseException
           ? e.code
@@ -327,6 +337,16 @@ class DeleteAccountFlow {
     } finally {
       progress.dispose();
     }
+  }
+
+  /// 将删除进度步骤转为本地化文案。
+  static String _localizeStep(String step, S l10n) {
+    return switch (step) {
+      'firestore' => l10n.deleteAccountStepCloud,
+      'local' => l10n.deleteAccountStepLocal,
+      'done' => l10n.deleteAccountStepDone,
+      _ => step,
+    };
   }
 
   /// 将删除错误映射为用户可读的本地化消息。

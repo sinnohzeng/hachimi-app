@@ -4379,6 +4379,24 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Usage analytics and crash reports cannot be deleted.'**
   String get deleteAccountRetainedData;
+
+  /// No description provided for @deleteAccountStepCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting cloud data...'**
+  String get deleteAccountStepCloud;
+
+  /// No description provided for @deleteAccountStepLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing local data...'**
+  String get deleteAccountStepLocal;
+
+  /// No description provided for @deleteAccountStepDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get deleteAccountStepDone;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -13,6 +13,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/screens/profile/components/avatar_picker_sheet.dart';
 import 'package:hachimi_app/screens/profile/components/edit_name_dialog.dart';
@@ -172,7 +173,7 @@ class AppDrawer extends ConsumerWidget {
             FilledButton(
               onPressed: () async {
                 Navigator.of(ctx).pop();
-                await ref.read(authBackendProvider).signOut();
+                await ref.read(userProfileNotifierProvider.notifier).logout();
               },
               child: Text(l10n.commonLogOut),
             ),

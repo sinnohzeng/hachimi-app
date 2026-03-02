@@ -2333,4 +2333,13 @@ class SKo extends S {
 
   @override
   String get deleteAccountRetainedData => '사용 통계 및 오류 보고서는 삭제할 수 없습니다.';
+
+  @override
+  String get deleteAccountStepCloud => '클라우드 데이터 삭제 중...';
+
+  @override
+  String get deleteAccountStepLocal => '로컬 데이터 정리 중...';
+
+  @override
+  String get deleteAccountStepDone => '완료';
 }

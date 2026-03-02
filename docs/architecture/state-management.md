@@ -44,7 +44,12 @@ Local-first infrastructure (SQLite-backed, event-sourced):
 
 Guest mode:
 
-         isAnonymousProvider (Provider<bool>)
+         isGuestProvider (Provider<bool>)
+
+
+Onboarding lifecycle:
+
+         onboardingCompleteProvider (NotifierProvider<OnboardingNotifier, bool>)
 
 
 Pixel cat rendering (singleton + per-cat cache):
@@ -555,7 +560,10 @@ chatNotifierProvider(catId) — StateNotifierProvider.autoDispose.family<ChatNot
 | `updateDisplayName(name)` | Auth + Ledger + Firestore sync |
 | `updateAvatar(avatarId)` | Ledger + Firestore sync |
 | `updateTitle(titleId?)` | Ledger + Firestore sync |
-| `logout()` | Stop SyncEngine + Auth signOut |
+| `logout()` | Stop SyncEngine + clear auth cache + reset onboarding + signOut (**sole logout entry point**) |
+| `resetGuestData()` | Delete guest data + logout (for guest data reset flow) |
+
+> **Logout Convention**: All screens MUST call `notifier.logout()` or `notifier.resetGuestData()`. Never call `authBackend.signOut()` directly.
 
 ---
 

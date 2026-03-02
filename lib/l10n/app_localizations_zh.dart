@@ -2325,6 +2325,15 @@ class SZh extends S {
 
   @override
   String get deleteAccountRetainedData => '使用统计和崩溃报告无法删除';
+
+  @override
+  String get deleteAccountStepCloud => '正在删除云端数据...';
+
+  @override
+  String get deleteAccountStepLocal => '正在清理本地数据...';
+
+  @override
+  String get deleteAccountStepDone => '已完成';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4648,4 +4657,13 @@ class SZhHant extends SZh {
 
   @override
   String get deleteAccountRetainedData => '使用統計和當機報告無法刪除';
+
+  @override
+  String get deleteAccountStepCloud => '正在刪除雲端資料...';
+
+  @override
+  String get deleteAccountStepLocal => '正在清理本機資料...';
+
+  @override
+  String get deleteAccountStepDone => '已完成';
 }
