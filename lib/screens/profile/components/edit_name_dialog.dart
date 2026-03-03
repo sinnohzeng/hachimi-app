@@ -18,29 +18,38 @@ Future<void> showEditNameDialog(BuildContext context, WidgetRef ref) {
 
   return showDialog(
     context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(l10n.profileEditName),
-      content: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: l10n.profileDisplayName,
-          counterText: '',
-        ),
-        maxLength: 30,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
+    builder: (ctx) => _buildEditNameDialog(ctx, ref, controller, l10n),
+  );
+}
+
+AlertDialog _buildEditNameDialog(
+  BuildContext ctx,
+  WidgetRef ref,
+  TextEditingController controller,
+  S l10n,
+) {
+  return AlertDialog(
+    title: Text(l10n.profileEditName),
+    content: TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: l10n.profileDisplayName,
+        counterText: '',
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(),
-          child: Text(l10n.commonCancel),
-        ),
-        FilledButton(
-          onPressed: () => _saveName(ctx, ref, controller, l10n),
-          child: Text(l10n.commonSave),
-        ),
-      ],
+      maxLength: 30,
+      autofocus: true,
+      textCapitalization: TextCapitalization.words,
     ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(ctx).pop(),
+        child: Text(l10n.commonCancel),
+      ),
+      FilledButton(
+        onPressed: () => _saveName(ctx, ref, controller, l10n),
+        child: Text(l10n.commonSave),
+      ),
+    ],
   );
 }
 

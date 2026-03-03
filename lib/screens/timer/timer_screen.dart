@@ -27,12 +27,10 @@ import 'package:hachimi_app/widgets/progress_ring.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show ServiceRequestFailure;
 import 'package:uuid/uuid.dart';
-
 /// Focus timer in-progress screen.
 /// Full-screen immersive view with pixel cat, circular progress, and timer.
 class TimerScreen extends ConsumerStatefulWidget {
   final String habitId;
-
   const TimerScreen({super.key, required this.habitId});
 
   @override

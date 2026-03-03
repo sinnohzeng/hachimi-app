@@ -1112,5 +1112,13 @@
   "deleteAccountRetainedData": "Usage analytics and crash reports cannot be deleted.",
   "deleteAccountStepCloud": "Deleting cloud data...",
   "deleteAccountStepLocal": "Clearing local data...",
-  "deleteAccountStepDone": "Complete"
+  "deleteAccountStepDone": "Complete",
+  "deleteAccountQueued": "Local data deleted. Cloud account deletion is queued and will finish when online.",
+  "deleteAccountPending": "Account deletion is pending. Keep the app online to finish cloud and auth deletion.",
+  "archiveConflictTitle": "Choose archive to keep",
+  "archiveConflictMessage": "Both local and cloud archives have data. Choose one to keep:",
+  "archiveConflictLocal": "Local archive",
+  "archiveConflictCloud": "Cloud archive",
+  "archiveConflictKeepCloud": "Keep cloud",
+  "archiveConflictKeepLocal": "Keep local"
 }

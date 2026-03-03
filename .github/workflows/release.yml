@@ -90,6 +90,9 @@ jobs:
       - name: Check formatting
         run: dart format --set-exit-if-changed lib/ test/
 
+      - name: Quality gate
+        run: dart run tool/quality_gate.dart
+
       - name: Static analysis
         run: dart analyze lib/
 

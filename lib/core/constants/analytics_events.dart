@@ -72,12 +72,6 @@ class AnalyticsEvents {
   static const String onboardingCompleted = 'onboarding_completed';
   static const String firstSessionCompleted = 'first_session_completed';
 
-  // Legacy (kept for backward compat with existing screens)
-  static const String timerStarted = 'timer_started';
-  static const String timerCompleted = 'timer_completed';
-  static const String dailyCheckIn = 'daily_check_in';
-  static const String goalProgress = 'goal_progress';
-
   // ─── Parameter Keys ───
 
   static const String paramMethod = 'method';
@@ -105,12 +99,6 @@ class AnalyticsEvents {
   static const String paramCatCount = 'cat_count';
   static const String paramAction = 'action';
   static const String paramNotificationType = 'notification_type';
-  static const String paramDurationMinutes = 'duration_minutes';
-  static const String paramTotalCheckInDays = 'total_check_in_days';
-  static const String paramMinutesToday = 'minutes_today';
-  static const String paramMilestone = 'milestone';
-  static const String paramPercentComplete = 'percent_complete';
-
   // Error tracking params
   static const String paramErrorType = 'error_type';
   static const String paramErrorSource = 'error_source';

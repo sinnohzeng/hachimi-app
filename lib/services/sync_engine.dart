@@ -28,6 +28,7 @@ class SyncEngine {
   Timer? _debounce;
   bool _isSyncing = false;
   String? _uid;
+  String? _ensuredUserDocUid;
 
   // 水化标记键名使用 AppPrefsKeys 集中管理。
 
@@ -149,6 +150,7 @@ class SyncEngine {
   /// 自动检测未水化状态并重试水化。
   void start(String uid) {
     _uid = uid;
+    _ensuredUserDocUid = null;
     if (uid.startsWith('guest_')) return;
 
     // 未水化时自动重试
@@ -183,6 +185,7 @@ class SyncEngine {
     _connectivitySub = null;
     _debounce = null;
     _uid = null;
+    _ensuredUserDocUid = null;
   }
 
   void _scheduleSync() {
@@ -195,6 +198,7 @@ class SyncEngine {
     _isSyncing = true;
 
     try {
+      await _ensureUserDocExists(_uid!);
       final actions = await _ledger.getUnsyncedActions(
         limit: SyncConstants.syncBatchSize,
       );
@@ -220,6 +224,24 @@ class SyncEngine {
       );
     } finally {
       _isSyncing = false;
+    }
+  }
+
+  Future<void> _ensureUserDocExists(String uid) async {
+    if (_ensuredUserDocUid == uid) return;
+    try {
+      final userRef = _db.collection('users').doc(uid);
+      await userRef.set({
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      _ensuredUserDocUid = uid;
+    } catch (e, stack) {
+      ErrorHandler.record(
+        e,
+        stackTrace: stack,
+        source: 'SyncEngine',
+        operation: '_ensureUserDocExists',
+      );
     }
   }
 
@@ -259,13 +281,26 @@ class SyncEngine {
       await _ledger.markSynced(action.id);
     } catch (e) {
       final attempts = action.syncAttempts + 1;
-      await _ledger.markSyncFailed(action.id, e.toString(), attempts);
+      final permanent = _isPermanentSyncError(e);
+      final nextAttempts = permanent ? 5 : attempts;
+      await _ledger.markSyncFailed(action.id, e.toString(), nextAttempts);
       ErrorHandler.record(
         e,
         source: 'SyncEngine',
         operation: 'syncAction:${action.type.value}',
       );
     }
+  }
+
+  bool _isPermanentSyncError(Object error) {
+    if (error is! FirebaseException) return false;
+    return switch (error.code) {
+      'permission-denied' => true,
+      'failed-precondition' => true,
+      'invalid-argument' => true,
+      'unauthenticated' => true,
+      _ => false,
+    };
   }
 
   void _syncCheckIn(WriteBatch batch, String uid, LedgerAction action) {

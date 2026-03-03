@@ -229,6 +229,24 @@ class LedgerService {
     });
   }
 
+  /// 删除指定 uid 的全部本地业务数据。
+  Future<void> deleteUidData(String uid) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final table in [
+        'action_ledger',
+        'local_habits',
+        'local_cats',
+        'local_sessions',
+        'local_monthly_checkins',
+        'materialized_state',
+        'local_achievements',
+      ]) {
+        await txn.delete(table, where: 'uid = ?', whereArgs: [uid]);
+      }
+    });
+  }
+
   /// 释放资源。
   void dispose() {
     _changeController.close();

@@ -2371,4 +2371,31 @@ class SEn extends S {
 
   @override
   String get deleteAccountStepDone => 'Complete';
+
+  @override
+  String get deleteAccountQueued =>
+      'Local data deleted. Cloud account deletion is queued and will finish when online.';
+
+  @override
+  String get deleteAccountPending =>
+      'Account deletion is pending. Keep the app online to finish cloud and auth deletion.';
+
+  @override
+  String get archiveConflictTitle => 'Choose archive to keep';
+
+  @override
+  String get archiveConflictMessage =>
+      'Both local and cloud archives have data. Choose one to keep:';
+
+  @override
+  String get archiveConflictLocal => 'Local archive';
+
+  @override
+  String get archiveConflictCloud => 'Cloud archive';
+
+  @override
+  String get archiveConflictKeepCloud => 'Keep cloud';
+
+  @override
+  String get archiveConflictKeepLocal => 'Keep local';
 }

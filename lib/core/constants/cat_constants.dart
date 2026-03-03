@@ -65,54 +65,44 @@ const CatMood moodMissing = CatMood(
 /// 根据最近一次专注时间计算心情。
 /// [createdAt] 用于区分新领养猫（24h 内为 happy）和长期未互动猫（missing）。
 String calculateMood(DateTime? lastSessionAt, {DateTime? createdAt}) {
-  if (lastSessionAt == null) {
-    // 领养 24h 内的猫应该是 happy，不是 missing
-    if (createdAt != null &&
-        DateTime.now().difference(createdAt).inHours < 24) {
-      return moodHappy.id;
-    }
-    return moodMissing.id;
-  }
   final now = DateTime.now();
-  final diff = now.difference(lastSessionAt);
-  if (diff.inHours < 24) return moodHappy.id;
-  if (diff.inDays < 3) return moodNeutral.id;
-  if (diff.inDays < 7) return moodLonely.id;
-  return moodMissing.id;
+  if (lastSessionAt != null) {
+    final diff = now.difference(lastSessionAt);
+    return diff.inHours < 24
+        ? moodHappy.id
+        : diff.inDays < 3
+        ? moodNeutral.id
+        : diff.inDays < 7
+        ? moodLonely.id
+        : moodMissing.id;
+  }
+  final adoptedRecently =
+      createdAt != null && now.difference(createdAt).inHours < 24;
+  return adoptedRecently ? moodHappy.id : moodMissing.id;
 }
 
 /// 根据 ID 查找心情对象
 CatMood moodById(String id) {
-  switch (id) {
-    case 'happy':
-      return moodHappy;
-    case 'neutral':
-      return moodNeutral;
-    case 'lonely':
-      return moodLonely;
-    case 'missing':
-      return moodMissing;
-    default:
-      return moodNeutral;
-  }
+  const moodMap = {
+    'happy': moodHappy,
+    'neutral': moodNeutral,
+    'lonely': moodLonely,
+    'missing': moodMissing,
+  };
+  return moodMap[id] ?? moodNeutral;
 }
 
 // ─── Stage Colors ───
 
 /// 阶段对应的主题色（用于 UI 进度条等）
 Color stageColor(String stage) {
-  switch (stage) {
-    case 'kitten':
-      return const Color(0xFFFFB74D); // 暖橙
-    case 'adolescent':
-      return const Color(0xFF81C784); // 浅绿
-    case 'adult':
-      return const Color(0xFF64B5F6); // 浅蓝
-    case 'senior':
-      return const Color(0xFFE57373); // 暖红（长老猫威严感）
-    default:
-      return const Color(0xFFFFB74D);
-  }
+  const colors = {
+    'kitten': Color(0xFFFFB74D),
+    'adolescent': Color(0xFF81C784),
+    'adult': Color(0xFF64B5F6),
+    'senior': Color(0xFFE57373),
+  };
+  return colors[stage] ?? const Color(0xFFFFB74D);
 }
 
 // ─── Random Cat Names ───

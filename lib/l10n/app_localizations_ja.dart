@@ -2341,4 +2341,28 @@ class SJa extends S {
 
   @override
   String get deleteAccountStepDone => '完了';
+
+  @override
+  String get deleteAccountQueued => 'ローカルデータは削除されました。クラウド削除はオンライン復帰後に自動完了します。';
+
+  @override
+  String get deleteAccountPending => 'アカウント削除処理が保留中です。オンライン状態を維持してください。';
+
+  @override
+  String get archiveConflictTitle => '保持するアーカイブを選択';
+
+  @override
+  String get archiveConflictMessage => 'ローカルとクラウドの両方にデータがあります。保持する方を選択してください：';
+
+  @override
+  String get archiveConflictLocal => 'ローカルアーカイブ';
+
+  @override
+  String get archiveConflictCloud => 'クラウドアーカイブ';
+
+  @override
+  String get archiveConflictKeepCloud => 'クラウドを保持';
+
+  @override
+  String get archiveConflictKeepLocal => 'ローカルを保持';
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
@@ -84,6 +86,9 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _appOpenLogged = false;
+  bool _isAutoSigningIn = false;
+  bool _isPendingDeletionRetry = false;
+  Timer? _pendingDeletionTimer;
 
   @override
   void initState() {
@@ -97,9 +102,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         debugPrint('[APP] GoogleSignIn init failed: $e');
       }
     });
+
+    _resumePendingDeletion();
+    _pendingDeletionTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _resumePendingDeletion(),
+    );
   }
 
-  bool _isAutoSigningIn = false;
+  @override
+  void dispose() {
+    _pendingDeletionTimer?.cancel();
+    super.dispose();
+  }
 
   void _onOnboardingComplete() {
     _ensureLocalUid();
@@ -129,22 +144,23 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
   }
 
-  /// 认证用户就绪后：缓存 UID、设置 Crashlytics、迁移访客数据。
+  Future<void> _resumePendingDeletion() async {
+    if (_isPendingDeletionRetry) return;
+    _isPendingDeletionRetry = true;
+    try {
+      await ref
+          .read(accountDeletionOrchestratorProvider)
+          .resumePendingDeletion();
+    } finally {
+      _isPendingDeletionRetry = false;
+    }
+  }
+
+  /// 认证用户就绪后：缓存 UID、设置 Crashlytics。
   void _handleAuthUser(AuthUser user, SharedPreferences prefs) {
     prefs.setString(AppPrefsKeys.cachedUid, user.uid);
     FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
     ErrorHandler.breadcrumb('auth_state: ${user.uid}');
-    _clearLocalGuestState(user.uid);
-  }
-
-  /// UID 迁移 — 将 guest_ 本地数据迁移至 Firebase UID。
-  Future<void> _clearLocalGuestState(String firebaseUid) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    final localGuestUid = prefs.getString(AppPrefsKeys.localGuestUid);
-    if (localGuestUid == null || localGuestUid == firebaseUid) return;
-    final ledger = ref.read(ledgerServiceProvider);
-    await ledger.migrateUid(localGuestUid, firebaseUid);
-    await prefs.remove(AppPrefsKeys.localGuestUid);
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
@@ -200,12 +216,17 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final prefs = ref.read(sharedPreferencesProvider);
     final authState = ref.watch(authStateProvider);
 
-    // 已认证 → 使用认证 UID，迁移本地访客数据
+    if (_hasPendingDeletion(prefs)) {
+      _resumePendingDeletion();
+      return const _PendingDeletionScreen();
+    }
+
+    // 已认证 → 使用认证 UID
     final AuthUser? authUser = authState.whenOrNull(data: (u) => u);
     if (authUser != null) {
       _handleAuthUser(authUser, prefs);
       _logAppOpened();
-      return _VersionGate(
+      return _FirstHabitGate(
         uid: authUser.uid,
         startupStopwatch: widget.startupStopwatch,
       );
@@ -216,7 +237,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (cachedUid != null) {
       _autoSignInAnonymously();
       _logAppOpened();
-      return _VersionGate(
+      return _FirstHabitGate(
         uid: cachedUid,
         startupStopwatch: widget.startupStopwatch,
       );
@@ -225,114 +246,34 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     // 无认证 + 无缓存 = 已登出，等 onboardingCompleteProvider reset 触发重建
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
+
+  bool _hasPendingDeletion(SharedPreferences prefs) {
+    final tombstone = prefs.getBool(AppPrefsKeys.deletionTombstone) ?? false;
+    final pending = prefs.getString(AppPrefsKeys.pendingDeletionJob);
+    return tombstone || (pending != null && pending.isNotEmpty);
+  }
 }
 
-/// _VersionGate — detects old data schema and prompts data reset.
-/// Inserted between AuthGate and _FirstHabitGate.
-///
-/// [A3] 迁移检查缓存化：已检查过则直接跳过，不阻塞首屏。
-class _VersionGate extends ConsumerStatefulWidget {
-  final String uid;
-  final Stopwatch? startupStopwatch;
-  const _VersionGate({required this.uid, this.startupStopwatch});
+class _PendingDeletionScreen extends ConsumerWidget {
+  const _PendingDeletionScreen();
 
   @override
-  ConsumerState<_VersionGate> createState() => _VersionGateState();
-}
-
-class _VersionGateState extends ConsumerState<_VersionGate> {
-  bool _needsMigration = false;
-  bool _clearing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkMigration();
-  }
-
-  Future<void> _checkMigration() async {
-    // 检测并恢复未完成的账号删除
-    final resumed = await ref
-        .read(accountDeletionServiceProvider)
-        .resumeIfNeeded();
-    if (resumed) return;
-
-    try {
-      final migrationService = ref.read(migrationServiceProvider);
-      final needs = await migrationService.checkNeedsMigration(widget.uid);
-
-      // Lazy migrate per-cat accessories to user-level inventory
-      await migrationService.migrateAccessoriesToInventory(widget.uid);
-
-      if (mounted && needs) {
-        setState(() {
-          _needsMigration = true;
-        });
-      }
-    } catch (e) {
-      debugPrint('[VersionGate] migration check failed: $e');
-      // 迁移检查失败时跳过，允许用户正常使用
-    }
-  }
-
-  Future<void> _clearData() async {
-    setState(() => _clearing = true);
-    final migrationService = ref.read(migrationServiceProvider);
-    await migrationService.clearAllUserData(widget.uid);
-    if (mounted) {
-      setState(() {
-        _needsMigration = false;
-        _clearing = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // [A3] 默认直接渲染 _FirstHabitGate，仅在检测到需迁移时才阻塞
-    if (_needsMigration) {
-      return Scaffold(
-        body: Center(
-          child: Padding(
-            padding: AppSpacing.paddingXl,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('🐱', style: Theme.of(context).textTheme.displayLarge),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  context.l10n.migrationTitle,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  context.l10n.migrationMessage,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                if (_clearing)
-                  const CircularProgressIndicator()
-                else
-                  FilledButton.icon(
-                    onPressed: _clearData,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(context.l10n.migrationResetButton),
-                  ),
-              ],
-            ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: AppSpacing.paddingXl,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: AppSpacing.lg),
+              Text(l10n.deleteAccountPending, textAlign: TextAlign.center),
+            ],
           ),
         ),
-      );
-    }
-
-    return _FirstHabitGate(
-      uid: widget.uid,
-      startupStopwatch: widget.startupStopwatch,
+      ),
     );
   }
 }

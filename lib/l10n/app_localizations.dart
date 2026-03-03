@@ -4397,6 +4397,54 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Complete'**
   String get deleteAccountStepDone;
+
+  /// No description provided for @deleteAccountQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data deleted. Cloud account deletion is queued and will finish when online.'**
+  String get deleteAccountQueued;
+
+  /// No description provided for @deleteAccountPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion is pending. Keep the app online to finish cloud and auth deletion.'**
+  String get deleteAccountPending;
+
+  /// No description provided for @archiveConflictTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose archive to keep'**
+  String get archiveConflictTitle;
+
+  /// No description provided for @archiveConflictMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Both local and cloud archives have data. Choose one to keep:'**
+  String get archiveConflictMessage;
+
+  /// No description provided for @archiveConflictLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Local archive'**
+  String get archiveConflictLocal;
+
+  /// No description provided for @archiveConflictCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud archive'**
+  String get archiveConflictCloud;
+
+  /// No description provided for @archiveConflictKeepCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep cloud'**
+  String get archiveConflictKeepCloud;
+
+  /// No description provided for @archiveConflictKeepLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep local'**
+  String get archiveConflictKeepLocal;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

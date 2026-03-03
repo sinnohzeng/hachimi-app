@@ -1,88 +1,12 @@
 import 'package:hachimi_app/models/cat_appearance.dart';
 
 /// 皮毛图案类型 → 人类可读描述。
-String peltTypeDescription(String peltType) {
-  switch (peltType) {
-    case 'Tabby':
-      return 'Classic tabby stripes';
-    case 'Ticked':
-      return 'Ticked agouti pattern';
-    case 'Mackerel':
-      return 'Mackerel tabby';
-    case 'Classic':
-      return 'Classic swirl pattern';
-    case 'Sokoke':
-      return 'Sokoke marble pattern';
-    case 'Agouti':
-      return 'Agouti ticked';
-    case 'Speckled':
-      return 'Speckled coat';
-    case 'Rosette':
-      return 'Rosette spotted';
-    case 'SingleColour':
-      return 'Solid color';
-    case 'TwoColour':
-      return 'Two-tone';
-    case 'Smoke':
-      return 'Smoke shading';
-    case 'Singlestripe':
-      return 'Single stripe';
-    case 'Bengal':
-      return 'Bengal pattern';
-    case 'Marbled':
-      return 'Marbled pattern';
-    case 'Masked':
-      return 'Masked face';
-    default:
-      return peltType;
-  }
-}
+String peltTypeDescription(String peltType) =>
+    _peltTypeDescriptions[peltType] ?? peltType;
 
 /// 皮毛颜色 ID → 人类可读名称。
-String peltColorDescription(String color) {
-  switch (color) {
-    case 'WHITE':
-      return 'White';
-    case 'PALEGREY':
-      return 'Pale grey';
-    case 'SILVER':
-      return 'Silver';
-    case 'GREY':
-      return 'Grey';
-    case 'DARKGREY':
-      return 'Dark grey';
-    case 'GHOST':
-      return 'Ghost grey';
-    case 'BLACK':
-      return 'Black';
-    case 'CREAM':
-      return 'Cream';
-    case 'PALEGINGER':
-      return 'Pale ginger';
-    case 'GOLDEN':
-      return 'Golden';
-    case 'GINGER':
-      return 'Ginger';
-    case 'DARKGINGER':
-      return 'Dark ginger';
-    case 'SIENNA':
-      return 'Sienna';
-    case 'LIGHTBROWN':
-      return 'Light brown';
-    case 'LILAC':
-      return 'Lilac';
-    case 'BROWN':
-      return 'Brown';
-    case 'GOLDEN-BROWN':
-      return 'Golden brown';
-    case 'DARKBROWN':
-      return 'Dark brown';
-    case 'CHOCOLATE':
-      return 'Chocolate';
-    default:
-      return color[0] + color.substring(1).toLowerCase();
-  }
-}
+String peltColorDescription(String color) =>
+    _peltColorDescriptions[color] ?? _titleCaseToken(color);
 
 /// 眼色 ID → 人类可读名称。支持异色瞳。
 String eyeDescription(String eyeColor, String? eyeColor2) {
@@ -93,54 +17,8 @@ String eyeDescription(String eyeColor, String? eyeColor2) {
   return '$primary eyes';
 }
 
-String _eyeColorName(String color) {
-  switch (color) {
-    case 'YELLOW':
-      return 'Yellow';
-    case 'AMBER':
-      return 'Amber';
-    case 'HAZEL':
-      return 'Hazel';
-    case 'PALEGREEN':
-      return 'Pale green';
-    case 'GREEN':
-      return 'Green';
-    case 'BLUE':
-      return 'Blue';
-    case 'DARKBLUE':
-      return 'Dark blue';
-    case 'BLUEYELLOW':
-      return 'Blue-yellow';
-    case 'BLUEGREEN':
-      return 'Blue-green';
-    case 'GREY':
-      return 'Grey';
-    case 'CYAN':
-      return 'Cyan';
-    case 'EMERALD':
-      return 'Emerald';
-    case 'HEATHERBLUE':
-      return 'Heather blue';
-    case 'SUNLITICE':
-      return 'Sunlit ice';
-    case 'COPPER':
-      return 'Copper';
-    case 'SAGE':
-      return 'Sage';
-    case 'COBALT':
-      return 'Cobalt';
-    case 'PALEBLUE':
-      return 'Pale blue';
-    case 'BRONZE':
-      return 'Bronze';
-    case 'SILVER':
-      return 'Silver';
-    case 'PALEYELLOW':
-      return 'Pale yellow';
-    default:
-      return color[0] + color.substring(1).toLowerCase();
-  }
-}
+String _eyeColorName(String color) =>
+    _eyeColorDescriptions[color] ?? _titleCaseToken(color);
 
 /// 毛发长度描述。
 String furLengthDescription(bool isLonghair) {
@@ -148,56 +26,11 @@ String furLengthDescription(bool isLonghair) {
 }
 
 /// 白斑色调描述。
-String? whitePatchesTintDescription(String tint) {
-  switch (tint) {
-    case 'none':
-      return null;
-    case 'offwhite':
-      return 'Off-white tint';
-    case 'cream':
-      return 'Cream tint';
-    case 'darkcream':
-      return 'Dark cream tint';
-    case 'gray':
-      return 'Grey tint';
-    case 'pink':
-      return 'Pink tint';
-    default:
-      return null;
-  }
-}
+String? whitePatchesTintDescription(String tint) => _whitePatchesTint[tint];
 
 /// 皮肤色描述。
-String skinColorDescription(String skinColor) {
-  switch (skinColor) {
-    case 'PINK':
-      return 'Pink';
-    case 'RED':
-      return 'Red';
-    case 'BLACK':
-      return 'Black';
-    case 'DARK':
-      return 'Dark';
-    case 'DARKBROWN':
-      return 'Dark brown';
-    case 'BROWN':
-      return 'Brown';
-    case 'LIGHTBROWN':
-      return 'Light brown';
-    case 'DARKGREY':
-      return 'Dark grey';
-    case 'GREY':
-      return 'Grey';
-    case 'DARKSALMON':
-      return 'Dark salmon';
-    case 'SALMON':
-      return 'Salmon';
-    case 'PEACH':
-      return 'Peach';
-    default:
-      return skinColor[0] + skinColor.substring(1).toLowerCase();
-  }
-}
+String skinColorDescription(String skinColor) =>
+    _skinColorDescriptions[skinColor] ?? _titleCaseToken(skinColor);
 
 /// 一行概要：如 "Ginger tabby, golden eyes, longhair"。
 String fullSummary(CatAppearance a) {
@@ -216,3 +49,96 @@ String fullSummary(CatAppearance a) {
 
   return parts.join(', ');
 }
+
+String _titleCaseToken(String input) {
+  if (input.isEmpty) return input;
+  return input[0] + input.substring(1).toLowerCase();
+}
+
+const Map<String, String> _peltTypeDescriptions = {
+  'Tabby': 'Classic tabby stripes',
+  'Ticked': 'Ticked agouti pattern',
+  'Mackerel': 'Mackerel tabby',
+  'Classic': 'Classic swirl pattern',
+  'Sokoke': 'Sokoke marble pattern',
+  'Agouti': 'Agouti ticked',
+  'Speckled': 'Speckled coat',
+  'Rosette': 'Rosette spotted',
+  'SingleColour': 'Solid color',
+  'TwoColour': 'Two-tone',
+  'Smoke': 'Smoke shading',
+  'Singlestripe': 'Single stripe',
+  'Bengal': 'Bengal pattern',
+  'Marbled': 'Marbled pattern',
+  'Masked': 'Masked face',
+};
+
+const Map<String, String> _peltColorDescriptions = {
+  'WHITE': 'White',
+  'PALEGREY': 'Pale grey',
+  'SILVER': 'Silver',
+  'GREY': 'Grey',
+  'DARKGREY': 'Dark grey',
+  'GHOST': 'Ghost grey',
+  'BLACK': 'Black',
+  'CREAM': 'Cream',
+  'PALEGINGER': 'Pale ginger',
+  'GOLDEN': 'Golden',
+  'GINGER': 'Ginger',
+  'DARKGINGER': 'Dark ginger',
+  'SIENNA': 'Sienna',
+  'LIGHTBROWN': 'Light brown',
+  'LILAC': 'Lilac',
+  'BROWN': 'Brown',
+  'GOLDEN-BROWN': 'Golden brown',
+  'DARKBROWN': 'Dark brown',
+  'CHOCOLATE': 'Chocolate',
+};
+
+const Map<String, String> _eyeColorDescriptions = {
+  'YELLOW': 'Yellow',
+  'AMBER': 'Amber',
+  'HAZEL': 'Hazel',
+  'PALEGREEN': 'Pale green',
+  'GREEN': 'Green',
+  'BLUE': 'Blue',
+  'DARKBLUE': 'Dark blue',
+  'BLUEYELLOW': 'Blue-yellow',
+  'BLUEGREEN': 'Blue-green',
+  'GREY': 'Grey',
+  'CYAN': 'Cyan',
+  'EMERALD': 'Emerald',
+  'HEATHERBLUE': 'Heather blue',
+  'SUNLITICE': 'Sunlit ice',
+  'COPPER': 'Copper',
+  'SAGE': 'Sage',
+  'COBALT': 'Cobalt',
+  'PALEBLUE': 'Pale blue',
+  'BRONZE': 'Bronze',
+  'SILVER': 'Silver',
+  'PALEYELLOW': 'Pale yellow',
+};
+
+const Map<String, String?> _whitePatchesTint = {
+  'none': null,
+  'offwhite': 'Off-white tint',
+  'cream': 'Cream tint',
+  'darkcream': 'Dark cream tint',
+  'gray': 'Grey tint',
+  'pink': 'Pink tint',
+};
+
+const Map<String, String> _skinColorDescriptions = {
+  'PINK': 'Pink',
+  'RED': 'Red',
+  'BLACK': 'Black',
+  'DARK': 'Dark',
+  'DARKBROWN': 'Dark brown',
+  'BROWN': 'Brown',
+  'LIGHTBROWN': 'Light brown',
+  'DARKGREY': 'Dark grey',
+  'GREY': 'Grey',
+  'DARKSALMON': 'Dark salmon',
+  'SALMON': 'Salmon',
+  'PEACH': 'Peach',
+};

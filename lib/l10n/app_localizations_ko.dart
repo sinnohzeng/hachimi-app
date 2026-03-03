@@ -2342,4 +2342,29 @@ class SKo extends S {
 
   @override
   String get deleteAccountStepDone => '완료';
+
+  @override
+  String get deleteAccountQueued =>
+      '로컬 데이터가 삭제되었습니다. 클라우드 계정 삭제는 온라인 복구 후 자동 완료됩니다.';
+
+  @override
+  String get deleteAccountPending => '계정 삭제가 대기 중입니다. 온라인 상태를 유지해 주세요.';
+
+  @override
+  String get archiveConflictTitle => '보관할 아카이브 선택';
+
+  @override
+  String get archiveConflictMessage => '로컬과 클라우드 모두 데이터가 있습니다. 하나를 선택해 보관하세요:';
+
+  @override
+  String get archiveConflictLocal => '로컬 아카이브';
+
+  @override
+  String get archiveConflictCloud => '클라우드 아카이브';
+
+  @override
+  String get archiveConflictKeepCloud => '클라우드 유지';
+
+  @override
+  String get archiveConflictKeepLocal => '로컬 유지';
 }

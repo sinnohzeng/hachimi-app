@@ -82,8 +82,14 @@ class FirebaseAuthBackend implements AuthBackend {
       final credential = await _getGoogleCredential();
       final user = _auth.currentUser;
       if (user != null) {
-        final result = await user.linkWithCredential(credential);
-        return _mapResult(result);
+        try {
+          final result = await user.linkWithCredential(credential);
+          return _mapResult(result);
+        } on FirebaseAuthException catch (e) {
+          if (!_isCredentialAlreadyInUse(e.code)) rethrow;
+          final result = await _auth.signInWithCredential(credential);
+          return _mapResult(result);
+        }
       }
       final result = await _auth.signInWithCredential(credential);
       return _mapResult(result);
@@ -103,15 +109,24 @@ class FirebaseAuthBackend implements AuthBackend {
       password: password,
     );
     final user = _auth.currentUser;
-    if (user != null) {
-      final result = await user.linkWithCredential(credential);
+    try {
+      if (user != null) {
+        final result = await user.linkWithCredential(credential);
+        return _mapResult(result);
+      }
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return _mapResult(result);
+    } on FirebaseAuthException catch (e) {
+      if (!_isCredentialAlreadyInUse(e.code)) rethrow;
+      final result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       return _mapResult(result);
     }
-    final result = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return _mapResult(result);
   }
 
   @override
@@ -193,5 +208,10 @@ class FirebaseAuthBackend implements AuthBackend {
       displayName: user.displayName,
       isAnonymous: user.isAnonymous,
     );
+  }
+
+  bool _isCredentialAlreadyInUse(String code) {
+    return code == 'credential-already-in-use' ||
+        code == 'email-already-in-use';
   }
 }

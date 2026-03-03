@@ -6,8 +6,8 @@ abstract class UserProfileBackend {
   /// 后端标识名。
   String get id;
 
-  /// 注册时创建用户文档。
-  Future<void> createProfile({
+  /// 注册时确保用户文档存在（幂等，不覆盖已有文档）。
+  Future<void> ensureProfile({
     required String uid,
     required String email,
     String? displayName,

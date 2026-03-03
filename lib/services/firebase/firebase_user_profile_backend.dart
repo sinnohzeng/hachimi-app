@@ -10,18 +10,23 @@ class FirebaseUserProfileBackend implements UserProfileBackend {
   String get id => 'firebase';
 
   @override
-  Future<void> createProfile({
+  Future<void> ensureProfile({
     required String uid,
     required String email,
     String? displayName,
   }) async {
-    await _db.collection('users').doc(uid).set({
-      'email': email,
-      'displayName': displayName ?? email.split('@').first,
-      'coins': 0,
-      'inventory': <String>[],
-      'lastCheckInDate': null,
-      'createdAt': FieldValue.serverTimestamp(),
+    final docRef = _db.collection('users').doc(uid);
+    await _db.runTransaction((txn) async {
+      final doc = await txn.get(docRef);
+      if (doc.exists) return;
+      txn.set(docRef, {
+        'email': email,
+        'displayName': displayName ?? email.split('@').first,
+        'coins': 0,
+        'inventory': <String>[],
+        'lastCheckInDate': null,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
     });
   }
 

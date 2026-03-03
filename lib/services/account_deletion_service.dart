@@ -1,144 +1,66 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
-import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as p;
 
-/// 删除阶段枚举 — 替代魔法数字 0/1/2。
-enum DeletionPhase {
-  firestore,
-  local,
-  auth,
-  done;
+/// 删除前的数据摘要。
+class AccountDeletionSummary {
+  final int questCount;
+  final int catCount;
+  final int totalHours;
 
-  static DeletionPhase fromIndex(int index) =>
-      DeletionPhase.values.elementAtOrNull(index) ?? DeletionPhase.firestore;
+  const AccountDeletionSummary({
+    required this.questCount,
+    required this.catCount,
+    required this.totalHours,
+  });
 }
 
-/// 账号删除服务 — 负责 Firestore 全量清理、本地清理。
+/// 本地数据删除服务。
 ///
-/// 重认证职责已归 [AuthBackend]，本服务仅负责数据删除。
-/// 构造注入依赖，支持测试时 mock。
+/// 职责固定：
+/// 1. 读取本地数据摘要；
+/// 2. 清理 SQLite、SharedPreferences、通知、计时状态。
+///
+/// 云端/Auth 删除由 AccountDeletionOrchestrator + Cloud Functions 负责。
 class AccountDeletionService {
-  final FirebaseFirestore _db;
   final LocalDatabaseService _localDb;
   final NotificationService _notifications;
 
   AccountDeletionService({
     required LocalDatabaseService localDb,
     required NotificationService notifications,
-    FirebaseFirestore? db,
   }) : _localDb = localDb,
-       _notifications = notifications,
-       _db = db ?? FirebaseFirestore.instance;
+       _notifications = notifications;
 
-  // 删除恢复标记键名使用 AppPrefsKeys 集中管理。
+  Future<AccountDeletionSummary> getUserDataSummary(String uid) async {
+    final db = await _localDb.database;
+    final habits = await db.rawQuery(
+      'SELECT COUNT(*) AS count, COALESCE(SUM(total_minutes), 0) AS minutes '
+      'FROM local_habits WHERE uid = ?',
+      [uid],
+    );
+    final cats = await db.rawQuery(
+      'SELECT COUNT(*) AS count FROM local_cats WHERE uid = ?',
+      [uid],
+    );
 
-  /// Firestore 用户数据拓扑 — 新增集合只需在此注册。
-  /// 格式：(集合名, [嵌套子集合名])
-  static const _userCollections = [
-    ('habits', ['sessions']),
-    ('cats', <String>[]),
-    ('achievements', <String>[]),
-    ('monthlyCheckIns', <String>[]),
-    ('checkIns', ['entries']),
-  ];
-
-  /// 获取用户数据摘要（Quest 数、Cat 数、累计小时数）。
-  Future<({int questCount, int catCount, int totalHours})> getUserDataSummary(
-    String uid,
-  ) async {
-    return _getFirestoreSummary(uid);
-  }
-
-  /// Firestore 获取用户数据摘要。
-  Future<({int questCount, int catCount, int totalHours})> _getFirestoreSummary(
-    String uid,
-  ) async {
-    final userRef = _db.collection('users').doc(uid);
-    final habitsSnap = await userRef.collection('habits').get();
-    final catsSnap = await userRef.collection('cats').get();
-
-    int totalMinutes = 0;
-    for (final doc in habitsSnap.docs) {
-      totalMinutes += (doc.data()['totalMinutes'] as int?) ?? 0;
-    }
-
-    return (
-      questCount: habitsSnap.docs.length,
-      catCount: catsSnap.docs.length,
-      totalHours: totalMinutes ~/ 60,
+    final minutes = _toInt(habits.first['minutes']);
+    return AccountDeletionSummary(
+      questCount: _toInt(habits.first['count']),
+      catCount: _toInt(cats.first['count']),
+      totalHours: minutes ~/ 60,
     );
   }
 
-  /// 全量删除：Firestore → 本地清理。
-  /// Auth 删除和 Google 登出由调用方负责（DeleteAccountFlow）。
-  /// 使用 SharedPreferences 标记删除进度，崩溃后可恢复。
-  Future<void> deleteEverything(
-    String uid, {
-    void Function(double progress, String step)? onProgress,
+  Future<void> cleanLocalData({
+    Map<String, Object?> preservePrefs = const {},
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
-    await prefs.setString(AppPrefsKeys.deletionUid, uid);
-    await prefs.setInt(
-      AppPrefsKeys.deletionStep,
-      DeletionPhase.firestore.index,
-    );
-
-    // Phase 1: Firestore 全量清理
-    onProgress?.call(0.0, 'firestore');
-    await _deleteFirestoreData(uid, onProgress: onProgress);
-    await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.local.index);
-
-    // Phase 2: 本地清理
-    onProgress?.call(0.7, 'local');
-    await cleanLocalData();
-    // cleanLocalData 清空 SharedPreferences，需重设标记
-    await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
-    await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.auth.index);
-
-    onProgress?.call(1.0, 'done');
-  }
-
-  /// 清理访客数据：Firestore（匿名用户）+ 本地。
-  Future<void> deleteGuestData(String uid) async {
-    await _deleteFirestoreData(uid);
-    await cleanLocalData();
-  }
-
-  /// 声明式遍历引擎 — 按拓扑自动删除所有用户集合和嵌套子集合。
-  Future<void> _deleteFirestoreData(
-    String uid, {
-    void Function(double progress, String step)? onProgress,
-  }) async {
-    final userRef = _db.collection('users').doc(uid);
-    final total = _userCollections.length;
-
-    for (var i = 0; i < total; i++) {
-      final (name, nested) = _userCollections[i];
-      final snap = await userRef.collection(name).get();
-      for (final doc in snap.docs) {
-        for (final sub in nested) {
-          await _deleteSubcollection(doc.reference.collection(sub));
-        }
-        await doc.reference.delete();
-      }
-      onProgress?.call((i + 1) / (total + 1), name);
-    }
-
-    await userRef.delete();
-    onProgress?.call(1.0, 'user');
-  }
-
-  /// 清理本地数据 — 拆分为 4 个子函数。
-  Future<void> cleanLocalData() async {
     await _cleanSqlite();
-    await _cleanPreferences();
+    await _cleanPreferences(preservePrefs);
     await _cleanNotifications();
     await _cleanTimerState();
   }
@@ -159,25 +81,12 @@ class AccountDeletionService {
     }
   }
 
-  Future<void> _cleanPreferences() async {
+  Future<void> _cleanPreferences(Map<String, Object?> preservePrefs) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // 保存恢复标记（防止 clear 与 re-set 之间崩溃导致丢失）
-      final savedProgress = prefs.getBool(AppPrefsKeys.deletionInProgress);
-      final savedUid = prefs.getString(AppPrefsKeys.deletionUid);
-      final savedStep = prefs.getInt(AppPrefsKeys.deletionStep);
-
       await prefs.clear();
-
-      // 恢复标记
-      if (savedProgress == true) {
-        await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
-        if (savedUid != null) {
-          await prefs.setString(AppPrefsKeys.deletionUid, savedUid);
-        }
-        if (savedStep != null) {
-          await prefs.setInt(AppPrefsKeys.deletionStep, savedStep);
-        }
+      for (final entry in preservePrefs.entries) {
+        await _restorePref(prefs, entry.key, entry.value);
       }
     } catch (e, stack) {
       ErrorHandler.record(
@@ -187,6 +96,40 @@ class AccountDeletionService {
         operation: 'cleanLocalData(prefs)',
       );
     }
+  }
+
+  Future<void> _restorePref(
+    SharedPreferences prefs,
+    String key,
+    Object? value,
+  ) async {
+    if (value == null) {
+      await prefs.remove(key);
+      return;
+    }
+    if (value is bool) {
+      await prefs.setBool(key, value);
+      return;
+    }
+    if (value is int) {
+      await prefs.setInt(key, value);
+      return;
+    }
+    if (value is double) {
+      await prefs.setDouble(key, value);
+      return;
+    }
+    if (value is String) {
+      await prefs.setString(key, value);
+      return;
+    }
+    if (value is List<String>) {
+      await prefs.setStringList(key, value);
+      return;
+    }
+    throw ArgumentError(
+      'Unsupported SharedPreferences type: ${value.runtimeType}',
+    );
   }
 
   Future<void> _cleanNotifications() async {
@@ -215,78 +158,9 @@ class AccountDeletionService {
     }
   }
 
-  // ─── 删除恢复 ───
-
-  /// 检查并恢复未完成的账号删除（app 启动时调用）。
-  /// 返回 true 表示检测到并处理了未完成删除。
-  Future<bool> resumeIfNeeded() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(AppPrefsKeys.deletionInProgress) ?? false)) {
-      return false;
-    }
-
-    try {
-      await _executeDeletionResume(prefs);
-    } catch (e, stack) {
-      ErrorHandler.record(
-        e,
-        stackTrace: stack,
-        source: 'AccountDeletionService',
-        operation: 'resumeIfNeeded',
-      );
-    } finally {
-      await _clearDeletionMarkers(prefs);
-    }
-    return true;
-  }
-
-  /// 从中断处继续执行删除。所有步骤都是幂等的。
-  Future<void> _executeDeletionResume(SharedPreferences prefs) async {
-    final phase = DeletionPhase.fromIndex(
-      prefs.getInt(AppPrefsKeys.deletionStep) ?? 0,
-    );
-    final uid = prefs.getString(AppPrefsKeys.deletionUid);
-
-    if (phase.index < DeletionPhase.local.index && uid != null) {
-      await _deleteFirestoreData(uid);
-    }
-    if (phase.index < DeletionPhase.auth.index) {
-      await cleanLocalData();
-      await prefs.setBool(AppPrefsKeys.deletionInProgress, true);
-      await prefs.setInt(AppPrefsKeys.deletionStep, DeletionPhase.auth.index);
-    }
-    // Auth 删除由调用方（app 启动逻辑）负责
-  }
-
-  Future<void> _clearDeletionMarkers(SharedPreferences prefs) async {
-    await prefs.remove(AppPrefsKeys.deletionInProgress);
-    await prefs.remove(AppPrefsKeys.deletionUid);
-    await prefs.remove(AppPrefsKeys.deletionStep);
-  }
-
-  /// 批量删除一个集合下的所有文档。
-  Future<void> _deleteSubcollection(CollectionReference ref) async {
-    const batchSize = 100;
-    QuerySnapshot snapshot;
-    do {
-      snapshot = await ref.limit(batchSize).get();
-      if (snapshot.docs.isEmpty) break;
-
-      final batch = _db.batch();
-      for (final doc in snapshot.docs) {
-        batch.delete(doc.reference);
-      }
-      try {
-        await batch.commit();
-      } catch (e, stack) {
-        ErrorHandler.record(
-          e,
-          stackTrace: stack,
-          source: 'AccountDeletionService',
-          operation: '_deleteSubcollection(${ref.path})',
-        );
-        rethrow;
-      }
-    } while (snapshot.docs.length == batchSize);
+  int _toInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return 0;
   }
 }

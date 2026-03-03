@@ -1,0 +1,21 @@
+{
+  "name": "hachimi-functions",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "test": "npm run build && node --test lib/test/*.test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "typescript": "^5.8.2"
+  }
+}

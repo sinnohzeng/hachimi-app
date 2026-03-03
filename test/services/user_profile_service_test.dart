@@ -4,7 +4,7 @@
 //
 // 🧩 文件结构：
 // - FakeUserProfileBackend mock 实现；
-// - createProfile 参数传递验证；
+// - ensureProfile 参数传递验证；
 // - syncToFirestore 委托验证；
 //
 // 🕒 创建时间：2026-02-27
@@ -23,7 +23,7 @@ class FakeUserProfileBackend implements UserProfileBackend {
   Map<String, dynamic>? lastSyncCall;
 
   @override
-  Future<void> createProfile({
+  Future<void> ensureProfile({
     required String uid,
     required String email,
     String? displayName,
@@ -62,9 +62,9 @@ void main() {
     });
   });
 
-  group('UserProfileService.createProfile', () {
+  group('UserProfileService.ensureProfile', () {
     test('delegates to backend with correct params', () async {
-      await service.createProfile(
+      await service.ensureProfile(
         uid: 'u1',
         email: 'a@b.com',
         displayName: 'Alice',
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('passes null displayName when not provided', () async {
-      await service.createProfile(uid: 'u2', email: 'b@c.com');
+      await service.ensureProfile(uid: 'u2', email: 'b@c.com');
       expect(fakeBackend.lastCreateCall?['displayName'], isNull);
     });
   });

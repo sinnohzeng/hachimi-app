@@ -10,13 +10,13 @@ class UserProfileService {
   UserProfileService({required UserProfileBackend backend})
     : _backend = backend;
 
-  /// 注册时初始化用户文档。
-  Future<void> createProfile({
+  /// 注册时确保用户文档存在（幂等）。
+  Future<void> ensureProfile({
     required String uid,
     required String email,
     String? displayName,
   }) async {
-    await _backend.createProfile(
+    await _backend.ensureProfile(
       uid: uid,
       email: email,
       displayName: displayName,

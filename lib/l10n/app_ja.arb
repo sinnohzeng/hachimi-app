@@ -824,5 +824,13 @@
   "deleteAccountRetainedData": "利用統計とクラッシュレポートは削除できません。",
   "deleteAccountStepCloud": "クラウドデータを削除中...",
   "deleteAccountStepLocal": "ローカルデータを削除中...",
-  "deleteAccountStepDone": "完了"
+  "deleteAccountStepDone": "完了",
+  "deleteAccountQueued": "ローカルデータは削除されました。クラウド削除はオンライン復帰後に自動完了します。",
+  "deleteAccountPending": "アカウント削除処理が保留中です。オンライン状態を維持してください。",
+  "archiveConflictTitle": "保持するアーカイブを選択",
+  "archiveConflictMessage": "ローカルとクラウドの両方にデータがあります。保持する方を選択してください：",
+  "archiveConflictLocal": "ローカルアーカイブ",
+  "archiveConflictCloud": "クラウドアーカイブ",
+  "archiveConflictKeepCloud": "クラウドを保持",
+  "archiveConflictKeepLocal": "ローカルを保持"
 }

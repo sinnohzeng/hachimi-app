@@ -86,9 +86,9 @@ void main() {
         AppPrefsKeys.localGuestUid,
         AppPrefsKeys.onboardingComplete,
         AppPrefsKeys.dataHydrated,
-        AppPrefsKeys.deletionInProgress,
-        AppPrefsKeys.deletionUid,
-        AppPrefsKeys.deletionStep,
+        AppPrefsKeys.pendingDeletionJob,
+        AppPrefsKeys.deletionTombstone,
+        AppPrefsKeys.deletionRetryCount,
         AppPrefsKeys.lastAppOpen,
         AppPrefsKeys.consecutiveDays,
       ];

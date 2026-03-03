@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
@@ -28,33 +29,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authBackend = ref.read(authBackendProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
-
       final notifier = ref.read(userProfileNotifierProvider.notifier);
+      final oldUid = ref.read(currentUidProvider);
+      final wasAnonymous = authBackend.isAnonymous;
+      final result = widget.linkMode
+          ? await authBackend.linkWithGoogle()
+          : await authBackend.signInWithGoogle();
+      if (result == null) return;
 
-      if (widget.linkMode) {
-        // 匿名用户关联 Google 账号
-        final result = await authBackend.linkWithGoogle();
-        if (result != null) {
-          await notifier.createProfile(
-            uid: result.uid,
-            email: result.email ?? '',
-            displayName: result.displayName,
-          );
-          await analyticsService.logSignUp(method: 'google_link');
-          if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
-        }
-      } else {
-        final result = await authBackend.signInWithGoogle();
-        if (result != null && result.isNewUser) {
-          await analyticsService.logSignUp(method: 'google');
-          await notifier.createProfile(
-            uid: result.uid,
-            email: result.email ?? '',
-            displayName: result.displayName,
-          );
-        }
+      await notifier.ensureProfile(
+        uid: result.uid,
+        email: result.email ?? '',
+        displayName: result.displayName,
+      );
+
+      if (result.isNewUser) {
+        await analyticsService.logSignUp(
+          method: widget.linkMode ? 'google_link' : 'google',
+        );
       }
-      // AuthGate will automatically navigate to HomeScreen
+
+      await _resolveGuestConflictIfNeeded(
+        result: result,
+        oldUid: oldUid,
+        wasAnonymous: wasAnonymous,
+      );
+
+      if (widget.linkMode && mounted) {
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      }
     } on Exception catch (e) {
       if (mounted) {
         final message = mapAuthError(e, context.l10n);
@@ -67,10 +70,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _resolveGuestConflictIfNeeded({
+    required AuthResult result,
+    required String? oldUid,
+    required bool wasAnonymous,
+  }) async {
+    if (oldUid == null || !mounted) return;
+    if (!_shouldResolveConflict(oldUid, result.uid, wasAnonymous)) return;
+    await ref
+        .read(guestUpgradeCoordinatorProvider)
+        .resolve(
+          context: context,
+          oldUid: oldUid,
+          newUid: result.uid,
+          email: result.email ?? '',
+          displayName: result.displayName,
+        );
+  }
+
+  bool _shouldResolveConflict(String oldUid, String newUid, bool wasAnonymous) {
+    if (oldUid == newUid) return false;
+    if (widget.linkMode) return true;
+    return oldUid.startsWith('guest_') || wasAnonymous;
+  }
+
   void _navigateToEmailAuth() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => EmailAuthScreen(linkMode: widget.linkMode),
+        builder: (_) => EmailAuthScreen(
+          linkMode: widget.linkMode,
+          startAsLogin: widget.linkMode,
+        ),
       ),
     );
   }

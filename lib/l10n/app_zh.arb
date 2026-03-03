@@ -1067,5 +1067,13 @@
   "deleteAccountRetainedData": "使用统计和崩溃报告无法删除",
   "deleteAccountStepCloud": "正在删除云端数据...",
   "deleteAccountStepLocal": "正在清理本地数据...",
-  "deleteAccountStepDone": "已完成"
+  "deleteAccountStepDone": "已完成",
+  "deleteAccountQueued": "本地数据已删除。云端账号删除已排队，将在联网后自动完成。",
+  "deleteAccountPending": "账号删除任务处理中，请保持网络连接以完成云端与认证删除。",
+  "archiveConflictTitle": "选择保留存档",
+  "archiveConflictMessage": "检测到本地和云端都有存档数据，请选择保留其一：",
+  "archiveConflictLocal": "本地存档",
+  "archiveConflictCloud": "云端存档",
+  "archiveConflictKeepCloud": "保留云端",
+  "archiveConflictKeepLocal": "保留本地"
 }

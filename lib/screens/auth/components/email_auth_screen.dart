@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
+import 'package:hachimi_app/services/analytics_service.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {
   final bool startAsLogin;
@@ -36,8 +38,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   @override
   void initState() {
     super.initState();
-    // linkMode 总是"注册"形式（关联新凭证）
-    _isLogin = widget.linkMode ? false : widget.startAsLogin;
+    _isLogin = widget.startAsLogin;
   }
 
   @override
@@ -57,36 +58,22 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       final authBackend = ref.read(authBackendProvider);
       final analyticsService = ref.read(analyticsServiceProvider);
       final notifier = ref.read(userProfileNotifierProvider.notifier);
+      final oldUid = ref.read(currentUidProvider);
+      final wasAnonymous = authBackend.isAnonymous;
+      final result = await _authenticate(authBackend);
 
-      if (widget.linkMode) {
-        // 匿名用户关联 Email 账号
-        final result = await authBackend.linkWithEmail(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        await analyticsService.logSignUp(method: 'email_link');
-        await notifier.createProfile(
-          uid: result.uid,
-          email: _emailController.text.trim(),
-        );
-      } else if (_isLogin) {
-        await authBackend.signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-      } else {
-        final result = await authBackend.signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        await analyticsService.logSignUp();
-        await notifier.createProfile(
-          uid: result.uid,
-          email: _emailController.text.trim(),
-        );
-      }
-      // AuthGate will automatically navigate to HomeScreen.
-      // Pop this screen so we don't leave it on the stack.
+      await notifier.ensureProfile(
+        uid: result.uid,
+        email: _emailController.text.trim(),
+        displayName: result.displayName,
+      );
+      await _logSignUpIfNeeded(analyticsService, result);
+      await _resolveGuestConflictIfNeeded(
+        result: result,
+        oldUid: oldUid,
+        wasAnonymous: wasAnonymous,
+      );
+
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
       if (mounted) {
@@ -98,6 +85,51 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<AuthResult> _authenticate(AuthBackend authBackend) async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (_isLogin) {
+      return authBackend.signIn(email: email, password: password);
+    }
+    if (widget.linkMode) {
+      return authBackend.linkWithEmail(email: email, password: password);
+    }
+    return authBackend.signUp(email: email, password: password);
+  }
+
+  Future<void> _logSignUpIfNeeded(
+    AnalyticsService analyticsService,
+    AuthResult result,
+  ) async {
+    if (!result.isNewUser) return;
+    final method = widget.linkMode ? 'email_link' : 'email';
+    await analyticsService.logSignUp(method: method);
+  }
+
+  Future<void> _resolveGuestConflictIfNeeded({
+    required AuthResult result,
+    required String? oldUid,
+    required bool wasAnonymous,
+  }) async {
+    if (oldUid == null || !mounted) return;
+    if (!_shouldResolveConflict(oldUid, result.uid, wasAnonymous)) return;
+    await ref
+        .read(guestUpgradeCoordinatorProvider)
+        .resolve(
+          context: context,
+          oldUid: oldUid,
+          newUid: result.uid,
+          email: _emailController.text.trim(),
+          displayName: result.displayName,
+        );
+  }
+
+  bool _shouldResolveConflict(String oldUid, String newUid, bool wasAnonymous) {
+    if (oldUid == newUid) return false;
+    if (widget.linkMode) return true;
+    return oldUid.startsWith('guest_') || wasAnonymous;
   }
 
   @override
@@ -159,15 +191,36 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
                         // Toggle hint
                         Text(
-                          widget.linkMode
-                              ? context.l10n.loginLinkTagline
-                              : _isLogin
+                          _isLogin
                               ? context.l10n.loginWelcomeBack
                               : context.l10n.loginCreateAccount,
                           style: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
                         ),
+                        if (widget.linkMode) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ChoiceChip(
+                                label: Text(context.l10n.loginLogIn),
+                                selected: _isLogin,
+                                onSelected: (_) =>
+                                    setState(() => _isLogin = true),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              ChoiceChip(
+                                label: Text(
+                                  context.l10n.loginCreateAccountButton,
+                                ),
+                                selected: !_isLogin,
+                                onSelected: (_) =>
+                                    setState(() => _isLogin = false),
+                              ),
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.xl),
 
                         // Email field
@@ -302,7 +355,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // Toggle login/register (hidden in linkMode)
+                        // Toggle login/register
                         if (!widget.linkMode)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

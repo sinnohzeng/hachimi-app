@@ -228,56 +228,6 @@ class AnalyticsService {
     ),
   );
 
-  // ─── Legacy Events (backward compat) ───
-
-  Future<void> logTimerStarted({required String habitName}) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.timerStarted,
-      parameters: {AnalyticsEvents.paramHabitName: habitName},
-    ),
-  );
-
-  Future<void> logTimerCompleted({
-    required String habitName,
-    required int durationMinutes,
-  }) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.timerCompleted,
-      parameters: {
-        AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramDurationMinutes: durationMinutes,
-      },
-    ),
-  );
-
-  Future<void> logDailyCheckIn({
-    required String habitName,
-    required int totalCheckInDays,
-    required int minutesToday,
-  }) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.dailyCheckIn,
-      parameters: {
-        AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramTotalCheckInDays: totalCheckInDays,
-        AnalyticsEvents.paramMinutesToday: minutesToday,
-      },
-    ),
-  );
-
-  Future<void> logGoalProgress({
-    required String habitName,
-    required int percentComplete,
-  }) => _safeLog(
-    () => _analytics.logEvent(
-      name: AnalyticsEvents.goalProgress,
-      parameters: {
-        AnalyticsEvents.paramHabitName: habitName,
-        AnalyticsEvents.paramPercentComplete: percentComplete,
-      },
-    ),
-  );
-
   // ─── Engagement Depth Events ───
 
   Future<void> logFeatureUsed({required String feature}) => _safeLog(

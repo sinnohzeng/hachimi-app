@@ -2334,6 +2334,30 @@ class SZh extends S {
 
   @override
   String get deleteAccountStepDone => '已完成';
+
+  @override
+  String get deleteAccountQueued => '本地数据已删除。云端账号删除已排队，将在联网后自动完成。';
+
+  @override
+  String get deleteAccountPending => '账号删除任务处理中，请保持网络连接以完成云端与认证删除。';
+
+  @override
+  String get archiveConflictTitle => '选择保留存档';
+
+  @override
+  String get archiveConflictMessage => '检测到本地和云端都有存档数据，请选择保留其一：';
+
+  @override
+  String get archiveConflictLocal => '本地存档';
+
+  @override
+  String get archiveConflictCloud => '云端存档';
+
+  @override
+  String get archiveConflictKeepCloud => '保留云端';
+
+  @override
+  String get archiveConflictKeepLocal => '保留本地';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4666,4 +4690,28 @@ class SZhHant extends SZh {
 
   @override
   String get deleteAccountStepDone => '已完成';
+
+  @override
+  String get deleteAccountQueued => '本機資料已刪除。雲端帳號刪除已排隊，恢復連線後會自動完成。';
+
+  @override
+  String get deleteAccountPending => '帳號刪除任務處理中，請保持網路連線以完成雲端與認證刪除。';
+
+  @override
+  String get archiveConflictTitle => '選擇保留存檔';
+
+  @override
+  String get archiveConflictMessage => '偵測到本機與雲端都有存檔資料，請選擇保留其中一個：';
+
+  @override
+  String get archiveConflictLocal => '本機存檔';
+
+  @override
+  String get archiveConflictCloud => '雲端存檔';
+
+  @override
+  String get archiveConflictKeepCloud => '保留雲端';
+
+  @override
+  String get archiveConflictKeepLocal => '保留本機';
 }

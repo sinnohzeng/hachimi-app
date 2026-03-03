@@ -15,10 +15,10 @@ class AppPrefsKeys {
   // ─── 同步 ───
   static const dataHydrated = 'local_data_hydrated_v1';
 
-  // ─── 账号删除恢复 ───
-  static const deletionInProgress = 'deletion_in_progress';
-  static const deletionUid = 'deletion_uid';
-  static const deletionStep = 'deletion_step';
+  // ─── 账号删除队列 ───
+  static const pendingDeletionJob = 'pending_deletion_job';
+  static const deletionTombstone = 'deletion_tombstone';
+  static const deletionRetryCount = 'deletion_retry_count';
 
   // ─── 应用生命周期 ───
   static const lastAppOpen = 'last_app_open';

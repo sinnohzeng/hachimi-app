@@ -3,7 +3,6 @@ import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
-import 'package:hachimi_app/services/user_profile_service.dart';
 
 /// UserProfileNotifier — 用户资料变更的统一入口。
 ///
@@ -17,7 +16,7 @@ class UserProfileNotifier extends Notifier<void> {
   void build() {}
 
   /// 注册后初始化用户资料（Firestore + 本地 Ledger）。
-  Future<void> createProfile({
+  Future<void> ensureProfile({
     required String uid,
     required String email,
     String? displayName,
@@ -25,7 +24,7 @@ class UserProfileNotifier extends Notifier<void> {
     // 1. Firestore 文档创建
     await ref
         .read(userProfileServiceProvider)
-        .createProfile(uid: uid, email: email, displayName: displayName);
+        .ensureProfile(uid: uid, email: email, displayName: displayName);
 
     // 2. 本地 materialized_state 初始化
     final ledger = ref.read(ledgerServiceProvider);
@@ -88,27 +87,14 @@ class UserProfileNotifier extends Notifier<void> {
     }
   }
 
-  /// 访客数据重置 — 清除数据后登出。
+  /// 访客数据重置 — 清除数据后回到引导。
   Future<void> resetGuestData() async {
-    ref.read(syncEngineProvider).stop();
-
     final uid = ref.read(currentUidProvider);
     if (uid != null) {
-      await ref.read(accountDeletionServiceProvider).deleteGuestData(uid);
-    }
-
-    _clearAuthCache();
-    ref.read(onboardingCompleteProvider.notifier).reset();
-
-    try {
-      await ref.read(authBackendProvider).signOut();
-    } catch (e, stack) {
-      ErrorHandler.record(
-        e,
-        stackTrace: stack,
-        source: 'UserProfileNotifier',
-        operation: 'resetGuestData',
-      );
+      await ref
+          .read(accountDeletionOrchestratorProvider)
+          .deleteAccount(uid: uid);
+      ref.read(onboardingCompleteProvider.notifier).reset();
     }
   }
 
@@ -185,9 +171,4 @@ class UserProfileNotifier extends Notifier<void> {
 /// 用户资料操作 Provider — 统一入口。
 final userProfileNotifierProvider = NotifierProvider<UserProfileNotifier, void>(
   UserProfileNotifier.new,
-);
-
-/// UserProfileService — singleton provider。
-final userProfileServiceProvider = Provider<UserProfileService>(
-  (ref) => UserProfileService(backend: ref.watch(userProfileBackendProvider)),
 );
