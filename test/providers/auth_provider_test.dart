@@ -25,7 +25,7 @@ Future<ProviderContainer> _createAndPump({
   );
 
   // 用 listen 触发 StreamProvider 订阅（不阻塞等待 future）
-  container.listen(authStateProvider, (_, __) {});
+  container.listen(authStateProvider, (_, _) {});
 
   // 给 async* generator 足够的事件循环来 yield 值
   await Future<void>.delayed(Duration.zero);

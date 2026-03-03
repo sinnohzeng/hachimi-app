@@ -74,7 +74,7 @@ void main() {
     });
 
     test('returns empty for empty stream', () async {
-      final lines = Stream<String>.empty();
+      const lines = Stream<String>.empty();
       final tokens = await SseParser.parse(lines).toList();
       expect(tokens, isEmpty);
     });

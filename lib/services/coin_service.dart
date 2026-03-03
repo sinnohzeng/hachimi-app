@@ -153,8 +153,9 @@ class CoinService {
 
   /// 扣减金币。余额不足返回 false。
   Future<bool> spendCoins({required String uid, required int amount}) async {
-    if (amount <= 0)
+    if (amount <= 0) {
       throw ArgumentError('amount must be positive, got $amount');
+    }
     final db = await _ledger.database;
 
     try {
@@ -257,8 +258,9 @@ class CoinService {
 
   /// 增加金币（计时奖励用）。
   Future<void> earnCoins({required String uid, required int amount}) async {
-    if (amount <= 0)
+    if (amount <= 0) {
       throw ArgumentError('amount must be positive, got $amount');
+    }
     final db = await _ledger.database;
 
     try {

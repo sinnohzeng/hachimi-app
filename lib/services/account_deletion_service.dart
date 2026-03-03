@@ -221,8 +221,9 @@ class AccountDeletionService {
   /// 返回 true 表示检测到并处理了未完成删除。
   Future<bool> resumeIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(AppPrefsKeys.deletionInProgress) ?? false))
+    if (!(prefs.getBool(AppPrefsKeys.deletionInProgress) ?? false)) {
       return false;
+    }
 
     try {
       await _executeDeletionResume(prefs);
