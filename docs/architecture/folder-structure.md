@@ -1,330 +1,49 @@
-# Project Folder Structure (SSOT)
+# Folder Structure
 
-> This document defines the authoritative directory layout and naming conventions for the Hachimi codebase. New files must follow these conventions exactly.
+> SSOT for active folder layout.
 
----
-
-## Full Directory Tree
-
+## Top-Level
 ```
 hachimi-app/
-│
-├── docs/                                   # DDD: All specification documents
-│   ├── README.md                           # Documentation index
-│   ├── CONTRIBUTING.md                     # Development workflow + conventions
-│   ├── architecture/
-│   │   ├── overview.md                     # System design + dependency flow
-│   │   ├── data-model.md                   # Firestore schema (SSOT)
-│   │   ├── cat-system.md                   # Cat game design (SSOT)
-│   │   ├── state-management.md             # Riverpod provider graph (SSOT)
-│   │   ├── folder-structure.md             # This file
-│   │   ├── atomic-island.md               # vivo Atomic Island notification spec
-│   │   ├── focus-completion.md            # Focus completion celebration spec
-│   │   └── localization.md                 # i18n approach + ARB workflow
-│   ├── product/
-│   │   ├── prd.md                          # PRD v3.0 (SSOT)
-│   │   └── user-stories.md                 # User stories + acceptance criteria
-│   ├── firebase/
-│   │   ├── setup-guide.md                  # Step-by-step Firebase setup
-│   │   ├── analytics-events.md             # GA4 event definitions (SSOT)
-│   │   ├── security-rules.md               # Firestore security rules spec
-│   │   └── remote-config.md                # Remote Config parameter definitions
-│   ├── design/
-│   │   ├── design-system.md                # Material 3 theme spec (SSOT)
-│   │   └── screens.md                      # Screen-by-screen UI specifications
-│   └── zh-CN/                              # Chinese documentation mirror
-│       ├── README.md
-│       ├── CONTRIBUTING.md
-│       ├── architecture/ ...
-│       ├── product/ ...
-│       ├── firebase/ ...
-│       └── design/ ...
-│
-├── lib/                                    # Application source code
-│   ├── main.dart                           # Entry point: Firebase + foreground task init
-│   ├── app.dart                            # Root widget: AuthGate + _FirstHabitGate + MaterialApp
-│   │
-│   ├── core/                               # Shared cross-cutting concerns
-│   │   ├── constants/
-│   │   │   ├── analytics_events.dart       # SSOT: all GA4 event names + params
-│   │   │   ├── cat_constants.dart          # SSOT: stages, moods, personalities
-│   │   │   ├── pixel_cat_constants.dart    # SSOT: appearance parameter value sets for pixel-cat-maker
-│   │   │   ├── ai_constants.dart           # SSOT: AI config, prompts, inference params
-│   │   │   └── avatar_constants.dart      # SSOT: predefined avatar options (id, icon, color)
-│   │   ├── backend/                          # Multi-backend abstraction (Strategy Pattern)
-│   │   │   ├── auth_backend.dart             # AuthBackend — sign in/up/link/delete
-│   │   │   ├── sync_backend.dart             # SyncBackend — batch write/hydrate + SyncOperation
-│   │   │   ├── user_profile_backend.dart     # UserProfileBackend — create/sync profile
-│   │   │   ├── analytics_backend.dart        # AnalyticsBackend — log events/properties
-│   │   │   ├── crash_backend.dart            # CrashBackend — error recording/logging
-│   │   │   ├── remote_config_backend.dart    # RemoteConfigBackend — typed config getters
-│   │   │   └── backend_registry.dart         # BackendRegistry + BackendRegion enum
-│   │   ├── utils/
-│   │   │   ├── appearance_descriptions.dart # Human-readable descriptions for cat appearance
-│   │   │   ├── auth_error_mapper.dart       # Firebase Auth error code → L10N mapper
-│   │   │   ├── date_utils.dart             # AppDateUtils — unified date string formatting
-│   │   │   ├── streak_utils.dart           # StreakUtils — streak calculation logic
-│   │   │   ├── background_color_utils.dart # Mesh gradient color extraction from cat stage/pelt
-│   │   │   └── guest_id_generator.dart    # 10-char secure random guest ID generator
-│   │   ├── router/
-│   │   │   └── app_router.dart             # Named route registry + route constants
-│   │   └── theme/
-│   │       ├── app_theme.dart              # SSOT: Material 3 theme (seed color, typography)
-│   │       ├── app_spacing.dart            # M3 spacing tokens (xs/sm/md/base/lg/xl/xxl)
-│   │       ├── app_motion.dart             # M3 motion tokens (durations + easing curves)
-│   │       ├── app_shape.dart              # M3 shape scale tokens (borderRadius presets)
-│   │       └── app_elevation.dart          # M3 elevation scale tokens (level0–level5)
-│   │
-│   ├── l10n/                               # Localization ARB source files
-│   │   ├── app_en.arb                      # English strings (primary)
-│   │   └── app_zh.arb                      # Chinese strings
-│   │
-│   ├── models/                             # Data models (Dart classes, no Flutter dependency)
-│   │   ├── cat.dart                        # Cat — Firestore model + computed getters (stage, mood)
-│   │   ├── cat_appearance.dart             # CatAppearance — pixel-cat-maker parameter value object
-│   │   ├── habit.dart                      # Habit — Firestore model
-│   │   ├── focus_session.dart              # FocusSession — session history record
-│   │   ├── check_in.dart                   # CheckInEntry — daily check-in entry (legacy compat)
-│   │   ├── diary_entry.dart                # DiaryEntry — local SQLite model (AI diary)
-│   │   ├── chat_message.dart               # ChatMessage — local SQLite model (AI chat)
-│   │   ├── ledger_action.dart             # LedgerAction + ActionType — action ledger event model
-│   │   └── unlocked_achievement.dart      # UnlockedAchievement — local achievement record
-│   │
-│   ├── services/                           # Data layer (no UI, no BuildContext)
-│   │   ├── analytics_service.dart          # Analytics facade — log events
-│   │   ├── coin_service.dart               # Coin balance + accessory purchase operations
-│   │   ├── user_profile_service.dart       # User profile sync (delegates to UserProfileBackend)
-│   │   ├── atomic_island_service.dart      # vivo Atomic Island rich notification (MethodChannel)
-│   │   ├── focus_timer_service.dart        # Android foreground service wrapper
-│   │   ├── migration_service.dart          # Data migration for schema evolution (e.g. breed -> appearance)
-│   │   ├── notification_service.dart       # FCM + flutter_local_notifications
-│   │   ├── pixel_cat_generation_service.dart # Random cat generation — appearance + personality
-│   │   ├── pixel_cat_renderer.dart         # 13-layer sprite compositor (pixel-cat-maker engine)
-│   │   ├── remote_config_service.dart      # Remote Config — typed getters + defaults
-│   │   ├── xp_service.dart                 # XP calculation (pure Dart, no Firebase)
-│   │   ├── ai_service.dart                # AI facade service (routes to AiProvider, concurrency control)
-│   │   ├── ai/                             # AI provider implementations
-│   │   │   ├── minimax_provider.dart       # MiniMax M2.5 cloud AI provider
-│   │   │   ├── gemini_provider.dart        # Gemini 3 Flash cloud AI provider
-│   │   │   └── sse_parser.dart             # SSE stream parser with pluggable token extractors
-│   │   ├── firebase/                       # Firebase backend implementations
-│   │   │   ├── firebase_auth_backend.dart           # FirebaseAuthBackend — Firebase Auth + Google Sign-In
-│   │   │   ├── firebase_sync_backend.dart           # FirebaseSyncBackend — SyncOperation → WriteBatch
-│   │   │   ├── firebase_user_profile_backend.dart   # FirebaseUserProfileBackend — Firestore profile docs
-│   │   │   ├── firebase_analytics_backend.dart      # FirebaseAnalyticsBackend — Firebase Analytics
-│   │   │   ├── firebase_crash_backend.dart          # FirebaseCrashBackend — Firebase Crashlytics
-│   │   │   └── firebase_remote_config_backend.dart  # FirebaseRemoteConfigBackend — Firebase Remote Config
-│   │   ├── diary_service.dart             # AI diary generation + SQLite read/write
-│   │   ├── chat_service.dart              # AI chat prompt + stream + SQLite read/write
-│   │   ├── local_database_service.dart    # SQLite initialization (diary + chat tables)
-│   │   ├── ledger_service.dart            # Action ledger write + broadcast stream + materialized state
-│   │   ├── local_habit_repository.dart    # Local habit CRUD + ledger writes
-│   │   ├── local_cat_repository.dart      # Local cat CRUD + ledger writes
-│   │   ├── local_session_repository.dart  # Local session CRUD + ledger writes
-│   │   ├── sync_engine.dart               # Background Firestore sync (debounced, exponential backoff)
-│   │   └── achievement_evaluator.dart     # Event-driven achievement evaluation (listens to ledger)
-│   │
-│   ├── providers/                          # Riverpod providers — reactive SSOT for each domain
-│   │   ├── app_info_provider.dart           # appInfoProvider (runtime version from package_info_plus)
-│   │   ├── auth_provider.dart              # authStateProvider, currentUidProvider, isGuestProvider
-│   │   ├── service_providers.dart          # Non-auth service singletons (Firestore, Analytics, Coin, XP, etc.)
-│   │   ├── cat_provider.dart               # catsProvider, allCatsProvider, catByIdProvider (family)
-│   │   ├── cat_sprite_provider.dart        # pixelCatRendererProvider, catSpriteImageProvider (family)
-│   │   ├── accessory_provider.dart          # AccessoryInfo data class for shop + equip UI
-│   │   ├── coin_provider.dart              # coinServiceProvider, coinBalanceProvider, hasCheckedInTodayProvider
-│   │   ├── connectivity_provider.dart      # connectivityProvider, isOfflineProvider
-│   │   ├── focus_timer_provider.dart       # focusTimerProvider (FSM + SharedPreferences persistence)
-│   │   ├── habits_provider.dart            # habitsProvider, todayCheckInsProvider
-│   │   ├── locale_provider.dart            # localeProvider (app language override)
-│   │   ├── stats_provider.dart             # statsProvider (computed HabitStats)
-│   │   ├── theme_provider.dart             # themeProvider (theme mode + seed color)
-│   │   ├── user_profile_provider.dart      # avatarIdProvider (local materialized_state avatar)
-│   │   ├── user_profile_notifier.dart     # UserProfileNotifier — unified profile operations
-│   │   ├── ai_provider.dart               # AI provider selection, feature toggle, availability, service wiring
-│   │   ├── diary_provider.dart            # diaryEntriesProvider, todayDiaryProvider (family)
-│   │   └── chat_provider.dart             # chatNotifierProvider (StateNotifier family)
-│   │
-│   ├── screens/                            # Full-page widgets (consume providers, no business logic)
-│   │   ├── auth/
-│   │   │   ├── login_screen.dart           # Login + Register + Guest link mode
-│   │   │   └── components/
-│   │   │       └── email_auth_screen.dart  # Email auth form (signup/login/link mode)
-│   │   ├── cat_detail/
-│   │   │   ├── cat_detail_screen.dart      # Cat info, progress bar, heatmap, accessories
-│   │   │   ├── cat_diary_screen.dart     # AI-generated diary list page
-│   │   │   ├── cat_chat_screen.dart      # Cat chat page with streaming responses
-│   │   │   └── components/              # Extracted sub-widgets for CatDetailScreen
-│   │   │       ├── focus_stats_card.dart
-│   │   │       ├── reminder_card.dart
-│   │   │       ├── edit_quest_sheet.dart
-│   │   │       ├── cat_info_card.dart
-│   │   │       ├── diary_preview_card.dart
-│   │   │       ├── chat_entry_card.dart
-│   │   │       ├── habit_heatmap_card.dart
-│   │   │       └── accessories_card.dart
-│   │   ├── cat_room/
-│   │   │   ├── cat_room_screen.dart        # 2-column CatHouse grid with pixel-art cats
-│   │   │   └── accessory_shop_screen.dart  # Accessory shop: 3-tab grid + purchase flow
-│   │   ├── habits/
-│   │   │   └── adoption_flow_screen.dart   # 3-step habit creation + 3-cat adoption choice
-│   │   ├── home/
-│   │   │   └── home_screen.dart            # 3-tab NavigationBar + Drawer shell
-│   │   ├── onboarding/
-│   │   │   └── onboarding_screen.dart      # 3-page intro carousel
-│   │   ├── profile/
-│   │   │   ├── profile_screen.dart         # User info, stats, settings entry
-│   │   │   └── components/
-│   │   │       ├── edit_name_dialog.dart    # Display name edit AlertDialog
-│   │   │       └── avatar_picker_sheet.dart # Predefined avatar selection BottomSheet
-│   │   ├── settings/
-│   │   │   ├── settings_screen.dart        # Notifications, language, about, account actions
-│   │   │   ├── ai_settings_page.dart       # AI settings sub-page (provider selection, toggle, status)
-│   │   │   ├── model_test_chat_screen.dart # AI test chat (verify cloud AI connection)
-│   │   │   └── components/              # Extracted sub-widgets for SettingsScreen
-│   │   │       ├── notification_settings_dialog.dart
-│   │   │       ├── language_dialog.dart
-│   │   │       ├── theme_mode_dialog.dart
-│   │   │       ├── theme_color_dialog.dart
-│   │   │       ├── delete_account_flow.dart
-│   │   │       └── section_header.dart
-│   │   ├── stats/
-│   │   │   └── stats_screen.dart           # Activity heatmap + per-habit progress
-│   │   └── timer/
-│   │       ├── focus_setup_screen.dart     # Duration + mode selector before starting
-│   │       ├── focus_complete_screen.dart  # XP animation + session summary
-│   │       └── timer_screen.dart           # Active timer with foreground service
-│   │
-│   │
-│   └── widgets/                            # Reusable UI components (stateless preferred)
-│       ├── accessory_card.dart             # Reusable accessory card (name, price badge, owned badge)
-│       ├── accessory_shop_section.dart     # Accessory grid in CatDetailScreen + purchase flow
-│       ├── cat_house_card.dart             # Single cat card in CatHouse 2-column grid
-│       ├── check_in_banner.dart            # Daily check-in coin bonus banner on HomeScreen
-│       ├── offline_banner.dart             # Offline indicator: cloud_off + sync message
-│       ├── pixel_cat_sprite.dart           # Pixel-art cat display widget (renders ui.Image from provider)
-│       ├── tappable_cat_sprite.dart       # Tap-to-cycle pose wrapper (bounce + haptic + local variant)
-│       ├── progress_ring.dart              # Circular progress indicator (timer ring)
-│       ├── skeleton_loader.dart            # M3 shimmer skeleton loaders (SkeletonLoader, SkeletonCard, SkeletonGrid)
-│       ├── empty_state.dart               # Unified empty state (icon + title + subtitle + optional CTA)
-│       ├── error_state.dart               # Unified error state (icon + message + retry button)
-│       ├── streak_heatmap.dart             # 91-day GitHub-style activity heatmap
-│       ├── streak_indicator.dart           # Fire badge showing current streak count
-│       ├── staggered_list_item.dart       # Stagger animation wrapper for list/grid items (fade+slide)
-│       ├── animated_mesh_background.dart  # Reusable animated mesh gradient background with toggle
-│       ├── particle_overlay.dart          # Floating particle overlay (firefly/dust presets)
-│       ├── app_drawer.dart               # M3 NavigationDrawer (guest upgrade, milestones, settings)
-│       ├── guest_upgrade_prompt.dart      # Guest account upgrade bottom sheet prompt
-│       └── content_width_constraint.dart  # Tablet-responsive max-width wrapper
-│
-├── assets/
-│   ├── pixel_cat/                          # Pixel-cat-maker sprite layers
-│   │   ├── body/                           # Base body sprites by peltType + variant
-│   │   ├── pelt/                           # Pelt color overlays
-│   │   ├── white/                          # White patch patterns
-│   │   ├── white_tint/                     # White patch tint overlays
-│   │   ├── points/                         # Color-point patterns (Siamese etc.)
-│   │   ├── vitiligo/                       # Vitiligo patch overlay
-│   │   ├── tortie/                         # Tortoiseshell base layers
-│   │   ├── tortie_pattern/                 # Tortoiseshell pattern variants
-│   │   ├── tortie_color/                   # Tortoiseshell color overlays
-│   │   ├── fur/                            # Fur length overlays (long/short)
-│   │   ├── eyes/                           # Eye color sprites
-│   │   ├── skin/                           # Skin (nose/ear) color sprites
-│   │   ├── tint/                           # Overall tint overlays
-│   │   └── accessories/                    # Accessory overlay sprites
-│   └── room/
-│       ├── room_day.png                    # Daytime room background
-│       └── room_night.png                  # Nighttime room background
-│
-├── l10n.yaml                               # Flutter gen-l10n configuration
-│
-├── test/                                   # Automated tests
-│   ├── widget_test.dart                   # Framework sanity check
-│   ├── dart_test.yaml                     # Test configuration (golden tag exclusions)
-│   ├── models/
-│   │   └── habit_test.dart                # Habit model unit tests
-│   ├── providers/
-│   │   ├── stats_provider_test.dart       # HabitStats computed properties
-│   │   ├── focus_timer_provider_test.dart # FocusTimerState computed properties
-│   │   ├── chat_provider_test.dart        # ChatState defaults + copyWith
-│   │   ├── ai_provider_test.dart          # AiAvailability + AI service tests
-│   │   └── auth_provider_test.dart        # AuthUser/AuthResult value semantics + currentUidProvider + isGuestProvider
-│   ├── services/
-│   │   ├── chat_service_test.dart         # ChatRole + ChatMessage serialization
-│   │   └── diary_service_test.dart        # DiaryEntry toMap/fromMap roundtrip
-│   └── widgets/
-│       ├── empty_state_test.dart          # EmptyState widget test
-│       ├── error_state_test.dart          # ErrorState widget test
-│       └── skeleton_loader_test.dart      # SkeletonLoader widget test
-│
-├── android/                                # Android platform project
-│   ├── app/
-│   │   ├── google-services.json            # Firebase config (gitignored)
-│   │   ├── proguard-rules.pro              # R8/ProGuard keep rules (Firebase, FFI)
-│   │   └── src/main/
-│   │       ├── AndroidManifest.xml         # Permissions + service declarations
-│   │       └── kotlin/com/hachimi/hachimi_app/
-│   │           ├── MainActivity.kt        # Flutter Activity + MethodChannel registration
-│   │           └── FocusNotificationHelper.kt # Rich notification builder (Atomic Island)
-│   └── ...
-│
-├── .github/
-│   └── workflows/
-│       └── release.yml                    # CI/CD: tag-triggered release APK build + GitHub Release
-│
-├── packages/                              # Vendored native packages (gitignored, see scripts/)
-││
-├── scripts/
-│   ├── setup-release-signing.sh           # Interactive setup: keystore gen + GitHub Secrets output
-││
-├── dart_test.yaml                         # Test configuration (exclude golden tags)
-├── firestore.rules                         # Deployed Firestore security rules
-├── firebase.json                           # Firebase project configuration
-├── pubspec.yaml                            # Flutter dependencies
-├── pubspec.lock                            # Locked dependency versions
-├── README.md                               # English project overview (root)
-└── README.zh-CN.md                         # Chinese project overview (root)
+├── lib/
+├── test/
+├── functions/                 # Firebase Cloud Functions (Node 20 + TypeScript)
+├── tool/                      # quality_gate.dart
+├── docs/
+│   ├── archive/               # archived docs only
+│   └── zh-CN/archive/
+├── firestore.rules
+├── firebase.json
+└── .github/workflows/
 ```
 
----
+## `lib/` Key Domains
+- `core/backend/`: backend abstractions (Firebase-only runtime path)
+- `core/constants/`: constants SSOT
+- `providers/`: Riverpod providers and service wiring
+- `services/`: orchestration/business logic
+- `services/firebase/`: Firebase backend implementations
+- `screens/`: UI pages
+- `widgets/`: reusable UI components
+- `models/`: domain models
 
-## Naming Conventions
+## Account Lifecycle Files
+- `lib/models/account_data_snapshot.dart`
+- `lib/services/account_snapshot_service.dart`
+- `lib/services/account_merge_service.dart`
+- `lib/services/guest_upgrade_coordinator.dart`
+- `lib/services/account_deletion_service.dart`
+- `lib/services/account_deletion_orchestrator.dart`
+- `lib/core/backend/account_lifecycle_backend.dart`
+- `lib/services/firebase/firebase_account_lifecycle_backend.dart`
+- `lib/widgets/archive_conflict_dialog.dart`
 
-| Category | Convention | Example |
-|----------|-----------|---------|
-| Dart files | `snake_case.dart` | `pixel_cat_renderer.dart` |
-| Classes | `PascalCase` | `PixelCatRenderer` |
-| Constants | `camelCase` (variables), `kConstantName` (compile-time) | `catPersonalities`, `kMaxCoins` |
-| Providers | `camelCase` + `Provider` suffix | `catsProvider`, `coinBalanceProvider` |
-| Screens | `PascalCase` + `Screen` suffix | `CatRoomScreen` |
-| Widgets | `PascalCase` descriptive noun | `PixelCatSprite`, `CatHouseCard` |
-| Services | `PascalCase` + `Service` suffix | `AuthService`, `CoinService` |
-| Models | `PascalCase` noun | `Cat`, `CatAppearance`, `Habit` |
-| Assets | `snake_case` | `body_tabby_0.png`, `room_day.png` |
-| Doc files | `kebab-case.md` | `data-model.md`, `cat-system.md` |
-| ARB keys | `screenName` + purpose in camelCase | `homeTabToday`, `adoptionConfirmButton` |
+## Removed Legacy Files
+- `lib/services/migration_service.dart`
+- `lib/services/remote_config_service.dart`
+- `lib/core/utils/offline_write_guard.dart`
 
----
-
-## Layer Rules
-
-| Layer | Imports allowed | Imports forbidden |
-|-------|----------------|------------------|
-| `models/` | Only Dart core + `cloud_firestore` (for `Timestamp`) | Flutter, Services, Providers |
-| `services/` | Models, Firebase SDK, Dart core | Flutter widgets, Providers, Screens |
-| `providers/` | Services, Models, Riverpod | Flutter widgets, Screens |
-| `screens/` | Providers, Widgets, Models (read-only), Router | Services (never import directly) |
-| `widgets/` | Models (read-only), Theme | Services, Providers |
-| `core/` | Dart core only | All others |
-| `l10n/` | (Generated) Dart core only | All others |
-
-**Enforcement:** If a Screen needs to call a Service, it must do so through a Provider method, not by importing the Service directly. This keeps the dependency graph acyclic and testable.
-
----
-
-## One Class Per File
-
-Each Dart file contains exactly one public class (or one public top-level function for utilities). Small private helper classes (prefixed with `_`) may live in the same file as the public class they support.
-
-**Good:** `cat_room_screen.dart` contains `CatRoomScreen` and private `_CatHouseGridDelegate`
-**Bad:** `screens.dart` containing `CatRoomScreen`, `CatDetailScreen`, and `TimerScreen`
+## Rules
+- Generated localization files under `lib/l10n/app_localizations*.dart` are excluded from quality gate.
+- Business logic must not depend on archived docs.
+- New architecture changes must update both `docs/` and `docs/zh-CN/` mirrors.

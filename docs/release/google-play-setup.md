@@ -12,7 +12,7 @@ This guide walks through the **complete, end-to-end** process of connecting GitH
 |------|--------|
 | `.github/workflows/release.yml` — AAB build + Play Store upload steps | Done |
 | `distribution/whatsnew/en-US` — Play Store "What's New" text | Done |
-| `android/app/proguard-rules.pro` — removed legacy llama_cpp_dart rules | Done |
+| `android/app/proguard-rules.pro` — removed obsolete legacy keep rules | Done |
 | `docs/release/process.md` — updated with Play Store workflow | Done |
 | `hachimi.ai/privacy` — privacy policy page (required by Play Store) | Done |
 | `CLAUDE.md` — added AAB build command | Done |

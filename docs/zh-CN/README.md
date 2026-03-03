@@ -32,7 +32,23 @@
 | [配置指南](firebase/setup-guide.md) | Firebase 从零配置步骤 |
 | [分析事件](firebase/analytics-events.md) | GA4 自定义事件定义（SSOT）——所有事件、参数、用户属性 |
 | [安全规则](firebase/security-rules.md) | Firestore 安全规则规范及部署说明 |
-| [远程配置](firebase/remote-config.md) | A/B 测试参数定义及控制台设置 |
+| [Cloud Functions](firebase/setup-guide.md#cloud-functions-账户生命周期) | 账户生命周期 callable 部署与本地验证 |
+
+---
+
+## 计划
+
+| 文档 | 说明 |
+|------|------|
+| [20260304 生命周期重构计划](plan/20260304-account-lifecycle-refactor-governance-plan.md) | 离线优先账户生命周期、质量闸门与 SSOT 治理 |
+
+---
+
+## 已归档
+
+| 文档 | 说明 |
+|------|------|
+| [远程配置（已归档）](archive/firebase/remote-config.md) | 历史资料保留，仅供追溯，不再属于当前架构 |
 
 ---
 

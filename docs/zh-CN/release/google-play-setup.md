@@ -12,7 +12,7 @@
 |------|------|
 | `.github/workflows/release.yml` — AAB 构建 + Play Store 上传步骤 | 已完成 |
 | `distribution/whatsnew/en-US` — Play Store 更新说明 | 已完成 |
-| `android/app/proguard-rules.pro` — 移除遗留 llama_cpp_dart 规则 | 已完成 |
+| `android/app/proguard-rules.pro` — 移除过时 legacy keep 规则 | 已完成 |
 | `docs/release/process.md` — 更新 Play Store 发布流程 | 已完成 |
 | `hachimi.ai/privacy` — 隐私政策页面（Play Store 强制要求） | 已完成 |
 | `CLAUDE.md` — 新增 AAB 构建命令 | 已完成 |

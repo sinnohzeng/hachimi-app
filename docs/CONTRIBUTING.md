@@ -73,12 +73,15 @@ chore: upgrade AGP to 8.13.2
 
 ## Code Style
 
-Run the linter before every commit:
+Run checks before every commit:
 ```bash
-flutter analyze
+dart analyze lib test
+dart run tool/quality_gate.dart
+flutter test --exclude-tags golden
+cd functions && npm test
 ```
 
-Zero warnings, zero errors is required. If `flutter analyze` fails, do not open a PR.
+Zero warnings, zero errors is required. If checks fail, do not open a PR.
 
 **Key style rules:**
 - Use `const` wherever the compiler will accept it
@@ -95,7 +98,7 @@ Zero warnings, zero errors is required. If `flutter analyze` fails, do not open 
 2. **Update data model** if Firestore schema changes — update `data-model.md` and `firestore.rules`.
 3. **Update analytics** if new user actions need tracking — update `analytics-events.md` and `analytics_events.dart`.
 4. **Implement** — follow the existing patterns in the relevant layer (model → service → provider → screen/widget).
-5. **Run `flutter analyze`** — fix all warnings.
+5. **Run validation commands** — fix all warnings/errors.
 6. **Test manually** — use the verification plan from the implementation plan if one exists.
 
 ---
@@ -130,7 +133,10 @@ Zero warnings, zero errors is required. If `flutter analyze` fails, do not open 
 
 Before requesting review:
 
-- [ ] `flutter analyze` passes with 0 warnings
+- [ ] `dart analyze lib test` passes with 0 warnings
+- [ ] `dart run tool/quality_gate.dart` passes
+- [ ] `flutter test --exclude-tags golden` passes
+- [ ] `cd functions && npm test` passes
 - [ ] Relevant docs updated (spec, data model, analytics, etc.)
 - [ ] No hardcoded colors, fonts, or spacing values
 - [ ] No direct Service imports in Screen files
@@ -162,11 +168,14 @@ flutter build apk
 # Install APK directly via ADB (vivo/some devices)
 adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
 
-# Lint
-flutter analyze
+# Analyze
+dart analyze lib test
+
+# Quality gate
+dart run tool/quality_gate.dart
 
 # Format code
-dart format lib/
+dart format lib test tool
 
 # Enable Firebase Analytics DebugView
 adb shell setprop debug.firebase.analytics.app com.hachimi.hachimi_app

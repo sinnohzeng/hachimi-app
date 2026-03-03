@@ -32,7 +32,23 @@
 | [Setup Guide](firebase/setup-guide.md) | Step-by-step Firebase configuration for new contributors |
 | [Analytics Events](firebase/analytics-events.md) | GA4 custom event definitions (SSOT) — all events, parameters, user properties |
 | [Security Rules](firebase/security-rules.md) | Firestore security rule spec and deploy instructions |
-| [Remote Config](firebase/remote-config.md) | A/B test parameter definitions and Console setup |
+| [Cloud Functions](firebase/setup-guide.md#cloud-functions-account-lifecycle) | Account lifecycle callable deployment and local test checklist |
+
+---
+
+## Plans
+
+| Document | Description |
+|----------|-------------|
+| [20260304 Lifecycle Refactor Plan](plan/20260304-account-lifecycle-refactor-governance-plan.md) | Offline-first account lifecycle, quality gate, SSOT governance |
+
+---
+
+## Archived
+
+| Document | Description |
+|----------|-------------|
+| [Remote Config (Archived)](archive/firebase/remote-config.md) | Historical doc kept for traceability; no longer part of active architecture |
 
 ---
 

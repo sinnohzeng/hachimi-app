@@ -73,12 +73,15 @@ chore: 升级 AGP 至 8.13.2
 
 ## 代码风格
 
-每次提交前运行 Lint：
+每次提交前运行校验：
 ```bash
-flutter analyze
+dart analyze lib test
+dart run tool/quality_gate.dart
+flutter test --exclude-tags golden
+cd functions && npm test
 ```
 
-要求零警告、零错误。若 `flutter analyze` 失败，禁止开启 PR。
+要求零警告、零错误。若校验失败，禁止开启 PR。
 
 **核心规范：**
 - 编译器能接受的地方一律使用 `const`
@@ -95,7 +98,7 @@ flutter analyze
 2. **更新数据模型**——若 Firestore 模式有变化，更新 `data-model.md` 和 `firestore.rules`。
 3. **更新分析事件**——若有新的用户行为需要追踪，更新 `analytics-events.md` 和 `analytics_events.dart`。
 4. **实现**——遵循现有层级模式：模型 → 服务 → Provider → 界面/组件。
-5. **运行 `flutter analyze`**——修复所有警告。
+5. **运行校验命令**——修复所有警告/错误。
 6. **手动测试**——参照实现计划中的验证步骤。
 
 ---
@@ -130,7 +133,10 @@ flutter analyze
 
 申请审查前：
 
-- [ ] `flutter analyze` 通过，零警告
+- [ ] `dart analyze lib test` 通过，零警告
+- [ ] `dart run tool/quality_gate.dart` 通过
+- [ ] `flutter test --exclude-tags golden` 通过
+- [ ] `cd functions && npm test` 通过
 - [ ] 相关文档已更新（规范、数据模型、分析事件等）
 - [ ] 无硬编码颜色、字体或间距值
 - [ ] Screen 文件中无直接导入 Service
@@ -162,11 +168,14 @@ flutter build apk
 # 通过 ADB 直接安装（部分设备如 vivo）
 adb install -r -t -d build/app/outputs/flutter-apk/app-debug.apk
 
-# 代码检查
-flutter analyze
+# 静态分析
+dart analyze lib test
+
+# 质量闸门
+dart run tool/quality_gate.dart
 
 # 格式化代码
-dart format lib/
+dart format lib test tool
 
 # 启用 Firebase Analytics DebugView
 adb shell setprop debug.firebase.analytics.app com.hachimi.hachimi_app

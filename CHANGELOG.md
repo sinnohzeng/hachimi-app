@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.0] - 2026-03-04
+
+### Added
+- New account lifecycle services:
+  - `AccountSnapshotService`
+  - `AccountMergeService`
+  - `GuestUpgradeCoordinator`
+  - `AccountDeletionOrchestrator`
+  - `AccountLifecycleBackend` + Firebase Functions implementation
+- New account conflict UI: `ArchiveConflictDialog` with local/cloud metric comparison.
+- Firebase Cloud Functions workspace (`functions/`) with:
+  - `deleteAccountV1`
+  - `wipeUserDataV1`
+- Repository quality gate script: `tool/quality_gate.dart`.
+
+### Changed
+- `UserProfileBackend.createProfile` replaced with idempotent `ensureProfile`.
+- Auth screens now route guest upgrade through unified conflict coordinator for both Google and Email flows.
+- `FirebaseAuthBackend` now degrades `credential-already-in-use` / `email-already-in-use` link attempts to sign-in flow.
+- Account deletion flow rebuilt to 3-step UX:
+  - data summary
+  - type `DELETE`
+  - execute deletion
+- Deletion semantics changed to offline-first queue model using:
+  - `pending_deletion_job`
+  - `deletion_tombstone`
+  - `deletion_retry_count`
+- `AuthGate` now handles pending deletion tombstones and auto-retries queued cloud hard-deletes.
+- Firestore rules removed legacy `checkIns` compatibility subtree.
+- Removed legacy analytics compatibility events (`timer_started`, `timer_completed`, `daily_check_in`, `goal_progress`).
+
+### Removed
+- `MigrationService` and `_VersionGate` migration compatibility flow.
+- `RemoteConfigService` (unused runtime service).
+- `OfflineWriteGuard` (unused compatibility safety net).
+- Multi-region backend compatibility branch (`BackendRegion.china`).
+
 ## [2.25.0] - 2026-03-02
 
 ### Fixed
