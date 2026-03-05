@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -77,11 +79,13 @@ class UserProfileNotifier extends Notifier<void> {
 
     try {
       await ref.read(authBackendProvider).signOut();
+      ObservabilityRuntime.clearUidHash();
+      await FirebaseCrashlytics.instance.setUserIdentifier('');
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'UserProfileNotifier',
+        feature: 'UserProfileNotifier',
         operation: 'logout',
       );
     }
@@ -158,10 +162,10 @@ class UserProfileNotifier extends Notifier<void> {
   /// 尽力同步 — 失败时记录错误但不阻塞用户操作。
   void _syncBestEffort(Future<void> Function() action, String operation) {
     action().catchError((Object e, StackTrace stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'UserProfileNotifier',
+        feature: 'UserProfileNotifier',
         operation: operation,
       );
     });

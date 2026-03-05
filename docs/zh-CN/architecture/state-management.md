@@ -8,6 +8,7 @@
 - `localDatabaseServiceProvider`
 - `ledgerServiceProvider`
 - `syncEngineProvider`
+- 运行时可观测上下文（全局单例）：`ObservabilityRuntime`
 
 ### 后端 Provider
 - `backendRegistryProvider`（单 Firebase 路径）
@@ -54,3 +55,4 @@
 - Screen 层禁止直接调用 Firebase SDK。
 - Provider 层禁止重新引入 legacy 兼容分支。
 - 新增持久化键必须统一进入 `AppPrefsKeys`。
+- 账户生命周期 callable 必须始终传递 `OperationContext`。

@@ -46,10 +46,10 @@ class FirebaseUserProfileBackend implements UserProfileBackend {
     try {
       await _db.collection('users').doc(uid).update(updates);
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'FirebaseUserProfileBackend',
+        feature: 'FirebaseUserProfileBackend',
         operation: 'syncFields',
       );
     }

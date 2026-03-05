@@ -16,7 +16,7 @@
 | Local storage | sqflite + SharedPreferences |
 | Auth/Data | Firebase Auth + Firestore |
 | Server-side account ops | Firebase Cloud Functions (callable) |
-| Observability | Firebase Analytics + Crashlytics |
+| Observability | Crashlytics + Cloud Logging + BigQuery + Google Chat/Email alerts |
 
 ## Layered Design
 ```
@@ -44,6 +44,23 @@ Screens -> Providers -> Services -> Backend abstractions -> Firebase SDK / Cloud
 ## Cloud Functions Contract
 - `deleteAccountV1`: recursive delete `users/{uid}` + delete Auth user (idempotent)
 - `wipeUserDataV1`: recursive delete `users/{uid}` only (idempotent)
+- Both callables require `OperationContext` payload:
+  - `correlation_id`
+  - `uid_hash`
+  - `operation_stage`
+  - `retry_count`
+
+## Observability Contract (New)
+- Client errors are reported through `ErrorHandler.record(...)` with `ErrorContext`.
+- Crash reporting uses hashed identity (`uid_hash`) only.
+- Functions logs are structured and include:
+  - `correlation_id`
+  - `uid_hash`
+  - `function_name`
+  - `latency_ms`
+  - `result`
+  - `error_code`
+- AI triage function `runAiDebugTriageV1` runs every 15 minutes and writes reports to `obs.ai_debug_reports_v1`.
 
 ## SSOT Snapshot
 | Concern | SSOT |

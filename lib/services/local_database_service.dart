@@ -46,18 +46,18 @@ class LocalDatabaseService {
       final result = await db.rawQuery('PRAGMA integrity_check');
       final status = result.first.values.first as String?;
       if (status != 'ok') {
-        ErrorHandler.record(
+        ErrorHandler.recordOperation(
           StateError('SQLite integrity check failed: $status'),
-          source: 'LocalDatabaseService',
+          feature: 'LocalDatabaseService',
           operation: '_verifyIntegrity',
         );
         await _resetCorruptedDatabase();
       }
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'LocalDatabaseService',
+        feature: 'LocalDatabaseService',
         operation: '_verifyIntegrity',
       );
       await _resetCorruptedDatabase();
@@ -308,10 +308,10 @@ class LocalDatabaseService {
       );
       return true;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'LocalDatabaseService',
+        feature: 'LocalDatabaseService',
         operation: 'insertDiaryEntry',
       );
       return false;

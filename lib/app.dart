@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -159,8 +160,15 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   /// 认证用户就绪后：缓存 UID、设置 Crashlytics。
   void _handleAuthUser(AuthUser user, SharedPreferences prefs) {
     prefs.setString(AppPrefsKeys.cachedUid, user.uid);
-    FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
-    ErrorHandler.breadcrumb('auth_state: ${user.uid}');
+    _applyUidObservability(user.uid);
+    ErrorHandler.breadcrumb('auth_state: ${ObservabilityRuntime.uidHash}');
+  }
+
+  void _applyUidObservability(String uid) {
+    ObservabilityRuntime.setUidHashFromUid(uid);
+    FirebaseCrashlytics.instance.setUserIdentifier(
+      ObservabilityRuntime.uidHash,
+    );
   }
 
   /// Log app_opened analytics event with days_since_last and consecutive_days.
@@ -235,6 +243,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     // Firebase 未就绪 → 使用缓存 UID（_ensureLocalUid 已保证存在）
     final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
     if (cachedUid != null) {
+      _applyUidObservability(cachedUid);
       _autoSignInAnonymously();
       _logAppOpened();
       return _FirstHabitGate(
@@ -242,6 +251,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         startupStopwatch: widget.startupStopwatch,
       );
     }
+
+    ObservabilityRuntime.clearUidHash();
+    FirebaseCrashlytics.instance.setUserIdentifier('');
 
     // 无认证 + 无缓存 = 已登出，等 onboardingCompleteProvider reset 触发重建
     return const Scaffold(body: Center(child: CircularProgressIndicator()));

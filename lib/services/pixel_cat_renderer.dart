@@ -103,10 +103,10 @@ class PixelCatRenderer {
             .toList();
       }
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'PixelCatRenderer',
+        feature: 'PixelCatRenderer',
         operation: '_ensureConfigLoaded',
       );
       // 初始化空默认值防止重复尝试
@@ -148,10 +148,10 @@ class PixelCatRenderer {
       _spritesheetCache[name] = frame.image;
       return frame.image;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'PixelCatRenderer',
+        feature: 'PixelCatRenderer',
         operation: '_loadSpritesheet',
         extras: {'spritesheet': name},
       );

@@ -5,9 +5,14 @@
 - Offline delete is local-first; cloud/Auth hard-delete may be queued.
 - Pending deletion relies on authenticated context when retrying callable functions.
 
-## Auth Linking
-- `credential-already-in-use` / `email-already-in-use` in link flows should degrade to sign-in, not fail fast.
-- Guest upgrade conflict decision is mandatory when both local and cloud snapshots are non-empty.
+## Observability
+- Never log plaintext UID/email/phone; use `uid_hash` only.
+- Keep `correlation_id` stable across client error, callable payload, and function logs.
+- Do not emit non-allowlisted custom keys in crash/log telemetry.
+
+## Alerting
+- Google Chat channel can be Preview; Email fallback must remain enabled.
+- Never run single-channel incident alerts in production.
 
 ## Quality Gate
 - Quality gate applies to hand-written `lib/` files only.

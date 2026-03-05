@@ -16,10 +16,10 @@ class AnalyticsService {
     try {
       await fn();
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AnalyticsService',
+        feature: 'AnalyticsService',
         operation: '_safeLog',
       );
     }

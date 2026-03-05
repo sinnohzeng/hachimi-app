@@ -39,10 +39,10 @@ class DeferredInit {
       await NotificationService().initializePlugins();
     } catch (e, stack) {
       debugPrint('[DeferredInit] Notification init failed: $e');
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'DeferredInit',
+        feature: 'DeferredInit',
         operation: 'initNotifications',
       );
     }
@@ -53,10 +53,10 @@ class DeferredInit {
       FocusTimerService.init();
     } catch (e, stack) {
       debugPrint('[DeferredInit] FocusTimer init failed: $e');
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'DeferredInit',
+        feature: 'DeferredInit',
         operation: 'initFocusTimer',
       );
     }

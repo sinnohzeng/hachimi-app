@@ -274,10 +274,10 @@ class GeminiProvider implements AiProvider {
 
   void _recordError(Object e, StackTrace stack, String operation) {
     debugPrint('[GeminiProvider] $operation failed: $e');
-    ErrorHandler.record(
+    ErrorHandler.recordOperation(
       e,
       stackTrace: stack,
-      source: 'GeminiProvider',
+      feature: 'GeminiProvider',
       operation: operation,
     );
   }

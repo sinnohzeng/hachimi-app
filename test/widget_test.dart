@@ -1,6 +1,6 @@
 // ---
 // 📘 文件说明：
-// App 冒烟测试占位 — Firebase 初始化需要 native 环境，此文件仅作标记。
+// App 冒烟测试入口：Firebase 初始化需要 native 环境，此文件仅作测试框架校验。
 // 真正的 widget 测试在 test/widgets/ 目录下。
 //
 // 🕒 创建时间：2026-02-20

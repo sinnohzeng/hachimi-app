@@ -2,7 +2,7 @@
 
 > **状态**：草案模板——发布前需经法律审核。
 >
-> **最后更新**：2026-02-27
+> **最后更新**：2026-03-05
 
 ---
 
@@ -59,6 +59,7 @@
 |------|----------|------|
 | 应用使用事件 | Firebase Analytics | 产品改进 |
 | 崩溃报告 | Firebase Crashlytics | 修复 Bug、提升稳定性 |
+| 可观测性元数据（`correlation_id`、`uid_hash`、`error_code`、`operation_stage`） | 客户端遥测 + Cloud Functions 日志 | 端到端问题定位与故障响应 |
 | FCM 令牌 | Firebase Cloud Messaging | 推送通知 |
 | 设备类型、系统版本 | 自动收集 | 兼容性 |
 
@@ -124,6 +125,7 @@
 - Firestore 安全规则限制仅用户本人可访问数据
 - 专注记录使用 HMAC-SHA256 签名以防篡改
 - Firebase Authentication 负责凭据安全
+- 日志与崩溃元数据统一使用哈希身份（`uid_hash`），不使用明文 UID/邮箱/手机号
 
 ---
 
@@ -171,8 +173,8 @@
 
 如果你对本隐私政策有任何疑问，请通过以下方式联系我们：
 
-- **电子邮箱**：[TODO: 添加联系邮箱]
-- **GitHub**：[TODO: 添加仓库链接]
+- **电子邮箱**：未提供，请通过 GitHub issues 联系
+- **GitHub**：https://github.com/sinnohzeng/hachimi-app/issues
 
 ---
 
@@ -180,4 +182,5 @@
 
 | 日期 | 变更 |
 |------|------|
+| 2026-03-05 | 新增可观测性元数据处理说明（`correlation_id`、`uid_hash`、`error_code`、`operation_stage`），移除联系信息占位项 |
 | 2026-02-27 | 创建初始草案模板 |

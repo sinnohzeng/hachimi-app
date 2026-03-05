@@ -13,6 +13,7 @@
 | [猫咪系统](architecture/cat-system.md) | 猫咪游戏设计（SSOT）——品种、XP、心情、房间槽位、生成算法 |
 | [状态管理](architecture/state-management.md) | Riverpod Provider 图谱（SSOT）——所有 Provider 及其职责 |
 | [目录结构](architecture/folder-structure.md) | 目录布局、命名规范、层级规则 |
+| [可观测性架构](architecture/observability.md) | 错误遥测契约、Callable 链路追踪与 AI 分诊闭环 |
 
 ---
 
@@ -30,9 +31,11 @@
 | 文档 | 说明 |
 |------|------|
 | [配置指南](firebase/setup-guide.md) | Firebase 从零配置步骤 |
+| [凭据与 Secrets 指南](firebase/credentials-and-secrets.md) | 云端凭据、Secret Manager 流程与 GitHub Actions 密钥配置 |
 | [分析事件](firebase/analytics-events.md) | GA4 自定义事件定义（SSOT）——所有事件、参数、用户属性 |
 | [安全规则](firebase/security-rules.md) | Firestore 安全规则规范及部署说明 |
 | [Cloud Functions](firebase/setup-guide.md#cloud-functions-账户生命周期) | 账户生命周期 callable 部署与本地验证 |
+| [可观测性运行手册](firebase/observability-runbook.md) | BigQuery/告警/AI 分诊运维清单 |
 
 ---
 
@@ -41,6 +44,7 @@
 | 文档 | 说明 |
 |------|------|
 | [20260304 生命周期重构计划](plan/20260304-account-lifecycle-refactor-governance-plan.md) | 离线优先账户生命周期、质量闸门与 SSOT 治理 |
+| [20260305 可观测性闭环计划](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email 可观测性与 AI Debug 自动化 |
 
 ---
 

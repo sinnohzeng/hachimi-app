@@ -1,28 +1,42 @@
 # Crashlytics Integration
 
-## Current Error Pipeline
-- Use `ErrorHandler.record(...)` for non-fatal errors.
-- Flutter framework errors are routed through `FirebaseCrashlytics.instance.recordFlutterFatalError`.
-- Platform async errors are captured in `PlatformDispatcher.instance.onError`.
+## Current Error Contract
+- All caught exceptions must use `ErrorHandler.record(...)` with `ErrorContext`.
+- `ErrorContext` mandatory fields:
+  - `feature`
+  - `operation`
+  - `operation_stage`
+  - `correlation_id`
+  - `uid_hash`
+  - `app_version`
+  - `build_number`
+  - `network_state`
+  - `retry_count`
+  - `error_code`
 
-## Where to Record
-- Service-layer failures (sync, auth orchestration, deletion orchestration).
-- Catch blocks where user flow continues after fallback.
-- Permanent sync failures and deletion retry failures.
+## Identity and Privacy
+- Crashlytics user identifier must be hashed (`uid_hash`).
+- Never send plaintext UID, email, or phone into custom keys.
+- Custom tags are filtered by `ObservabilityTags` allowlist.
 
-## What Was Removed
-- `OfflineWriteGuard` is removed from runtime architecture.
-- Local-first resilience now relies on SQLite ledger + deletion pending queue orchestrator.
+## Runtime Entry Points
+- Flutter framework fatal errors are routed through `ErrorHandler.recordOperation(..., fatal: true)`.
+- Platform async fatal errors are routed through `ErrorHandler.recordOperation(..., fatal: true)`.
+- Service/provider/domain non-fatal errors use `ErrorHandler.recordOperation(...)`.
+
+## Correlation
+For account lifecycle and retry flows:
+- client side error events must include `correlation_id`
+- callable requests must pass `OperationContext`
+- function logs must keep same `correlation_id`
 
 ## Verification
 ```bash
-# Trigger a test crash in debug build
-FirebaseCrashlytics.instance.crash();
+# Trigger a synthetic non-fatal from app code path
+# and verify Crashlytics dashboard + BigQuery export.
 ```
-Check Firebase Console -> Crashlytics.
 
-## Operational Note
-For account deletion failures, prefer recording in `AccountDeletionOrchestrator` with context:
-- operation name
-- retry count
-- error code/type
+Validation targets:
+1. Event visible in Crashlytics within 5 minutes.
+2. Same issue visible in BigQuery within 60 minutes.
+3. `correlation_id` matches function logs for callable-related failures.

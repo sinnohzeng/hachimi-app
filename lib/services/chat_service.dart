@@ -93,10 +93,10 @@ class ChatService {
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, cleaned);
       return cleaned;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'ChatService',
+        feature: 'ChatService',
         operation: 'sendMessage',
       );
       final fallback = _fallbackResponse(chatCtx.isZhLocale);

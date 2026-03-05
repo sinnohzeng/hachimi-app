@@ -29,6 +29,17 @@
 - `account_deletion_completed`
 - `account_deletion_failed`
 
+### Observability
+- `app_error`
+  - required params:
+    - `error_type`
+    - `error_source`
+    - `error_operation`
+  - additional params:
+    - `correlation_id`
+    - `operation_stage`
+    - `error_code`
+
 ## Removed Legacy Events
 The following compatibility events were removed from active tracking:
 - `timer_started`

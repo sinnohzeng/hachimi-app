@@ -1,0 +1,54 @@
+-- Refresh ai_debug_tasks_v1 from the last 24h crash events.
+MERGE `obs.ai_debug_tasks_v1` T
+USING (
+  SELECT
+    FORMAT(
+      '%s:%s',
+      IFNULL((SELECT value FROM UNNEST(custom_keys) WHERE key = 'feature' LIMIT 1), 'unknown'),
+      IFNULL((SELECT value FROM UNNEST(custom_keys) WHERE key = 'error_code' LIMIT 1), 'unknown_error')
+    ) AS issue_id,
+    IFNULL((SELECT value FROM UNNEST(custom_keys) WHERE key = 'feature' LIMIT 1), 'unknown') AS feature,
+    IFNULL((SELECT value FROM UNNEST(custom_keys) WHERE key = 'error_code' LIMIT 1), 'unknown_error') AS error_code,
+    COUNT(*) AS velocity_24h,
+    COUNT(DISTINCT (SELECT value FROM UNNEST(custom_keys) WHERE key = 'uid_hash' LIMIT 1)) AS impacted_users,
+    ANY_VALUE(error) AS sample_error,
+    ANY_VALUE(stacktrace) AS sample_stack,
+    MIN(event_timestamp) AS first_seen,
+    CURRENT_DATE() AS event_date,
+    CURRENT_TIMESTAMP() AS created_at
+  FROM `firebase_crashlytics.*`
+  WHERE REGEXP_CONTAINS(_TABLE_SUFFIX, r'_(ANDROID|IOS)(?:_REALTIME)?$')
+    AND event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+  GROUP BY issue_id, feature, error_code
+) S
+ON T.issue_id = S.issue_id AND T.event_date = S.event_date
+WHEN MATCHED THEN UPDATE SET
+  velocity_24h = S.velocity_24h,
+  impacted_users = S.impacted_users,
+  sample_error = S.sample_error,
+  sample_stack = S.sample_stack,
+  first_seen = S.first_seen,
+  created_at = S.created_at
+WHEN NOT MATCHED THEN INSERT (
+  issue_id,
+  feature,
+  error_code,
+  velocity_24h,
+  impacted_users,
+  sample_error,
+  sample_stack,
+  first_seen,
+  event_date,
+  created_at
+) VALUES (
+  S.issue_id,
+  S.feature,
+  S.error_code,
+  S.velocity_24h,
+  S.impacted_users,
+  S.sample_error,
+  S.sample_stack,
+  S.first_seen,
+  S.event_date,
+  S.created_at
+);

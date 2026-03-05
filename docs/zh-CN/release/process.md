@@ -77,12 +77,13 @@ GitHub Actions（`.github/workflows/release.yml`）将自动执行：
 5. 检查代码格式（`dart format --set-exit-if-changed lib/ test/`）
 6. 运行 `dart analyze lib/`
 7. 运行测试（`flutter test --exclude-tags golden`）
-8. 构建 release 签名 AAB（`flutter build appbundle --release`）
-9. 构建 release 签名 APK（`flutter build apk --release`）
-10. 报告 APK + AAB 构建尺寸
-11. 通过 `r0adkll/upload-google-play` 上传 AAB 到 Google Play internal 轨道
-12. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
-13. 创建 GitHub Release 并附上 APK
+8. 运行 Functions 测试（`cd functions && npm ci && npm test`）
+9. 构建 release 签名 AAB（`flutter build appbundle --release`）
+10. 构建 release 签名 APK（`flutter build apk --release`）
+11. 报告 APK + AAB 构建尺寸
+12. 通过 `r0adkll/upload-google-play` 上传 AAB 到 Google Play internal 轨道
+13. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
+14. 创建 GitHub Release 并附上 APK
 
 ### 第 3.5 步 — 监控 CI 构建
 
@@ -164,6 +165,10 @@ CI 仅上传到 **internal** 轨道。推广到正式版的操作：
 - [ ] APK 可在测试设备上正常安装和运行
 - [ ] AAB 已上传到 Google Play internal 轨道
 - [ ] 在 Play Console 推广到正式版（如适用）
+- [ ] 已在 Cloud Monitoring 执行告警演练，且双通道都收到通知：
+  - Google Chat（主通道）
+  - Email（兜底）
+- [ ] `runAiDebugTriageV1` 在发布后至少成功执行一次
 
 ## Release 签名
 

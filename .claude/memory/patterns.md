@@ -15,6 +15,13 @@
 2. Orchestrator: local wipe first.
 3. Online: call `deleteAccountV1` immediately.
 4. Offline: queue and retry with tombstone.
+5. All callable operations pass `OperationContext` (`correlation_id`, `uid_hash`, `operation_stage`, `retry_count`).
+
+## Error Reporting Pattern
+1. Build `ErrorContext` through `ErrorHandler.recordOperation(...)`.
+2. Require deterministic `error_code` + `operation_stage`.
+3. Keep `uid_hash` and `correlation_id` in every key flow.
+4. Reject non-allowlisted extras via `ObservabilityTags`.
 
 ## Provider Wiring
 - Service singletons are defined in `lib/providers/service_providers.dart`.

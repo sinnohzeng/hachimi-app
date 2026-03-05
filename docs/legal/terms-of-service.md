@@ -2,7 +2,7 @@
 
 > **Status**: Draft template — requires legal review before publication.
 >
-> **Last updated**: 2026-02-27
+> **Last updated**: 2026-03-05
 
 ---
 
@@ -148,7 +148,7 @@ We reserve the right to suspend or terminate your access to the App at any time,
 
 ## 14. Governing Law
 
-These Terms shall be governed by and construed in accordance with the laws of [TODO: Add jurisdiction], without regard to conflict of law principles.
+These Terms shall be governed by and construed in accordance with the laws of the People's Republic of China, without regard to conflict of law principles.
 
 ---
 
@@ -156,8 +156,8 @@ These Terms shall be governed by and construed in accordance with the laws of [T
 
 If you have questions about these Terms, please contact us at:
 
-- **Email**: [TODO: Add contact email]
-- **GitHub**: [TODO: Add repository URL]
+- **Email**: Not provided. Contact via GitHub issues.
+- **GitHub**: https://github.com/sinnohzeng/hachimi-app/issues
 
 ---
 
@@ -165,4 +165,5 @@ If you have questions about these Terms, please contact us at:
 
 | Date | Change |
 |------|--------|
+| 2026-03-05 | Finalized governing law section and replaced placeholder contact fields with GitHub issue channel |
 | 2026-02-27 | Initial draft template created |

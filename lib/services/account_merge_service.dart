@@ -1,5 +1,6 @@
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/observability/operation_context.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:hachimi_app/services/sync_engine.dart';
@@ -54,7 +55,9 @@ class AccountMergeService {
   }) async {
     _syncEngine.stop();
 
-    await _lifecycleBackend.wipeUserData();
+    await _lifecycleBackend.wipeUserData(
+      context: OperationContext.capture(operationStage: 'account_merge'),
+    );
 
     if (oldUid != newUid) {
       await _ledger.migrateUid(oldUid, newUid);

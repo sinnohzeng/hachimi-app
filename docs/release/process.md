@@ -77,12 +77,13 @@ GitHub Actions (`.github/workflows/release.yml`) will:
 5. Check formatting (`dart format --set-exit-if-changed lib/ test/`)
 6. Run `dart analyze lib/`
 7. Run tests (`flutter test --exclude-tags golden`)
-8. Build a release-signed AAB (`flutter build appbundle --release`)
-9. Build a release-signed APK (`flutter build apk --release`)
-10. Report APK + AAB build sizes
-11. Upload AAB to Google Play internal track via `r0adkll/upload-google-play`
-12. Rename the APK to `hachimi-vX.Y.Z.apk`
-13. Create a GitHub Release with the APK attached
+8. Run Functions tests (`cd functions && npm ci && npm test`)
+9. Build a release-signed AAB (`flutter build appbundle --release`)
+10. Build a release-signed APK (`flutter build apk --release`)
+11. Report APK + AAB build sizes
+12. Upload AAB to Google Play internal track via `r0adkll/upload-google-play`
+13. Rename the APK to `hachimi-vX.Y.Z.apk`
+14. Create a GitHub Release with the APK attached
 
 ### Step 3.5 — Monitor CI build
 
@@ -164,6 +165,10 @@ CI uploads to the **internal** track only. To release to production:
 - [ ] APK installs and runs correctly on test device
 - [ ] AAB uploaded to Google Play internal track
 - [ ] Promoted to production on Play Console (if applicable)
+- [ ] Alert drill executed in Cloud Monitoring and both channels notified:
+  - Google Chat (primary)
+  - Email (fallback)
+- [ ] `runAiDebugTriageV1` completed at least one successful run after release
 
 ## Release Signing
 

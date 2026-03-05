@@ -13,6 +13,7 @@
 | [Cat System](architecture/cat-system.md) | Cat game design (SSOT) — breeds, XP, moods, room slots, draft algorithm |
 | [State Management](architecture/state-management.md) | Riverpod provider graph (SSOT) — all providers and their responsibilities |
 | [Folder Structure](architecture/folder-structure.md) | Directory layout, naming conventions, layer rules |
+| [Observability](architecture/observability.md) | Error telemetry contract, callable tracing, AI triage loop |
 
 ---
 
@@ -30,9 +31,11 @@
 | Document | Description |
 |----------|-------------|
 | [Setup Guide](firebase/setup-guide.md) | Step-by-step Firebase configuration for new contributors |
+| [Credentials & Secrets](firebase/credentials-and-secrets.md) | Cloud credentials, Secret Manager workflow, and GitHub Actions secret setup |
 | [Analytics Events](firebase/analytics-events.md) | GA4 custom event definitions (SSOT) — all events, parameters, user properties |
 | [Security Rules](firebase/security-rules.md) | Firestore security rule spec and deploy instructions |
 | [Cloud Functions](firebase/setup-guide.md#cloud-functions-account-lifecycle) | Account lifecycle callable deployment and local test checklist |
+| [Observability Runbook](firebase/observability-runbook.md) | BigQuery/alerts/AI triage operational checklist |
 
 ---
 
@@ -41,6 +44,7 @@
 | Document | Description |
 |----------|-------------|
 | [20260304 Lifecycle Refactor Plan](plan/20260304-account-lifecycle-refactor-governance-plan.md) | Offline-first account lifecycle, quality gate, SSOT governance |
+| [20260305 Observability Closed Loop Plan](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email observability and AI debug automation |
 
 ---
 

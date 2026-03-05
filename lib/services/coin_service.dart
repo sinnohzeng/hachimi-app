@@ -36,10 +36,10 @@ class CoinService {
         return rewards.toResult();
       });
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'CoinService',
+        feature: 'CoinService',
         operation: 'checkIn',
       );
       rethrow;
@@ -173,10 +173,10 @@ class CoinService {
         return true;
       });
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'CoinService',
+        feature: 'CoinService',
         operation: 'spendCoins',
       );
       rethrow;
@@ -204,10 +204,10 @@ class CoinService {
       }
       return result;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'CoinService',
+        feature: 'CoinService',
         operation: 'purchaseAccessory',
       );
       rethrow;
@@ -275,10 +275,10 @@ class CoinService {
         );
       });
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'CoinService',
+        feature: 'CoinService',
         operation: 'earnCoins',
       );
       rethrow;

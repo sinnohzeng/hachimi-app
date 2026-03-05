@@ -29,6 +29,17 @@
 - `account_deletion_completed`
 - `account_deletion_failed`
 
+### 可观测性
+- `app_error`
+  - 必填参数：
+    - `error_type`
+    - `error_source`
+    - `error_operation`
+  - 扩展参数：
+    - `correlation_id`
+    - `operation_stage`
+    - `error_code`
+
 ## 已移除 legacy 事件
 以下兼容事件已从活跃追踪中移除：
 - `timer_started`

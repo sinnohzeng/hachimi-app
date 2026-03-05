@@ -68,10 +68,10 @@ class SyncEngine {
       _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
       debugPrint('SyncEngine: hydration complete for $uid');
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'SyncEngine',
+        feature: 'SyncEngine',
         operation: 'hydrateFromFirestore',
       );
       // 水化失败不阻塞启动，下次仍会重试
@@ -216,10 +216,10 @@ class SyncEngine {
 
       debugPrint('SyncEngine: synced ${actions.length} actions');
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'SyncEngine',
+        feature: 'SyncEngine',
         operation: '_sync',
       );
     } finally {
@@ -236,10 +236,10 @@ class SyncEngine {
       }, SetOptions(merge: true));
       _ensuredUserDocUid = uid;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'SyncEngine',
+        feature: 'SyncEngine',
         operation: '_ensureUserDocExists',
       );
     }
@@ -284,9 +284,9 @@ class SyncEngine {
       final permanent = _isPermanentSyncError(e);
       final nextAttempts = permanent ? 5 : attempts;
       await _ledger.markSyncFailed(action.id, e.toString(), nextAttempts);
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
-        source: 'SyncEngine',
+        feature: 'SyncEngine',
         operation: 'syncAction:${action.type.value}',
       );
     }

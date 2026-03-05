@@ -20,6 +20,7 @@ hachimi-app/
 ## `lib/` 核心域
 - `core/backend/`：后端抽象（运行时仅 Firebase）
 - `core/constants/`：常量 SSOT
+- `core/observability/`：遥测契约（`ErrorContext`、`OperationContext`、哈希与关联 ID 工具）
 - `providers/`：Riverpod 接线与状态入口
 - `services/`：业务编排
 - `services/firebase/`：Firebase 实现
@@ -37,6 +38,8 @@ hachimi-app/
 - `lib/core/backend/account_lifecycle_backend.dart`
 - `lib/services/firebase/firebase_account_lifecycle_backend.dart`
 - `lib/widgets/archive_conflict_dialog.dart`
+- `lib/core/observability/error_context.dart`
+- `lib/core/observability/operation_context.dart`
 
 ## 已移除 legacy 文件
 - `lib/services/migration_service.dart`

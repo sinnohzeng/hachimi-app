@@ -20,6 +20,7 @@ hachimi-app/
 ## `lib/` Key Domains
 - `core/backend/`: backend abstractions (Firebase-only runtime path)
 - `core/constants/`: constants SSOT
+- `core/observability/`: telemetry contracts (`ErrorContext`, `OperationContext`, hashing/correlation helpers)
 - `providers/`: Riverpod providers and service wiring
 - `services/`: orchestration/business logic
 - `services/firebase/`: Firebase backend implementations
@@ -37,6 +38,8 @@ hachimi-app/
 - `lib/core/backend/account_lifecycle_backend.dart`
 - `lib/services/firebase/firebase_account_lifecycle_backend.dart`
 - `lib/widgets/archive_conflict_dialog.dart`
+- `lib/core/observability/error_context.dart`
+- `lib/core/observability/operation_context.dart`
 
 ## Removed Legacy Files
 - `lib/services/migration_service.dart`

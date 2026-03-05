@@ -8,6 +8,7 @@
 - `localDatabaseServiceProvider`
 - `ledgerServiceProvider`
 - `syncEngineProvider`
+- Runtime observability context (global singleton): `ObservabilityRuntime`
 
 ### Backend providers
 - `backendRegistryProvider` (single Firebase path)
@@ -54,3 +55,4 @@
 - Screens must not call Firebase SDK directly.
 - Providers must not reintroduce legacy compatibility branches.
 - New persistent keys must be added only via `AppPrefsKeys`.
+- Account lifecycle callables must always pass `OperationContext`.

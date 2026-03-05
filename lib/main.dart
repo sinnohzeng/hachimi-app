@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/app.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,6 +34,11 @@ Future<SharedPreferences> _initializeCriticalServices() async {
     SharedPreferences.getInstance(),
   ]);
   final prefs = results[1] as SharedPreferences;
+  await ObservabilityRuntime.initialize();
+  final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
+  if (cachedUid != null && cachedUid.isNotEmpty) {
+    ObservabilityRuntime.setUidHashFromUid(cachedUid);
+  }
 
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
@@ -44,11 +53,39 @@ Future<void> _configureCrashlytics() async {
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
     kReleaseMode,
   );
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = _handleFlutterFatal;
   PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    _handlePlatformFatal(error, stack);
     return true;
   };
+}
+
+void _handleFlutterFatal(FlutterErrorDetails details) {
+  unawaited(
+    ErrorHandler.recordOperation(
+      details.exception,
+      stackTrace: details.stack,
+      feature: 'FlutterFramework',
+      operation: 'onError',
+      operationStage: 'bootstrap',
+      fatal: true,
+      errorCode: 'flutter_fatal',
+    ),
+  );
+}
+
+void _handlePlatformFatal(Object error, StackTrace stack) {
+  unawaited(
+    ErrorHandler.recordOperation(
+      error,
+      stackTrace: stack,
+      feature: 'PlatformDispatcher',
+      operation: 'onError',
+      operationStage: 'bootstrap',
+      fatal: true,
+      errorCode: 'platform_fatal',
+    ),
+  );
 }
 
 void _registerLicenseAttribution() {
@@ -76,10 +113,10 @@ void _runMainApp(Stopwatch startupStopwatch, SharedPreferences prefs) {
 
 void _handleInitFailure(Object error, StackTrace stack) {
   debugPrint('[main] initialization failed: $error');
-  ErrorHandler.record(
+  ErrorHandler.recordOperation(
     error,
     stackTrace: stack,
-    source: 'main',
+    feature: 'main',
     operation: 'initialization',
     fatal: true,
   );

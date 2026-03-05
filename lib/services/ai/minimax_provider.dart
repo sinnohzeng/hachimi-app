@@ -211,10 +211,10 @@ class MiniMaxProvider implements AiProvider {
 
   void _recordError(Object e, StackTrace stack, String operation) {
     debugPrint('[MiniMaxProvider] $operation failed: $e');
-    ErrorHandler.record(
+    ErrorHandler.recordOperation(
       e,
       stackTrace: stack,
-      source: 'MiniMaxProvider',
+      feature: 'MiniMaxProvider',
       operation: operation,
     );
   }

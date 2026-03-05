@@ -1,9 +1,13 @@
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/observability/correlation_id_factory.dart';
+import 'package:hachimi_app/core/observability/observability_runtime.dart';
+import 'package:hachimi_app/core/observability/operation_context.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/services/account_deletion_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,11 +38,14 @@ class AccountDeletionOrchestrator {
       return;
     }
 
-    await _storePending(uid: uid, retryCount: 0);
+    final correlationId = CorrelationIdFactory.newId();
+    await _storePending(uid: uid, retryCount: 0, correlationId: correlationId);
     await _deletionService.cleanLocalData(
       preservePrefs: _pendingPrefsSnapshot(),
     );
-    if (await _isOnline()) await _attemptRemoteDeletion(uid);
+    if (await _isOnline()) {
+      await _attemptRemoteDeletion(uid, correlationId: correlationId);
+    }
   }
 
   Future<bool> resumePendingDeletion() async {
@@ -53,7 +60,8 @@ class AccountDeletionOrchestrator {
         await _clearPending();
         return false;
       }
-      await _attemptRemoteDeletion(uid);
+      final correlationId = data['correlation_id'] as String?;
+      await _attemptRemoteDeletion(uid, correlationId: correlationId);
       return true;
     } catch (_) {
       await _clearPending();
@@ -61,23 +69,38 @@ class AccountDeletionOrchestrator {
     }
   }
 
-  Future<void> _attemptRemoteDeletion(String uid) async {
+  Future<void> _attemptRemoteDeletion(
+    String uid, {
+    String? correlationId,
+  }) async {
+    final retryCount = _prefs.getInt(AppPrefsKeys.deletionRetryCount) ?? 0;
+    final opContext = OperationContext.capture(
+      operationStage: 'account_deletion',
+      retryCount: retryCount,
+      correlationId: correlationId,
+    );
     try {
       if (_authBackend.currentUid != uid) {
         await _incrementRetry();
         return;
       }
 
-      await _lifecycleBackend.deleteAccountHard();
+      await _lifecycleBackend.deleteAccountHard(context: opContext);
       await _authBackend.signOut();
+      ObservabilityRuntime.clearUidHash();
+      await FirebaseCrashlytics.instance.setUserIdentifier('');
       await _clearPending();
     } catch (e, stack) {
       await _incrementRetry();
-      ErrorHandler.record(
+      await ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AccountDeletionOrchestrator',
+        feature: 'AccountDeletionOrchestrator',
         operation: 'attemptRemoteDeletion',
+        operationStage: 'account_deletion',
+        retryCount: retryCount,
+        correlationId: opContext.correlationId,
+        errorCode: 'delete_account_remote_failed',
       );
     }
   }
@@ -85,9 +108,11 @@ class AccountDeletionOrchestrator {
   Future<void> _storePending({
     required String uid,
     required int retryCount,
+    required String correlationId,
   }) async {
     final payload = jsonEncode({
       'uid': uid,
+      'correlation_id': correlationId,
       'createdAt': DateTime.now().toIso8601String(),
     });
     await _prefs.setString(AppPrefsKeys.pendingDeletionJob, payload);

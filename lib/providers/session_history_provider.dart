@@ -94,10 +94,10 @@ class SessionHistoryNotifier extends Notifier<SessionHistoryState> {
         offset: state.offset + result.length,
       );
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'SessionHistoryNotifier',
+        feature: 'SessionHistoryNotifier',
         operation: 'loadMore',
       );
       state = state.copyWith(isLoading: false, error: e.toString);

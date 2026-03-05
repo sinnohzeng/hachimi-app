@@ -81,10 +81,10 @@ class AchievementEvaluator {
         _onUnlocked(newlyUnlocked);
       }
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AchievementEvaluator',
+        feature: 'AchievementEvaluator',
         operation: '_evaluate',
       );
     }

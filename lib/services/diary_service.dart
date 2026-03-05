@@ -58,10 +58,10 @@ class DiaryService {
     try {
       return await _generateAndSave(ctx);
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'DiaryService',
+        feature: 'DiaryService',
         operation: 'generateTodayDiary',
       );
       return null;

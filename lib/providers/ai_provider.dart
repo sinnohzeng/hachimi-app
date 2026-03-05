@@ -151,10 +151,10 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
       state = ok ? AiAvailability.ready : AiAvailability.error;
       return ok;
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AiAvailabilityNotifier',
+        feature: 'AiAvailabilityNotifier',
         operation: 'validateConnection',
       );
       state = AiAvailability.error;

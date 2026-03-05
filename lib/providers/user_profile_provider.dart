@@ -77,10 +77,10 @@ List<String> _decodeTitles(String? raw) {
     if (decoded is List) return decoded.whereType<String>().toList();
     return [];
   } catch (e, stack) {
-    ErrorHandler.record(
+    ErrorHandler.recordOperation(
       e,
       stackTrace: stack,
-      source: 'user_profile_provider',
+      feature: 'user_profile_provider',
       operation: '_decodeTitles',
     );
     return [];

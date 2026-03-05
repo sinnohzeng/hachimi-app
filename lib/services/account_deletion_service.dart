@@ -72,10 +72,10 @@ class AccountDeletionService {
       final path = p.join(dbPath, 'hachimi_local.db');
       await deleteDatabase(path);
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AccountDeletionService',
+        feature: 'AccountDeletionService',
         operation: 'cleanLocalData(sqlite)',
       );
     }
@@ -89,10 +89,10 @@ class AccountDeletionService {
         await _restorePref(prefs, entry.key, entry.value);
       }
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AccountDeletionService',
+        feature: 'AccountDeletionService',
         operation: 'cleanLocalData(prefs)',
       );
     }
@@ -136,10 +136,10 @@ class AccountDeletionService {
     try {
       await _notifications.cancelAll();
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AccountDeletionService',
+        feature: 'AccountDeletionService',
         operation: 'cleanLocalData(notifications)',
       );
     }
@@ -149,10 +149,10 @@ class AccountDeletionService {
     try {
       await FocusTimerNotifier.clearSavedState();
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'AccountDeletionService',
+        feature: 'AccountDeletionService',
         operation: 'cleanLocalData(timer)',
       );
     }

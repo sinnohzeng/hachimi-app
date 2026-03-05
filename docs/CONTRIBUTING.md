@@ -79,6 +79,7 @@ dart analyze lib test
 dart run tool/quality_gate.dart
 flutter test --exclude-tags golden
 cd functions && npm test
+rg -n "TODO|FIXME|TBD|占位" lib test functions/src functions/test .claude/memory
 ```
 
 Zero warnings, zero errors is required. If checks fail, do not open a PR.
@@ -182,6 +183,9 @@ adb shell setprop debug.firebase.analytics.app com.hachimi.hachimi_app
 
 # Deploy Firestore rules
 firebase deploy --only firestore:rules
+
+# Bootstrap observability dataset + scheduled query
+PROJECT_ID=<project-id> ANALYTICS_DATASET=analytics_<property_id> ./scripts/gcp/setup_observability.sh
 
 # Clear app data (useful for testing first-launch flows)
 adb shell pm clear com.hachimi.hachimi_app

@@ -233,10 +233,10 @@ class NotificationService {
           body: body,
         );
       } catch (e, stack) {
-        ErrorHandler.record(
+        ErrorHandler.recordOperation(
           e,
           stackTrace: stack,
-          source: 'NotificationService',
+          feature: 'NotificationService',
           operation: 'scheduleReminders[$i]',
         );
       }

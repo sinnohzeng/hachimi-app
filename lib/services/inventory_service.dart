@@ -85,10 +85,10 @@ class InventoryService {
 
       _ledger.notifyChange(LedgerChange(type: 'equip', affectedIds: [catId]));
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'InventoryService',
+        feature: 'InventoryService',
         operation: 'equipAccessory',
       );
       rethrow;
@@ -155,10 +155,10 @@ class InventoryService {
 
       _ledger.notifyChange(LedgerChange(type: 'unequip', affectedIds: [catId]));
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'InventoryService',
+        feature: 'InventoryService',
         operation: 'unequipAccessory',
       );
       rethrow;

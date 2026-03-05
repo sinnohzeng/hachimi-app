@@ -51,10 +51,10 @@ class FocusTimerService {
         callback: _startCallback,
       );
     } catch (e, stack) {
-      ErrorHandler.record(
+      ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
-        source: 'FocusTimerService',
+        feature: 'FocusTimerService',
         operation: 'start',
       );
       return ServiceRequestFailure(error: e);

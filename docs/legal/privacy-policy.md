@@ -2,7 +2,7 @@
 
 > **Status**: Draft template — requires legal review before publication.
 >
-> **Last updated**: 2026-02-27
+> **Last updated**: 2026-03-05
 
 ---
 
@@ -59,6 +59,7 @@ When you enable AI features, the following data is sent to our AI providers:
 |------|-------------------|---------|
 | App usage events | Firebase Analytics | Product improvement |
 | Crash reports | Firebase Crashlytics | Bug fixing, stability |
+| Observability metadata (`correlation_id`, `uid_hash`, `error_code`, `operation_stage`) | Client telemetry + Cloud Functions logs | End-to-end debugging and incident response |
 | FCM token | Firebase Cloud Messaging | Push notifications |
 | Device type, OS version | Automatic | Compatibility |
 
@@ -124,6 +125,7 @@ We use the following third-party services:
 - Firestore security rules enforce user-only data access
 - Focus session records are signed with HMAC-SHA256 for tamper detection
 - Firebase Authentication handles credential security
+- Logs and crash metadata use hashed identity (`uid_hash`), not plaintext UID/email/phone
 
 ---
 
@@ -171,8 +173,8 @@ We may update this Privacy Policy from time to time. We will notify you of any c
 
 If you have questions about this Privacy Policy, please contact us at:
 
-- **Email**: [TODO: Add contact email]
-- **GitHub**: [TODO: Add repository URL]
+- **Email**: Not provided. Contact via GitHub issues.
+- **GitHub**: https://github.com/sinnohzeng/hachimi-app/issues
 
 ---
 
@@ -180,4 +182,5 @@ If you have questions about this Privacy Policy, please contact us at:
 
 | Date | Change |
 |------|--------|
+| 2026-03-05 | Added observability metadata handling (`correlation_id`, `uid_hash`, `error_code`, `operation_stage`) and removed placeholder contact fields |
 | 2026-02-27 | Initial draft template created |
