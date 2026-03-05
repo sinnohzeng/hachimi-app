@@ -38,6 +38,92 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Restore firebase_options.dart from secret (if available)
+        if: ${{ secrets.FIREBASE_OPTIONS_DART != '' }}
+        run: echo "${{ secrets.FIREBASE_OPTIONS_DART }}" | base64 --decode > lib/firebase_options.dart
+
+      - name: Generate firebase_options.dart fallback for CI (no secret)
+        if: ${{ secrets.FIREBASE_OPTIONS_DART == '' }}
+        run: |
+          cat > lib/firebase_options.dart <<'EOF'
+          import 'package:firebase_core/firebase_core.dart';
+          import 'package:flutter/foundation.dart'
+              show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              if (kIsWeb) return _web;
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return _android;
+                case TargetPlatform.iOS:
+                  return _ios;
+                case TargetPlatform.macOS:
+                  return _macos;
+                case TargetPlatform.windows:
+                  return _windows;
+                case TargetPlatform.linux:
+                  return _linux;
+                default:
+                  return _android;
+              }
+            }
+
+            static const FirebaseOptions _android = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:android:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+            );
+
+            static const FirebaseOptions _ios = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:ios:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+              iosBundleId: 'com.example.ci',
+            );
+
+            static const FirebaseOptions _macos = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:ios:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+              iosBundleId: 'com.example.ci',
+            );
+
+            static const FirebaseOptions _windows = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:web:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+              authDomain: 'ci-placeholder.firebaseapp.com',
+              storageBucket: 'ci-placeholder.appspot.com',
+              measurementId: 'G-CI00000000',
+            );
+
+            static const FirebaseOptions _linux = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:web:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+              authDomain: 'ci-placeholder.firebaseapp.com',
+              storageBucket: 'ci-placeholder.appspot.com',
+              measurementId: 'G-CI00000000',
+            );
+
+            static const FirebaseOptions _web = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:web:ci',
+              messagingSenderId: '000000000000',
+              projectId: 'ci-placeholder',
+              authDomain: 'ci-placeholder.firebaseapp.com',
+              storageBucket: 'ci-placeholder.appspot.com',
+              measurementId: 'G-CI00000000',
+            );
+          }
+          EOF
+
       - name: Check for placeholders
         run: |
           ! rg -n "TODO|FIXME|TBD|占位" lib test functions/src functions/test .claude/memory
