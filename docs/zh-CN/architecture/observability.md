@@ -1,9 +1,9 @@
 # 可观测性架构
 
-> 应用错误遥测、Callable 链路追踪与 AI 分诊自动化的 SSOT。
+> 遥测契约、数据链路与 AI Debug 闭环的 SSOT。
 
 ## 目标
-定义移动端错误、Cloud Functions 日志、BigQuery 查询、告警与 AI 分诊之间的统一运行契约。
+定义从客户端错误到 AI 分诊报告与告警联动的一体化契约。
 
 ## 核心契约
 ### ErrorContext（客户端）
@@ -26,44 +26,74 @@
 - `operation_stage`
 - `retry_count`
 
+### Callable telemetry 响应
+- `ok`
+- `correlation_id`
+- `function_name`
+- `latency_ms`
+- `result`
+- `error_code?`
+
 ## 客户端链路
 1. 捕获异常。
-2. 构建 `ErrorContext`。
-3. `ErrorHandler.record(...)` 基于白名单过滤字段。
-4. 写入 Crashlytics 自定义键与错误事件。
-5. 发出 Analytics `app_error` 事件并带关联字段。
+2. 构建强类型 `ErrorContext`。
+3. `ErrorHandler.record(...)` 按白名单过滤字段。
+4. 写入 Crashlytics custom key 和错误事件。
+5. 发出带关联元数据的 Analytics `app_error`。
 
 ## Callable 链路
-1. 校验 `OperationContext`。
-2. 函数按统一结构写入开始/成功/失败日志。
-3. 返回统一 telemetry 响应。
-4. 失败时输出 `error_code` 并抛 `HttpsError`。
+敏感操作：
+- `deleteAccountV2`
+- `wipeUserDataV2`
+
+执行规则：
+1. 校验 auth 与 `OperationContext`。
+2. 强制 App Check 并消费 token。
+3. 输出结构化开始/成功/失败日志。
+4. 返回统一 telemetry 响应或抛出 `HttpsError`。
 
 ## 数据层
-- Crashlytics 导出到 BigQuery 与 Cloud Logging。
-- Analytics 导出到 BigQuery。
-- Functions 日志进入 Cloud Logging（可导出到 BigQuery）。
-- `obs` 数据集承载问题视图与 AI 分诊表。
+- Crashlytics 导出 -> BigQuery + Cloud Logging
+- Analytics 导出 -> BigQuery
+- Functions 日志 -> Cloud Logging -> BigQuery sink
+- BigQuery `obs` 数据集承载：
+  - `issue_daily_v1`
+  - `issue_velocity_v1`
+  - `issue_user_impact_v1`
+  - `flow_error_funnel_v1`
+  - `release_stability_v1`
+  - `ai_debug_tasks_v1`
+  - `ai_debug_reports_v1`
 
 ## AI Debug 闭环
-1. 每 15 分钟刷新 `obs.ai_debug_tasks_v1`。
-2. `runAiDebugTriageV1` 读取任务并生成可执行报告。
-3. 报告落库到 `obs.ai_debug_reports_v1`。
-4. 自动创建 GitHub 草稿 issue（前缀 `[DRAFT][AI-DEBUG]`）。
+1. 定时 SQL 每 15 分钟刷新 `ai_debug_tasks_v1`。
+2. `runAiDebugTriageV2` 读取任务并通过 IAM/ADC 调用 Vertex AI。
+3. AI 调用失败时回退 heuristic。
+4. 输出写入 `ai_debug_reports_v1`。
+5. 通过 GitHub App 安装令牌创建草稿 issue。
 
 ## 告警
-- 主通道：Google Chat。
-- 兜底通道：Email。
-- 禁止单通道运行。
+允许通道：
+- Google Chat（主）
+- Email（兜底）
 
-## 隐私红线
+策略名称约束：
+- `crash_free_users`
+- `fatal_rate`
+- `delete_account_error_rate`
+- `high_velocity_issues`
+- `ai_pipeline_failure`
+- `budget_threshold`
+
+## 隐私与合规
 - 禁止记录明文 UID/邮箱/手机号。
-- 全链路统一使用 `uid_hash`。
+- 身份关联仅使用 `uid_hash`。
 - 非白名单字段不进入遥测。
+- AI 报告保留审计字段：`model_name`、`prompt_version`、`decision_trace_id`。
 
 ## 关联文件
 - `lib/core/observability/*`
 - `lib/core/utils/error_handler.dart`
+- `lib/services/firebase/firebase_account_lifecycle_backend.dart`
 - `functions/src/index.ts`
-- `functions/sql/observability/*`
-- `scripts/gcp/setup_observability.sh`
+- `infra/terraform/modules/observability/*`

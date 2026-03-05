@@ -1,0 +1,15 @@
+SELECT
+  IFNULL(
+    (SELECT value FROM UNNEST(custom_keys) WHERE key = 'feature' LIMIT 1),
+    'unknown'
+  ) AS feature,
+  IFNULL(
+    (SELECT value FROM UNNEST(custom_keys) WHERE key = 'error_code' LIMIT 1),
+    'unknown_error'
+  ) AS error_code,
+  COUNTIF(event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)) AS velocity_24h,
+  COUNTIF(event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR)) AS velocity_2h
+FROM `${project_id}.${crashlytics_dataset}.*`
+WHERE REGEXP_CONTAINS(_TABLE_SUFFIX, r'_(ANDROID|IOS)(?:_REALTIME)?$')
+  AND event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
+GROUP BY feature, error_code

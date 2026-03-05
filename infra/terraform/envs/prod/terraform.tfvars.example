@@ -1,0 +1,32 @@
+project_id = "hachimi-prod-project"
+region     = "us-central1"
+bq_location = "US"
+
+obs_dataset_id      = "obs"
+crashlytics_dataset = "firebase_crashlytics"
+analytics_dataset   = "analytics_123456789"
+enable_export_dependent_resources = true
+table_ttl_days      = 90
+
+scheduled_query_service_account_email = "obs-scheduler-prod@hachimi-prod-project.iam.gserviceaccount.com"
+functions_runtime_service_account_email = "hachimi-functions-prod@hachimi-prod-project.iam.gserviceaccount.com"
+
+alert_email = "alerts@example.com"
+chat_notification_channel_ids = [
+  "projects/hachimi-prod-project/notificationChannels/1234567890123456789",
+  "projects/hachimi-prod-project/notificationChannels/9876543210987654321"
+]
+
+fatal_event_threshold_count          = 5
+delete_account_error_threshold_count = 3
+high_velocity_issue_threshold_count  = 10
+ai_pipeline_failure_threshold_count  = 1
+
+billing_account_id    = "billingAccounts/000000-000000-000000"
+budget_amount         = 150
+budget_currency       = "USD"
+budget_cost_threshold = 120
+enable_budget_metric_alert = false
+
+github_app_private_key_secret_name = "GITHUB_APP_PRIVATE_KEY"
+github_app_private_key             = ""

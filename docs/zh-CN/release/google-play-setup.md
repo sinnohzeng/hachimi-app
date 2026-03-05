@@ -242,7 +242,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 | 崩溃日志 | 是 | 是（Google） | 数据分析 |
 | 性能诊断 | 是 | 是（Google） | 应用性能 |
 | 设备或其他标识符（FCM Token） | 是 | 是（Google） | 推送通知 |
-| 其他（AI 聊天内容） | 可选 | 是（MiniMax 或 Google Gemini） | 应用功能（AI 功能） |
+| 其他（AI 聊天内容） | 可选 | 是（Google，基于 Firebase AI Logic / Vertex AI） | 应用功能（AI 功能） |
 
 标记：数据在传输中加密，用户可请求删除数据。
 
@@ -264,7 +264,7 @@ Google Play API 要求**首个 AAB 必须通过网页控制台上传**，之后 
 ### 7a. 在本地构建 AAB
 
 ```bash
-flutter build appbundle --release --dart-define-from-file=.env
+flutter build appbundle --release
 ```
 
 AAB 文件位于：`build/app/outputs/bundle/release/app-release.aab`

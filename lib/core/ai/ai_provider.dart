@@ -3,10 +3,10 @@ import 'package:hachimi_app/core/ai/ai_message.dart';
 
 /// 大模型提供商抽象接口 — 策略模式。
 ///
-/// 每个大模型厂商（MiniMax、千问、Gemini 等）实现此接口。
+/// 每个大模型后端（例如 Firebase AI Logic）实现此接口。
 /// [ChatService] 和 [DiaryService] 仅依赖此抽象，永远不直接导入具体实现。
 abstract class AiProvider {
-  /// 提供商标识名（如 'minimax'、'qwen'、'gemini'）。
+  /// 提供商标识名（如 'firebase_gemini'）。
   String get id;
 
   /// 用户可见的显示名称。

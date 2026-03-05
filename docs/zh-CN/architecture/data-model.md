@@ -50,17 +50,21 @@ users/{uid}
 - `deletion_retry_count`
 
 ## Cloud Functions
-### `deleteAccountV1`
+### `deleteAccountV2`
 - 需要登录态。
+- 需要有效 App Check token（消费 token 防重放）。
 - 递归删除 `users/{uid}` 全量业务数据。
 - 删除 Firebase Auth 用户。
 - 对缺失文档/缺失用户幂等成功。
 
-### `wipeUserDataV1`
+### `wipeUserDataV2`
 - 需要登录态。
+- 需要有效 App Check token（消费 token 防重放）。
 - 仅递归删除 `users/{uid}` 业务数据。
 - 保留 Firebase Auth 用户。
 - 用于访客升级 `keepLocal` 路径。
+
+兼容别名（`deleteAccountV1` / `wipeUserDataV1`）在迁移期仍保留。
 
 ## 合并语义
 - 保留云端：删除旧访客本地数据，云端 hydrate 覆盖本地。

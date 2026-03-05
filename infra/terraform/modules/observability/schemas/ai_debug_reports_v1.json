@@ -1,0 +1,12 @@
+[
+  {"name":"issue_id","type":"STRING","mode":"REQUIRED"},
+  {"name":"root_cause_hypothesis","type":"STRING","mode":"REQUIRED"},
+  {"name":"repro_steps","type":"STRING","mode":"REQUIRED"},
+  {"name":"affected_scope","type":"STRING","mode":"REQUIRED"},
+  {"name":"fix_suggestion","type":"STRING","mode":"REQUIRED"},
+  {"name":"model_name","type":"STRING","mode":"REQUIRED"},
+  {"name":"prompt_version","type":"STRING","mode":"REQUIRED"},
+  {"name":"decision_trace_id","type":"STRING","mode":"REQUIRED"},
+  {"name":"github_issue_url","type":"STRING","mode":"NULLABLE"},
+  {"name":"created_at","type":"TIMESTAMP","mode":"REQUIRED"}
+]

@@ -106,8 +106,7 @@
 | Firebase Crashlytics | Google | 崩溃报告 | 同上 |
 | Firebase Cloud Messaging | Google | 推送通知 | 同上 |
 | Google 登录 | Google | OAuth 身份验证 | [Google 隐私政策](https://policies.google.com/privacy) |
-| MiniMax API | MiniMax | AI 聊天和日记（需启用） | [MiniMax 隐私政策](https://www.minimaxi.com/privacy) |
-| Google Gemini API | Google | AI 聊天和日记（需启用） | [Google AI 隐私政策](https://ai.google.dev/terms) |
+| Firebase AI Logic（Gemini on Vertex AI） | Google | AI 聊天和日记（需启用） | [Firebase 隐私政策](https://firebase.google.com/support/privacy) |
 
 ---
 
@@ -117,7 +116,7 @@
 
 - **云端数据**：存储在 Google Cloud（Firebase）基础设施中
 - **本地数据**：存储在设备上的 SQLite 数据库和 SharedPreferences 中
-- **AI 数据**：由 AI 服务提供商实时处理；我们不会在自己的服务器上存储 AI 对话记录
+- **AI 数据**：通过 Firebase AI Logic / Vertex AI 处理；release 构建不再内置长期静态 AI key
 
 ### 5.2 安全措施
 
@@ -182,5 +181,5 @@
 
 | 日期 | 变更 |
 |------|------|
-| 2026-03-05 | 新增可观测性元数据处理说明（`correlation_id`、`uid_hash`、`error_code`、`operation_stage`），移除联系信息占位项 |
+| 2026-03-05 | 将 AI 数据处理说明统一为 Firebase AI Logic（Vertex AI），移除第三方静态 AI key 主路径，并补充可观测性元数据说明（`correlation_id`、`uid_hash`、`error_code`、`operation_stage`） |
 | 2026-02-27 | 创建初始草案模板 |

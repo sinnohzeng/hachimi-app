@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ Future<SharedPreferences> _initializeCriticalServices() async {
     Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
     SharedPreferences.getInstance(),
   ]);
+  await _activateAppCheck();
   final prefs = results[1] as SharedPreferences;
   await ObservabilityRuntime.initialize();
   final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
@@ -47,6 +49,18 @@ Future<SharedPreferences> _initializeCriticalServices() async {
 
   await _configureCrashlytics();
   return prefs;
+}
+
+Future<void> _activateAppCheck() async {
+  await FirebaseAppCheck.instance.activate(
+    providerAndroid: kReleaseMode
+        ? const AndroidPlayIntegrityProvider()
+        : const AndroidDebugProvider(),
+    providerApple: kReleaseMode
+        ? const AppleAppAttestWithDeviceCheckFallbackProvider()
+        : const AppleDebugProvider(),
+  );
+  await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
 }
 
 Future<void> _configureCrashlytics() async {

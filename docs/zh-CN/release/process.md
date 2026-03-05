@@ -72,18 +72,19 @@ GitHub Actions（`.github/workflows/release.yml`）将自动执行：
 
 1. 检出 tag 对应的代码
 2. 配置 JDK 17 + Flutter 3.41.1
-3. 从 GitHub Secrets 恢复 Firebase 配置文件和签名 keystore
-4. 验证版本一致性（tag 必须与 pubspec 版本号匹配）
-5. 检查代码格式（`dart format --set-exit-if-changed lib/ test/`）
-6. 运行 `dart analyze lib/`
-7. 运行测试（`flutter test --exclude-tags golden`）
-8. 运行 Functions 测试（`cd functions && npm ci && npm test`）
-9. 构建 release 签名 AAB（`flutter build appbundle --release`）
-10. 构建 release 签名 APK（`flutter build apk --release`）
-11. 报告 APK + AAB 构建尺寸
-12. 通过 `r0adkll/upload-google-play` 上传 AAB 到 Google Play internal 轨道
-13. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
-14. 创建 GitHub Release 并附上 APK
+3. 通过 `tool/check_release_secrets.sh` 校验 release 必需 secrets
+4. 从 GitHub Secrets 恢复 Firebase 配置文件和签名 keystore
+5. 验证版本一致性（tag 必须与 pubspec 版本号匹配）
+6. 检查代码格式（`dart format --set-exit-if-changed lib/ test/`）
+7. 运行 `dart analyze lib/`
+8. 运行测试（`flutter test --exclude-tags golden`）
+9. 运行 Functions 测试（`cd functions && npm ci && npm test`）
+10. 构建 release 签名 AAB（`flutter build appbundle --release`）
+11. 构建 release 签名 APK（`flutter build apk --release`）
+12. 报告 APK + AAB 构建尺寸
+13. 通过 `r0adkll/upload-google-play` 上传 AAB 到 Google Play internal 轨道
+14. 将 APK 重命名为 `hachimi-vX.Y.Z.apk`
+15. 创建 GitHub Release 并附上 APK
 
 ### 第 3.5 步 — 监控 CI 构建
 
@@ -168,7 +169,7 @@ CI 仅上传到 **internal** 轨道。推广到正式版的操作：
 - [ ] 已在 Cloud Monitoring 执行告警演练，且双通道都收到通知：
   - Google Chat（主通道）
   - Email（兜底）
-- [ ] `runAiDebugTriageV1` 在发布后至少成功执行一次
+- [ ] `runAiDebugTriageV2` 在发布后至少成功执行一次
 
 ## Release 签名
 
@@ -198,12 +199,11 @@ CI workflow 需要在仓库中配置以下 Secrets：
 | `KEY_PASSWORD` | 密钥密码 |
 | `GOOGLE_SERVICES_JSON` | Base64 编码的 `google-services.json` |
 | `FIREBASE_OPTIONS_DART` | Base64 编码的 `firebase_options.dart` |
-| `MINIMAX_API_KEY` | MiniMax AI 功能的 API 密钥 |
-| `GEMINI_API_KEY` | Google Gemini AI 功能的 API 密钥 |
 | `WIF_PROVIDER` | Workload Identity Federation Provider 全名 |
 | `WIF_SERVICE_ACCOUNT` | 用于 Play Store 上传的 Google Cloud 服务账号邮箱 |
 
 运行 `scripts/setup-release-signing.sh` 可自动生成 keystore 相关的值。
+旧版客户端 AI key secrets 已是遗留项，release 构建不再依赖。
 
 ## Google Play Store
 

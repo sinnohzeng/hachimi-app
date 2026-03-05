@@ -72,18 +72,19 @@ GitHub Actions (`.github/workflows/release.yml`) will:
 
 1. Check out the code at the tagged commit
 2. Set up JDK 17 + Flutter 3.41.1
-3. Restore Firebase config files and signing keystore from GitHub Secrets
-4. Verify version consistency (tag must match pubspec version)
-5. Check formatting (`dart format --set-exit-if-changed lib/ test/`)
-6. Run `dart analyze lib/`
-7. Run tests (`flutter test --exclude-tags golden`)
-8. Run Functions tests (`cd functions && npm ci && npm test`)
-9. Build a release-signed AAB (`flutter build appbundle --release`)
-10. Build a release-signed APK (`flutter build apk --release`)
-11. Report APK + AAB build sizes
-12. Upload AAB to Google Play internal track via `r0adkll/upload-google-play`
-13. Rename the APK to `hachimi-vX.Y.Z.apk`
-14. Create a GitHub Release with the APK attached
+3. Validate required release secrets via `tool/check_release_secrets.sh`
+4. Restore Firebase config files and signing keystore from GitHub Secrets
+5. Verify version consistency (tag must match pubspec version)
+6. Check formatting (`dart format --set-exit-if-changed lib/ test/`)
+7. Run `dart analyze lib/`
+8. Run tests (`flutter test --exclude-tags golden`)
+9. Run Functions tests (`cd functions && npm ci && npm test`)
+10. Build a release-signed AAB (`flutter build appbundle --release`)
+11. Build a release-signed APK (`flutter build apk --release`)
+12. Report APK + AAB build sizes
+13. Upload AAB to Google Play internal track via `r0adkll/upload-google-play`
+14. Rename the APK to `hachimi-vX.Y.Z.apk`
+15. Create a GitHub Release with the APK attached
 
 ### Step 3.5 — Monitor CI build
 
@@ -168,7 +169,7 @@ CI uploads to the **internal** track only. To release to production:
 - [ ] Alert drill executed in Cloud Monitoring and both channels notified:
   - Google Chat (primary)
   - Email (fallback)
-- [ ] `runAiDebugTriageV1` completed at least one successful run after release
+- [ ] `runAiDebugTriageV2` completed at least one successful run after release
 
 ## Release Signing
 
@@ -198,12 +199,11 @@ The CI workflow requires these secrets configured in the repository:
 | `KEY_PASSWORD` | Key password |
 | `GOOGLE_SERVICES_JSON` | Base64-encoded `google-services.json` |
 | `FIREBASE_OPTIONS_DART` | Base64-encoded `firebase_options.dart` |
-| `MINIMAX_API_KEY` | MiniMax API key for AI features |
-| `GEMINI_API_KEY` | Google Gemini API key for AI features |
 | `WIF_PROVIDER` | Workload Identity Federation provider full name |
 | `WIF_SERVICE_ACCOUNT` | Google Cloud service account email for Play Store uploads |
 
 Run `scripts/setup-release-signing.sh` to generate keystore-related values.
+Legacy client AI key secrets are no longer required by release builds.
 
 ## Google Play Store
 

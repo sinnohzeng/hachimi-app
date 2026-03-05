@@ -242,7 +242,7 @@ Fill the data safety form based on the data types described in the privacy polic
 | Crash logs | Yes | Yes (Google) | Analytics |
 | Performance diagnostics | Yes | Yes (Google) | App performance |
 | Device or other IDs (FCM token) | Yes | Yes (Google) | Push notifications |
-| Other (AI chat content) | Optional | Yes (MiniMax or Google Gemini) | App functionality (AI features) |
+| Other (AI chat content) | Optional | Yes (Google via Firebase AI Logic / Vertex AI) | App functionality (AI features) |
 
 Mark: Data is encrypted in transit, users can request data deletion.
 
@@ -264,7 +264,7 @@ Google Play's API requires the **first AAB to be uploaded via the web console**.
 ### 7a. Build the AAB locally
 
 ```bash
-flutter build appbundle --release --dart-define-from-file=.env
+flutter build appbundle --release
 ```
 
 The AAB will be at: `build/app/outputs/bundle/release/app-release.aab`

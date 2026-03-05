@@ -70,3 +70,18 @@ test/widgets/failures/
 
 # Android Gradle build artifacts
 /android/build/
+
+# Terraform local state
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+**/tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# GitHub App private keys (downloaded PEM)
+*.private-key.pem

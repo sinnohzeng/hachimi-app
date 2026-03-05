@@ -9,6 +9,7 @@
 - `ledgerServiceProvider`
 - `syncEngineProvider`
 - Runtime observability context (global singleton): `ObservabilityRuntime`
+- AI provider selection is constrained to `firebase_gemini` (`AiProviderId` wire value).
 
 ### Backend providers
 - `backendRegistryProvider` (single Firebase path)
@@ -50,9 +51,11 @@
 - UI flow is three-step confirmation only.
 - `AccountDeletionOrchestrator` owns local cleanup + remote hard-delete retry queue.
 - Guest local uid (`guest_*`) never calls Firestore delete APIs.
+- Firebase backend implementation calls `deleteAccountV2` / `wipeUserDataV2` with limited-use App Check token.
 
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Providers must not reintroduce legacy compatibility branches.
 - New persistent keys must be added only via `AppPrefsKeys`.
 - Account lifecycle callables must always pass `OperationContext`.
+- Screens must never inject static AI API keys; AI runtime is Firebase AI Logic only.

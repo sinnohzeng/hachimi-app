@@ -1,0 +1,12 @@
+[
+  {"name":"issue_id","type":"STRING","mode":"REQUIRED"},
+  {"name":"feature","type":"STRING","mode":"REQUIRED"},
+  {"name":"error_code","type":"STRING","mode":"REQUIRED"},
+  {"name":"velocity_24h","type":"INT64","mode":"REQUIRED"},
+  {"name":"impacted_users","type":"INT64","mode":"REQUIRED"},
+  {"name":"sample_error","type":"STRING","mode":"NULLABLE"},
+  {"name":"sample_stack","type":"STRING","mode":"NULLABLE"},
+  {"name":"first_seen","type":"TIMESTAMP","mode":"NULLABLE"},
+  {"name":"event_date","type":"DATE","mode":"REQUIRED"},
+  {"name":"created_at","type":"TIMESTAMP","mode":"NULLABLE"}
+]

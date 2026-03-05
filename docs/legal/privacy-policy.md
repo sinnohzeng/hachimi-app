@@ -106,8 +106,7 @@ We use the following third-party services:
 | Firebase Crashlytics | Google | Crash reporting | Same as above |
 | Firebase Cloud Messaging | Google | Push notifications | Same as above |
 | Google Sign-In | Google | OAuth authentication | [Google Privacy](https://policies.google.com/privacy) |
-| MiniMax API | MiniMax | AI chat and diary (opt-in) | [MiniMax Privacy](https://www.minimaxi.com/privacy) |
-| Google Gemini API | Google | AI chat and diary (opt-in) | [Google AI Privacy](https://ai.google.dev/terms) |
+| Firebase AI Logic (Gemini on Vertex AI) | Google | AI chat and diary (opt-in) | [Firebase Privacy](https://firebase.google.com/support/privacy) |
 
 ---
 
@@ -117,7 +116,7 @@ We use the following third-party services:
 
 - **Cloud data**: Stored in Google Cloud (Firebase) infrastructure
 - **Local data**: Stored in SQLite database and SharedPreferences on your device
-- **AI data**: Processed in real-time by AI providers; we do not store AI conversation logs on our servers
+- **AI data**: Processed by Firebase AI Logic / Vertex AI under Google Cloud controls; release builds do not embed long-lived static AI keys
 
 ### 5.2 Security Measures
 
@@ -182,5 +181,5 @@ If you have questions about this Privacy Policy, please contact us at:
 
 | Date | Change |
 |------|--------|
-| 2026-03-05 | Added observability metadata handling (`correlation_id`, `uid_hash`, `error_code`, `operation_stage`) and removed placeholder contact fields |
+| 2026-03-05 | Migrated AI processing disclosure to Firebase AI Logic (Vertex AI), removed third-party AI key path, and added observability metadata handling (`correlation_id`, `uid_hash`, `error_code`, `operation_stage`) |
 | 2026-02-27 | Initial draft template created |

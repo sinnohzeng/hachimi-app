@@ -52,6 +52,6 @@ describe("account lifecycle helpers", () => {
       first_seen: "2026-03-05",
     });
     assert.match(report.root_cause_hypothesis, /issue_1/);
-    assert.equal(report.model_name, "heuristic-v1");
+    assert.equal(report.model_name, "heuristic:gemini-2.5-flash");
   });
 });

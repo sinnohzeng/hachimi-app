@@ -1,12 +1,12 @@
 # Architecture Overview
 
-> SSOT: this document describes the current runtime architecture after the 2026-03 account lifecycle refactor.
+> SSOT for the runtime architecture after 2026-03 security and observability modernization.
 
 ## Core Principles
-- Offline-first: local SQLite + ledger is runtime SSOT.
-- Deterministic sync: `SyncEngine` pushes unsynced actions to Firestore.
-- No legacy compatibility: removed migration/version gates and pre-release fallback branches.
-- Single cloud path: Firebase only (no region split branch).
+- Offline-first runtime state: local SQLite + ledger are runtime SSOT.
+- Deterministic sync: `SyncEngine` reconciles local actions to Firestore.
+- Google-first security: App Check + IAM/ADC + Secret Manager.
+- No client-side static AI API keys in release path.
 
 ## Stack
 | Layer | Technology |
@@ -15,66 +15,69 @@
 | State | Riverpod 3.x |
 | Local storage | sqflite + SharedPreferences |
 | Auth/Data | Firebase Auth + Firestore |
-| Server-side account ops | Firebase Cloud Functions (callable) |
-| Observability | Crashlytics + Cloud Logging + BigQuery + Google Chat/Email alerts |
+| Server account ops | Firebase Functions callable V2 |
+| AI | Firebase AI Logic + Vertex AI |
+| Observability | Crashlytics + Cloud Logging + BigQuery + Google Chat/Email |
+| Infra control plane | Terraform |
 
 ## Layered Design
-```
+```text
 Screens -> Providers -> Services -> Backend abstractions -> Firebase SDK / Cloud Functions
 ```
 
-## Account Lifecycle (New)
+## Account Lifecycle
 ### Guest upgrade conflict
-1. Auth succeeds (Google or Email).
+1. Auth succeeds.
 2. Build local snapshot + cloud snapshot.
-3. Resolve by matrix:
-- local empty + cloud non-empty: keep cloud
-- cloud empty + local non-empty: keep local
-- both non-empty: explicit user choice dialog
+3. Resolve conflict matrix (`keepLocal` / `keepCloud` / explicit choice).
 4. Execute merge via `AccountMergeService`.
 
 ### Account deletion (offline-first)
-1. Confirm summary.
-2. User types `DELETE`.
-3. `AccountDeletionOrchestrator`:
-- delete local data immediately
-- online: call `deleteAccountV1` now
-- offline: store pending deletion job + tombstone and retry later
+1. Confirm summary + `DELETE` confirmation.
+2. `AccountDeletionOrchestrator` cleans local data first.
+3. Online path calls `deleteAccountV2`.
+4. Offline path queues pending deletion and retries.
 
 ## Cloud Functions Contract
-- `deleteAccountV1`: recursive delete `users/{uid}` + delete Auth user (idempotent)
-- `wipeUserDataV1`: recursive delete `users/{uid}` only (idempotent)
-- Both callables require `OperationContext` payload:
+Primary callable contract:
+- `deleteAccountV2`
+- `wipeUserDataV2`
+
+Contract requirements:
+- Authenticated user context
+- App Check enforced (and token consume for replay protection)
+- `OperationContext` payload:
   - `correlation_id`
   - `uid_hash`
   - `operation_stage`
   - `retry_count`
 
-## Observability Contract (New)
-- Client errors are reported through `ErrorHandler.record(...)` with `ErrorContext`.
-- Crash reporting uses hashed identity (`uid_hash`) only.
-- Functions logs are structured and include:
+Compatibility aliases (`V1`) still exist for safe migration.
+
+## AI and Security Contract
+- Client AI provider is `firebase_gemini` only.
+- Server triage function is `runAiDebugTriageV2`.
+- GitHub issue draft creation uses GitHub App installation token flow.
+- GitHub App private key is stored in Secret Manager.
+
+## Observability Contract
+- Client errors go through typed `ErrorContext` + `ErrorHandler.record(...)`.
+- PII redline: no plaintext UID/email/phone in telemetry.
+- Functions structured logs must include:
   - `correlation_id`
   - `uid_hash`
   - `function_name`
   - `latency_ms`
   - `result`
   - `error_code`
-- AI triage function `runAiDebugTriageV1` runs every 15 minutes and writes reports to `obs.ai_debug_reports_v1`.
+- Alert channels are fixed to Google Chat + Email.
 
 ## SSOT Snapshot
 | Concern | SSOT |
 |---|---|
-| Business runtime state | SQLite (`local_*`, `materialized_state`) |
+| Runtime business state | SQLite (`local_*`, `materialized_state`) |
 | Write log | `action_ledger` |
 | Cloud persistence | Firestore `users/{uid}` subtree |
 | Auth state | `authStateProvider` |
-| Pending account deletion | SharedPreferences queue keys |
-| Event names | `lib/core/constants/analytics_events.dart` |
-
-## Removed Legacy Paths
-- `MigrationService` and `_VersionGate`
-- legacy Firestore `checkIns` compatibility path
-- `RemoteConfigService` runtime dependency
-- `OfflineWriteGuard`
-- multi-region `BackendRegion.china` branch
+| Observability schema | `docs/architecture/observability.md` |
+| Infra state | `infra/terraform/*` |

@@ -50,17 +50,21 @@ Optional profile fields:
 - `deletion_retry_count`
 
 ## Cloud Functions
-### `deleteAccountV1`
+### `deleteAccountV2`
 - Requires authenticated user.
+- Requires valid App Check token (consumed to prevent replay).
 - Recursively deletes all `users/{uid}` data.
 - Deletes Firebase Auth user.
 - Idempotent for missing doc/user.
 
-### `wipeUserDataV1`
+### `wipeUserDataV2`
 - Requires authenticated user.
+- Requires valid App Check token (consumed to prevent replay).
 - Recursively deletes all `users/{uid}` data.
 - Keeps Firebase Auth user.
 - Used by guest upgrade `keepLocal` path.
+
+Compatibility aliases (`deleteAccountV1` / `wipeUserDataV1`) remain available during migration.
 
 ## Merge Semantics
 - Keep cloud: local old guest data is removed; cloud hydrates local.

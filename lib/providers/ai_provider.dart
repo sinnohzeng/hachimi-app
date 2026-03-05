@@ -2,8 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/services/ai/gemini_provider.dart';
-import 'package:hachimi_app/services/ai/minimax_provider.dart';
+import 'package:hachimi_app/services/ai/firebase_ai_provider.dart';
 import 'package:hachimi_app/services/ai_service.dart';
 import 'package:hachimi_app/services/chat_service.dart';
 import 'package:hachimi_app/services/diary_service.dart';
@@ -19,8 +18,7 @@ final localDatabaseProvider = Provider<LocalDatabaseService>(
 final aiServiceProvider = Provider<AiService>((ref) {
   final selected = ref.watch(aiProviderSelectionProvider);
   final provider = switch (selected) {
-    AiProviderId.minimax => MiniMaxProvider(),
-    AiProviderId.gemini => GeminiProvider(),
+    AiProviderId.firebaseGemini => FirebaseAiProvider(),
   };
   return AiService(provider: provider);
 });
@@ -44,28 +42,41 @@ final chatServiceProvider = Provider<ChatService>((ref) {
 // ─── AI Provider Selection ───
 
 /// 可选的 AI 提供商标识。
-enum AiProviderId { minimax, gemini }
+enum AiProviderId { firebaseGemini }
+
+extension AiProviderIdWire on AiProviderId {
+  String get wireValue => switch (this) {
+    AiProviderId.firebaseGemini => 'firebase_gemini',
+  };
+
+  static AiProviderId fromWireValue(String? value) {
+    return switch (value) {
+      'firebase_gemini' => AiProviderId.firebaseGemini,
+      _ => AiProviderId.firebaseGemini,
+    };
+  }
+}
 
 /// AI 提供商选择 — 持久化到 SharedPreferences。
 class AiProviderSelectionNotifier extends Notifier<AiProviderId> {
   @override
   AiProviderId build() {
     _load();
-    return AiProviderId.minimax;
+    return AiProviderId.firebaseGemini;
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(AiConstants.prefAiProvider);
-    if (saved == AiProviderId.gemini.name) {
-      state = AiProviderId.gemini;
-    }
+    final parsed = AiProviderIdWire.fromWireValue(saved);
+    state = parsed;
+    await prefs.setString(AiConstants.prefAiProvider, parsed.wireValue);
   }
 
   Future<void> select(AiProviderId id) async {
     state = id;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AiConstants.prefAiProvider, id.name);
+    await prefs.setString(AiConstants.prefAiProvider, id.wireValue);
   }
 }
 

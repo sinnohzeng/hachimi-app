@@ -28,11 +28,11 @@ cd functions && npm test
 - 验证保留云端/保留本地两条分支均可成功收敛。
 
 ### 删号
-- 在线：本地立即清空，并执行 `deleteAccountV1`。
+- 在线：本地立即清空，并执行 `deleteAccountV2`。
 - 离线：本地立即清空，并写入 `pending_deletion_job`。
 - 联网后：启动期/轮询自动重试，直至云端硬删完成。
 
 ## 常见问题
-- 删号 `permission-denied`：检查 callable 登录态与规则部署。
+- 删号 `permission-denied`：检查 callable 登录态与 App Check token 有效性。
 - pending 任务不清除：检查 Functions 是否部署且用户仍保留登录态。
 - 未触发冲突弹窗：检查本地与云端快照是否都为非空。

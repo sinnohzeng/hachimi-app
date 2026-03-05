@@ -70,7 +70,7 @@ Flutter 有两种主要构建模式。理解它们的区别是高效开发的前
 
 - 修改了原生代码（Gradle 配置、Kotlin/Java 文件、`AndroidManifest.xml`）
 - 添加或升级了包含原生代码的插件
-- 修改了 `--dart-define` 的值（如 `MINIMAX_API_KEY`、`GEMINI_API_KEY`）
+- 修改了 `--dart-define` 的值（如 `SESSION_HMAC_KEY`）
 - 修改了 `pubspec.yaml` 中的资产声明
 - 修改了 minSdkVersion 或其他 Gradle 配置
 

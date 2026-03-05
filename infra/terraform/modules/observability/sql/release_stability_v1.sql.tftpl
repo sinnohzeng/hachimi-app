@@ -1,0 +1,11 @@
+SELECT
+  DATE(event_timestamp) AS event_date,
+  IFNULL(application.display_version, 'unknown') AS app_version,
+  COUNT(*) AS crash_events,
+  COUNT(DISTINCT (
+    SELECT value FROM UNNEST(custom_keys) WHERE key = 'uid_hash' LIMIT 1
+  )) AS impacted_users
+FROM `${project_id}.${crashlytics_dataset}.*`
+WHERE REGEXP_CONTAINS(_TABLE_SUFFIX, r'_(ANDROID|IOS)(?:_REALTIME)?$')
+  AND event_timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+GROUP BY event_date, app_version

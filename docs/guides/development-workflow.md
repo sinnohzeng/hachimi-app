@@ -70,7 +70,7 @@ Stop `flutter run` (press `q`) and re-run it. Only needed when:
 
 - Native code changes (Gradle config, Kotlin/Java files, `AndroidManifest.xml`)
 - Adding or upgrading a plugin that includes native code
-- Changing `--dart-define` values (e.g., `MINIMAX_API_KEY`, `GEMINI_API_KEY`)
+- Changing `--dart-define` values (e.g., `SESSION_HMAC_KEY`)
 - Modifying asset declarations in `pubspec.yaml`
 - Changing minimum SDK version or other Gradle configuration
 

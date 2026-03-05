@@ -1,27 +1,32 @@
 # Firebase/GCP Observability Runbook
 
 ## Purpose
-Operational checklist for enabling and validating Hachimi observability stack.
+Operational checklist for Hachimi observability closed loop:
+- Crashlytics + Cloud Logging + BigQuery
+- AI triage (`runAiDebugTriageV2`)
+- Alerting via Google Chat + Email
 
-## Prerequisites
-- Firebase project on Blaze plan.
-- Google Cloud project billing enabled.
-- Firebase services enabled: Crashlytics, Analytics, Cloud Functions.
-- Google Chat space prepared and Cloud Monitoring notification channel created.
-- Email notification channel created as fallback.
+## Preconditions
+1. Firebase project is on Blaze.
+2. App Check enabled for Android (Play Integrity in release).
+3. Firebase AI Logic enabled (Vertex provider).
+4. Google Chat spaces created and Monitoring app installed.
+5. Email fallback channel defined.
 
-## 1) Provision BigQuery Assets
+## 1) Provision via Terraform
 ```bash
-export PROJECT_ID=<your-project-id>
-export LOCATION=US
-export DATASET=obs
-export ANALYTICS_DATASET=analytics_<property_id> # optional if auto-discovery fails
-export TTL_DAYS=90
-export BILLING_ACCOUNT_ID=<billing-account-id>
-export BUDGET_AMOUNT=50
-
-./scripts/gcp/setup_observability.sh
+cd infra/terraform/envs/prod
+terraform init
+terraform plan
+terraform apply
 ```
+
+Required tfvars values:
+- `project_id`
+- `analytics_dataset`
+- `chat_notification_channel_ids`
+- `alert_email`
+- `billing_account_id`
 
 ## 2) Deploy Functions
 ```bash
@@ -32,51 +37,58 @@ cd ..
 firebase deploy --only functions
 ```
 
-## 3) Configure AI Triage Runtime Secrets
-Set environment variables for functions runtime:
-- `AI_DEBUG_MODEL_ENDPOINT`
-- `AI_DEBUG_MODEL_API_KEY`
-- `AI_DEBUG_MODEL_NAME`
-- `AI_DEBUG_GITHUB_REPO` (`owner/repo`)
-- `GITHUB_TOKEN`
+## 3) Runtime Param/Secret Validation
+Validate these runtime parameters exist:
 - `OBS_DATASET`
 - `BQ_LOCATION`
+- `AI_DEBUG_TRIAGE_LIMIT`
+- `TRIAGE_MODEL`
+- `TRIAGE_VERTEX_LOCATION`
+- `AI_DEBUG_GITHUB_REPO`
+- `GITHUB_APP_ID`
+- `GITHUB_APP_INSTALLATION_ID`
 
-## 4) Enable Exports
-- Crashlytics -> BigQuery
-- Crashlytics -> Cloud Logging
-- Analytics -> BigQuery
-- Cloud Logging sink (optional) -> BigQuery
+Validate secret parameter exists:
+- `GITHUB_APP_PRIVATE_KEY`
 
-## 5) Alert Policies
-Create/verify policies:
+## 4) Export and Data Plane Checks
+1. Crashlytics -> BigQuery enabled
+2. Crashlytics -> Cloud Logging enabled
+3. Analytics -> BigQuery enabled
+4. Logging sink writes to `obs` dataset
+
+## 5) Alert Policy Checks
+Required policy names:
 - `crash_free_users`
 - `fatal_rate`
 - `delete_account_error_rate`
 - `high_velocity_issues`
 - `ai_pipeline_failure`
-- `budget_threshold`
 
-Attach both channels:
-- Google Chat (primary)
-- Email (fallback)
+Each policy must include both:
+- Google Chat channel
+- Email fallback channel
 
-## 6) Verification Drills
+Budget guardrail is implemented by Billing Budget resource (`hachimi-observability-budget`) with Email notification.
+
+## 6) Verification Drill
 1. Trigger synthetic non-fatal from app.
 2. Confirm Crashlytics visibility within 5 minutes.
 3. Confirm BigQuery visibility within 60 minutes.
-4. Trigger test alert from Cloud Monitoring.
-5. Confirm both Google Chat and Email receive the alert.
-6. Confirm `runAiDebugTriageV1` writes into `obs.ai_debug_reports_v1`.
+4. Trigger test alert in Cloud Monitoring.
+5. Confirm notifications in Google Chat and Email.
+6. Confirm `runAiDebugTriageV2` writes to `obs.ai_debug_reports_v1`.
+7. Confirm draft issue creation with GitHub App auth.
 
 ## 7) Incident Triage Procedure
-1. Query by `correlation_id` across Crashlytics and Functions logs.
-2. Confirm `uid_hash`, `error_code`, `operation_stage`, `retry_count` consistency.
-3. Check generated GitHub draft issue for actionable fix suggestion.
-4. Assign owner and track fix via release gate.
+1. Start from alert.
+2. Query by `correlation_id` across Crashlytics + Functions logs.
+3. Confirm `uid_hash` / `operation_stage` / `error_code` consistency.
+4. Read AI triage report and draft issue.
+5. Assign owner and gate release on fix verification.
 
 ## 8) Cost Guardrails
-- Keep dataset TTL enabled.
-- Keep budget alerts at 50% / 80% / 100%.
-- Keep scheduled query cadence at 15 minutes.
-- Review heavy queries weekly.
+1. Keep BigQuery TTL enabled.
+2. Keep budget thresholds at 50/80/100%.
+3. Keep scheduled query interval at 15 minutes.
+4. Review high-cost queries weekly.

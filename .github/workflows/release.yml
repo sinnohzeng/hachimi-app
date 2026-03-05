@@ -8,8 +8,9 @@
 #
 # Required GitHub Secrets:
 #   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD,
-#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART, MINIMAX_API_KEY,
-#   GEMINI_API_KEY, WIF_PROVIDER, WIF_SERVICE_ACCOUNT
+#   GOOGLE_SERVICES_JSON, FIREBASE_OPTIONS_DART,
+#   WIF_PROVIDER, WIF_SERVICE_ACCOUNT
+# Optional (legacy, no longer used): MINIMAX_API_KEY, GEMINI_API_KEY
 # ---
 
 name: Build & Release
@@ -57,6 +58,20 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: functions/package-lock.json
+
+      - name: Validate release secrets
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+          WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: ./tool/check_release_secrets.sh
 
       # Restore gitignored Firebase config files from secrets
       - name: Decode google-services.json
@@ -120,10 +135,10 @@ jobs:
 
       # Build AAB for Google Play (before APK — fail fast on Play Store deliverable)
       - name: Build release AAB
-        run: flutter build appbundle --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        run: flutter build appbundle --release
 
       - name: Build release APK
-        run: flutter build apk --release --dart-define=MINIMAX_API_KEY=${{ secrets.MINIMAX_API_KEY }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        run: flutter build apk --release
 
       - name: Report build sizes
         run: |

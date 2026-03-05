@@ -1,16 +1,18 @@
 # Firebase Setup Guide
 
 ## 1. Required Services
-Enable in Firebase Console:
-- Authentication: Google + Email/Password (+ Anonymous if guest anonymous mode is used)
+Enable in Firebase/GCP:
+- Firebase Authentication
 - Firestore
-- Cloud Functions (Blaze plan required)
+- Cloud Functions (Blaze required)
 - Analytics
 - Crashlytics
-- Cloud Logging export for Crashlytics
-- BigQuery export for Crashlytics + Analytics
+- Firebase App Check
+- Firebase AI Logic (Vertex provider)
+- Crashlytics export to BigQuery and Cloud Logging
+- Analytics export to BigQuery
 
-## 2. Local Project Bootstrap
+## 2. Local Bootstrap
 ```bash
 flutter pub get
 firebase login
@@ -18,15 +20,28 @@ flutterfire configure --project <project-id>
 ```
 
 ## 3. Firestore Rules
-Deploy rules and indexes:
 ```bash
 firebase deploy --only firestore:rules,firestore:indexes
 ```
 
-## 4. Cloud Functions Account Lifecycle
-### Functions included
+## 4. Cloud Functions Contracts
+Current callable contracts:
+- `deleteAccountV2`
+- `wipeUserDataV2`
+
+Compatibility aliases are still exported:
 - `deleteAccountV1`
 - `wipeUserDataV1`
+
+### Security behavior (V2)
+- Requires authenticated user context
+- Requires valid App Check token
+- Consumes App Check token for replay protection
+- Requires `OperationContext` fields:
+  - `correlation_id`
+  - `uid_hash`
+  - `operation_stage`
+  - `retry_count`
 
 ### Deploy
 ```bash
@@ -37,34 +52,31 @@ cd ..
 firebase deploy --only functions
 ```
 
-### Cloud Functions account lifecycle
-- `deleteAccountV1`: recursively delete `users/{uid}` and delete Auth user.
-- `wipeUserDataV1`: recursively delete `users/{uid}` only.
-- Both callables require authenticated context and are idempotent.
-- Both callables require operation context payload fields:
-  - `correlation_id`
-  - `uid_hash`
-  - `operation_stage`
-  - `retry_count`
+## 5. App Check Configuration
+Client runtime behavior is implemented in [lib/main.dart](/data/workspace/hachimi-app/lib/main.dart):
+- Android release: Play Integrity
+- Debug builds: Debug provider
 
-## 5. Client Runtime Expectations
-- Client deletion flow is local-first and may queue pending cloud deletion when offline.
-- App startup retries pending deletion jobs automatically.
-- Guest local UID (`guest_*`) does not call Firestore deletion APIs.
+Console actions required:
+1. Register Android app in App Check.
+2. Enable Play Integrity provider in production.
+3. Keep Debug provider available for local development.
 
-## 6. Observability Bootstrap
+## 6. AI Path (Google-First)
+- Client AI provider is Firebase AI Logic (`firebase_ai`) with Vertex backend.
+- No client static AI API key is required in release workflow.
+- Server triage function uses IAM/ADC for Vertex calls.
+
+## 7. Observability Bootstrap
+Primary path is Terraform:
+
 ```bash
-export PROJECT_ID=<your-project-id>
-export LOCATION=US
-export DATASET=obs
-export ANALYTICS_DATASET=analytics_<property_id> # optional if auto-discovery fails
-export TTL_DAYS=90
-./scripts/gcp/setup_observability.sh
+cd infra/terraform/envs/prod
+terraform init
+terraform plan
+terraform apply
 ```
 
-Then configure Cloud Monitoring notification channels:
-- Google Chat (primary)
-- Email (fallback)
-
-See [Observability Runbook](observability-runbook.md) for full operational steps.
-Credential and GitHub secret setup details are in [Credentials & Secrets](credentials-and-secrets.md).
+Operational details:
+- [Observability Runbook](observability-runbook.md)
+- [Credentials & Secrets](credentials-and-secrets.md)

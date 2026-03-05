@@ -1,0 +1,23 @@
+SELECT
+  PARSE_DATE('%Y%m%d', event_date) AS event_date,
+  event_name,
+  IFNULL(
+    (
+      SELECT
+        COALESCE(
+          ep.value.string_value,
+          CAST(ep.value.int_value AS STRING),
+          CAST(ep.value.double_value AS STRING)
+        )
+      FROM UNNEST(event_params) ep
+      WHERE ep.key = 'feature'
+      LIMIT 1
+    ),
+    'unknown'
+  ) AS feature,
+  COUNT(*) AS event_count,
+  COUNT(DISTINCT user_pseudo_id) AS distinct_users
+FROM `${project_id}.${analytics_dataset}.events_*`
+WHERE event_name IN ('app_opened', 'sign_up', 'app_error', 'account_deletion_failed')
+  AND _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
+GROUP BY event_date, event_name, feature

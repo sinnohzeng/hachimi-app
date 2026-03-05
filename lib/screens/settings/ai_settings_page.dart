@@ -134,7 +134,6 @@ class _ProviderSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(aiProviderSelectionProvider);
     final l10n = context.l10n;
 
     return Column(
@@ -150,30 +149,18 @@ class _ProviderSection extends ConsumerWidget {
             ),
           ),
         ),
-        RadioGroup<AiProviderId>(
-          groupValue: selected,
-          onChanged: (v) => _onChanged(ref, v),
-          child: Column(
-            children: [
-              RadioListTile<AiProviderId>(
-                title: Text(l10n.settingsAiProviderMinimax),
-                value: AiProviderId.minimax,
-              ),
-              RadioListTile<AiProviderId>(
-                title: Text(l10n.settingsAiProviderGemini),
-                value: AiProviderId.gemini,
-              ),
-            ],
+        ListTile(
+          leading: const Icon(Icons.auto_awesome),
+          title: Text(l10n.settingsAiProviderGemini),
+          subtitle: Text(
+            context.l10n.aiRequiresNetwork,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],
     );
-  }
-
-  void _onChanged(WidgetRef ref, AiProviderId? value) {
-    if (value == null) return;
-    ref.read(aiProviderSelectionProvider.notifier).select(value);
-    ref.read(aiAvailabilityProvider.notifier).refresh();
   }
 }
 

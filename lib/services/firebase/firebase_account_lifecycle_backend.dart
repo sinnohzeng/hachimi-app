@@ -14,11 +14,21 @@ class FirebaseAccountLifecycleBackend implements AccountLifecycleBackend {
 
   @override
   Future<void> deleteAccountHard({required OperationContext context}) async {
-    await _functions.httpsCallable('deleteAccountV1').call(context.toJson());
+    await _functions
+        .httpsCallable(
+          'deleteAccountV2',
+          options: HttpsCallableOptions(limitedUseAppCheckToken: true),
+        )
+        .call(context.toJson());
   }
 
   @override
   Future<void> wipeUserData({required OperationContext context}) async {
-    await _functions.httpsCallable('wipeUserDataV1').call(context.toJson());
+    await _functions
+        .httpsCallable(
+          'wipeUserDataV2',
+          options: HttpsCallableOptions(limitedUseAppCheckToken: true),
+        )
+        .call(context.toJson());
   }
 }

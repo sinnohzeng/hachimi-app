@@ -28,11 +28,11 @@ cd functions && npm test
 - Verify keep-cloud and keep-local branches both succeed.
 
 ### Account deletion
-- Online: local data clears immediately and `deleteAccountV1` executes.
+- Online: local data clears immediately and `deleteAccountV2` executes.
 - Offline: local clears immediately; `pending_deletion_job` is written.
 - Reconnect: app startup/polling retries cloud hard delete until completion.
 
 ## Common Failures
-- `permission-denied` during deletion: check callable auth context and rules deployment.
+- `permission-denied` during deletion: check callable auth context and App Check token validity.
 - Pending deletion never clears: verify Functions deployment and user still authenticated.
 - Missing conflict dialog: verify both local and cloud snapshots are non-empty.

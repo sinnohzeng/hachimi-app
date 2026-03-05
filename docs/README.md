@@ -32,6 +32,7 @@
 |----------|-------------|
 | [Setup Guide](firebase/setup-guide.md) | Step-by-step Firebase configuration for new contributors |
 | [Credentials & Secrets](firebase/credentials-and-secrets.md) | Cloud credentials, Secret Manager workflow, and GitHub Actions secret setup |
+| [Terraform IaC](../infra/terraform/README.md) | Long-term IaC entry for observability, alerts, budget, secrets, and IAM |
 | [Analytics Events](firebase/analytics-events.md) | GA4 custom event definitions (SSOT) — all events, parameters, user properties |
 | [Security Rules](firebase/security-rules.md) | Firestore security rule spec and deploy instructions |
 | [Cloud Functions](firebase/setup-guide.md#cloud-functions-account-lifecycle) | Account lifecycle callable deployment and local test checklist |
@@ -45,6 +46,7 @@
 |----------|-------------|
 | [20260304 Lifecycle Refactor Plan](plan/20260304-account-lifecycle-refactor-governance-plan.md) | Offline-first account lifecycle, quality gate, SSOT governance |
 | [20260305 Observability Closed Loop Plan](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email observability and AI debug automation |
+| [20260305 Security Modernization Plan](plan/20260305-security-modernization-collaboration-plan.md) | Google-first credentials modernization, keyless auth, and Terraform governance |
 
 ---
 

@@ -1,14 +1,16 @@
 # Firebase 配置指南
 
 ## 1. 必需服务
-在 Firebase Console 启用：
-- Authentication：Google + 邮箱密码（若使用匿名访客模式则同时启用 Anonymous）
+在 Firebase/GCP 中启用：
+- Firebase Authentication
 - Firestore
-- Cloud Functions（需 Blaze 计费）
+- Cloud Functions（需 Blaze）
 - Analytics
 - Crashlytics
-- Crashlytics 到 Cloud Logging 导出
-- Crashlytics 与 Analytics 到 BigQuery 导出
+- Firebase App Check
+- Firebase AI Logic（Vertex provider）
+- Crashlytics 导出到 BigQuery 和 Cloud Logging
+- Analytics 导出到 BigQuery
 
 ## 2. 本地初始化
 ```bash
@@ -18,15 +20,28 @@ flutterfire configure --project <project-id>
 ```
 
 ## 3. Firestore 规则
-部署规则与索引：
 ```bash
 firebase deploy --only firestore:rules,firestore:indexes
 ```
 
-## 4. Cloud Functions 账户生命周期
-### 已实现函数
+## 4. Cloud Functions 契约
+当前 callable 契约：
+- `deleteAccountV2`
+- `wipeUserDataV2`
+
+兼容别名仍保留：
 - `deleteAccountV1`
 - `wipeUserDataV1`
+
+### V2 安全行为
+- 必须登录态
+- 必须携带有效 App Check token
+- 消费 App Check token 防重放
+- 强制 `OperationContext` 字段：
+  - `correlation_id`
+  - `uid_hash`
+  - `operation_stage`
+  - `retry_count`
 
 ### 部署
 ```bash
@@ -37,34 +52,31 @@ cd ..
 firebase deploy --only functions
 ```
 
-### Cloud Functions 账户生命周期
-- `deleteAccountV1`：递归删除 `users/{uid}` 并删除 Auth 用户。
-- `wipeUserDataV1`：仅递归删除 `users/{uid}`。
-- 两个 callable 都要求登录态且具备幂等语义。
-- 两个 callable 强制 operation context 字段：
-  - `correlation_id`
-  - `uid_hash`
-  - `operation_stage`
-  - `retry_count`
+## 5. App Check 配置
+客户端运行时逻辑见 [lib/main.dart](/data/workspace/hachimi-app/lib/main.dart)：
+- Android release：Play Integrity
+- Debug 构建：Debug provider
 
-## 5. 客户端运行约束
-- 客户端删号为离线优先，离线时写入 pending job。
-- App 启动时自动重试 pending 删号任务。
-- `guest_*` 本地 UID 不触发 Firestore 删除调用。
+你需要在控制台完成：
+1. 在 App Check 注册 Android 应用。
+2. 生产环境启用 Play Integrity。
+3. 为本地开发保留 Debug provider。
 
-## 6. 可观测性初始化
+## 6. AI 路径（Google 优先）
+- 客户端 AI 使用 Firebase AI Logic（`firebase_ai`）+ Vertex。
+- Release 流程不再依赖客户端静态 AI key。
+- 服务端 AI 分诊通过 IAM/ADC 调用 Vertex。
+
+## 7. 可观测性初始化
+首选 Terraform 路径：
+
 ```bash
-export PROJECT_ID=<your-project-id>
-export LOCATION=US
-export DATASET=obs
-export ANALYTICS_DATASET=analytics_<property_id> # 自动发现失败时显式指定
-export TTL_DAYS=90
-./scripts/gcp/setup_observability.sh
+cd infra/terraform/envs/prod
+terraform init
+terraform plan
+terraform apply
 ```
 
-然后在 Cloud Monitoring 中配置通知通道：
-- Google Chat（主）
-- Email（兜底）
-
-完整操作见 [可观测性运行手册](observability-runbook.md)。
-云端凭据与 GitHub Secrets 详见 [凭据与 Secrets 指南](credentials-and-secrets.md)。
+运维细节：
+- [可观测性运行手册](observability-runbook.md)
+- [凭据与 Secrets](credentials-and-secrets.md)

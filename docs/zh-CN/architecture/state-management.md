@@ -9,6 +9,7 @@
 - `ledgerServiceProvider`
 - `syncEngineProvider`
 - 运行时可观测上下文（全局单例）：`ObservabilityRuntime`
+- AI provider 选择收敛为 `firebase_gemini`（`AiProviderId` 的 wire value）。
 
 ### 后端 Provider
 - `backendRegistryProvider`（单 Firebase 路径）
@@ -50,9 +51,11 @@
 - UI 仅保留三段式确认。
 - 本地清理 + 云端硬删排队完全由 `AccountDeletionOrchestrator` 编排。
 - `guest_*` 本地 UID 禁止触发 Firestore 删除调用。
+- Firebase 后端实现统一调用 `deleteAccountV2` / `wipeUserDataV2`，并携带 limited-use App Check token。
 
 ## 约束
 - Screen 层禁止直接调用 Firebase SDK。
 - Provider 层禁止重新引入 legacy 兼容分支。
 - 新增持久化键必须统一进入 `AppPrefsKeys`。
 - 账户生命周期 callable 必须始终传递 `OperationContext`。
+- UI/Provider 层禁止注入静态 AI API key，AI 运行路径统一为 Firebase AI Logic。
