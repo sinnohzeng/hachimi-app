@@ -1,8 +1,7 @@
-v2.27.0
+v2.28.0
 
-- Improved account lifecycle: guest upgrade, data merge, and account deletion now work seamlessly with offline support
-- Enhanced security with App Check protection for sensitive operations
-- Logout and session management fully reworked for reliability
-- Centralized preference keys eliminate scattered configuration
-- CI/CD pipeline hardened with supply-chain security best practices
+- Added BigQuery debug tooling for crash analysis and analytics queries
+- New one-click WIF setup script for CI/CD configuration
+- Global distribution: app now available in all countries/regions
+- Updated Play Store setup documentation with correct navigation paths
 - Bug fixes and performance improvements

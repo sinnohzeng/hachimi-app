@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.28.0] - 2026-03-06
+
+### Added
+- **BigQuery debug tooling**: `scripts/bq-debug-queries.sh` parameterized query script for Crashlytics crash analysis and GA4 analytics queries.
+- **BigQuery setup guide**: `docs/guides/bigquery-debug-setup.md` with Firebase → BigQuery export instructions and 5 ready-to-use SQL templates.
+- **WIF one-click setup**: `scripts/setup-wif.sh` automates GCP Workload Identity Federation configuration and GitHub secrets provisioning.
+- **Country availability docs**: Global distribution guidance added to Play Store setup guide.
+
+### Fixed
+- **Play Console navigation**: Corrected "Reach and devices" → "Test and release → Production → Countries/regions" to match current Play Console UI.
+
 ## [2.27.0] - 2026-03-06
 
 ### Added
