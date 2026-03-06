@@ -496,11 +496,12 @@ GitHub Actions 自动触发 release.yml
 ### 操作步骤
 
 1. 打开 [Google Play Console](https://play.google.com/console) → 选择 Hachimi 应用
-2. 左侧导航 → **Reach and devices** → **Countries/regions**
-3. 点击 **Add countries/regions**
-4. 勾选 **Select all** 选中全部 170+ 个国家和地区
-5. 点击 **Add countries/regions** 确认
-6. 变更立即生效，无需重新提交审核
+2. 左侧导航 → **Test and release** → **Production**
+3. 选择页面顶部的 **Countries/regions** 标签页
+4. 点击 **Add countries/regions**
+5. 勾选 **Select all** 选中全部 170+ 个国家和地区
+6. 点击 **Add countries/regions** 确认
+7. 变更立即生效，无需重新提交审核
 
 ### 常见问题
 
