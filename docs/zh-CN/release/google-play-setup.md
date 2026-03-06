@@ -57,7 +57,7 @@ WIF 方式（推荐）：
 | 条件 | 如何确认 |
 |------|---------|
 | Google Play Console 开发者账号 | 打开 https://play.google.com/console 能看到控制台 |
-| Google Cloud 项目（已关联 Play Console） | Play Console → Settings → API access 显示已关联的项目 |
+| Google Cloud 项目（已启用 Play Developer API） | 在 [Google Cloud Console](https://console.cloud.google.com) 中确认项目存在，并已启用 Google Play Android Developer API |
 | `gcloud` CLI 已安装 | 终端运行 `gcloud --version` 有输出 |
 | `gcloud` 已登录 | 运行 `gcloud auth list` 确认当前账号 |
 | GitHub 仓库管理员权限 | 能访问 https://github.com/sinnohzeng/hachimi-app/settings |
@@ -66,20 +66,19 @@ WIF 方式（推荐）：
 
 **这两个值在后续步骤中反复用到**，请现在记录下来：
 
-1. 打开 [Google Play Console](https://play.google.com/console)
-2. 点击左下角 **Settings**（齿轮图标）→ **API access**
-3. 页面顶部显示已关联的 Google Cloud 项目名称
-4. 点击项目名称旁的链接，跳转到 Google Cloud Console
-5. 在 Cloud Console Dashboard 页面：
+1. 打开 [Google Cloud Console](https://console.cloud.google.com)
+2. 在页面左上角的项目选择器中选择你的项目（如 `hachimi-ai`）
+3. 在 Dashboard 页面右侧的"项目信息"卡片中找到：
    - **Project ID**（项目 ID）：字母数字组合，如 `hachimi-ai`
    - **Project number**（项目编号）：纯数字，如 `123456789`
+4. 或者通过命令行获取：
+   ```bash
+   gcloud projects describe YOUR_PROJECT_ID --format="value(projectNumber)"
+   ```
 
 > **重要区别**：后续命令中 `YOUR_PROJECT_ID` 用项目 ID（字母数字），`YOUR_PROJECT_NUMBER` 用项目编号（纯数字）。混淆这两个值是最常见的配置错误。
 
-如果 Play Console 未关联 Cloud 项目：
-1. 在 API access 页面点击 **Link existing project**
-2. 选择你的 Cloud 项目（或创建新项目）
-3. 关联操作可能需要几分钟生效
+> **关于 Play Console 的 API access 页面**：Google 在 2024-2025 年间移除了 Play Console 中 Settings → API access 页面的公开可见性（需要 "Manage API access" 权限，且部分账号类型不显示此菜单项）。当前**不再需要**在 Play Console 中关联 Cloud 项目——只需在 Cloud Console 中启用 API 即可。
 
 ---
 
@@ -249,7 +248,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 
 **背景知识**：即使服务账号已经有了 WIF 绑定和 Google Cloud IAM 权限，它还需要在 **Play Console** 中被授予"上传 AAB"的权限。这是两个独立的权限系统——Google Cloud IAM 管的是"谁能调用哪些 API"，Play Console 管的是"谁能操作哪些应用"。
 
-> **注意**：Google 已在 2024 年移除了 Play Console 中旧的 "Setup → API access → Link service account" 页面。现在通过 "Users and permissions" 将服务账号作为普通用户邀请。
+> **重要变更**：Google 在 2024-2025 年间逐步移除了 Play Console 中旧的 "Setup → API access" 页面（部分账号仍可见，但已非推荐路径）。当前标准做法是通过 **Users and permissions → Invite new users** 将服务账号作为普通用户邀请。本文档的所有步骤均基于此新流程。
 
 ### 详细步骤
 
@@ -284,7 +283,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 
 1. **确认 API 已启用**：回到第一步，验证 `Google Play Android Developer API` 已在 Cloud Console 中启用
 2. **确认邮箱格式正确**：必须是 `name@project-id.iam.gserviceaccount.com`，注意 `project-id` 是你的 Google Cloud 项目 ID（不是项目编号）
-3. **确认 Cloud 项目已关联**：Play Console → Settings → API access，确认显示了正确的 Cloud 项目
+3. **确认 API 已在正确的 Cloud 项目中启用**：在 Google Cloud Console 中运行 `gcloud services list --enabled --project=YOUR_PROJECT_ID | grep androidpublisher`，确认 `androidpublisher.googleapis.com` 出现在列表中
 
 ---
 
@@ -488,6 +487,32 @@ GitHub Actions 自动触发 release.yml
 
 ---
 
+## 上架地区配置
+
+**操作位置**：Google Play Console
+
+默认情况下，新上架的应用可能只在部分地区可见。建议**选择全部地区**发布，这是绝大多数应用的标准做法。
+
+### 操作步骤
+
+1. 打开 [Google Play Console](https://play.google.com/console) → 选择 Hachimi 应用
+2. 左侧导航 → **Reach and devices** → **Countries/regions**
+3. 点击 **Add countries/regions**
+4. 勾选 **Select all** 选中全部 170+ 个国家和地区
+5. 点击 **Add countries/regions** 确认
+6. 变更立即生效，无需重新提交审核
+
+### 常见问题
+
+| 问题 | 回答 |
+|------|------|
+| 选全部地区会增加审核难度吗？ | 不会。地区选择不影响审核流程 |
+| 中国大陆选不选有区别吗？ | 无区别。Google Play 在中国大陆不可用 |
+| 需要针对不同地区做合规处理吗？ | 一般应用不需要。GDPR（欧盟）、LGPD（巴西）等法规主要影响数据处理方式，Hachimi 的隐私政策和数据安全声明已覆盖 |
+| 韩国/日本有特殊要求吗？ | 有年龄分级要求，但 Play Console 的 IARC 内容评级问卷已自动覆盖 |
+
+---
+
 ## 验证
 
 完成全部配置后，通过以下测试验证端到端流水线可用。
@@ -648,5 +673,7 @@ gh run watch <RUN_ID> --exit-status
 
 | 日期 | 变更 |
 |------|------|
+| 2026-03-06 | 新增"上架地区配置"章节，建议全球发布 |
+| 2026-03-06 | 修正过时的 Play Console 导航路径：移除 "Settings → API access" 和 "Link existing project" 引用，改为 Cloud Console 直接操作 |
 | 2026-03-06 | 更新为中文，增加详细讲解；新增 WIF 架构介绍、参数逐行解释、故障排查扩展 |
 | 2026-03-02 | 初始创建，用于 v2.24.0 首次上架 Google Play |

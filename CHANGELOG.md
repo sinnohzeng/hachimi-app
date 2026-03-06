@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.27.0] - 2026-03-06
+
+### Added
+- **Full-auto production release pipeline**: `release.yml` now builds APK + AAB, uploads AAB to Google Play production track (100% rollout), creates GitHub Release with APK attached, all triggered by `v*` tag push.
+- **Supply-chain security hardening**: All GitHub Actions pinned to commit SHA, top-level `permissions: {}` deny-by-default, `production` GitHub Environment with `v*` tag deployment restriction.
+- **APK provenance attestation**: Sigstore build provenance via `actions/attest-build-provenance`, verifiable with `gh attestation verify`.
+- **whatsnew freshness guard**: CI blocks release if whatsnew files contain generic app description instead of version-specific notes.
+- **WIF setup automation**: `scripts/setup-wif.sh` one-click script for configuring GCP Workload Identity Federation + GitHub secrets.
+- **BigQuery debug setup guide**: `docs/guides/bigquery-debug-setup.md` with Crashlytics/GA4 export instructions and query templates.
+- **BigQuery debug query script**: `scripts/bq-debug-queries.sh` for parameterized crash and analytics queries.
+- **Country availability documentation**: Added global distribution guidance to `docs/release/google-play-setup.md`.
+
+### Changed
+- **Google Play setup docs updated**: Removed outdated "Settings -> API access" and "Link existing project" references, replaced with current Cloud Console and "Users and permissions" workflows.
+- **Release secret validation**: `tool/check_release_secrets.sh` validates all 8 required secrets before build.
+- **Dependabot**: Weekly auto-updates for GitHub Actions SHA pins.
+
 ## [2.26.0] - 2026-03-04
 
 ### Added
