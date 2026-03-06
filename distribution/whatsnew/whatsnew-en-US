@@ -1,7 +1,6 @@
-v2.28.0
+v2.28.1
 
-- Added BigQuery debug tooling for crash analysis and analytics queries
-- New one-click WIF setup script for CI/CD configuration
-- Global distribution: app now available in all countries/regions
-- Updated Play Store setup documentation with correct navigation paths
-- Bug fixes and performance improvements
+- Edge-to-edge display: app now renders behind system bars on Android 15+
+- Migrated Android themes to Material 3 for modern system UI integration
+- Upgraded Material Components to fix deprecated system bar API warnings
+- Improved system bar icon contrast in light/dark themes

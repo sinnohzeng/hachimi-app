@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_elevation.dart';
@@ -76,6 +77,19 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         elevation: AppElevation.level0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: colorScheme.brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
+          statusBarBrightness: colorScheme.brightness,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarIconBrightness:
+              colorScheme.brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
+          systemNavigationBarDividerColor: Colors.transparent,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: colorScheme.brightness == Brightness.dark

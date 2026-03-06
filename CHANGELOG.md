@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.28.1] - 2026-03-06
+
+### Changed
+- **Edge-to-edge compliance**: Android themes migrated from legacy `Theme.Light.NoTitleBar` / `Theme.Black.NoTitleBar` to `Theme.Material3.Light.NoActionBar` / `Theme.Material3.Dark.NoActionBar`.
+- **MainActivity**: Switched from `FlutterActivity` to `FlutterFragmentActivity` with `enableEdgeToEdge()` call for proper Android 15+ edge-to-edge rendering.
+- **System bar styling**: Centralized transparent system bar configuration in `AppBarTheme.systemOverlayStyle` (theme SSOT) with adaptive icon brightness for light/dark themes.
+- **Flutter edge-to-edge bootstrap**: Added `SystemUiMode.edgeToEdge` and transparent system bar overlay in `main.dart`.
+- **CatDetailScreen**: Replaced implicit `SystemUiOverlayStyle.dark/light` presets with explicit transparent color declaration.
+
+### Fixed
+- **Deprecated API warnings**: Upgraded `com.google.android.material:material` from 1.7.0 to 1.12.0 (fixes datepicker deprecated `setStatusBarColor` call) and `androidx.activity:activity-ktx` from 1.8.1 to 1.10.1.
+- **Google Play Console warnings**: Resolved "Edge-to-edge may not display for all users" and "deprecated APIs for edge-to-edge" recommended actions.
+
 ## [2.28.0] - 2026-03-06
 
 ### Added

@@ -275,9 +275,13 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
-      systemOverlayStyle: Theme.of(context).brightness == Brightness.light
-          ? SystemUiOverlayStyle.dark
-          : SystemUiOverlayStyle.light,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness:
+            Theme.of(context).brightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light,
+      ),
       title: AnimatedOpacity(
         opacity: _showAppBarTitle ? 1.0 : 0.0,
         duration: AppMotion.durationShort2,

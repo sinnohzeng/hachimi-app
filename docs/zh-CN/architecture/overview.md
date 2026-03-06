@@ -72,6 +72,14 @@ Screens -> Providers -> Services -> Backend 抽象 -> Firebase SDK / Cloud Funct
   - `error_code`
 - 告警通道固定为 Google Chat + Email。
 
+## Android 平台配置
+- **Edge-to-edge**：`MainActivity.onCreate()` 中调用 `enableEdgeToEdge()`（原生窗口配置 SSOT）。
+- **基础 Activity**：`FlutterFragmentActivity`（提供 `ComponentActivity` 以支持 AndroidX edge-to-edge API）。
+- **主题**：`Theme.Material3.Light.NoActionBar` / `Theme.Material3.Dark.NoActionBar`。
+- **系统栏样式**：`app_theme.dart` 中的 `AppBarTheme.systemOverlayStyle`（Flutter 侧系统 UI 的 SSOT）。
+- **依赖**：`activity-ktx:1.10.1`、`material:1.12.0`（在 `build.gradle` 中显式声明）。
+- **预测性返回**：AndroidManifest 中 `android:enableOnBackInvokedCallback="true"`。
+
 ## SSOT 映射
 | 关注点 | SSOT |
 |---|---|
