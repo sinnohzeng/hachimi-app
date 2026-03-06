@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
@@ -59,6 +61,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Navigator.of(context).popUntil((r) => r.isFirst);
       }
     } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'auth',
+        operation: 'sign_in_google',
+        errorCode: e is FirebaseAuthException ? e.code : 'google_sign_in_error',
+      );
       if (mounted) {
         final message = mapAuthError(e, context.l10n);
         ScaffoldMessenger.of(

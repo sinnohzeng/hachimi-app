@@ -21,8 +21,8 @@ set -euo pipefail
 # ── 配置 ──────────────────────────────────────────────────────────────
 PROJECT_ID="hachimi-ai"
 CRASHLYTICS_TABLE="${PROJECT_ID}.firebase_crashlytics.com_hachimi_hachimi_app"
-# GA4 表名需要替换 PROPERTY_ID（首次使用时在 BigQuery 中查看实际数据集名）
-ANALYTICS_DATASET="analytics_PROPERTY_ID"
+# GA4 数据集（Property ID: 522585423）
+ANALYTICS_DATASET="analytics_522585423"
 # ────────────────────────────────────────────────────────────────────────
 
 # 默认参数

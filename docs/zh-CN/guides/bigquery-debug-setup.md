@@ -104,7 +104,7 @@ hachimi-ai (project)
 
 ```
 hachimi-ai (project)
-└── analytics_PROPERTY_ID (dataset)
+└── analytics_522585423 (dataset)
     └── events_YYYYMMDD (table, 每日分区)
         ├── event_date          STRING      事件日期 YYYYMMDD
         ├── event_timestamp     INT64       事件时间（微秒）
@@ -182,7 +182,7 @@ SELECT
   TIMESTAMP_MICROS(event_timestamp) AS event_time,
   (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'screen_name') AS screen,
   app_info.version AS app_version
-FROM `hachimi-ai.analytics_PROPERTY_ID.events_*`
+FROM `hachimi-ai.analytics_522585423.events_*`
 WHERE user_pseudo_id = 'TARGET_USER_ID'
   AND _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))
 ORDER BY event_timestamp
@@ -196,7 +196,7 @@ SELECT
   event_name,
   COUNT(*) AS event_count,
   COUNT(DISTINCT user_pseudo_id) AS unique_users
-FROM `hachimi-ai.analytics_PROPERTY_ID.events_*`
+FROM `hachimi-ai.analytics_522585423.events_*`
 WHERE _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
   AND event_name NOT IN ('session_start', 'first_visit', 'screen_view', 'user_engagement')
 GROUP BY event_name
@@ -267,8 +267,8 @@ bq ls --project_id=hachimi-ai
 # 验证 Crashlytics 数据集
 bq ls hachimi-ai:firebase_crashlytics
 
-# 验证 Analytics 数据集（替换 PROPERTY_ID）
-bq ls hachimi-ai:analytics_PROPERTY_ID
+# 验证 Analytics 数据集
+bq ls hachimi-ai:analytics_522585423
 ```
 
 > **注意**：首次导出需要 24-48 小时才能看到数据。配置当天查询可能为空，这是正常的。

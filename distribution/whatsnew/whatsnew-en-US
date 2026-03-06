@@ -1,6 +1,5 @@
-v2.28.1
+v2.28.2
 
-- Edge-to-edge display: app now renders behind system bars on Android 15+
-- Migrated Android themes to Material 3 for modern system UI integration
-- Upgraded Material Components to fix deprecated system bar API warnings
-- Improved system bar icon contrast in light/dark themes
+- Fixed: login errors now properly reported for faster issue diagnosis
+- Fixed: BigQuery debug queries now use correct GA4 dataset ID
+- Improved authentication error monitoring and observability

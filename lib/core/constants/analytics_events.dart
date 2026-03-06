@@ -10,6 +10,8 @@ class AnalyticsEvents {
 
   // Auth
   static const String signUp = 'sign_up';
+  static const String signInFailed = 'sign_in_failed';
+  static const String signUpFailed = 'sign_up_failed';
 
   // Habit lifecycle
   static const String habitCreated = 'habit_created';

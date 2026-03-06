@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
@@ -76,6 +78,12 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'auth',
+        operation: _isLogin ? 'sign_in_email' : 'sign_up_email',
+        errorCode: e is FirebaseAuthException ? e.code : 'email_auth_error',
+      );
       if (mounted) {
         final message = mapAuthError(e, context.l10n);
         ScaffoldMessenger.of(

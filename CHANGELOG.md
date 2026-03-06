@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.28.2] - 2026-03-06
+
+### Fixed
+- **Auth observability**: Login failures (Google Sign-In and email) now report to ErrorHandler → Crashlytics + GA4 `app_error` event, closing the blind spot where auth errors were invisible in monitoring.
+- **BigQuery queries**: Replaced placeholder `analytics_PROPERTY_ID` with actual GA4 dataset `analytics_522585423` in `bq-debug-queries.sh` and all documentation.
+
+### Added
+- **Analytics events**: `signInFailed` and `signUpFailed` constants in `AnalyticsEvents`.
+
 ## [2.28.1] - 2026-03-06
 
 ### Changed
