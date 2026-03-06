@@ -47,6 +47,15 @@
 | [20260304 Lifecycle Refactor Plan](plan/20260304-account-lifecycle-refactor-governance-plan.md) | Offline-first account lifecycle, quality gate, SSOT governance |
 | [20260305 Observability Closed Loop Plan](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email observability and AI debug automation |
 | [20260305 Security Modernization Plan](plan/20260305-security-modernization-collaboration-plan.md) | Google-first credentials modernization, keyless auth, and Terraform governance |
+| [Play Auto-Release Plan](plan/20260306-play-auto-release-plan.md) | 2026-03-06 | Active | Automated production release + supply-chain hardening |
+
+---
+
+## Release
+
+| Document | Description |
+|----------|-------------|
+| [Auto-Release Runbook](release/play-auto-release-runbook.md) | Operations guide for automated production releases |
 
 ---
 

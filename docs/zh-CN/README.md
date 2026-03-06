@@ -47,6 +47,15 @@
 | [20260304 生命周期重构计划](plan/20260304-account-lifecycle-refactor-governance-plan.md) | 离线优先账户生命周期、质量闸门与 SSOT 治理 |
 | [20260305 可观测性闭环计划](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email 可观测性与 AI Debug 自动化 |
 | [20260305 安全现代化整改计划](plan/20260305-security-modernization-collaboration-plan.md) | Google 优先凭据治理、无长期静态密钥与 Terraform 治理 |
+| [Play 自动发布计划](plan/20260306-play-auto-release-plan.md) | 2026-03-06 | Active | 自动化正式版发布 + 供应链加固 |
+
+---
+
+## 发布
+
+| 文档 | 说明 |
+|------|------|
+| [自动发布运维手册](release/play-auto-release-runbook.md) | 自动化正式版发布的运维指南 |
 
 ---
 

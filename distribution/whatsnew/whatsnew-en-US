@@ -1,10 +1,8 @@
-Welcome to Hachimi! A cat-parenting habit app where pixel cats grow as you build habits.
+v2.27.0
 
-- Adopt unique pixel cats with thousands of appearance combinations
-- Focus timer with countdown and stopwatch modes
-- AI-powered cat chat with personality-driven responses
-- 163 achievements across 4 categories
-- Daily check-in with coin rewards and accessory shop
-- Smart reminders with 9 scheduling modes
-- Works offline, syncs when connected
-- Available in 5 languages
+- Improved account lifecycle: guest upgrade, data merge, and account deletion now work seamlessly with offline support
+- Enhanced security with App Check protection for sensitive operations
+- Logout and session management fully reworked for reliability
+- Centralized preference keys eliminate scattered configuration
+- CI/CD pipeline hardened with supply-chain security best practices
+- Bug fixes and performance improvements

@@ -71,3 +71,4 @@ Use `gh release create` with a **user-facing release body**. The release page is
 | Verify version consistency | pubspec version doesn't match tag | Fix pubspec version, commit, move tag |
 | Static analysis | New error-level lint | Fix the lint issue, commit, move tag |
 | Build release APK | Compilation error | Fix the code, commit, move tag |
+| Whatsnew validation | whatsnew files contain generic app description | Update `distribution/whatsnew/` with version-specific release notes |
