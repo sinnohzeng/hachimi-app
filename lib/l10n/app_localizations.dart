@@ -3009,55 +3009,55 @@ abstract class S {
   /// No description provided for @onboardTitle1.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Hachimi'**
+  /// **'Meet Your Companion'**
   String get onboardTitle1;
 
   /// No description provided for @onboardSubtitle1.
   ///
   /// In en, this message translates to:
-  /// **'Raise cats, complete quests'**
+  /// **'Every quest begins with a kitten'**
   String get onboardSubtitle1;
 
   /// No description provided for @onboardBody1.
   ///
   /// In en, this message translates to:
-  /// **'Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!'**
+  /// **'Set a goal and adopt a kitten.\nFocus on it, and watch your cat grow!'**
   String get onboardBody1;
 
   /// No description provided for @onboardTitle2.
   ///
   /// In en, this message translates to:
-  /// **'Focus & Grow'**
+  /// **'Focus, Grow, Evolve'**
   String get onboardTitle2;
 
   /// No description provided for @onboardSubtitle2.
   ///
   /// In en, this message translates to:
-  /// **'Every minute counts'**
+  /// **'4 stages of growth'**
   String get onboardSubtitle2;
 
   /// No description provided for @onboardBody2.
   ///
   /// In en, this message translates to:
-  /// **'Start a focus session and your cat grows with you.\nThe more time you invest, the faster it evolves\nthrough each stage!'**
+  /// **'Every minute of focus helps your cat evolve\nfrom a tiny kitten to a magnificent senior!'**
   String get onboardBody2;
 
   /// No description provided for @onboardTitle3.
   ///
   /// In en, this message translates to:
-  /// **'Watch Them Evolve'**
+  /// **'Build Your Cat Room'**
   String get onboardTitle3;
 
   /// No description provided for @onboardSubtitle3.
   ///
   /// In en, this message translates to:
-  /// **'4 stages of growth'**
+  /// **'Collect unique cats'**
   String get onboardSubtitle3;
 
   /// No description provided for @onboardBody3.
   ///
   /// In en, this message translates to:
-  /// **'Cats evolve through 4 stages as they grow.\nCollect different breeds, discover unique personalities,\nand build your dream cat room!'**
+  /// **'Each quest brings a new cat with unique looks.\nDiscover them all and build your dream collection!'**
   String get onboardBody3;
 
   /// No description provided for @onboardSkip.

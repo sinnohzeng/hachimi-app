@@ -1573,34 +1573,34 @@ class SEn extends S {
   }
 
   @override
-  String get onboardTitle1 => 'Welcome to Hachimi';
+  String get onboardTitle1 => 'Meet Your Companion';
 
   @override
-  String get onboardSubtitle1 => 'Raise cats, complete quests';
+  String get onboardSubtitle1 => 'Every quest begins with a kitten';
 
   @override
   String get onboardBody1 =>
-      'Every quest you start comes with a kitten.\nFocus on your goals and watch them grow\nfrom tiny kittens into shiny cats!';
+      'Set a goal and adopt a kitten.\nFocus on it, and watch your cat grow!';
 
   @override
-  String get onboardTitle2 => 'Focus & Grow';
+  String get onboardTitle2 => 'Focus, Grow, Evolve';
 
   @override
-  String get onboardSubtitle2 => 'Every minute counts';
+  String get onboardSubtitle2 => '4 stages of growth';
 
   @override
   String get onboardBody2 =>
-      'Start a focus session and your cat grows with you.\nThe more time you invest, the faster it evolves\nthrough each stage!';
+      'Every minute of focus helps your cat evolve\nfrom a tiny kitten to a magnificent senior!';
 
   @override
-  String get onboardTitle3 => 'Watch Them Evolve';
+  String get onboardTitle3 => 'Build Your Cat Room';
 
   @override
-  String get onboardSubtitle3 => '4 stages of growth';
+  String get onboardSubtitle3 => 'Collect unique cats';
 
   @override
   String get onboardBody3 =>
-      'Cats evolve through 4 stages as they grow.\nCollect different breeds, discover unique personalities,\nand build your dream cat room!';
+      'Each quest brings a new cat with unique looks.\nDiscover them all and build your dream collection!';
 
   @override
   String get onboardSkip => 'Skip';

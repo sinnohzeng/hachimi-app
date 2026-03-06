@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.29.0] - 2026-03-06
+
+### Changed
+- **Onboarding redesign**: Replaced emoji-based onboarding (🐱⏱️✨) with real `PixelCatSprite` visuals — users now see actual pixel cats from their first interaction
+- **Page 1 "Meet Your Companion"**: 160px kitten with breathing scale animation on a rounded surface platform
+- **Page 2 "Focus, Grow, Evolve"**: 4 growth stages displayed horizontally (kitten → adolescent → adult → senior) with size progression (48-96px) and staggered entrance animations
+- **Page 3 "Build Your Cat Room"**: 3 randomly generated cats with unique appearances in a cluster layout
+- **Particle overlay**: Moved to screen level — firefly particles now persist across all 3 pages without visual discontinuity
+- **Unified color scheme**: Removed per-page gradient backgrounds and `_ColorRole` enum; all pages now use consistent M3 surface colors with `primary` accent
+- **Responsive layout**: Added height check (>= 500dp) to prevent landscape phones from triggering tablet layout
+- **Updated L10N**: New onboarding copy across all 5 languages (en, zh, zh-Hant, ja, ko) reflecting the cat-focused narrative
+
+### Added
+- `OnboardingCatHero` component — single kitten with breathing animation and accessibility support
+- `OnboardingStageStrip` component — 4-stage growth visualization with `stageColor()` labels
+- `OnboardingCatCluster` component — multi-cat group display with `FittedBox` overflow protection
+- 6 widget tests for onboarding screen (navigation, skip, completion, back)
+
 ## [2.28.2] - 2026-03-06
 
 ### Fixed

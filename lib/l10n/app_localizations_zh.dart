@@ -1552,31 +1552,31 @@ class SZh extends S {
   }
 
   @override
-  String get onboardTitle1 => '欢迎来到 Hachimi';
+  String get onboardTitle1 => '认识你的伙伴';
 
   @override
-  String get onboardSubtitle1 => '养猫咪，完成任务';
+  String get onboardSubtitle1 => '每段旅程从一只小猫开始';
 
   @override
-  String get onboardBody1 => '每个任务都会搭配一只小猫。\n专注你的目标，看着它们\n从小猫成长为闪亮的大猫！';
+  String get onboardBody1 => '设定目标，领养一只小猫。\n专注目标，看着你的猫咪成长！';
 
   @override
-  String get onboardTitle2 => '专注就是成长';
+  String get onboardTitle2 => '专注、成长、进化';
 
   @override
-  String get onboardSubtitle2 => '每一分钟都算数';
+  String get onboardSubtitle2 => '4 个成长阶段';
 
   @override
-  String get onboardBody2 => '开始专注，猫猫就和你一起成长。\n投入的时间越多，它进化得越快！';
+  String get onboardBody2 => '每分钟的专注都帮助猫咪进化，\n从小小幼猫到威风凛凛的大猫！';
 
   @override
-  String get onboardTitle3 => '见证它们进化';
+  String get onboardTitle3 => '打造你的猫房';
 
   @override
-  String get onboardSubtitle3 => '4 个成长阶段';
+  String get onboardSubtitle3 => '收集独特猫咪';
 
   @override
-  String get onboardBody3 => '猫猫在成长过程中会经历 4 个阶段。\n收集不同品种，发现独特个性，\n打造你的梦想猫房！';
+  String get onboardBody3 => '每个任务都带来一只独特外观的新猫。\n收集它们，打造你的梦想收藏！';
 
   @override
   String get onboardSkip => '跳过';
@@ -3908,31 +3908,31 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get onboardTitle1 => '歡迎嚟到 Hachimi';
+  String get onboardTitle1 => '認識你嘅伙伴';
 
   @override
-  String get onboardSubtitle1 => '養貓咪，完成任務';
+  String get onboardSubtitle1 => '每段旅程由一隻小貓開始';
 
   @override
-  String get onboardBody1 => '每個任務都會配搭一隻小貓。\n專注你嘅目標，睇住佢哋\n由小貓成長為閃亮嘅大貓！';
+  String get onboardBody1 => '設定目標，領養一隻小貓。\n專注目標，睇住你嘅貓咪成長！';
 
   @override
-  String get onboardTitle2 => '專注就係成長';
+  String get onboardTitle2 => '專注、成長、進化';
 
   @override
-  String get onboardSubtitle2 => '每一分鐘都算數';
+  String get onboardSubtitle2 => '4 個成長階段';
 
   @override
-  String get onboardBody2 => '開始專注，貓咪就同你一齊成長。\n投入嘅時間越多，佢進化得越快！';
+  String get onboardBody2 => '每分鐘嘅專注都幫助貓咪進化，\n由小小幼貓到威風凜凜嘅大貓！';
 
   @override
-  String get onboardTitle3 => '見證佢哋進化';
+  String get onboardTitle3 => '打造你嘅貓屋';
 
   @override
-  String get onboardSubtitle3 => '4 個成長階段';
+  String get onboardSubtitle3 => '收集獨特貓咪';
 
   @override
-  String get onboardBody3 => '貓咪喺成長過程中會經歷 4 個階段。\n收集唔同品種，發現獨特個性，\n打造你嘅夢想貓屋！';
+  String get onboardBody3 => '每個任務都帶嚟一隻獨特外觀嘅新貓。\n收集佢哋，打造你嘅夢想收藏！';
 
   @override
   String get onboardSkip => '跳過';

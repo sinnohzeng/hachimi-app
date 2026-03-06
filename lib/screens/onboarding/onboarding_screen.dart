@@ -6,7 +6,13 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/cat_appearance.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/screens/onboarding/components/onboarding_cat_cluster.dart';
+import 'package:hachimi_app/screens/onboarding/components/onboarding_cat_hero.dart';
+import 'package:hachimi_app/screens/onboarding/components/onboarding_stage_strip.dart';
+import 'package:hachimi_app/services/pixel_cat_generation_service.dart';
+import 'package:hachimi_app/widgets/particle_overlay.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback onComplete;
@@ -23,29 +29,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   static const _pageCount = 3;
 
-  List<_OnboardingPageData> _buildPages(BuildContext context) => [
-    _OnboardingPageData(
-      emoji: '🐱',
-      title: context.l10n.onboardTitle1,
-      subtitle: context.l10n.onboardSubtitle1,
-      body: context.l10n.onboardBody1,
-      colorRole: _ColorRole.primary,
-    ),
-    _OnboardingPageData(
-      emoji: '⏱️',
-      title: context.l10n.onboardTitle2,
-      subtitle: context.l10n.onboardSubtitle2,
-      body: context.l10n.onboardBody2,
-      colorRole: _ColorRole.secondary,
-    ),
-    _OnboardingPageData(
-      emoji: '✨',
-      title: context.l10n.onboardTitle3,
-      subtitle: context.l10n.onboardSubtitle3,
-      body: context.l10n.onboardBody3,
-      colorRole: _ColorRole.tertiary,
-    ),
-  ];
+  late final CatAppearance _heroCat;
+  late final List<CatAppearance> _clusterCats;
+
+  @override
+  void initState() {
+    super.initState();
+    final gen = PixelCatGenerationService();
+    _heroCat = gen.generateRandomAppearance();
+    _clusterCats = List.generate(3, (_) => gen.generateRandomAppearance());
+  }
 
   void _next() {
     if (_currentPage < _pageCount - 1) {
@@ -74,11 +67,35 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     widget.onComplete();
   }
 
-  // Shared page transition switcher used by both layouts.
-  Widget _buildPageSwitcher(
-    List<_OnboardingPageData> pages,
-    Widget Function(_OnboardingPageData) builder,
-  ) {
+  Widget _buildHero(int page) => switch (page) {
+    0 => OnboardingCatHero(appearance: _heroCat),
+    1 => OnboardingStageStrip(appearance: _heroCat),
+    2 => OnboardingCatCluster(appearances: _clusterCats),
+    _ => const SizedBox.shrink(),
+  };
+
+  String _title(int page, BuildContext context) => switch (page) {
+    0 => context.l10n.onboardTitle1,
+    1 => context.l10n.onboardTitle2,
+    2 => context.l10n.onboardTitle3,
+    _ => '',
+  };
+
+  String _subtitle(int page, BuildContext context) => switch (page) {
+    0 => context.l10n.onboardSubtitle1,
+    1 => context.l10n.onboardSubtitle2,
+    2 => context.l10n.onboardSubtitle3,
+    _ => '',
+  };
+
+  String _body(int page, BuildContext context) => switch (page) {
+    0 => context.l10n.onboardBody1,
+    1 => context.l10n.onboardBody2,
+    2 => context.l10n.onboardBody3,
+    _ => '',
+  };
+
+  Widget _buildPageSwitcher(Widget Function(int) builder) {
     return PageTransitionSwitcher(
       duration: AppMotion.durationMedium2,
       reverse: !_isForward,
@@ -90,7 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
       child: KeyedSubtree(
         key: ValueKey<int>(_currentPage),
-        child: builder(pages[_currentPage]),
+        child: builder(_currentPage),
       ),
     );
   }
@@ -119,55 +136,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget _buildFilledButton({
-    required String label,
-    required Color backgroundColor,
-    required Color foregroundColor,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: FilledButton(
-        onPressed: _next,
-        style: FilledButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: foregroundColor,
-          shape: RoundedRectangleBorder(borderRadius: AppShape.borderLarge),
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: foregroundColor,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final pages = _buildPages(context);
     return Semantics(
       label: 'Page ${_currentPage + 1} of $_pageCount',
       child: LayoutBuilder(
-        builder: (context, constraints) =>
-            constraints.maxWidth >= AppBreakpoints.compact
-            ? _buildTabletLayout(context, pages)
-            : _buildCompactLayout(context, pages),
+        builder: (context, constraints) {
+          final isTablet =
+              constraints.maxWidth >= AppBreakpoints.compact &&
+              constraints.maxHeight >= 500;
+          return isTablet
+              ? _buildTabletLayout(context)
+              : _buildCompactLayout(context);
+        },
       ),
     );
   }
 
-  // ── Compact (phone) layout ────────────────────────────────────────────────
+  // -- Compact (phone) layout ------------------------------------------------
 
-  Widget _buildCompactLayout(
-    BuildContext context,
-    List<_OnboardingPageData> pages,
-  ) {
+  Widget _buildCompactLayout(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final pageData = pages[_currentPage];
-    final onColor = pageData.onColor(colorScheme);
 
     return PopScope(
       canPop: _currentPage == 0,
@@ -177,36 +166,42 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            _buildPageSwitcher(pages, (d) => _CompactOnboardingPage(data: d)),
-            if (_currentPage > 0) _buildCompactBackButton(context, onColor),
-            if (_currentPage < pages.length - 1)
-              _buildCompactSkipButton(context, onColor),
-            _buildCompactBottomBar(
-              context,
-              pages,
-              pageData,
-              onColor,
-              colorScheme,
+            const ParticleOverlay(
+              mode: ParticleMode.firefly,
+              child: SizedBox.expand(),
             ),
+            _buildPageSwitcher(
+              (page) => _CompactPage(
+                hero: _buildHero(page),
+                title: _title(page, context),
+                subtitle: _subtitle(page, context),
+                body: _body(page, context),
+              ),
+            ),
+            if (_currentPage > 0) _buildBackButton(context),
+            if (_currentPage < _pageCount - 1) _buildSkipButton(context),
+            _buildCompactBottomBar(context, colorScheme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCompactBackButton(BuildContext context, Color onColor) {
+  Widget _buildBackButton(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurface;
     return Positioned(
       top: MediaQuery.of(context).padding.top + 8,
       left: 8,
       child: IconButton(
         onPressed: _previous,
-        icon: Icon(Icons.arrow_back, color: onColor.withValues(alpha: 0.7)),
+        icon: Icon(Icons.arrow_back, color: color.withValues(alpha: 0.7)),
         tooltip: MaterialLocalizations.of(context).backButtonTooltip,
       ),
     );
   }
 
-  Widget _buildCompactSkipButton(BuildContext context, Color onColor) {
+  Widget _buildSkipButton(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurface;
     return Positioned(
       top: MediaQuery.of(context).padding.top + 8,
       right: 8,
@@ -214,22 +209,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         onPressed: _skip,
         child: Text(
           context.l10n.onboardSkip,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: onColor.withValues(alpha: 0.7),
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: color.withValues(alpha: 0.7)),
         ),
       ),
     );
   }
 
-  Widget _buildCompactBottomBar(
-    BuildContext context,
-    List<_OnboardingPageData> pages,
-    _OnboardingPageData pageData,
-    Color onColor,
-    ColorScheme colorScheme,
-  ) {
-    final isLast = _currentPage == pages.length - 1;
+  Widget _buildCompactBottomBar(BuildContext context, ColorScheme colorScheme) {
+    final isLast = _currentPage == _pageCount - 1;
     final label = isLast
         ? context.l10n.onboardLetsGo
         : context.l10n.onboardNext;
@@ -244,13 +233,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildPageIndicator(onColor, onColor.withValues(alpha: 0.38)),
-              const SizedBox(height: AppSpacing.lg),
-              _buildFilledButton(
-                label: label,
-                backgroundColor: onColor,
-                foregroundColor: pageData.gradientColors(colorScheme).first,
+              _buildPageIndicator(
+                colorScheme.primary,
+                colorScheme.onSurface.withValues(alpha: 0.38),
               ),
+              const SizedBox(height: AppSpacing.lg),
+              _buildCtaButton(label, colorScheme),
             ],
           ),
         ),
@@ -258,12 +246,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  // ── Tablet (≥ 600dp) layout — M3 supporting-pane canonical layout ─────────
+  Widget _buildCtaButton(String label, ColorScheme colorScheme) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: FilledButton(
+        onPressed: _next,
+        style: FilledButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(borderRadius: AppShape.borderLarge),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+      ),
+    );
+  }
 
-  Widget _buildTabletLayout(
-    BuildContext context,
-    List<_OnboardingPageData> pages,
-  ) {
+  // -- Tablet (>= 600dp width + >= 500dp height) layout ---------------------
+
+  Widget _buildTabletLayout(BuildContext context) {
     return PopScope(
       canPop: _currentPage == 0,
       onPopInvokedWithResult: (didPop, _) {
@@ -272,26 +279,33 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Scaffold(
         body: Row(
           children: [
-            Expanded(
-              flex: 2,
-              child: _buildPageSwitcher(pages, (d) => _TabletLeftPane(data: d)),
-            ),
-            Expanded(flex: 3, child: _buildTabletRightPane(context, pages)),
+            Expanded(flex: 2, child: _buildTabletLeftPane(context)),
+            Expanded(flex: 3, child: _buildTabletRightPane(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTabletRightPane(
-    BuildContext context,
-    List<_OnboardingPageData> pages,
-  ) {
+  Widget _buildTabletLeftPane(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final pageData = pages[_currentPage];
-    final mainColor = pageData.gradientColors(colorScheme).first;
-    final onColor = pageData.onColor(colorScheme);
-    final isLast = _currentPage == pages.length - 1;
+    return Stack(
+      children: [
+        SizedBox.expand(
+          child: ColoredBox(color: colorScheme.surfaceContainerLow),
+        ),
+        const ParticleOverlay(
+          mode: ParticleMode.firefly,
+          child: SizedBox.expand(),
+        ),
+        Center(child: _buildPageSwitcher(_buildHero)),
+      ],
+    );
+  }
+
+  Widget _buildTabletRightPane(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isLast = _currentPage == _pageCount - 1;
     final label = isLast
         ? context.l10n.onboardLetsGo
         : context.l10n.onboardNext;
@@ -304,23 +318,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTabletNavRow(context, pages),
+              _buildTabletNavRow(context),
               Expanded(
                 child: _buildPageSwitcher(
-                  pages,
-                  (d) => _TabletRightContent(data: d),
+                  (page) => _TabletTextContent(
+                    title: _title(page, context),
+                    subtitle: _subtitle(page, context),
+                    body: _body(page, context),
+                  ),
                 ),
               ),
               _buildPageIndicator(
-                mainColor,
+                colorScheme.primary,
                 colorScheme.onSurface.withValues(alpha: 0.38),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _buildFilledButton(
-                label: label,
-                backgroundColor: mainColor,
-                foregroundColor: onColor,
-              ),
+              _buildCtaButton(label, colorScheme),
             ],
           ),
         ),
@@ -328,10 +341,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget _buildTabletNavRow(
-    BuildContext context,
-    List<_OnboardingPageData> pages,
-  ) {
+  Widget _buildTabletNavRow(BuildContext context) {
     return Row(
       children: [
         if (_currentPage > 0)
@@ -343,7 +353,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         else
           const SizedBox(width: 48),
         const Spacer(),
-        if (_currentPage < pages.length - 1)
+        if (_currentPage < _pageCount - 1)
           TextButton(onPressed: _skip, child: Text(context.l10n.onboardSkip))
         else
           const SizedBox(height: 48),
@@ -352,140 +362,63 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-// ── Data model ────────────────────────────────────────────────────────────────
+// -- Compact page content widget ---------------------------------------------
 
-enum _ColorRole { primary, secondary, tertiary }
-
-class _OnboardingPageData {
-  final String emoji;
+class _CompactPage extends StatelessWidget {
+  final Widget hero;
   final String title;
   final String subtitle;
   final String body;
-  final _ColorRole colorRole;
 
-  const _OnboardingPageData({
-    required this.emoji,
+  const _CompactPage({
+    required this.hero,
     required this.title,
     required this.subtitle,
     required this.body,
-    required this.colorRole,
   });
-
-  List<Color> gradientColors(ColorScheme cs) => switch (colorRole) {
-    _ColorRole.primary => [cs.primary, cs.primary.withValues(alpha: 0.7)],
-    _ColorRole.secondary => [cs.secondary, cs.secondary.withValues(alpha: 0.7)],
-    _ColorRole.tertiary => [cs.tertiary, cs.tertiary.withValues(alpha: 0.7)],
-  };
-
-  Color onColor(ColorScheme cs) => switch (colorRole) {
-    _ColorRole.primary => cs.onPrimary,
-    _ColorRole.secondary => cs.onSecondary,
-    _ColorRole.tertiary => cs.onTertiary,
-  };
-}
-
-// ── Page widgets ─────────────────────────────────────────────────────────────
-
-/// Phone layout: full-screen gradient page.
-/// Wrapped in [SizedBox.expand] to fill parent even under loose Stack constraints.
-class _CompactOnboardingPage extends StatelessWidget {
-  final _OnboardingPageData data;
-
-  const _CompactOnboardingPage({required this.data});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final onColor = data.onColor(colorScheme);
 
     return SizedBox.expand(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: data.gradientColors(colorScheme),
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(flex: 2),
-                Text(
-                  data.subtitle,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: onColor.withValues(alpha: 0.7),
-                  ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            children: [
+              const Spacer(flex: 2),
+              Flexible(flex: 4, child: Center(child: hero)),
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                subtitle,
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  data.title,
-                  style: textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: onColor,
-                  ),
-                  textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                title,
+                style: textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
-                const SizedBox(height: 40),
-                Text(data.emoji, style: const TextStyle(fontSize: 96)),
-                const SizedBox(height: 40),
-                Text(
-                  data.body,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.base),
+              Flexible(
+                flex: 2,
+                child: Text(
+                  body,
                   style: textTheme.bodyLarge?.copyWith(
-                    color: onColor.withValues(alpha: 0.85),
+                    color: colorScheme.onSurface.withValues(alpha: 0.85),
                     height: 1.6,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const Spacer(flex: 3),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Tablet left decorative pane: gradient background with oversized emoji.
-/// Wrapped in [SizedBox.expand] to fill the [Expanded] flex column.
-class _TabletLeftPane extends StatelessWidget {
-  final _OnboardingPageData data;
-
-  const _TabletLeftPane({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final onColor = data.onColor(colorScheme);
-
-    return SizedBox.expand(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: data.gradientColors(colorScheme),
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(data.emoji, style: const TextStyle(fontSize: 120)),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                'Hachimi',
-                style: textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: onColor,
-                ),
               ),
+              const Spacer(flex: 3),
             ],
           ),
         ),
@@ -494,11 +427,18 @@ class _TabletLeftPane extends StatelessWidget {
   }
 }
 
-/// Tablet right content pane: text content that transitions per page.
-class _TabletRightContent extends StatelessWidget {
-  final _OnboardingPageData data;
+// -- Tablet text content widget ----------------------------------------------
 
-  const _TabletRightContent({required this.data});
+class _TabletTextContent extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String body;
+
+  const _TabletTextContent({
+    required this.title,
+    required this.subtitle,
+    required this.body,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -510,14 +450,14 @@ class _TabletRightContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          data.subtitle,
+          subtitle,
           style: textTheme.titleMedium?.copyWith(
             color: onSurface.withValues(alpha: 0.7),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          data.title,
+          title,
           style: textTheme.headlineLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: onSurface,
@@ -525,7 +465,7 @@ class _TabletRightContent extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          data.body,
+          body,
           style: textTheme.bodyLarge?.copyWith(
             color: onSurface.withValues(alpha: 0.85),
             height: 1.6,

@@ -1,5 +1,6 @@
-v2.28.2
+v2.29.0
 
-- Fixed: login errors now properly reported for faster issue diagnosis
-- Fixed: BigQuery debug queries now use correct GA4 dataset ID
-- Improved authentication error monitoring and observability
+- New: Onboarding redesigned with real pixel cats! Meet your kitten from the very first screen
+- New: See all 4 growth stages (kitten, adolescent, adult, senior) in the onboarding journey
+- New: Firefly particle effects across the entire onboarding experience
+- Improved: Updated onboarding text across all 5 languages

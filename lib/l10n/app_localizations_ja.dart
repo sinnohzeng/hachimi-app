@@ -1554,33 +1554,31 @@ class SJa extends S {
   }
 
   @override
-  String get onboardTitle1 => 'Hachimiへようこそ';
+  String get onboardTitle1 => '仲間に会おう';
 
   @override
-  String get onboardSubtitle1 => 'ネコを育てて、クエストを達成しよう';
+  String get onboardSubtitle1 => 'すべての冒険は子猫から始まる';
 
   @override
-  String get onboardBody1 =>
-      '始めるクエストごとに子猫がやってきます。\n目標に集中して、小さな子猫が\n立派なネコに育つのを見届けましょう！';
+  String get onboardBody1 => '目標を決めて、子猫を迎えよう。\n集中すれば、ネコが成長していくよ！';
 
   @override
-  String get onboardTitle2 => '集中して成長しよう';
+  String get onboardTitle2 => '集中、成長、進化';
 
   @override
-  String get onboardSubtitle2 => '1分1分が力になる';
+  String get onboardSubtitle2 => '4つの成長ステージ';
 
   @override
-  String get onboardBody2 => '集中セッションを始めると、ネコも一緒に成長します。\n時間を重ねるほど、進化が早くなります！';
+  String get onboardBody2 => '集中した1分1分がネコの進化を助けます。\n小さな子猫から立派なシニアネコへ！';
 
   @override
-  String get onboardTitle3 => '進化を見届けよう';
+  String get onboardTitle3 => 'ネコ部屋を作ろう';
 
   @override
-  String get onboardSubtitle3 => '4つの成長ステージ';
+  String get onboardSubtitle3 => 'ユニークなネコを集めよう';
 
   @override
-  String get onboardBody3 =>
-      'ネコは成長とともに4つのステージを経て進化します。\nさまざまな種類を集めて、ユニークな個性を発見し、\n理想のネコ部屋を作りましょう！';
+  String get onboardBody3 => 'クエストごとにユニークな見た目のネコが仲間入り。\nみんな集めて、夢のコレクションを作ろう！';
 
   @override
   String get onboardSkip => 'スキップ';

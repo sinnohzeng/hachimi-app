@@ -26,19 +26,36 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 
 ## S1：引导界面
 **文件：** `lib/screens/onboarding/onboarding_screen.dart`
+**组件：** `lib/screens/onboarding/components/`
 
 ### 布局
-- 全屏 `PageView`，共 3 页
-- 每页：居中 Emoji（96pt）+ 粗体标题 + 副标题正文
-- 第 1 页：🐱「欢迎来到 Hachimi」/「养猫，养成习惯。每次专注，一步成长。」
-- 第 2 页：⏱️「专注赚取 XP」/「每一分钟都算数，你的猫咪在每次会话中变得更强。」
-- 第 3 页：✨「看着它们进化」/「从幼猫到闪光猫——猫咪的成长旅程映照着你自己。」
-- 底部：页面指示点 + 「立即开始」`FilledButton`（仅最后一页显示）
+- 3 页 `PageTransitionSwitcher`（SharedAxisTransition，水平方向），以像素猫为视觉核心
+- **第 1 页「认识你的伙伴」**：单只 kitten `PixelCatSprite`（160px），带呼吸缩放动画（1.0-1.03），置于 `surfaceContainerHighest` 圆角平台上
+- **第 2 页「专注、成长、进化」**：4 个成长阶段横向排列（kitten 48px → adolescent 64px → adult 80px → senior 96px），`StaggeredListItem` 交错入场，阶段标签使用 `stageColor()` 着色
+- **第 3 页「打造你的猫房」**：3 只随机生成的猫（80/120/100px）组成群组，交错入场
+- `ParticleOverlay(mode: firefly)` 放在屏幕层级，贯穿 3 页不随页面切换重建
+- 动画圆点指示器 + FilledButton CTA（「下一步」/「开始吧！」）
+- Compact 布局：Surface 背景，英雄区（约 60%）+ 文案区（约 40%）
+- 平板布局（宽度 >= 600dp 且高度 >= 500dp）：左面板（猫 + 粒子）+ 右面板（文案 + 控件）
+
+### 组件
+| 文件 | 用途 |
+|------|------|
+| `onboarding_cat_hero.dart` | 第 1 页：单只幼猫 + 呼吸动画 + 平台 |
+| `onboarding_stage_strip.dart` | 第 2 页：4 阶段成长条 + 交错入场 |
+| `onboarding_cat_cluster.dart` | 第 3 页：多猫群组展示 |
+
+### 无障碍
+- `Semantics(label: 'Page N of M')` 标注页面进度
+- 每个猫展示组件有描述性语义标签
+- 呼吸动画尊重 `MediaQuery.disableAnimations`
+- `ParticleOverlay` 内置动画偏好检查
+- `FittedBox(fit: BoxFit.scaleDown)` 防止窄屏溢出
 
 ### 行为
-- 左右滑动翻页
-- 「立即开始」→ 导航至 `LoginScreen`
-- 完成后执行 `SharedPreferences.setBool('onboarding_complete', true)`
+- 第 1-2 页有跳过按钮，第 2-3 页有返回按钮
+- 第 3 页「开始吧！」→ `analyticsServiceProvider.logOnboardingCompleted()` + `widget.onComplete()`
+- `CatAppearance` 在 `initState` 中通过 `PixelCatGenerationService` 随机生成
 - 完成后不再显示
 
 ---

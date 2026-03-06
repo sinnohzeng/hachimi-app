@@ -26,19 +26,36 @@ ProfileScreen → CatDetailScreen (via Cat Album)
 
 ## S1: Onboarding Screen
 **File:** `lib/screens/onboarding/onboarding_screen.dart`
+**Components:** `lib/screens/onboarding/components/`
 
 ### Layout
-- Full-screen `PageView` with 3 pages
-- Each page: centered emoji (96pt), bold headline, subtitle body text
-- Page 1: 🐱 "Welcome to Hachimi" / "Raise cats. Build habits. One focus session at a time."
-- Page 2: ⏱️ "Focus & Earn XP" / "Every minute counts. Your cat grows stronger with every session."
-- Page 3: ✨ "Watch Them Evolve" / "From kitten to shiny — your cat's journey mirrors your own."
-- Bottom: `SmoothPageIndicator` dots + "Get Started" `FilledButton` (visible on last page only)
+- 3-page `PageTransitionSwitcher` (SharedAxisTransition, horizontal) with pixel cat visuals
+- **Page 1 "Meet Your Companion"**: Single kitten `PixelCatSprite` (160px) with breathing scale animation (1.0-1.03), on `surfaceContainerHighest` rounded platform
+- **Page 2 "Focus, Grow, Evolve"**: 4 growth stages in a horizontal strip (kitten 48px → adolescent 64px → adult 80px → senior 96px), staggered entrance via `StaggeredListItem`, stage labels colored by `stageColor()`
+- **Page 3 "Build Your Cat Room"**: 3 randomly generated cats (80/120/100px) in a cluster, staggered entrance
+- `ParticleOverlay(mode: firefly)` at screen level, persists across page transitions
+- Animated dot indicator + FilledButton CTA ("Next" / "Let's Go!")
+- Compact layout: Surface background, hero area (~60%) + text area (~40%)
+- Tablet layout (width >= 600dp AND height >= 500dp): Left pane (cat + particles) + Right pane (text + controls)
+
+### Components
+| File | Purpose |
+|------|---------|
+| `onboarding_cat_hero.dart` | Page 1: Single kitten with breathing animation + platform |
+| `onboarding_stage_strip.dart` | Page 2: 4-stage growth strip with staggered entrance |
+| `onboarding_cat_cluster.dart` | Page 3: Multi-cat group display |
+
+### Accessibility
+- `Semantics(label: 'Page N of M')` on outer widget and page indicator
+- Each hero component has descriptive semantics labels
+- Breathing animation respects `MediaQuery.disableAnimations`
+- `ParticleOverlay` has built-in animation preference check
+- `FittedBox(fit: BoxFit.scaleDown)` prevents overflow on narrow screens
 
 ### Behavior
-- Swipe left/right to advance
-- "Get Started" → navigate to `LoginScreen`
-- On completion, `SharedPreferences.setBool('onboarding_complete', true)`
+- Skip button on pages 1-2, Back button on pages 2-3
+- "Let's Go!" on page 3 → `analyticsServiceProvider.logOnboardingCompleted()` + `widget.onComplete()`
+- `CatAppearance` instances generated randomly in `initState` via `PixelCatGenerationService`
 - Never shown again after completion
 
 ---
