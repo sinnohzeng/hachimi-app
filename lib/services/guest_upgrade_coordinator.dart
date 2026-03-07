@@ -1,31 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/account_data_snapshot.dart';
 import 'package:hachimi_app/services/account_merge_service.dart';
 import 'package:hachimi_app/services/account_snapshot_service.dart';
 import 'package:hachimi_app/widgets/archive_conflict_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 访客升级协调器：在账号切换后执行本地/云端冲突判定与合并。
 class GuestUpgradeCoordinator {
   final AccountSnapshotService _snapshotService;
   final AccountMergeService _mergeService;
+  final SharedPreferences _prefs;
 
   GuestUpgradeCoordinator({
     required AccountSnapshotService snapshotService,
     required AccountMergeService mergeService,
+    required SharedPreferences prefs,
   }) : _snapshotService = snapshotService,
-       _mergeService = mergeService;
+       _mergeService = mergeService,
+       _prefs = prefs;
 
   Future<void> resolve({
     required BuildContext context,
-    required String oldUid,
+    required String migrationSourceUid,
     required String newUid,
     required String email,
     String? displayName,
   }) async {
-    if (oldUid == newUid) return;
+    if (migrationSourceUid == newUid) return;
 
-    final local = await _snapshotService.readLocal(oldUid);
+    final expectedGuestUid = _prefs.getString(AppPrefsKeys.localGuestUid);
+    if (expectedGuestUid != null && expectedGuestUid != migrationSourceUid) {
+      await ErrorHandler.recordOperation(
+        Exception('guest_merge_source_mismatch'),
+        feature: 'GuestUpgradeCoordinator',
+        operation: 'resolve',
+        operationStage: 'account_merge',
+        errorCode: 'guest_merge_source_mismatch',
+      );
+      return;
+    }
+
+    final local = await _snapshotService.readLocal(migrationSourceUid);
 
     // 云端快照读取 best-effort — 失败视为空（安全默认保留本地）
     final cloud = await _readCloudOrEmpty(newUid);
@@ -35,7 +52,7 @@ class GuestUpgradeCoordinator {
 
     if (choice == ArchiveConflictChoice.keepLocal) {
       await _mergeService.keepLocal(
-        oldUid: oldUid,
+        oldUid: migrationSourceUid,
         newUid: newUid,
         email: email,
         displayName: displayName,
@@ -43,7 +60,7 @@ class GuestUpgradeCoordinator {
       return;
     }
 
-    await _mergeService.keepCloud(oldUid: oldUid, newUid: newUid);
+    await _mergeService.keepCloud(oldUid: migrationSourceUid, newUid: newUid);
   }
 
   Future<AccountDataSnapshot> _readCloudOrEmpty(String uid) async {

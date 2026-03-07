@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.30.1] - 2026-03-07
+
+### Fixed
+- **Login data loss**: Guest data no longer lost when UID changes during login — `_FirstHabitGate` now handles `didUpdateWidget` with engine-run serialization
+- **Logout non-responsive**: Centralized reactive `popUntil` listener in `AuthGate` ensures OnboardingScreen is shown from all 3 logout entry points
+- **Delete account broken state**: Explicit `AccountDeletionResult` state machine with retryable/non-retryable error classification; progress dialog always dismissed correctly
+- **Delete timing glitch**: `onboarding.reset()` now fires before progress dialog pop to prevent brief HomeScreen flash
+- **Consolidated logout**: Three identical `_confirmLogout` methods replaced by single `showLogoutConfirmation()` utility
+
+### Added
+- `IdentityTransitionResolver` — deterministic migration-source UID resolution for guest-to-credentialed upgrades
+- `AccountDeletionResult` model — typed deletion outcome with `localDeleted`, `remoteDeleted`, `queued`, `errorCode`
+- Pre-release Cloud Functions check script (`scripts/check-account-lifecycle-functions.sh`)
+- 8 new unit tests for deletion orchestrator and identity resolver
+
+### Deployed
+- Cloud Functions `deleteAccountV2` and `wipeUserDataV2` deployed to `hachimi-ai` Firebase project (App Check enforced)
+- Cloud Functions `monitorAiUsageV1` and `runAiDebugTriageV2` scheduled functions deployed
+- Fixed `functions/package.json` main entry point and `@octokit/rest` ESM dynamic import
+
 ## [2.30.0] - 2026-03-07
 
 ### Changed

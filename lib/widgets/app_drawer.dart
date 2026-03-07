@@ -13,11 +13,11 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
-import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/screens/profile/components/avatar_picker_sheet.dart';
 import 'package:hachimi_app/screens/profile/components/edit_name_dialog.dart';
 import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
+import 'package:hachimi_app/widgets/logout_confirmation.dart';
 
 /// M3 Drawer — 替代原 Profile Tab，提供身份、里程碑、设置和账号管理。
 class AppDrawer extends ConsumerWidget {
@@ -133,7 +133,12 @@ class AppDrawer extends ConsumerWidget {
                   l10n.commonLogOut,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
-                onTap: () => _confirmLogout(context, ref),
+                onTap: () async {
+                  Navigator.of(context).pop(); // 关闭 Drawer
+                  await Future<void>.delayed(AppMotion.durationMedium1);
+                  if (!context.mounted) return;
+                  await showLogoutConfirmation(context, ref);
+                },
               ),
             ],
 
@@ -152,34 +157,6 @@ class AppDrawer extends ConsumerWidget {
     Navigator.of(context).pop();
     Future.delayed(AppMotion.durationMedium1, () {
       if (context.mounted) Navigator.of(context).pushNamed(route);
-    });
-  }
-
-  void _confirmLogout(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    Navigator.of(context).pop(); // 关闭 Drawer
-    Future.delayed(AppMotion.durationMedium1, () {
-      if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(l10n.logoutTitle),
-          content: Text(l10n.logoutMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              onPressed: () async {
-                Navigator.of(ctx).pop();
-                await ref.read(userProfileNotifierProvider.notifier).logout();
-              },
-              child: Text(l10n.commonLogOut),
-            ),
-          ],
-        ),
-      );
     });
   }
 }

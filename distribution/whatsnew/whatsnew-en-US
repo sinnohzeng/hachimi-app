@@ -1,8 +1,6 @@
-v2.30.0
+v2.30.1
 
-- New: AI features (diary & chat) are now always on — no setup needed
-- New: 5-message daily chat limit per cat with remaining count display
-- New: Failed diary entries auto-retry on next visit (up to 3 attempts)
-- New: Offline banner when AI is temporarily unavailable
-- Improved: Faster AI startup with lazy validation and circuit breaker
-- Removed: AI settings page (no longer needed)
+- Fixed: Logging in after creating cats no longer causes data loss
+- Fixed: Logout now correctly returns to the welcome screen from all pages
+- Fixed: Account deletion works reliably with proper error handling and offline retry
+- Deployed: Server-side account deletion functions for secure data cleanup

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -164,37 +163,63 @@ class DeleteAccountFlow {
     ref.read(syncEngineProvider).stop();
 
     try {
-      await ref
+      progress.value = l10n.deleteAccountStepCloud;
+      final result = await ref
           .read(accountDeletionOrchestratorProvider)
           .deleteAccount(uid: uid);
-      progress.value = l10n.deleteAccountStepCloud;
-
-      final pending = ref
-          .read(sharedPreferencesProvider)
-          .getString(AppPrefsKeys.pendingDeletionJob);
-      final queued = pending != null && pending.isNotEmpty;
-
-      ref.read(onboardingCompleteProvider.notifier).reset();
-      ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
 
       if (!context.mounted) return;
+
+      if (result.remoteDeleted) {
+        // 先 reset onboarding 再关进度 dialog — 避免用户短暂看到 HomeScreen 闪烁
+        ref.read(onboardingCompleteProvider.notifier).reset();
+        await ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
+        if (!context.mounted) return;
+        Navigator.of(context).pop();
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.deleteAccountSuccess),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      if (result.queued) {
+        await ref
+            .read(analyticsServiceProvider)
+            .logAccountDeletionFailed(
+              errorCode: result.errorCode ?? 'delete_account_queued',
+            );
+        if (!context.mounted) return;
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.deleteAccountQueued),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      await ref
+          .read(analyticsServiceProvider)
+          .logAccountDeletionFailed(
+            errorCode: result.errorCode ?? 'delete_account_remote_failed',
+          );
+      if (!context.mounted) return;
       Navigator.of(context).pop();
-      Navigator.of(context).popUntil((route) => route.isFirst);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            queued ? l10n.deleteAccountQueued : l10n.deleteAccountSuccess,
-          ),
+          content: Text(l10n.deleteAccountError),
           behavior: SnackBarBehavior.floating,
         ),
       );
-    } on Exception catch (e) {
-      if (!uid.startsWith('guest_')) {
-        ref.read(syncEngineProvider).start(uid);
-      }
-      ref
+    } on Exception {
+      await ref
           .read(analyticsServiceProvider)
-          .logAccountDeletionFailed(errorCode: e.runtimeType.toString());
+          .logAccountDeletionFailed(errorCode: 'delete_account_local_failed');
 
       if (!context.mounted) return;
       Navigator.of(context).pop();

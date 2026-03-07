@@ -87,6 +87,7 @@ class UserProfileNotifier extends Notifier<void> {
         stackTrace: stack,
         feature: 'UserProfileNotifier',
         operation: 'logout',
+        errorCode: 'logout_failed',
       );
     }
   }

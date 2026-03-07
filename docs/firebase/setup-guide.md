@@ -52,6 +52,11 @@ cd ..
 firebase deploy --only functions
 ```
 
+Post-deploy verification:
+```bash
+./scripts/check-account-lifecycle-functions.sh <project-id>
+```
+
 ## 5. App Check Configuration
 Client runtime behavior is implemented in [lib/main.dart](/data/workspace/hachimi-app/lib/main.dart):
 - Android release: Play Integrity

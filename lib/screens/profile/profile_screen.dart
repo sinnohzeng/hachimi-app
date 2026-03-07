@@ -13,12 +13,12 @@ import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
-import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/stats_provider.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
+import 'package:hachimi_app/widgets/logout_confirmation.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/edit_name_dialog.dart';
@@ -149,35 +149,11 @@ class ProfileScreen extends ConsumerWidget {
                 l10n.commonLogOut,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
-              onTap: () => _confirmLogout(context, ref),
+              onTap: () => showLogoutConfirmation(context, ref),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
         ]),
-      ),
-    );
-  }
-
-  void _confirmLogout(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logoutTitle),
-        content: Text(l10n.logoutMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(userProfileNotifierProvider.notifier).logout();
-            },
-            child: Text(l10n.commonLogOut),
-          ),
-        ],
       ),
     );
   }

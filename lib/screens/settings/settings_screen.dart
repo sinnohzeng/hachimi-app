@@ -10,6 +10,7 @@ import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
+import 'package:hachimi_app/widgets/logout_confirmation.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/delete_account_flow.dart';
@@ -259,7 +260,7 @@ class SettingsScreen extends ConsumerWidget {
                     l10n.commonLogOut,
                     style: TextStyle(color: colorScheme.error),
                   ),
-                  onTap: () => _confirmLogout(context, ref),
+                  onTap: () => showLogoutConfirmation(context, ref),
                 ),
               ),
               StaggeredListItem(
@@ -375,30 +376,6 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   // --- Account Actions ---
-
-  void _confirmLogout(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logoutTitle),
-        content: Text(l10n.logoutMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref.read(userProfileNotifierProvider.notifier).logout();
-            },
-            child: Text(l10n.commonLogOut),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _confirmResetData(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;

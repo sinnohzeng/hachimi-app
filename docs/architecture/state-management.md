@@ -19,6 +19,7 @@
 - `accountLifecycleBackendProvider`
 
 ### Account lifecycle providers
+- `identityTransitionResolverProvider`
 - `accountSnapshotServiceProvider`
 - `accountMergeServiceProvider`
 - `guestUpgradeCoordinatorProvider`
@@ -44,13 +45,20 @@
 
 ## Guest Upgrade Flow
 - Triggered in login screens after auth success.
+- Migration source UID is resolved before auth mutation:
+  - prefer `local_guest_uid`
+  - fallback to pre-auth `currentUid`
 - `GuestUpgradeCoordinator` decides merge path using snapshots.
+- `GuestUpgradeCoordinator.resolve(...)` requires `migrationSourceUid` and aborts on source mismatch to avoid dangerous merges.
 - Merge always goes through explicit service orchestration; no implicit UID migration in `AuthGate`.
 
 ## Deletion Flow
 - UI flow is three-step confirmation only.
 - `AccountDeletionOrchestrator` owns local cleanup + remote hard-delete retry queue.
 - Guest local uid (`guest_*`) never calls Firestore delete APIs.
+- Orchestrator returns typed `AccountDeletionResult` (`localDeleted`, `remoteDeleted`, `queued`, `errorCode`).
+- Remote deletion retries only for retryable callable errors; non-retryable errors clear pending markers immediately.
+- Sign-out and Crashlytics user reset happen only on remote hard-delete success.
 - Firebase backend implementation calls `deleteAccountV2` / `wipeUserDataV2` with limited-use App Check token.
 
 ## AI Runtime
@@ -86,6 +94,7 @@ Each cat is limited to **5 chat messages per day**, enforced via `getRemainingMe
 
 ## Rules
 - Screens must not call Firebase SDK directly.
+- Navigation side-effects must be handled by listeners/effects, not inside `build()`.
 - Providers must not reintroduce legacy compatibility branches.
 - New persistent keys must be added only via `AppPrefsKeys`.
 - Account lifecycle callables must always pass `OperationContext`.

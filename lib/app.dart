@@ -90,10 +90,24 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   bool _isAutoSigningIn = false;
   bool _isPendingDeletionRetry = false;
   Timer? _pendingDeletionTimer;
+  ProviderSubscription<bool>? _onboardingListener;
 
   @override
   void initState() {
     super.initState();
+
+    _onboardingListener = ref.listenManual<bool>(onboardingCompleteProvider, (
+      previous,
+      next,
+    ) {
+      if (previous == true && next == false) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          final navigator = Navigator.maybeOf(context);
+          navigator?.popUntil((route) => route.isFirst);
+        });
+      }
+    });
 
     // Google Sign-In 延迟初始化（从 DeferredInit 迁移至此，通过 Provider 获取 AuthBackend）
     Future.microtask(() async {
@@ -114,6 +128,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void dispose() {
     _pendingDeletionTimer?.cancel();
+    _onboardingListener?.close();
     super.dispose();
   }
 
@@ -328,6 +343,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   bool _remindersScheduled = false;
   bool _deferredInitTriggered = false;
   AchievementEvaluator? _evaluator;
+  int _engineRunId = 0;
 
   @override
   void initState() {
@@ -345,36 +361,70 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   }
 
   @override
+  void didUpdateWidget(covariant _FirstHabitGate oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.uid != widget.uid) {
+      _onUidChanged();
+    }
+  }
+
+  @override
   void dispose() {
+    _engineRunId++;
     _evaluator?.stop();
-    ref.read(syncEngineProvider).stop();
     super.dispose();
+  }
+
+  void _onUidChanged() {
+    _evaluator?.stop();
+    _checkedFirstHabit = false;
+    _remindersScheduled = false;
+    _startBackgroundEngines();
   }
 
   /// 启动后台引擎：孤立数据恢复 + 数据水化 + 同步引擎 + 成就评估器。
   /// guest_ UID 跳过 Firestore 水化/同步（纯本地模式）。
-  void _startBackgroundEngines() {
+  Future<void> _startBackgroundEngines() async {
+    final runId = ++_engineRunId;
     final uid = widget.uid;
+    final syncEngine = ref.read(syncEngineProvider);
 
-    // Saga 补偿：检测未完成的访客迁移并恢复
-    _recoverOrphanedGuestData(uid);
+    try {
+      // Saga 补偿：检测未完成的访客迁移并恢复
+      await _recoverOrphanedGuestData(uid);
+      if (!mounted || runId != _engineRunId) return;
 
-    if (!uid.startsWith('guest_')) {
-      // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
-      ref.read(syncEngineProvider).hydrateFromFirestore(uid).then((_) {
-        ref.read(syncEngineProvider).start(uid);
-      });
+      // 先停旧引擎，避免旧 UID 同步链路残留。
+      syncEngine.stop();
+
+      if (!uid.startsWith('guest_')) {
+        // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
+        await syncEngine.hydrateFromFirestore(uid);
+        if (!mounted || runId != _engineRunId) return;
+        syncEngine.start(uid);
+      }
+
+      // 成就评估器 — 纯本地，不需要网络
+      final ledger = ref.read(ledgerServiceProvider);
+      final evaluator = AchievementEvaluator(
+        ledger: ledger,
+        onUnlocked: (ids) {
+          ref.read(newlyUnlockedProvider.notifier).addAll(ids);
+        },
+      );
+      if (!mounted || runId != _engineRunId) return;
+      _evaluator?.stop();
+      _evaluator = evaluator;
+      evaluator.start(uid);
+    } on Exception catch (e, stack) {
+      await ErrorHandler.recordOperation(
+        e,
+        stackTrace: stack,
+        feature: 'FirstHabitGate',
+        operation: 'startBackgroundEngines',
+        errorCode: 'background_engine_start_failed',
+      );
     }
-
-    // 成就评估器 — 纯本地，不需要网络
-    final ledger = ref.read(ledgerServiceProvider);
-    _evaluator = AchievementEvaluator(
-      ledger: ledger,
-      onUnlocked: (ids) {
-        ref.read(newlyUnlockedProvider.notifier).addAll(ids);
-      },
-    );
-    _evaluator!.start(uid);
   }
 
   /// 检测 localGuestUid 与当前 UID 不一致 → 补偿迁移。

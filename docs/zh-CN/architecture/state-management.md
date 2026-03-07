@@ -19,6 +19,7 @@
 - `accountLifecycleBackendProvider`
 
 ### 账户生命周期 Provider
+- `identityTransitionResolverProvider`
 - `accountSnapshotServiceProvider`
 - `accountMergeServiceProvider`
 - `guestUpgradeCoordinatorProvider`
@@ -44,13 +45,20 @@
 
 ## 访客升级
 - 在登录页认证成功后触发。
+- 认证动作前先确定迁移源 UID：
+  - 优先 `local_guest_uid`
+  - 缺失时回退认证前 `currentUid`
 - `GuestUpgradeCoordinator` 基于快照判定合并路径。
+- `GuestUpgradeCoordinator.resolve(...)` 必须接收 `migrationSourceUid`，若与本地访客 UID 不一致则中止危险迁移。
 - 不再在 `AuthGate` 中做隐式 UID 迁移。
 
 ## 删号流程
 - UI 仅保留三段式确认。
 - 本地清理 + 云端硬删排队完全由 `AccountDeletionOrchestrator` 编排。
 - `guest_*` 本地 UID 禁止触发 Firestore 删除调用。
+- Orchestrator 返回类型化结果 `AccountDeletionResult`（`localDeleted`、`remoteDeleted`、`queued`、`errorCode`）。
+- 远端 callable 错误仅对可重试类型保留队列；不可重试错误立即清空 pending。
+- 仅在远端硬删成功后执行 signOut 与 Crashlytics 用户标识清理。
 - Firebase 后端实现统一调用 `deleteAccountV2` / `wipeUserDataV2`，并携带 limited-use App Check token。
 
 ## AI 运行时
@@ -86,6 +94,7 @@
 
 ## 约束
 - Screen 层禁止直接调用 Firebase SDK。
+- 导航副作用必须放在监听器/effect，不要写在 `build()` 中。
 - Provider 层禁止重新引入 legacy 兼容分支。
 - 新增持久化键必须统一进入 `AppPrefsKeys`。
 - 账户生命周期 callable 必须始终传递 `OperationContext`。

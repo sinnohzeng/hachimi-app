@@ -23,6 +23,7 @@ import 'package:hachimi_app/services/firebase/firebase_remote_config_backend.dar
 import 'package:hachimi_app/services/firebase/firebase_sync_backend.dart';
 import 'package:hachimi_app/services/firebase/firebase_user_profile_backend.dart';
 import 'package:hachimi_app/services/guest_upgrade_coordinator.dart';
+import 'package:hachimi_app/services/identity_transition_resolver.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:hachimi_app/services/local_cat_repository.dart';
@@ -163,8 +164,17 @@ final guestUpgradeCoordinatorProvider = Provider<GuestUpgradeCoordinator>((
   return GuestUpgradeCoordinator(
     snapshotService: ref.watch(accountSnapshotServiceProvider),
     mergeService: ref.watch(accountMergeServiceProvider),
+    prefs: ref.watch(sharedPreferencesProvider),
   );
 });
+
+final identityTransitionResolverProvider = Provider<IdentityTransitionResolver>(
+  (ref) {
+    return IdentityTransitionResolver(
+      prefs: ref.watch(sharedPreferencesProvider),
+    );
+  },
+);
 
 final accountDeletionOrchestratorProvider =
     Provider<AccountDeletionOrchestrator>((ref) {

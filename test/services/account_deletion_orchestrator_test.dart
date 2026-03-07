@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,12 +34,14 @@ class FakeAccountLifecycleBackend implements AccountLifecycleBackend {
   String get id => 'fake';
 
   bool deleteAccountHardCalled = false;
-  bool shouldFail = false;
+  Object? deleteAccountHardError;
 
   @override
   Future<void> deleteAccountHard({required OperationContext context}) async {
     deleteAccountHardCalled = true;
-    if (shouldFail) throw Exception('remote_delete_failed');
+    if (deleteAccountHardError != null) {
+      throw deleteAccountHardError!;
+    }
   }
 
   @override
@@ -73,6 +76,11 @@ class FakeConnectivity implements Connectivity {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeFunctionsException extends FirebaseFunctionsException {
+  FakeFunctionsException(String code)
+    : super(message: 'functions error', code: code);
 }
 
 // ─── Helpers ───
@@ -193,13 +201,55 @@ void main() {
       await buildOrchestrator(values);
 
       fakeAuthBackend._currentUid = 'uid_abc';
-      fakeLifecycleBackend.shouldFail = true;
+      fakeLifecycleBackend.deleteAccountHardError = Exception(
+        'remote_delete_failed',
+      );
 
       await orchestrator.resumePendingDeletion();
 
       expect(prefs.getInt(AppPrefsKeys.deletionRetryCount), 2);
       // markers 仍存在，等待下次重试
       expect(prefs.getString(AppPrefsKeys.pendingDeletionJob), isNotNull);
+    });
+
+    test('non-retryable functions error clears pending markers', () async {
+      final values = <String, Object>{};
+      _seedPendingJob(values, 'uid_abc', retryCount: 1);
+      await buildOrchestrator(values);
+
+      fakeAuthBackend._currentUid = 'uid_abc';
+      fakeLifecycleBackend.deleteAccountHardError = FakeFunctionsException(
+        'unimplemented',
+      );
+
+      await orchestrator.resumePendingDeletion();
+
+      expect(_hasNoMarkers(prefs), isTrue);
+    });
+  });
+
+  group('deleteAccount result state', () {
+    test('returns queued when offline after local delete', () async {
+      await buildOrchestrator({});
+      fakeConnectivity.result = [ConnectivityResult.none];
+
+      final result = await orchestrator.deleteAccount(uid: 'uid_abc');
+
+      expect(result.localDeleted, isTrue);
+      expect(result.remoteDeleted, isFalse);
+      expect(result.queued, isTrue);
+    });
+
+    test('returns remoteDeleted when remote call succeeds', () async {
+      await buildOrchestrator({});
+      fakeAuthBackend._currentUid = 'uid_abc';
+
+      final result = await orchestrator.deleteAccount(uid: 'uid_abc');
+
+      expect(result.localDeleted, isTrue);
+      expect(result.remoteDeleted, isTrue);
+      expect(result.queued, isFalse);
+      expect(fakeAuthBackend.signOutCalled, isTrue);
     });
   });
 

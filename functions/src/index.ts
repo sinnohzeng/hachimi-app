@@ -1,6 +1,7 @@
 import { BigQuery } from "@google-cloud/bigquery";
 import { GoogleAuth } from "google-auth-library";
-import { Octokit } from "@octokit/rest";
+// Dynamic import — @octokit/rest is ESM-only
+type OctokitType = import("@octokit/rest").Octokit;
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {
@@ -773,7 +774,8 @@ async function createGithubDraftIssue(
   );
   if (!token) return undefined;
 
-  const octokit = new Octokit({ auth: token });
+  const { Octokit } = await import("@octokit/rest");
+  const octokit: OctokitType = new Octokit({ auth: token });
   const issue = await octokit.issues.create({
     owner,
     repo,

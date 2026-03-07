@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
@@ -10,6 +11,7 @@ import 'package:hachimi_app/core/observability/correlation_id_factory.dart';
 import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/observability/operation_context.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/models/account_deletion_result.dart';
 import 'package:hachimi_app/services/account_deletion_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,11 +34,15 @@ class AccountDeletionOrchestrator {
        _prefs = prefs,
        _connectivity = connectivity ?? Connectivity();
 
-  Future<void> deleteAccount({required String uid}) async {
+  Future<AccountDeletionResult> deleteAccount({required String uid}) async {
     if (_isLocalGuestUid(uid)) {
       await _deletionService.cleanLocalData();
       await _clearPending();
-      return;
+      return const AccountDeletionResult(
+        localDeleted: true,
+        remoteDeleted: true,
+        queued: false,
+      );
     }
 
     final correlationId = CorrelationIdFactory.newId();
@@ -44,9 +50,18 @@ class AccountDeletionOrchestrator {
     await _deletionService.cleanLocalData(
       preservePrefs: _pendingPrefsSnapshot(),
     );
-    if (await _isOnline()) {
-      await _attemptRemoteDeletion(uid, correlationId: correlationId);
+    if (!await _isOnline()) {
+      return const AccountDeletionResult(
+        localDeleted: true,
+        remoteDeleted: false,
+        queued: true,
+      );
     }
+    return _attemptRemoteDeletion(
+      uid,
+      correlationId: correlationId,
+      localDeleted: true,
+    );
   }
 
   Future<bool> resumePendingDeletion() async {
@@ -70,28 +85,41 @@ class AccountDeletionOrchestrator {
     }
   }
 
-  Future<void> _attemptRemoteDeletion(
+  Future<AccountDeletionResult> _attemptRemoteDeletion(
     String uid, {
     String? correlationId,
+    bool localDeleted = false,
   }) async {
     final retryCount = _prefs.getInt(AppPrefsKeys.deletionRetryCount) ?? 0;
 
     // 终止条件 1：UID 不匹配 — 用户已重新注册，无法以旧身份认证
     if (_authBackend.currentUid != uid) {
       await _clearPending();
-      return;
+      return AccountDeletionResult(
+        localDeleted: localDeleted,
+        remoteDeleted: false,
+        queued: false,
+        errorCode: 'deletion_uid_mismatch',
+      );
     }
 
     // 终止条件 2：重试耗尽
     if (retryCount >= SyncConstants.deletionMaxRetryCount) {
       await _clearPending();
-      ErrorHandler.recordOperation(
+      await ErrorHandler.recordOperation(
         Exception('deletion_max_retries_exceeded'),
         feature: 'AccountDeletionOrchestrator',
         operation: 'attemptRemoteDeletion',
+        operationStage: 'account_deletion',
+        retryCount: retryCount,
         errorCode: 'max_retries_exceeded',
       );
-      return;
+      return AccountDeletionResult(
+        localDeleted: localDeleted,
+        remoteDeleted: false,
+        queued: false,
+        errorCode: 'max_retries_exceeded',
+      );
     }
 
     final opContext = OperationContext.capture(
@@ -103,10 +131,23 @@ class AccountDeletionOrchestrator {
       await _lifecycleBackend.deleteAccountHard(context: opContext);
       await _authBackend.signOut();
       ObservabilityRuntime.clearUidHash();
-      await FirebaseCrashlytics.instance.setUserIdentifier('');
+      try {
+        await FirebaseCrashlytics.instance.setUserIdentifier('');
+      } catch (_) {}
       await _clearPending();
+      return AccountDeletionResult(
+        localDeleted: localDeleted,
+        remoteDeleted: true,
+        queued: false,
+      );
     } catch (e, stack) {
-      await _incrementRetry();
+      final retryable = _isRetryableRemoteError(e);
+      final errorCode = _toRemoteErrorCode(e);
+      if (retryable) {
+        await _incrementRetry();
+      } else {
+        await _clearPending();
+      }
       await ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
@@ -115,7 +156,14 @@ class AccountDeletionOrchestrator {
         operationStage: 'account_deletion',
         retryCount: retryCount,
         correlationId: opContext.correlationId,
-        errorCode: 'delete_account_remote_failed',
+        errorCode: errorCode,
+        extras: {'retryable': retryable.toString()},
+      );
+      return AccountDeletionResult(
+        localDeleted: localDeleted,
+        remoteDeleted: false,
+        queued: retryable,
+        errorCode: errorCode,
       );
     }
   }
@@ -160,6 +208,30 @@ class AccountDeletionOrchestrator {
   Future<void> _incrementRetry() async {
     final next = (_prefs.getInt(AppPrefsKeys.deletionRetryCount) ?? 0) + 1;
     await _prefs.setInt(AppPrefsKeys.deletionRetryCount, next);
+  }
+
+  bool _isRetryableRemoteError(Object error) {
+    if (error is FirebaseFunctionsException) {
+      const retryableCodes = <String>{
+        'cancelled',
+        'unknown',
+        'deadline-exceeded',
+        'resource-exhausted',
+        'internal',
+        'unavailable',
+        'data-loss',
+      };
+      return retryableCodes.contains(error.code);
+    }
+    return true;
+  }
+
+  String _toRemoteErrorCode(Object error) {
+    if (error is FirebaseFunctionsException) {
+      final normalized = error.code.replaceAll('-', '_');
+      return 'functions_$normalized';
+    }
+    return 'delete_account_remote_failed';
   }
 
   Future<bool> _isOnline() async {

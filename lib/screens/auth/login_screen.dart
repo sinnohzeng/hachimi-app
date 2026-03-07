@@ -30,7 +30,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authBackend = ref.read(authBackendProvider);
-      final oldUid = ref.read(currentUidProvider);
+      final migrationSourceUid = ref
+          .read(identityTransitionResolverProvider)
+          .resolveMigrationSourceUid(currentUid: ref.read(currentUidProvider));
       final wasAnonymous = authBackend.isAnonymous;
 
       // Phase A: 认证 — 失败才显示 SnackBar
@@ -42,7 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Phase B: 账号设置 — 失败仅记录，不阻塞用户
       await _finalizeAccountSetup(
         result: result,
-        oldUid: oldUid,
+        migrationSourceUid: migrationSourceUid,
         wasAnonymous: wasAnonymous,
       );
     } on Exception catch (e) {
@@ -67,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// 未完成的访客迁移由 _FirstHabitGate._recoverOrphanedGuestData 兜底恢复。
   Future<void> _finalizeAccountSetup({
     required AuthResult result,
-    required String? oldUid,
+    required String? migrationSourceUid,
     required bool wasAnonymous,
   }) async {
     try {
@@ -86,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       await _resolveGuestConflictIfNeeded(
         result: result,
-        oldUid: oldUid,
+        migrationSourceUid: migrationSourceUid,
         wasAnonymous: wasAnonymous,
       );
 
@@ -98,23 +100,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         e,
         feature: 'auth',
         operation: 'finalize_account_setup',
-        errorCode: 'post_sign_in_error',
+        errorCode: 'finalize_account_setup_failed',
       );
     }
   }
 
   Future<void> _resolveGuestConflictIfNeeded({
     required AuthResult result,
-    required String? oldUid,
+    required String? migrationSourceUid,
     required bool wasAnonymous,
   }) async {
-    if (oldUid == null || !mounted) return;
-    if (!_shouldResolveConflict(oldUid, result.uid, wasAnonymous)) return;
+    if (migrationSourceUid == null || !mounted) return;
+    if (!_shouldResolveConflict(migrationSourceUid, result.uid, wasAnonymous)) {
+      return;
+    }
     await ref
         .read(guestUpgradeCoordinatorProvider)
         .resolve(
           context: context,
-          oldUid: oldUid,
+          migrationSourceUid: migrationSourceUid,
           newUid: result.uid,
           email: result.email ?? '',
           displayName: result.displayName,

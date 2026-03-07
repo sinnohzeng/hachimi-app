@@ -44,6 +44,7 @@
 
 | 文档 | 说明 |
 |------|------|
+| [20260307 账号生命周期缺陷修复计划](plan/20260307-auth-lifecycle-bugs-plan.md) | 登录丢档、退出路由与删号状态机加固 |
 | [20260304 生命周期重构计划](plan/20260304-account-lifecycle-refactor-governance-plan.md) | 离线优先账户生命周期、质量闸门与 SSOT 治理 |
 | [20260305 可观测性闭环计划](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email 可观测性与 AI Debug 自动化 |
 | [20260305 安全现代化整改计划](plan/20260305-security-modernization-collaboration-plan.md) | Google 优先凭据治理、无长期静态密钥与 Terraform 治理 |

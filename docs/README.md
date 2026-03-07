@@ -44,6 +44,7 @@
 
 | Document | Description |
 |----------|-------------|
+| [20260307 Auth Lifecycle Bugfix Plan](plan/20260307-auth-lifecycle-bugs-plan.md) | Login data loss, logout routing, and delete-account state machine hardening |
 | [20260304 Lifecycle Refactor Plan](plan/20260304-account-lifecycle-refactor-governance-plan.md) | Offline-first account lifecycle, quality gate, SSOT governance |
 | [20260305 Observability Closed Loop Plan](plan/20260305-observability-ai-debug-closed-loop-plan.md) | Blaze + Google Chat/Email observability and AI debug automation |
 | [20260305 Security Modernization Plan](plan/20260305-security-modernization-collaboration-plan.md) | Google-first credentials modernization, keyless auth, and Terraform governance |

@@ -52,6 +52,11 @@ cd ..
 firebase deploy --only functions
 ```
 
+部署后校验：
+```bash
+./scripts/check-account-lifecycle-functions.sh <project-id>
+```
+
 ## 5. App Check 配置
 客户端运行时逻辑见 [lib/main.dart](/data/workspace/hachimi-app/lib/main.dart)：
 - Android release：Play Integrity
