@@ -53,6 +53,37 @@
 - `guest_*` 本地 UID 禁止触发 Firestore 删除调用。
 - Firebase 后端实现统一调用 `deleteAccountV2` / `wipeUserDataV2`，并携带 limited-use App Check token。
 
+## AI 运行时
+
+### 可用性模型
+
+`AiAvailability` 是 2 态枚举：`ready` | `error`。
+
+- AI 对已认证用户始终开启——没有用户侧开关。
+- `AiFeatureNotifier` 和 `aiFeatureEnabledProvider` 已删除。
+- 启动时乐观地设为 `ready`。首次 AI 访问时执行异步验证探测（惰性验证）。
+
+### 断路器
+
+`AiAvailabilityNotifier` 追踪连续失败次数：
+- 连续 3 次失败触发 5 分钟退避（可用性切换为 `error`）。
+- 退避到期后，下次 AI 访问自动重试。
+
+### 网络超时保护
+
+| 操作 | 超时 |
+|------|------|
+| 聊天 | 15s |
+| 日记 | 20s |
+| 验证探测 | 5s |
+| 流式空闲 | 10s |
+
+### 聊天每日限额
+
+每只猫每天最多 **5 条聊天消息**，通过 `getRemainingMessages()` 检查。
+- 纵深防御：服务层在达到限额时拒绝消息 + UI 禁用发送按钮。
+- 限额通过 RemoteConfig 可配置（`chat_daily_limit`，默认值：5）。
+
 ## 约束
 - Screen 层禁止直接调用 Firebase SDK。
 - Provider 层禁止重新引入 legacy 兼容分支。

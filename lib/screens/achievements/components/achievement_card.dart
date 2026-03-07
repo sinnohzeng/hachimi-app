@@ -6,8 +6,10 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
+import 'package:hachimi_app/widgets/celebration/celebration_tier.dart';
 
 /// 成就卡片 Widget — 显示单个成就的状态、进度、奖励。
+/// 支持层级感知的视觉差异（tier accent stripe + icon glow）。
 class AchievementCard extends StatelessWidget {
   final AchievementDef def;
   final bool isUnlocked;
@@ -30,8 +32,8 @@ class AchievementCard extends StatelessWidget {
     final l10n = context.l10n;
     final locale = Localizations.localeOf(context).languageCode;
 
-    // 隐藏成就且未解锁时显示为问号
     final isHiddenLocked = def.isHidden && !isUnlocked;
+    final tier = CelebrationConfig.tierFromDef(def);
 
     final icon = isHiddenLocked ? Icons.help_outline : def.icon;
     final iconColor = isUnlocked
@@ -48,6 +50,9 @@ class AchievementCard extends StatelessWidget {
         ? l10n.achievementHiddenDesc
         : _resolveDesc(context, locale);
 
+    // 层级色条 — 仅解锁时显示
+    final accentColor = isUnlocked ? _tierAccentColor(tier, colorScheme) : null;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 0,
@@ -55,21 +60,39 @@ class AchievementCard extends StatelessWidget {
         borderRadius: AppShape.borderMedium,
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
-      color: colorScheme.surface,
+      color: isUnlocked
+          ? colorScheme.primaryContainer.withValues(alpha: 0.08)
+          : colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         borderRadius: AppShape.borderMedium,
-        child: Padding(
+        child: Container(
+          decoration: accentColor != null
+              ? BoxDecoration(
+                  borderRadius: AppShape.borderMedium,
+                  border: Border(
+                    left: BorderSide(color: accentColor, width: 3),
+                  ),
+                )
+              : null,
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // 成就图标
+              // 成就图标 — 圆形
               Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
                   color: iconBgColor,
-                  borderRadius: AppShape.borderMedium,
+                  shape: BoxShape.circle,
+                  boxShadow: isUnlocked && tier == CelebrationTier.epic
+                      ? [
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Icon(
                   icon,
@@ -103,7 +126,6 @@ class AchievementCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // 进度条（有 targetValue 且未解锁时显示）
                     if (!isUnlocked &&
                         !isHiddenLocked &&
                         progress != null &&
@@ -130,11 +152,34 @@ class AchievementCard extends StatelessWidget {
               // 奖励/状态
               const SizedBox(width: AppSpacing.sm),
               if (isUnlocked)
-                Icon(
-                  Icons.check_circle,
-                  color: colorScheme.primary,
-                  size: 24,
-                  semanticLabel: 'Unlocked',
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: AppShape.borderSmall,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: colorScheme.primary,
+                        size: 14,
+                        semanticLabel: 'Unlocked',
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        '+${def.coinReward}',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               else
                 Container(
@@ -159,6 +204,17 @@ class AchievementCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _tierAccentColor(CelebrationTier tier, ColorScheme colorScheme) {
+    switch (tier) {
+      case CelebrationTier.epic:
+        return colorScheme.primary;
+      case CelebrationTier.notable:
+        return colorScheme.tertiary;
+      case CelebrationTier.standard:
+        return colorScheme.outlineVariant;
+    }
   }
 
   String _resolveDesc(BuildContext context, String locale) {

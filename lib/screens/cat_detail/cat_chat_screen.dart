@@ -4,7 +4,9 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/chat_message.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/chat_provider.dart';
@@ -78,6 +80,18 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.chatTitle(cat.name)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(24),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              context.l10n.chatDailyRemaining(chatState.remainingMessages),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
         actions: [
           if (chatState.messages.isNotEmpty)
             PopupMenuButton<String>(
@@ -194,11 +208,12 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     ChatState chatState,
     ColorScheme colorScheme,
     TextTheme textTheme,
-    dynamic cat,
-    dynamic habit,
+    Cat cat,
+    Habit? habit,
   ) {
     final isGenerating = chatState.status == ChatStatus.generating;
-    final canSend = habit != null && !isGenerating;
+    final atLimit = chatState.remainingMessages <= 0;
+    final canSend = habit != null && !isGenerating && !atLimit;
 
     return Material(
       elevation: AppElevation.level2,
@@ -218,7 +233,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                   minLines: 1,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
-                    hintText: isGenerating
+                    hintText: atLimit
+                        ? context.l10n.chatDailyLimitReached
+                        : isGenerating
                         ? context.l10n.chatGenerating
                         : context.l10n.chatTypeMessage,
                     border: OutlineInputBorder(
@@ -233,7 +250,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                     ),
                     isDense: true,
                   ),
-                  enabled: !isGenerating,
+                  enabled: !isGenerating && !atLimit,
                   onSubmitted: canSend ? (_) => _send(cat, habit) : null,
                 ),
               ),
@@ -273,7 +290,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     );
   }
 
-  void _send(dynamic cat, dynamic habit) {
+  void _send(Cat cat, Habit habit) {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 

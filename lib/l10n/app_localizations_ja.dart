@@ -434,15 +434,6 @@ class SJa extends S {
   String get settingsThemeColorDynamicSubtitle => '壁紙の色を使用';
 
   @override
-  String get settingsAiModel => 'AIモデル';
-
-  @override
-  String get settingsAiFeatures => 'AI機能';
-
-  @override
-  String get settingsAiSubtitle => 'クラウドAIによるネコ日記とチャットを有効にする';
-
-  @override
   String get settingsAbout => 'アプリについて';
 
   @override
@@ -557,74 +548,15 @@ class SJa extends S {
   String get commonYes => 'はい';
 
   @override
-  String get testChatTitle => 'AIをテスト';
+  String chatDailyRemaining(int count) {
+    return '今日残り $count 件のメッセージ';
+  }
 
   @override
-  String get testChatModelReady => 'AI準備完了';
+  String get chatDailyLimitReached => '本日のメッセージ上限に達しました';
 
   @override
-  String get testChatSendToTest => 'メッセージを送信してAIをテストしてください。';
-
-  @override
-  String get testChatGenerating => '生成中...';
-
-  @override
-  String get testChatTypeMessage => 'メッセージを入力...';
-
-  @override
-  String get settingsAiProvider => 'プロバイダー';
-
-  @override
-  String get settingsAiProviderMinimax => 'MiniMax（デフォルト）';
-
-  @override
-  String get settingsAiProviderGemini => 'Gemini';
-
-  @override
-  String get settingsAiCloudBadge => 'クラウドAI搭載 — ネットワーク接続が必要です';
-
-  @override
-  String get settingsAiWhatYouGet => '利用できる機能:';
-
-  @override
-  String get settingsAiFeatureDiary => 'Hachimi日記 — あなたのネコが毎日日記を書きます';
-
-  @override
-  String get settingsAiFeatureChat => 'ネコチャット — ネコと会話しましょう';
-
-  @override
-  String get settingsTestConnection => '接続テスト';
-
-  @override
-  String get settingsConnectionSuccess => '接続成功';
-
-  @override
-  String get settingsConnectionFailed => '接続失敗';
-
-  @override
-  String get settingsTestModel => 'チャットテスト';
-
-  @override
-  String get settingsStatusReady => '準備完了';
-
-  @override
-  String get settingsStatusError => 'エラー';
-
-  @override
-  String get settingsStatusDisabled => '無効';
-
-  @override
-  String get aiPrivacyTitle => 'クラウドAIプライバシー通知';
-
-  @override
-  String get aiPrivacyMessage =>
-      'AI機能を有効にすると、ネコの名前、性格、集中データがクラウドサーバーに送信され、日記やチャットの生成に使用されます。インターネット接続が必要です。AI機能はいつでも無効にできます。';
-
-  @override
-  String get aiPrivacyAccept => '了解しました';
-
-  @override
-  String get aiRequiresNetwork => 'ネットワーク接続が必要です';
+  String get aiTemporarilyUnavailable => 'AI 機能は一時的に利用できません';
 
   @override
   String get catDetailNotFound => 'ネコが見つかりません';
@@ -2051,6 +1983,12 @@ class SJa extends S {
 
   @override
   String get achievementUnlocked => '実績解除！';
+
+  @override
+  String get achievementAwesome => 'すばらしい！';
+
+  @override
+  String get achievementIncredible => '信じられない！';
 
   @override
   String get achievementHidden => '???';

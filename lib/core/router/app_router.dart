@@ -13,8 +13,6 @@ import 'package:hachimi_app/screens/cat_detail/cat_diary_screen.dart';
 import 'package:hachimi_app/screens/cat_detail/cat_chat_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 import 'package:hachimi_app/screens/settings/settings_screen.dart';
-import 'package:hachimi_app/screens/settings/ai_settings_page.dart';
-import 'package:hachimi_app/screens/settings/model_test_chat_screen.dart';
 import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
 import 'package:hachimi_app/screens/cat_room/inventory_screen.dart';
 import 'package:hachimi_app/screens/check_in/check_in_screen.dart';
@@ -40,8 +38,6 @@ class AppRouter {
   static const String checkIn = '/check-in';
   static const String catDiary = '/cat-diary';
   static const String catChat = '/cat-chat';
-  static const String aiSettings = '/ai-settings';
-  static const String modelTestChat = '/model-test-chat';
   static const String sessionHistory = '/session-history';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -106,10 +102,6 @@ class AppRouter {
         final catId = settings.arguments as String;
         return MaterialPageRoute(builder: (_) => CatChatScreen(catId: catId));
       // Settings sub-pages use Shared Axis transition (horizontal)
-      case aiSettings:
-        return _sharedAxisRoute((_) => const AiSettingsPage());
-      case modelTestChat:
-        return _sharedAxisRoute((_) => const ModelTestChatScreen());
       case sessionHistory:
         return _sharedAxisRoute((_) => const SessionHistoryScreen());
       default:

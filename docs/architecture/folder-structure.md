@@ -26,6 +26,7 @@ hachimi-app/
 - `services/firebase/`: Firebase backend implementations
 - `screens/`: UI pages
 - `widgets/`: reusable UI components
+- `widgets/celebration/`: achievement celebration overlay system (6 files: `achievement_celebration_layer.dart`, `celebration_confetti_painter.dart`, `celebration_glow_icon.dart`, `celebration_overlay.dart`, `celebration_reward_badges.dart`, `celebration_tier.dart`)
 - `models/`: domain models
 
 ## Account Lifecycle Files

@@ -437,16 +437,6 @@ class SEn extends S {
   String get settingsThemeColorDynamicSubtitle => 'Use wallpaper colors';
 
   @override
-  String get settingsAiModel => 'AI Model';
-
-  @override
-  String get settingsAiFeatures => 'AI Features';
-
-  @override
-  String get settingsAiSubtitle =>
-      'Enable cat diary and chat powered by cloud AI';
-
-  @override
   String get settingsAbout => 'About';
 
   @override
@@ -562,76 +552,16 @@ class SEn extends S {
   String get commonYes => 'Yes';
 
   @override
-  String get testChatTitle => 'Test AI';
+  String chatDailyRemaining(int count) {
+    return '$count messages left today';
+  }
 
   @override
-  String get testChatModelReady => 'AI Ready';
+  String get chatDailyLimitReached => 'Daily message limit reached';
 
   @override
-  String get testChatSendToTest => 'Send a message to test the AI.';
-
-  @override
-  String get testChatGenerating => 'Generating...';
-
-  @override
-  String get testChatTypeMessage => 'Type a message...';
-
-  @override
-  String get settingsAiProvider => 'Provider';
-
-  @override
-  String get settingsAiProviderMinimax => 'MiniMax (default)';
-
-  @override
-  String get settingsAiProviderGemini => 'Gemini';
-
-  @override
-  String get settingsAiCloudBadge => 'Powered by cloud AI — requires network';
-
-  @override
-  String get settingsAiWhatYouGet => 'What you get:';
-
-  @override
-  String get settingsAiFeatureDiary =>
-      'Hachimi Diary — Your cat writes daily diary entries';
-
-  @override
-  String get settingsAiFeatureChat =>
-      'Cat Chat — Have conversations with your cat';
-
-  @override
-  String get settingsTestConnection => 'Test Connection';
-
-  @override
-  String get settingsConnectionSuccess => 'Connection successful';
-
-  @override
-  String get settingsConnectionFailed => 'Connection failed';
-
-  @override
-  String get settingsTestModel => 'Test Chat';
-
-  @override
-  String get settingsStatusReady => 'Ready';
-
-  @override
-  String get settingsStatusError => 'Error';
-
-  @override
-  String get settingsStatusDisabled => 'Disabled';
-
-  @override
-  String get aiPrivacyTitle => 'Cloud AI Privacy Notice';
-
-  @override
-  String get aiPrivacyMessage =>
-      'When AI features are enabled, your cat\'s name, personality, and focus data will be sent to cloud servers for generating diary entries and chat responses. An internet connection is required. You can disable AI features at any time.';
-
-  @override
-  String get aiPrivacyAccept => 'I understand';
-
-  @override
-  String get aiRequiresNetwork => 'Requires network connection';
+  String get aiTemporarilyUnavailable =>
+      'AI features are temporarily unavailable';
 
   @override
   String get catDetailNotFound => 'Cat not found';
@@ -2077,6 +2007,12 @@ class SEn extends S {
 
   @override
   String get achievementUnlocked => 'Achievement unlocked!';
+
+  @override
+  String get achievementAwesome => 'Awesome!';
+
+  @override
+  String get achievementIncredible => 'Incredible!';
 
   @override
   String get achievementHidden => '???';

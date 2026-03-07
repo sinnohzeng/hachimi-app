@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
 import 'package:hachimi_app/core/ai/ai_message.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/performance_traces.dart';
@@ -50,22 +55,130 @@ class DiaryService {
 
   /// 生成今日日记。
   /// 当天已有日记则直接返回，AI 未配置则返回 null。
+  /// 失败时保存重试条目到 SharedPreferences 队列。
   Future<DiaryEntry?> generateTodayDiary(DiaryGenerationContext ctx) async {
+    debugPrint('[DiaryService] generateTodayDiary start (catId=${ctx.cat.id})');
     final existing = await _dbService.getTodayDiary(ctx.cat.id);
-    if (existing != null) return existing;
+    if (existing != null) {
+      debugPrint('[DiaryService] cache hit — today diary exists');
+      return existing;
+    }
     if (!_aiService.isConfigured) return null;
 
     try {
-      return await _generateAndSave(ctx);
+      final result = await _generateAndSave(ctx);
+      debugPrint(
+        '[DiaryService] success (length=${result?.content.length ?? 0})',
+      );
+      return result;
     } catch (e, stack) {
+      debugPrint('[DiaryService] failed — saving retry (error=$e)');
       ErrorHandler.recordOperation(
         e,
         stackTrace: stack,
         feature: 'DiaryService',
         operation: 'generateTodayDiary',
       );
+      await savePendingRetry(ctx);
       return null;
     }
+  }
+
+  // ─── Retry Queue ───
+
+  static const _maxRetryAttempts = 3;
+
+  /// 保存待重试条目。
+  Future<void> savePendingRetry(DiaryGenerationContext ctx) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
+    final list = raw != null
+        ? (jsonDecode(raw) as List).cast<Map<String, dynamic>>()
+        : <Map<String, dynamic>>[];
+
+    // 移除同一 catId 已有的条目（覆盖）
+    list.removeWhere((e) => e['catId'] == ctx.cat.id);
+    list.add({
+      'catId': ctx.cat.id,
+      'habitId': ctx.habit.id,
+      'todayMinutes': ctx.todayMinutes,
+      'isZhLocale': ctx.isZhLocale,
+      'date': AppDateUtils.todayString(),
+      'attempts': 0,
+    });
+    await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
+  }
+
+  /// 处理待重试队列中指定 catId 的条目。
+  /// 由 CatDetailScreen 打开时调用。
+  Future<DiaryEntry?> processPendingRetries(
+    String catId,
+    Cat cat,
+    Habit habit,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
+    if (raw == null) return null;
+
+    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    final idx = list.indexWhere((e) => e['catId'] == catId);
+    if (idx == -1) return null;
+
+    final entry = list[idx];
+    final today = AppDateUtils.todayString();
+
+    // 过期（非今天）或超过最大重试次数 → 移除
+    if (entry['date'] != today ||
+        (entry['attempts'] as int) >= _maxRetryAttempts) {
+      list.removeAt(idx);
+      await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
+      return null;
+    }
+
+    // 今天的日记已存在 → 移除重试条目
+    final existing = await _dbService.getTodayDiary(catId);
+    if (existing != null) {
+      list.removeAt(idx);
+      await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
+      return existing;
+    }
+
+    // 尝试重试
+    entry['attempts'] = (entry['attempts'] as int) + 1;
+    list[idx] = entry;
+    await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
+
+    debugPrint(
+      '[DiaryService] retry attempt=${entry['attempts']} '
+      '(catId=$catId)',
+    );
+
+    final ctx = DiaryGenerationContext(
+      cat: cat,
+      habit: habit,
+      todayMinutes: entry['todayMinutes'] as int,
+      isZhLocale: entry['isZhLocale'] as bool,
+    );
+
+    try {
+      final result = await _generateAndSave(ctx);
+      if (result != null) await clearPendingRetry(catId);
+      return result;
+    } catch (e) {
+      debugPrint('[DiaryService] retry failed (error=$e)');
+      return null;
+    }
+  }
+
+  /// 清除指定 catId 的待重试条目。
+  Future<void> clearPendingRetry(String catId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
+    if (raw == null) return;
+
+    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    list.removeWhere((e) => e['catId'] == catId);
+    await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
   }
 
   // ─── Private Helpers ───

@@ -21,12 +21,14 @@ class ChatState {
   final ChatStatus status;
   final String partialResponse; // 流式生成中的部分回复
   final String? error;
+  final int remainingMessages; // 今日剩余可发送消息数
 
   const ChatState({
     this.messages = const [],
     this.status = ChatStatus.idle,
     this.partialResponse = '',
     this.error,
+    this.remainingMessages = 5,
   });
 
   ChatState copyWith({
@@ -34,12 +36,14 @@ class ChatState {
     ChatStatus? status,
     String? partialResponse,
     String? error,
+    int? remainingMessages,
   }) {
     return ChatState(
       messages: messages ?? this.messages,
       status: status ?? this.status,
       partialResponse: partialResponse ?? this.partialResponse,
       error: error,
+      remainingMessages: remainingMessages ?? this.remainingMessages,
     );
   }
 }
@@ -67,7 +71,12 @@ class ChatNotifier extends Notifier<ChatState> {
   Future<void> _loadHistory() async {
     try {
       final messages = await _chatService.getRecentMessages(_catId);
-      state = state.copyWith(messages: messages, status: ChatStatus.idle);
+      final remaining = await _chatService.getRemainingMessages(_catId);
+      state = state.copyWith(
+        messages: messages,
+        status: ChatStatus.idle,
+        remainingMessages: remaining,
+      );
     } catch (e) {
       state = state.copyWith(status: ChatStatus.error, error: e.toString());
     }
@@ -122,10 +131,12 @@ class ChatNotifier extends Notifier<ChatState> {
 
       // 生成完毕，从数据库重新加载消息（确保与 SQLite 一致）
       final messages = await _chatService.getRecentMessages(_catId);
+      final remaining = await _chatService.getRemainingMessages(_catId);
       state = state.copyWith(
         messages: messages,
         status: ChatStatus.idle,
         partialResponse: '',
+        remainingMessages: remaining,
       );
     } catch (e) {
       state = state.copyWith(

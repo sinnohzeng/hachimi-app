@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/services/firebase/firebase_remote_config_backend.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 
@@ -27,7 +29,11 @@ class DeferredInit {
     _completer = Completer<void>();
 
     try {
-      await Future.wait([_initNotifications(), _initFocusTimer()]);
+      await Future.wait([
+        _initNotifications(),
+        _initFocusTimer(),
+        _initRemoteConfig(),
+      ]);
     } finally {
       _done = true;
       _completer!.complete();
@@ -58,6 +64,22 @@ class DeferredInit {
         stackTrace: stack,
         feature: 'DeferredInit',
         operation: 'initFocusTimer',
+      );
+    }
+  }
+
+  static Future<void> _initRemoteConfig() async {
+    try {
+      await FirebaseRemoteConfigBackend().initialize({
+        'chat_daily_limit': AiConstants.chatDailyLimit,
+      });
+    } catch (e, stack) {
+      debugPrint('[DeferredInit] RemoteConfig init failed: $e');
+      ErrorHandler.recordOperation(
+        e,
+        stackTrace: stack,
+        feature: 'DeferredInit',
+        operation: 'initRemoteConfig',
       );
     }
   }

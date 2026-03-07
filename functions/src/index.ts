@@ -30,6 +30,7 @@ const DEFAULT_VERTEX_LOCATION = "us-central1";
 const obsDatasetParam = defineString("OBS_DATASET", { default: "obs" });
 const bqLocationParam = defineString("BQ_LOCATION", { default: "US" });
 const triageLimitParam = defineInt("AI_DEBUG_TRIAGE_LIMIT", { default: 25 });
+const aiUsageThresholdParam = defineInt("AI_USAGE_THRESHOLD", { default: 1000000 });
 const triageModelParam = defineString("TRIAGE_MODEL", { default: DEFAULT_TRIAGE_MODEL });
 const vertexLocationParam = defineString("TRIAGE_VERTEX_LOCATION", {
   default: DEFAULT_VERTEX_LOCATION,
@@ -108,6 +109,80 @@ export const wipeUserDataV2 = onCall(
   },
   async (request) => {
     return handleWipeUserData(request, "wipeUserDataV2", true);
+  },
+);
+
+export const monitorAiUsageV1 = onSchedule(
+  { schedule: "0 6 * * *" },
+  async () => {
+    const projectId = process.env.GCLOUD_PROJECT;
+    if (!projectId) {
+      logger.warn("monitorAiUsageV1: GCLOUD_PROJECT not set");
+      return;
+    }
+
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dateStr = yesterday.toISOString().slice(0, 10).replace(/-/g, "");
+
+    const query = `
+      SELECT
+        COALESCE(SUM(CAST(ep.value.int_value AS INT64)), 0) AS total_tokens,
+        COUNT(DISTINCT user_pseudo_id) AS unique_users,
+        COUNTIF(
+          (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'operation') = 'diary'
+        ) AS diary_count,
+        COUNTIF(
+          (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'operation') = 'chat'
+        ) AS chat_count
+      FROM \`${projectId}.analytics_${obsDatasetParam.value()}.events_${dateStr}\`,
+        UNNEST(event_params) AS ep
+      WHERE event_name = 'ai_token_usage'
+        AND ep.key IN ('prompt_tokens', 'completion_tokens')
+    `;
+
+    try {
+      const [rows] = await bigQuery.query({
+        query,
+        location: bqLocationParam.value(),
+      });
+      const row = rows[0] || { total_tokens: 0, unique_users: 0, diary_count: 0, chat_count: 0 };
+      const totalTokens = Number(row.total_tokens ?? 0);
+      const uniqueUsers = Number(row.unique_users ?? 0);
+      const diaryCount = Number(row.diary_count ?? 0);
+      const chatCount = Number(row.chat_count ?? 0);
+
+      await db.doc(`admin/ai_usage_daily/${dateStr}`).set({
+        date: dateStr,
+        totalTokens,
+        uniqueUsers,
+        diaryCount,
+        chatCount,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      logger.info("ai_usage_monitor_completed", {
+        date: dateStr,
+        totalTokens,
+        uniqueUsers,
+        diaryCount,
+        chatCount,
+      });
+
+      if (totalTokens > aiUsageThresholdParam.value()) {
+        logger.warn("ai_usage_threshold_exceeded", {
+          date: dateStr,
+          totalTokens,
+          threshold: aiUsageThresholdParam.value(),
+        });
+      }
+    } catch (error) {
+      logger.error("ai_usage_monitor_failed", {
+        date: dateStr,
+        error_code: mapErrorCode(error),
+      });
+    }
   },
 );
 

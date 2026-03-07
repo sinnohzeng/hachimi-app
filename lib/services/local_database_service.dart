@@ -378,6 +378,22 @@ class LocalDatabaseService {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
+  /// 获取指定猫猫今天的用户消息数量。
+  Future<int> getTodayUserMessageCount(String catId) async {
+    final db = await database;
+    final todayStart = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    ).millisecondsSinceEpoch;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM chat_messages '
+      "WHERE cat_id = ? AND role = 'user' AND created_at >= ?",
+      [catId, todayStart],
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   /// 删除指定猫猫的所有聊天记录。
   Future<void> clearChatHistory(String catId) async {
     final db = await database;

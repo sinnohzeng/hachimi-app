@@ -1,16 +1,8 @@
-// ---
-// 📘 文件说明：
-// ChatMessage 与 ChatRole 单元测试 — 验证聊天消息序列化和角色解析。
-//
-// 🧩 文件结构：
-// - ChatRole 枚举: value, fromString
-// - ChatMessage: toMap / fromMap roundtrip
-// - ChatService.maxHistoryMessages 常量
-//
-// 🕒 创建时间：2026-02-20
-// ---
+// ChatService unit tests — ChatRole, ChatMessage serialization,
+// constants, and getRemainingMessages boundary conditions.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 import 'package:hachimi_app/services/chat_service.dart';
 
@@ -85,6 +77,46 @@ void main() {
   group('ChatService — constants', () {
     test('maxHistoryMessages is 20', () {
       expect(ChatService.maxHistoryMessages, equals(20));
+    });
+
+    test('recentMessagesFetchLimit is 50', () {
+      expect(ChatService.recentMessagesFetchLimit, equals(50));
+    });
+  });
+
+  group('AiConstants.chatDailyLimit', () {
+    test('daily limit is 5', () {
+      expect(AiConstants.chatDailyLimit, equals(5));
+    });
+  });
+
+  group('getRemainingMessages — boundary logic', () {
+    // Tests the clamping arithmetic: (limit - sent).clamp(0, limit)
+    // where limit = AiConstants.chatDailyLimit = 5.
+    const limit = AiConstants.chatDailyLimit;
+
+    test('0 sent → 5 remaining', () {
+      expect((limit - 0).clamp(0, limit), equals(5));
+    });
+
+    test('1 sent → 4 remaining', () {
+      expect((limit - 1).clamp(0, limit), equals(4));
+    });
+
+    test('4 sent → 1 remaining', () {
+      expect((limit - 4).clamp(0, limit), equals(1));
+    });
+
+    test('5 sent → 0 remaining (at limit)', () {
+      expect((limit - 5).clamp(0, limit), equals(0));
+    });
+
+    test('6 sent → 0 remaining (clamp prevents negative)', () {
+      expect((limit - 6).clamp(0, limit), equals(0));
+    });
+
+    test('100 sent → 0 remaining (far exceeds limit)', () {
+      expect((limit - 100).clamp(0, limit), equals(0));
     });
   });
 }

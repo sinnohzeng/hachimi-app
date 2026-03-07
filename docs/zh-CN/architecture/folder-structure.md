@@ -26,6 +26,7 @@ hachimi-app/
 - `services/firebase/`：Firebase 实现
 - `screens/`：页面层
 - `widgets/`：复用组件
+- `widgets/celebration/`：成就庆祝弹层系统（6 个文件：`achievement_celebration_layer.dart`、`celebration_confetti_painter.dart`、`celebration_glow_icon.dart`、`celebration_overlay.dart`、`celebration_reward_badges.dart`、`celebration_tier.dart`）
 - `models/`：领域模型
 
 ## 账户生命周期关键文件

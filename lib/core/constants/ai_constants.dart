@@ -6,9 +6,12 @@ class AiConstants {
 
   // ─── SharedPreferences Keys ───
 
-  static const String prefAiEnabled = 'ai_features_enabled';
-  static const String prefAiPrivacyAcknowledged = 'ai_privacy_acknowledged';
   static const String prefAiProvider = 'ai_selected_provider';
+
+  // ─── Chat Limits ───
+
+  /// 每只猫每天最大聊天消息数。
+  static const int chatDailyLimit = 5;
 }
 
 // ─── Prompt Metadata Lookup Tables ───
@@ -266,20 +269,5 @@ class ChatPrompt {
         '- Occasionally use cat sounds (meow~, purr~, nya~)\n'
         '- Encourage your owner to complete their habit goals\n'
         '- Do not mention being an AI';
-  }
-}
-
-/// 测试 prompt 构建器 — 无猫猫角色。
-class TestPrompt {
-  TestPrompt._();
-
-  /// 构建测试聊天的消息列表。
-  static List<AiMessage> build(String userMessage) {
-    return [
-      const AiMessage.system(
-        'You are a helpful AI assistant. Respond concisely in 1-2 sentences.',
-      ),
-      AiMessage.user(userMessage),
-    ];
   }
 }

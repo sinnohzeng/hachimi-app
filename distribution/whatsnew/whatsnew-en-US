@@ -1,7 +1,8 @@
-v2.29.1
+v2.30.0
 
-- Fixed: Login no longer shows false error messages when sign-in succeeds
-- Fixed: Cat progress is preserved after signing in with Google or email
-- Fixed: Account deletion no longer gets stuck in an infinite loading loop
-- Added: "Start fresh" escape option when deletion retry limit is reached
-- Added: Automatic recovery of orphaned guest data on app startup
+- New: AI features (diary & chat) are now always on — no setup needed
+- New: 5-message daily chat limit per cat with remaining count display
+- New: Failed diary entries auto-retry on next visit (up to 3 attempts)
+- New: Offline banner when AI is temporarily unavailable
+- Improved: Faster AI startup with lazy validation and circuit breaker
+- Removed: AI settings page (no longer needed)

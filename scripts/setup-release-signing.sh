@@ -26,7 +26,7 @@ NC='\033[0m'
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KEYSTORE_PATH="$HOME/hachimi-release.jks"
-KEY_ALIAS="hachimi-release"
+KEY_ALIAS="upload"
 KEY_PROPERTIES="$PROJECT_ROOT/android/key.properties"
 
 echo ""

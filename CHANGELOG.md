@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.30.0] - 2026-03-07
+
+### Changed
+- **AI always-on**: AI features (diary generation, cat chat) are now always available for authenticated users — no toggle needed
+- **Simplified AI state**: `AiAvailability` reduced from 3-state to 2-state (`ready` / `error`); removed `AiFeatureNotifier` and privacy dialog
+- **Lazy validation**: AI availability uses optimistic `ready` state with async background probe instead of blocking on startup
+- **Circuit breaker**: After 3 consecutive AI failures, requests are suppressed for 5 minutes to prevent retry storms
+- **Celebration redesign**: Achievement overlay decomposed from 1 file (541L) into 6 focused files in `lib/widgets/celebration/`; 3-tier celebration system (Standard/Notable/Epic) with haptic scarcity; migrated from `MaterialApp.builder` to `OverlayPortal`
+
+### Added
+- **Chat daily limit**: 5 messages per cat per day with remaining count in chat bar; configurable via Firebase RemoteConfig
+- **Diary retry queue**: Failed diary generations are saved to SharedPreferences and retried (up to 3 attempts) on next CatDetail visit
+- **Network timeout protection**: Per-operation timeouts (chat 15s, diary 20s, validation 5s, streaming idle 10s)
+- **AI offline banner**: Authenticated users see a `cloud_off` banner when AI is unavailable, instead of silently hiding cards
+- **Token analytics**: `ai_token_usage` and `ai_chat_limit_reached` GA4 events for cost monitoring
+- **Cloud Function**: `monitorAiUsageV1` daily scheduled function aggregates AI token usage from BigQuery to Firestore
+- 3 new L10N keys across 5 languages: `chatDailyRemaining`, `chatDailyLimitReached`, `aiTemporarilyUnavailable`
+
+### Removed
+- AI settings page (`ai_settings_page.dart`) and test chat screen (`model_test_chat_screen.dart`)
+- `aiSettings` and `modelTestChat` routes
+- ~26 dead L10N keys (AI settings, privacy dialog, test chat, network requirement)
+- AI Model section from Settings screen
+
+### Fixed
+- Type safety: `dynamic` parameters replaced with proper `Cat`/`Habit` types in `focus_complete_screen.dart` and `cat_chat_screen.dart`
+- `_AiTeaserCard`: removed `BuildContext context` constructor parameter (anti-pattern)
+- AppBar chat icon now properly hidden for guest users
+
 ## [2.29.1] - 2026-03-07
 
 ### Fixed

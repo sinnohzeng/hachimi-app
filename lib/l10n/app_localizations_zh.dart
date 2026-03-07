@@ -432,15 +432,6 @@ class SZh extends S {
   String get settingsThemeColorDynamicSubtitle => '使用壁纸颜色';
 
   @override
-  String get settingsAiModel => 'AI 模型';
-
-  @override
-  String get settingsAiFeatures => 'AI 功能';
-
-  @override
-  String get settingsAiSubtitle => '启用由云端 AI 驱动的猫猫日记和聊天';
-
-  @override
   String get settingsAbout => '关于';
 
   @override
@@ -555,74 +546,15 @@ class SZh extends S {
   String get commonYes => '是';
 
   @override
-  String get testChatTitle => '测试 AI';
+  String chatDailyRemaining(int count) {
+    return '今天还可以发送 $count 条消息';
+  }
 
   @override
-  String get testChatModelReady => 'AI 就绪';
+  String get chatDailyLimitReached => '今日消息额度已用完';
 
   @override
-  String get testChatSendToTest => '发送消息来测试 AI。';
-
-  @override
-  String get testChatGenerating => '生成中...';
-
-  @override
-  String get testChatTypeMessage => '输入消息...';
-
-  @override
-  String get settingsAiProvider => '服务商';
-
-  @override
-  String get settingsAiProviderMinimax => 'MiniMax（默认）';
-
-  @override
-  String get settingsAiProviderGemini => 'Gemini';
-
-  @override
-  String get settingsAiCloudBadge => '由云端 AI 驱动 — 需要网络连接';
-
-  @override
-  String get settingsAiWhatYouGet => '你将获得：';
-
-  @override
-  String get settingsAiFeatureDiary => 'Hachimi 日记 — 猫猫每天为你写日记';
-
-  @override
-  String get settingsAiFeatureChat => '猫猫聊天 — 和你的猫猫对话';
-
-  @override
-  String get settingsTestConnection => '测试连接';
-
-  @override
-  String get settingsConnectionSuccess => '连接成功';
-
-  @override
-  String get settingsConnectionFailed => '连接失败';
-
-  @override
-  String get settingsTestModel => '测试聊天';
-
-  @override
-  String get settingsStatusReady => '就绪';
-
-  @override
-  String get settingsStatusError => '错误';
-
-  @override
-  String get settingsStatusDisabled => '已停用';
-
-  @override
-  String get aiPrivacyTitle => '云端 AI 隐私说明';
-
-  @override
-  String get aiPrivacyMessage =>
-      '启用 AI 功能后，猫猫的名字、性格和专注数据将发送到云端服务器，用于生成日记和聊天回复。需要网络连接。你可以随时停用 AI 功能。';
-
-  @override
-  String get aiPrivacyAccept => '我了解了';
-
-  @override
-  String get aiRequiresNetwork => '需要网络连接';
+  String get aiTemporarilyUnavailable => 'AI 功能暂时不可用';
 
   @override
   String get catDetailNotFound => '未找到猫猫';
@@ -2051,6 +1983,12 @@ class SZh extends S {
   String get achievementUnlocked => '成就解锁！';
 
   @override
+  String get achievementAwesome => '太棒了！';
+
+  @override
+  String get achievementIncredible => '不可思议！';
+
+  @override
   String get achievementHidden => '???';
 
   @override
@@ -2791,15 +2729,6 @@ class SZhHant extends SZh {
   String get settingsThemeColorDynamicSubtitle => '使用桌布顏色';
 
   @override
-  String get settingsAiModel => 'AI 模型';
-
-  @override
-  String get settingsAiFeatures => 'AI 功能';
-
-  @override
-  String get settingsAiSubtitle => '啟用由雲端 AI 驅動嘅貓咪日記同聊天';
-
-  @override
   String get settingsAbout => '關於';
 
   @override
@@ -2914,74 +2843,15 @@ class SZhHant extends SZh {
   String get commonYes => '係';
 
   @override
-  String get testChatTitle => '測試 AI';
+  String chatDailyRemaining(int count) {
+    return '今天還可以傳送 $count 條訊息';
+  }
 
   @override
-  String get testChatModelReady => 'AI 就緒';
+  String get chatDailyLimitReached => '今日訊息額度已用完';
 
   @override
-  String get testChatSendToTest => '傳送訊息嚟測試 AI。';
-
-  @override
-  String get testChatGenerating => '產生中⋯';
-
-  @override
-  String get testChatTypeMessage => '輸入訊息⋯';
-
-  @override
-  String get settingsAiProvider => '服務商';
-
-  @override
-  String get settingsAiProviderMinimax => 'MiniMax（預設）';
-
-  @override
-  String get settingsAiProviderGemini => 'Gemini';
-
-  @override
-  String get settingsAiCloudBadge => '由雲端 AI 驅動——需要網絡連接';
-
-  @override
-  String get settingsAiWhatYouGet => '你會獲得：';
-
-  @override
-  String get settingsAiFeatureDiary => 'Hachimi 日記——貓咪每日為你寫日記';
-
-  @override
-  String get settingsAiFeatureChat => '貓咪聊天——同你嘅貓咪傾偈';
-
-  @override
-  String get settingsTestConnection => '測試連接';
-
-  @override
-  String get settingsConnectionSuccess => '連接成功';
-
-  @override
-  String get settingsConnectionFailed => '連接失敗';
-
-  @override
-  String get settingsTestModel => '測試聊天';
-
-  @override
-  String get settingsStatusReady => '就緒';
-
-  @override
-  String get settingsStatusError => '錯誤';
-
-  @override
-  String get settingsStatusDisabled => '已停用';
-
-  @override
-  String get aiPrivacyTitle => '雲端 AI 私隱聲明';
-
-  @override
-  String get aiPrivacyMessage =>
-      '啟用 AI 功能後，貓咪嘅名、性格同專注數據會傳送到雲端伺服器，用嚟產生日記同聊天回覆。需要網絡連接。你可以隨時停用 AI 功能。';
-
-  @override
-  String get aiPrivacyAccept => '我明白了';
-
-  @override
-  String get aiRequiresNetwork => '需要網絡連接';
+  String get aiTemporarilyUnavailable => 'AI 功能暫時無法使用';
 
   @override
   String get catDetailNotFound => '搵唔到貓咪';
@@ -4408,6 +4278,12 @@ class SZhHant extends SZh {
 
   @override
   String get achievementUnlocked => '成就解鎖！';
+
+  @override
+  String get achievementAwesome => '太棒了！';
+
+  @override
+  String get achievementIncredible => '不可思議！';
 
   @override
   String get achievementHidden => '???';

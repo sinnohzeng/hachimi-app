@@ -864,24 +864,6 @@ abstract class S {
   /// **'Use wallpaper colors'**
   String get settingsThemeColorDynamicSubtitle;
 
-  /// No description provided for @settingsAiModel.
-  ///
-  /// In en, this message translates to:
-  /// **'AI Model'**
-  String get settingsAiModel;
-
-  /// No description provided for @settingsAiFeatures.
-  ///
-  /// In en, this message translates to:
-  /// **'AI Features'**
-  String get settingsAiFeatures;
-
-  /// No description provided for @settingsAiSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable cat diary and chat powered by cloud AI'**
-  String get settingsAiSubtitle;
-
   /// No description provided for @settingsAbout.
   ///
   /// In en, this message translates to:
@@ -1110,143 +1092,23 @@ abstract class S {
   /// **'Yes'**
   String get commonYes;
 
-  /// No description provided for @testChatTitle.
+  /// No description provided for @chatDailyRemaining.
   ///
   /// In en, this message translates to:
-  /// **'Test AI'**
-  String get testChatTitle;
+  /// **'{count} messages left today'**
+  String chatDailyRemaining(int count);
 
-  /// No description provided for @testChatModelReady.
+  /// No description provided for @chatDailyLimitReached.
   ///
   /// In en, this message translates to:
-  /// **'AI Ready'**
-  String get testChatModelReady;
+  /// **'Daily message limit reached'**
+  String get chatDailyLimitReached;
 
-  /// No description provided for @testChatSendToTest.
+  /// No description provided for @aiTemporarilyUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'Send a message to test the AI.'**
-  String get testChatSendToTest;
-
-  /// No description provided for @testChatGenerating.
-  ///
-  /// In en, this message translates to:
-  /// **'Generating...'**
-  String get testChatGenerating;
-
-  /// No description provided for @testChatTypeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Type a message...'**
-  String get testChatTypeMessage;
-
-  /// No description provided for @settingsAiProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'Provider'**
-  String get settingsAiProvider;
-
-  /// No description provided for @settingsAiProviderMinimax.
-  ///
-  /// In en, this message translates to:
-  /// **'MiniMax (default)'**
-  String get settingsAiProviderMinimax;
-
-  /// No description provided for @settingsAiProviderGemini.
-  ///
-  /// In en, this message translates to:
-  /// **'Gemini'**
-  String get settingsAiProviderGemini;
-
-  /// No description provided for @settingsAiCloudBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Powered by cloud AI — requires network'**
-  String get settingsAiCloudBadge;
-
-  /// No description provided for @settingsAiWhatYouGet.
-  ///
-  /// In en, this message translates to:
-  /// **'What you get:'**
-  String get settingsAiWhatYouGet;
-
-  /// No description provided for @settingsAiFeatureDiary.
-  ///
-  /// In en, this message translates to:
-  /// **'Hachimi Diary — Your cat writes daily diary entries'**
-  String get settingsAiFeatureDiary;
-
-  /// No description provided for @settingsAiFeatureChat.
-  ///
-  /// In en, this message translates to:
-  /// **'Cat Chat — Have conversations with your cat'**
-  String get settingsAiFeatureChat;
-
-  /// No description provided for @settingsTestConnection.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Connection'**
-  String get settingsTestConnection;
-
-  /// No description provided for @settingsConnectionSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection successful'**
-  String get settingsConnectionSuccess;
-
-  /// No description provided for @settingsConnectionFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection failed'**
-  String get settingsConnectionFailed;
-
-  /// No description provided for @settingsTestModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Chat'**
-  String get settingsTestModel;
-
-  /// No description provided for @settingsStatusReady.
-  ///
-  /// In en, this message translates to:
-  /// **'Ready'**
-  String get settingsStatusReady;
-
-  /// No description provided for @settingsStatusError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error'**
-  String get settingsStatusError;
-
-  /// No description provided for @settingsStatusDisabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Disabled'**
-  String get settingsStatusDisabled;
-
-  /// No description provided for @aiPrivacyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud AI Privacy Notice'**
-  String get aiPrivacyTitle;
-
-  /// No description provided for @aiPrivacyMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'When AI features are enabled, your cat\'s name, personality, and focus data will be sent to cloud servers for generating diary entries and chat responses. An internet connection is required. You can disable AI features at any time.'**
-  String get aiPrivacyMessage;
-
-  /// No description provided for @aiPrivacyAccept.
-  ///
-  /// In en, this message translates to:
-  /// **'I understand'**
-  String get aiPrivacyAccept;
-
-  /// No description provided for @aiRequiresNetwork.
-  ///
-  /// In en, this message translates to:
-  /// **'Requires network connection'**
-  String get aiRequiresNetwork;
+  /// **'AI features are temporarily unavailable'**
+  String get aiTemporarilyUnavailable;
 
   /// No description provided for @catDetailNotFound.
   ///
@@ -3887,6 +3749,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Achievement unlocked!'**
   String get achievementUnlocked;
+
+  /// No description provided for @achievementAwesome.
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome!'**
+  String get achievementAwesome;
+
+  /// No description provided for @achievementIncredible.
+  ///
+  /// In en, this message translates to:
+  /// **'Incredible!'**
+  String get achievementIncredible;
 
   /// No description provided for @achievementHidden.
   ///

@@ -6,6 +6,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -150,7 +151,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   }
 
   /// 异步触发日记生成 — fire-and-forget，不影响 UI。
-  void _triggerDiaryGeneration(dynamic cat, dynamic habit) {
+  void _triggerDiaryGeneration(Cat? cat, Habit? habit) {
     if (_diaryTriggered) return;
     _diaryTriggered = true;
 
@@ -162,7 +163,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
 
     final locale = Localizations.localeOf(context);
     final diaryService = ref.read(diaryServiceProvider);
-    final catId = (cat as Cat).id;
+    final catId = cat.id;
     final ctx = DiaryGenerationContext(
       cat: cat,
       habit: habit,

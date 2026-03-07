@@ -7,9 +7,7 @@ import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
-import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
-import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
@@ -171,38 +169,16 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             const Divider(),
 
-            // AI Model section
-            StaggeredListItem(
-              index: 7,
-              child: SectionHeader(
-                title: l10n.settingsAiModel,
-                colorScheme: colorScheme,
-              ),
-            ),
-            StaggeredListItem(
-              index: 8,
-              child: _buildAiListTile(
-                context,
-                ref,
-                l10n,
-                colorScheme,
-                textTheme,
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-            const Divider(),
-
             // About section
             StaggeredListItem(
-              index: 9,
+              index: 7,
               child: SectionHeader(
                 title: l10n.settingsAbout,
                 colorScheme: colorScheme,
               ),
             ),
             StaggeredListItem(
-              index: 10,
+              index: 8,
               child: ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: Text(l10n.settingsVersion),
@@ -216,7 +192,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             StaggeredListItem(
-              index: 11,
+              index: 9,
               child: ListTile(
                 leading: const Icon(Icons.description_outlined),
                 title: Text(l10n.settingsLicenses),
@@ -239,7 +215,7 @@ class SettingsScreen extends ConsumerWidget {
 
             // Account section
             StaggeredListItem(
-              index: 12,
+              index: 10,
               child: SectionHeader(
                 title: l10n.settingsAccount,
                 colorScheme: colorScheme,
@@ -248,7 +224,7 @@ class SettingsScreen extends ConsumerWidget {
             if (isGuest) ...[
               // 访客：登录入口 + 清除数据
               StaggeredListItem(
-                index: 13,
+                index: 11,
                 child: ListTile(
                   leading: Icon(Icons.login, color: colorScheme.primary),
                   title: Text(
@@ -260,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               StaggeredListItem(
-                index: 14,
+                index: 12,
                 child: ListTile(
                   leading: Icon(
                     Icons.delete_sweep_outlined,
@@ -276,7 +252,7 @@ class SettingsScreen extends ConsumerWidget {
             ] else ...[
               // 已登录：退出 + 删除账号
               StaggeredListItem(
-                index: 13,
+                index: 11,
                 child: ListTile(
                   leading: Icon(Icons.logout, color: colorScheme.error),
                   title: Text(
@@ -287,7 +263,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               StaggeredListItem(
-                index: 14,
+                index: 12,
                 child: ListTile(
                   leading: Icon(Icons.delete_forever, color: colorScheme.error),
                   title: Text(
@@ -309,45 +285,6 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  // --- AI Settings Navigation ---
-
-  Widget _buildAiListTile(
-    BuildContext context,
-    WidgetRef ref,
-    S l10n,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    final aiEnabled = ref.watch(aiFeatureEnabledProvider);
-    final availability = ref.watch(aiAvailabilityProvider);
-    final aiService = ref.watch(aiServiceProvider);
-
-    final subtitle = aiEnabled
-        ? '${aiService.providerName} · ${_availabilityLabel(availability, l10n)}'
-        : l10n.settingsStatusDisabled;
-
-    return ListTile(
-      leading: const Icon(Icons.smart_toy_outlined),
-      title: Text(l10n.settingsAiFeatures),
-      subtitle: Text(
-        subtitle,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => Navigator.of(context).pushNamed(AppRouter.aiSettings),
-    );
-  }
-
-  String _availabilityLabel(AiAvailability availability, S l10n) {
-    return switch (availability) {
-      AiAvailability.ready => l10n.settingsStatusReady,
-      AiAvailability.error => l10n.settingsStatusError,
-      AiAvailability.disabled => l10n.settingsStatusDisabled,
-    };
   }
 
   // --- Notification Settings ---

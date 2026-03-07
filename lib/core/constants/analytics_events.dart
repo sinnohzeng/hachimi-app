@@ -45,6 +45,8 @@ class AnalyticsEvents {
   static const String featureUsed = 'feature_used';
   static const String aiChatStarted = 'ai_chat_started';
   static const String aiDiaryGenerated = 'ai_diary_generated';
+  static const String aiChatLimitReached = 'ai_chat_limit_reached';
+  static const String aiTokenUsage = 'ai_token_usage';
 
   // Session quality
   static const String sessionQuality = 'session_quality';
@@ -110,6 +112,12 @@ class AnalyticsEvents {
 
   // Engagement depth params
   static const String paramFeature = 'feature';
+
+  // AI token usage params
+  static const String paramPromptTokens = 'prompt_tokens';
+  static const String paramCompletionTokens = 'completion_tokens';
+  static const String paramOperation = 'operation';
+  static const String paramProvider = 'provider';
 
   // Enhanced session params
   static const String paramTargetDurationMinutes = 'target_duration_minutes';

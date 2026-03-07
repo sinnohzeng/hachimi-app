@@ -434,15 +434,6 @@ class SKo extends S {
   String get settingsThemeColorDynamicSubtitle => '배경화면 색상 사용';
 
   @override
-  String get settingsAiModel => 'AI 모델';
-
-  @override
-  String get settingsAiFeatures => 'AI 기능';
-
-  @override
-  String get settingsAiSubtitle => '클라우드 AI 기반 고양이 일기와 채팅을 사용해 보세요';
-
-  @override
   String get settingsAbout => '정보';
 
   @override
@@ -557,74 +548,15 @@ class SKo extends S {
   String get commonYes => '네';
 
   @override
-  String get testChatTitle => 'AI 테스트';
+  String chatDailyRemaining(int count) {
+    return '오늘 $count개의 메시지를 더 보낼 수 있어요';
+  }
 
   @override
-  String get testChatModelReady => 'AI 준비 완료';
+  String get chatDailyLimitReached => '오늘의 메시지 한도에 도달했어요';
 
   @override
-  String get testChatSendToTest => '메시지를 보내 AI를 테스트해 보세요.';
-
-  @override
-  String get testChatGenerating => '생성 중...';
-
-  @override
-  String get testChatTypeMessage => '메시지를 입력하세요...';
-
-  @override
-  String get settingsAiProvider => '공급자';
-
-  @override
-  String get settingsAiProviderMinimax => 'MiniMax (기본값)';
-
-  @override
-  String get settingsAiProviderGemini => 'Gemini';
-
-  @override
-  String get settingsAiCloudBadge => '클라우드 AI 탑재 — 네트워크 연결 필요';
-
-  @override
-  String get settingsAiWhatYouGet => '제공되는 기능:';
-
-  @override
-  String get settingsAiFeatureDiary => '하치미 일기 — 고양이가 매일 일기를 써요';
-
-  @override
-  String get settingsAiFeatureChat => '고양이 채팅 — 고양이와 대화해 보세요';
-
-  @override
-  String get settingsTestConnection => '연결 테스트';
-
-  @override
-  String get settingsConnectionSuccess => '연결 성공';
-
-  @override
-  String get settingsConnectionFailed => '연결 실패';
-
-  @override
-  String get settingsTestModel => '채팅 테스트';
-
-  @override
-  String get settingsStatusReady => '준비 완료';
-
-  @override
-  String get settingsStatusError => '오류';
-
-  @override
-  String get settingsStatusDisabled => '비활성화됨';
-
-  @override
-  String get aiPrivacyTitle => '클라우드 AI 개인정보 안내';
-
-  @override
-  String get aiPrivacyMessage =>
-      'AI 기능을 활성화하면 고양이의 이름, 성격, 집중 데이터가 클라우드 서버로 전송되어 일기와 채팅 응답 생성에 사용돼요. 인터넷 연결이 필요해요. AI 기능은 언제든지 비활성화할 수 있어요.';
-
-  @override
-  String get aiPrivacyAccept => '이해했어요';
-
-  @override
-  String get aiRequiresNetwork => '네트워크 연결 필요';
+  String get aiTemporarilyUnavailable => 'AI 기능을 일시적으로 사용할 수 없어요';
 
   @override
   String get catDetailNotFound => '고양이를 찾을 수 없어요';
@@ -2054,6 +1986,12 @@ class SKo extends S {
 
   @override
   String get achievementUnlocked => '업적 달성!';
+
+  @override
+  String get achievementAwesome => '대단해!';
+
+  @override
+  String get achievementIncredible => '놀라워!';
 
   @override
   String get achievementHidden => '???';

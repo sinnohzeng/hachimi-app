@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
 import 'package:hachimi_app/core/ai/ai_message.dart';
@@ -61,6 +62,13 @@ class ChatService {
     return _dbService.getChatMessageCount(catId);
   }
 
+  /// 获取今日剩余可发送消息数。
+  Future<int> getRemainingMessages(String catId) async {
+    final sent = await _dbService.getTodayUserMessageCount(catId);
+    const limit = AiConstants.chatDailyLimit;
+    return (limit - sent).clamp(0, limit);
+  }
+
   /// 清除聊天历史。
   Future<void> clearHistory(String catId) {
     return _dbService.clearChatHistory(catId);
@@ -74,6 +82,16 @@ class ChatService {
     required String userMessage,
     required ChatContext chatCtx,
   }) async {
+    debugPrint('[ChatService] sendMessage start (catId=${chatCtx.cat.id})');
+
+    // 0. 检查每日消息限额
+    final remaining = await getRemainingMessages(chatCtx.cat.id);
+    debugPrint('[ChatService] remaining=$remaining');
+    if (remaining <= 0) {
+      debugPrint('[ChatService] daily limit reached');
+      throw Exception('Daily message limit reached');
+    }
+
     // 1. 保存用户消息到 SQLite
     await _saveMessage(chatCtx.cat.id, ChatRole.user, userMessage);
 
@@ -91,8 +109,10 @@ class ChatService {
           ? _fallbackResponse(chatCtx.isZhLocale)
           : response;
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, cleaned);
+      debugPrint('[ChatService] success (length=${cleaned.length})');
       return cleaned;
     } catch (e, stack) {
+      debugPrint('[ChatService] error=$e');
       ErrorHandler.recordOperation(
         e,
         stackTrace: stack,

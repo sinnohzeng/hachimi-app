@@ -9,10 +9,14 @@ class AiRequestConfig {
   /// Top-p 核采样。
   final double topP;
 
+  /// 请求超时时长。
+  final Duration timeout;
+
   const AiRequestConfig({
     required this.maxTokens,
     this.temperature = 0.7,
     this.topP = 0.9,
+    this.timeout = const Duration(seconds: 15),
   });
 
   /// 聊天场景默认配置。
@@ -20,6 +24,7 @@ class AiRequestConfig {
     maxTokens: 150,
     temperature: 0.7,
     topP: 0.9,
+    timeout: Duration(seconds: 15),
   );
 
   /// 日记生成默认配置。
@@ -27,6 +32,7 @@ class AiRequestConfig {
     maxTokens: 200,
     temperature: 0.7,
     topP: 0.9,
+    timeout: Duration(seconds: 20),
   );
 
   /// 连接验证用的最小配置。
@@ -34,5 +40,6 @@ class AiRequestConfig {
     maxTokens: 1,
     temperature: 0.0,
     topP: 1.0,
+    timeout: Duration(seconds: 5),
   );
 }

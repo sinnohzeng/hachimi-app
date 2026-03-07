@@ -53,6 +53,37 @@
 - Guest local uid (`guest_*`) never calls Firestore delete APIs.
 - Firebase backend implementation calls `deleteAccountV2` / `wipeUserDataV2` with limited-use App Check token.
 
+## AI Runtime
+
+### Availability Model
+
+`AiAvailability` is a 2-state enum: `ready` | `error`.
+
+- AI is always-on for authenticated users — there is no user-facing toggle.
+- `AiFeatureNotifier` and `aiFeatureEnabledProvider` have been deleted.
+- On startup, availability is optimistically set to `ready`. An async validation probe runs on first AI access (lazy validation).
+
+### Circuit Breaker
+
+`AiAvailabilityNotifier` tracks consecutive failures:
+- 3 consecutive failures trigger a 5-minute backoff (availability switches to `error`).
+- After backoff expires, the next AI access retries automatically.
+
+### Network Timeout Protection
+
+| Operation | Timeout |
+|-----------|---------|
+| Chat | 15s |
+| Diary | 20s |
+| Validation probe | 5s |
+| Streaming idle | 10s |
+
+### Chat Daily Limit
+
+Each cat is limited to **5 chat messages per day**, enforced via `getRemainingMessages()`.
+- Defense-in-depth: service-layer guard rejects messages at limit + UI disables the send button.
+- The limit is configurable via RemoteConfig (`chat_daily_limit`, default: 5).
+
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Providers must not reintroduce legacy compatibility branches.

@@ -210,7 +210,14 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           ),
           const SizedBox(height: AppSpacing.base),
         ],
-        if (aiReady) ...[
+        if (isGuest) ...[
+          StaggeredListItem(
+            waitForRoute: true,
+            index: idx++,
+            child: _AiTeaserCard(catName: cat.name),
+          ),
+          const SizedBox(height: AppSpacing.base),
+        ] else if (aiReady) ...[
           StaggeredListItem(
             waitForRoute: true,
             index: idx++,
@@ -223,11 +230,11 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
             child: ChatEntryCard(catId: cat.id, catName: cat.name),
           ),
           const SizedBox(height: AppSpacing.base),
-        ] else if (isGuest) ...[
+        ] else ...[
           StaggeredListItem(
             waitForRoute: true,
             index: idx++,
-            child: _AiTeaserCard(catName: cat.name, context: context),
+            child: const _AiOfflineBanner(),
           ),
           const SizedBox(height: AppSpacing.base),
         ],
@@ -312,7 +319,8 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         onPressed: () => _showRenameDialog(context, cat),
         tooltip: context.l10n.catDetailRenameTooltip,
       ),
-      if (ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
+      if (!ref.watch(isGuestProvider) &&
+          ref.watch(aiAvailabilityProvider) == AiAvailability.ready)
         IconButton(
           icon: const Icon(Icons.chat_bubble_outline),
           onPressed: () {
@@ -424,7 +432,14 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         ),
         const SizedBox(height: AppSpacing.base),
       ],
-      if (aiReady) ...[
+      if (isGuest) ...[
+        StaggeredListItem(
+          waitForRoute: true,
+          index: 2,
+          child: _AiTeaserCard(catName: cat.name),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ] else if (aiReady) ...[
         StaggeredListItem(
           waitForRoute: true,
           index: 2,
@@ -437,11 +452,11 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
           child: ChatEntryCard(catId: cat.id, catName: cat.name),
         ),
         const SizedBox(height: AppSpacing.base),
-      ] else if (isGuest) ...[
-        StaggeredListItem(
+      ] else ...[
+        const StaggeredListItem(
           waitForRoute: true,
           index: 2,
-          child: _AiTeaserCard(catName: cat.name, context: context),
+          child: _AiOfflineBanner(),
         ),
         const SizedBox(height: AppSpacing.base),
       ],
@@ -555,20 +570,19 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 /// AI 功能 Teaser 卡 — 访客用户看到的虚化预览引导。
 class _AiTeaserCard extends ConsumerWidget {
   final String catName;
-  final BuildContext context;
 
-  const _AiTeaserCard({required this.catName, required this.context});
+  const _AiTeaserCard({required this.catName});
 
   @override
-  Widget build(BuildContext innerContext, WidgetRef ref) {
-    final colorScheme = Theme.of(innerContext).colorScheme;
-    final textTheme = Theme.of(innerContext).textTheme;
-    final l10n = innerContext.l10n;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     return Card.outlined(
       child: InkWell(
         borderRadius: AppShape.borderMedium,
-        onTap: () => showGuestUpgradePrompt(innerContext, ref),
+        onTap: () => showGuestUpgradePrompt(context, ref),
         child: Padding(
           padding: AppSpacing.paddingBase,
           child: Column(
@@ -618,6 +632,43 @@ class _AiTeaserCard extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// AI 离线提示横幅 — 已登录用户 AI 不可用时显示。
+class _AiOfflineBanner extends StatelessWidget {
+  const _AiOfflineBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.cloud_off,
+              size: 20,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                context.l10n.aiTemporarilyUnavailable,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

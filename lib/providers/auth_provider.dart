@@ -48,7 +48,7 @@ final isGuestProvider = Provider<bool>((ref) {
 
 /// 引导完成状态 — 响应式，AuthGate 通过 watch 自动切换。
 ///
-/// 遵循 [AiFeatureNotifier] 模式（NotifierProvider + SharedPreferences 持久化）。
+/// 遵循 NotifierProvider + SharedPreferences 持久化模式。
 class OnboardingNotifier extends Notifier<bool> {
   @override
   bool build() {

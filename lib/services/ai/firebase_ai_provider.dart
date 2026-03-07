@@ -31,7 +31,17 @@ class FirebaseAiProvider implements AiProvider {
     _cancelRequested = false;
     try {
       final model = _createModel(messages, config);
-      final response = await model.generateContent(_toPrompt(messages));
+      final response = await model
+          .generateContent(_toPrompt(messages))
+          .timeout(
+            config.timeout,
+            onTimeout: () {
+              throw const AiException(
+                AiErrorType.networkError,
+                'Request timed out',
+              );
+            },
+          );
       if (_cancelRequested) {
         throw const AiException(AiErrorType.cancelled, 'Cancelled by user');
       }
@@ -55,12 +65,21 @@ class FirebaseAiProvider implements AiProvider {
     try {
       final model = _createModel(messages, config);
       final stream = model.generateContentStream(_toPrompt(messages));
+      var lastTokenTime = DateTime.now();
+      const idleTimeout = Duration(seconds: 10);
       await for (final event in stream) {
         if (_cancelRequested) {
           throw const AiException(AiErrorType.cancelled, 'Cancelled by user');
         }
+        if (DateTime.now().difference(lastTokenTime) > idleTimeout) {
+          throw const AiException(
+            AiErrorType.networkError,
+            'Stream idle timeout',
+          );
+        }
         final token = event.text;
         if (token == null || token.isEmpty) continue;
+        lastTokenTime = DateTime.now();
         yield token;
       }
     } catch (e, stack) {

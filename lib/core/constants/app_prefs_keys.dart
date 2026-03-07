@@ -23,4 +23,7 @@ class AppPrefsKeys {
   // ─── 应用生命周期 ───
   static const lastAppOpen = 'last_app_open';
   static const consecutiveDays = 'consecutive_days';
+
+  // ─── AI 日记重试队列 ───
+  static const diaryPendingRetries = 'diary_pending_retries';
 }

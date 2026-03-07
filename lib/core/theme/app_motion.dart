@@ -32,6 +32,12 @@ class AppMotion {
   static const Duration durationShimmer = Duration(milliseconds: 1500);
   static const Duration durationParticle = Duration(milliseconds: 3000);
 
+  // --- Celebration motion tokens ---
+  static const Duration durationCelebrationBuild = Duration(milliseconds: 600);
+  static const Duration durationCelebrationReveal = Duration(milliseconds: 400);
+  static const Duration durationCelebrationExit = Duration(milliseconds: 400);
+  static const Curve celebrationSpring = Curves.easeOutBack;
+
   // --- Easing tokens (M3 spec) ---
   static const Curve emphasized = Curves.easeInOutCubicEmphasized;
   static const Curve emphasizedDecelerate = Curves.easeOutCubic;

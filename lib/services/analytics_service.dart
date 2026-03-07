@@ -251,6 +251,30 @@ class AnalyticsService {
     ),
   );
 
+  Future<void> logAiChatLimitReached({required String catId}) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.aiChatLimitReached,
+      parameters: {AnalyticsEvents.paramCatId: catId},
+    ),
+  );
+
+  Future<void> logAiTokenUsage({
+    required String provider,
+    required String operation,
+    required int promptTokens,
+    required int completionTokens,
+  }) => _safeLog(
+    () => _analytics.logEvent(
+      name: AnalyticsEvents.aiTokenUsage,
+      parameters: {
+        AnalyticsEvents.paramProvider: provider,
+        AnalyticsEvents.paramOperation: operation,
+        AnalyticsEvents.paramPromptTokens: promptTokens,
+        AnalyticsEvents.paramCompletionTokens: completionTokens,
+      },
+    ),
+  );
+
   // ─── Session Quality Events ───
 
   Future<void> logSessionQuality({

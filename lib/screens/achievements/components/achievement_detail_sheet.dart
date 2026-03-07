@@ -3,12 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
-import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/models/unlocked_achievement.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
+import 'package:hachimi_app/widgets/celebration/celebration_tier.dart';
 
 /// 显示单个成就详情的底部弹窗。
 void showAchievementDetailSheet(
@@ -51,6 +51,7 @@ class _DetailContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final tier = CelebrationConfig.tierFromDef(def);
 
     final name = AchievementStrings.name(def.id, locale);
     final desc = _resolveDesc(context);
@@ -61,7 +62,7 @@ class _DetailContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildIcon(colorScheme),
+            _buildIcon(colorScheme, tier),
             const SizedBox(height: AppSpacing.md),
             Text(
               name,
@@ -78,6 +79,8 @@ class _DetailContent extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: AppSpacing.sm),
+            _TierChip(tier: tier, colorScheme: colorScheme),
             const Divider(height: 24),
             if (isUnlocked)
               _buildUnlockedInfo(context, colorScheme, textTheme)
@@ -90,7 +93,7 @@ class _DetailContent extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(ColorScheme colorScheme) {
+  Widget _buildIcon(ColorScheme colorScheme, CelebrationTier tier) {
     final bgColor = isUnlocked
         ? colorScheme.primaryContainer
         : colorScheme.surfaceContainerHighest;
@@ -99,13 +102,22 @@ class _DetailContent extends StatelessWidget {
         : colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
 
     return Container(
-      width: 48,
-      height: 48,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: AppShape.borderMedium,
+        shape: BoxShape.circle,
+        boxShadow: isUnlocked
+            ? [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                ),
+              ]
+            : null,
       ),
-      child: Icon(def.icon, color: iconColor, size: 24),
+      child: Icon(def.icon, color: iconColor, size: 32),
     );
   }
 
@@ -200,6 +212,34 @@ class _DetailContent extends StatelessWidget {
     final date = DateFormat.yMMMd(loc).format(unlockedAt);
     final time = DateFormat.Hm().format(unlockedAt);
     return '$date $time';
+  }
+}
+
+/// 层级标签 — 显示成就的稀有度层级。
+class _TierChip extends StatelessWidget {
+  final CelebrationTier tier;
+  final ColorScheme colorScheme;
+
+  const _TierChip({required this.tier, required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, bgColor) = switch (tier) {
+      CelebrationTier.epic => ('Epic', colorScheme.primaryContainer),
+      CelebrationTier.notable => ('Notable', colorScheme.tertiaryContainer),
+      CelebrationTier.standard => (
+        'Standard',
+        colorScheme.surfaceContainerHighest,
+      ),
+    };
+
+    return Chip(
+      label: Text(label),
+      backgroundColor: bgColor,
+      side: BorderSide.none,
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
+    );
   }
 }
 

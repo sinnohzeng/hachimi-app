@@ -29,7 +29,7 @@ Future<Widget> _buildTestApp({required VoidCallback onComplete}) async {
     overrides: [
       analyticsServiceProvider.overrideWithValue(_FakeAnalyticsService()),
       sharedPreferencesProvider.overrideWithValue(prefs),
-      themeProvider.overrideWith(() => _DisabledAnimationThemeNotifier()),
+      themeProvider.overrideWith(_DisabledAnimationThemeNotifier.new),
     ],
     child: MaterialApp(
       localizationsDelegates: S.localizationsDelegates,

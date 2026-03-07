@@ -459,7 +459,7 @@ The `CheckInScreen` (`/check-in` route) displays full monthly check-in details:
 
 ## Hachimi Diary (AI Cat Diary)
 
-The Hachimi Diary gives each cat the ability to write daily diary entries based on the user's habit completion, the cat's personality, and mood. Diary generation requires the cloud AI to be configured and AI features enabled.
+The Hachimi Diary gives each cat the ability to write daily diary entries based on the user's habit completion, the cat's personality, and mood. AI is always-on for authenticated users — no toggle is required.
 
 ### Generation Trigger
 
@@ -478,6 +478,13 @@ The diary prompt uses ChatML format (`<|im_start|>system/assistant<|im_end|>`) a
 - Bilingual templates (English and Chinese based on app locale)
 
 **Constants:** `lib/core/constants/ai_constants.dart` -> `class DiaryPrompt`
+
+### Diary Retry Queue
+
+Failed diary generations are queued for retry via SharedPreferences (JSON-serialized):
+- Maximum 3 retry attempts per entry.
+- Entries expire after 1 day (no retry after expiry).
+- Retries are attempted on next `CatDetailScreen` open or focus session completion.
 
 ### Cat Detail Page Integration
 
@@ -500,7 +507,19 @@ Tapping "View all" navigates to `CatDiaryScreen` (`/cat-diary` route).
 
 ## Cat Chat (AI Chat)
 
-Users can have text conversations with their cat. The cat responds in character based on its personality. Chat requires the cloud AI to be configured and AI features enabled.
+Users can have text conversations with their cat. The cat responds in character based on its personality. AI is always-on for authenticated users — no toggle is required. When AI is unavailable, a `_AiOfflineBanner` is shown in the chat screen.
+
+### Daily Message Limit
+
+Each cat is limited to **5 messages per day** (configurable via RemoteConfig key `chat_daily_limit`, default: 5). Enforcement is defense-in-depth: the service layer rejects messages at the limit, and the UI disables the send button via `getRemainingMessages()`.
+
+### Network Timeout Config
+
+| Operation | Timeout |
+|-----------|---------|
+| Chat | 15s |
+| Diary | 20s |
+| Validation probe | 5s |
 
 ### Entry Point
 

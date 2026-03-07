@@ -1,9 +1,4 @@
-// ---
-// AI Provider 单元测试 — 验证 AiAvailability 枚举和 AiException 分类。
-//
-// 🕒 创建时间：2026-02-23
-// ---
-
+// AI Provider unit tests — AiAvailability enum, AiException, AiRequestConfig.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
 import 'package:hachimi_app/core/ai/ai_exception.dart';
@@ -23,9 +18,8 @@ void main() {
   });
 
   group('AiAvailability — enum', () {
-    test('has 3 values', () {
-      expect(AiAvailability.values.length, equals(3));
-      expect(AiAvailability.values, contains(AiAvailability.disabled));
+    test('has 2 values (always-on architecture)', () {
+      expect(AiAvailability.values.length, equals(2));
       expect(AiAvailability.values, contains(AiAvailability.ready));
       expect(AiAvailability.values, contains(AiAvailability.error));
     });
@@ -84,15 +78,24 @@ void main() {
     test('chat preset', () {
       expect(AiRequestConfig.chat.maxTokens, equals(150));
       expect(AiRequestConfig.chat.temperature, closeTo(0.7, 0.01));
+      expect(AiRequestConfig.chat.timeout, equals(const Duration(seconds: 15)));
     });
 
     test('diary preset', () {
       expect(AiRequestConfig.diary.maxTokens, equals(200));
+      expect(
+        AiRequestConfig.diary.timeout,
+        equals(const Duration(seconds: 20)),
+      );
     });
 
-    test('validation preset uses minimal tokens', () {
+    test('validation preset uses minimal tokens and short timeout', () {
       expect(AiRequestConfig.validation.maxTokens, equals(1));
       expect(AiRequestConfig.validation.temperature, equals(0.0));
+      expect(
+        AiRequestConfig.validation.timeout,
+        equals(const Duration(seconds: 5)),
+      );
     });
   });
 
