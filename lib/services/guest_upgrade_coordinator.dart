@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/account_data_snapshot.dart';
 import 'package:hachimi_app/services/account_merge_service.dart';
 import 'package:hachimi_app/services/account_snapshot_service.dart';
@@ -25,7 +26,10 @@ class GuestUpgradeCoordinator {
     if (oldUid == newUid) return;
 
     final local = await _snapshotService.readLocal(oldUid);
-    final cloud = await _snapshotService.readCloud(newUid);
+
+    // 云端快照读取 best-effort — 失败视为空（安全默认保留本地）
+    final cloud = await _readCloudOrEmpty(newUid);
+
     if (!context.mounted) return;
     final choice = await _decide(context, local: local, cloud: cloud);
 
@@ -40,6 +44,20 @@ class GuestUpgradeCoordinator {
     }
 
     await _mergeService.keepCloud(oldUid: oldUid, newUid: newUid);
+  }
+
+  Future<AccountDataSnapshot> _readCloudOrEmpty(String uid) async {
+    try {
+      return await _snapshotService.readCloud(uid);
+    } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'GuestUpgradeCoordinator',
+        operation: 'readCloudSnapshot',
+        errorCode: 'cloud_snapshot_failed',
+      );
+      return const AccountDataSnapshot();
+    }
   }
 
   Future<ArchiveConflictChoice> _decide(

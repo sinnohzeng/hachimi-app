@@ -207,7 +207,7 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
       options: AdoptionStep1Form.targetHourOptions,
       selected: targetHours,
       isCustom: _isCustomTarget,
-      labelBuilder: (v) => '${v}h',
+      labelBuilder: (v) => '$v',
       customLabel: context.l10n.adoptionCustom,
       onSelected: (v) => setState(() {
         targetHours = v;
@@ -223,7 +223,7 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
       options: AdoptionStep1Form.goalOptions,
       selected: goalMinutes,
       isCustom: _isCustomGoal,
-      labelBuilder: (v) => '${v}min',
+      labelBuilder: (v) => '$v',
       customLabel: context.l10n.adoptionCustom,
       onSelected: (v) => setState(() {
         goalMinutes = v;

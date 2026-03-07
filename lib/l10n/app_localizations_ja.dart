@@ -1335,7 +1335,7 @@ class SJa extends S {
   String get adoptionQuestHint => '例: 面接の準備';
 
   @override
-  String get adoptionTotalTarget => '目標合計時間';
+  String get adoptionTotalTarget => '目標合計（時間）';
 
   @override
   String get adoptionGrowthHint => '集中時間が増えるとネコが成長します';
@@ -1344,7 +1344,7 @@ class SJa extends S {
   String get adoptionCustom => 'カスタム';
 
   @override
-  String get adoptionDailyGoalLabel => '1日の集中目標';
+  String get adoptionDailyGoalLabel => '1日の集中目標（分）';
 
   @override
   String get adoptionReminderLabel => 'デイリーリマインダー（任意）';
@@ -2345,6 +2345,9 @@ class SJa extends S {
 
   @override
   String get deleteAccountPending => 'アカウント削除処理が保留中です。オンライン状態を維持してください。';
+
+  @override
+  String get deleteAccountAbandon => 'やり直す';
 
   @override
   String get archiveConflictTitle => '保持するアーカイブを選択';

@@ -47,8 +47,11 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeCtrl;
 
-  /// 缓存路由动画引用，确保 dispose 时移除的是同一个对象。
-  Animation<double>? _routeAnimation;
+  /// 多态 opacity 驱动：默认使用 _fadeCtrl，路由转场中使用 CurvedAnimation。
+  late Animation<double> _opacity;
+
+  /// 标记是否已解析过路由动画，避免 didChangeDependencies 重复执行。
+  bool _resolved = false;
 
   @override
   void initState() {
@@ -58,12 +61,14 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
       duration: widget.fadeInDuration,
       value: widget.fadeIn ? 0.0 : 1.0,
     );
+    _opacity = _fadeCtrl;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!widget.fadeIn || _routeAnimation != null) return;
+    if (!widget.fadeIn || _resolved) return;
+    _resolved = true;
 
     final route = ModalRoute.of(context);
     if (route == null) {
@@ -74,23 +79,21 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
 
     final animation = route.animation;
     if (animation == null || animation.status == AnimationStatus.completed) {
-      // 转场已完成（如从后台恢复或热重载），或无动画
-      _fadeCtrl.value = 1.0;
-    } else {
-      _routeAnimation = animation;
-      animation.addStatusListener(_onRouteAnimationStatus);
-    }
-  }
-
-  void _onRouteAnimationStatus(AnimationStatus status) {
-    if (status == AnimationStatus.completed && mounted) {
+      // 转场已完成（如从后台恢复或热重载），渐入显示
       _fadeCtrl.forward();
+    } else {
+      // 路由转场进行中 — 同步 opacity 与转场进度。
+      // Interval(0.3, 1.0)：前 30% 保持不可见（shader 预热缓冲），
+      // 剩余 70% 随页面入场渐入。
+      _opacity = CurvedAnimation(
+        parent: animation,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+      );
     }
   }
 
   @override
   void dispose() {
-    _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
     _fadeCtrl.dispose();
     super.dispose();
   }
@@ -112,7 +115,7 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
     }
 
     return FadeTransition(
-      opacity: _fadeCtrl,
+      opacity: _opacity,
       child: SizedBox.expand(
         child: AnimatedMeshGradient(
           colors: widget.colors,

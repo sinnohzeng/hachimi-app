@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ import 'package:hachimi_app/core/utils/deferred_init.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart'; // re-exports service_providers
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -26,6 +28,7 @@ import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
 // NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/services/achievement_evaluator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -149,12 +152,20 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     if (_isPendingDeletionRetry) return;
     _isPendingDeletionRetry = true;
     try {
-      await ref
+      final changed = await ref
           .read(accountDeletionOrchestratorProvider)
           .resumePendingDeletion();
+      if (changed && mounted) setState(() {});
     } finally {
       _isPendingDeletionRetry = false;
     }
+  }
+
+  Future<void> _abandonPendingDeletion() async {
+    await ref
+        .read(accountDeletionOrchestratorProvider)
+        .abandonPendingDeletion();
+    await ref.read(userProfileNotifierProvider.notifier).logout();
   }
 
   /// 认证用户就绪后：缓存 UID、设置 Crashlytics。
@@ -225,8 +236,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     final authState = ref.watch(authStateProvider);
 
     if (_hasPendingDeletion(prefs)) {
-      _resumePendingDeletion();
-      return const _PendingDeletionScreen();
+      return _PendingDeletionScreen(onAbandon: _abandonPendingDeletion);
     }
 
     // 已认证 → 使用认证 UID
@@ -267,11 +277,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
 }
 
 class _PendingDeletionScreen extends ConsumerWidget {
-  const _PendingDeletionScreen();
+  final VoidCallback onAbandon;
+  const _PendingDeletionScreen({required this.onAbandon});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final retryCount =
+        ref
+            .read(sharedPreferencesProvider)
+            .getInt(AppPrefsKeys.deletionRetryCount) ??
+        0;
+    final showEscape = retryCount >= SyncConstants.deletionEscapeRetryThreshold;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -282,6 +300,13 @@ class _PendingDeletionScreen extends ConsumerWidget {
               const CircularProgressIndicator(),
               const SizedBox(height: AppSpacing.lg),
               Text(l10n.deleteAccountPending, textAlign: TextAlign.center),
+              if (showEscape) ...[
+                const SizedBox(height: AppSpacing.xl),
+                TextButton(
+                  onPressed: onAbandon,
+                  child: Text(l10n.deleteAccountAbandon),
+                ),
+              ],
             ],
           ),
         ),
@@ -329,10 +354,13 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     super.dispose();
   }
 
-  /// 启动后台引擎：数据水化 + 同步引擎 + 成就评估器。
+  /// 启动后台引擎：孤立数据恢复 + 数据水化 + 同步引擎 + 成就评估器。
   /// guest_ UID 跳过 Firestore 水化/同步（纯本地模式）。
   void _startBackgroundEngines() {
     final uid = widget.uid;
+
+    // Saga 补偿：检测未完成的访客迁移并恢复
+    _recoverOrphanedGuestData(uid);
 
     if (!uid.startsWith('guest_')) {
       // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
@@ -350,6 +378,32 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
       },
     );
     _evaluator!.start(uid);
+  }
+
+  /// 检测 localGuestUid 与当前 UID 不一致 → 补偿迁移。
+  /// 幂等：migrateUid 对已迁移数据是 no-op（UPDATE WHERE uid=oldUid 匹配 0 行）。
+  Future<void> _recoverOrphanedGuestData(String currentUid) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
+    if (guestUid == null || guestUid == currentUid) return;
+
+    try {
+      final ledger = ref.read(ledgerServiceProvider);
+      await ledger.migrateUid(guestUid, currentUid);
+      await prefs.remove(AppPrefsKeys.localGuestUid);
+      await prefs.setBool(AppPrefsKeys.dataHydrated, true);
+      ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+      debugPrint(
+        '[RECOVERY] migrated orphaned guest data: $guestUid -> $currentUid',
+      );
+    } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'FirstHabitGate',
+        operation: 'recoverOrphanedGuestData',
+        errorCode: 'guest_recovery_failed',
+      );
+    }
   }
 
   Future<void> _checkInterruptedSession() async {

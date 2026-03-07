@@ -1336,7 +1336,7 @@ class SKo extends S {
   String get adoptionQuestHint => '예: 면접 질문 준비';
 
   @override
-  String get adoptionTotalTarget => '총 목표 시간';
+  String get adoptionTotalTarget => '총 목표 (시간)';
 
   @override
   String get adoptionGrowthHint => '집중 시간이 쌓이면 고양이가 성장해요';
@@ -1345,7 +1345,7 @@ class SKo extends S {
   String get adoptionCustom => '직접 설정';
 
   @override
-  String get adoptionDailyGoalLabel => '일일 집중 목표';
+  String get adoptionDailyGoalLabel => '일일 집중 목표 (분)';
 
   @override
   String get adoptionReminderLabel => '일일 알림 (선택)';
@@ -2349,6 +2349,9 @@ class SKo extends S {
 
   @override
   String get deleteAccountPending => '계정 삭제가 대기 중입니다. 온라인 상태를 유지해 주세요.';
+
+  @override
+  String get deleteAccountAbandon => '새로 시작';
 
   @override
   String get archiveConflictTitle => '보관할 아카이브 선택';

@@ -58,25 +58,18 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
 
     try {
       final authBackend = ref.read(authBackendProvider);
-      final analyticsService = ref.read(analyticsServiceProvider);
-      final notifier = ref.read(userProfileNotifierProvider.notifier);
       final oldUid = ref.read(currentUidProvider);
       final wasAnonymous = authBackend.isAnonymous;
+
+      // Phase A: 认证 — 失败才显示 SnackBar
       final result = await _authenticate(authBackend);
 
-      await notifier.ensureProfile(
-        uid: result.uid,
-        email: _emailController.text.trim(),
-        displayName: result.displayName,
-      );
-      await _logSignUpIfNeeded(analyticsService, result);
-      await _resolveGuestConflictIfNeeded(
+      // Phase B: 账号设置 — 失败仅记录，不阻塞用户
+      await _finalizeAccountSetup(
         result: result,
         oldUid: oldUid,
         wasAnonymous: wasAnonymous,
       );
-
-      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -92,6 +85,38 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  /// 登录后账号初始化 — best-effort，失败不影响用户进入主页。
+  /// 未完成的访客迁移由 _FirstHabitGate._recoverOrphanedGuestData 兜底恢复。
+  Future<void> _finalizeAccountSetup({
+    required AuthResult result,
+    required String? oldUid,
+    required bool wasAnonymous,
+  }) async {
+    try {
+      final notifier = ref.read(userProfileNotifierProvider.notifier);
+      await notifier.ensureProfile(
+        uid: result.uid,
+        email: _emailController.text.trim(),
+        displayName: result.displayName,
+      );
+      await _logSignUpIfNeeded(ref.read(analyticsServiceProvider), result);
+      await _resolveGuestConflictIfNeeded(
+        result: result,
+        oldUid: oldUid,
+        wasAnonymous: wasAnonymous,
+      );
+
+      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+    } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'auth',
+        operation: 'finalize_account_setup',
+        errorCode: 'post_sign_in_error',
+      );
     }
   }
 

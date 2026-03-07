@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.29.1] - 2026-03-07
+
+### Fixed
+- **Login error handling**: Split auth flow into Phase A (authentication) and Phase B (account setup). Only Phase A failures show user-facing error SnackBar; Phase B failures log silently without misleading users
+- **Guest data preservation**: Reordered `AccountMergeService.keepLocal()` — local UID migration (atomic SQLite transaction) now executes before cloud cleanup, preventing data loss when cloud operations fail
+- **Saga compensation**: Added `_recoverOrphanedGuestData()` in `_FirstHabitGate` startup to detect and recover incomplete guest-to-authenticated migrations via `localGuestUid` persistence signal
+- **Account deletion state machine**: UID mismatch and max retries now properly clear pending deletion markers instead of looping indefinitely; `_PendingDeletionScreen` shows state-driven escape button after 3 failed retries
+- **Cloud snapshot resilience**: `GuestUpgradeCoordinator.readCloud()` now catches exceptions and defaults to empty snapshot, preventing cloud failures from blocking local data merge
+
+### Added
+- `SyncConstants.deletionMaxRetryCount` and `deletionEscapeRetryThreshold` constants
+- `AccountDeletionOrchestrator.abandonPendingDeletion()` for user-initiated escape from stuck deletion
+- `deleteAccountAbandon` L10N key across all 5 languages
+- 11 unit tests: `AccountDeletionOrchestrator` (6 tests) and `AccountMergeService` (5 tests)
+
 ## [2.29.0] - 2026-03-06
 
 ### Changed

@@ -17,4 +17,12 @@ class SyncConstants {
   static const keyDisplayName = 'display_name';
   static const keyCurrentTitle = 'current_title';
   static const keyUnlockedTitles = 'unlocked_titles';
+
+  // ─── 账号删除 ───
+
+  /// 账号删除远程重试上限。
+  static const deletionMaxRetryCount = 5;
+
+  /// 删除待处理页面显示逃生按钮的最小重试次数。
+  static const deletionEscapeRetryThreshold = 3;
 }

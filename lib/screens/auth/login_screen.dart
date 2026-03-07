@@ -30,36 +30,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authBackend = ref.read(authBackendProvider);
-      final analyticsService = ref.read(analyticsServiceProvider);
-      final notifier = ref.read(userProfileNotifierProvider.notifier);
       final oldUid = ref.read(currentUidProvider);
       final wasAnonymous = authBackend.isAnonymous;
+
+      // Phase A: 认证 — 失败才显示 SnackBar
       final result = widget.linkMode
           ? await authBackend.linkWithGoogle()
           : await authBackend.signInWithGoogle();
       if (result == null) return;
 
-      await notifier.ensureProfile(
-        uid: result.uid,
-        email: result.email ?? '',
-        displayName: result.displayName,
-      );
-
-      if (result.isNewUser) {
-        await analyticsService.logSignUp(
-          method: widget.linkMode ? 'google_link' : 'google',
-        );
-      }
-
-      await _resolveGuestConflictIfNeeded(
+      // Phase B: 账号设置 — 失败仅记录，不阻塞用户
+      await _finalizeAccountSetup(
         result: result,
         oldUid: oldUid,
         wasAnonymous: wasAnonymous,
       );
-
-      if (widget.linkMode && mounted) {
-        Navigator.of(context).popUntil((r) => r.isFirst);
-      }
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -75,6 +60,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } finally {
       if (mounted) setState(() => _isGoogleLoading = false);
+    }
+  }
+
+  /// 登录后账号初始化 — best-effort，失败不影响用户进入主页。
+  /// 未完成的访客迁移由 _FirstHabitGate._recoverOrphanedGuestData 兜底恢复。
+  Future<void> _finalizeAccountSetup({
+    required AuthResult result,
+    required String? oldUid,
+    required bool wasAnonymous,
+  }) async {
+    try {
+      final notifier = ref.read(userProfileNotifierProvider.notifier);
+      await notifier.ensureProfile(
+        uid: result.uid,
+        email: result.email ?? '',
+        displayName: result.displayName,
+      );
+
+      if (result.isNewUser) {
+        await ref
+            .read(analyticsServiceProvider)
+            .logSignUp(method: widget.linkMode ? 'google_link' : 'google');
+      }
+
+      await _resolveGuestConflictIfNeeded(
+        result: result,
+        oldUid: oldUid,
+        wasAnonymous: wasAnonymous,
+      );
+
+      if (widget.linkMode && mounted) {
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      }
+    } on Exception catch (e) {
+      ErrorHandler.recordOperation(
+        e,
+        feature: 'auth',
+        operation: 'finalize_account_setup',
+        errorCode: 'post_sign_in_error',
+      );
     }
   }
 

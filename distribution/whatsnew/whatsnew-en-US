@@ -1,6 +1,7 @@
-v2.29.0
+v2.29.1
 
-- New: Onboarding redesigned with real pixel cats! Meet your kitten from the very first screen
-- New: See all 4 growth stages (kitten, adolescent, adult, senior) in the onboarding journey
-- New: Firefly particle effects across the entire onboarding experience
-- Improved: Updated onboarding text across all 5 languages
+- Fixed: Login no longer shows false error messages when sign-in succeeds
+- Fixed: Cat progress is preserved after signing in with Google or email
+- Fixed: Account deletion no longer gets stuck in an infinite loading loop
+- Added: "Start fresh" escape option when deletion retry limit is reached
+- Added: Automatic recovery of orphaned guest data on app startup

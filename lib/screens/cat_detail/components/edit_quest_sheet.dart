@@ -223,7 +223,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
       options: _defaultTargetOptions,
       selected: _selectedTarget,
       isCustom: _isCustomTarget,
-      labelBuilder: (v) => '${v}h',
+      labelBuilder: (v) => '$v',
       customLabel: context.l10n.adoptionCustom,
       onSelected: (v) => setState(() {
         _selectedTarget = v;
@@ -239,7 +239,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
       options: _defaultGoalOptions,
       selected: _selectedGoal,
       isCustom: _isCustomGoal,
-      labelBuilder: (v) => '${v}min',
+      labelBuilder: (v) => '$v',
       customLabel: context.l10n.adoptionCustom,
       onSelected: (v) => setState(() {
         _selectedGoal = v;

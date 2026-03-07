@@ -1,4 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_elevation.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -255,21 +258,25 @@ class CatRoomScreen extends ConsumerWidget {
         final habits = ref.watch(habitsProvider).value ?? [];
         final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
 
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
         return StaggeredListItem(
           index: index,
-          child: Card(
-            clipBehavior: Clip.antiAlias,
-            child: _CatHouseCard(
+          child: OpenContainer<void>(
+            transitionDuration: AppMotion.durationMedium4,
+            closedShape: AppShape.shapeMedium,
+            closedElevation: theme.cardTheme.elevation ?? AppElevation.level1,
+            closedColor:
+                theme.cardTheme.color ?? colorScheme.surfaceContainerLow,
+            openColor: colorScheme.surface,
+            tappable: false,
+            openBuilder: (context, _) => CatDetailScreen(catId: cat.id),
+            closedBuilder: (context, openContainer) => _CatHouseCard(
               cat: cat,
               habitName: habit?.name,
               habitId: habit?.id,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => CatDetailScreen(catId: cat.id),
-                  ),
-                );
-              },
+              onTap: openContainer,
               onLongPress: () => _showCatActions(context, ref, cat, habit),
             ),
           ),
@@ -314,11 +321,7 @@ class _CatHouseCard extends StatelessWidget {
           padding: AppSpacing.paddingMd,
           child: Column(
             children: [
-              // Pixel cat sprite — Hero flies to CatDetailScreen
-              Hero(
-                tag: 'cat-${cat.id}',
-                child: TappableCatSprite(cat: cat, size: 80, enableTap: false),
-              ),
+              TappableCatSprite(cat: cat, size: 80, enableTap: false),
               const SizedBox(height: AppSpacing.xs),
 
               // Name + habit (flexible to prevent overflow)
@@ -326,30 +329,13 @@ class _CatHouseCard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Hero(
-                      tag: 'cat-name-${cat.id}',
-                      flightShuttleBuilder: (_, _, _, _, _) => Material(
-                        type: MaterialType.transparency,
-                        child: Text(
-                          cat.name,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.clip,
-                        ),
+                    Text(
+                      cat.name,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: Text(
-                          cat.name,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     if (habitName != null)

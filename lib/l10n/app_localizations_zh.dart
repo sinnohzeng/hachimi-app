@@ -1333,7 +1333,7 @@ class SZh extends S {
   String get adoptionQuestHint => '例如 准备面试题';
 
   @override
-  String get adoptionTotalTarget => '总目标小时数';
+  String get adoptionTotalTarget => '总目标（小时）';
 
   @override
   String get adoptionGrowthHint => '你的猫会随着你积累专注时间而成长';
@@ -1342,7 +1342,7 @@ class SZh extends S {
   String get adoptionCustom => '自定义';
 
   @override
-  String get adoptionDailyGoalLabel => '每日专注目标';
+  String get adoptionDailyGoalLabel => '每日专注目标（分钟）';
 
   @override
   String get adoptionReminderLabel => '每日提醒（可选）';
@@ -2340,6 +2340,9 @@ class SZh extends S {
 
   @override
   String get deleteAccountPending => '账号删除任务处理中，请保持网络连接以完成云端与认证删除。';
+
+  @override
+  String get deleteAccountAbandon => '重新开始';
 
   @override
   String get archiveConflictTitle => '选择保留存档';
@@ -3689,7 +3692,7 @@ class SZhHant extends SZh {
   String get adoptionQuestHint => '例如 準備面試題目';
 
   @override
-  String get adoptionTotalTarget => '總目標時數';
+  String get adoptionTotalTarget => '總目標（小時）';
 
   @override
   String get adoptionGrowthHint => '你嘅貓會隨住你累積專注時間而成長';
@@ -3698,7 +3701,7 @@ class SZhHant extends SZh {
   String get adoptionCustom => '自訂';
 
   @override
-  String get adoptionDailyGoalLabel => '每日專注目標';
+  String get adoptionDailyGoalLabel => '每日專注目標（分鐘）';
 
   @override
   String get adoptionReminderLabel => '每日提醒（可選）';
@@ -4696,6 +4699,9 @@ class SZhHant extends SZh {
 
   @override
   String get deleteAccountPending => '帳號刪除任務處理中，請保持網路連線以完成雲端與認證刪除。';
+
+  @override
+  String get deleteAccountAbandon => '重新開始';
 
   @override
   String get archiveConflictTitle => '選擇保留存檔';

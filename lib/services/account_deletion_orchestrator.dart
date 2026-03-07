@@ -5,6 +5,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/observability/correlation_id_factory.dart';
 import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/observability/operation_context.dart';
@@ -74,17 +75,31 @@ class AccountDeletionOrchestrator {
     String? correlationId,
   }) async {
     final retryCount = _prefs.getInt(AppPrefsKeys.deletionRetryCount) ?? 0;
+
+    // 终止条件 1：UID 不匹配 — 用户已重新注册，无法以旧身份认证
+    if (_authBackend.currentUid != uid) {
+      await _clearPending();
+      return;
+    }
+
+    // 终止条件 2：重试耗尽
+    if (retryCount >= SyncConstants.deletionMaxRetryCount) {
+      await _clearPending();
+      ErrorHandler.recordOperation(
+        Exception('deletion_max_retries_exceeded'),
+        feature: 'AccountDeletionOrchestrator',
+        operation: 'attemptRemoteDeletion',
+        errorCode: 'max_retries_exceeded',
+      );
+      return;
+    }
+
     final opContext = OperationContext.capture(
       operationStage: 'account_deletion',
       retryCount: retryCount,
       correlationId: correlationId,
     );
     try {
-      if (_authBackend.currentUid != uid) {
-        await _incrementRetry();
-        return;
-      }
-
       await _lifecycleBackend.deleteAccountHard(context: opContext);
       await _authBackend.signOut();
       ObservabilityRuntime.clearUidHash();
@@ -103,6 +118,11 @@ class AccountDeletionOrchestrator {
         errorCode: 'delete_account_remote_failed',
       );
     }
+  }
+
+  /// 用户主动放弃待处理的远程删除。
+  Future<void> abandonPendingDeletion() async {
+    await _clearPending();
   }
 
   Future<void> _storePending({

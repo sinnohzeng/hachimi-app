@@ -1352,7 +1352,7 @@ class SEn extends S {
   String get adoptionQuestHint => 'e.g. Prepare interview questions';
 
   @override
-  String get adoptionTotalTarget => 'Total target hours';
+  String get adoptionTotalTarget => 'Total target (hours)';
 
   @override
   String get adoptionGrowthHint =>
@@ -1362,7 +1362,7 @@ class SEn extends S {
   String get adoptionCustom => 'Custom';
 
   @override
-  String get adoptionDailyGoalLabel => 'Daily focus goal';
+  String get adoptionDailyGoalLabel => 'Daily focus goal (min)';
 
   @override
   String get adoptionReminderLabel => 'Daily reminder (optional)';
@@ -2379,6 +2379,9 @@ class SEn extends S {
   @override
   String get deleteAccountPending =>
       'Account deletion is pending. Keep the app online to finish cloud and auth deletion.';
+
+  @override
+  String get deleteAccountAbandon => 'Start fresh';
 
   @override
   String get archiveConflictTitle => 'Choose archive to keep';

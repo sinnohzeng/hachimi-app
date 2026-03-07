@@ -373,24 +373,15 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: AppSpacing.xxl),
-        Hero(
-          tag: 'cat-${cat.id}',
-          child: TappableCatSprite(cat: cat, size: 120),
-        ),
+        TappableCatSprite(cat: cat, size: 120),
         const SizedBox(height: AppSpacing.sm),
-        Hero(
-          tag: 'cat-name-${cat.id}',
-          child: Material(
-            type: MaterialType.transparency,
-            child: Text(
-              cat.name,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
+        Text(
+          cat.name,
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xs),
         if (personality != null)

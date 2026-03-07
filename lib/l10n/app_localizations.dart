@@ -2595,7 +2595,7 @@ abstract class S {
   /// No description provided for @adoptionTotalTarget.
   ///
   /// In en, this message translates to:
-  /// **'Total target hours'**
+  /// **'Total target (hours)'**
   String get adoptionTotalTarget;
 
   /// No description provided for @adoptionGrowthHint.
@@ -2613,7 +2613,7 @@ abstract class S {
   /// No description provided for @adoptionDailyGoalLabel.
   ///
   /// In en, this message translates to:
-  /// **'Daily focus goal'**
+  /// **'Daily focus goal (min)'**
   String get adoptionDailyGoalLabel;
 
   /// No description provided for @adoptionReminderLabel.
@@ -4409,6 +4409,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Account deletion is pending. Keep the app online to finish cloud and auth deletion.'**
   String get deleteAccountPending;
+
+  /// No description provided for @deleteAccountAbandon.
+  ///
+  /// In en, this message translates to:
+  /// **'Start fresh'**
+  String get deleteAccountAbandon;
 
   /// No description provided for @archiveConflictTitle.
   ///
