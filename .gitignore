@@ -85,3 +85,4 @@ override.tf.json
 
 # GitHub App private keys (downloaded PEM)
 *.private-key.pem
+.vscode/settings.json
