@@ -87,3 +87,34 @@ Screens → Providers → Services → Firebase SDK
 - `StateNotifierProvider.autoDispose` auto-disposes the notifier — do NOT add manual `ref.onDispose(() => notifier.dispose())`
 - Firestore security rules must be deployed before the app can read/write data
 - Pre-commit version check: `scripts/pre-commit-version-check.sh` warns if pubspec version matches latest tag (forgot to bump)
+
+## 开发工作流（强制执行）
+
+### Plan-Review-Implement 三阶段流程
+
+所有涉及 3 个以上文件变更的任务，必须遵循以下流程：
+
+**阶段一：规划（Plan）**
+- 进入 Plan Mode，分析需求，研读相关代码
+- 制定详细实现计划，包括：文件变更清单、技术方案、依赖关系、测试策略
+- 使用 ultrathink 关键字确保深度推理
+
+**阶段二：审查（Review）**
+- 计划完成后，自动调用 architect-reviewer 子 Agent 进行审查
+- 或由开发者手动执行 /review-plan
+- 审查必须达到 🟢 评级才能进入实现阶段
+- 如果评级为 🟡 或 🔴，根据审查报告修改计划后重新审查
+
+**阶段三：实现（Implement）**
+- 切换到 Normal Mode 开始编码
+- 每完成一个逻辑单元立即提交 commit
+- 实现完成后运行测试确保通过
+- 复杂变更完成后建议再次请求代码审查
+
+### 代码质量标准
+- 写有品味的代码：简洁、可读、可维护
+- 变量和函数命名要有语义，避免缩写
+- 每个函数职责单一，不超过 30 行（参见 `.claude/rules/03-code-quality-thresholds.md`）
+- 错误处理不能吞异常，不能用默认值掩盖问题
+- 所有公开 API 必须有注释
+- commit message 遵循 Conventional Commits 规范
