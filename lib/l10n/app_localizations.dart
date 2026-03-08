@@ -3030,6 +3030,54 @@ abstract class S {
   /// **'Archive'**
   String get catRoomArchive;
 
+  /// No description provided for @catRoomAlbumSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Album ({count})'**
+  String catRoomAlbumSection(int count);
+
+  /// No description provided for @catRoomReactivateCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate Cat'**
+  String get catRoomReactivateCat;
+
+  /// No description provided for @catRoomReactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate cat?'**
+  String get catRoomReactivateTitle;
+
+  /// No description provided for @catRoomReactivateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will restore \"{name}\" and its bound quest to the CatHouse.'**
+  String catRoomReactivateMessage(String name);
+
+  /// No description provided for @catRoomReactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate'**
+  String get catRoomReactivate;
+
+  /// No description provided for @catRoomArchivedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get catRoomArchivedLabel;
+
+  /// No description provided for @catRoomArchiveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" archived'**
+  String catRoomArchiveSuccess(String name);
+
+  /// No description provided for @catRoomReactivateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" reactivated'**
+  String catRoomReactivateSuccess(String name);
+
   /// No description provided for @addHabitTitle.
   ///
   /// In en, this message translates to:

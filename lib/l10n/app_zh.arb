@@ -696,6 +696,26 @@
     "placeholders": { "name": { "type": "String" } }
   },
   "catRoomArchive": "归档",
+  "catRoomAlbumSection": "相册（{count}）",
+  "@catRoomAlbumSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "catRoomReactivateCat": "重新激活",
+  "catRoomReactivateTitle": "重新激活猫猫？",
+  "catRoomReactivateMessage": "将「{name}」和其关联的任务恢复到猫猫小屋。",
+  "@catRoomReactivateMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivate": "激活",
+  "catRoomArchivedLabel": "已归档",
+  "catRoomArchiveSuccess": "已归档「{name}」",
+  "@catRoomArchiveSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivateSuccess": "已重新激活「{name}」",
+  "@catRoomReactivateSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "addHabitTitle": "新任务",
   "addHabitQuestName": "任务名称",

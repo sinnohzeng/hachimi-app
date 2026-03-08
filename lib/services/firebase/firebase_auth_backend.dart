@@ -4,8 +4,12 @@ import 'package:hachimi_app/core/backend/auth_backend.dart';
 
 /// Firebase 认证后端实现。
 class FirebaseAuthBackend implements AuthBackend {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn;
+
+  FirebaseAuthBackend({FirebaseAuth? auth, GoogleSignIn? googleSignIn})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   @override
   String get id => 'firebase';
@@ -140,9 +144,9 @@ class FirebaseAuthBackend implements AuthBackend {
   @override
   Future<void> signOut() async {
     try {
-      await _googleSignIn.signOut();
+      await _googleSignIn.signOut().timeout(const Duration(seconds: 3));
     } catch (_) {
-      // Google 未初始化或已退出 — 不阻止 Firebase signOut
+      // Google 未初始化、已退出、或网络超时 — 不阻止 Firebase signOut
     }
     await _auth.signOut();
   }

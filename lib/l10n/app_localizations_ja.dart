@@ -1569,6 +1569,38 @@ class SJa extends S {
   String get catRoomArchive => 'アーカイブ';
 
   @override
+  String catRoomAlbumSection(int count) {
+    return 'アルバム（$count）';
+  }
+
+  @override
+  String get catRoomReactivateCat => '再アクティブ化';
+
+  @override
+  String get catRoomReactivateTitle => 'ネコを再アクティブ化しますか？';
+
+  @override
+  String catRoomReactivateMessage(String name) {
+    return '「$name」と紐づいたクエストをネコハウスに戻します。';
+  }
+
+  @override
+  String get catRoomReactivate => '再アクティブ化';
+
+  @override
+  String get catRoomArchivedLabel => 'アーカイブ済み';
+
+  @override
+  String catRoomArchiveSuccess(String name) {
+    return '「$name」をアーカイブしました';
+  }
+
+  @override
+  String catRoomReactivateSuccess(String name) {
+    return '「$name」を再アクティブ化しました';
+  }
+
+  @override
   String get addHabitTitle => '新しいクエスト';
 
   @override

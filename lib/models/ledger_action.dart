@@ -12,6 +12,7 @@ enum ActionType {
   habitCreate('habit_create'),
   habitUpdate('habit_update'),
   habitDelete('habit_delete'),
+  habitRestore('habit_restore'),
   accountCreated('account_created'),
   accountLinked('account_linked'),
   achievementUnlocked('achievement_unlocked'),

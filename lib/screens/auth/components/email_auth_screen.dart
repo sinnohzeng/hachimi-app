@@ -110,8 +110,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         migrationSourceUid: migrationSourceUid,
         wasAnonymous: wasAnonymous,
       );
-
-      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -119,6 +117,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         operation: 'finalize_account_setup',
         errorCode: 'finalize_account_setup_failed',
       );
+    } finally {
+      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 

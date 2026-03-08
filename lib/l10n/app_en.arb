@@ -696,6 +696,26 @@
     "placeholders": { "name": { "type": "String" } }
   },
   "catRoomArchive": "Archive",
+  "catRoomAlbumSection": "Album ({count})",
+  "@catRoomAlbumSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "catRoomReactivateCat": "Reactivate Cat",
+  "catRoomReactivateTitle": "Reactivate cat?",
+  "catRoomReactivateMessage": "This will restore \"{name}\" and its bound quest to the CatHouse.",
+  "@catRoomReactivateMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivate": "Reactivate",
+  "catRoomArchivedLabel": "Archived",
+  "catRoomArchiveSuccess": "\"{name}\" archived",
+  "@catRoomArchiveSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivateSuccess": "\"{name}\" reactivated",
+  "@catRoomReactivateSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "addHabitTitle": "New Quest",
   "addHabitQuestName": "Quest name",

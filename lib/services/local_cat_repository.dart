@@ -204,15 +204,85 @@ class LocalCatRepository {
     );
   }
 
-  /// 将猫设为毕业状态。
-  Future<void> graduate(String uid, String catId) async {
+  /// 归档猫猫 — 原子事务：猫归档 + 习惯软删除 + 台账 + 通知。
+  ///
+  /// 跨表操作说明：此方法同时写 local_cats 和 local_habits，
+  /// 与 LocalHabitRepository.delete() 的软删除逻辑一致。
+  /// 如果 delete() 的行为发生变化，此处需同步更新。
+  Future<void> archive(String uid, String catId, String habitId) async {
     final db = await _ledger.database;
-    await db.update(
-      'local_cats',
-      {'state': 'graduated'},
-      where: 'id = ?',
-      whereArgs: [catId],
+    final now = DateTime.now();
+
+    await db.transaction((txn) async {
+      await txn.update(
+        'local_cats',
+        {'state': 'graduated'},
+        where: 'id = ?',
+        whereArgs: [catId],
+      );
+      if (habitId.isNotEmpty) {
+        await txn.update(
+          'local_habits',
+          {'is_active': 0},
+          where: 'id = ?',
+          whereArgs: [habitId],
+        );
+      }
+      await _ledger.appendInTxn(
+        txn,
+        type: ActionType.habitDelete,
+        uid: uid,
+        startedAt: now,
+        payload: {'habitId': habitId, 'catId': catId, 'reason': 'archive'},
+      );
+    });
+
+    _ledger.notifyChange(
+      LedgerChange(type: 'habit_delete', affectedIds: [habitId, catId]),
     );
+  }
+
+  /// 重新激活已归档的猫猫 — 恢复猫状态 + 习惯活跃 + 台账。
+  ///
+  /// 跨表操作说明：同 archive()。
+  /// 习惯行可能因数据损坏不存在 — UPDATE 0 rows 是安全的。
+  Future<void> reactivate(String uid, String catId, String habitId) async {
+    final db = await _ledger.database;
+    final now = DateTime.now();
+
+    await db.transaction((txn) async {
+      await txn.update(
+        'local_cats',
+        {'state': 'active'},
+        where: 'id = ?',
+        whereArgs: [catId],
+      );
+      if (habitId.isNotEmpty) {
+        await txn.update(
+          'local_habits',
+          {'is_active': 1},
+          where: 'id = ?',
+          whereArgs: [habitId],
+        );
+      }
+      await _ledger.appendInTxn(
+        txn,
+        type: ActionType.habitRestore,
+        uid: uid,
+        startedAt: now,
+        payload: {'habitId': habitId, 'catId': catId},
+      );
+    });
+
+    _ledger.notifyChange(
+      LedgerChange(type: 'habit_restore', affectedIds: [habitId, catId]),
+    );
+  }
+
+  /// 将猫设为毕业状态。
+  @Deprecated('Use archive() instead — atomic with ledger + notification')
+  Future<void> graduate(String uid, String catId) async {
+    await archive(uid, catId, '');
   }
 
   // ─── 内部工具 ───

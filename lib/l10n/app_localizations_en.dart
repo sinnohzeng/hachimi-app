@@ -1589,6 +1589,38 @@ class SEn extends S {
   String get catRoomArchive => 'Archive';
 
   @override
+  String catRoomAlbumSection(int count) {
+    return 'Album ($count)';
+  }
+
+  @override
+  String get catRoomReactivateCat => 'Reactivate Cat';
+
+  @override
+  String get catRoomReactivateTitle => 'Reactivate cat?';
+
+  @override
+  String catRoomReactivateMessage(String name) {
+    return 'This will restore \"$name\" and its bound quest to the CatHouse.';
+  }
+
+  @override
+  String get catRoomReactivate => 'Reactivate';
+
+  @override
+  String get catRoomArchivedLabel => 'Archived';
+
+  @override
+  String catRoomArchiveSuccess(String name) {
+    return '\"$name\" archived';
+  }
+
+  @override
+  String catRoomReactivateSuccess(String name) {
+    return '\"$name\" reactivated';
+  }
+
+  @override
   String get addHabitTitle => 'New Quest';
 
   @override

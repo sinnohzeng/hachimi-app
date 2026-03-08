@@ -1572,6 +1572,38 @@ class SKo extends S {
   String get catRoomArchive => '보관';
 
   @override
+  String catRoomAlbumSection(int count) {
+    return '앨범 ($count)';
+  }
+
+  @override
+  String get catRoomReactivateCat => '고양이 다시 활성화';
+
+  @override
+  String get catRoomReactivateTitle => '고양이를 다시 활성화할까요?';
+
+  @override
+  String catRoomReactivateMessage(String name) {
+    return '\"$name\"과(와) 연결된 퀘스트를 고양이 집에 복원해요.';
+  }
+
+  @override
+  String get catRoomReactivate => '활성화';
+
+  @override
+  String get catRoomArchivedLabel => '보관됨';
+
+  @override
+  String catRoomArchiveSuccess(String name) {
+    return '\"$name\"을(를) 보관했어요';
+  }
+
+  @override
+  String catRoomReactivateSuccess(String name) {
+    return '\"$name\"을(를) 다시 활성화했어요';
+  }
+
+  @override
   String get addHabitTitle => '새 퀘스트';
 
   @override

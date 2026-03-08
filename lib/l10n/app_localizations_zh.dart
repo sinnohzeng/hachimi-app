@@ -1567,6 +1567,38 @@ class SZh extends S {
   String get catRoomArchive => '归档';
 
   @override
+  String catRoomAlbumSection(int count) {
+    return '相册（$count）';
+  }
+
+  @override
+  String get catRoomReactivateCat => '重新激活';
+
+  @override
+  String get catRoomReactivateTitle => '重新激活猫猫？';
+
+  @override
+  String catRoomReactivateMessage(String name) {
+    return '将「$name」和其关联的任务恢复到猫猫小屋。';
+  }
+
+  @override
+  String get catRoomReactivate => '激活';
+
+  @override
+  String get catRoomArchivedLabel => '已归档';
+
+  @override
+  String catRoomArchiveSuccess(String name) {
+    return '已归档「$name」';
+  }
+
+  @override
+  String catRoomReactivateSuccess(String name) {
+    return '已重新激活「$name」';
+  }
+
+  @override
   String get addHabitTitle => '新任务';
 
   @override
@@ -3865,6 +3897,38 @@ class SZhHant extends SZh {
 
   @override
   String get catRoomArchive => '封存';
+
+  @override
+  String catRoomAlbumSection(int count) {
+    return '相簿（$count）';
+  }
+
+  @override
+  String get catRoomReactivateCat => '重新啟用';
+
+  @override
+  String get catRoomReactivateTitle => '重新啟用貓咪？';
+
+  @override
+  String catRoomReactivateMessage(String name) {
+    return '將「$name」同其綁定嘅任務恢復返貓咪小屋。';
+  }
+
+  @override
+  String get catRoomReactivate => '啟用';
+
+  @override
+  String get catRoomArchivedLabel => '已封存';
+
+  @override
+  String catRoomArchiveSuccess(String name) {
+    return '已封存「$name」';
+  }
+
+  @override
+  String catRoomReactivateSuccess(String name) {
+    return '已重新啟用「$name」';
+  }
 
   @override
   String get addHabitTitle => '新任務';

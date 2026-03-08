@@ -532,6 +532,26 @@
   "catRoomArchiveTitle": "고양이를 보관할까요?",
   "catRoomArchiveMessage": "\"{name}\"을(를) 보관하고 연결된 퀘스트가 삭제돼요. 고양이는 여전히 앨범에 남아 있어요.",
   "catRoomArchive": "보관",
+  "catRoomAlbumSection": "앨범 ({count})",
+  "@catRoomAlbumSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "catRoomReactivateCat": "고양이 다시 활성화",
+  "catRoomReactivateTitle": "고양이를 다시 활성화할까요?",
+  "catRoomReactivateMessage": "\"{name}\"과(와) 연결된 퀘스트를 고양이 집에 복원해요.",
+  "@catRoomReactivateMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivate": "활성화",
+  "catRoomArchivedLabel": "보관됨",
+  "catRoomArchiveSuccess": "\"{name}\"을(를) 보관했어요",
+  "@catRoomArchiveSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivateSuccess": "\"{name}\"을(를) 다시 활성화했어요",
+  "@catRoomReactivateSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "addHabitTitle": "새 퀘스트",
   "addHabitQuestName": "퀘스트 이름",

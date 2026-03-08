@@ -17,6 +17,8 @@ const _uuid = Uuid();
 const _triggerMap = {
   'focus_complete': AchievementTrigger.sessionCompleted,
   'habit_create': AchievementTrigger.habitCreated,
+  'habit_delete': AchievementTrigger.habitCreated,
+  'habit_restore': AchievementTrigger.habitCreated,
   'check_in': AchievementTrigger.checkInCompleted,
   'equip': AchievementTrigger.accessoryEquipped,
   'purchase': AchievementTrigger.accessoryEquipped,
@@ -249,9 +251,18 @@ class AchievementEvaluator {
       );
       final eq = row['equipped_accessory'] as String?;
       if (eq != null && eq.isNotEmpty) equipped.add(eq);
-      if (row['state'] == 'graduated') graduated++;
+      if (row['state'] == 'graduated') {
+        // 仅 senior 阶段的猫计入"毕业日"成就
+        final highestStage = _higherStage(
+          row['highest_stage'] as String?,
+          _computeStage(totalMin),
+        );
+        if (highestStage == 'senior') graduated++;
+      }
       final lastAt = row['last_session_at'] as int?;
-      if (lastAt != null) {
+      if (lastAt == null) {
+        allHappy = false; // 从未专注 = 不快乐
+      } else {
         final hours = DateTime.now()
             .difference(DateTime.fromMillisecondsSinceEpoch(lastAt))
             .inHours;
@@ -339,7 +350,7 @@ class AchievementEvaluator {
         'cat_graduated': (ctx, _) => ctx.graduatedCatCount >= 1,
         'cat_accessory': (ctx, _) => ctx.equippedAccessories.isNotEmpty,
         'cat_5_accessories': (ctx, _) => ctx.accessoryCount >= 5,
-        'cat_all_happy': (ctx, _) => ctx.allCatsHappy && ctx.totalCatCount > 0,
+        'cat_all_happy': (ctx, _) => ctx.allCatsHappy && ctx.totalCatCount >= 2,
       };
 
   /// 检查单个成就的解锁条件 — 谓词表查表，persist 类走通用分支。

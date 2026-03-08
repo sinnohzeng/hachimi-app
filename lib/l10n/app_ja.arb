@@ -532,6 +532,26 @@
   "catRoomArchiveTitle": "ネコをアーカイブしますか？",
   "catRoomArchiveMessage": "「{name}」をアーカイブし、紐づいたクエストを削除します。ネコはアルバムに残ります。",
   "catRoomArchive": "アーカイブ",
+  "catRoomAlbumSection": "アルバム（{count}）",
+  "@catRoomAlbumSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "catRoomReactivateCat": "再アクティブ化",
+  "catRoomReactivateTitle": "ネコを再アクティブ化しますか？",
+  "catRoomReactivateMessage": "「{name}」と紐づいたクエストをネコハウスに戻します。",
+  "@catRoomReactivateMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivate": "再アクティブ化",
+  "catRoomArchivedLabel": "アーカイブ済み",
+  "catRoomArchiveSuccess": "「{name}」をアーカイブしました",
+  "@catRoomArchiveSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivateSuccess": "「{name}」を再アクティブ化しました",
+  "@catRoomReactivateSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "addHabitTitle": "新しいクエスト",
   "addHabitQuestName": "クエスト名",

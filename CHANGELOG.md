@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.0] - 2026-03-08
+
+### Added
+- **猫猫归档相册**：归档的猫猫现在可在猫屋底部的可折叠「相册」section 中查看，支持点击查看详情、长按打开操作菜单
+- **重新激活**：已归档的猫猫可通过相册菜单一键恢复到活跃状态，关联的习惯任务同步恢复
+- **归档/恢复 SnackBar 反馈**：归档和重新激活操作完成后显示确认提示
+- **8 个 L10N 键**（5 种语言）：相册标题、归档标签、重新激活确认对话框、操作成功提示
+- `habitRestore` 台账行为类型，支持猫猫恢复的完整审计链路
+
+### Fixed
+- **成就误触发**：归档任意阶段的猫（含 0h kitten）都会触发"毕业日"成就并发放 150 金币。现在仅 senior 阶段（200h+）的猫归档才计入毕业成就
+- **归档非原子操作**：归档前需要分两步调用 `graduate()` + `delete()`，中间失败会导致数据不一致。现在 `archive()` 在单一 SQLite 事务中完成猫状态 + 习惯软删除 + 台账写入
+- **Firestore 猫状态不同步**：归档后 Firestore 中猫的 `state` 仍为 `active`，换设备登录后已归档猫重新出现在猫屋。现在 `_syncHabit` 同步归档/恢复时同步猫状态到 Firestore
+- **成就评估器不响应归档/恢复**：`_triggerMap` 缺少 `habit_delete` 和 `habit_restore` 映射，归档/恢复后 `activeHabitCount` 变化不触发成就重评估
+
+### Changed
+- `CatRoomScreen` 从 `ConsumerWidget` 升级为 `ConsumerStatefulWidget`，布局从 `GridView` 改为 `CustomScrollView`（活跃 Grid + 可折叠相册）
+- `graduate()` 标记为 `@Deprecated`，委托给 `archive()`
+
+### Refactored
+- **退出登录**: logout() 改为 Navigation-First 模式 — 先导航再后台清理，确保用户立即看到引导页
+- **退出确认 Dialog**: 从 StatefulWidget 简化为纯确认 Dialog，移除 loading 状态（因 Navigation-First 导航瞬间完成）
+- **登录流程**: `Navigator.popUntil` 移入 `finally` 块，确保即使 finalizeAccountSetup 失败也能正确导航
+- **FirebaseAuthBackend**: 构造函数支持依赖注入，`googleSignIn.signOut()` 增加 3s 超时防止网络阻塞
+
 ## [2.30.2] - 2026-03-08
 
 ### Fixed

@@ -1,6 +1,8 @@
-v2.30.2
+v2.31.0
 
-- Fixed: Logout now works reliably — no more silent failures or frozen screens
-- Fixed: Logout fully cleans up local data (focus sessions, notifications, preferences)
-- Fixed: Loading indicator shown during logout for clear feedback
-- Fixed: Guest users no longer see the logout button
+- New: Cat Album — archived cats now visible in a collapsible section at the bottom of CatHouse
+- New: Reactivate archived cats with one tap to restore them and their quests
+- Fixed: "Graduation Day" achievement no longer triggers for kittens — only senior cats (200h+) qualify
+- Fixed: Archive is now atomic — no more data inconsistency if interrupted mid-operation
+- Fixed: Archived cat state now syncs to cloud — no more ghost cats reappearing on new devices
+- Improved: Logout is now instant with background cleanup

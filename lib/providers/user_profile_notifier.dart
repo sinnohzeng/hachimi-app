@@ -69,40 +69,54 @@ class UserProfileNotifier extends Notifier<void> {
     );
   }
 
-  /// 登出 — 完整清理，确保用户回到引导页。
+  bool _isLoggingOut = false;
+
+  /// 登出 — Navigation-First：先导航，后清理。
   ///
   /// 这是所有登出操作的唯一入口。屏幕层不得直接调用 authBackend.signOut()。
-  /// 各阶段独立 try-catch：任何阶段失败不阻止后续阶段和最终导航。
+  /// 设计原则：用户反馈必须立即可见。
+  /// Phase 1-2 是同步操作，保证瞬间完成。
+  /// Phase 3 是异步清理，在后台 fire-and-forget。
   Future<void> logout() async {
+    if (_isLoggingOut) return;
+    _isLoggingOut = true;
+
     final uid = ref.read(currentUidProvider);
 
-    // Phase 1: 停止后台引擎（同步、幂等、安全）
+    // Phase 1: 停止后台引擎（同步、幂等）
     ref.read(syncEngineProvider).stop();
 
-    // Phase 2: 清理本地业务数据（best-effort）
-    try {
-      if (uid != null) {
-        await ref.read(ledgerServiceProvider).deleteUidData(uid);
-      }
-      await ref.read(notificationServiceProvider).cancelAll();
-    } catch (e, stack) {
-      _recordLogoutError(e, stack, 'data_cleanup');
-    }
-
-    // Phase 3: 清理全量用户级 SharedPreferences
-    _clearUserLocalState();
-
-    // Phase 4: Firebase 认证退出（best-effort）
-    try {
-      await ref.read(authBackendProvider).signOut();
-      ObservabilityRuntime.clearUidHash();
-      await FirebaseCrashlytics.instance.setUserIdentifier('');
-    } catch (e, stack) {
-      _recordLogoutError(e, stack, 'auth_signout');
-    }
-
-    // Phase 5: 导航触发 — MUST succeed，结构性置底
+    // Phase 2: 导航触发 — 用户立即看到引导页
     ref.read(onboardingCompleteProvider.notifier).reset();
+
+    // Phase 3: 后台清理（fire-and-forget，失败不影响用户）
+    _cleanupAfterLogout(uid);
+  }
+
+  /// 登出后台清理 — 全部 best-effort，失败仅记录不阻塞。
+  void _cleanupAfterLogout(String? uid) {
+    Future(() async {
+      try {
+        if (uid != null) {
+          await ref.read(ledgerServiceProvider).deleteUidData(uid);
+        }
+        await ref.read(notificationServiceProvider).cancelAll();
+      } catch (e, stack) {
+        _recordLogoutError(e, stack, 'data_cleanup');
+      }
+
+      _clearUserLocalState();
+
+      try {
+        await ref.read(authBackendProvider).signOut();
+        ObservabilityRuntime.clearUidHash();
+        await FirebaseCrashlytics.instance.setUserIdentifier('');
+      } catch (e, stack) {
+        _recordLogoutError(e, stack, 'auth_signout');
+      }
+
+      _isLoggingOut = false;
+    });
   }
 
   /// 访客数据重置 — 清除数据后回到引导。

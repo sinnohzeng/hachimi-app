@@ -264,6 +264,7 @@ class SyncEngine {
         case ActionType.habitCreate:
         case ActionType.habitUpdate:
         case ActionType.habitDelete:
+        case ActionType.habitRestore:
           await _syncHabit(batch, uid, action);
         case ActionType.achievementUnlocked:
           _syncAchievement(batch, uid, action);
@@ -482,9 +483,30 @@ class SyncEngine {
         }
       case ActionType.habitDelete:
         batch.update(habitRef, {'isActive': false});
+        _syncCatStateIfNeeded(batch, uid, action, 'graduated');
+      case ActionType.habitRestore:
+        batch.update(habitRef, {'isActive': true});
+        _syncCatStateIfNeeded(batch, uid, action, 'active');
       default:
         break;
     }
+  }
+
+  /// 归档/恢复时同步猫状态到 Firestore（payload 含 catId 时触发）。
+  void _syncCatStateIfNeeded(
+    WriteBatch batch,
+    String uid,
+    LedgerAction action,
+    String state,
+  ) {
+    final catId = action.payload['catId'] as String?;
+    if (catId == null || catId.isEmpty) return;
+    final catRef = _db
+        .collection('users')
+        .doc(uid)
+        .collection('cats')
+        .doc(catId);
+    batch.update(catRef, {'state': state});
   }
 
   void _syncProfileUpdate(WriteBatch batch, String uid, LedgerAction action) {

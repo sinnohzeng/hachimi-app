@@ -91,10 +91,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         migrationSourceUid: migrationSourceUid,
         wasAnonymous: wasAnonymous,
       );
-
-      if (widget.linkMode && mounted) {
-        Navigator.of(context).popUntil((r) => r.isFirst);
-      }
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -102,6 +98,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         operation: 'finalize_account_setup',
         errorCode: 'finalize_account_setup_failed',
       );
+    } finally {
+      if (widget.linkMode && mounted) {
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      }
     }
   }
 

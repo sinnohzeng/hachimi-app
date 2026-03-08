@@ -532,6 +532,26 @@
   "catRoomArchiveTitle": "封存貓咪？",
   "catRoomArchiveMessage": "呢個操作會封存「{name}」並刪除其綁定嘅任務。貓咪仍會出現喺圖鑑。",
   "catRoomArchive": "封存",
+  "catRoomAlbumSection": "相簿（{count}）",
+  "@catRoomAlbumSection": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "catRoomReactivateCat": "重新啟用",
+  "catRoomReactivateTitle": "重新啟用貓咪？",
+  "catRoomReactivateMessage": "將「{name}」同其綁定嘅任務恢復返貓咪小屋。",
+  "@catRoomReactivateMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivate": "啟用",
+  "catRoomArchivedLabel": "已封存",
+  "catRoomArchiveSuccess": "已封存「{name}」",
+  "@catRoomArchiveSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "catRoomReactivateSuccess": "已重新啟用「{name}」",
+  "@catRoomReactivateSuccess": {
+    "placeholders": { "name": { "type": "String" } }
+  },
 
   "addHabitTitle": "新任務",
   "addHabitQuestName": "任務名稱",
