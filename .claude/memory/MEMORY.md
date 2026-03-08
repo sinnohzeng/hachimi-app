@@ -11,6 +11,9 @@
 ## Architecture Facts
 - Single backend runtime path: Firebase only.
 - Sensitive callables are `deleteAccountV2` / `wipeUserDataV2` with App Check enforced.
+- Account migration source UID is deterministic (`local_guest_uid` first) via `IdentityTransitionResolver`.
+- Account deletion returns typed result states (`remoteDeleted` / `queued` / failure) and only signs out on remote success.
+- Logout route-stack normalization is listener-driven (no navigation side effects in `build()`).
 - Observability contract is typed (`ErrorContext`, `OperationContext`).
 - Crash identity is hashed only (`uid_hash`), never plaintext UID.
 - Functions use structured logging with correlation id + telemetry fields.

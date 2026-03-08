@@ -6,17 +6,29 @@
 
 ## Guest Upgrade Pattern
 1. Authenticate.
-2. Build local + cloud snapshots.
-3. Resolve (`keepLocal` / `keepCloud`).
-4. Execute via `AccountMergeService`.
+2. Resolve deterministic migration source UID before auth mutation:
+   - prefer `local_guest_uid`
+   - fallback to pre-auth `currentUid`
+3. Build local + cloud snapshots.
+4. Resolve (`keepLocal` / `keepCloud`).
+5. Execute via `AccountMergeService`.
+6. Abort merge if `migrationSourceUid` mismatches persisted `local_guest_uid`.
 
 ## Account Deletion Pattern
 1. UI: summary -> type `DELETE`.
 2. Orchestrator: local wipe first.
 3. Online: call `deleteAccountV2` immediately.
 4. Offline: queue and retry with tombstone.
-5. All callable operations pass `OperationContext` (`correlation_id`, `uid_hash`, `operation_stage`, `retry_count`).
-6. Sensitive callable requests use limited-use App Check token.
+5. Return typed `AccountDeletionResult` to UI (`localDeleted`, `remoteDeleted`, `queued`, `errorCode`).
+6. Retry only for retryable callable errors; clear pending on non-retryable errors.
+7. Only sign out on remote hard-delete success.
+8. All callable operations pass `OperationContext` (`correlation_id`, `uid_hash`, `operation_stage`, `retry_count`).
+9. Sensitive callable requests use limited-use App Check token.
+
+## Logout Navigation Pattern
+1. Keep logout logic in one shared confirmation entry.
+2. Keep navigation side effects out of widget `build()`.
+3. Use provider listeners to normalize route stack on auth/onboarding transitions.
 
 ## Error Reporting Pattern
 1. Build `ErrorContext` through `ErrorHandler.recordOperation(...)`.

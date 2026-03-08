@@ -2,8 +2,15 @@
 
 ## Account Lifecycle
 - Guest local uid format is `guest_*`; this path must not call Firestore deletion APIs.
+- Never derive guest merge source from post-auth state; capture deterministic source before auth mutation.
 - Offline delete is local-first; cloud/Auth hard-delete may be queued.
 - Pending deletion relies on authenticated context when retrying callable functions.
+- Do not force sign-out when deletion is queued for retry; this breaks the retry loop.
+- Non-retryable callable errors (`unimplemented`, `not-found`, `permission-denied`, etc.) should clear pending markers immediately.
+
+## Navigation
+- Do not perform navigation side effects directly inside widget `build()`.
+- Use provider/listener effects for auth/onboarding route stack normalization.
 
 ## App Check
 - `deleteAccountV2` / `wipeUserDataV2` require valid App Check token.
