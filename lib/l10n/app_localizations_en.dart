@@ -455,6 +455,9 @@ class SEn extends S {
   String get logoutMessage => 'Are you sure you want to log out?';
 
   @override
+  String get loggingOut => 'Logging out...';
+
+  @override
   String get deleteAccountTitle => 'Delete account?';
 
   @override

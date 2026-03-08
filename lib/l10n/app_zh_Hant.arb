@@ -146,6 +146,7 @@
   "settingsAccount": "帳號",
   "logoutTitle": "登出？",
   "logoutMessage": "確定要登出？",
+  "loggingOut": "正在登出...",
   "deleteAccountTitle": "刪除帳號？",
   "deleteAccountMessage": "呢個操作會永久刪除你嘅帳號同所有資料，無法復原。",
   "deleteAccountWarning": "呢個操作無法復原",

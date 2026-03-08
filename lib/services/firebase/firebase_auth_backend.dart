@@ -139,7 +139,11 @@ class FirebaseAuthBackend implements AuthBackend {
 
   @override
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {
+      // Google 未初始化或已退出 — 不阻止 Firebase signOut
+    }
     await _auth.signOut();
   }
 

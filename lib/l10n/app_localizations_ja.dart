@@ -452,6 +452,9 @@ class SJa extends S {
   String get logoutMessage => '本当にログアウトしますか？';
 
   @override
+  String get loggingOut => 'ログアウト中...';
+
+  @override
   String get deleteAccountTitle => 'アカウントを削除しますか？';
 
   @override

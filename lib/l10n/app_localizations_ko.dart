@@ -452,6 +452,9 @@ class SKo extends S {
   String get logoutMessage => '정말 로그아웃하시겠어요?';
 
   @override
+  String get loggingOut => '로그아웃 중...';
+
+  @override
   String get deleteAccountTitle => '계정을 삭제할까요?';
 
   @override

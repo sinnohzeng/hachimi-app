@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.30.2] - 2026-03-08
+
+### Fixed
+- **退出登录无响应**: AppDrawer 退出按钮因先关闭 Drawer 再弹 Dialog 导致 context 已 dispose，操作被静默取消。现在 Dialog 直接在 Drawer 上层弹出，消除竞态根因（6 行 → 1 行）
+- **退出流程缺乏容错**: `logout()` 前置步骤异常会阻止 `reset()` 执行导致卡死。重写为 5 阶段流水线，每阶段独立 try-catch，`reset()` 结构性置底确保导航必定触发
+- **退出不清理本地数据**: 退出后 SQLite 7 张表残留旧用户数据、已调度通知未取消、SharedPreferences 仅清理 4/10 个 key。现在完整清理 SQLite（`deleteUidData`）、取消全部通知、清除全量用户级 SharedPreferences
+- **Google SignOut 级联阻塞**: `_googleSignIn.signOut()` 失败会阻止 `_auth.signOut()` 执行。现在独立 try-catch 隔离
+- **退出无加载反馈**: 确认 Dialog 用 `StatefulBuilder` 就地变形为加载态（`CircularProgressIndicator` + 文案），`PopScope` 禁止返回键关闭
+- **访客可见退出按钮**: ProfileScreen 退出按钮无条件渲染，访客点击会丢失本地数据。现在用 `isGuestProvider` 守卫
+
+### Added
+- `loggingOut` L10N key（5 种语言：en/zh/zh_Hant/ja/ko）
+
 ## [2.30.1] - 2026-03-07
 
 ### Fixed

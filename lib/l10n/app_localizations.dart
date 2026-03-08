@@ -900,6 +900,12 @@ abstract class S {
   /// **'Are you sure you want to log out?'**
   String get logoutMessage;
 
+  /// No description provided for @loggingOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging out...'**
+  String get loggingOut;
+
   /// No description provided for @deleteAccountTitle.
   ///
   /// In en, this message translates to:

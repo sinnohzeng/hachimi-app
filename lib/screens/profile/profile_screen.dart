@@ -33,6 +33,7 @@ class ProfileScreen extends ConsumerWidget {
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];
     final avatarId = ref.watch(avatarIdProvider).value;
+    final isGuest = ref.watch(isGuestProvider);
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final stageCounts = _countStages(allCats);
@@ -61,6 +62,7 @@ class ProfileScreen extends ConsumerWidget {
               stageCounts: stageCounts,
               theme: theme,
               l10n: l10n,
+              isGuest: isGuest,
             ),
           ],
         ),
@@ -108,6 +110,7 @@ class ProfileScreen extends ConsumerWidget {
     required Map<String, int> stageCounts,
     required ThemeData theme,
     required S l10n,
+    required bool isGuest,
   }) {
     return SliverPadding(
       padding: AppSpacing.paddingBase,
@@ -141,17 +144,18 @@ class ProfileScreen extends ConsumerWidget {
                   Navigator.of(context).pushNamed(AppRouter.settingsPage),
             ),
           ),
-          StaggeredListItem(
-            index: 3,
-            child: ListTile(
-              leading: Icon(Icons.logout, color: theme.colorScheme.error),
-              title: Text(
-                l10n.commonLogOut,
-                style: TextStyle(color: theme.colorScheme.error),
+          if (!isGuest)
+            StaggeredListItem(
+              index: 3,
+              child: ListTile(
+                leading: Icon(Icons.logout, color: theme.colorScheme.error),
+                title: Text(
+                  l10n.commonLogOut,
+                  style: TextStyle(color: theme.colorScheme.error),
+                ),
+                onTap: () => showLogoutConfirmation(context, ref),
               ),
-              onTap: () => showLogoutConfirmation(context, ref),
             ),
-          ),
           const SizedBox(height: AppSpacing.xl),
         ]),
       ),

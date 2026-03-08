@@ -72,24 +72,37 @@ class UserProfileNotifier extends Notifier<void> {
   /// 登出 — 完整清理，确保用户回到引导页。
   ///
   /// 这是所有登出操作的唯一入口。屏幕层不得直接调用 authBackend.signOut()。
+  /// 各阶段独立 try-catch：任何阶段失败不阻止后续阶段和最终导航。
   Future<void> logout() async {
-    ref.read(syncEngineProvider).stop();
-    _clearAuthCache();
-    ref.read(onboardingCompleteProvider.notifier).reset();
+    final uid = ref.read(currentUidProvider);
 
+    // Phase 1: 停止后台引擎（同步、幂等、安全）
+    ref.read(syncEngineProvider).stop();
+
+    // Phase 2: 清理本地业务数据（best-effort）
+    try {
+      if (uid != null) {
+        await ref.read(ledgerServiceProvider).deleteUidData(uid);
+      }
+      await ref.read(notificationServiceProvider).cancelAll();
+    } catch (e, stack) {
+      _recordLogoutError(e, stack, 'data_cleanup');
+    }
+
+    // Phase 3: 清理全量用户级 SharedPreferences
+    _clearUserLocalState();
+
+    // Phase 4: Firebase 认证退出（best-effort）
     try {
       await ref.read(authBackendProvider).signOut();
       ObservabilityRuntime.clearUidHash();
       await FirebaseCrashlytics.instance.setUserIdentifier('');
     } catch (e, stack) {
-      ErrorHandler.recordOperation(
-        e,
-        stackTrace: stack,
-        feature: 'UserProfileNotifier',
-        operation: 'logout',
-        errorCode: 'logout_failed',
-      );
+      _recordLogoutError(e, stack, 'auth_signout');
     }
+
+    // Phase 5: 导航触发 — MUST succeed，结构性置底
+    ref.read(onboardingCompleteProvider.notifier).reset();
   }
 
   /// 访客数据重置 — 清除数据后回到引导。
@@ -103,13 +116,33 @@ class UserProfileNotifier extends Notifier<void> {
     }
   }
 
-  /// 清理 SharedPreferences 中的认证缓存。
-  void _clearAuthCache() {
+  /// 清理全量用户级 SharedPreferences — 保留应用级设置（theme、locale）。
+  void _clearUserLocalState() {
     final prefs = ref.read(sharedPreferencesProvider);
-    prefs.remove(AppPrefsKeys.cachedUid);
-    prefs.remove(AppPrefsKeys.localGuestUid);
-    prefs.remove(AppPrefsKeys.dataHydrated);
-    prefs.remove(AppPrefsKeys.onboardingComplete);
+    for (final key in const [
+      AppPrefsKeys.cachedUid,
+      AppPrefsKeys.localGuestUid,
+      AppPrefsKeys.dataHydrated,
+      AppPrefsKeys.onboardingComplete,
+      AppPrefsKeys.lastAppOpen,
+      AppPrefsKeys.consecutiveDays,
+      AppPrefsKeys.diaryPendingRetries,
+      AppPrefsKeys.pendingDeletionJob,
+      AppPrefsKeys.deletionTombstone,
+      AppPrefsKeys.deletionRetryCount,
+    ]) {
+      prefs.remove(key);
+    }
+  }
+
+  void _recordLogoutError(Object e, StackTrace stack, String phase) {
+    ErrorHandler.recordOperation(
+      e,
+      stackTrace: stack,
+      feature: 'UserProfileNotifier',
+      operation: 'logout_$phase',
+      errorCode: 'logout_${phase}_failed',
+    );
   }
 
   /// 更新当前佩戴称号（本地优先 → Firestore fire-and-forget）。

@@ -146,6 +146,7 @@
   "settingsAccount": "계정",
   "logoutTitle": "로그아웃할까요?",
   "logoutMessage": "정말 로그아웃하시겠어요?",
+  "loggingOut": "로그아웃 중...",
   "deleteAccountTitle": "계정을 삭제할까요?",
   "deleteAccountMessage": "계정과 모든 데이터가 영구적으로 삭제돼요. 이 작업은 되돌릴 수 없어요.",
   "deleteAccountWarning": "이 작업은 되돌릴 수 없어요",

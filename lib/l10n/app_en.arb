@@ -219,6 +219,7 @@
   "settingsAccount": "Account",
   "logoutTitle": "Log out?",
   "logoutMessage": "Are you sure you want to log out?",
+  "loggingOut": "Logging out...",
   "deleteAccountTitle": "Delete account?",
   "deleteAccountMessage": "This will permanently delete your account and all your data. This action cannot be undone.",
   "deleteAccountWarning": "This action cannot be undone",

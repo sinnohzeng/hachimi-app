@@ -133,12 +133,7 @@ class AppDrawer extends ConsumerWidget {
                   l10n.commonLogOut,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
-                onTap: () async {
-                  Navigator.of(context).pop(); // 关闭 Drawer
-                  await Future<void>.delayed(AppMotion.durationMedium1);
-                  if (!context.mounted) return;
-                  await showLogoutConfirmation(context, ref);
-                },
+                onTap: () => showLogoutConfirmation(context, ref),
               ),
             ],
 

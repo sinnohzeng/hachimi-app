@@ -450,6 +450,9 @@ class SZh extends S {
   String get logoutMessage => '确定要退出登录吗？';
 
   @override
+  String get loggingOut => '正在退出...';
+
+  @override
   String get deleteAccountTitle => '删除账号？';
 
   @override
@@ -2745,6 +2748,9 @@ class SZhHant extends SZh {
 
   @override
   String get logoutMessage => '確定要登出？';
+
+  @override
+  String get loggingOut => '正在登出...';
 
   @override
   String get deleteAccountTitle => '刪除帳號？';

@@ -146,6 +146,7 @@
   "settingsAccount": "アカウント",
   "logoutTitle": "ログアウトしますか？",
   "logoutMessage": "本当にログアウトしますか？",
+  "loggingOut": "ログアウト中...",
   "deleteAccountTitle": "アカウントを削除しますか？",
   "deleteAccountMessage": "アカウントとすべてのデータが完全に削除されます。この操作は取り消せません。",
   "deleteAccountWarning": "この操作は取り消せません",
