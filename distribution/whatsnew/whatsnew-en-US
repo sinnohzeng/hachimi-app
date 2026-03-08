@@ -1,8 +1,8 @@
 v2.31.0
 
-- New: Cat Album — archived cats now visible in a collapsible section at the bottom of CatHouse
-- New: Reactivate archived cats with one tap to restore them and their quests
-- Fixed: "Graduation Day" achievement no longer triggers for kittens — only senior cats (200h+) qualify
-- Fixed: Archive is now atomic — no more data inconsistency if interrupted mid-operation
-- Fixed: Archived cat state now syncs to cloud — no more ghost cats reappearing on new devices
+- New: Cat Album — view archived cats in a collapsible section in CatHouse
+- New: Reactivate archived cats to restore them and their quests
+- Fixed: "Graduation Day" achievement only triggers for senior cats (200h+)
+- Fixed: Archive is now atomic — no data inconsistency if interrupted
+- Fixed: Archived cat state syncs to cloud — no ghost cats on new devices
 - Improved: Logout is now instant with background cleanup
