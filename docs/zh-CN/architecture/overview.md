@@ -37,6 +37,7 @@ Screens -> Providers -> Services -> Backend 抽象 -> Firebase SDK / Cloud Funct
 2. `AccountDeletionOrchestrator` 先清理本地数据。
 3. 在线调用 `deleteAccountV2`。
 4. 离线进入待重试队列。
+5. UI `_executeDelete` 使用 `finally` 不变量：若 `localDataDestroyed && !navigatedAway`，无条件重置 onboarding — 任何错误路径都不会让应用停留在半销毁状态。
 
 ## Cloud Functions 契约
 主 callable 契约：

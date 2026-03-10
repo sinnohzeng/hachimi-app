@@ -37,11 +37,21 @@
 - 业务写入先落本地台账/物化状态。
 - `SyncEngine` 异步回推 Firestore。
 
+### LedgerChange 全局刷新模式
+`LedgerChange.isGlobalRefresh` 是语义属性（当前 `type == 'hydrate'`），通知所有 StreamProvider 重新读取本地数据。此设计消除了 shotgun surgery — 不再由 8 个以上 Provider 各自检查 `change.type == 'hydrate'`，而是统一使用 `change.isGlobalRefresh || <领域过滤器>`。新增全局事件（如 `full_restore`）只需修改 `isGlobalRefresh` getter。
+
+受影响 Provider：`habitsProvider`、`catsProvider`、`allCatsProvider`、`coinBalanceProvider`、`hasCheckedInTodayProvider`、`monthlyCheckInProvider`、`inventoryProvider`、`unlockedAchievementsProvider`、`avatarIdProvider`、`currentTitleProvider`、`unlockedTitlesProvider`。
+
 ## AuthGate 行为
 1. onboarding 未完成 -> onboarding 流程。
 2. 存在删号 tombstone/pending -> 待删除页面 + 重试。
 3. 已认证 -> 用 auth uid 启动业务。
 4. 未认证但有 cached uid -> 本地访客启动 + 匿名登录后台补齐。
+
+登出导航已集中化：AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → false` 变化后调用 `popUntil(isFirst)`。各页面统一调用 `UserProfileNotifier.logout()` — 唯一登出入口。
+
+### FirstHabitGate 水化守卫
+`_FirstHabitGate` 通过检查用户是否有习惯来决定新用户路由。非访客用户的检查延迟到 `dataHydrated == true`（SyncEngine 完成 Firestore 水化后设置），防止水化前空数据导致误入领养引导的竞态条件。
 
 ## 访客升级
 - 在登录页认证成功后触发。

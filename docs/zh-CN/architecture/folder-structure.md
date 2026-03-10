@@ -39,6 +39,9 @@ hachimi-app/
 - `lib/core/backend/account_lifecycle_backend.dart`
 - `lib/services/firebase/firebase_account_lifecycle_backend.dart`
 - `lib/widgets/archive_conflict_dialog.dart`
+- `lib/widgets/logout_confirmation.dart`
+- `lib/services/identity_transition_resolver.dart`
+- `lib/models/account_deletion_result.dart`
 - `lib/core/observability/error_context.dart`
 - `lib/core/observability/operation_context.dart`
 

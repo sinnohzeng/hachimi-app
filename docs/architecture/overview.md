@@ -37,6 +37,7 @@ Screens -> Providers -> Services -> Backend abstractions -> Firebase SDK / Cloud
 2. `AccountDeletionOrchestrator` cleans local data first.
 3. Online path calls `deleteAccountV2`.
 4. Offline path queues pending deletion and retries.
+5. UI `_executeDelete` uses a `finally` invariant: if `localDataDestroyed && !navigatedAway`, onboarding is unconditionally reset — no error path can leave the app in a half-destroyed state.
 
 ## Cloud Functions Contract
 Primary callable contract:

@@ -37,11 +37,21 @@
 - Services write to local ledger/materialized state first.
 - Sync engine asynchronously reconciles with Firestore.
 
+### LedgerChange Global Refresh Pattern
+`LedgerChange.isGlobalRefresh` is a semantic property (currently `type == 'hydrate'`) that signals all StreamProviders to re-read local data. This eliminates shotgun surgery — instead of 8+ providers each checking `change.type == 'hydrate'`, each provider uses `change.isGlobalRefresh || <domain-specific filter>`. Adding a new global event (e.g., `full_restore`) only requires updating the `isGlobalRefresh` getter.
+
+Affected providers: `habitsProvider`, `catsProvider`, `allCatsProvider`, `coinBalanceProvider`, `hasCheckedInTodayProvider`, `monthlyCheckInProvider`, `inventoryProvider`, `unlockedAchievementsProvider`, `avatarIdProvider`, `currentTitleProvider`, `unlockedTitlesProvider`.
+
 ## AuthGate Behavior
 1. If onboarding incomplete -> onboarding flow.
 2. If deletion tombstone/pending job exists -> pending deletion screen + retry loop.
 3. If authenticated -> boot app with auth uid.
 4. If unauthenticated but cached uid exists -> local guest boot + background anonymous sign-in.
+
+Logout navigation is centralized: `ref.listenManual(onboardingCompleteProvider)` in AuthGate detects `true → false` and calls `popUntil(isFirst)`. Individual screens call `UserProfileNotifier.logout()` — the only logout entry point.
+
+### FirstHabitGate Hydration Guard
+`_FirstHabitGate` checks whether the user has any habits to decide new-user routing. For non-guest users, this check is deferred until `dataHydrated == true` (set by SyncEngine after Firestore hydration), preventing a race condition where empty pre-hydration data triggers the adoption flow incorrectly.
 
 ## Guest Upgrade Flow
 - Triggered in login screens after auth success.
