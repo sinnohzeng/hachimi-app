@@ -1,8 +1,6 @@
-v2.31.0
+v2.31.1
 
-- New: Cat Album — view archived cats in a collapsible section in CatHouse
-- New: Reactivate archived cats to restore them and their quests
-- Fixed: "Graduation Day" achievement only triggers for senior cats (200h+)
-- Fixed: Archive is now atomic — no data inconsistency if interrupted
-- Fixed: Archived cat state syncs to cloud — no ghost cats on new devices
-- Improved: Logout is now instant with background cleanup
+- Fixed: Logging in with Google now correctly returns to the home screen
+- Fixed: Habits, coins, check-ins, cats, and achievements refresh immediately after login — no restart needed
+- Fixed: Returning users with cloud data are no longer sent to the new user guide
+- Fixed: Deleting your account now safely returns to the welcome screen, even if a network error occurs

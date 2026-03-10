@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.1] - 2026-03-10
+
+### Fixed
+- 登录 Google 账号后现在能正确返回主页，不再停留在登录页面
+- 登录后习惯、金币、签到、猫咪、成就等数据立即刷新，不再需要重启应用
+- 已有云端数据的用户登录后不再被误导进入新手引导
+- 删除账号时即使遇到网络错误，也能正确返回引导页，不再出现界面卡死
+
+### Added
+- 新增本地开发反馈闭环指南（开发者文档）
+
 ## [2.31.0] - 2026-03-08
 
 ### Added
