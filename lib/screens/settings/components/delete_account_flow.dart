@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/account_deletion_result.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 /// 三段式账号删除流程：
@@ -10,6 +12,12 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 /// 3) 立即本地删除 + 云端硬删（在线立即执行，离线排队）
 class DeleteAccountFlow {
   DeleteAccountFlow._();
+
+  static void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
 
   static Future<void> start(BuildContext context, WidgetRef ref) async {
     final uid = ref.read(currentUidProvider);
@@ -137,7 +145,42 @@ class DeleteAccountFlow {
   ) async {
     final l10n = context.l10n;
     final progress = ValueNotifier<String>(l10n.deleteAccountStepLocal);
+    _showProgressDialog(context, l10n, progress);
+    ref.read(syncEngineProvider).stop();
 
+    bool localDataDestroyed = false;
+    bool navigatedAway = false;
+    try {
+      progress.value = l10n.deleteAccountStepCloud;
+      final result = await ref
+          .read(accountDeletionOrchestratorProvider)
+          .deleteAccount(uid: uid);
+      localDataDestroyed = result.localDeleted;
+      if (!context.mounted) return;
+      navigatedAway = await _handleDeletionResult(context, ref, result, l10n);
+    } on Exception {
+      localDataDestroyed = true;
+      await ref
+          .read(analyticsServiceProvider)
+          .logAccountDeletionFailed(errorCode: 'delete_account_local_failed');
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        _showSnackBar(context, l10n.deleteAccountError);
+      }
+    } finally {
+      progress.dispose();
+      // 结构性不变量：本地数据已销毁且尚未导航 → 必须 reset 回引导页
+      if (localDataDestroyed && !navigatedAway && context.mounted) {
+        ref.read(onboardingCompleteProvider.notifier).reset();
+      }
+    }
+  }
+
+  static void _showProgressDialog(
+    BuildContext context,
+    S l10n,
+    ValueNotifier<String> progress,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -159,79 +202,47 @@ class DeleteAccountFlow {
         ),
       ),
     );
+  }
 
-    ref.read(syncEngineProvider).stop();
+  /// 处理删除结果 — 返回是否已导航离开。
+  static Future<bool> _handleDeletionResult(
+    BuildContext context,
+    WidgetRef ref,
+    AccountDeletionResult result,
+    S l10n,
+  ) async {
+    if (result.remoteDeleted) {
+      ref.read(onboardingCompleteProvider.notifier).reset();
+      await ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
+      if (!context.mounted) return true;
+      Navigator.of(context).pop();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      _showSnackBar(context, l10n.deleteAccountSuccess);
+      return true;
+    }
 
-    try {
-      progress.value = l10n.deleteAccountStepCloud;
-      final result = await ref
-          .read(accountDeletionOrchestratorProvider)
-          .deleteAccount(uid: uid);
-
-      if (!context.mounted) return;
-
-      if (result.remoteDeleted) {
-        // 先 reset onboarding 再关进度 dialog — 避免用户短暂看到 HomeScreen 闪烁
-        ref.read(onboardingCompleteProvider.notifier).reset();
-        await ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
-        if (!context.mounted) return;
-        Navigator.of(context).pop();
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.deleteAccountSuccess),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
-
-      if (result.queued) {
-        await ref
-            .read(analyticsServiceProvider)
-            .logAccountDeletionFailed(
-              errorCode: result.errorCode ?? 'delete_account_queued',
-            );
-        if (!context.mounted) return;
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.deleteAccountQueued),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
-
+    if (result.queued) {
       await ref
           .read(analyticsServiceProvider)
           .logAccountDeletionFailed(
-            errorCode: result.errorCode ?? 'delete_account_remote_failed',
+            errorCode: result.errorCode ?? 'delete_account_queued',
           );
-      if (!context.mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.deleteAccountError),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } on Exception {
-      await ref
-          .read(analyticsServiceProvider)
-          .logAccountDeletionFailed(errorCode: 'delete_account_local_failed');
-
-      if (!context.mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.deleteAccountError),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } finally {
-      progress.dispose();
+      if (!context.mounted) return true;
+      // 不 reset onboarding — AuthGate 的 _hasPendingDeletion 接管
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      _showSnackBar(context, l10n.deleteAccountQueued);
+      return true;
     }
+
+    await ref
+        .read(analyticsServiceProvider)
+        .logAccountDeletionFailed(
+          errorCode: result.errorCode ?? 'delete_account_remote_failed',
+        );
+    if (!context.mounted) return false;
+    Navigator.of(context).pop();
+    _showSnackBar(context, l10n.deleteAccountError);
+    return false;
   }
 }
 

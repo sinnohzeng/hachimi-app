@@ -22,7 +22,7 @@ final avatarIdProvider = StreamProvider<String?>((ref) async* {
 
   // 监听变更
   await for (final change in ledger.changes) {
-    if (change.type == 'profile_update' || change.type == 'hydrate') {
+    if (change.type == 'profile_update' || change.isGlobalRefresh) {
       yield await ledger.getMaterialized(uid, 'avatar_id');
     }
   }
@@ -42,7 +42,7 @@ final currentTitleProvider = StreamProvider<String?>((ref) async* {
   yield await ledger.getMaterialized(uid, 'current_title');
 
   await for (final change in ledger.changes) {
-    if (change.type == 'profile_update' || change.type == 'hydrate') {
+    if (change.type == 'profile_update' || change.isGlobalRefresh) {
       yield await ledger.getMaterialized(uid, 'current_title');
     }
   }
@@ -63,7 +63,7 @@ final unlockedTitlesProvider = StreamProvider<List<String>>((ref) async* {
 
   await for (final change in ledger.changes) {
     if (change.type == 'profile_update' ||
-        change.type == 'hydrate' ||
+        change.isGlobalRefresh ||
         change.type == 'achievement_unlocked') {
       yield _decodeTitles(await ledger.getMaterialized(uid, 'unlocked_titles'));
     }

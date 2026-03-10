@@ -20,7 +20,9 @@ final habitsProvider = StreamProvider<List<Habit>>((ref) async* {
 
   // 监听变更：台账写入后 yield 最新数据
   await for (final change in ledger.changes) {
-    if (change.type.startsWith('habit_') || change.type == 'focus_complete') {
+    if (change.isGlobalRefresh ||
+        change.type.startsWith('habit_') ||
+        change.type == 'focus_complete') {
       yield await habitRepo.getActiveHabits(uid);
     }
   }

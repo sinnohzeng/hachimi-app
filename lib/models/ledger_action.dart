@@ -123,4 +123,8 @@ class LedgerChange {
   final List<String> affectedIds;
 
   const LedgerChange({required this.type, this.affectedIds = const []});
+
+  /// 全局刷新 — 底层数据源发生批量变更（水化、UID 迁移等），
+  /// 所有依赖本地数据的 Provider 都应重新读取。
+  bool get isGlobalRefresh => type == 'hydrate';
 }

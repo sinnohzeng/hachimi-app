@@ -17,7 +17,8 @@ final coinBalanceProvider = StreamProvider<int>((ref) async* {
   yield balance ?? 0;
 
   await for (final change in ledger.changes) {
-    if (change.type == 'check_in' ||
+    if (change.isGlobalRefresh ||
+        change.type == 'check_in' ||
         change.type == 'focus_complete' ||
         change.type == 'purchase' ||
         change.type == 'achievement_unlocked') {
@@ -41,7 +42,7 @@ final hasCheckedInTodayProvider = StreamProvider<bool>((ref) async* {
   yield lastDate == today;
 
   await for (final change in ledger.changes) {
-    if (change.type == 'check_in') {
+    if (change.isGlobalRefresh || change.type == 'check_in') {
       final updated = await ledger.getMaterialized(uid, 'last_check_in_date');
       yield updated == today;
     }
@@ -62,7 +63,7 @@ final monthlyCheckInProvider = StreamProvider<MonthlyCheckIn?>((ref) async* {
   yield await _readMonthlyCheckIn(ledger, uid, month);
 
   await for (final change in ledger.changes) {
-    if (change.type == 'check_in') {
+    if (change.isGlobalRefresh || change.type == 'check_in') {
       yield await _readMonthlyCheckIn(ledger, uid, month);
     }
   }

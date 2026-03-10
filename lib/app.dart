@@ -547,42 +547,52 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // [R6] 冷启动度量 — 首次 build 时输出启动耗时
-    if (widget.startupStopwatch != null && widget.startupStopwatch!.isRunning) {
+  /// 非访客用户是否仍在等待水化完成。
+  bool get _isAwaitingHydration =>
+      !widget.uid.startsWith('guest_') &&
+      !(ref
+              .read(sharedPreferencesProvider)
+              .getBool(AppPrefsKeys.dataHydrated) ??
+          false);
+
+  /// 首次 build 时输出冷启动耗时。
+  void _logStartupMetric() {
+    final sw = widget.startupStopwatch;
+    if (sw != null && sw.isRunning) {
       debugPrint(
-        '[STARTUP] cold start to FirstHabitGate: '
-        '${widget.startupStopwatch!.elapsedMilliseconds}ms',
+        '[STARTUP] cold start to FirstHabitGate: ${sw.elapsedMilliseconds}ms',
       );
-      widget.startupStopwatch!.stop();
+      sw.stop();
     }
+  }
 
-    final habitsAsync = ref.watch(habitsProvider);
-
-    // Once habits load, check if this is a first-time user
-    if (!_checkedFirstHabit) {
-      habitsAsync.whenData((habits) {
-        if (habits.isEmpty) {
-          _checkedFirstHabit = true;
-          // Navigate to adoption flow after build completes
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              Navigator.of(context).pushNamed(
-                AppRouter.adoption,
-                arguments: true, // isFirstHabit = true
-              );
-            }
-          });
-        } else {
-          _checkedFirstHabit = true;
-          // Reschedule reminders for all active habits on app startup
-          if (!_remindersScheduled) {
-            _remindersScheduled = true;
-            _rescheduleReminders(habits);
-          }
+  /// 习惯数据就绪后判断是否为首次用户，触发领养引导或调度提醒。
+  void _onHabitsLoaded(List<Habit> habits) {
+    _checkedFirstHabit = true;
+    if (habits.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.of(context).pushNamed(
+            AppRouter.adoption,
+            arguments: true, // isFirstHabit = true
+          );
         }
       });
+    } else if (!_remindersScheduled) {
+      _remindersScheduled = true;
+      _rescheduleReminders(habits);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _logStartupMetric();
+
+    if (!_checkedFirstHabit) {
+      if (_isAwaitingHydration) {
+        return const AchievementCelebrationLayer(child: HomeScreen());
+      }
+      ref.watch(habitsProvider).whenData(_onHabitsLoaded);
     }
 
     return const AchievementCelebrationLayer(child: HomeScreen());

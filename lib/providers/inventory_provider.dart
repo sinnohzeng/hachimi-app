@@ -17,7 +17,8 @@ final inventoryProvider = StreamProvider<List<String>>((ref) async* {
   yield await _readInventory(ledger, uid);
 
   await for (final change in ledger.changes) {
-    if (change.type == 'purchase' ||
+    if (change.isGlobalRefresh ||
+        change.type == 'purchase' ||
         change.type == 'equip' ||
         change.type == 'unequip') {
       yield await _readInventory(ledger, uid);

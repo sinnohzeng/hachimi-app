@@ -23,7 +23,8 @@ final catsProvider = StreamProvider<List<Cat>>((ref) async* {
   yield await catRepo.getActiveCats(uid);
 
   await for (final change in ledger.changes) {
-    if (change.type.startsWith('habit_') ||
+    if (change.isGlobalRefresh ||
+        change.type.startsWith('habit_') ||
         change.type == 'cat_update' ||
         change.type == 'focus_complete' ||
         change.type == 'equip' ||
@@ -47,7 +48,8 @@ final allCatsProvider = StreamProvider<List<Cat>>((ref) async* {
   yield await catRepo.getAllCats(uid);
 
   await for (final change in ledger.changes) {
-    if (change.type.startsWith('habit_') ||
+    if (change.isGlobalRefresh ||
+        change.type.startsWith('habit_') ||
         change.type == 'cat_update' ||
         change.type == 'focus_complete' ||
         change.type == 'equip' ||

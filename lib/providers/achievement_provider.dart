@@ -21,7 +21,8 @@ final unlockedAchievementsProvider = StreamProvider<List<LocalAchievement>>((
   yield await _readUnlockedAchievements(ledger, uid);
 
   await for (final change in ledger.changes) {
-    if (change.type == 'achievement_unlocked' ||
+    if (change.isGlobalRefresh ||
+        change.type == 'achievement_unlocked' ||
         change.type == 'achievement_claimed') {
       yield await _readUnlockedAchievements(ledger, uid);
     }

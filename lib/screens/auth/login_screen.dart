@@ -99,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         errorCode: 'finalize_account_setup_failed',
       );
     } finally {
-      if (widget.linkMode && mounted) {
+      if (mounted) {
         Navigator.of(context).popUntil((r) => r.isFirst);
       }
     }
