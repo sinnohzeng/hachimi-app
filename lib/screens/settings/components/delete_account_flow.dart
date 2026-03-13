@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/account_deletion_result.dart';
@@ -154,11 +155,21 @@ class DeleteAccountFlow {
       localDataDestroyed = result.localDeleted;
       if (!context.mounted) return;
       navigatedAway = await _handleDeletionResult(context, ref, result, l10n);
-    } on Exception {
+    } catch (e, stack) {
       localDataDestroyed = true;
+      await ErrorHandler.recordOperation(
+        e,
+        stackTrace: stack,
+        feature: 'DeleteAccountFlow',
+        operation: 'executeDelete',
+        operationStage: 'account_deletion',
+        errorCode: 'delete_account_execute_failed',
+      );
       await ref
           .read(analyticsServiceProvider)
-          .logAccountDeletionFailed(errorCode: 'delete_account_local_failed');
+          .logAccountDeletionFailed(
+            errorCode: 'delete_account_execute_failed',
+          );
       if (context.mounted) {
         Navigator.of(context).pop();
         AppFeedback.error(context, l10n.deleteAccountError);
