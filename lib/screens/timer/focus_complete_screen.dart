@@ -12,6 +12,7 @@ import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/screens/timer/components/focus_cat_display.dart';
 import 'package:hachimi_app/screens/timer/components/focus_session_stats_card.dart';
+import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/services/diary_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:vibration/vibration.dart';
@@ -66,36 +67,37 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     );
     _initAnimations();
     _startStaggeredAnimations();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _triggerCelebration());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _triggerCelebration();
+      final habits = ref.read(habitsProvider).value ?? [];
+      final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
+      final cat = habit?.catId != null
+          ? ref.read(catByIdProvider(habit!.catId!))
+          : null;
+      _triggerDiaryGeneration(cat, habit);
+    });
+  }
+
+  /// 创建动画控制器并绑定曲线。
+  AnimationController _createController(Duration duration) {
+    return AnimationController(vsync: this, duration: duration);
   }
 
   /// 初始化 3 组动画控制器与曲线。
   void _initAnimations() {
-    // Emoji scale-up: 0 → 1 with overshoot
-    _emojiController = AnimationController(
-      vsync: this,
-      duration: AppMotion.durationMedium4,
-    );
+    _emojiController = _createController(AppMotion.durationMedium4);
     _emojiScale = CurvedAnimation(
       parent: _emojiController,
       curve: Curves.elasticOut,
     );
 
-    // Content (title, subtitle, cat) fade-in
-    _contentController = AnimationController(
-      vsync: this,
-      duration: AppMotion.durationMedium2,
-    );
+    _contentController = _createController(AppMotion.durationMedium2);
     _contentOpacity = CurvedAnimation(
       parent: _contentController,
       curve: AppMotion.standardDecelerate,
     );
 
-    // Stats card slide-up + fade-in
-    _statsController = AnimationController(
-      vsync: this,
-      duration: AppMotion.durationMedium4,
-    );
+    _statsController = _createController(AppMotion.durationMedium4);
     _statsSlide = Tween<Offset>(
       begin: const Offset(0, 0.15),
       end: Offset.zero,
@@ -151,15 +153,15 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     if (_diaryTriggered) return;
     _diaryTriggered = true;
 
-    if (cat == null || habit == null) return;
-    if (widget.isAbandoned) return;
+    if (cat == null || habit == null || widget.isAbandoned) return;
+    if (ref.read(aiAvailabilityProvider) != AiAvailability.ready) return;
 
-    final availability = ref.read(aiAvailabilityProvider);
-    if (availability != AiAvailability.ready) return;
+    _executeDiaryGeneration(cat, habit);
+  }
 
+  /// 执行日记生成请求，管理 generating/success 状态转换。
+  Future<void> _executeDiaryGeneration(Cat cat, Habit habit) async {
     final locale = Localizations.localeOf(context);
-    final diaryService = ref.read(diaryServiceProvider);
-    final catId = cat.id;
     final ctx = DiaryGenerationContext(
       cat: cat,
       habit: habit,
@@ -168,25 +170,18 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     );
 
     setState(() => _diaryGenerating = true);
-    diaryService
-        .generateTodayDiary(ctx)
-        .then((_) {
-          if (mounted) {
-            setState(() {
-              _diaryGenerating = false;
-              _diarySuccess = true;
-            });
-            ref
-                .read(analyticsServiceProvider)
-                .logAiDiaryGenerated(catId: catId);
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) setState(() => _diarySuccess = false);
-            });
-          }
-        })
-        .catchError((_) {
-          if (mounted) setState(() => _diaryGenerating = false);
-        });
+    try {
+      await ref.read(diaryServiceProvider).generateTodayDiary(ctx);
+      if (!mounted) return;
+      setState(() { _diaryGenerating = false; _diarySuccess = true; });
+      ref.read(analyticsServiceProvider).logAiDiaryGenerated(catId: cat.id);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _diarySuccess = false);
+      });
+    } catch (e) {
+      debugPrint('[DIARY] generation failed: $e');
+      if (mounted) setState(() => _diaryGenerating = false);
+    }
   }
 
   @override
@@ -204,11 +199,6 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
 
     final didStageUp = widget.stageUp?.didStageUp ?? false;
     final catName = cat?.name ?? l10n.focusCompleteYourCat;
-
-    // Trigger diary generation once
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _triggerDiaryGeneration(cat, habit);
-    });
 
     return Scaffold(
       body: Stack(
@@ -255,7 +245,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   Widget _buildHeadline(
     TextTheme textTheme,
     ColorScheme colorScheme,
-    dynamic l10n,
+    S l10n,
     bool didStageUp,
     String catName,
   ) {
@@ -365,7 +355,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   Widget _buildDoneButton(
     ColorScheme colorScheme,
     TextTheme textTheme,
-    dynamic l10n,
+    S l10n,
   ) {
     return SlideTransition(
       position: _statsSlide,

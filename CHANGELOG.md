@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.3] - 2026-03-13
+
+### Refactored
+- **渲染管线精修**：提取 `_renderLayer()` 统一画布合成模板，消除 6 处 PictureRecorder 样板代码；修复 `rec`/`c` 单字母变量为语义化命名
+- **类型安全修复**：`dynamic l10n` → `S l10n` 恢复静态类型检查；`_performRename` 中 `context.l10n` → `dialogCtx.l10n` 修复潜在 BuildContext 错用
+- **异常处理规范化**：所有 `catch (_) {}` 静默吞异常替换为 `catch (e) { debugPrint(...) }`，日记生成 `.then/.catchError` 重写为 async/await
+- **状态机去重**：提取 `_computeWallClockElapsed`（壁钟计算 3×→1×）、`_resolveCatDisplayName`（猫名回退 3×→1×）、`_computePendingPauseDelta`（暂停增量 2×→1×）
+- **常量提取**：`_defaultDurationSeconds`、`_autoCompleteThresholdMinutes`、`_saveIntervalTicks`、`_habitNameMaxLength`、`_buttonHeight` 替代散布的魔法数字
+- **按钮组件统一**：提取 `_TimerActionButton` 消除 timer_controls.dart 中 5 处 `SizedBox(height: 56)` 按钮布局重复
+- **日记触发架构修正**：从 `build()` 内的 `addPostFrameCallback` 移至 `initState()`，消除每次重建注册回调的反模式
+
 ## [2.31.2] - 2026-03-13
 
 ### Refactored

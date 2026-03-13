@@ -501,18 +501,23 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    HapticFeedback.mediumImpact();
-    final renamedCat = cat.copyWith(name: newName);
-    await ref.read(localCatRepositoryProvider).update(uid, renamedCat);
-    ref
-        .read(ledgerServiceProvider)
-        .notifyChange(const LedgerChange(type: 'cat_update'));
+    try {
+      HapticFeedback.mediumImpact();
+      final renamedCat = cat.copyWith(name: newName);
+      await ref.read(localCatRepositoryProvider).update(uid, renamedCat);
+      ref
+          .read(ledgerServiceProvider)
+          .notifyChange(const LedgerChange(type: 'cat_update'));
+    } catch (e) {
+      debugPrint('[CatDetail] rename failed: $e');
+      return;
+    }
 
     if (dialogCtx.mounted) {
       Navigator.of(dialogCtx).pop();
       ScaffoldMessenger.of(dialogCtx).showSnackBar(
         SnackBar(
-          content: Text(context.l10n.catDetailRenamed),
+          content: Text(dialogCtx.l10n.catDetailRenamed),
           behavior: SnackBarBehavior.floating,
         ),
       );

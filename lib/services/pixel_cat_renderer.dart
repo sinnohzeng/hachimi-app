@@ -198,10 +198,20 @@ class PixelCatRenderer {
   Future<ui.Image> _renderSpriteToImage(
     String spriteName,
     int spriteNumber,
+  ) {
+    return _renderLayer((canvas) => _drawSprite(spriteName, spriteNumber, canvas));
+  }
+
+  // ─── 图像合成基础工具 ───
+
+  /// 在独立画布上执行绘制操作并返回合成图像。
+  /// 消除 PictureRecorder + Canvas 模板代码的重复。
+  Future<ui.Image> _renderLayer(
+    Future<void> Function(ui.Canvas canvas) draw,
   ) async {
     final recorder = ui.PictureRecorder();
     final canvas = ui.Canvas(recorder);
-    await _drawSprite(spriteName, spriteNumber, canvas);
+    await draw(canvas);
     return recorder.endRecording().toImage(spriteSize, spriteSize);
   }
 
@@ -213,59 +223,50 @@ class PixelCatRenderer {
     List<int> tintRgb,
     ui.BlendMode blendMode,
   ) async {
-    final size = spriteSize.toDouble();
     final tintColor = ui.Color.fromARGB(255, tintRgb[0], tintRgb[1], tintRgb[2]);
 
-    // 生成色调遮罩
-    final tintOverlay = await _renderTintOverlay(source, tintColor, size);
-    // 混合色调到源图
-    final blended = await _blendImages(source, tintOverlay, blendMode, size);
-    // 用源图 alpha 裁切（保持透明区域）
-    return _clipToAlpha(blended, source, size);
+    // 生成色调遮罩 → 混合到源图 → 用源图 alpha 裁切
+    final tintOverlay = await _renderTintOverlay(source, tintColor);
+    final blended = await _blendImages(source, tintOverlay, blendMode);
+    return _clipToAlpha(blended, source);
   }
 
   Future<ui.Image> _renderTintOverlay(
     ui.Image source,
     ui.Color color,
-    double size,
-  ) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    c.drawImage(source, ui.Offset.zero, ui.Paint());
-    c.drawRect(
-      ui.Rect.fromLTWH(0, 0, size, size),
-      ui.Paint()..color = color..blendMode = ui.BlendMode.srcIn,
-    );
-    return rec.endRecording().toImage(spriteSize, spriteSize);
+  ) {
+    return _renderLayer((canvas) async {
+      canvas.drawImage(source, ui.Offset.zero, ui.Paint());
+      canvas.drawRect(
+        ui.Rect.fromLTWH(0, 0, spriteSize.toDouble(), spriteSize.toDouble()),
+        ui.Paint()..color = color..blendMode = ui.BlendMode.srcIn,
+      );
+    });
   }
 
   Future<ui.Image> _blendImages(
     ui.Image base,
     ui.Image overlay,
     ui.BlendMode mode,
-    double size,
-  ) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    c.drawImage(base, ui.Offset.zero, ui.Paint());
-    c.drawImage(overlay, ui.Offset.zero, ui.Paint()..blendMode = mode);
-    return rec.endRecording().toImage(spriteSize, spriteSize);
+  ) {
+    return _renderLayer((canvas) async {
+      canvas.drawImage(base, ui.Offset.zero, ui.Paint());
+      canvas.drawImage(overlay, ui.Offset.zero, ui.Paint()..blendMode = mode);
+    });
   }
 
   Future<ui.Image> _clipToAlpha(
     ui.Image image,
     ui.Image alphaSource,
-    double size,
-  ) async {
-    final rec = ui.PictureRecorder();
-    final c = ui.Canvas(rec);
-    c.drawImage(image, ui.Offset.zero, ui.Paint());
-    c.drawImage(
-      alphaSource,
-      ui.Offset.zero,
-      ui.Paint()..blendMode = ui.BlendMode.dstIn,
-    );
-    return rec.endRecording().toImage(spriteSize, spriteSize);
+  ) {
+    return _renderLayer((canvas) async {
+      canvas.drawImage(image, ui.Offset.zero, ui.Paint());
+      canvas.drawImage(
+        alphaSource,
+        ui.Offset.zero,
+        ui.Paint()..blendMode = ui.BlendMode.dstIn,
+      );
+    });
   }
 
   /// 遮罩合成（对应 drawMaskedSprite）
@@ -273,19 +274,16 @@ class PixelCatRenderer {
     String spriteName,
     String maskSpriteName,
     int spriteNumber,
-  ) async {
-    final recorder = ui.PictureRecorder();
-    final canvas = ui.Canvas(recorder);
-
-    await _drawSprite(maskSpriteName, spriteNumber, canvas);
-    final spriteImage = await _renderSpriteToImage(spriteName, spriteNumber);
-    canvas.drawImage(
-      spriteImage,
-      ui.Offset.zero,
-      ui.Paint()..blendMode = ui.BlendMode.srcIn,
-    );
-
-    return recorder.endRecording().toImage(spriteSize, spriteSize);
+  ) {
+    return _renderLayer((canvas) async {
+      await _drawSprite(maskSpriteName, spriteNumber, canvas);
+      final spriteImage = await _renderSpriteToImage(spriteName, spriteNumber);
+      canvas.drawImage(
+        spriteImage,
+        ui.Offset.zero,
+        ui.Paint()..blendMode = ui.BlendMode.srcIn,
+      );
+    });
   }
 
   // ─── 渲染管线 ───
@@ -326,25 +324,23 @@ class PixelCatRenderer {
   Future<ui.Image> _renderBasePelt(
     CatAppearance appearance,
     int spriteIndex,
-  ) async {
-    final recorder = ui.PictureRecorder();
-    final canvas = ui.Canvas(recorder);
-    final spriteName = peltTypeToSpriteName[appearance.peltType] ?? 'single';
+  ) {
+    return _renderLayer((canvas) async {
+      final spriteName = peltTypeToSpriteName[appearance.peltType] ?? 'single';
 
-    // Layer 1：底色
-    final baseSprite = appearance.isTortie
-        ? '${appearance.tortieBase ?? "single"}${appearance.peltColor}'
-        : '$spriteName${appearance.peltColor}';
-    await _drawSprite(baseSprite, spriteIndex, canvas);
+      // Layer 1：底色
+      final baseSprite = appearance.isTortie
+          ? '${appearance.tortieBase ?? "single"}${appearance.peltColor}'
+          : '$spriteName${appearance.peltColor}';
+      await _drawSprite(baseSprite, spriteIndex, canvas);
 
-    // Layer 2：玳瑁遮罩叠加
-    if (appearance.isTortie &&
-        appearance.tortiePattern != null &&
-        appearance.tortieColor != null) {
-      await _drawTortieOverlay(canvas, appearance, spriteIndex);
-    }
-
-    return recorder.endRecording().toImage(spriteSize, spriteSize);
+      // Layer 2：玳瑁遮罩叠加
+      if (appearance.isTortie &&
+          appearance.tortiePattern != null &&
+          appearance.tortieColor != null) {
+        await _drawTortieOverlay(canvas, appearance, spriteIndex);
+      }
+    });
   }
 
   Future<void> _drawTortieOverlay(
@@ -391,37 +387,35 @@ class PixelCatRenderer {
     ui.Image base,
     CatAppearance appearance,
     int spriteIndex,
-  ) async {
-    final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec);
-    canvas.drawImage(base, ui.Offset.zero, ui.Paint());
+  ) {
+    return _renderLayer((canvas) async {
+      canvas.drawImage(base, ui.Offset.zero, ui.Paint());
 
-    // Layer 4-5：白色斑块（含色调）
-    if (appearance.whitePatches != null) {
-      final wpImage = await _renderTintedWhiteLayer(
-        'white${appearance.whitePatches}',
-        appearance,
-        spriteIndex,
-      );
-      canvas.drawImage(wpImage, ui.Offset.zero, ui.Paint());
-    }
+      // Layer 4-5：白色斑块（含色调）
+      if (appearance.whitePatches != null) {
+        final wpImage = await _renderTintedWhiteLayer(
+          'white${appearance.whitePatches}',
+          appearance,
+          spriteIndex,
+        );
+        canvas.drawImage(wpImage, ui.Offset.zero, ui.Paint());
+      }
 
-    // Layer 6：重点色（含色调）
-    if (appearance.points != null) {
-      final ptImage = await _renderTintedWhiteLayer(
-        'white${appearance.points}',
-        appearance,
-        spriteIndex,
-      );
-      canvas.drawImage(ptImage, ui.Offset.zero, ui.Paint());
-    }
+      // Layer 6：重点色（含色调）
+      if (appearance.points != null) {
+        final pointsImage = await _renderTintedWhiteLayer(
+          'white${appearance.points}',
+          appearance,
+          spriteIndex,
+        );
+        canvas.drawImage(pointsImage, ui.Offset.zero, ui.Paint());
+      }
 
-    // Layer 7：白斑病
-    if (appearance.vitiligo != null) {
-      await _drawSprite('white${appearance.vitiligo}', spriteIndex, canvas);
-    }
-
-    return rec.endRecording().toImage(spriteSize, spriteSize);
+      // Layer 7：白斑病
+      if (appearance.vitiligo != null) {
+        await _drawSprite('white${appearance.vitiligo}', spriteIndex, canvas);
+      }
+    });
   }
 
   /// 渲染一个白色叠加层并应用白色斑块色调
@@ -447,26 +441,20 @@ class PixelCatRenderer {
     int spriteIndex,
   ) async {
     // Layer 8：眼睛
-    final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec);
-    canvas.drawImage(base, ui.Offset.zero, ui.Paint());
+    final withEyes = await _renderLayer((canvas) async {
+      canvas.drawImage(base, ui.Offset.zero, ui.Paint());
+      await _drawSprite('eyes${appearance.eyeColor}', spriteIndex, canvas);
+      if (appearance.eyeColor2 != null) {
+        await _drawSprite('eyes2${appearance.eyeColor2}', spriteIndex, canvas);
+      }
+    });
 
-    await _drawSprite('eyes${appearance.eyeColor}', spriteIndex, canvas);
-    if (appearance.eyeColor2 != null) {
-      await _drawSprite('eyes2${appearance.eyeColor2}', spriteIndex, canvas);
-    }
-
-    // Layer 10-11：线稿（跳过 shading 以优化移动端性能）
-    final preShading = await rec.endRecording().toImage(spriteSize, spriteSize);
-    final finalRec = ui.PictureRecorder();
-    final finalCanvas = ui.Canvas(finalRec);
-    finalCanvas.drawImage(preShading, ui.Offset.zero, ui.Paint());
-    await _drawSprite('lines', spriteIndex, finalCanvas);
-
-    // Layer 12：皮肤
-    await _drawSprite('skin${appearance.skinColor}', spriteIndex, finalCanvas);
-
-    return finalRec.endRecording().toImage(spriteSize, spriteSize);
+    // Layer 10-12：线稿 + 皮肤（跳过 shading 以优化移动端性能）
+    return _renderLayer((canvas) async {
+      canvas.drawImage(withEyes, ui.Offset.zero, ui.Paint());
+      await _drawSprite('lines', spriteIndex, canvas);
+      await _drawSprite('skin${appearance.skinColor}', spriteIndex, canvas);
+    });
   }
 
   /// Layer 13：饰品
@@ -481,11 +469,10 @@ class PixelCatRenderer {
     final prefix = _resolveAccessoryPrefix(accessoryId);
     if (prefix == null) return base;
 
-    final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec);
-    canvas.drawImage(base, ui.Offset.zero, ui.Paint());
-    await _drawSprite('$prefix$accessoryId', spriteIndex, canvas);
-    return rec.endRecording().toImage(spriteSize, spriteSize);
+    return _renderLayer((canvas) async {
+      canvas.drawImage(base, ui.Offset.zero, ui.Paint());
+      await _drawSprite('$prefix$accessoryId', spriteIndex, canvas);
+    });
   }
 
   String? _resolveAccessoryPrefix(String accessoryId) {
@@ -505,21 +492,18 @@ class PixelCatRenderer {
     CatAppearance appearance,
     String cacheKey,
   ) async {
-    final rec = ui.PictureRecorder();
-    final canvas = ui.Canvas(rec);
-
-    if (appearance.reverse) {
-      canvas.scale(-1, 1);
-      canvas.drawImage(
-        image,
-        ui.Offset(-spriteSize.toDouble(), 0),
-        ui.Paint(),
-      );
-    } else {
-      canvas.drawImage(image, ui.Offset.zero, ui.Paint());
-    }
-
-    final result = await rec.endRecording().toImage(spriteSize, spriteSize);
+    final result = await _renderLayer((canvas) async {
+      if (appearance.reverse) {
+        canvas.scale(-1, 1);
+        canvas.drawImage(
+          image,
+          ui.Offset(-spriteSize.toDouble(), 0),
+          ui.Paint(),
+        );
+      } else {
+        canvas.drawImage(image, ui.Offset.zero, ui.Paint());
+      }
+    });
     _addToCache(cacheKey, result);
     return result;
   }
