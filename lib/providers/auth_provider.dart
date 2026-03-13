@@ -59,10 +59,13 @@ class OnboardingNotifier extends Notifier<bool> {
   }
 
   /// 引导完成 — 更新状态 + 持久化。
+  ///
+  /// 同时设置 [AppPrefsKeys.hasOnboardedBefore] 永久标记，
+  /// 使登出后的返回用户跳过引导教程。
   void complete() {
-    ref
-        .read(sharedPreferencesProvider)
-        .setBool(AppPrefsKeys.onboardingComplete, true);
+    final prefs = ref.read(sharedPreferencesProvider);
+    prefs.setBool(AppPrefsKeys.onboardingComplete, true);
+    prefs.setBool(AppPrefsKeys.hasOnboardedBefore, true);
     state = true;
   }
 

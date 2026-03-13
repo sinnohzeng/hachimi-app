@@ -43,12 +43,19 @@
 Affected providers: `habitsProvider`, `catsProvider`, `allCatsProvider`, `coinBalanceProvider`, `hasCheckedInTodayProvider`, `monthlyCheckInProvider`, `inventoryProvider`, `unlockedAchievementsProvider`, `avatarIdProvider`, `currentTitleProvider`, `unlockedTitlesProvider`.
 
 ## AuthGate Behavior
-1. If onboarding incomplete -> onboarding flow.
+1. If onboarding incomplete:
+   - If `hasOnboardedBefore == false` → first-time user → show OnboardingScreen.
+   - If `hasOnboardedBefore == true` → returning user after logout → auto-skip tutorial, create guest UID, restore onboarding state.
 2. If deletion tombstone/pending job exists -> pending deletion screen + retry loop.
 3. If authenticated -> boot app with auth uid.
 4. If unauthenticated but cached uid exists -> local guest boot + background anonymous sign-in.
 
-Logout navigation is centralized: `ref.listenManual(onboardingCompleteProvider)` in AuthGate detects `true → false` and calls `popUntil(isFirst)`. Individual screens call `UserProfileNotifier.logout()` — the only logout entry point.
+`hasOnboardedBefore` is a persistent SharedPreferences flag set on first onboarding completion. It survives logout but is cleared on account deletion (fresh start).
+
+### Logout — Clean-Then-Navigate
+Logout is centralized in `UserProfileNotifier.logout()` — the only logout entry point. The flow follows a **Clean-Then-Navigate** pattern: user state is fully cleaned (SharedPreferences cleared, SQLite user data deleted, Firebase signed out) **before** triggering navigation via `onboardingCompleteProvider.reset()`. Non-critical cleanup (notification cancellation, Crashlytics user reset) runs as fire-and-forget after navigation.
+
+`ref.listenManual(onboardingCompleteProvider)` in AuthGate detects `true → false` and calls `popUntil(isFirst)` to dismiss any open dialogs or pushed routes.
 
 ### FirstHabitGate Hydration Guard
 `_FirstHabitGate` checks whether the user has any habits to decide new-user routing. For non-guest users, this check is deferred until `dataHydrated == true` (set by SyncEngine after Firestore hydration), preventing a race condition where empty pre-hydration data triggers the adoption flow incorrectly.

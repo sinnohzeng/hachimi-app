@@ -5,7 +5,7 @@ import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
 /// 退出确认 — 纯确认 dialog，无 loading 状态。
 ///
-/// Navigation-First 保证 logout() 瞬间完成导航，
+/// Clean-Then-Navigate 保证 logout() 先清理用户状态再触发导航，
 /// dialog 被 AuthGate 的 popUntil 自动关闭。
 Future<void> showLogoutConfirmation(BuildContext context, WidgetRef ref) {
   final l10n = context.l10n;

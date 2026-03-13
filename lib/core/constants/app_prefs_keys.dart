@@ -11,6 +11,7 @@ class AppPrefsKeys {
 
   // ─── 引导 ───
   static const onboardingComplete = 'onboarding_complete';
+  static const hasOnboardedBefore = 'has_onboarded_before';
 
   // ─── 同步 ───
   static const dataHydrated = 'local_data_hydrated_v1';

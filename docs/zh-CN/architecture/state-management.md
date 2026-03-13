@@ -43,12 +43,19 @@
 受影响 Provider：`habitsProvider`、`catsProvider`、`allCatsProvider`、`coinBalanceProvider`、`hasCheckedInTodayProvider`、`monthlyCheckInProvider`、`inventoryProvider`、`unlockedAchievementsProvider`、`avatarIdProvider`、`currentTitleProvider`、`unlockedTitlesProvider`。
 
 ## AuthGate 行为
-1. onboarding 未完成 -> onboarding 流程。
+1. onboarding 未完成：
+   - `hasOnboardedBefore == false` → 首次用户 → 显示 OnboardingScreen。
+   - `hasOnboardedBefore == true` → 登出后的返回用户 → 自动跳过教程，创建访客 UID，恢复 onboarding 状态。
 2. 存在删号 tombstone/pending -> 待删除页面 + 重试。
 3. 已认证 -> 用 auth uid 启动业务。
 4. 未认证但有 cached uid -> 本地访客启动 + 匿名登录后台补齐。
 
-登出导航已集中化：AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → false` 变化后调用 `popUntil(isFirst)`。各页面统一调用 `UserProfileNotifier.logout()` — 唯一登出入口。
+`hasOnboardedBefore` 是在首次完成引导时设置的持久化 SharedPreferences 标记。登出后保留，删号时清除（全新开始）。
+
+### 登出 — Clean-Then-Navigate
+登出统一由 `UserProfileNotifier.logout()` 编排 — 唯一登出入口。流程遵循 **Clean-Then-Navigate** 模式：先完成用户状态清理（SharedPreferences 清空、SQLite 用户数据删除、Firebase 签出），**再**通过 `onboardingCompleteProvider.reset()` 触发导航。非关键清理（通知取消、Crashlytics 用户标识清理）在导航后以 fire-and-forget 方式执行。
+
+AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → false` 变化后调用 `popUntil(isFirst)`，关闭所有已打开的对话框或已推入的路由。
 
 ### FirstHabitGate 水化守卫
 `_FirstHabitGate` 通过检查用户是否有习惯来决定新用户路由。非访客用户的检查延迟到 `dataHydrated == true`（SyncEngine 完成 Firestore 水化后设置），防止水化前空数据导致误入领养引导的竞态条件。

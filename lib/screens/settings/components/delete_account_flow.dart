@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
@@ -165,7 +166,11 @@ class DeleteAccountFlow {
     } finally {
       progress.dispose();
       // 结构性不变量：本地数据已销毁且尚未导航 → 必须 reset 回引导页
+      // 删号 = 全新开始，清除 hasOnboardedBefore 让用户看到完整引导教程。
       if (localDataDestroyed && !navigatedAway && context.mounted) {
+        ref
+            .read(sharedPreferencesProvider)
+            .remove(AppPrefsKeys.hasOnboardedBefore);
         ref.read(onboardingCompleteProvider.notifier).reset();
       }
     }
@@ -207,6 +212,10 @@ class DeleteAccountFlow {
     S l10n,
   ) async {
     if (result.remoteDeleted) {
+      // 删号 = 全新开始，清除 hasOnboardedBefore 让用户看到完整引导教程。
+      ref
+          .read(sharedPreferencesProvider)
+          .remove(AppPrefsKeys.hasOnboardedBefore);
       ref.read(onboardingCompleteProvider.notifier).reset();
       await ref.read(analyticsServiceProvider).logAccountDeletionCompleted();
       if (!context.mounted) return true;

@@ -207,18 +207,35 @@ class LedgerService {
   }
 
   /// 批量更新台账和本地表中的 uid（访客→正式用户迁移用）。
+  ///
+  /// 复合主键表（materialized_state、local_monthly_checkins）需要先删除
+  /// newUid 的默认行再更新 oldUid 行，否则 UNIQUE 约束冲突。
+  /// newUid 行是 ensureProfile() 写入的初始默认值，oldUid 行是用户真实数据。
   Future<void> migrateUid(String oldUid, String newUid) async {
     final db = await database;
     await db.transaction((txn) async {
+      // 单列 PK 表 — 直接 UPDATE
       for (final table in [
         'action_ledger',
         'local_habits',
         'local_cats',
         'local_sessions',
-        'local_monthly_checkins',
-        'materialized_state',
         'local_achievements',
       ]) {
+        await txn.update(
+          table,
+          {'uid': newUid},
+          where: 'uid = ?',
+          whereArgs: [oldUid],
+        );
+      }
+
+      // 复合 PK 表 — 先删 newUid 默认行，再更新 oldUid→newUid
+      for (final table in [
+        'materialized_state',
+        'local_monthly_checkins',
+      ]) {
+        await txn.delete(table, where: 'uid = ?', whereArgs: [newUid]);
         await txn.update(
           table,
           {'uid': newUid},

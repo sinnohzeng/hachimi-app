@@ -90,6 +90,7 @@ class AuthGate extends ConsumerStatefulWidget {
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _appOpenLogged = false;
   bool _isAutoSigningIn = false;
+  bool _isAutoSkipping = false;
   bool _isPendingDeletionRetry = false;
   Timer? _pendingDeletionTimer;
   ProviderSubscription<bool>? _onboardingListener;
@@ -243,6 +244,18 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Widget build(BuildContext context) {
     final onboardingComplete = ref.watch(onboardingCompleteProvider);
     if (!onboardingComplete) {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final hasOnboardedBefore =
+          prefs.getBool(AppPrefsKeys.hasOnboardedBefore) ?? false;
+      if (hasOnboardedBefore && !_isAutoSkipping) {
+        // 返回用户 — 跳过教程，直接创建访客 UID 并恢复 onboarding 状态。
+        // 不触发 onboarding_completed Analytics 事件（用户未实际完成引导流程）。
+        _isAutoSkipping = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _onOnboardingComplete();
+        });
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
       return OnboardingScreen(onComplete: _onOnboardingComplete);
     }
 

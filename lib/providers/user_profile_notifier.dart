@@ -71,66 +71,88 @@ class UserProfileNotifier extends Notifier<void> {
 
   bool _isLoggingOut = false;
 
-  /// 登出 — Navigation-First：先导航，后清理。
+  /// 登出 — Clean-Then-Navigate：先清理关键状态，再触发导航。
   ///
   /// 这是所有登出操作的唯一入口。屏幕层不得直接调用 authBackend.signOut()。
-  /// 设计原则：用户反馈必须立即可见。
-  /// Phase 1-2 是同步操作，保证瞬间完成。
-  /// Phase 3 是异步清理，在后台 fire-and-forget。
+  ///
+  /// 设计原则：关键状态（本地缓存 + Auth 会话）必须在导航重置前清除，
+  /// 否则新会话的 _ensureLocalUid / _autoSignInAnonymously 会与旧会话的
+  /// fire-and-forget signOut 产生竞态，导致用户卡死在加载页。
   Future<void> logout() async {
     if (_isLoggingOut) return;
     _isLoggingOut = true;
 
-    final uid = ref.read(currentUidProvider);
+    try {
+      final uid = ref.read(currentUidProvider);
 
-    // Phase 1: 停止后台引擎（同步、幂等）
-    ref.read(syncEngineProvider).stop();
+      ref.read(syncEngineProvider).stop(); // Phase 1: 停止后台引擎
+      _clearUserLocalState(); // Phase 2: SharedPreferences
+      await _destroySessionData(uid); // Phase 3-4: SQLite + Firebase
 
-    // Phase 2: 导航触发 — 用户立即看到引导页
-    ref.read(onboardingCompleteProvider.notifier).reset();
+      // Phase 5: 导航触发 — 用户看到引导页（此时旧会话已彻底销毁）
+      ref.read(onboardingCompleteProvider.notifier).reset();
 
-    // Phase 3: 后台清理（fire-and-forget，失败不影响用户）
-    _cleanupAfterLogout(uid);
+      _cleanupNonCritical(); // Phase 6: 通知 + Crashlytics（fire-and-forget）
+    } finally {
+      _isLoggingOut = false;
+    }
   }
 
-  /// 登出后台清理 — 全部 best-effort，失败仅记录不阻塞。
-  void _cleanupAfterLogout(String? uid) {
+  /// 销毁用户会话数据 — SQLite 台账 + Firebase Auth。
+  ///
+  /// 每个操作独立 try-catch，单个失败不影响后续清理。
+  Future<void> _destroySessionData(String? uid) async {
+    if (uid != null) {
+      try {
+        await ref.read(ledgerServiceProvider).deleteUidData(uid);
+      } catch (e, stack) {
+        _recordLogoutError(e, stack, 'delete_uid_data');
+      }
+    }
+    try {
+      await ref.read(authBackendProvider).signOut();
+    } catch (e, stack) {
+      _recordLogoutError(e, stack, 'auth_signout');
+    }
+    ObservabilityRuntime.clearUidHash();
+  }
+
+  /// 登出后台清理 — 非关键操作，best-effort。
+  ///
+  /// 仅负责通知取消和 Crashlytics 用户标识清理。
+  /// SQLite 数据已在 Phase 3 同步清除，此处不再处理。
+  void _cleanupNonCritical() {
     Future(() async {
       try {
-        if (uid != null) {
-          await ref.read(ledgerServiceProvider).deleteUidData(uid);
-        }
         await ref.read(notificationServiceProvider).cancelAll();
-      } catch (e, stack) {
-        _recordLogoutError(e, stack, 'data_cleanup');
-      }
-
-      _clearUserLocalState();
-
-      try {
-        await ref.read(authBackendProvider).signOut();
-        ObservabilityRuntime.clearUidHash();
         await FirebaseCrashlytics.instance.setUserIdentifier('');
       } catch (e, stack) {
-        _recordLogoutError(e, stack, 'auth_signout');
+        _recordLogoutError(e, stack, 'non_critical_cleanup');
       }
-
-      _isLoggingOut = false;
     });
   }
 
   /// 访客数据重置 — 清除数据后回到引导。
+  ///
+  /// 与删号相同，清除 hasOnboardedBefore 让用户看到完整引导教程。
   Future<void> resetGuestData() async {
     final uid = ref.read(currentUidProvider);
     if (uid != null) {
       await ref
           .read(accountDeletionOrchestratorProvider)
           .deleteAccount(uid: uid);
+      ref
+          .read(sharedPreferencesProvider)
+          .remove(AppPrefsKeys.hasOnboardedBefore);
       ref.read(onboardingCompleteProvider.notifier).reset();
     }
   }
 
-  /// 清理全量用户级 SharedPreferences — 保留应用级设置（theme、locale）。
+  /// 清理全量用户级 SharedPreferences — 保留应用级设置。
+  ///
+  /// 以下键被刻意保留：
+  /// - [AppPrefsKeys.hasOnboardedBefore] — 登出后跳过引导教程
+  /// - theme / locale 等应用级设置由各自 Provider 管理，不在此清理范围
   void _clearUserLocalState() {
     final prefs = ref.read(sharedPreferencesProvider);
     for (final key in const [
