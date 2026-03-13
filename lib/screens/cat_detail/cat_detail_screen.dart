@@ -196,76 +196,85 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
   /// 右栏 — FocusStats, Diary, Chat, Reminder, Heatmap, Accessories, CatInfo
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
+    return Column(
+      children: _buildCardWidgets(cat, habit, startIndex: 1),
+    );
+  }
+
+  /// 生成功能卡片列表（窄屏/宽屏共享），从 startIndex 起编排动画顺序。
+  List<Widget> _buildCardWidgets(
+    Cat cat,
+    Habit? habit, {
+    required int startIndex,
+  }) {
     final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
     final isGuest = ref.watch(isGuestProvider);
-    var idx = 1; // 左栏占 0
+    var idx = startIndex;
 
-    return Column(
-      children: [
-        if (habit != null) ...[
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: FocusStatsCard(habit: habit, cat: cat),
-          ),
-          const SizedBox(height: AppSpacing.base),
-        ],
-        if (isGuest) ...[
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: _AiTeaserCard(catName: cat.name),
-          ),
-          const SizedBox(height: AppSpacing.base),
-        ] else if (aiReady) ...[
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: DiaryPreviewCard(catId: cat.id),
-          ),
-          const SizedBox(height: AppSpacing.base),
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: ChatEntryCard(catId: cat.id, catName: cat.name),
-          ),
-          const SizedBox(height: AppSpacing.base),
-        ] else ...[
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: const _AiOfflineBanner(),
-          ),
-          const SizedBox(height: AppSpacing.base),
-        ],
-        if (habit != null) ...[
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: ReminderCard(habit: habit, cat: cat),
-          ),
-          const SizedBox(height: AppSpacing.base),
-          StaggeredListItem(
-            waitForRoute: true,
-            index: idx++,
-            child: HabitHeatmapCard(habitId: habit.id),
-          ),
-          const SizedBox(height: AppSpacing.base),
-        ],
+    return [
+      if (habit != null) ...[
         StaggeredListItem(
           waitForRoute: true,
           index: idx++,
-          child: AccessoriesCard(cat: cat),
+          child: FocusStatsCard(habit: habit, cat: cat),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ],
+      if (isGuest) ...[
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: _AiTeaserCard(catName: cat.name),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ] else if (aiReady) ...[
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: DiaryPreviewCard(catId: cat.id),
         ),
         const SizedBox(height: AppSpacing.base),
         StaggeredListItem(
           waitForRoute: true,
           index: idx++,
-          child: EnhancedCatInfoCard(cat: cat),
+          child: ChatEntryCard(catId: cat.id, catName: cat.name),
         ),
-        const SizedBox(height: AppSpacing.xl),
+        const SizedBox(height: AppSpacing.base),
+      ] else ...[
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: const _AiOfflineBanner(),
+        ),
+        const SizedBox(height: AppSpacing.base),
       ],
-    );
+      if (habit != null) ...[
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: ReminderCard(habit: habit, cat: cat),
+        ),
+        const SizedBox(height: AppSpacing.base),
+        StaggeredListItem(
+          waitForRoute: true,
+          index: idx++,
+          child: HabitHeatmapCard(habitId: habit.id),
+        ),
+        const SizedBox(height: AppSpacing.base),
+      ],
+      StaggeredListItem(
+        waitForRoute: true,
+        index: idx++,
+        child: AccessoriesCard(cat: cat),
+      ),
+      const SizedBox(height: AppSpacing.base),
+      StaggeredListItem(
+        waitForRoute: true,
+        index: idx++,
+        child: EnhancedCatInfoCard(cat: cat),
+      ),
+      const SizedBox(height: AppSpacing.xl),
+    ];
   }
 
   // ─── Shared SliverAppBar ───────────────────────────────────────
@@ -405,7 +414,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
   // ─── Narrow layout card list ───────────────────────────────────
 
-  /// 构建窄屏卡片列表（含 StaggeredListItem 动画）
+  /// 构建窄屏卡片列表：心情徽章 + 共享功能卡片。
   List<Widget> _buildAllCards(
     BuildContext context,
     Cat cat,
@@ -414,8 +423,6 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final aiReady = ref.watch(aiAvailabilityProvider) == AiAvailability.ready;
-    final isGuest = ref.watch(isGuestProvider);
 
     return [
       StaggeredListItem(
@@ -424,69 +431,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         child: _buildMoodBadge(context, moodData, colorScheme, textTheme),
       ),
       const SizedBox(height: AppSpacing.lg),
-      if (habit != null) ...[
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 1,
-          child: FocusStatsCard(habit: habit, cat: cat),
-        ),
-        const SizedBox(height: AppSpacing.base),
-      ],
-      if (isGuest) ...[
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 2,
-          child: _AiTeaserCard(catName: cat.name),
-        ),
-        const SizedBox(height: AppSpacing.base),
-      ] else if (aiReady) ...[
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 2,
-          child: DiaryPreviewCard(catId: cat.id),
-        ),
-        const SizedBox(height: AppSpacing.base),
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 3,
-          child: ChatEntryCard(catId: cat.id, catName: cat.name),
-        ),
-        const SizedBox(height: AppSpacing.base),
-      ] else ...[
-        const StaggeredListItem(
-          waitForRoute: true,
-          index: 2,
-          child: _AiOfflineBanner(),
-        ),
-        const SizedBox(height: AppSpacing.base),
-      ],
-      if (habit != null) ...[
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 4,
-          child: ReminderCard(habit: habit, cat: cat),
-        ),
-        const SizedBox(height: AppSpacing.base),
-      ],
-      if (habit != null)
-        StaggeredListItem(
-          waitForRoute: true,
-          index: 5,
-          child: HabitHeatmapCard(habitId: habit.id),
-        ),
-      const SizedBox(height: AppSpacing.base),
-      StaggeredListItem(
-        waitForRoute: true,
-        index: 6,
-        child: AccessoriesCard(cat: cat),
-      ),
-      const SizedBox(height: AppSpacing.base),
-      StaggeredListItem(
-        waitForRoute: true,
-        index: 7,
-        child: EnhancedCatInfoCard(cat: cat),
-      ),
-      const SizedBox(height: AppSpacing.xl),
+      ..._buildCardWidgets(cat, habit, startIndex: 1),
     ];
   }
 
@@ -517,15 +462,16 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
   void _showRenameDialog(BuildContext context, Cat cat) {
     final controller = TextEditingController(text: cat.name);
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.catDetailRenameTitle),
+        title: Text(l10n.catDetailRenameTitle),
         content: TextField(
           controller: controller,
           maxLength: Cat.maxNameLength,
           decoration: InputDecoration(
-            labelText: context.l10n.catDetailNewName,
+            labelText: l10n.catDetailNewName,
             prefixIcon: const Icon(Icons.pets),
           ),
           autofocus: true,
@@ -533,37 +479,44 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.commonCancel),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
-            onPressed: () async {
-              final newName = controller.text.trim();
-              if (newName.isEmpty) return;
-              final uid = ref.read(currentUidProvider);
-              if (uid == null) return;
-              HapticFeedback.mediumImpact();
-              final renamedCat = cat.copyWith(name: newName);
-              await ref
-                  .read(localCatRepositoryProvider)
-                  .update(uid, renamedCat);
-              ref
-                  .read(ledgerServiceProvider)
-                  .notifyChange(const LedgerChange(type: 'cat_update'));
-              if (ctx.mounted) {
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: Text(context.l10n.catDetailRenamed),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              }
-            },
-            child: Text(context.l10n.catDetailRename),
+            onPressed: () => _performRename(ctx, cat, controller.text),
+            child: Text(l10n.catDetailRename),
           ),
         ],
       ),
     );
+  }
+
+  /// 执行猫咪重命名：校验 → 持久化 → 同步通知。
+  Future<void> _performRename(
+    BuildContext dialogCtx,
+    Cat cat,
+    String rawName,
+  ) async {
+    final newName = rawName.trim();
+    if (newName.isEmpty) return;
+    final uid = ref.read(currentUidProvider);
+    if (uid == null) return;
+
+    HapticFeedback.mediumImpact();
+    final renamedCat = cat.copyWith(name: newName);
+    await ref.read(localCatRepositoryProvider).update(uid, renamedCat);
+    ref
+        .read(ledgerServiceProvider)
+        .notifyChange(const LedgerChange(type: 'cat_update'));
+
+    if (dialogCtx.mounted) {
+      Navigator.of(dialogCtx).pop();
+      ScaffoldMessenger.of(dialogCtx).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.catDetailRenamed),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
 

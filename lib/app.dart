@@ -19,7 +19,9 @@ import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart'; // re-exports service_providers
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/celebration/achievement_celebration_layer.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
@@ -390,32 +392,19 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     final syncEngine = ref.read(syncEngineProvider);
 
     try {
-      // Saga 补偿：检测未完成的访客迁移并恢复
       await _recoverOrphanedGuestData(uid);
       if (!mounted || runId != _engineRunId) return;
 
-      // 先停旧引擎，避免旧 UID 同步链路残留。
       syncEngine.stop();
 
       if (!uid.startsWith('guest_')) {
-        // 数据水化 — 首次从 Firestore 拉取已有数据到 SQLite
         await syncEngine.hydrateFromFirestore(uid);
         if (!mounted || runId != _engineRunId) return;
         syncEngine.start(uid);
       }
 
-      // 成就评估器 — 纯本地，不需要网络
-      final ledger = ref.read(ledgerServiceProvider);
-      final evaluator = AchievementEvaluator(
-        ledger: ledger,
-        onUnlocked: (ids) {
-          ref.read(newlyUnlockedProvider.notifier).addAll(ids);
-        },
-      );
       if (!mounted || runId != _engineRunId) return;
-      _evaluator?.stop();
-      _evaluator = evaluator;
-      evaluator.start(uid);
+      _initAchievementEvaluator(uid);
     } on Exception catch (e, stack) {
       await ErrorHandler.recordOperation(
         e,
@@ -425,6 +414,20 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
         errorCode: 'background_engine_start_failed',
       );
     }
+  }
+
+  /// 初始化成就评估器 — 纯本地，不需要网络。
+  void _initAchievementEvaluator(String uid) {
+    final ledger = ref.read(ledgerServiceProvider);
+    final evaluator = AchievementEvaluator(
+      ledger: ledger,
+      onUnlocked: (ids) {
+        ref.read(newlyUnlockedProvider.notifier).addAll(ids);
+      },
+    );
+    _evaluator?.stop();
+    _evaluator = evaluator;
+    evaluator.start(uid);
   }
 
   /// 检测 localGuestUid 与当前 UID 不一致 → 补偿迁移。
@@ -455,95 +458,109 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
   Future<void> _checkInterruptedSession() async {
     final hasSession = await FocusTimerNotifier.hasInterruptedSession();
-    if (!mounted) return;
+    if (!mounted || !hasSession) return;
 
-    if (hasSession) {
-      final info = await FocusTimerNotifier.getSavedSessionInfo();
-      if (!mounted || info == null) return;
+    final info = await FocusTimerNotifier.getSavedSessionInfo();
+    if (!mounted || info == null) return;
 
-      final habitName = info['habitName'] as String;
-      final elapsed = info['wallClockElapsed'] as int;
-      final habitId = info['habitId'] as String;
-      final mins = elapsed ~/ 60;
-      final secs = elapsed % 60;
+    final habitName = info['habitName'] as String;
+    final elapsed = info['wallClockElapsed'] as int;
+    final habitId = info['habitId'] as String;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        final l10n = context.l10n;
-        showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.sessionResumeTitle),
-            content: Text(
-              l10n.sessionResumeMessage(habitName, '${mins}m ${secs}s'),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: Text(l10n.sessionDiscard),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: Text(l10n.sessionResumeButton),
-              ),
-            ],
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final resume = await _showRecoveryDialog(
+        habitName,
+        elapsed ~/ 60,
+        elapsed % 60,
+      );
+      if (mounted) await _handleRecoveryResult(resume, habitId);
+    });
+  }
+
+  /// 显示会话恢复对话框。
+  Future<bool?> _showRecoveryDialog(String habitName, int mins, int secs) {
+    final l10n = context.l10n;
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.sessionResumeTitle),
+        content: Text(
+          l10n.sessionResumeMessage(habitName, '${mins}m ${secs}s'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.sessionDiscard),
           ),
-        ).then((resume) async {
-          if (!mounted) return;
-          if (resume == true) {
-            await ref.read(focusTimerProvider.notifier).restoreSession();
-            if (mounted && habitId.isNotEmpty) {
-              Navigator.of(
-                context,
-              ).pushNamed(AppRouter.timer, arguments: habitId);
-            }
-          } else {
-            await FocusTimerNotifier.clearSavedState();
-          }
-        });
-      });
-    }
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.sessionResumeButton),
+          ),
+        ],
+      ),
+    );
+  }
 
-    // Session check complete — no state tracking needed
+  /// 处理恢复对话框结果：恢复 session 或清除状态。
+  Future<void> _handleRecoveryResult(bool? resume, String habitId) async {
+    if (resume == true) {
+      await ref.read(focusTimerProvider.notifier).restoreSession();
+      if (mounted && habitId.isNotEmpty) {
+        Navigator.of(context).pushNamed(AppRouter.timer, arguments: habitId);
+      }
+    } else {
+      await FocusTimerNotifier.clearSavedState();
+    }
   }
 
   /// 重新调度所有有提醒的 habit 的通知。
   /// 仅在通知权限已授予时执行。
-  /// [R1] 等待 DeferredInit 完成以确保 NotificationService 已初始化。
   Future<void> _rescheduleReminders(List<Habit> habits) async {
-    // 在 async gap 之前缓存 context 引用
     final l10n = context.l10n;
     final fallbackCatName = l10n.focusCompleteYourCat;
 
-    await DeferredInit.run(); // 幂等，确保通知插件已初始化
+    await DeferredInit.run();
     final notifService = ref.read(notificationServiceProvider);
     final hasPermission = await notifService.isPermissionGranted();
     if (!hasPermission) return;
 
-    final catsAsync = ref.read(catsProvider);
-    final cats = catsAsync.value ?? [];
+    final cats = ref.read(catsProvider).value ?? [];
 
     for (final habit in habits) {
       if (habit.isActive && habit.hasReminders) {
-        try {
-          final cat = habit.catId != null
-              ? cats.where((c) => c.id == habit.catId).firstOrNull
-              : null;
-          final catName = cat?.name ?? fallbackCatName;
-
-          await notifService.scheduleReminders(
-            habitId: habit.id,
-            habitName: habit.name,
-            catName: catName,
-            reminders: habit.reminders,
-            title: l10n.reminderNotificationTitle(catName),
-            body: l10n.reminderNotificationBody(habit.name),
-          );
-        } on Exception catch (e) {
-          debugPrint('[REMINDER] Failed to schedule for ${habit.id}: $e');
-        }
+        await _scheduleHabitReminder(
+          habit, notifService, cats, l10n, fallbackCatName,
+        );
       }
+    }
+  }
+
+  /// 为单个 habit 调度提醒通知。
+  Future<void> _scheduleHabitReminder(
+    Habit habit,
+    NotificationService notifService,
+    List<Cat> cats,
+    S l10n,
+    String fallbackCatName,
+  ) async {
+    try {
+      final cat = habit.catId != null
+          ? cats.where((c) => c.id == habit.catId).firstOrNull
+          : null;
+      final catName = cat?.name ?? fallbackCatName;
+
+      await notifService.scheduleReminders(
+        habitId: habit.id,
+        habitName: habit.name,
+        catName: catName,
+        reminders: habit.reminders,
+        title: l10n.reminderNotificationTitle(catName),
+        body: l10n.reminderNotificationBody(habit.name),
+      );
+    } on Exception catch (e) {
+      debugPrint('[REMINDER] Failed to schedule for ${habit.id}: $e');
     }
   }
 

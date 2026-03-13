@@ -25,6 +25,8 @@ hachimi-app/
 - `services/`: orchestration/business logic
 - `services/firebase/`: Firebase backend implementations
 - `screens/`: UI pages
+- `screens/timer/components/`: timer screen extracted widgets (`stat_row.dart`, `timer_controls.dart`, `focus_cat_display.dart`, `focus_session_stats_card.dart`)
+- `screens/cat_detail/components/`: cat detail extracted cards (7 card widgets)
 - `widgets/`: reusable UI components
 - `widgets/celebration/`: achievement celebration overlay system (6 files: `achievement_celebration_layer.dart`, `celebration_confetti_painter.dart`, `celebration_glow_icon.dart`, `celebration_overlay.dart`, `celebration_reward_badges.dart`, `celebration_tier.dart`)
 - `models/`: domain models

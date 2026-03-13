@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.2] - 2026-03-13
+
+### Refactored
+- **渲染管线拆分**：`pixel_cat_renderer.dart` 的 `renderCat`（213 行）拆分为 6 个独立层方法，配置加载拆分为 5 个解析方法
+- **专注完成页组件提取**：提取 `FocusCatDisplay` 和 `FocusSessionStatsCard` 为独立 widget，`initState` 拆分为动画初始化和交错启动
+- **计时器控制按钮提取**：`TimerControls` 提取为独立 StatelessWidget，timer_screen.dart 从 800 行降至 686 行
+- **状态机逻辑优化**：`focus_timer_provider.dart` 的 `_onTick` 提取倒计时完成处理，`complete`/`abandon` 合并为 `_terminateSession` 消除代码重复
+- **猫咪详情页去重**：窄屏/宽屏卡片列表统一为 `_buildCardWidgets` 共享方法，消除 ~80 行重复代码
+- **应用生命周期拆分**：`app.dart` 的会话恢复、后台引擎启动、提醒调度各自拆分为独立方法
+
 ## [2.31.1] - 2026-03-10
 
 ### Fixed

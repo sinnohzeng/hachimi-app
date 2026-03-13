@@ -22,6 +22,7 @@ import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/screens/timer/components/timer_controls.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
@@ -476,7 +477,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   const SizedBox(height: AppSpacing.lg),
                   _buildTimerDisplay(timerState, theme),
                   const Spacer(flex: 3),
-                  _buildControls(timerState, theme),
+                  TimerControls(
+                    status: timerState.status,
+                    mode: timerState.mode,
+                    onStart: _startTimer,
+                    onPause: _pauseTimer,
+                    onResume: _resumeTimer,
+                    onComplete: _completeTimer,
+                  ),
                   _buildGraceOrGiveUp(timerState, inGracePeriod, theme),
                 ],
               ),
@@ -666,128 +674,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
   }
 
-  Widget _buildControls(FocusTimerState timerState, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-      child: switch (timerState.status) {
-        TimerStatus.idle => _buildIdleButton(theme),
-        TimerStatus.running => _buildRunningButtons(timerState, theme),
-        TimerStatus.paused => _buildPausedButtons(timerState, theme),
-        _ => const SizedBox.shrink(),
-      },
-    );
-  }
-
-  Widget _buildIdleButton(ThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: FilledButton.icon(
-        onPressed: _startTimer,
-        icon: const Icon(Icons.play_arrow, size: 28),
-        label: Text(
-          context.l10n.timerStart,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.onPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRunningButtons(FocusTimerState timerState, ThemeData theme) {
-    if (timerState.mode != TimerMode.stopwatch) {
-      return _buildCountdownRunningButton(theme);
-    }
-    return _buildStopwatchRunningButtons(theme);
-  }
-
-  Widget _buildCountdownRunningButton(ThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: FilledButton.tonalIcon(
-        onPressed: _pauseTimer,
-        icon: const Icon(Icons.pause, size: 28),
-        label: Text(
-          context.l10n.timerPause,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStopwatchRunningButtons(ThemeData theme) {
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: 56,
-            child: FilledButton.tonalIcon(
-              onPressed: _pauseTimer,
-              icon: const Icon(Icons.pause, size: 28),
-              label: Text(
-                context.l10n.timerPause,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: SizedBox(
-            height: 56,
-            child: FilledButton.icon(
-              onPressed: _completeTimer,
-              icon: const Icon(Icons.check, size: 28),
-              label: Text(
-                context.l10n.timerDone,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPausedButtons(FocusTimerState timerState, ThemeData theme) {
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: 56,
-            child: FilledButton.icon(
-              onPressed: _resumeTimer,
-              icon: const Icon(Icons.play_arrow),
-              label: Text(context.l10n.timerResume),
-            ),
-          ),
-        ),
-        if (timerState.mode == TimerMode.stopwatch) ...[
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: SizedBox(
-              height: 56,
-              child: FilledButton.tonalIcon(
-                onPressed: _completeTimer,
-                icon: const Icon(Icons.check),
-                label: Text(context.l10n.timerDone),
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
 }
 
 /// 会话奖励计算结果 — 在 _saveSession 子方法间传递。

@@ -25,6 +25,8 @@ hachimi-app/
 - `services/`：业务编排
 - `services/firebase/`：Firebase 实现
 - `screens/`：页面层
+- `screens/timer/components/`：计时器页面提取组件（`stat_row.dart`、`timer_controls.dart`、`focus_cat_display.dart`、`focus_session_stats_card.dart`）
+- `screens/cat_detail/components/`：猫咪详情提取卡片（7 个卡片组件）
 - `widgets/`：复用组件
 - `widgets/celebration/`：成就庆祝弹层系统（6 个文件：`achievement_celebration_layer.dart`、`celebration_confetti_painter.dart`、`celebration_glow_icon.dart`、`celebration_overlay.dart`、`celebration_reward_badges.dart`、`celebration_tier.dart`）
 - `models/`：领域模型
