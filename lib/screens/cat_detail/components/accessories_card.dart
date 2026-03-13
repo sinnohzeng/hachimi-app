@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -99,6 +100,7 @@ class AccessoriesCard extends ConsumerWidget {
                 runSpacing: 6,
                 children: inventory.map((id) {
                   return ActionChip(
+                    key: ValueKey(id),
                     label: Text(
                       accessoryDisplayName(id),
                       style: textTheme.labelSmall,
@@ -130,13 +132,9 @@ class AccessoriesCard extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .equipAccessory(uid: uid, catId: cat.id, accessoryId: accessoryId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.l10n.catDetailEquippedItem(accessoryDisplayName(accessoryId)),
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
+    AppFeedback.success(
+      context,
+      context.l10n.catDetailEquippedItem(accessoryDisplayName(accessoryId)),
     );
   }
 
@@ -147,11 +145,6 @@ class AccessoriesCard extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .unequipAccessory(uid: uid, catId: cat.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.l10n.catDetailUnequipped),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    AppFeedback.info(context, context.l10n.catDetailUnequipped);
   }
 }

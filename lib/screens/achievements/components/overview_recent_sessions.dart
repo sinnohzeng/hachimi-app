@@ -35,7 +35,7 @@ class OverviewRecentSessions extends ConsumerWidget {
             data: (sessions) {
               if (sessions.isEmpty) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: AppSpacing.paddingVBase,
                   child: Center(
                     child: Text(
                       l10n.historyNoSessions,
@@ -99,7 +99,7 @@ class _SessionTile extends StatelessWidget {
     final timeStr = DateFormat.Hm().format(session.endedAt);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: AppSpacing.paddingVSm,
       child: Row(
         children: [
           Icon(statusIcon, size: 20, color: statusColor),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_icon_size.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -28,7 +29,7 @@ class ChatEntryCard extends StatelessWidget {
           child: Row(
             children: [
               const ExcludeSemantics(
-                child: Text('\u{1F4AC}', style: TextStyle(fontSize: 20)),
+                child: Text('\u{1F4AC}', style: TextStyle(fontSize: AppIconSize.emojiSmall)),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(

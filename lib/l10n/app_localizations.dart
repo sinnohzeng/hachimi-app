@@ -4379,6 +4379,30 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Keep local'**
   String get archiveConflictKeepLocal;
+
+  /// No description provided for @loginShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get loginShowPassword;
+
+  /// No description provided for @loginHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get loginHidePassword;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again later'**
+  String get errorGeneric;
+
+  /// No description provided for @errorCreateHabit.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create habit. Try again'**
+  String get errorCreateHabit;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

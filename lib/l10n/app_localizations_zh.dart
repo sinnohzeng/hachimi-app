@@ -2334,6 +2334,18 @@ class SZh extends S {
 
   @override
   String get archiveConflictKeepLocal => '保留本地';
+
+  @override
+  String get loginShowPassword => '显示密码';
+
+  @override
+  String get loginHidePassword => '隐藏密码';
+
+  @override
+  String get errorGeneric => '出了点问题，稍后再试';
+
+  @override
+  String get errorCreateHabit => '创建习惯失败，请重试';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4666,4 +4678,16 @@ class SZhHant extends SZh {
 
   @override
   String get archiveConflictKeepLocal => '保留本機';
+
+  @override
+  String get loginShowPassword => '顯示密碼';
+
+  @override
+  String get loginHidePassword => '隱藏密碼';
+
+  @override
+  String get errorGeneric => '出了點問題，稍後再試';
+
+  @override
+  String get errorCreateHabit => '建立習慣失敗，請重試';
 }

@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
-import 'package:hachimi_app/services/analytics_service.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {
   final bool startAsLogin;
@@ -80,10 +80,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         errorCode: e is FirebaseAuthException ? e.code : 'email_auth_error',
       );
       if (mounted) {
-        final message = mapAuthError(e, context.l10n);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
+        AppFeedback.error(context, mapAuthError(e, context.l10n));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -104,7 +101,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         email: _emailController.text.trim(),
         displayName: result.displayName,
       );
-      await _logSignUpIfNeeded(ref.read(analyticsServiceProvider), result);
+      await _logSignUpIfNeeded(result);
       await _resolveGuestConflictIfNeeded(
         result: result,
         migrationSourceUid: migrationSourceUid,
@@ -134,13 +131,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     return authBackend.signUp(email: email, password: password);
   }
 
-  Future<void> _logSignUpIfNeeded(
-    AnalyticsService analyticsService,
-    AuthResult result,
-  ) async {
+  Future<void> _logSignUpIfNeeded(AuthResult result) async {
     if (!result.isNewUser) return;
     final method = widget.linkMode ? 'email_link' : 'email';
-    await analyticsService.logSignUp(method: method);
+    await ref.read(analyticsServiceProvider).logSignUp(method: method);
   }
 
   Future<void> _resolveGuestConflictIfNeeded({
@@ -304,8 +298,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                 () => _obscurePassword = !_obscurePassword,
                               ),
                               tooltip: _obscurePassword
-                                  ? 'Show password'
-                                  : 'Hide password',
+                                  ? context.l10n.loginShowPassword
+                                  : context.l10n.loginHidePassword,
                             ),
                           ),
                           validator: (value) {
@@ -344,8 +338,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                       !_obscureConfirmPassword,
                                 ),
                                 tooltip: _obscureConfirmPassword
-                                    ? 'Show password'
-                                    : 'Hide password',
+                                    ? context.l10n.loginShowPassword
+                                    : context.l10n.loginHidePassword,
                               ),
                             ),
                             validator: (value) {

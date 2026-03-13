@@ -132,7 +132,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         // 30-day heatmap
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            padding: AppSpacing.paddingScreenBodyCompact,
             child: _HeatmapCard(),
           ),
         ),
@@ -176,7 +176,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         // Per-habit progress
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            padding: AppSpacing.paddingSection,
             child: Text(
               l10n.statsPerQuestProgress,
               style: textTheme.titleMedium,
@@ -212,10 +212,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               delegate: SliverChildBuilderDelegate((context, index) {
                 final habit = habits[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
+                  margin: AppSpacing.paddingCard,
                   child: Padding(
                     padding: AppSpacing.paddingBase,
                     child: Row(
@@ -269,7 +266,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         // Recent sessions
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            padding: AppSpacing.paddingSection,
             child: Text(l10n.statsRecentSessions, style: textTheme.titleMedium),
           ),
         ),
@@ -536,7 +533,7 @@ class _RecentSessionsCard extends ConsumerWidget {
             data: (sessions) {
               if (sessions.isEmpty) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: AppSpacing.paddingVBase,
                   child: Center(
                     child: Text(
                       l10n.historyNoSessions,
@@ -600,7 +597,7 @@ class _SessionTile extends StatelessWidget {
     final timeStr = DateFormat.Hm().format(session.endedAt);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: AppSpacing.paddingVSm,
       child: Row(
         children: [
           Icon(statusIcon, size: 20, color: statusColor),

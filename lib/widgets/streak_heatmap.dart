@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 
@@ -89,7 +90,7 @@ class StreakHeatmap extends StatelessWidget {
                                       ? 0.5
                                       : 0.3,
                                 ),
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: AppShape.borderExtraSmall,
                         ),
                       ),
                     );
@@ -146,7 +147,7 @@ class StreakHeatmap extends StatelessWidget {
                               ? 0.5
                               : 0.3,
                         ),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppShape.borderExtraSmall,
                 ),
               );
             }),

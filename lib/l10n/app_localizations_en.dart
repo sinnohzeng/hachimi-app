@@ -2372,4 +2372,16 @@ class SEn extends S {
 
   @override
   String get archiveConflictKeepLocal => 'Keep local';
+
+  @override
+  String get loginShowPassword => 'Show password';
+
+  @override
+  String get loginHidePassword => 'Hide password';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Try again later';
+
+  @override
+  String get errorCreateHabit => 'Failed to create habit. Try again';
 }

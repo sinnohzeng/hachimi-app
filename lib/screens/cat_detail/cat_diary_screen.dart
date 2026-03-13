@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_icon_size.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +60,7 @@ class CatDiaryScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('📖', style: TextStyle(fontSize: 48)),
+                    const Text('📖', style: TextStyle(fontSize: AppIconSize.emoji)),
                     const SizedBox(height: AppSpacing.base),
                     Text(
                       context.l10n.diaryEmptyTitle,

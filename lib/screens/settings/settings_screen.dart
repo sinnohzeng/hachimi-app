@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -121,13 +122,7 @@ class SettingsScreen extends ConsumerWidget {
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: SweepGradient(
-                            colors: [
-                              Color(0xFF4285F4),
-                              Color(0xFF34A853),
-                              Color(0xFFFBBC05),
-                              Color(0xFFEA4335),
-                              Color(0xFF4285F4),
-                            ],
+                            colors: BrandColors.google,
                           ),
                         ),
                       )

@@ -356,7 +356,9 @@ class PixelCatRenderer {
     final maskName = 'tortiemask${appearance.tortiePattern}';
 
     if (!_spritesIndex!.containsKey(tortieSprite) ||
-        !_spritesIndex!.containsKey(maskName)) return;
+        !_spritesIndex!.containsKey(maskName)) {
+      return;
+    }
 
     final masked = await _renderMaskedSprite(tortieSprite, maskName, spriteIndex);
     canvas.drawImage(masked, ui.Offset.zero, ui.Paint());

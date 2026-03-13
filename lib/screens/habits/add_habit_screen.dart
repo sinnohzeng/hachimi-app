@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -53,11 +54,9 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
           .logHabitCreated(habitName: name, targetHours: targetHours);
 
       if (mounted) Navigator.of(context).pop();
-    } on Exception catch (e) {
+    } on Exception {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        AppFeedback.error(context, context.l10n.errorCreateHabit);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

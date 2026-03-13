@@ -105,7 +105,7 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
     final animationEnabled = ref.watch(
       themeProvider.select((s) => s.enableBackgroundAnimation),
     );
-    final disableAnimations = MediaQuery.of(context).disableAnimations;
+    final disableAnimations = MediaQuery.disableAnimationsOf(context);
 
     // 动画禁用时跳过 fade，直接显示静态 fallback
     if (!animationEnabled || disableAnimations) {
@@ -114,18 +114,20 @@ class _AnimatedMeshBackgroundState extends ConsumerState<AnimatedMeshBackground>
       );
     }
 
-    return FadeTransition(
-      opacity: _opacity,
-      child: SizedBox.expand(
-        child: AnimatedMeshGradient(
-          colors: widget.colors,
-          options: AnimatedMeshGradientOptions(
-            speed: widget.speed,
-            grain: 0.0,
-            frequency: 3,
-            amplitude: 20,
+    return RepaintBoundary(
+      child: FadeTransition(
+        opacity: _opacity,
+        child: SizedBox.expand(
+          child: AnimatedMeshGradient(
+            colors: widget.colors,
+            options: AnimatedMeshGradientOptions(
+              speed: widget.speed,
+              grain: 0.0,
+              frequency: 3,
+              amplitude: 20,
+            ),
+            child: widget.child ?? const SizedBox.shrink(),
           ),
-          child: widget.child ?? const SizedBox.shrink(),
         ),
       ),
     );

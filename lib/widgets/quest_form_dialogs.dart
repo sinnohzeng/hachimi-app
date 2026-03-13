@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// 自定义每日目标对话框（共用于创建和编辑 Quest）。
@@ -34,9 +35,7 @@ void showCustomGoalDialog(
           onPressed: () {
             final value = int.tryParse(controller.text.trim());
             if (value == null || value < 5 || value > 180) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(context.l10n.adoptionValidMinutes)),
-              );
+              AppFeedback.error(context, context.l10n.adoptionValidMinutes);
               return;
             }
             onConfirm(value);
@@ -82,9 +81,7 @@ void showCustomTargetDialog(
           onPressed: () {
             final value = int.tryParse(controller.text.trim());
             if (value == null || value < 10 || value > 2000) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(context.l10n.adoptionValidHours)),
-              );
+              AppFeedback.error(context, context.l10n.adoptionValidHours);
               return;
             }
             onConfirm(value);

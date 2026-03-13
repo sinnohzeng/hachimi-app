@@ -497,7 +497,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
   Widget _buildPermissionBanner() {
     return MaterialBanner(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: AppSpacing.paddingListTile,
       content: Text(context.l10n.timerNotificationBanner),
       leading: const Icon(Icons.notifications_off_outlined),
       actions: [
@@ -525,7 +525,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final textTheme = theme.textTheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: AppSpacing.paddingScreenBodyCompact,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -651,7 +651,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     if (!isActive) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: AppSpacing.paddingBottomBase,
       child: inGracePeriod
           ? TextButton(
               onPressed: _goBack,

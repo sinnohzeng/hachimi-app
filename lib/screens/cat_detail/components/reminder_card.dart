@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -150,21 +151,14 @@ class ReminderCard extends ConsumerWidget {
           );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.catDetailReminderSet(result.timeString)),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppFeedback.success(
+          context,
+          context.l10n.catDetailReminderSet(result.timeString),
         );
       }
-    } on Exception catch (e) {
+    } on Exception {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppFeedback.error(context, context.l10n.errorGeneric);
       }
     }
   }
@@ -203,21 +197,11 @@ class ReminderCard extends ConsumerWidget {
       }
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.catDetailReminderRemoved),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppFeedback.success(context, context.l10n.catDetailReminderRemoved);
       }
-    } on Exception catch (e) {
+    } on Exception {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppFeedback.error(context, context.l10n.errorGeneric);
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 
 /// 金币奖励徽章。
@@ -20,13 +21,13 @@ class CoinRewardBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.amber.withValues(alpha: 0.15),
+        color: BrandColors.rewardGold.withValues(alpha: 0.15),
         borderRadius: AppShape.borderLarge,
       ),
       child: Text(
         l10n.achievementCelebrationCoins(coinReward),
         style: textTheme.titleMedium?.copyWith(
-          color: Colors.amber.shade700,
+          color: BrandColors.achievementStar,
           fontWeight: FontWeight.bold,
         ),
       ),

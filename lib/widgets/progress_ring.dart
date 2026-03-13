@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 
-/// ProgressRing — circular progress indicator around a child widget.
+/// ProgressRing — 带弧线过渡动画的环形进度指示器。
+///
+/// 当 [progress] 变化时，弧线平滑过渡到新进度值。
 class ProgressRing extends StatelessWidget {
   final double progress; // 0.0 to 1.0
   final double size;
@@ -29,13 +32,20 @@ class ProgressRing extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            CustomPaint(
-              size: Size(size, size),
-              painter: _RingPainter(
-                progress: progress,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                foregroundColor: colorScheme.primary,
-                strokeWidth: strokeWidth,
+            RepaintBoundary(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(end: progress),
+                duration: AppMotion.durationMedium2,
+                curve: AppMotion.emphasized,
+                builder: (context, animatedProgress, _) => CustomPaint(
+                  size: Size(size, size),
+                  painter: _RingPainter(
+                    progress: animatedProgress,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    foregroundColor: colorScheme.primary,
+                    strokeWidth: strokeWidth,
+                  ),
+                ),
               ),
             ),
             child,
@@ -72,22 +82,25 @@ class _RingPainter extends CustomPainter {
     canvas.drawCircle(center, radius, bgPaint);
 
     // Progress arc
-    final fgPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..color = foregroundColor
-      ..strokeCap = StrokeCap.round;
+    if (progress > 0) {
+      final fgPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..color = foregroundColor
+        ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2, // Start from top
-      2 * pi * progress,
-      false,
-      fgPaint,
-    );
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -pi / 2, // Start from top
+        2 * pi * progress,
+        false,
+        fgPaint,
+      );
+    }
   }
 
   @override
   bool shouldRepaint(_RingPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+      oldDelegate.progress != progress ||
+      oldDelegate.foregroundColor != foregroundColor;
 }

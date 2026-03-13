@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -33,99 +34,120 @@ class TodayTab extends ConsumerWidget {
     final l10n = context.l10n;
 
     return ContentWidthConstraint(
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(floating: true, title: Text(l10n.appTitle)),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(habitsProvider);
+          ref.invalidate(catsProvider);
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(floating: true, title: Text(l10n.appTitle)),
 
-          // Offline banner
-          const SliverToBoxAdapter(child: OfflineBanner()),
+            // Offline banner
+            const SliverToBoxAdapter(child: OfflineBanner()),
 
-          // Featured cat card（首屏核心情感焦点）
-          catsAsync.when(
-            loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-            error: (_, _) => const SliverToBoxAdapter(child: SizedBox.shrink()),
-            data: (cats) {
-              if (cats.isEmpty) {
-                return const SliverToBoxAdapter(child: SizedBox.shrink());
-              }
-              final featured = _findFeaturedCat(cats, todayMinutes);
-              if (featured == null) {
-                return const SliverToBoxAdapter(child: SizedBox.shrink());
-              }
-              return SliverToBoxAdapter(child: FeaturedCatCard(cat: featured));
-            },
-          ),
+            // Featured cat card（首屏核心情感焦点）
+            catsAsync.when(
+              loading: () =>
+                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+              error: (_, _) =>
+                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+              data: (cats) {
+                if (cats.isEmpty) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                final featured = _findFeaturedCat(cats, todayMinutes);
+                if (featured == null) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                return SliverToBoxAdapter(
+                  child: FeaturedCatCard(cat: featured),
+                );
+              },
+            ),
 
-          // Daily check-in trigger
-          const SliverToBoxAdapter(child: CheckInBanner()),
+            // Daily check-in trigger
+            const SliverToBoxAdapter(child: CheckInBanner()),
 
-          // Section header
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text(
-                l10n.todayYourQuests,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            // Section header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  l10n.todayYourQuests,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Habit list
-          habitsAsync.when(
-            loading: () => SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (_, _) => const SkeletonCard(),
-                childCount: 3,
+            // Habit list
+            habitsAsync.when(
+              loading: () => SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, _) => const SkeletonCard(),
+                  childCount: 3,
+                ),
               ),
-            ),
-            error: (error, _) => SliverFillRemaining(
-              child: ErrorState(
-                message: l10n.todayFailedToLoad,
-                onRetry: () => ref.invalidate(habitsProvider),
+              error: (error, _) => SliverFillRemaining(
+                child: ErrorState(
+                  message: l10n.todayFailedToLoad,
+                  onRetry: () => ref.invalidate(habitsProvider),
+                ),
               ),
-            ),
-            data: (habits) {
-              if (habits.isEmpty) {
-                return SliverFillRemaining(
-                  child: EmptyState(
-                    icon: Icons.add_task,
-                    title: l10n.todayNoQuests,
-                    subtitle: l10n.todayNoQuestsHint,
-                  ),
-                );
-              }
-
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final habit = habits[index];
-                  final cat = habit.catId != null
-                      ? ref.watch(catByIdProvider(habit.catId!))
-                      : null;
-                  final minutes = todayMinutes[habit.id] ?? 0;
-
-                  return StaggeredListItem(
-                    index: index,
-                    child: HabitRow(
-                      habit: habit,
-                      cat: cat,
-                      todayMinutes: minutes,
-                      onTap: () => Navigator.of(
-                        context,
-                      ).pushNamed(AppRouter.focusSetup, arguments: habit.id),
-                      onDelete: () =>
-                          _confirmDelete(context, ref, habit.id, habit.name),
+              data: (habits) {
+                if (habits.isEmpty) {
+                  return SliverFillRemaining(
+                    child: AnimatedSwitcher(
+                      duration: AppMotion.durationMedium2,
+                      child: EmptyState(
+                        key: const ValueKey('empty'),
+                        icon: Icons.add_task,
+                        title: l10n.todayNoQuests,
+                        subtitle: l10n.todayNoQuestsHint,
+                      ),
                     ),
                   );
-                }, childCount: habits.length),
-              );
-            },
-          ),
+                }
 
-          // Bottom breathing space for FAB + NavigationBar
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final habit = habits[index];
+                    final cat = habit.catId != null
+                        ? ref.watch(catByIdProvider(habit.catId!))
+                        : null;
+                    final minutes = todayMinutes[habit.id] ?? 0;
+
+                    return StaggeredListItem(
+                      index: index,
+                      child: HabitRow(
+                        habit: habit,
+                        cat: cat,
+                        todayMinutes: minutes,
+                        onTap: () => Navigator.of(
+                          context,
+                        ).pushNamed(
+                          AppRouter.focusSetup,
+                          arguments: habit.id,
+                        ),
+                        onDelete: () => _confirmDelete(
+                          context,
+                          ref,
+                          habit.id,
+                          habit.name,
+                        ),
+                      ),
+                    );
+                  }, childCount: habits.length),
+                );
+              },
+            ),
+
+            // Bottom breathing space for FAB + NavigationBar
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
       ),
     );
   }

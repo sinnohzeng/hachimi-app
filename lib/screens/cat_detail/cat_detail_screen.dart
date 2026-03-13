@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -515,12 +516,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
     if (dialogCtx.mounted) {
       Navigator.of(dialogCtx).pop();
-      ScaffoldMessenger.of(dialogCtx).showSnackBar(
-        SnackBar(
-          content: Text(dialogCtx.l10n.catDetailRenamed),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppFeedback.success(dialogCtx, dialogCtx.l10n.catDetailRenamed);
     }
   }
 }
@@ -568,7 +564,7 @@ class _AiTeaserCard extends ConsumerWidget {
                 shaderCallback: (bounds) => LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.white, Colors.white.withValues(alpha: 0)],
+                  colors: [colorScheme.surface, colorScheme.surface.withValues(alpha: 0)],
                   stops: const [0.3, 1.0],
                 ).createShader(bounds),
                 child: Text(

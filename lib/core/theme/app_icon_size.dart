@@ -16,4 +16,11 @@ class AppIconSize {
   static const double large = 40;
   static const double extraLarge = 56;
   static const double hero = 64;
+
+  // --- Emoji text sizes ---
+  /// 空状态 emoji 字体大小。
+  static const double emoji = 48;
+
+  /// 卡片内 emoji 字体大小。
+  static const double emojiSmall = 20;
 }

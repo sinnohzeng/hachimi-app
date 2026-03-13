@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/screens/auth/components/email_auth_screen.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/habits/adoption_flow_screen.dart';
@@ -38,6 +39,7 @@ class AppRouter {
   static const String checkIn = '/check-in';
   static const String catDiary = '/cat-diary';
   static const String catChat = '/cat-chat';
+  static const String emailAuth = '/email-auth';
   static const String sessionHistory = '/session-history';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -101,15 +103,23 @@ class AppRouter {
       case catChat:
         final catId = settings.arguments as String;
         return MaterialPageRoute(builder: (_) => CatChatScreen(catId: catId));
+      case emailAuth:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        return MaterialPageRoute(
+          builder: (_) => EmailAuthScreen(
+            startAsLogin: args['startAsLogin'] as bool? ?? false,
+            linkMode: args['linkMode'] as bool? ?? false,
+          ),
+        );
       // Settings sub-pages use Shared Axis transition (horizontal)
       case sessionHistory:
         return _sharedAxisRoute((_) => const SessionHistoryScreen());
       default:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return MaterialPageRoute(builder: (_) => const _NotFoundScreen());
     }
   }
 
-  /// M3 Shared Axis transition (horizontal) for same-level navigation.
+  /// M3 Shared Axis transition — 同级导航使用水平共享轴。
   static Route<T> _sharedAxisRoute<T>(WidgetBuilder builder) {
     return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => builder(context),
@@ -122,6 +132,43 @@ class AppRouter {
           ),
       transitionDuration: AppMotion.durationMedium2,
       reverseTransitionDuration: AppMotion.durationMedium2,
+    );
+  }
+}
+
+/// 404 页面 — 未知路由兜底。
+class _NotFoundScreen extends StatelessWidget {
+  const _NotFoundScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('404')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.explore_off_outlined,
+              size: 64,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Page not found',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.tonal(
+              onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRouter.home,
+                (_) => false,
+              ),
+              child: const Text('Go home'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

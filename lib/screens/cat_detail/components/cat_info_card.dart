@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_icon_size.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
@@ -50,7 +51,7 @@ class EnhancedCatInfoCard extends StatelessWidget {
                 children: [
                   Text(
                     '${personality.emoji} ',
-                    style: const TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: AppIconSize.emojiSmall),
                   ),
                   Text(
                     l10n.personalityName(personality.id),

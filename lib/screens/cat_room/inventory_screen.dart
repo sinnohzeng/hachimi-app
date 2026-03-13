@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -65,6 +66,7 @@ class InventoryScreen extends ConsumerWidget {
               runSpacing: 8,
               children: inventory.map((id) {
                 return ActionChip(
+                  key: ValueKey(id),
                   label: Text(accessoryDisplayName(id)),
                   onPressed: () => _showEquipDialog(context, ref, id, cats),
                 );
@@ -96,6 +98,7 @@ class InventoryScreen extends ConsumerWidget {
           else
             ...equippedItems.map((item) {
               return Card(
+                key: ValueKey(item.accessoryId),
                 child: ListTile(
                   leading: PixelCatSprite.fromCat(cat: item.cat, size: 40),
                   title: Text(accessoryDisplayName(item.accessoryId)),
@@ -121,9 +124,7 @@ class InventoryScreen extends ConsumerWidget {
     HapticFeedback.mediumImpact();
 
     if (cats.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.inventoryNoActiveCats)),
-      );
+      AppFeedback.info(context, context.l10n.inventoryNoActiveCats);
       return;
     }
 
@@ -210,12 +211,9 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(analyticsServiceProvider)
         .logAccessoryEquipped(catId: catId, accessoryId: accessoryId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.l10n.inventoryEquipSuccess(accessoryDisplayName(accessoryId)),
-        ),
-      ),
+    AppFeedback.success(
+      context,
+      context.l10n.inventoryEquipSuccess(accessoryDisplayName(accessoryId)),
     );
   }
 
@@ -225,8 +223,9 @@ class InventoryScreen extends ConsumerWidget {
     ref
         .read(inventoryServiceProvider)
         .unequipAccessory(uid: uid, catId: cat.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.inventoryUnequipSuccess(cat.name))),
+    AppFeedback.success(
+      context,
+      context.l10n.inventoryUnequipSuccess(cat.name),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 
@@ -111,13 +112,7 @@ class _DynamicColorOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const SweepGradient(
-                  colors: [
-                    Color(0xFF4285F4),
-                    Color(0xFF34A853),
-                    Color(0xFFFBBC05),
-                    Color(0xFFEA4335),
-                    Color(0xFF4285F4),
-                  ],
+                  colors: BrandColors.google,
                 ),
                 border: isSelected
                     ? Border.all(color: colorScheme.onSurface, width: 3)

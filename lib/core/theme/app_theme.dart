@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'app_breakpoints.dart';
 import 'app_elevation.dart';
 import 'app_shape.dart';
+import 'app_spacing.dart';
 
 /// App Theme — Single Source of Truth for all UI styling.
 /// All screens and widgets MUST use Theme.of(context) to access colors and text styles.
@@ -60,15 +62,22 @@ class AppTheme {
   }
 
   static ThemeData _buildTheme(ColorScheme colorScheme, TextTheme textTheme) {
+    // M3 Typography 微调 — Display/Headline 级别收紧字间距。
+    final refinedTextTheme = textTheme.copyWith(
+      displayLarge: textTheme.displayLarge?.copyWith(letterSpacing: -0.25),
+      displayMedium: textTheme.displayMedium?.copyWith(letterSpacing: -0.25),
+      headlineLarge: textTheme.headlineLarge?.copyWith(letterSpacing: -0.25),
+    );
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      textTheme: textTheme,
+      textTheme: refinedTextTheme,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),
@@ -157,6 +166,49 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppShape.extraLarge),
+          ),
+        ),
+        showDragHandle: true,
+        constraints: BoxConstraints(
+          maxWidth: AppBreakpoints.maxSheetWidth,
+        ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
+        elevation: AppElevation.level2,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: colorScheme.inverseSurface,
+          borderRadius: AppShape.borderExtraSmall,
+        ),
+        textStyle: refinedTextTheme.bodySmall?.copyWith(
+          color: colorScheme.onInverseSurface,
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
+      ),
+      listTileTheme: ListTileThemeData(
+        shape: RoundedRectangleBorder(borderRadius: AppShape.borderMedium),
+        contentPadding: AppSpacing.paddingHBase,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? colorScheme.onPrimary
+              : null,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? colorScheme.primary
+              : null,
+        ),
       ),
     );
   }

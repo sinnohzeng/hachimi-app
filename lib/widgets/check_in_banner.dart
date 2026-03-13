@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -53,32 +54,11 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
           message += l10n.checkInBannerBonus(result.milestoneBonus);
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.monetization_on,
-                  color: Color(0xFFFFD700),
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(message)),
-              ],
-            ),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        AppFeedback.success(context, message);
       }
-    } on Exception catch (e) {
+    } on Exception {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppFeedback.error(context, context.l10n.errorGeneric);
       }
     } finally {
       if (mounted) setState(() => _isCheckingIn = false);

@@ -93,7 +93,7 @@ class _ParticleOverlayState extends ConsumerState<ParticleOverlay>
     final animationEnabled = ref.watch(
       themeProvider.select((s) => s.enableBackgroundAnimation),
     );
-    final disableAnimations = MediaQuery.of(context).disableAnimations;
+    final disableAnimations = MediaQuery.disableAnimationsOf(context);
 
     if (!animationEnabled || disableAnimations) {
       return widget.child ?? const SizedBox.shrink();
@@ -107,9 +107,11 @@ class _ParticleOverlayState extends ConsumerState<ParticleOverlay>
 
     final particles = _buildParticles(particleColor);
 
-    if (!widget.fadeIn) return particles;
+    if (!widget.fadeIn) return RepaintBoundary(child: particles);
 
-    return FadeTransition(opacity: _fadeCtrl, child: particles);
+    return RepaintBoundary(
+      child: FadeTransition(opacity: _fadeCtrl, child: particles),
+    );
   }
 
   Widget _buildParticles(Color particleColor) {
