@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.3] - 2026-03-13
+
+### Refactored
+- **渲染管线精修**：提取 `_renderLayer()` 统一画布合成模板，消除 6 处 PictureRecorder 样板代码；修复 `rec`/`c` 单字母变量为语义化命名
+- **类型安全修复**：`dynamic l10n` → `S l10n` 恢复静态类型检查；`_performRename` 中 `context.l10n` → `dialogCtx.l10n` 修复潜在 BuildContext 错用
+- **异常处理规范化**：所有 `catch (_) {}` 静默吞异常替换为 `catch (e) { debugPrint(...) }`，日记生成 `.then/.catchError` 重写为 async/await
+- **状态机去重**：提取 `_computeWallClockElapsed`（壁钟计算 3×→1×）、`_resolveCatDisplayName`（猫名回退 3×→1×）、`_computePendingPauseDelta`（暂停增量 2×→1×）
+- **常量提取**：`_defaultDurationSeconds`、`_autoCompleteThresholdMinutes`、`_saveIntervalTicks`、`_habitNameMaxLength`、`_buttonHeight` 替代散布的魔法数字
+- **按钮组件统一**：提取 `_TimerActionButton` 消除 timer_controls.dart 中 5 处 `SizedBox(height: 56)` 按钮布局重复
+- **日记触发架构修正**：从 `build()` 内的 `addPostFrameCallback` 移至 `initState()`，消除每次重建注册回调的反模式
+
+## [2.31.2] - 2026-03-13
+
+### Refactored
+- **渲染管线拆分**：`pixel_cat_renderer.dart` 的 `renderCat`（213 行）拆分为 6 个独立层方法，配置加载拆分为 5 个解析方法
+- **专注完成页组件提取**：提取 `FocusCatDisplay` 和 `FocusSessionStatsCard` 为独立 widget，`initState` 拆分为动画初始化和交错启动
+- **计时器控制按钮提取**：`TimerControls` 提取为独立 StatelessWidget，timer_screen.dart 从 800 行降至 686 行
+- **状态机逻辑优化**：`focus_timer_provider.dart` 的 `_onTick` 提取倒计时完成处理，`complete`/`abandon` 合并为 `_terminateSession` 消除代码重复
+- **猫咪详情页去重**：窄屏/宽屏卡片列表统一为 `_buildCardWidgets` 共享方法，消除 ~80 行重复代码
+- **应用生命周期拆分**：`app.dart` 的会话恢复、后台引擎启动、提醒调度各自拆分为独立方法
+
 ## [2.31.1] - 2026-03-10
 
 ### Fixed

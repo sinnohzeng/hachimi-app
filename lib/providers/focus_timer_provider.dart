@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
@@ -134,6 +135,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   Timer? _ticker;
   int _ticksSinceSave = 0;
 
+  // 常量定义
+  static const _defaultDurationSeconds = 1500; // 25 分钟
+  static const _autoCompleteThresholdMinutes = 30;
+  static const _saveIntervalTicks = 5;
+  static const _habitNameMaxLength = 20;
+
   // SharedPreferences key prefix
   static const _prefix = 'focus_timer_';
   static const _keyHabitId = '${_prefix}habitId';
@@ -171,33 +178,18 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final startedAt = DateTime.tryParse(startedAtStr);
     if (startedAt == null) return null;
 
-    final habitName = prefs.getString(_keyHabitName) ?? 'Focus';
-    final habitId = prefs.getString(_keyHabitId) ?? '';
-    final total = prefs.getInt(_keyTotalSeconds) ?? 0;
-    final modeIndex = prefs.getInt(_keyMode) ?? 0;
-    final totalPausedSeconds = prefs.getInt(_keyTotalPausedSeconds) ?? 0;
-
-    // Account for pending pause time if app was killed while paused/backgrounded
-    final pausedAtStr = prefs.getString(_keyPausedAt);
-    int pendingPause = 0;
-    if (pausedAtStr != null) {
-      final pausedAt = DateTime.tryParse(pausedAtStr);
-      if (pausedAt != null) {
-        pendingPause = DateTime.now().difference(pausedAt).inSeconds;
-      }
-    }
-
-    // Wall-clock elapsed minus all paused time
-    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
-    final effectiveElapsed = (wallTotal - totalPausedSeconds - pendingPause)
-        .clamp(0, wallTotal);
+    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0)
+        + _computePendingPauseDelta(prefs.getString(_keyPausedAt));
+    final effectiveElapsed = _computeWallClockElapsed(
+      startedAt, totalPausedSeconds,
+    );
 
     return {
-      'habitId': habitId,
-      'habitName': habitName,
+      'habitId': prefs.getString(_keyHabitId) ?? '',
+      'habitName': prefs.getString(_keyHabitName) ?? 'Focus',
       'wallClockElapsed': effectiveElapsed,
-      'totalSeconds': total,
-      'mode': TimerMode.values[modeIndex],
+      'totalSeconds': prefs.getInt(_keyTotalSeconds) ?? 0,
+      'mode': TimerMode.values[prefs.getInt(_keyMode) ?? 0],
     };
   }
 
@@ -264,59 +256,70 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final catId = prefs.getString(_keyCatId) ?? '';
     final catName = prefs.getString(_keyCatName) ?? '';
     final habitName = prefs.getString(_keyHabitName) ?? '';
-    final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? 1500;
+    final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? _defaultDurationSeconds;
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
     final mode = TimerMode.values[modeIndex];
-    var totalPausedSeconds = prefs.getInt(_keyTotalPausedSeconds) ?? 0;
-
-    // Account for pending pause (app was killed while paused/backgrounded)
-    final pausedAtStr = prefs.getString(_keyPausedAt);
-    if (pausedAtStr != null) {
-      final pausedAt = DateTime.tryParse(pausedAtStr);
-      if (pausedAt != null) {
-        totalPausedSeconds += DateTime.now().difference(pausedAt).inSeconds;
-      }
-    }
-
-    // Wall-clock elapsed minus paused time
-    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
-    final effectiveElapsed = (wallTotal - totalPausedSeconds).clamp(
-      0,
-      wallTotal,
-    );
+    final restored = _computeRestoredElapsed(prefs, startedAt);
 
     // Countdown mode: check if would have completed
-    if (mode == TimerMode.countdown && effectiveElapsed >= totalSeconds) {
-      state = FocusTimerState(
-        habitId: habitId,
-        catId: catId,
-        catName: catName,
-        habitName: habitName,
-        totalSeconds: totalSeconds,
-        elapsedSeconds: totalSeconds,
-        totalPausedSeconds: totalPausedSeconds,
-        status: TimerStatus.completed,
-        mode: mode,
-        startedAt: startedAt,
-      );
-      await FocusTimerNotifier.clearSavedState();
-      return;
-    }
+    final terminalStatus = (mode == TimerMode.countdown &&
+            restored.elapsed >= totalSeconds)
+        ? TimerStatus.completed
+        : TimerStatus.paused;
 
-    // Otherwise restore as paused (add current time to paused total)
     state = FocusTimerState(
       habitId: habitId,
       catId: catId,
       catName: catName,
       habitName: habitName,
       totalSeconds: totalSeconds,
-      elapsedSeconds: effectiveElapsed,
-      totalPausedSeconds: totalPausedSeconds,
-      status: TimerStatus.paused,
+      elapsedSeconds: terminalStatus == TimerStatus.completed
+          ? totalSeconds
+          : restored.elapsed,
+      totalPausedSeconds: restored.pausedSeconds,
+      status: terminalStatus,
       mode: mode,
       startedAt: startedAt,
-      pausedAt: DateTime.now(),
+      pausedAt: terminalStatus == TimerStatus.paused ? DateTime.now() : null,
     );
+
+    if (terminalStatus == TimerStatus.completed) {
+      await FocusTimerNotifier.clearSavedState();
+    }
+  }
+
+  /// 根据壁钟锚点计算有效专注秒数 = (now - startedAt) - totalPausedSeconds。
+  static int _computeWallClockElapsed(
+    DateTime startedAt,
+    int totalPausedSeconds,
+  ) {
+    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
+    return (wallTotal - totalPausedSeconds).clamp(0, wallTotal);
+  }
+
+  /// 解析猫咪显示名称，按优先级回退：catName → labelDefaultCat → fallback。
+  String _resolveCatDisplayName([String? fallback]) {
+    if (state.catName.isNotEmpty) return state.catName;
+    if (state.labelDefaultCat.isNotEmpty) return state.labelDefaultCat;
+    return fallback ?? 'Your cat';
+  }
+
+  /// 从 SharedPreferences 解析未结算的暂停时长（app 被杀时正处于暂停/后台）。
+  static int _computePendingPauseDelta(String? pausedAtStr) {
+    if (pausedAtStr == null) return 0;
+    final pausedAt = DateTime.tryParse(pausedAtStr);
+    return pausedAt != null ? DateTime.now().difference(pausedAt).inSeconds : 0;
+  }
+
+  /// 计算恢复后的有效专注时间（扣除暂停时间）。
+  ({int elapsed, int pausedSeconds}) _computeRestoredElapsed(
+    SharedPreferences prefs,
+    DateTime startedAt,
+  ) {
+    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0)
+        + _computePendingPauseDelta(prefs.getString(_keyPausedAt));
+    final elapsed = _computeWallClockElapsed(startedAt, totalPausedSeconds);
+    return (elapsed: elapsed, pausedSeconds: totalPausedSeconds);
   }
 
   /// Start the timer.
@@ -340,100 +343,99 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final startedAt = state.startedAt;
     if (startedAt == null) return;
 
-    // Wall-clock calculation: elapsed = (now - startedAt) - totalPausedSeconds
-    final wallTotal = DateTime.now().difference(startedAt).inSeconds;
-    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(
-      0,
-      wallTotal,
+    final newElapsed = _computeWallClockElapsed(
+      startedAt, state.totalPausedSeconds,
     );
 
     // Countdown: check if time is up
     if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
-      _ticker?.cancel();
-      state = state.copyWith(
-        elapsedSeconds: state.totalSeconds,
-        status: TimerStatus.completed,
-      );
-      FocusTimerNotifier.clearSavedState();
-      AtomicIslandService.cancel();
-      FocusTimerService.stop();
-      _cancelBackupAlarm();
-
-      // Fire completion notification immediately — works even when app is
-      // backgrounded since _onTick runs in the main isolate with ticker alive.
-      // Uses a fixed notification ID (300000) so the localized notification
-      // from timer_screen._saveSession() will replace this if app is visible.
-      final catLabel = state.catName.isNotEmpty
-          ? state.catName
-          : (state.labelDefaultCat.isNotEmpty
-                ? state.labelDefaultCat
-                : 'Focus');
-      ref
-          .read(notificationServiceProvider)
-          .showFocusComplete(
-            title: catLabel,
-            body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
-          );
+      _handleCountdownComplete();
       return;
     }
 
     state = state.copyWith(elapsedSeconds: newElapsed);
-
-    // Update foreground notification
     _updateNotification();
 
-    // Save state every 5 seconds
     _ticksSinceSave++;
-    if (_ticksSinceSave >= 5) {
+    if (_ticksSinceSave >= _saveIntervalTicks) {
       _ticksSinceSave = 0;
       _saveState();
     }
   }
 
-  /// Update the foreground service notification with current timer state.
-  /// Uses L10N labels from [configure()] with English fallbacks.
-  void _updateNotification() {
+  /// 倒计时归零：停止计时、清理状态、发送完成通知。
+  void _handleCountdownComplete() {
+    _ticker?.cancel();
+    state = state.copyWith(
+      elapsedSeconds: state.totalSeconds,
+      status: TimerStatus.completed,
+    );
+    FocusTimerNotifier.clearSavedState();
+    AtomicIslandService.cancel();
+    FocusTimerService.stop();
+    _cancelBackupAlarm();
+
+    final labels = _resolveDisplayLabels();
+    ref
+        .read(notificationServiceProvider)
+        .showFocusComplete(
+          title: labels.catName,
+          body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+        );
+  }
+
+  /// 解析通知显示标签，使用 configure() 传入的 L10N 标签，英文兜底。
+  ({String catName, String focusingLabel, String label}) _resolveDisplayLabels() {
     final label = state.mode == TimerMode.countdown
         ? (state.labelRemaining.isNotEmpty ? state.labelRemaining : 'remaining')
         : (state.labelElapsed.isNotEmpty ? state.labelElapsed : 'elapsed');
     final focusingLabel = state.labelFocusing.isNotEmpty
         ? state.labelFocusing
         : 'focusing...';
-    final catDisplayName = state.catName.isNotEmpty
-        ? state.catName
-        : (state.labelDefaultCat.isNotEmpty
-              ? state.labelDefaultCat
-              : 'Your cat');
+    return (
+      catName: _resolveCatDisplayName(),
+      focusingLabel: focusingLabel,
+      label: label,
+    );
+  }
+
+  /// Update the foreground service notification with current timer state.
+  void _updateNotification() {
+    final labels = _resolveDisplayLabels();
 
     // 基础通知（fallback）— 时间优先显示，habitName 截断防止遮挡
-    final truncatedHabit = state.habitName.length > 20
-        ? '${state.habitName.substring(0, 20)}...'
+    final truncatedHabit = state.habitName.length > _habitNameMaxLength
+        ? '${state.habitName.substring(0, _habitNameMaxLength)}...'
         : state.habitName;
     FocusTimerService.updateNotification(
-      title: '$catDisplayName $focusingLabel',
-      text: '${state.displayTime} $label \u{00B7} $truncatedHabit',
+      title: '${labels.catName} ${labels.focusingLabel}',
+      text: '${state.displayTime} ${labels.label} \u{00B7} $truncatedHabit',
     );
 
     // 富通知（触发 vivo 原子岛 + Android 16 ProgressStyle）
-    if (state.startedAt != null) {
-      final isCountdown = state.mode == TimerMode.countdown;
-      AtomicIslandService.updateNotification(
-        title: '$catDisplayName focusing...',
-        text: state.habitName,
-        isCountdown: isCountdown,
-        isPaused: state.status == TimerStatus.paused,
-        endTimeMs: isCountdown
-            ? state.startedAt!
-                  .add(
-                    Duration(
-                      seconds: state.totalSeconds + state.totalPausedSeconds,
-                    ),
-                  )
-                  .millisecondsSinceEpoch
-            : null,
-        startTimeMs: state.startedAt!.millisecondsSinceEpoch,
-      );
-    }
+    _updateAtomicIsland(labels.catName);
+  }
+
+  /// 更新 vivo 原子岛 / Android 16 ProgressStyle 富通知。
+  void _updateAtomicIsland(String catDisplayName) {
+    if (state.startedAt == null) return;
+    final isCountdown = state.mode == TimerMode.countdown;
+    AtomicIslandService.updateNotification(
+      title: '$catDisplayName focusing...',
+      text: state.habitName,
+      isCountdown: isCountdown,
+      isPaused: state.status == TimerStatus.paused,
+      endTimeMs: isCountdown
+          ? state.startedAt!
+                .add(
+                  Duration(
+                    seconds: state.totalSeconds + state.totalPausedSeconds,
+                  ),
+                )
+                .millisecondsSinceEpoch
+          : null,
+      startTimeMs: state.startedAt!.millisecondsSinceEpoch,
+    );
   }
 
   /// Pause the timer.
@@ -469,49 +471,35 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   }
 
   /// Complete the session (stopwatch mode: user presses done).
-  void complete() {
-    _ticker?.cancel();
-    state = state.copyWith(status: TimerStatus.completed);
-    FocusTimerNotifier.clearSavedState();
-    AtomicIslandService.cancel();
-    FocusTimerService.stop();
-    _cancelBackupAlarm();
-
-    // Analytics: log session quality (non-critical, must not break core flow)
-    try {
-      final completionRatio = state.totalSeconds > 0
-          ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
-          : 1.0;
-      ref
-          .read(analyticsServiceProvider)
-          .logSessionQuality(
-            sessionDuration: state.elapsedSeconds,
-            completionRatio: completionRatio,
-          );
-    } catch (_) {}
-  }
+  void complete() => _terminateSession(TimerStatus.completed);
 
   /// Abandon the session.
-  void abandon() {
+  void abandon() => _terminateSession(TimerStatus.abandoned);
+
+  /// 统一的会话终止逻辑：停止计时、清理状态、记录分析。
+  void _terminateSession(TimerStatus terminalStatus) {
     _ticker?.cancel();
-    state = state.copyWith(status: TimerStatus.abandoned);
+    state = state.copyWith(status: terminalStatus);
     FocusTimerNotifier.clearSavedState();
     AtomicIslandService.cancel();
     FocusTimerService.stop();
     _cancelBackupAlarm();
 
-    // Analytics: log session quality (non-critical, must not break core flow)
+    // Analytics: non-critical — failure must not break core flow
     try {
+      final defaultRatio = terminalStatus == TimerStatus.completed ? 1.0 : 0.0;
       final completionRatio = state.totalSeconds > 0
           ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
-          : 0.0;
+          : defaultRatio;
       ref
           .read(analyticsServiceProvider)
           .logSessionQuality(
             sessionDuration: state.elapsedSeconds,
             completionRatio: completionRatio,
           );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[FocusTimer] analytics error: $e');
+    }
   }
 
   /// Handle app going to background.
@@ -534,13 +522,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       final inProgressLabel = state.labelInProgress.isNotEmpty
           ? state.labelInProgress
           : 'Focus session in progress';
-      final catDisplayName = state.catName.isNotEmpty
-          ? state.catName
-          : (state.labelDefaultCat.isNotEmpty
-                ? state.labelDefaultCat
-                : 'Your cat');
       FocusTimerService.updateNotification(
-        title: '$catDisplayName $focusingLabel',
+        title: '${_resolveCatDisplayName()} $focusingLabel',
         text: inProgressLabel,
       );
     }
@@ -549,47 +532,54 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Handle app coming back to foreground.
   /// Uses wall-clock anchoring to compute the real elapsed time. The timer
   /// continues seamlessly — no time is ever lost.
-  /// Restarts the foreground service if the OS killed it while backgrounded.
   Future<void> onAppResumed() async {
     if (state.status != TimerStatus.running || state.pausedAt == null) return;
     if (state.startedAt == null) return;
 
-    // Wall-clock total elapsed minus paused time
-    final wallTotal = DateTime.now().difference(state.startedAt!).inSeconds;
-    final newElapsed = (wallTotal - state.totalPausedSeconds).clamp(
-      0,
-      wallTotal,
+    final newElapsed = _computeWallClockElapsed(
+      state.startedAt!, state.totalPausedSeconds,
     );
 
-    // Auto-complete if away > 30 minutes (user forgot about it)
-    final awayDuration = DateTime.now().difference(state.pausedAt!);
-    if (awayDuration.inMinutes > 30) {
-      _ticker?.cancel();
-      final cappedElapsed = state.mode == TimerMode.countdown
-          ? newElapsed.clamp(0, state.totalSeconds)
-          : newElapsed;
-      state = state.copyWith(
-        elapsedSeconds: cappedElapsed,
-        status: TimerStatus.completed,
-        clearPausedAt: true,
-      );
-      FocusTimerNotifier.clearSavedState();
+    // Auto-complete: session timeout OR countdown finished in background
+    if (_shouldAutoComplete(newElapsed)) {
+      _handleAutoComplete(newElapsed);
       return;
     }
 
-    // Countdown completed while in background
-    if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
-      _ticker?.cancel();
-      state = state.copyWith(
-        elapsedSeconds: state.totalSeconds,
-        status: TimerStatus.completed,
-        clearPausedAt: true,
-      );
-      FocusTimerNotifier.clearSavedState();
-      return;
-    }
+    await _restartForegroundServiceIfNeeded();
 
-    // Restart foreground service if the OS killed it while backgrounded
+    // Normal resume — clear pausedAt, restart ticker, refresh display
+    state = state.copyWith(elapsedSeconds: newElapsed, clearPausedAt: true);
+    _ticker?.cancel();
+    _ticksSinceSave = 0;
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
+    _updateNotification();
+  }
+
+  /// 判断是否应自动完成：离开超过阈值或倒计时已归零。
+  bool _shouldAutoComplete(int newElapsed) {
+    final awayMinutes = DateTime.now().difference(state.pausedAt!).inMinutes;
+    final countdownDone = state.mode == TimerMode.countdown &&
+        newElapsed >= state.totalSeconds;
+    return awayMinutes > _autoCompleteThresholdMinutes || countdownDone;
+  }
+
+  /// 执行自动完成：清理计时器并设置终态。
+  void _handleAutoComplete(int newElapsed) {
+    _ticker?.cancel();
+    final cappedElapsed = state.mode == TimerMode.countdown
+        ? state.totalSeconds
+        : newElapsed;
+    state = state.copyWith(
+      elapsedSeconds: cappedElapsed,
+      status: TimerStatus.completed,
+      clearPausedAt: true,
+    );
+    FocusTimerNotifier.clearSavedState();
+  }
+
+  /// 检查并重启被系统杀死的前台服务。
+  Future<void> _restartForegroundServiceIfNeeded() async {
     final isRunning = await FlutterForegroundTask.isRunningService;
     if (!isRunning) {
       await FocusTimerService.start(
@@ -599,13 +589,6 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
         isCountdown: state.mode == TimerMode.countdown,
       );
     }
-
-    // Normal resume — clear pausedAt, restart ticker, refresh display
-    state = state.copyWith(elapsedSeconds: newElapsed, clearPausedAt: true);
-    _ticker?.cancel();
-    _ticksSinceSave = 0;
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
-    _updateNotification();
   }
 
   /// Reset to idle state.
@@ -632,20 +615,15 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       // 只在未来的时间点调度
       if (fireAt.isBefore(DateTime.now())) return;
 
-      final catLabel = state.catName.isNotEmpty
-          ? state.catName
-          : (state.labelDefaultCat.isNotEmpty
-                ? state.labelDefaultCat
-                : 'Focus');
       ref
           .read(notificationServiceProvider)
           .scheduleTimerBackup(
             fireAt: fireAt,
-            title: catLabel,
+            title: _resolveCatDisplayName('Focus'),
             body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
           );
-    } catch (_) {
-      // Non-critical: backup alarm is best-effort
+    } catch (e) {
+      debugPrint('[FocusTimer] backup alarm schedule error: $e');
     }
   }
 
@@ -653,8 +631,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void _cancelBackupAlarm() {
     try {
       ref.read(notificationServiceProvider).cancelTimerBackup();
-    } catch (_) {
-      // Non-critical: backup alarm is best-effort
+    } catch (e) {
+      debugPrint('[FocusTimer] backup alarm cancel error: $e');
     }
   }
 
