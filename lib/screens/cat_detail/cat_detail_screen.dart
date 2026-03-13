@@ -197,9 +197,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
   /// 右栏 — FocusStats, Diary, Chat, Reminder, Heatmap, Accessories, CatInfo
   Widget _buildRightColumn(BuildContext context, Cat cat, Habit? habit) {
-    return Column(
-      children: _buildCardWidgets(cat, habit, startIndex: 1),
-    );
+    return Column(children: _buildCardWidgets(cat, habit, startIndex: 1));
   }
 
   /// 生成功能卡片列表（窄屏/宽屏共享），从 startIndex 起编排动画顺序。
@@ -564,7 +562,10 @@ class _AiTeaserCard extends ConsumerWidget {
                 shaderCallback: (bounds) => LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [colorScheme.surface, colorScheme.surface.withValues(alpha: 0)],
+                  colors: [
+                    colorScheme.surface,
+                    colorScheme.surface.withValues(alpha: 0),
+                  ],
                   stops: const [0.3, 1.0],
                 ).createShader(bounds),
                 child: Text(

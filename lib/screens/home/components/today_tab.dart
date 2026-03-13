@@ -50,8 +50,7 @@ class TodayTab extends ConsumerWidget {
 
             // Featured cat card（首屏核心情感焦点）
             catsAsync.when(
-              loading: () =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+              loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
               error: (_, _) =>
                   const SliverToBoxAdapter(child: SizedBox.shrink()),
               data: (cats) {
@@ -129,16 +128,9 @@ class TodayTab extends ConsumerWidget {
                         todayMinutes: minutes,
                         onTap: () => Navigator.of(
                           context,
-                        ).pushNamed(
-                          AppRouter.focusSetup,
-                          arguments: habit.id,
-                        ),
-                        onDelete: () => _confirmDelete(
-                          context,
-                          ref,
-                          habit.id,
-                          habit.name,
-                        ),
+                        ).pushNamed(AppRouter.focusSetup, arguments: habit.id),
+                        onDelete: () =>
+                            _confirmDelete(context, ref, habit.id, habit.name),
                       ),
                     );
                   }, childCount: habits.length),

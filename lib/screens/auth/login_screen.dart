@@ -132,10 +132,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _navigateToEmailAuth() {
     Navigator.of(context).pushNamed(
       AppRouter.emailAuth,
-      arguments: {
-        'linkMode': widget.linkMode,
-        'startAsLogin': widget.linkMode,
-      },
+      arguments: {'linkMode': widget.linkMode, 'startAsLogin': widget.linkMode},
     );
   }
 

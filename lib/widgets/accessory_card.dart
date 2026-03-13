@@ -96,20 +96,13 @@ class AccessoryCard extends StatelessWidget {
                       Icon(
                         Icons.monetization_on,
                         size: 14,
-                        color: _priceColor(
-                          info.price,
-                          colorScheme,
-                        ),
+                        color: _priceColor(info.price, colorScheme),
                       ),
                       const SizedBox(width: 2),
                       Text(
                         '${info.price}',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: _priceColor(
-                            info.price,
-                            colorScheme,
-                            theme.brightness,
-                          ),
+                          color: _priceColor(info.price, colorScheme),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

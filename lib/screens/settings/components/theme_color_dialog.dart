@@ -111,9 +111,7 @@ class _DynamicColorOption extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const SweepGradient(
-                  colors: BrandColors.google,
-                ),
+                gradient: const SweepGradient(colors: BrandColors.google),
                 border: isSelected
                     ? Border.all(color: colorScheme.onSurface, width: 3)
                     : null,

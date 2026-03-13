@@ -178,10 +178,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final startedAt = DateTime.tryParse(startedAtStr);
     if (startedAt == null) return null;
 
-    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0)
-        + _computePendingPauseDelta(prefs.getString(_keyPausedAt));
+    final totalPausedSeconds =
+        (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
+        _computePendingPauseDelta(prefs.getString(_keyPausedAt));
     final effectiveElapsed = _computeWallClockElapsed(
-      startedAt, totalPausedSeconds,
+      startedAt,
+      totalPausedSeconds,
     );
 
     return {
@@ -256,14 +258,15 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     final catId = prefs.getString(_keyCatId) ?? '';
     final catName = prefs.getString(_keyCatName) ?? '';
     final habitName = prefs.getString(_keyHabitName) ?? '';
-    final totalSeconds = prefs.getInt(_keyTotalSeconds) ?? _defaultDurationSeconds;
+    final totalSeconds =
+        prefs.getInt(_keyTotalSeconds) ?? _defaultDurationSeconds;
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
     final mode = TimerMode.values[modeIndex];
     final restored = _computeRestoredElapsed(prefs, startedAt);
 
     // Countdown mode: check if would have completed
-    final terminalStatus = (mode == TimerMode.countdown &&
-            restored.elapsed >= totalSeconds)
+    final terminalStatus =
+        (mode == TimerMode.countdown && restored.elapsed >= totalSeconds)
         ? TimerStatus.completed
         : TimerStatus.paused;
 
@@ -316,8 +319,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     SharedPreferences prefs,
     DateTime startedAt,
   ) {
-    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0)
-        + _computePendingPauseDelta(prefs.getString(_keyPausedAt));
+    final totalPausedSeconds =
+        (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
+        _computePendingPauseDelta(prefs.getString(_keyPausedAt));
     final elapsed = _computeWallClockElapsed(startedAt, totalPausedSeconds);
     return (elapsed: elapsed, pausedSeconds: totalPausedSeconds);
   }
@@ -344,7 +348,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     if (startedAt == null) return;
 
     final newElapsed = _computeWallClockElapsed(
-      startedAt, state.totalPausedSeconds,
+      startedAt,
+      state.totalPausedSeconds,
     );
 
     // Countdown: check if time is up
@@ -385,7 +390,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   }
 
   /// 解析通知显示标签，使用 configure() 传入的 L10N 标签，英文兜底。
-  ({String catName, String focusingLabel, String label}) _resolveDisplayLabels() {
+  ({String catName, String focusingLabel, String label})
+  _resolveDisplayLabels() {
     final label = state.mode == TimerMode.countdown
         ? (state.labelRemaining.isNotEmpty ? state.labelRemaining : 'remaining')
         : (state.labelElapsed.isNotEmpty ? state.labelElapsed : 'elapsed');
@@ -537,7 +543,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     if (state.startedAt == null) return;
 
     final newElapsed = _computeWallClockElapsed(
-      state.startedAt!, state.totalPausedSeconds,
+      state.startedAt!,
+      state.totalPausedSeconds,
     );
 
     // Auto-complete: session timeout OR countdown finished in background
@@ -559,8 +566,8 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// 判断是否应自动完成：离开超过阈值或倒计时已归零。
   bool _shouldAutoComplete(int newElapsed) {
     final awayMinutes = DateTime.now().difference(state.pausedAt!).inMinutes;
-    final countdownDone = state.mode == TimerMode.countdown &&
-        newElapsed >= state.totalSeconds;
+    final countdownDone =
+        state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds;
     return awayMinutes > _autoCompleteThresholdMinutes || countdownDone;
   }
 

@@ -121,9 +121,7 @@ class SettingsScreen extends ConsumerWidget {
                         height: 24,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: SweepGradient(
-                            colors: BrandColors.google,
-                          ),
+                          gradient: SweepGradient(colors: BrandColors.google),
                         ),
                       )
                     else

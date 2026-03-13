@@ -673,7 +673,6 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             ),
     );
   }
-
 }
 
 /// 会话奖励计算结果 — 在 _saveSession 子方法间传递。

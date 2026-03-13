@@ -41,7 +41,9 @@ class CelebrationGlowIcon extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: CelebrationColors.glow.withValues(alpha: 0.4 * burstOpacity),
+                      color: CelebrationColors.glow.withValues(
+                        alpha: 0.4 * burstOpacity,
+                      ),
                       width: 2,
                     ),
                   ),
@@ -64,7 +66,11 @@ class CelebrationGlowIcon extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, size: size * 0.5, color: CelebrationColors.onOverlay),
+            child: Icon(
+              icon,
+              size: size * 0.5,
+              color: CelebrationColors.onOverlay,
+            ),
           ),
         ],
       ),

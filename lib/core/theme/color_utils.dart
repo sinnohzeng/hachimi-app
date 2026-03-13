@@ -48,12 +48,12 @@ class BrandColors {
 
   /// 从 ColorScheme 派生的 confetti 颜色。
   static List<Color> confetti(ColorScheme cs) => [
-        cs.primary,
-        cs.tertiary,
-        cs.secondary,
-        rewardGold,
-        cs.error,
-      ];
+    cs.primary,
+    cs.tertiary,
+    cs.secondary,
+    rewardGold,
+    cs.error,
+  ];
 }
 
 /// 庆祝覆盖层颜色 — 用于深色渐变背景上的固定亮色。

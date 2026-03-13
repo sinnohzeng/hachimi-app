@@ -195,11 +195,10 @@ class PixelCatRenderer {
   }
 
   /// 在独立层上绘制 sprite 并返回 Image
-  Future<ui.Image> _renderSpriteToImage(
-    String spriteName,
-    int spriteNumber,
-  ) {
-    return _renderLayer((canvas) => _drawSprite(spriteName, spriteNumber, canvas));
+  Future<ui.Image> _renderSpriteToImage(String spriteName, int spriteNumber) {
+    return _renderLayer(
+      (canvas) => _drawSprite(spriteName, spriteNumber, canvas),
+    );
   }
 
   // ─── 图像合成基础工具 ───
@@ -223,7 +222,12 @@ class PixelCatRenderer {
     List<int> tintRgb,
     ui.BlendMode blendMode,
   ) async {
-    final tintColor = ui.Color.fromARGB(255, tintRgb[0], tintRgb[1], tintRgb[2]);
+    final tintColor = ui.Color.fromARGB(
+      255,
+      tintRgb[0],
+      tintRgb[1],
+      tintRgb[2],
+    );
 
     // 生成色调遮罩 → 混合到源图 → 用源图 alpha 裁切
     final tintOverlay = await _renderTintOverlay(source, tintColor);
@@ -231,15 +235,14 @@ class PixelCatRenderer {
     return _clipToAlpha(blended, source);
   }
 
-  Future<ui.Image> _renderTintOverlay(
-    ui.Image source,
-    ui.Color color,
-  ) {
+  Future<ui.Image> _renderTintOverlay(ui.Image source, ui.Color color) {
     return _renderLayer((canvas) async {
       canvas.drawImage(source, ui.Offset.zero, ui.Paint());
       canvas.drawRect(
         ui.Rect.fromLTWH(0, 0, spriteSize.toDouble(), spriteSize.toDouble()),
-        ui.Paint()..color = color..blendMode = ui.BlendMode.srcIn,
+        ui.Paint()
+          ..color = color
+          ..blendMode = ui.BlendMode.srcIn,
       );
     });
   }
@@ -255,10 +258,7 @@ class PixelCatRenderer {
     });
   }
 
-  Future<ui.Image> _clipToAlpha(
-    ui.Image image,
-    ui.Image alphaSource,
-  ) {
+  Future<ui.Image> _clipToAlpha(ui.Image image, ui.Image alphaSource) {
     return _renderLayer((canvas) async {
       canvas.drawImage(image, ui.Offset.zero, ui.Paint());
       canvas.drawImage(
@@ -314,17 +314,19 @@ class PixelCatRenderer {
     image = await _renderFaceAndSkin(image, appearance, spriteIndex);
 
     // Layer 13：饰品
-    image = await _renderAccessories(image, appearance, spriteIndex, accessoryId);
+    image = await _renderAccessories(
+      image,
+      appearance,
+      spriteIndex,
+      accessoryId,
+    );
 
     // 翻转 + 缓存
     return _finalizeImage(image, appearance, cacheKey);
   }
 
   /// Layer 1-2：底层皮毛 + 玳瑁叠加
-  Future<ui.Image> _renderBasePelt(
-    CatAppearance appearance,
-    int spriteIndex,
-  ) {
+  Future<ui.Image> _renderBasePelt(CatAppearance appearance, int spriteIndex) {
     return _renderLayer((canvas) async {
       final spriteName = peltTypeToSpriteName[appearance.peltType] ?? 'single';
 
@@ -348,7 +350,8 @@ class PixelCatRenderer {
     CatAppearance appearance,
     int spriteIndex,
   ) async {
-    final patternSprite = peltTypeToSpriteName[appearance.tortiePattern!] ??
+    final patternSprite =
+        peltTypeToSpriteName[appearance.tortiePattern!] ??
         appearance.tortiePattern!.toLowerCase();
     final tortieSprite = patternSprite.isEmpty
         ? 'single${appearance.tortieColor}'
@@ -360,7 +363,11 @@ class PixelCatRenderer {
       return;
     }
 
-    final masked = await _renderMaskedSprite(tortieSprite, maskName, spriteIndex);
+    final masked = await _renderMaskedSprite(
+      tortieSprite,
+      maskName,
+      spriteIndex,
+    );
     canvas.drawImage(masked, ui.Offset.zero, ui.Paint());
   }
 

@@ -29,7 +29,10 @@ class ChatEntryCard extends StatelessWidget {
           child: Row(
             children: [
               const ExcludeSemantics(
-                child: Text('\u{1F4AC}', style: TextStyle(fontSize: AppIconSize.emojiSmall)),
+                child: Text(
+                  '\u{1F4AC}',
+                  style: TextStyle(fontSize: AppIconSize.emojiSmall),
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(

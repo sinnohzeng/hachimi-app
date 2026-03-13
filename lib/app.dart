@@ -531,7 +531,11 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
     for (final habit in habits) {
       if (habit.isActive && habit.hasReminders) {
         await _scheduleHabitReminder(
-          habit, notifService, cats, l10n, fallbackCatName,
+          habit,
+          notifService,
+          cats,
+          l10n,
+          fallbackCatName,
         );
       }
     }

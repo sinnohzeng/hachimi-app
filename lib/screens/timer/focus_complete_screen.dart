@@ -14,7 +14,9 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/ai_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
+import 'package:hachimi_app/screens/timer/components/stat_row.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
+import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/services/diary_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 import 'package:vibration/vibration.dart';
@@ -100,12 +102,13 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     );
 
     _statsController = _createController(AppMotion.durationMedium4);
-    _statsSlide = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _statsController, curve: AppMotion.emphasized),
-    );
+    _statsSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _statsController,
+            curve: AppMotion.emphasized,
+          ),
+        );
     _statsOpacity = CurvedAnimation(
       parent: _statsController,
       curve: AppMotion.standardDecelerate,
@@ -175,7 +178,10 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     try {
       await ref.read(diaryServiceProvider).generateTodayDiary(ctx);
       if (!mounted) return;
-      setState(() { _diaryGenerating = false; _diarySuccess = true; });
+      setState(() {
+        _diaryGenerating = false;
+        _diarySuccess = true;
+      });
       ref.read(analyticsServiceProvider).logAiDiaryGenerated(catId: cat.id);
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) setState(() => _diarySuccess = false);

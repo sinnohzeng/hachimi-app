@@ -160,10 +160,9 @@ class _NotFoundScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.tonal(
-              onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRouter.home,
-                (_) => false,
-              ),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false),
               child: const Text('Go home'),
             ),
           ],

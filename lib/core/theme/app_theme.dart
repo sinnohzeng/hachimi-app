@@ -174,9 +174,7 @@ class AppTheme {
           ),
         ),
         showDragHandle: true,
-        constraints: BoxConstraints(
-          maxWidth: AppBreakpoints.maxSheetWidth,
-        ),
+        constraints: BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
       ),
       popupMenuTheme: PopupMenuThemeData(
         shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),

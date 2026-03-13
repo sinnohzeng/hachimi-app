@@ -394,10 +394,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
         .read(localCatRepositoryProvider)
         .archive(uid, cat.id, cat.boundHabitId);
     if (!mounted) return;
-    AppFeedback.success(
-      context,
-      context.l10n.catRoomArchiveSuccess(cat.name),
-    );
+    AppFeedback.success(context, context.l10n.catRoomArchiveSuccess(cat.name));
   }
 
   void _confirmReactivate(BuildContext context, Cat cat) {

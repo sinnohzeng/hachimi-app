@@ -34,7 +34,10 @@ class DiaryPreviewCard extends ConsumerWidget {
               Row(
                 children: [
                   const ExcludeSemantics(
-                    child: Text('\u{1F4D6}', style: TextStyle(fontSize: AppIconSize.emojiSmall)),
+                    child: Text(
+                      '\u{1F4D6}',
+                      style: TextStyle(fontSize: AppIconSize.emojiSmall),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(

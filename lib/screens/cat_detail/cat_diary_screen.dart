@@ -60,7 +60,10 @@ class CatDiaryScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('📖', style: TextStyle(fontSize: AppIconSize.emoji)),
+                    const Text(
+                      '📖',
+                      style: TextStyle(fontSize: AppIconSize.emoji),
+                    ),
                     const SizedBox(height: AppSpacing.base),
                     Text(
                       context.l10n.diaryEmptyTitle,

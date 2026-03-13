@@ -66,13 +66,7 @@ class AnimatedLoadingButton extends StatelessWidget {
     }
 
     return tonal
-        ? FilledButton.tonal(
-            onPressed: effectiveOnPressed,
-            child: child,
-          )
-        : FilledButton(
-            onPressed: effectiveOnPressed,
-            child: child,
-          );
+        ? FilledButton.tonal(onPressed: effectiveOnPressed, child: child)
+        : FilledButton(onPressed: effectiveOnPressed, child: child);
   }
 }
