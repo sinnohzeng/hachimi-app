@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
@@ -139,7 +140,7 @@ class _MilestoneRow extends StatelessWidget {
               if (!milestone.isClaimed) ...[
                 const SizedBox(height: AppSpacing.xs),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppShape.borderExtraSmall,
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 4,

@@ -53,24 +53,26 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
         ? colorScheme.surface
         : colorScheme.surfaceContainerLow;
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final shimmerValue = _controller.value;
-        return Container(
-          width: widget.width,
-          height: widget.height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            gradient: LinearGradient(
-              begin: Alignment(-1.0 + 2.0 * shimmerValue, 0),
-              end: Alignment(1.0 + 2.0 * shimmerValue, 0),
-              colors: [baseColor, highlightColor, baseColor],
-              stops: const [0.0, 0.5, 1.0],
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final shimmerValue = _controller.value;
+          return Container(
+            width: widget.width,
+            height: widget.height,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+              gradient: LinearGradient(
+                begin: Alignment(-1.0 + 2.0 * shimmerValue, 0),
+                end: Alignment(1.0 + 2.0 * shimmerValue, 0),
+                colors: [baseColor, highlightColor, baseColor],
+                stops: const [0.0, 0.5, 1.0],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -94,12 +96,12 @@ class SkeletonCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SkeletonLoader(
-                    width: MediaQuery.of(context).size.width * 0.35,
+                    width: MediaQuery.sizeOf(context).width * 0.35,
                     height: 14,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   SkeletonLoader(
-                    width: MediaQuery.of(context).size.width * 0.25,
+                    width: MediaQuery.sizeOf(context).width * 0.25,
                     height: 12,
                   ),
                 ],

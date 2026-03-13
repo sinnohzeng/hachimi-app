@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/accessory_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -223,29 +224,10 @@ class _AccessoryGrid extends ConsumerWidget {
     }
 
     final l10n = context.l10n;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            if (success)
-              Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.onPrimary,
-                size: 20,
-                semanticLabel: 'Success',
-              ),
-            if (success) const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                success
-                    ? l10n.shopPurchaseSuccess(item.displayName)
-                    : l10n.shopPurchaseFailed(item.price),
-              ),
-            ),
-          ],
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    if (success) {
+      AppFeedback.success(context, l10n.shopPurchaseSuccess(item.displayName));
+    } else {
+      AppFeedback.error(context, l10n.shopPurchaseFailed(item.price));
+    }
   }
 }

@@ -54,7 +54,7 @@ class AchievementCard extends StatelessWidget {
     final accentColor = isUnlocked ? _tierAccentColor(tier, colorScheme) : null;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: AppSpacing.paddingCard,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: AppShape.borderMedium,
@@ -75,7 +75,7 @@ class AchievementCard extends StatelessWidget {
                   ),
                 )
               : null,
-          padding: const EdgeInsets.all(12),
+          padding: AppSpacing.paddingMd,
           child: Row(
             children: [
               // 成就图标 — 圆形
@@ -135,7 +135,7 @@ class AchievementCard extends StatelessWidget {
                       LinearProgressIndicator(
                         value: progress!.percent,
                         minHeight: 4,
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: AppShape.borderExtraSmall,
                       ),
                       const SizedBox(height: 2),
                       Text(

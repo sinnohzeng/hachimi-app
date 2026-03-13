@@ -835,5 +835,10 @@
   "archiveConflictLocal": "ローカルアーカイブ",
   "archiveConflictCloud": "クラウドアーカイブ",
   "archiveConflictKeepCloud": "クラウドを保持",
-  "archiveConflictKeepLocal": "ローカルを保持"
+  "archiveConflictKeepLocal": "ローカルを保持",
+
+  "loginShowPassword": "パスワードを表示",
+  "loginHidePassword": "パスワードを非表示",
+  "errorGeneric": "問題が発生しました。しばらくしてからもう一度お試しください",
+  "errorCreateHabit": "習慣の作成に失敗しました。もう一度お試しください"
 }

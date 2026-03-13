@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/account_deletion_result.dart';
@@ -12,12 +13,6 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 /// 3) 立即本地删除 + 云端硬删（在线立即执行，离线排队）
 class DeleteAccountFlow {
   DeleteAccountFlow._();
-
-  static void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
-    );
-  }
 
   static Future<void> start(BuildContext context, WidgetRef ref) async {
     final uid = ref.read(currentUidProvider);
@@ -165,7 +160,7 @@ class DeleteAccountFlow {
           .logAccountDeletionFailed(errorCode: 'delete_account_local_failed');
       if (context.mounted) {
         Navigator.of(context).pop();
-        _showSnackBar(context, l10n.deleteAccountError);
+        AppFeedback.error(context, l10n.deleteAccountError);
       }
     } finally {
       progress.dispose();
@@ -217,7 +212,7 @@ class DeleteAccountFlow {
       if (!context.mounted) return true;
       Navigator.of(context).pop();
       Navigator.of(context).popUntil((route) => route.isFirst);
-      _showSnackBar(context, l10n.deleteAccountSuccess);
+      AppFeedback.success(context, l10n.deleteAccountSuccess);
       return true;
     }
 
@@ -230,7 +225,7 @@ class DeleteAccountFlow {
       if (!context.mounted) return true;
       // 不 reset onboarding — AuthGate 的 _hasPendingDeletion 接管
       Navigator.of(context).popUntil((route) => route.isFirst);
-      _showSnackBar(context, l10n.deleteAccountQueued);
+      AppFeedback.info(context, l10n.deleteAccountQueued);
       return true;
     }
 
@@ -241,7 +236,7 @@ class DeleteAccountFlow {
         );
     if (!context.mounted) return false;
     Navigator.of(context).pop();
-    _showSnackBar(context, l10n.deleteAccountError);
+    AppFeedback.error(context, l10n.deleteAccountError);
     return false;
   }
 }

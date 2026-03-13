@@ -42,7 +42,7 @@ class _OnboardingCatHeroState extends ConsumerState<OnboardingCatHero>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final disable = MediaQuery.of(context).disableAnimations;
+    final disable = MediaQuery.disableAnimationsOf(context);
     if (disable) {
       _breathController.stop();
     } else if (!_breathController.isAnimating) {
@@ -59,7 +59,7 @@ class _OnboardingCatHeroState extends ConsumerState<OnboardingCatHero>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final disable = MediaQuery.of(context).disableAnimations;
+    final disable = MediaQuery.disableAnimationsOf(context);
 
     final sprite = PixelCatSprite(
       appearance: widget.appearance,

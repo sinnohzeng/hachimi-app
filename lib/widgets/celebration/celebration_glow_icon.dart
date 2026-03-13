@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/widgets/celebration/celebration_tier.dart';
 
 /// 成就图标 + 辐射光环效果 — 按层级区分视觉表现。
@@ -40,7 +41,9 @@ class CelebrationGlowIcon extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.4 * burstOpacity),
+                      color: CelebrationColors.glow.withValues(
+                        alpha: 0.4 * burstOpacity,
+                      ),
                       width: 2,
                     ),
                   ),
@@ -54,16 +57,20 @@ class CelebrationGlowIcon extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.12),
+              color: CelebrationColors.glow.withValues(alpha: 0.12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: CelebrationColors.glow.withValues(alpha: 0.2),
                   blurRadius: tier == CelebrationTier.epic ? 24 : 16,
                   spreadRadius: tier == CelebrationTier.epic ? 6 : 3,
                 ),
               ],
             ),
-            child: Icon(icon, size: size * 0.5, color: Colors.white),
+            child: Icon(
+              icon,
+              size: size * 0.5,
+              color: CelebrationColors.onOverlay,
+            ),
           ),
         ],
       ),

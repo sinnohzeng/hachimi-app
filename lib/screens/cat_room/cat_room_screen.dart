@@ -8,6 +8,7 @@ import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
@@ -71,23 +72,29 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
     List<Cat> archivedCats,
   ) {
     if (activeCats.isEmpty && archivedCats.isEmpty) {
-      return _buildEmpty(context);
+      return RefreshIndicator(
+        onRefresh: () async => ref.invalidate(catsProvider),
+        child: ListView(children: [_buildEmpty(context)]),
+      );
     }
 
-    return CustomScrollView(
-      slivers: [
-        if (activeCats.isNotEmpty) _buildActiveCatsGrid(activeCats),
-        if (activeCats.isEmpty && archivedCats.isNotEmpty)
-          SliverToBoxAdapter(child: _buildEmpty(context)),
-        if (archivedCats.isNotEmpty)
-          ArchivedCatsSection(
-            cats: archivedCats,
-            expanded: _isAlbumExpanded,
-            onToggle: _toggleAlbum,
-            onTap: (cat) => _navigateToCatDetail(context, cat),
-            onLongPress: (cat) => _showArchivedCatActions(context, cat),
-          ),
-      ],
+    return RefreshIndicator(
+      onRefresh: () async => ref.invalidate(catsProvider),
+      child: CustomScrollView(
+        slivers: [
+          if (activeCats.isNotEmpty) _buildActiveCatsGrid(activeCats),
+          if (activeCats.isEmpty && archivedCats.isNotEmpty)
+            SliverToBoxAdapter(child: _buildEmpty(context)),
+          if (archivedCats.isNotEmpty)
+            ArchivedCatsSection(
+              cats: archivedCats,
+              expanded: _isAlbumExpanded,
+              onToggle: _toggleAlbum,
+              onTap: (cat) => _navigateToCatDetail(context, cat),
+              onLongPress: (cat) => _showArchivedCatActions(context, cat),
+            ),
+        ],
+      ),
     );
   }
 
@@ -387,9 +394,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
         .read(localCatRepositoryProvider)
         .archive(uid, cat.id, cat.boundHabitId);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.catRoomArchiveSuccess(cat.name))),
-    );
+    AppFeedback.success(context, context.l10n.catRoomArchiveSuccess(cat.name));
   }
 
   void _confirmReactivate(BuildContext context, Cat cat) {
@@ -422,8 +427,9 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
         .read(localCatRepositoryProvider)
         .reactivate(uid, cat.id, cat.boundHabitId);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.catRoomReactivateSuccess(cat.name))),
+    AppFeedback.success(
+      context,
+      context.l10n.catRoomReactivateSuccess(cat.name),
     );
   }
 }

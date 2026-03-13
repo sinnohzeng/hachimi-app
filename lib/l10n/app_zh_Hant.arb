@@ -835,5 +835,10 @@
   "archiveConflictLocal": "本機存檔",
   "archiveConflictCloud": "雲端存檔",
   "archiveConflictKeepCloud": "保留雲端",
-  "archiveConflictKeepLocal": "保留本機"
+  "archiveConflictKeepLocal": "保留本機",
+
+  "loginShowPassword": "顯示密碼",
+  "loginHidePassword": "隱藏密碼",
+  "errorGeneric": "出了點問題，稍後再試",
+  "errorCreateHabit": "建立習慣失敗，請重試"
 }

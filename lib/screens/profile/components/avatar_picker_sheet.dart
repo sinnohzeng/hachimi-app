@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/user_profile_provider.dart';
@@ -89,13 +90,7 @@ class _AvatarPickerContent extends StatelessWidget {
       if (context.mounted) Navigator.of(context).pop();
     } catch (_) {
       if (context.mounted) {
-        final l10n = context.l10n;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.commonError),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppFeedback.error(context, context.l10n.commonError);
       }
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/account_data_snapshot.dart';
@@ -70,7 +71,7 @@ class _SnapshotCard extends StatelessWidget {
       padding: AppSpacing.paddingBase,
       decoration: BoxDecoration(
         color: highlighted ? colors.primaryContainer : colors.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShape.borderMedium,
         border: Border.all(color: colors.outlineVariant),
       ),
       child: Column(

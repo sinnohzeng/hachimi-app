@@ -18,7 +18,7 @@ class HabitHeatmapCard extends ConsumerStatefulWidget {
 class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
   Map<String, int>? _dailyMinutes;
   bool _isLoading = true;
-  String? _error;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -29,7 +29,7 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
-      _error = null;
+      _hasError = false;
     });
 
     try {
@@ -46,11 +46,11 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _error = e.toString();
+          _hasError = true;
         });
       }
     }
@@ -81,7 +81,7 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               )
-            else if (_error != null)
+            else if (_hasError)
               Center(
                 child: Padding(
                   padding: AppSpacing.paddingBase,

@@ -9,6 +9,7 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -414,13 +415,7 @@ class _DrawerFooter extends StatelessWidget {
                   icon: const Icon(Icons.copy, size: 14),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: uid!));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('ID copied'),
-                        behavior: SnackBarBehavior.floating,
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
+                    AppFeedback.info(context, 'ID copied');
                   },
                   tooltip: 'Copy ID',
                   visualDensity: VisualDensity.compact,

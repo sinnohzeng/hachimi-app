@@ -2343,4 +2343,16 @@ class SKo extends S {
 
   @override
   String get archiveConflictKeepLocal => '로컬 유지';
+
+  @override
+  String get loginShowPassword => '비밀번호 표시';
+
+  @override
+  String get loginHidePassword => '비밀번호 숨기기';
+
+  @override
+  String get errorGeneric => '문제가 발생했어요. 나중에 다시 시도해 주세요';
+
+  @override
+  String get errorCreateHabit => '습관 만들기에 실패했어요. 다시 시도해 주세요';
 }

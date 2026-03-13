@@ -302,7 +302,12 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
         }
 
         final cards = habits
-            .map((h) => _habitCard(h, textTheme, colorScheme, edgePadding))
+            .map(
+              (h) => KeyedSubtree(
+                key: ValueKey(h.id),
+                child: _habitCard(h, textTheme, colorScheme, edgePadding),
+              ),
+            )
             .toList();
 
         if (!isExpanded) return Column(children: cards);

@@ -96,21 +96,13 @@ class AccessoryCard extends StatelessWidget {
                       Icon(
                         Icons.monetization_on,
                         size: 14,
-                        color: _priceColor(
-                          info.price,
-                          colorScheme,
-                          theme.brightness,
-                        ),
+                        color: _priceColor(info.price, colorScheme),
                       ),
                       const SizedBox(width: 2),
                       Text(
                         '${info.price}',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: _priceColor(
-                            info.price,
-                            colorScheme,
-                            theme.brightness,
-                          ),
+                          color: _priceColor(info.price, colorScheme),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -137,16 +129,12 @@ class AccessoryCard extends StatelessWidget {
     }
   }
 
-  Color _priceColor(int price, ColorScheme colorScheme, Brightness brightness) {
+  Color _priceColor(int price, ColorScheme colorScheme) {
     if (price >= 350) {
-      return brightness == Brightness.dark
-          ? Colors.amber.shade400
-          : Colors.amber.shade700;
+      return colorScheme.tertiary;
     }
     if (price >= 250) {
-      return brightness == Brightness.dark
-          ? Colors.purple.shade300
-          : Colors.purple.shade400;
+      return colorScheme.secondary;
     }
     if (price >= 150) return colorScheme.primary;
     return colorScheme.onSurfaceVariant;

@@ -11,7 +11,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/screens/onboarding/components/onboarding_cat_cluster.dart';
 import 'package:hachimi_app/screens/onboarding/components/onboarding_cat_hero.dart';
 import 'package:hachimi_app/screens/onboarding/components/onboarding_stage_strip.dart';
-import 'package:hachimi_app/services/pixel_cat_generation_service.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -35,7 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    final gen = PixelCatGenerationService();
+    final gen = ref.read(pixelCatGenerationServiceProvider);
     _heroCat = gen.generateRandomAppearance();
     _clusterCats = List.generate(3, (_) => gen.generateRandomAppearance());
   }
@@ -190,7 +190,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget _buildBackButton(BuildContext context) {
     final color = Theme.of(context).colorScheme.onSurface;
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 8,
+      top: MediaQuery.paddingOf(context).top + 8,
       left: 8,
       child: IconButton(
         onPressed: _previous,
@@ -203,7 +203,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget _buildSkipButton(BuildContext context) {
     final color = Theme.of(context).colorScheme.onSurface;
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 8,
+      top: MediaQuery.paddingOf(context).top + 8,
       right: 8,
       child: TextButton(
         onPressed: _skip,

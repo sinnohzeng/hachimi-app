@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
@@ -308,13 +310,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         ? AchievementStrings.titleName(def.titleReward!, locale)
         : null;
 
-    final confettiColors = [
-      colorScheme.primary,
-      colorScheme.tertiary,
-      colorScheme.error,
-      Colors.amber,
-      colorScheme.secondary,
-    ];
+    final confettiColors = BrandColors.confetti(colorScheme);
 
     final exitBgFade = Tween<double>(
       begin: 1.0,
@@ -385,7 +381,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
 
   Widget _buildBackground(ColorScheme colorScheme) {
     final spotlightCenter = _tier == CelebrationTier.epic
-        ? Color.lerp(colorScheme.primary, Colors.white, 0.15)!
+        ? Color.lerp(colorScheme.primary, CelebrationColors.onOverlay, 0.15)!
         : colorScheme.primary;
 
     return Positioned.fill(
@@ -443,18 +439,18 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         FadeTransition(
           opacity: _headlineFade,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: AppSpacing.paddingHXl,
             child: Text(
               headline,
               style: textTheme.labelLarge?.copyWith(
-                color: Colors.white70,
+                color: CelebrationColors.onOverlayMedium,
                 letterSpacing: 1.2,
               ),
               textAlign: TextAlign.center,
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.base),
 
         // 成就图标（带光环）
         FadeTransition(
@@ -468,7 +464,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.lg),
 
         // 成就名称
         SlideTransition(
@@ -476,12 +472,12 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
           child: FadeTransition(
             opacity: _textFade,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: AppSpacing.paddingHXl,
               child: Text(
                 name,
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: CelebrationColors.onOverlay,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -489,23 +485,25 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
           ),
         ),
         if (desc.isNotEmpty) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           SlideTransition(
             position: textSlide,
             child: FadeTransition(
               opacity: _textFade,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                padding: AppSpacing.paddingHXl,
                 child: Text(
                   desc,
-                  style: textTheme.bodyLarge?.copyWith(color: Colors.white70),
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: CelebrationColors.onOverlayMedium,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
           ),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.lg),
 
         // 金币奖励
         FadeTransition(
@@ -515,7 +513,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
 
         // 称号（如有）
         if (hasTitle && titleName != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           FadeTransition(
             opacity: _rewardFade,
             child: TitleRewardBadge(titleName: titleName, l10n: l10n),
@@ -528,7 +526,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         FadeTransition(
           opacity: _rewardFade,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: AppSpacing.paddingHXl,
             child: SizedBox(
               width: double.infinity,
               height: 52,
@@ -542,21 +540,23 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
 
         // 跳过全部（队列 > 1 时显示）
         if (widget.totalCount > 1) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           TextButton(
             onPressed: _handleSkipAll,
             child: Text(l10n.achievementCelebrationSkipAll),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             l10n.achievementCelebrationCounter(
               widget.currentNumber,
               widget.totalCount,
             ),
-            style: textTheme.labelSmall?.copyWith(color: Colors.white54),
+            style: textTheme.labelSmall?.copyWith(
+              color: CelebrationColors.onOverlayDim,
+            ),
           ),
         ],
-        const SizedBox(height: 32),
+        const SizedBox(height: AppSpacing.xl),
       ],
     );
   }

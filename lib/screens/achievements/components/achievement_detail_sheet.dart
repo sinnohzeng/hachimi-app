@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
+import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/achievement.dart';
@@ -139,7 +141,7 @@ class _DetailContent extends StatelessWidget {
         ),
         _InfoRow(
           icon: Icons.monetization_on,
-          iconColor: Colors.amber.shade700,
+          iconColor: BrandColors.achievementStar,
           text: l10n.achievementRewardCoins(def.coinReward),
         ),
         if (def.titleReward != null)
@@ -177,7 +179,7 @@ class _DetailContent extends StatelessWidget {
                 LinearProgressIndicator(
                   value: progress!.percent,
                   minHeight: 6,
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: AppShape.borderExtraSmall,
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
@@ -192,7 +194,7 @@ class _DetailContent extends StatelessWidget {
         ],
         _InfoRow(
           icon: Icons.monetization_on,
-          iconColor: Colors.amber.shade700,
+          iconColor: BrandColors.achievementStar,
           text: l10n.achievementRewardCoins(def.coinReward),
         ),
       ],

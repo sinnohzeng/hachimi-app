@@ -30,6 +30,7 @@ class AppSpacing {
   // --- Horizontal-only ---
   static const EdgeInsets paddingHBase = EdgeInsets.symmetric(horizontal: base);
   static const EdgeInsets paddingHLg = EdgeInsets.symmetric(horizontal: lg);
+  static const EdgeInsets paddingHXl = EdgeInsets.symmetric(horizontal: xl);
 
   // --- Vertical-only ---
   static const EdgeInsets paddingVXs = EdgeInsets.symmetric(vertical: xs);
@@ -46,6 +47,10 @@ class AppSpacing {
   static const EdgeInsets paddingBottomBase = EdgeInsets.only(bottom: base);
   static const EdgeInsets paddingBottomXl = EdgeInsets.only(bottom: xl);
 
+  // --- Single-side horizontal ---
+  static const EdgeInsets paddingLeftBase = EdgeInsets.only(left: base);
+  static const EdgeInsets paddingRightBase = EdgeInsets.only(right: base);
+
   // --- Common mixed patterns ---
   static const EdgeInsets paddingListTile = EdgeInsets.symmetric(
     horizontal: base,
@@ -60,5 +65,46 @@ class AppSpacing {
   static const EdgeInsets paddingCard = EdgeInsets.symmetric(
     horizontal: base,
     vertical: xs,
+  );
+
+  /// 屏幕内容区 — 水平 base + 顶部 sm。
+  static const EdgeInsets paddingScreenBody = EdgeInsets.fromLTRB(
+    base,
+    sm,
+    base,
+    0,
+  );
+
+  /// 屏幕内容区（带底部安全间距）。
+  static const EdgeInsets paddingScreenBodyFull = EdgeInsets.fromLTRB(
+    base,
+    sm,
+    base,
+    base,
+  );
+
+  /// 紧凑屏幕内容区 — 水平 base + 顶部 xs。
+  static const EdgeInsets paddingScreenBodyCompact = EdgeInsets.fromLTRB(
+    base,
+    xs,
+    base,
+    0,
+  );
+
+  /// 宽松屏幕内容区 — 水平 lg + 顶部 base。
+  static const EdgeInsets paddingScreenBodyWide = EdgeInsets.fromLTRB(
+    lg,
+    base,
+    lg,
+    base,
+  );
+
+  /// 对话框/Sheet 内容区。
+  static const EdgeInsets paddingDialog = EdgeInsets.all(lg);
+
+  /// 紧凑对话框内容区。
+  static const EdgeInsets paddingDialogCompact = EdgeInsets.symmetric(
+    horizontal: lg,
+    vertical: base,
   );
 }

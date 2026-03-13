@@ -26,3 +26,52 @@ class StatusColors {
   static Color onSuccess(Brightness b) =>
       b == Brightness.dark ? const Color(0xFF81C784) : success;
 }
+
+/// 品牌与功能色常量 — 避免在 Widget 中硬编码颜色值。
+class BrandColors {
+  BrandColors._();
+
+  /// Google 品牌色（用于登录按钮渐变等）。
+  static const List<Color> google = [
+    Color(0xFF4285F4), // Blue
+    Color(0xFF34A853), // Green
+    Color(0xFFFBBC05), // Yellow
+    Color(0xFFEA4335), // Red
+    Color(0xFF4285F4), // Blue（闭合渐变）
+  ];
+
+  /// 奖励金色 — 签到、成就等奖励场景。
+  static const Color rewardGold = Color(0xFFFFD700);
+
+  /// 成就星星色 — 成就详情页星标。
+  static const Color achievementStar = Color(0xFFFF8F00); // amber.shade700
+
+  /// 从 ColorScheme 派生的 confetti 颜色。
+  static List<Color> confetti(ColorScheme cs) => [
+    cs.primary,
+    cs.tertiary,
+    cs.secondary,
+    rewardGold,
+    cs.error,
+  ];
+}
+
+/// 庆祝覆盖层颜色 — 用于深色渐变背景上的固定亮色。
+///
+/// 庆祝覆盖层运行在 `colorScheme.primary → scrim` 的深色径向渐变上，
+/// 因此文本和图标使用固定亮色以确保对比度，不随主题变化。
+class CelebrationColors {
+  CelebrationColors._();
+
+  /// 主文本色（覆盖层标题、成就名称）。
+  static const Color onOverlay = Colors.white;
+
+  /// 次要文本色（覆盖层描述、标签）。
+  static const Color onOverlayMedium = Colors.white70;
+
+  /// 弱文本色（计数器等辅助信息）。
+  static const Color onOverlayDim = Colors.white54;
+
+  /// 光环/光晕效果色。
+  static const Color glow = Colors.white;
+}

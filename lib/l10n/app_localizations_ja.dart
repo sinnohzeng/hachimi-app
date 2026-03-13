@@ -2339,4 +2339,16 @@ class SJa extends S {
 
   @override
   String get archiveConflictKeepLocal => 'ローカルを保持';
+
+  @override
+  String get loginShowPassword => 'パスワードを表示';
+
+  @override
+  String get loginHidePassword => 'パスワードを非表示';
+
+  @override
+  String get errorGeneric => '問題が発生しました。しばらくしてからもう一度お試しください';
+
+  @override
+  String get errorCreateHabit => '習慣の作成に失敗しました。もう一度お試しください';
 }

@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -79,9 +80,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
     if (_currentStep == 0) {
       if (_nameController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.adoptionValidQuestName)),
-        );
+        AppFeedback.error(context, context.l10n.adoptionValidQuestName);
         return;
       }
       _generateCats();
@@ -135,9 +134,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
 
   Future<void> _adopt() async {
     if (_catNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.adoptionValidCatName)),
-      );
+      AppFeedback.error(context, context.l10n.adoptionValidCatName);
       return;
     }
 
@@ -151,11 +148,9 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       await _scheduleReminders(result.habitId, result.reminders);
 
       if (mounted) Navigator.of(context).pop(true);
-    } on Exception catch (e) {
+    } on Exception {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.adoptionError(e.toString()))),
-        );
+        AppFeedback.error(context, context.l10n.errorGeneric);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

@@ -1123,5 +1123,10 @@
   "archiveConflictLocal": "Local archive",
   "archiveConflictCloud": "Cloud archive",
   "archiveConflictKeepCloud": "Keep cloud",
-  "archiveConflictKeepLocal": "Keep local"
+  "archiveConflictKeepLocal": "Keep local",
+
+  "loginShowPassword": "Show password",
+  "loginHidePassword": "Hide password",
+  "errorGeneric": "Something went wrong. Try again later",
+  "errorCreateHabit": "Failed to create habit. Try again"
 }

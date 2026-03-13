@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +10,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
-
-import 'components/email_auth_screen.dart';
+import 'package:hachimi_app/core/router/app_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   /// linkMode: 匿名用户关联账号（而非全新登录）。
@@ -56,9 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       if (mounted) {
         final message = mapAuthError(e, context.l10n);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
+        AppFeedback.error(context, message);
       }
     } finally {
       if (mounted) setState(() => _isGoogleLoading = false);
@@ -132,13 +130,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToEmailAuth() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => EmailAuthScreen(
-          linkMode: widget.linkMode,
-          startAsLogin: widget.linkMode,
-        ),
-      ),
+    Navigator.of(context).pushNamed(
+      AppRouter.emailAuth,
+      arguments: {'linkMode': widget.linkMode, 'startAsLogin': widget.linkMode},
     );
   }
 
@@ -226,6 +220,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
                                 width: 20,
                                 height: 20,
+                                semanticLabel: 'Google logo',
                                 errorBuilder: (_, _, _) =>
                                     const Icon(Icons.g_mobiledata, size: 24),
                               ),
@@ -271,12 +266,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             label: context.l10n.loginLogIn,
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => const EmailAuthScreen(
-                                      startAsLogin: true,
-                                    ),
-                                  ),
+                                Navigator.of(context).pushNamed(
+                                  AppRouter.emailAuth,
+                                  arguments: {'startAsLogin': true},
                                 );
                               },
                               child: ExcludeSemantics(
