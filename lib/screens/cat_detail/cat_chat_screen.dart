@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_icon_size.dart';
-import 'package:hachimi_app/core/theme/app_elevation.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
-import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/chat_message.dart';
@@ -13,7 +12,10 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/chat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
-import 'package:hachimi_app/screens/cat_detail/components/message_bubble.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_badge.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_button.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_chat_bubble.dart';
+import 'package:hachimi_app/widgets/pixel_ui/retro_tiled_background.dart';
 
 /// 猫猫聊天页。
 class CatChatScreen extends ConsumerStatefulWidget {
@@ -80,20 +82,19 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.chatTitle(cat.name)),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(24),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Text(
-              context.l10n.chatDailyRemaining(chatState.remainingMessages),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+        title: Text(
+          context.l10n.chatTitle(cat.name),
+          style: context.pixel.pixelTitle,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: PixelBadge(
+              text: context.l10n.chatDailyRemaining(
+                chatState.remainingMessages,
               ),
             ),
           ),
-        ),
-        actions: [
           if (chatState.messages.isNotEmpty)
             PopupMenuButton<String>(
               onSelected: (value) {
@@ -110,28 +111,24 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
             ),
         ],
       ),
-      body: Column(
-        children: [
-          // 消息列表
-          Expanded(
-            child: chatState.status == ChatStatus.loading
-                ? const Center(child: CircularProgressIndicator())
-                : chatState.messages.isEmpty &&
-                      chatState.status != ChatStatus.generating
-                ? _buildEmptyState(textTheme, colorScheme, cat.name)
-                : _buildMessageList(chatState, colorScheme, textTheme),
-          ),
+      body: RetroTiledBackground(
+        pattern: PatternType.crosshatch,
+        child: Column(
+          children: [
+            // 消息列表
+            Expanded(
+              child: chatState.status == ChatStatus.loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : chatState.messages.isEmpty &&
+                        chatState.status != ChatStatus.generating
+                  ? _buildEmptyState(textTheme, colorScheme, cat.name)
+                  : _buildMessageList(chatState),
+            ),
 
-          // 输入区域
-          _buildInputBar(
-            context,
-            chatState,
-            colorScheme,
-            textTheme,
-            cat,
-            habit,
-          ),
-        ],
+            // 输入区域
+            _buildInputBar(context, chatState, cat, habit),
+          ],
+        ),
       ),
     );
   }
@@ -169,11 +166,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     );
   }
 
-  Widget _buildMessageList(
-    ChatState chatState,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
+  Widget _buildMessageList(ChatState chatState) {
     final messages = chatState.messages;
     final isGenerating = chatState.status == ChatStatus.generating;
     final partial = chatState.partialResponse;
@@ -185,20 +178,23 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
       itemBuilder: (context, index) {
         // 流式部分回复
         if (index == messages.length) {
-          return MessageBubble(
-            content: partial,
-            isUser: false,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
+          return Padding(
+            padding: AppSpacing.paddingVXs,
+            child: PixelChatBubble(
+              text: partial,
+              isUser: false,
+              isStreaming: true,
+            ),
           );
         }
 
         final msg = messages[index];
-        return MessageBubble(
-          content: msg.content,
-          isUser: msg.role == ChatRole.user,
-          colorScheme: colorScheme,
-          textTheme: textTheme,
+        return Padding(
+          padding: AppSpacing.paddingVXs,
+          child: PixelChatBubble(
+            text: msg.content,
+            isUser: msg.role == ChatRole.user,
+          ),
         );
       },
     );
@@ -207,19 +203,17 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
   Widget _buildInputBar(
     BuildContext context,
     ChatState chatState,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
     Cat cat,
     Habit? habit,
   ) {
+    final pixel = context.pixel;
+    final colorScheme = Theme.of(context).colorScheme;
     final isGenerating = chatState.status == ChatStatus.generating;
     final atLimit = chatState.remainingMessages <= 0;
     final canSend = habit != null && !isGenerating && !atLimit;
 
-    return Material(
-      elevation: AppElevation.level2,
-      surfaceTintColor: colorScheme.surfaceTint,
-      color: colorScheme.surface,
+    return Container(
+      color: pixel.retroSurface,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -240,11 +234,28 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                         ? context.l10n.chatGenerating
                         : context.l10n.chatTypeMessage,
                     border: OutlineInputBorder(
-                      borderRadius: AppShape.borderExtraLarge,
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: pixel.pixelBorder,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: pixel.pixelBorder,
+                        width: 2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
                     ),
                     filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest,
+                    fillColor: colorScheme.surface,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 10,
@@ -259,30 +270,22 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
 
               // 发送/停止按钮
               if (isGenerating)
-                IconButton(
+                PixelButton(
+                  label: 'Stop',
+                  icon: Icons.stop,
+                  backgroundColor: colorScheme.errorContainer,
+                  foregroundColor: colorScheme.onErrorContainer,
                   onPressed: () {
                     ref
                         .read(chatNotifierProvider(widget.catId).notifier)
                         .stopGeneration();
                   },
-                  icon: const Icon(Icons.stop),
-                  tooltip: 'Stop',
-                  style: IconButton.styleFrom(
-                    backgroundColor: colorScheme.errorContainer,
-                    foregroundColor: colorScheme.onErrorContainer,
-                  ),
                 )
               else
-                IconButton(
+                PixelButton(
+                  label: 'Send',
+                  icon: Icons.send,
                   onPressed: canSend ? () => _send(cat, habit) : null,
-                  icon: const Icon(Icons.send),
-                  tooltip: 'Send',
-                  style: IconButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    disabledBackgroundColor:
-                        colorScheme.surfaceContainerHighest,
-                  ),
                 ),
             ],
           ),

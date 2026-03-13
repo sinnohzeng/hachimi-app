@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/ai_provider.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_badge.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
@@ -300,10 +302,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       title: AnimatedOpacity(
         opacity: _showAppBarTitle ? 1.0 : 0.0,
         duration: AppMotion.durationShort2,
-        child: Text(
-          cat.name,
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
+        child: Text(cat.name, style: context.pixel.pixelTitle),
       ),
       actions: _buildAppBarActions(context, cat),
       flexibleSpace: FlexibleSpaceBar(
@@ -385,6 +384,8 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
+    final pixel = context.pixel;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -393,19 +394,15 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         const SizedBox(height: AppSpacing.sm),
         Text(
           cat.name,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
+          style: pixel.pixelName.copyWith(color: colorScheme.onSurface),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xs),
         if (personality != null)
-          Text(
-            '${personality.emoji} ${context.l10n.personalityName(personality.id)}',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+          PixelBadge(
+            text: context.l10n.personalityName(personality.id),
+            icon: Text(personality.emoji, style: const TextStyle(fontSize: 12)),
+            animate: true,
           ),
       ],
     );
@@ -443,18 +440,12 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
     TextTheme textTheme,
   ) {
     return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: colorScheme.tertiaryContainer,
-          borderRadius: AppShape.borderLarge,
-        ),
-        child: Text(
-          '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-          style: textTheme.labelLarge?.copyWith(
-            color: colorScheme.onTertiaryContainer,
-          ),
-        ),
+      child: PixelBadge(
+        text: context.l10n.moodName(moodData.id),
+        icon: Text(moodData.emoji, style: const TextStyle(fontSize: 14)),
+        backgroundColor: colorScheme.tertiaryContainer,
+        textColor: colorScheme.onTertiaryContainer,
+        animate: true,
       ),
     );
   }

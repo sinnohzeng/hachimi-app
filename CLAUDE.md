@@ -103,6 +103,15 @@ lib/
 - Build with AI (env file): `flutter run --dart-define-from-file=.env`
 - Build with AI (manual): `flutter build apk --release --dart-define=MINIMAX_API_KEY=xxx --dart-define=GEMINI_API_KEY=xxx`
 - Tag release: `git tag -a v<VERSION> -m "v<VERSION>: <description>" && git push origin main --tags`
+- Check device status: `scripts/adb-debug.sh status`
+- Read device logs: `scripts/adb-debug.sh logs [--lines N] [--level W|E] [--tag TAG]`
+- Read errors only: `scripts/adb-debug.sh errors`
+- Read crash trace: `scripts/adb-debug.sh crash`
+- Clear device logs: `scripts/adb-debug.sh clear`
+- Start log collector: `scripts/adb-debug.sh start-bg`
+- Stop log collector: `scripts/adb-debug.sh stop-bg`
+- Install debug APK: `scripts/adb-debug.sh install`
+- Device screenshot: `scripts/adb-debug.sh screenshot`
 
 ## Key Gotchas
 

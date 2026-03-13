@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -21,6 +22,10 @@ import 'package:hachimi_app/providers/coin_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/screens/cat_detail/cat_detail_screen.dart';
 import 'package:hachimi_app/screens/cat_room/components/archived_cats_section.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_badge.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_coin_display.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_progress_bar.dart';
+import 'package:hachimi_app/widgets/pixel_ui/retro_tiled_background.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/skeleton_loader.dart';
@@ -47,16 +52,19 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(context, theme, outerScaffold),
-      body: activeCatsAsync.when(
-        loading: () => const SkeletonGrid(),
-        error: (e, _) => ErrorState(
-          message: context.l10n.catRoomLoadError,
-          onRetry: () => ref.invalidate(catsProvider),
+      body: RetroTiledBackground(
+        pattern: PatternType.dots,
+        child: activeCatsAsync.when(
+          loading: () => const SkeletonGrid(),
+          error: (e, _) => ErrorState(
+            message: context.l10n.catRoomLoadError,
+            onRetry: () => ref.invalidate(catsProvider),
+          ),
+          data: (activeCats) {
+            final archivedCats = _extractArchivedCats(allCatsAsync);
+            return _buildBody(context, activeCats, archivedCats);
+          },
         ),
-        data: (activeCats) {
-          final archivedCats = _extractArchivedCats(allCatsAsync);
-          return _buildBody(context, activeCats, archivedCats);
-        },
       ),
     );
   }
@@ -107,6 +115,8 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
     ThemeData theme,
     ScaffoldState? outerScaffold,
   ) {
+    final pixel = context.pixel;
+
     return AppBar(
       leading: outerScaffold != null
           ? IconButton(
@@ -115,27 +125,12 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
               tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
             )
           : null,
-      title: Text(context.l10n.catRoomTitle),
+      title: Text(context.l10n.catRoomTitle, style: pixel.pixelTitle),
       actions: [
         Padding(
           padding: const EdgeInsetsDirectional.only(end: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.monetization_on,
-                size: 20,
-                color: theme.colorScheme.tertiary,
-                semanticLabel: 'Coins',
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                '${ref.watch(coinBalanceProvider).value ?? 0}',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          child: PixelCoinDisplay(
+            amount: ref.watch(coinBalanceProvider).value ?? 0,
           ),
         ),
         IconButton(
@@ -453,8 +448,7 @@ class _CatHouseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
+    final pixel = context.pixel;
     final stageClr = stageColor(cat.displayStage);
 
     return Semantics(
@@ -472,14 +466,14 @@ class _CatHouseCard extends StatelessWidget {
               TappableCatSprite(cat: cat, size: 80, enableTap: false),
               const SizedBox(height: AppSpacing.xs),
 
-              // Name + habit (flexible to prevent overflow)
+              // Name + habit
               Flexible(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       cat.name,
-                      style: textTheme.titleSmall?.copyWith(
+                      style: pixel.pixelHeading.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
@@ -490,8 +484,8 @@ class _CatHouseCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           habitName!,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -502,25 +496,20 @@ class _CatHouseCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
 
-              // Growth progress bar
-              ClipRRect(
-                borderRadius: AppShape.borderExtraSmall,
-                child: LinearProgressIndicator(
-                  value: cat.growthProgress,
-                  minHeight: 6,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation(stageClr),
-                ),
+              // Pixel progress bar
+              PixelProgressBar(
+                value: cat.growthProgress,
+                segments: 10,
+                filledColor: stageClr,
+                height: 10,
               ),
               const SizedBox(height: AppSpacing.xs),
 
-              // Stage label
-              Text(
-                context.l10n.stageName(cat.displayStage),
-                style: textTheme.labelSmall?.copyWith(
-                  color: stageClr,
-                  fontWeight: FontWeight.w600,
-                ),
+              // Stage badge
+              PixelBadge(
+                text: context.l10n.stageName(cat.displayStage),
+                backgroundColor: stageClr.withValues(alpha: 0.15),
+                textColor: stageClr,
               ),
             ],
           ),

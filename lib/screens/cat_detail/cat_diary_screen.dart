@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_icon_size.dart';
-import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/diary_provider.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_diary_entry.dart';
+import 'package:hachimi_app/widgets/pixel_ui/retro_tiled_background.dart';
 import 'package:intl/intl.dart';
 
 /// 猫猫日记列表页。
@@ -28,129 +30,89 @@ class CatDiaryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           context.l10n.diaryTitle(cat?.name ?? context.l10n.fallbackCatName),
+          style: context.pixel.pixelTitle,
         ),
       ),
-      body: diaryAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: AppSpacing.base),
-              Text(context.l10n.diaryLoadFailed, style: textTheme.bodyLarge),
-              const SizedBox(height: AppSpacing.sm),
-              TextButton.icon(
-                onPressed: () => ref.invalidate(diaryEntriesProvider(catId)),
-                icon: const Icon(Icons.refresh),
-                label: Text(context.l10n.commonRetry),
-              ),
-            ],
-          ),
-        ),
-        data: (entries) {
-          if (entries.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: AppSpacing.paddingXl,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '📖',
-                      style: TextStyle(fontSize: AppIconSize.emoji),
-                    ),
-                    const SizedBox(height: AppSpacing.base),
-                    Text(
-                      context.l10n.diaryEmptyTitle,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      context.l10n.diaryEmptyHint,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+      body: RetroTiledBackground(
+        pattern: PatternType.diagonal,
+        child: diaryAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: colorScheme.onSurfaceVariant,
                 ),
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: AppSpacing.paddingBase,
-            itemCount: entries.length,
-            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-            itemBuilder: (context, index) {
-              final entry = entries[index];
-              final moodData = moodById(entry.mood);
-              final personality = personalityMap[entry.personality];
-
-              return Card(
+                const SizedBox(height: AppSpacing.base),
+                Text(context.l10n.diaryLoadFailed, style: textTheme.bodyLarge),
+                const SizedBox(height: AppSpacing.sm),
+                TextButton.icon(
+                  onPressed: () => ref.invalidate(diaryEntriesProvider(catId)),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(context.l10n.commonRetry),
+                ),
+              ],
+            ),
+          ),
+          data: (entries) {
+            if (entries.isEmpty) {
+              return Center(
                 child: Padding(
-                  padding: AppSpacing.paddingBase,
+                  padding: AppSpacing.paddingXl,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // 日期 + 心情
-                      Row(
-                        children: [
-                          Text(
-                            _formatDate(entry.date, context),
-                            style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.tertiaryContainer,
-                              borderRadius: AppShape.borderMedium,
-                            ),
-                            child: Text(
-                              '${moodData.emoji} ${context.l10n.moodName(moodData.id)}',
-                              style: textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onTertiaryContainer,
-                              ),
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        '📖',
+                        style: TextStyle(fontSize: AppIconSize.emoji),
                       ),
-                      if (personality != null) ...[
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          '${personality.emoji} ${context.l10n.personalityName(personality.id)} · ${context.l10n.stageName(entry.stage)}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: AppSpacing.md),
-
-                      // 日记正文
+                      const SizedBox(height: AppSpacing.base),
                       Text(
-                        entry.content,
-                        style: textTheme.bodyMedium?.copyWith(height: 1.5),
+                        context.l10n.diaryEmptyTitle,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        context.l10n.diaryEmptyHint,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
               );
-            },
-          );
-        },
+            }
+
+            return ListView.separated(
+              padding: AppSpacing.paddingBase,
+              itemCount: entries.length,
+              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+              itemBuilder: (context, index) {
+                final entry = entries[index];
+                final moodData = moodById(entry.mood);
+                final personality = personalityMap[entry.personality];
+
+                return PixelDiaryEntry(
+                  date: _formatDate(entry.date, context),
+                  content: entry.content,
+                  moodEmoji: moodData.emoji,
+                  moodName: context.l10n.moodName(moodData.id),
+                  personality: personality != null
+                      ? '${personality.emoji} ${context.l10n.personalityName(personality.id)}'
+                      : null,
+                  stage: context.l10n.stageName(entry.stage),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

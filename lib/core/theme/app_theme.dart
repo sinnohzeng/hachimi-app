@@ -6,6 +6,7 @@ import 'app_breakpoints.dart';
 import 'app_elevation.dart';
 import 'app_shape.dart';
 import 'app_spacing.dart';
+import 'pixel_theme_extension.dart';
 
 /// App Theme — Single Source of Truth for all UI styling.
 /// All screens and widgets MUST use Theme.of(context) to access colors and text styles.
@@ -62,6 +63,9 @@ class AppTheme {
   }
 
   static ThemeData _buildTheme(ColorScheme colorScheme, TextTheme textTheme) {
+    final pixelExt = colorScheme.brightness == Brightness.dark
+        ? PixelThemeExtension.dark(colorScheme)
+        : PixelThemeExtension.light(colorScheme);
     // M3 Typography 微调 — Display/Headline 级别收紧字间距。
     final refinedTextTheme = textTheme.copyWith(
       displayLarge: textTheme.displayLarge?.copyWith(letterSpacing: -0.25),
@@ -71,6 +75,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      extensions: [pixelExt],
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
       textTheme: refinedTextTheme,

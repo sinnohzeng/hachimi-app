@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hachimi_app/core/theme/app_icon_size.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
-import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/diary_provider.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_card.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_section_header.dart';
 
 /// 日记预览卡片 — 展示今日日记摘要，点击进入日记列表。
 class DiaryPreviewCard extends ConsumerWidget {
@@ -20,75 +20,60 @@ class DiaryPreviewCard extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final todayDiary = ref.watch(todayDiaryProvider(catId));
 
-    return Card(
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).pushNamed(AppRouter.catDiary, arguments: catId);
-        },
-        borderRadius: AppShape.borderMedium,
-        child: Padding(
-          padding: AppSpacing.paddingBase,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return PixelCard(
+      onTap: () {
+        Navigator.of(context).pushNamed(AppRouter.catDiary, arguments: catId);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  const ExcludeSemantics(
-                    child: Text(
-                      '\u{1F4D6}',
-                      style: TextStyle(fontSize: AppIconSize.emojiSmall),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    context.l10n.catDetailDiaryTitle,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.chevron_right,
-                    color: colorScheme.onSurfaceVariant,
-                    semanticLabel: context.l10n.catDetailDiaryTitle,
-                  ),
-                ],
+              PixelSectionHeader(
+                title: context.l10n.catDetailDiaryTitle,
+                icon: Icons.auto_stories,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              todayDiary.when(
-                loading: () => Text(
-                  context.l10n.catDetailDiaryLoading,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                error: (_, _) => Text(
-                  context.l10n.catDetailDiaryError,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                data: (entry) {
-                  if (entry == null) {
-                    return Text(
-                      context.l10n.catDetailDiaryEmpty,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    );
-                  }
-                  return Text(
-                    entry.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(height: 1.4),
-                  );
-                },
+              const Spacer(),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+                semanticLabel: context.l10n.catDetailDiaryTitle,
               ),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          todayDiary.when(
+            loading: () => Text(
+              context.l10n.catDetailDiaryLoading,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            error: (_, _) => Text(
+              context.l10n.catDetailDiaryError,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            data: (entry) {
+              if (entry == null) {
+                return Text(
+                  context.l10n.catDetailDiaryEmpty,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                );
+              }
+              return Text(
+                entry.content,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodyMedium?.copyWith(height: 1.4),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

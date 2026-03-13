@@ -4,12 +4,16 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:hachimi_app/l10n/appearance_l10n.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/cat_appearance.dart';
-import 'package:hachimi_app/widgets/stage_milestone.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_card.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_milestone.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_progress_bar.dart';
+import 'package:hachimi_app/widgets/pixel_ui/pixel_section_header.dart';
 
 /// About card — personality, appearance summary, expandable details, status.
 class EnhancedCatInfoCard extends StatelessWidget {
@@ -27,90 +31,83 @@ class EnhancedCatInfoCard extends StatelessWidget {
     final a = cat.appearance;
     final summary = l10n.fullAppearanceSummary(a);
 
-    return Card(
-      child: Padding(
-        padding: AppSpacing.paddingBase,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return PixelCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PixelSectionHeader(
+            title: context.l10n.catDetailAbout(cat.name),
+            icon: Icons.info_outline,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Growth progress
+          _GrowthSection(cat: cat),
+          const Divider(height: 24),
+
+          // Personality
+          if (personality != null) ...[
+            Row(
+              children: [
+                Text(
+                  '${personality.emoji} ',
+                  style: const TextStyle(fontSize: AppIconSize.emojiSmall),
+                ),
+                Text(
+                  l10n.personalityName(personality.id),
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
             Text(
-              context.l10n.catDetailAbout(cat.name),
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              l10n.personalityFlavor(personality.id),
+              style: textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-
-            // Growth progress
-            _GrowthSection(cat: cat),
-            const Divider(height: 24),
-
-            // Personality
-            if (personality != null) ...[
-              Row(
-                children: [
-                  Text(
-                    '${personality.emoji} ',
-                    style: const TextStyle(fontSize: AppIconSize.emojiSmall),
-                  ),
-                  Text(
-                    l10n.personalityName(personality.id),
-                    style: textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                l10n.personalityFlavor(personality.id),
-                style: textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
-
-            // Summary line
-            Container(
-              width: double.infinity,
-              padding: AppSpacing.paddingMd,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.5,
-                ),
-                borderRadius: AppShape.borderSmall,
-              ),
-              child: Text(summary, style: textTheme.bodyMedium),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
-            // Expandable appearance details
-            Theme(
-              data: theme.copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                title: Text(
-                  context.l10n.catDetailAppearanceDetails,
-                  style: textTheme.labelLarge,
-                ),
-                tilePadding: EdgeInsets.zero,
-                childrenPadding: EdgeInsets.zero,
-                children: _buildAppearanceDetails(context, a),
-              ),
-            ),
-
-            const Divider(height: 24),
-            InfoRow(
-              label: context.l10n.catDetailStatus,
-              value: cat.state[0].toUpperCase() + cat.state.substring(1),
-            ),
-            InfoRow(
-              label: context.l10n.catDetailAdopted,
-              value: _formatDate(cat.createdAt),
-            ),
           ],
-        ),
+
+          // Summary line
+          Container(
+            width: double.infinity,
+            padding: AppSpacing.paddingMd,
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: AppShape.borderSmall,
+            ),
+            child: Text(summary, style: textTheme.bodyMedium),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Expandable appearance details
+          Theme(
+            data: theme.copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              title: Text(
+                context.l10n.catDetailAppearanceDetails,
+                style: textTheme.labelLarge,
+              ),
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              children: _buildAppearanceDetails(context, a),
+            ),
+          ),
+
+          const Divider(height: 24),
+          InfoRow(
+            label: context.l10n.catDetailStatus,
+            value: cat.state[0].toUpperCase() + cat.state.substring(1),
+          ),
+          InfoRow(
+            label: context.l10n.catDetailAdopted,
+            value: _formatDate(cat.createdAt),
+          ),
+        ],
       ),
     );
   }
@@ -264,8 +261,7 @@ class _GrowthSection extends StatelessWidget {
   }
 
   Widget _buildProgressHeader(BuildContext context, Color stageClr) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final pixel = context.pixel;
 
     return Column(
       children: [
@@ -273,14 +269,12 @@ class _GrowthSection extends StatelessWidget {
           children: [
             Text(
               context.l10n.catDetailGrowthTitle,
-              style: textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: pixel.pixelHeading.copyWith(fontWeight: FontWeight.bold),
             ),
             const Spacer(),
             Text(
               context.l10n.stageName(cat.displayStage),
-              style: textTheme.labelLarge?.copyWith(
+              style: pixel.pixelLabel.copyWith(
                 color: stageClr,
                 fontWeight: FontWeight.bold,
               ),
@@ -288,18 +282,11 @@ class _GrowthSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
-        ClipRRect(
-          borderRadius: AppShape.borderSmall,
-          child: LinearProgressIndicator(
-            value: cat.growthProgress,
-            minHeight: 10,
-            backgroundColor: colorScheme.outlineVariant.withValues(
-              alpha: Theme.of(context).brightness == Brightness.dark
-                  ? 0.8
-                  : 0.5,
-            ),
-            valueColor: AlwaysStoppedAnimation(stageClr),
-          ),
+        PixelProgressBar(
+          value: cat.growthProgress,
+          segments: 20,
+          filledColor: stageClr,
+          height: 12,
         ),
       ],
     );
@@ -329,29 +316,19 @@ class _GrowthSection extends StatelessWidget {
   }
 
   Widget _buildMilestones(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        StageMilestone(
-          name: context.l10n.stageKitten,
-          isReached: true,
-          color: stageColor('kitten'),
-        ),
-        StageMilestone(
-          name: context.l10n.stageAdolescent,
-          isReached: stageOrder(cat.displayStage) >= 1,
-          color: stageColor('adolescent'),
-        ),
-        StageMilestone(
-          name: context.l10n.stageAdult,
-          isReached: stageOrder(cat.displayStage) >= 2,
-          color: stageColor('adult'),
-        ),
-        StageMilestone(
-          name: context.l10n.stageSenior,
-          isReached: stageOrder(cat.displayStage) >= 3,
-          color: stageColor('senior'),
-        ),
+    return PixelMilestone(
+      stages: [
+        context.l10n.stageKitten,
+        context.l10n.stageAdolescent,
+        context.l10n.stageAdult,
+        context.l10n.stageSenior,
+      ],
+      currentIndex: stageOrder(cat.displayStage),
+      stageColors: [
+        stageColor('kitten'),
+        stageColor('adolescent'),
+        stageColor('adult'),
+        stageColor('senior'),
       ],
     );
   }
