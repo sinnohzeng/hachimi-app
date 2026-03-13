@@ -38,7 +38,8 @@ class _SteppedOpacity extends Animation<double>
 
   @override
   double get value {
-    final t = parent.value;
+    // clamp 防御弹性曲线/物理模拟的越界值
+    final t = parent.value.clamp(0.0, 1.0);
     if (t < 0.25) return 0.0;
     if (t < 0.5) return 0.33;
     if (t < 0.75) return 0.66;

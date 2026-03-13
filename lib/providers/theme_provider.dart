@@ -60,7 +60,9 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     final styleIndex = prefs.getInt(_keyUiStyle);
 
     return ThemeSettings(
-      mode: modeIndex != null ? ThemeMode.values[modeIndex] : ThemeMode.system,
+      mode: modeIndex != null && modeIndex < ThemeMode.values.length
+          ? ThemeMode.values[modeIndex]
+          : ThemeMode.system,
       seedColor: colorValue != null
           ? Color(colorValue)
           : AppTheme.defaultSeedColor,
