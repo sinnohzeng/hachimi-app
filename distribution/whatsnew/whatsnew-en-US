@@ -1,5 +1,6 @@
-v2.31.4
+v2.32.1
 
-- Fixed: Logging out no longer gets stuck on a loading screen — you can now sign back in immediately
-- Fixed: Guest-to-account upgrade no longer fails with a database conflict error
-- Improved: Returning users skip the onboarding tutorial after logging out — jump straight back in
+- New: Switch between Material 3 and Retro Pixel visual styles in Settings
+- New: Pixel-art UI — stepped borders, segmented progress rings, rectangular toggles, retro page transitions
+- Improved: Background pattern renders as a cached texture for smoother scrolling
+- Fixed: App no longer crashes on startup if theme preferences are corrupted

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.32.1] - 2026-03-13
+
+### Fixed
+- **ThemeMode 反序列化越界防御**：SharedPreferences 存储的主题模式索引越界时不再导致启动崩溃，与 AppUiStyle 采用一致的 bounds check 策略
+- **页面转场动画值 clamp**：防御弹性曲线或物理模拟产生的越界动画值（<0 或 >1），避免 debug 模式下 FadeTransition assert 失败
+
 ## [2.32.0] - 2026-03-13
 
 ### Added
