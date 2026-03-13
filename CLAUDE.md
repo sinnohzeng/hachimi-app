@@ -50,6 +50,31 @@ Screens → Providers → Services → Firebase SDK
 - Providers orchestrate Services and expose reactive state — never access Firebase SDK directly
 - Services encapsulate all Firebase SDK interactions — no UI code, no BuildContext
 
+## Architecture Overview
+
+State management: **Riverpod 3.x** (`StreamProvider`, `FutureProvider`, `StateNotifierProvider`)
+
+```
+lib/
+├── main.dart / app.dart          # Entry point & app root
+├── core/                         # Infrastructure layer
+│   ├── ai/                       # AI provider interface & config
+│   ├── backend/                  # Backend abstraction layer (8 interfaces)
+│   ├── constants/                # App-wide constants & metadata
+│   ├── observability/            # Logging, correlation IDs, error context
+│   ├── router/                   # GoRouter route definitions
+│   ├── theme/                    # Material 3 design tokens
+│   └── utils/                    # Shared utilities
+├── models/                       # Data models (13 files)
+├── providers/                    # Riverpod providers (22 files)
+├── services/                     # Business logic & Firebase SDK (29 files)
+│   ├── firebase/                 # Firebase backend implementations
+│   └── ai/                       # AI provider implementations
+├── screens/                      # Feature screens (14 modules)
+├── widgets/                      # Reusable components (36 files)
+└── l10n/                         # ARB localization files
+```
+
 ## Environment
 
 - Flutter: 3.41.x stable, Dart: 3.11.x
@@ -64,6 +89,7 @@ Screens → Providers → Services → Firebase SDK
 - Resolve deps: `flutter pub get`
 - Analyze: `dart analyze lib/`
 - Auto-fix lint: `dart fix --apply`
+- Format code: `dart format lib/ test/`
 - Run tests: `flutter test`
 - Update goldens: `flutter test --update-goldens`
 - Build debug APK: `flutter build apk --debug`
@@ -88,33 +114,9 @@ Screens → Providers → Services → Firebase SDK
 - Firestore security rules must be deployed before the app can read/write data
 - Pre-commit version check: `scripts/pre-commit-version-check.sh` warns if pubspec version matches latest tag (forgot to bump)
 
-## 开发工作流（强制执行）
+## Testing
 
-### Plan-Review-Implement 三阶段流程
-
-所有涉及 3 个以上文件变更的任务，必须遵循以下流程：
-
-**阶段一：规划（Plan）**
-- 进入 Plan Mode，分析需求，研读相关代码
-- 制定详细实现计划，包括：文件变更清单、技术方案、依赖关系、测试策略
-- 使用 ultrathink 关键字确保深度推理
-
-**阶段二：审查（Review）**
-- 计划完成后，自动调用 architect-reviewer 子 Agent 进行审查
-- 或由开发者手动执行 /review-plan
-- 审查必须达到 🟢 评级才能进入实现阶段
-- 如果评级为 🟡 或 🔴，根据审查报告修改计划后重新审查
-
-**阶段三：实现（Implement）**
-- 切换到 Normal Mode 开始编码
-- 每完成一个逻辑单元立即提交 commit
-- 实现完成后运行测试确保通过
-- 复杂变更完成后建议再次请求代码审查
-
-### 代码质量标准
-- 写有品味的代码：简洁、可读、可维护
-- 变量和函数命名要有语义，避免缩写
-- 每个函数职责单一，不超过 30 行（参见 `.claude/rules/03-code-quality-thresholds.md`）
-- 错误处理不能吞异常，不能用默认值掩盖问题
-- 所有公开 API 必须有注释
-- commit message 遵循 Conventional Commits 规范
+- Tests mirror `lib/` structure: `test/{core,models,providers,screens,services,widgets}/`
+- Golden files: `test/widgets/goldens/` — tagged `['golden']`, update with `flutter test --update-goldens`
+- Provider tests use `ProviderContainer(overrides: [...])` — no mockito
+- Firebase mocking: `setupFirebaseCoreMocks()` from `firebase_core_platform_interface`
