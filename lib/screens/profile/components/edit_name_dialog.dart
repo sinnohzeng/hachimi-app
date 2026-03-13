@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
@@ -71,21 +72,11 @@ Future<void> _saveName(
 
     if (ctx.mounted) {
       Navigator.of(ctx).pop();
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        SnackBar(
-          content: Text(l10n.profileSaved),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppFeedback.success(ctx, l10n.profileSaved);
     }
   } catch (_) {
     if (ctx.mounted) {
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        SnackBar(
-          content: Text(l10n.commonError),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppFeedback.error(ctx, l10n.commonError);
     }
   }
 }

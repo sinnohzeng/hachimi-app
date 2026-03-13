@@ -51,7 +51,27 @@ class BrandColors {
         cs.primary,
         cs.tertiary,
         cs.secondary,
-        Colors.amber,
-        Colors.pink,
+        rewardGold,
+        cs.error,
       ];
+}
+
+/// 庆祝覆盖层颜色 — 用于深色渐变背景上的固定亮色。
+///
+/// 庆祝覆盖层运行在 `colorScheme.primary → scrim` 的深色径向渐变上，
+/// 因此文本和图标使用固定亮色以确保对比度，不随主题变化。
+class CelebrationColors {
+  CelebrationColors._();
+
+  /// 主文本色（覆盖层标题、成就名称）。
+  static const Color onOverlay = Colors.white;
+
+  /// 次要文本色（覆盖层描述、标签）。
+  static const Color onOverlayMedium = Colors.white70;
+
+  /// 弱文本色（计数器等辅助信息）。
+  static const Color onOverlayDim = Colors.white54;
+
+  /// 光环/光晕效果色。
+  static const Color glow = Colors.white;
 }

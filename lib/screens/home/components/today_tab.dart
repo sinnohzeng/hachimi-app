@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -72,7 +74,7 @@ class TodayTab extends ConsumerWidget {
             // Section header
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: AppSpacing.paddingSection,
                 child: Text(
                   l10n.todayYourQuests,
                   style: textTheme.titleMedium?.copyWith(
@@ -239,12 +241,7 @@ class TodayTab extends ConsumerWidget {
               }
               if (ctx.mounted) {
                 Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.todayQuestCompleted(habitName)),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                AppFeedback.success(ctx, l10n.todayQuestCompleted(habitName));
               }
             },
             child: Text(l10n.commonDelete),

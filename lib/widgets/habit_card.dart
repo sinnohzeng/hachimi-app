@@ -63,7 +63,7 @@ class _HabitCardState extends State<HabitCard> {
         label: '${habit.name}, ${habit.progressText}',
         button: true,
         child: Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          margin: AppSpacing.paddingCard,
           child: GestureDetector(
             onTapDown: _onTapDown,
             onTapUp: _onTapUp,
