@@ -274,6 +274,12 @@
   "settingsBackgroundAnimation": "アニメーション背景",
   "settingsBackgroundAnimationSubtitle": "メッシュグラデーションと浮遊パーティクル",
 
+  "settingsUiStyle": "UIスタイル",
+  "settingsUiStyleMaterial": "Material 3",
+  "settingsUiStyleRetroPixel": "レトロピクセル",
+  "settingsUiStyleMaterialSubtitle": "モダンな丸角マテリアルデザイン",
+  "settingsUiStyleRetroPixelSubtitle": "あたたかいピクセルアートスタイル",
+
   "personalityLazy": "のんびり屋",
   "personalityCurious": "好奇心旺盛",
   "personalityPlayful": "遊び好き",

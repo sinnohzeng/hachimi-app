@@ -12,6 +12,7 @@ import 'package:hachimi_app/screens/achievements/components/achievement_detail_s
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/screens/achievements/components/achievement_summary.dart';
 import 'package:hachimi_app/screens/achievements/components/overview_tab.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 
 /// 成就页面 — 底部导航 Tab 2，替代原 StatsScreen。
@@ -44,7 +45,7 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen>
     final l10n = context.l10n;
     final outerScaffold = Scaffold.maybeOf(context);
 
-    return Scaffold(
+    return AppScaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(

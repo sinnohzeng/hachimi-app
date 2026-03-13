@@ -109,6 +109,43 @@ Each cat is limited to **5 chat messages per day**, enforced via `getRemainingMe
 - Defense-in-depth: service-layer guard rejects messages at limit + UI disables the send button.
 - The limit is configurable via RemoteConfig (`chat_daily_limit`, default: 5).
 
+## Theme State — Dual UI Style
+
+### ThemeSettings
+
+`ThemeSettings` (in `theme_provider.dart`) holds all theme-related state:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `mode` | `ThemeMode` | `system` | Light/dark/system |
+| `seedColor` | `Color` | `#4285F4` | M3 seed color |
+| `useDynamicColor` | `bool` | `true` | Material You wallpaper color |
+| `enableBackgroundAnimation` | `bool` | `true` | Mesh gradient + particles |
+| `uiStyle` | `AppUiStyle` | `retroPixel` | `material` or `retroPixel` |
+
+`effectiveDynamicColor` forces `false` when `uiStyle == retroPixel` — the retro palette IS the brand identity.
+
+### ThemeSkin Strategy Pattern
+
+`AppTheme._assemble()` delegates all component theming to a `ThemeSkin` implementation:
+
+```
+ThemeSettings.uiStyle → _skinFor(style) → MaterialSkin | RetroPixelSkin
+                                              ↓
+                                    _assemble(colorScheme, textTheme, skin)
+                                              ↓
+                                    ThemeData (zero branching)
+```
+
+- `MaterialSkin` — extracted from original `_buildTheme()`, zero behavioral change.
+- `RetroPixelSkin` — maps retro colors onto `ColorScheme` slots, applies `PixelBorderShape` to all component themes, Silkscreen font for display text, stepped page transitions.
+
+Key files: `lib/core/theme/skins/{theme_skin,material_skin,retro_pixel_skin}.dart`
+
+### AppScaffold
+
+`AppScaffold` (in `lib/widgets/app_scaffold.dart`) wraps `Scaffold` and conditionally overlays `RetroTiledBackground` in retro mode. All screens use `AppScaffold` instead of `Scaffold` — single integration point for 23+ screens.
+
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Navigation side-effects must be handled by listeners/effects, not inside `build()`.

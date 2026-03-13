@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
@@ -235,7 +236,7 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     final colorScheme = theme.colorScheme;
     final step1 = _step1Key.currentState;
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         title: Text(
           widget.isFirstHabit

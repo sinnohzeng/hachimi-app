@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +37,7 @@ class InventoryScreen extends ConsumerWidget {
       }
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(context.l10n.inventoryTitle)),
       body: ListView(
         padding: AppSpacing.paddingBase,

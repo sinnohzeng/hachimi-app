@@ -18,6 +18,7 @@ import 'package:hachimi_app/providers/user_profile_provider.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/logout_confirmation.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
@@ -42,7 +43,7 @@ class ProfileScreen extends ConsumerWidget {
         user?.email?.split('@').first ??
         l10n.profileFallbackUser;
 
-    return Scaffold(
+    return AppScaffold(
       body: ContentWidthConstraint(
         child: CustomScrollView(
           slivers: [

@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.32.0] - 2026-03-13
+
+### Added
+- **双 UI 风格切换**：新增 Material 3 与复古像素（Retro Pixel）两种视觉风格，可在设置中一键切换
+- **ThemeSkin 策略模式**：`MaterialSkin` / `RetroPixelSkin` 通过策略接口消除主题构建中的条件分支，遵循开闭原则
+- **PixelBorderShape**：自定义 `OutlinedBorder` 子类，注入 ThemeData 组件主题级联，一个类替代 7+ 个包装组件
+- **AppScaffold**：统一 Scaffold 包装器，在复古模式下自动叠加 `RetroTiledBackground`，23+ 个屏幕的唯一集成点
+- **像素风专属组件**：`PixelSwitch`（矩形开关）、`PixelSkeletonLoader`（脉冲虚线骨架屏）、`PixelLoadingIndicator`（4 帧阶梯旋转）、`PixelProgressRing`（12 段离散弧）
+- **像素风页面转场**：`PixelPageTransitionsBuilder` 实现 4 级阶梯透明度交叉淡入，模拟 8-bit 屏幕切换
+- **SectionHeader 风格感知**：设置页分组标题在复古模式下自动切换为像素字体 + "━━━" 装饰线
+
+### Changed
+- **RetroTiledBackground 性能优化**：从 static 缓存重构为 StatefulWidget 实例缓存，GPU 纹理与 widget 生命周期绑定，正确 dispose 防止内存泄漏；新增 4096px 尺寸上限和 toImageSync 异常防御
+- **PixelThemeExtension 新增 isRetro 标志**：组件可通过 `pixelExt.isRetro` 判断当前风格，替代脆弱的字体名检测
+- **语义色映射**：复古配色映射到 `ColorScheme` 槽位，所有 Material 组件零改动自动适配
+- **FadeTransition 替代 Opacity**：页面转场使用 `_SteppedOpacity` 动画代理 + `FadeTransition`，避免创建额外合成层
+
+### Removed
+- 自定义 `lerpDouble` 函数（冗余，改用 `dart:ui.lerpDouble`）
+- 手写牛顿法 `_sqrt`（改用 `dart:math.sqrt`）
+
 ## [2.31.4] - 2026-03-13
 
 ### Fixed

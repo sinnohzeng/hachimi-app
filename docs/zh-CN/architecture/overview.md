@@ -81,6 +81,20 @@ Screens -> Providers -> Services -> Backend 抽象 -> Firebase SDK / Cloud Funct
 - **依赖**：`activity-ktx:1.10.1`、`material:1.12.0`（在 `build.gradle` 中显式声明）。
 - **预测性返回**：AndroidManifest 中 `android:enableOnBackInvokedCallback="true"`。
 
+## 双 UI 风格架构
+
+应用支持两种视觉模式，可在设置中切换：
+
+- **Material 3** — 标准 M3 圆角组件，支持动态色。
+- **复古像素（Retro Pixel）** — 星露谷物语风格的暖色调像素 UI，所有 Material 组件通过 `PixelBorderShape` 自动获得阶梯角。
+
+架构要点：
+- `ThemeSkin` 策略模式（`MaterialSkin` / `RetroPixelSkin`）消除主题构建中的条件分支。
+- `PixelBorderShape extends OutlinedBorder` — 注入 `cardTheme.shape`、`dialogTheme.shape` 等主题级联。一个 `ShapeBorder` 替代 7+ 个包装组件。
+- 复古色映射到 `ColorScheme` 槽位（如 `surface` → 复古背景色、`outline` → 像素边框色），所有 Material 组件零改动自动适配。
+- `AppScaffold` 包裹 `Scaffold`，在复古模式下条件性叠加 `RetroTiledBackground` — 23+ 个屏幕的唯一集成点。
+- `PixelThemeExtension` 承载像素专用令牌（经验条、成功/警告色、Silkscreen 字体样式）。
+
 ## SSOT 映射
 | 关注点 | SSOT |
 |---|---|

@@ -19,6 +19,7 @@ hachimi-app/
 
 ## `lib/` Key Domains
 - `core/backend/`: backend abstractions (Firebase-only runtime path)
+- `core/theme/skins/`: ThemeSkin strategy implementations (`theme_skin.dart`, `material_skin.dart`, `retro_pixel_skin.dart`)
 - `core/constants/`: constants SSOT
 - `core/observability/`: telemetry contracts (`ErrorContext`, `OperationContext`, hashing/correlation helpers)
 - `providers/`: Riverpod providers and service wiring
@@ -28,6 +29,7 @@ hachimi-app/
 - `screens/timer/components/`: timer screen extracted widgets (`stat_row.dart`, `timer_controls.dart`, `focus_cat_display.dart`, `focus_session_stats_card.dart`)
 - `screens/cat_detail/components/`: cat detail extracted cards (7 card widgets)
 - `widgets/`: reusable UI components
+- `widgets/pixel_ui/`: pixel-art UI components for Retro Pixel mode (16 files: `pixel_border.dart`, `pixel_badge.dart`, `pixel_button.dart`, `pixel_card.dart`, `pixel_chat_bubble.dart`, `pixel_coin_display.dart`, `pixel_diary_entry.dart`, `pixel_loading_indicator.dart`, `pixel_milestone.dart`, `pixel_progress_bar.dart`, `pixel_progress_ring.dart`, `pixel_section_header.dart`, `pixel_skeleton_loader.dart`, `pixel_stat_row.dart`, `pixel_switch.dart`, `retro_tiled_background.dart`)
 - `widgets/celebration/`: achievement celebration overlay system (6 files: `achievement_celebration_layer.dart`, `celebration_confetti_painter.dart`, `celebration_glow_icon.dart`, `celebration_overlay.dart`, `celebration_reward_badges.dart`, `celebration_tier.dart`)
 - `models/`: domain models
 

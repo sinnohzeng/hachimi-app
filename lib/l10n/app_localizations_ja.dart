@@ -821,6 +821,21 @@ class SJa extends S {
   String get settingsBackgroundAnimationSubtitle => 'メッシュグラデーションと浮遊パーティクル';
 
   @override
+  String get settingsUiStyle => 'UIスタイル';
+
+  @override
+  String get settingsUiStyleMaterial => 'Material 3';
+
+  @override
+  String get settingsUiStyleRetroPixel => 'レトロピクセル';
+
+  @override
+  String get settingsUiStyleMaterialSubtitle => 'モダンな丸角マテリアルデザイン';
+
+  @override
+  String get settingsUiStyleRetroPixelSubtitle => 'あたたかいピクセルアートスタイル';
+
+  @override
   String get personalityLazy => 'のんびり屋';
 
   @override

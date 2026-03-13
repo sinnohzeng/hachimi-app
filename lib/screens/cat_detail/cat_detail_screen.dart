@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -70,7 +71,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   Widget build(BuildContext context) {
     final cat = ref.watch(catByIdProvider(widget.catId));
     if (cat == null) {
-      return Scaffold(
+      return AppScaffold(
         appBar: AppBar(),
         body: Center(child: Text(context.l10n.catDetailNotFound)),
       );
@@ -87,7 +88,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
       colorScheme,
     );
 
-    return Scaffold(
+    return AppScaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth >= AppBreakpoints.expanded;

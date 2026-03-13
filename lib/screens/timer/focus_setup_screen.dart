@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -83,7 +84,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         : null;
 
     if (habit == null) {
-      return Scaffold(
+      return AppScaffold(
         appBar: AppBar(),
         body: Center(child: Text(context.l10n.focusSetupQuestNotFound)),
       );
@@ -100,7 +101,7 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         ? stageColor(cat.displayStage)
         : colorScheme.primary;
 
-    return Scaffold(
+    return AppScaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

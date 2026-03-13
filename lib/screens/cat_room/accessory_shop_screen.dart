@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
@@ -76,7 +77,7 @@ class AccessoryShopScreen extends ConsumerWidget {
 
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
+      child: AppScaffold(
         appBar: AppBar(
           title: Text(context.l10n.shopTitle),
           actions: [

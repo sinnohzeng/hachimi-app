@@ -8,6 +8,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
 import 'package:hachimi_app/screens/achievements/achievement_screen.dart';
 import 'package:hachimi_app/widgets/app_drawer.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 
 import 'components/today_tab.dart';
 
@@ -42,7 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // --- Compact: 手机竖屏 — NavigationBar（底部） ---
 
   Widget _buildCompactLayout(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       drawer: const AppDrawer(),
       body: _buildBody(),
       floatingActionButton: _buildFab(context),
@@ -57,7 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // --- Medium/Expanded: 平板 — NavigationRail（侧边） ---
 
   Widget _buildMediumLayout(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       drawer: const AppDrawer(),
       body: Row(
         children: [

@@ -47,19 +47,23 @@ class HachimiApp extends ConsumerWidget {
 
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        // Use system dynamic color when available and enabled by user
+        final style = themeSettings.uiStyle;
+        // Retro Pixel 模式强制禁用动态色 — 复古色板即品牌标识
         final useDynamic =
-            themeSettings.useDynamicColor && lightDynamic != null;
+            themeSettings.effectiveDynamicColor && lightDynamic != null;
 
         return MaterialApp(
           title: 'Hachimi',
           debugShowCheckedModeBanner: false,
           theme: useDynamic
-              ? AppTheme.lightThemeFromScheme(lightDynamic)
-              : AppTheme.lightTheme(themeSettings.seedColor),
+              ? AppTheme.lightThemeFromScheme(lightDynamic, style)
+              : AppTheme.lightTheme(themeSettings.seedColor, style),
           darkTheme: useDynamic
-              ? AppTheme.lightThemeFromScheme(darkDynamic ?? lightDynamic)
-              : AppTheme.darkTheme(themeSettings.seedColor),
+              ? AppTheme.lightThemeFromScheme(
+                  darkDynamic ?? lightDynamic,
+                  style,
+                )
+              : AppTheme.darkTheme(themeSettings.seedColor, style),
           themeMode: themeSettings.mode,
           locale: locale,
           // i18n support

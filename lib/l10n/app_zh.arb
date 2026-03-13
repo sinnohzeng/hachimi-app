@@ -371,6 +371,12 @@
   "settingsBackgroundAnimation": "动态背景",
   "settingsBackgroundAnimationSubtitle": "流体渐变和浮动粒子效果",
 
+  "settingsUiStyle": "界面风格",
+  "settingsUiStyleMaterial": "Material 3",
+  "settingsUiStyleRetroPixel": "复古像素",
+  "settingsUiStyleMaterialSubtitle": "现代圆角 Material 设计",
+  "settingsUiStyleRetroPixelSubtitle": "温暖的像素艺术风格",
+
   "personalityLazy": "慵懒",
   "personalityCurious": "好奇",
   "personalityPlayful": "活泼",

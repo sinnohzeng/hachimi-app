@@ -819,6 +819,21 @@ class SZh extends S {
   String get settingsBackgroundAnimationSubtitle => '流体渐变和浮动粒子效果';
 
   @override
+  String get settingsUiStyle => '界面风格';
+
+  @override
+  String get settingsUiStyleMaterial => 'Material 3';
+
+  @override
+  String get settingsUiStyleRetroPixel => '复古像素';
+
+  @override
+  String get settingsUiStyleMaterialSubtitle => '现代圆角 Material 设计';
+
+  @override
+  String get settingsUiStyleRetroPixelSubtitle => '温暖的像素艺术风格';
+
+  @override
   String get personalityLazy => '慵懒';
 
   @override
@@ -3161,6 +3176,21 @@ class SZhHant extends SZh {
 
   @override
   String get settingsBackgroundAnimationSubtitle => '流體漸層同浮動粒子效果';
+
+  @override
+  String get settingsUiStyle => '介面風格';
+
+  @override
+  String get settingsUiStyleMaterial => 'Material 3';
+
+  @override
+  String get settingsUiStyleRetroPixel => '復古像素';
+
+  @override
+  String get settingsUiStyleMaterialSubtitle => '現代圓角 Material 設計';
+
+  @override
+  String get settingsUiStyleRetroPixelSubtitle => '溫暖的像素藝術風格';
 
   @override
   String get personalityLazy => '慵懶';

@@ -2,21 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'app_breakpoints.dart';
-import 'app_elevation.dart';
-import 'app_shape.dart';
-import 'app_spacing.dart';
 import 'pixel_theme_extension.dart';
+import 'skins/material_skin.dart';
+import 'skins/retro_pixel_skin.dart';
+import 'skins/theme_skin.dart';
+
+/// UI 风格枚举 — 用户可在设置中切换。
+enum AppUiStyle { material, retroPixel }
 
 /// App Theme — Single Source of Truth for all UI styling.
-/// All screens and widgets MUST use Theme.of(context) to access colors and text styles.
-/// No hardcoded colors, fonts, or spacing values anywhere else.
+///
+/// 通过 [ThemeSkin] 策略模式构建 ThemeData：
+/// - [MaterialSkin]: Material Design 3 默认样式
+/// - [RetroPixelSkin]: 复古像素风（星露谷物语风格）
+///
+/// 所有屏幕和组件必须通过 Theme.of(context) 访问颜色和文字样式。
 class AppTheme {
   AppTheme._();
 
   static const Color defaultSeedColor = Color(0xFF4285F4); // Google Blue
 
-  /// Preset color palette — 8 Material Design 3 recommended seed colors.
+  /// 预设色板 — 8 种 Material Design 3 推荐种子色。
   static const List<Color> presetColors = [
     Color(0xFF4285F4), // Google Blue (default)
     Color(0xFF009688), // Teal
@@ -28,191 +34,129 @@ class AppTheme {
     Color(0xFF3F51B5), // Indigo
   ];
 
-  static ThemeData lightTheme([Color? seed]) {
-    final seedColor = seed ?? defaultSeedColor;
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-      brightness: Brightness.light,
-    );
-
-    final textTheme = GoogleFonts.robotoTextTheme();
-
-    return _buildTheme(colorScheme, textTheme);
+  static ThemeSkin _skinFor(AppUiStyle style) {
+    return switch (style) {
+      AppUiStyle.material => const MaterialSkin(),
+      AppUiStyle.retroPixel => const RetroPixelSkin(),
+    };
   }
 
-  /// Build theme from a pre-built ColorScheme (used for dynamic color).
-  static ThemeData lightThemeFromScheme(ColorScheme scheme) {
-    final textTheme = GoogleFonts.robotoTextTheme(
+  static ThemeData lightTheme([
+    Color? seed,
+    AppUiStyle style = AppUiStyle.material,
+  ]) {
+    final seedColor = seed ?? defaultSeedColor;
+    final skin = _skinFor(style);
+    final baseText = GoogleFonts.robotoTextTheme();
+    return _buildTheme(seedColor, Brightness.light, baseText, skin);
+  }
+
+  /// 从系统动态色方案构建主题（Material You 壁纸取色）。
+  static ThemeData lightThemeFromScheme(
+    ColorScheme scheme, [
+    AppUiStyle style = AppUiStyle.material,
+  ]) {
+    final skin = _skinFor(style);
+    final baseText = GoogleFonts.robotoTextTheme(
       scheme.brightness == Brightness.dark
           ? ThemeData.dark().textTheme
           : ThemeData.light().textTheme,
     );
-    return _buildTheme(scheme, textTheme);
+    // 动态色方案：skin 可在 buildColorScheme 中覆盖语义槽
+    return _buildThemeFromScheme(scheme, baseText, skin);
   }
 
-  static ThemeData darkTheme([Color? seed]) {
+  static ThemeData darkTheme([
+    Color? seed,
+    AppUiStyle style = AppUiStyle.material,
+  ]) {
     final seedColor = seed ?? defaultSeedColor;
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-      brightness: Brightness.dark,
-    );
-
-    final textTheme = GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme);
-
-    return _buildTheme(colorScheme, textTheme);
+    final skin = _skinFor(style);
+    final baseText = GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme);
+    return _buildTheme(seedColor, Brightness.dark, baseText, skin);
   }
 
-  static ThemeData _buildTheme(ColorScheme colorScheme, TextTheme textTheme) {
+  /// 从种子色构建 — 皮肤负责 ColorScheme 定制。
+  static ThemeData _buildTheme(
+    Color seedColor,
+    Brightness brightness,
+    TextTheme baseText,
+    ThemeSkin skin,
+  ) {
+    final colorScheme = skin.buildColorScheme(seedColor, brightness);
+    return _assemble(colorScheme, baseText, skin);
+  }
+
+  /// 从动态色方案构建 — 用于 Material You。
+  static ThemeData _buildThemeFromScheme(
+    ColorScheme scheme,
+    TextTheme baseText,
+    ThemeSkin skin,
+  ) {
+    // Retro 模式不应使用动态色，但以防万一仍走正常路径
+    final colorScheme = skin is RetroPixelSkin
+        ? skin.buildColorScheme(scheme.primary, scheme.brightness)
+        : scheme;
+    return _assemble(colorScheme, baseText, skin);
+  }
+
+  /// 组装最终 ThemeData — 全部委托给皮肤，零分支。
+  static ThemeData _assemble(
+    ColorScheme colorScheme,
+    TextTheme baseText,
+    ThemeSkin skin,
+  ) {
     final pixelExt = colorScheme.brightness == Brightness.dark
-        ? PixelThemeExtension.dark(colorScheme)
-        : PixelThemeExtension.light(colorScheme);
-    // M3 Typography 微调 — Display/Headline 级别收紧字间距。
-    final refinedTextTheme = textTheme.copyWith(
-      displayLarge: textTheme.displayLarge?.copyWith(letterSpacing: -0.25),
-      displayMedium: textTheme.displayMedium?.copyWith(letterSpacing: -0.25),
-      headlineLarge: textTheme.headlineLarge?.copyWith(letterSpacing: -0.25),
-    );
+        ? PixelThemeExtension.dark(colorScheme).copyWith(isRetro: skin.isRetro)
+        : PixelThemeExtension.light(
+            colorScheme,
+          ).copyWith(isRetro: skin.isRetro);
+
+    final textTheme = skin.buildTextTheme(baseText, colorScheme);
 
     return ThemeData(
       useMaterial3: true,
       extensions: [pixelExt],
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      textTheme: refinedTextTheme,
+      textTheme: textTheme,
       materialTapTargetSize: MaterialTapTargetSize.padded,
-      pageTransitionsTheme: const PageTransitionsTheme(
-        builders: {
-          TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        },
-      ),
-      appBarTheme: AppBarTheme(
-        centerTitle: true,
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: AppElevation.level0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: colorScheme.brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light,
-          statusBarBrightness: colorScheme.brightness,
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarIconBrightness:
-              colorScheme.brightness == Brightness.light
-              ? Brightness.dark
-              : Brightness.light,
-          systemNavigationBarDividerColor: Colors.transparent,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        elevation: colorScheme.brightness == Brightness.dark
-            ? AppElevation.level0
-            : AppElevation.level1,
-        color: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainerHigh
-            : colorScheme.surfaceContainerLow,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppShape.borderMedium,
-          side: colorScheme.brightness == Brightness.dark
-              ? BorderSide(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                )
-              : BorderSide.none,
-        ),
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          side: BorderSide(color: colorScheme.outline),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-      iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
-      ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        indicatorColor: colorScheme.secondaryContainer,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      ),
-      navigationRailTheme: NavigationRailThemeData(
-        indicatorColor: colorScheme.secondaryContainer,
-        selectedIconTheme: IconThemeData(
-          color: colorScheme.onSecondaryContainer,
-        ),
-        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
-        labelType: NavigationRailLabelType.all,
-        backgroundColor: colorScheme.surface,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withValues(
-          alpha: colorScheme.brightness == Brightness.dark ? 0.6 : 0.3,
-        ),
-      ),
-      dialogTheme: DialogThemeData(
-        elevation: AppElevation.level5,
-        shape: AppShape.shapeExtraLarge,
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppShape.extraLarge),
-          ),
-        ),
-        showDragHandle: true,
-        constraints: BoxConstraints(maxWidth: AppBreakpoints.maxSheetWidth),
-      ),
-      popupMenuTheme: PopupMenuThemeData(
-        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
-        elevation: AppElevation.level2,
-      ),
-      tooltipTheme: TooltipThemeData(
-        decoration: BoxDecoration(
-          color: colorScheme.inverseSurface,
-          borderRadius: AppShape.borderExtraSmall,
-        ),
-        textStyle: refinedTextTheme.bodySmall?.copyWith(
-          color: colorScheme.onInverseSurface,
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: AppShape.borderSmall),
-      ),
-      listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(borderRadius: AppShape.borderMedium),
-        contentPadding: AppSpacing.paddingHBase,
-      ),
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? colorScheme.onPrimary
-              : null,
-        ),
-        trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? colorScheme.primary
-              : null,
-        ),
-      ),
+      pageTransitionsTheme: skin.pageTransitions(),
+      appBarTheme: skin
+          .appBarTheme(colorScheme, pixelExt)
+          .copyWith(systemOverlayStyle: _systemOverlay(colorScheme)),
+      cardTheme: skin.cardTheme(colorScheme, pixelExt),
+      dialogTheme: skin.dialogTheme(colorScheme, pixelExt),
+      bottomSheetTheme: skin.bottomSheetTheme(colorScheme),
+      inputDecorationTheme: skin.inputDecoration(colorScheme),
+      navigationBarTheme: skin.navigationBarTheme(colorScheme),
+      navigationRailTheme: skin.navigationRailTheme(colorScheme),
+      floatingActionButtonTheme: skin.fabTheme(colorScheme),
+      filledButtonTheme: skin.filledButtonTheme(colorScheme),
+      outlinedButtonTheme: skin.outlinedButtonTheme(colorScheme),
+      textButtonTheme: skin.textButtonTheme(),
+      iconButtonTheme: skin.iconButtonTheme(),
+      chipTheme: skin.chipTheme(colorScheme),
+      snackBarTheme: skin.snackBarTheme(colorScheme),
+      listTileTheme: skin.listTileTheme(colorScheme),
+      switchTheme: skin.switchTheme(colorScheme),
+      popupMenuTheme: skin.popupMenuTheme(colorScheme),
+      tooltipTheme: skin.tooltipTheme(colorScheme, textTheme),
+    );
+  }
+
+  /// 系统状态栏 / 导航栏样式 — 两种皮肤共用。
+  static SystemUiOverlayStyle _systemOverlay(ColorScheme scheme) {
+    final isLight = scheme.brightness == Brightness.light;
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isLight ? Brightness.dark : Brightness.light,
+      statusBarBrightness: scheme.brightness,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarIconBrightness: isLight
+          ? Brightness.dark
+          : Brightness.light,
+      systemNavigationBarDividerColor: Colors.transparent,
     );
   }
 }

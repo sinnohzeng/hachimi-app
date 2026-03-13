@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -65,7 +66,7 @@ class _AddHabitScreenState extends ConsumerState<AddHabitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(context.l10n.addHabitTitle)),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingLg,

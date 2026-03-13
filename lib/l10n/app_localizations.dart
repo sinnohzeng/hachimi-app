@@ -1602,6 +1602,36 @@ abstract class S {
   /// **'Mesh gradient and floating particles'**
   String get settingsBackgroundAnimationSubtitle;
 
+  /// No description provided for @settingsUiStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'UI style'**
+  String get settingsUiStyle;
+
+  /// No description provided for @settingsUiStyleMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material 3'**
+  String get settingsUiStyleMaterial;
+
+  /// No description provided for @settingsUiStyleRetroPixel.
+  ///
+  /// In en, this message translates to:
+  /// **'Retro Pixel'**
+  String get settingsUiStyleRetroPixel;
+
+  /// No description provided for @settingsUiStyleMaterialSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Modern, rounded Material Design'**
+  String get settingsUiStyleMaterialSubtitle;
+
+  /// No description provided for @settingsUiStyleRetroPixelSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm pixel-art aesthetic'**
+  String get settingsUiStyleRetroPixelSubtitle;
+
   /// No description provided for @personalityLazy.
   ///
   /// In en, this message translates to:

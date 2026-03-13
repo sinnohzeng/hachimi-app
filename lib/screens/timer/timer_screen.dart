@@ -3,6 +3,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
@@ -426,7 +427,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     ref.listen(focusTimerProvider, _onTimerTerminated);
 
     if (habit == null) {
-      return Scaffold(
+      return AppScaffold(
         appBar: AppBar(),
         body: Center(child: Text(context.l10n.timerQuestNotFound)),
       );
@@ -453,7 +454,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         }
         _giveUp();
       },
-      child: Scaffold(
+      child: AppScaffold(
         body: Stack(
           children: [
             Positioned.fill(

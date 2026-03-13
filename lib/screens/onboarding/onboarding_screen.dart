@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
@@ -163,7 +164,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _previous();
       },
-      child: Scaffold(
+      child: AppScaffold(
         body: Stack(
           children: [
             const ParticleOverlay(
@@ -276,7 +277,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _previous();
       },
-      child: Scaffold(
+      child: AppScaffold(
         body: Row(
           children: [
             Expanded(flex: 2, child: _buildTabletLeftPane(context)),

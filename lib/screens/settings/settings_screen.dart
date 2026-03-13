@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
@@ -11,6 +12,7 @@ import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/logout_confirmation.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
@@ -19,6 +21,7 @@ import 'components/notification_settings_dialog.dart';
 import 'components/language_dialog.dart';
 import 'components/theme_mode_dialog.dart';
 import 'components/theme_color_dialog.dart';
+import 'components/ui_style_dialog.dart';
 import 'components/section_header.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -35,7 +38,7 @@ class SettingsScreen extends ConsumerWidget {
 
     final l10n = context.l10n;
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ContentWidthConstraint(
         child: ListView(
@@ -159,20 +162,35 @@ class SettingsScreen extends ConsumerWidget {
                 },
               ),
             ),
+            StaggeredListItem(
+              index: 7,
+              child: ListTile(
+                leading: const Icon(Icons.style_outlined),
+                title: Text(l10n.settingsUiStyle),
+                subtitle: Text(
+                  _uiStyleName(themeSettings.uiStyle, l10n),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showUiStyleSettings(context, ref),
+              ),
+            ),
 
             const SizedBox(height: AppSpacing.sm),
             const Divider(),
 
             // About section
             StaggeredListItem(
-              index: 7,
+              index: 8,
               child: SectionHeader(
                 title: l10n.settingsAbout,
                 colorScheme: colorScheme,
               ),
             ),
             StaggeredListItem(
-              index: 8,
+              index: 9,
               child: ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: Text(l10n.settingsVersion),
@@ -186,7 +204,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             StaggeredListItem(
-              index: 9,
+              index: 10,
               child: ListTile(
                 leading: const Icon(Icons.description_outlined),
                 title: Text(l10n.settingsLicenses),
@@ -209,7 +227,7 @@ class SettingsScreen extends ConsumerWidget {
 
             // Account section
             StaggeredListItem(
-              index: 10,
+              index: 11,
               child: SectionHeader(
                 title: l10n.settingsAccount,
                 colorScheme: colorScheme,
@@ -218,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
             if (isGuest) ...[
               // 访客：登录入口 + 清除数据
               StaggeredListItem(
-                index: 11,
+                index: 12,
                 child: ListTile(
                   leading: Icon(Icons.login, color: colorScheme.primary),
                   title: Text(
@@ -230,7 +248,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               StaggeredListItem(
-                index: 12,
+                index: 13,
                 child: ListTile(
                   leading: Icon(
                     Icons.delete_sweep_outlined,
@@ -246,7 +264,7 @@ class SettingsScreen extends ConsumerWidget {
             ] else ...[
               // 已登录：退出 + 删除账号
               StaggeredListItem(
-                index: 11,
+                index: 12,
                 child: ListTile(
                   leading: Icon(Icons.logout, color: colorScheme.error),
                   title: Text(
@@ -257,7 +275,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               StaggeredListItem(
-                index: 12,
+                index: 13,
                 child: ListTile(
                   leading: Icon(Icons.delete_forever, color: colorScheme.error),
                   title: Text(
@@ -366,6 +384,27 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showThemeColorSettings(BuildContext context) {
     showDialog(context: context, builder: (ctx) => const ThemeColorDialog());
+  }
+
+  // --- UI Style Settings ---
+
+  String _uiStyleName(AppUiStyle style, S l10n) {
+    return switch (style) {
+      AppUiStyle.material => l10n.settingsUiStyleMaterial,
+      AppUiStyle.retroPixel => l10n.settingsUiStyleRetroPixel,
+    };
+  }
+
+  void _showUiStyleSettings(BuildContext context, WidgetRef ref) {
+    final currentStyle = ref.read(themeProvider).uiStyle;
+    showDialog<AppUiStyle>(
+      context: context,
+      builder: (ctx) => UiStyleDialog(currentStyle: currentStyle),
+    ).then((result) {
+      if (result != null) {
+        ref.read(themeProvider.notifier).setUiStyle(result);
+      }
+    });
   }
 
   // --- Account Actions ---

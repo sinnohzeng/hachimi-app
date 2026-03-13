@@ -81,6 +81,20 @@ Compatibility aliases (`V1`) still exist for safe migration.
 - **Dependencies**: `activity-ktx:1.10.1`, `material:1.12.0` (explicit in `build.gradle`).
 - **Predictive back**: `android:enableOnBackInvokedCallback="true"` in AndroidManifest.
 
+## Dual UI Style Architecture
+
+The app supports two visual modes switchable in Settings:
+
+- **Material 3** — standard M3 rounded components, dynamic color support.
+- **Retro Pixel** — Stardew Valley-inspired warm pixel-art aesthetic with `PixelBorderShape` stepped corners on all Material components.
+
+Architecture:
+- `ThemeSkin` strategy pattern (`MaterialSkin` / `RetroPixelSkin`) eliminates conditional branching in theme construction.
+- `PixelBorderShape extends OutlinedBorder` — injected into `cardTheme.shape`, `dialogTheme.shape`, etc. via theme cascade. One `ShapeBorder` replaces 7+ wrapper components.
+- Retro colors map onto `ColorScheme` slots (e.g., `surface` → retro background, `outline` → pixel border) so all existing Material widgets auto-adapt with zero code changes.
+- `AppScaffold` wraps `Scaffold` and conditionally overlays `RetroTiledBackground` in retro mode — single integration point for 23+ screens.
+- `PixelThemeExtension` carries pixel-only tokens (XP bar, success/warning colors, Silkscreen text styles).
+
 ## SSOT Snapshot
 | Concern | SSOT |
 |---|---|

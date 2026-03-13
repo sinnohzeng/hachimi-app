@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/focus_session.dart';
@@ -77,7 +78,7 @@ class _SessionHistoryScreenState extends ConsumerState<SessionHistoryScreen> {
               l10n.historyAllHabits)
         : l10n.historyAllHabits;
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(l10n.historyTitle)),
       body: Column(
         children: [

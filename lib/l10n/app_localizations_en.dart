@@ -830,6 +830,22 @@ class SEn extends S {
       'Mesh gradient and floating particles';
 
   @override
+  String get settingsUiStyle => 'UI style';
+
+  @override
+  String get settingsUiStyleMaterial => 'Material 3';
+
+  @override
+  String get settingsUiStyleRetroPixel => 'Retro Pixel';
+
+  @override
+  String get settingsUiStyleMaterialSubtitle =>
+      'Modern, rounded Material Design';
+
+  @override
+  String get settingsUiStyleRetroPixelSubtitle => 'Warm pixel-art aesthetic';
+
+  @override
   String get personalityLazy => 'Lazy';
 
   @override

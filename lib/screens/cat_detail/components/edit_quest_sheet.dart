@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/motivation_quotes.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -70,7 +71,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(context.l10n.catDetailEditQuestTitle)),
       body: Column(
         children: [

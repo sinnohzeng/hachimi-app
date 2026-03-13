@@ -6,6 +6,7 @@ import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -142,7 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Scaffold(
+    return AppScaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

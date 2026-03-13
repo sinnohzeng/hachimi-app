@@ -1,6 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -208,7 +209,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     final didStageUp = widget.stageUp?.didStageUp ?? false;
     final catName = cat?.name ?? l10n.focusCompleteYourCat;
 
-    return Scaffold(
+    return AppScaffold(
       body: Stack(
         children: [
           SafeArea(

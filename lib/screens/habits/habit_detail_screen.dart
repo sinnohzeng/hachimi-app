@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 
@@ -20,21 +21,21 @@ class HabitDetailScreen extends ConsumerWidget {
 
     return habitsAsync.when(
       loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(
+          const AppScaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, _) => AppScaffold(
         body: Center(child: Text(context.l10n.commonErrorWithDetail('$e'))),
       ),
       data: (habits) {
         final habit = habits.where((h) => h.id == habitId).firstOrNull;
         if (habit == null) {
-          return Scaffold(
+          return AppScaffold(
             appBar: AppBar(),
             body: Center(child: Text(context.l10n.habitDetailQuestNotFound)),
           );
         }
 
         final l10n = context.l10n;
-        return Scaffold(
+        return AppScaffold(
           appBar: AppBar(title: Text(habit.name)),
           body: Padding(
             padding: AppSpacing.paddingLg,

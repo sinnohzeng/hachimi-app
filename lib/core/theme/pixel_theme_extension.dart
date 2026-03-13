@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// 像素风 UI 设计令牌 — 为猫咪屏幕提供复古游戏视觉层。
+/// 像素风 UI 设计令牌 — 为全应用提供复古游戏视觉层。
 ///
-/// 通过 `Theme.of(context).extension<PixelThemeExtension>()` 访问。
-/// 仅在猫咪相关屏幕使用，不影响其他 Material 3 界面。
+/// 通过 `Theme.of(context).extension<PixelThemeExtension>()` 访问，
+/// 或使用便捷扩展 `context.pixel`。
+///
+/// 在 Retro Pixel 模式下，语义色已映射到 [ColorScheme]（由 [RetroPixelSkin] 处理），
+/// 本扩展仅承载「无 ColorScheme 对应项」的像素专用令牌：
+/// - 经验条/金币色（xpBarFill, xpBarTrack）
+/// - 暖冷色点缀（pixelAccentWarm, pixelAccentCool）
+/// - 状态色（pixelSuccess, pixelWarning）
+/// - 像素字体样式（Silkscreen 系列）
 class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   const PixelThemeExtension({
+    required this.isRetro,
     required this.retroBackground,
     required this.retroSurface,
     required this.pixelBorder,
@@ -14,11 +22,17 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
     required this.xpBarTrack,
     required this.pixelAccentWarm,
     required this.pixelAccentCool,
+    required this.pixelSuccess,
+    required this.pixelWarning,
     required this.pixelTitle,
     required this.pixelHeading,
+    required this.pixelBody,
     required this.pixelLabel,
     required this.pixelName,
   });
+
+  /// 当前是否处于复古像素模式 — SectionHeader 等组件据此切换样式。
+  final bool isRetro;
 
   // --- 复古配色 ---
 
@@ -43,6 +57,12 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   /// 冷色调点缀 — 天蓝色
   final Color pixelAccentCool;
 
+  /// 正向反馈色 — 复古绿
+  final Color pixelSuccess;
+
+  /// 警告色 — 琥珀色
+  final Color pixelWarning;
+
   // --- 像素字体样式 ---
 
   /// 屏幕标题 — Silkscreen 16px bold
@@ -51,7 +71,10 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   /// 卡片区块标题 — Silkscreen 14px
   final TextStyle pixelHeading;
 
-  /// 徽章、标签 — Silkscreen 12px
+  /// 正文 — Silkscreen 14px（最小可读尺寸）
+  final TextStyle pixelBody;
+
+  /// 徽章、标签 — Silkscreen 14px（从 12px 提升，确保无障碍访问）
   final TextStyle pixelLabel;
 
   /// 猫咪名称（详情页英雄区）— Silkscreen 20px bold
@@ -60,6 +83,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   /// 明亮主题
   factory PixelThemeExtension.light(ColorScheme scheme) {
     return PixelThemeExtension(
+      isRetro: true,
       retroBackground: const Color(0xFFFFF8E7),
       retroSurface: const Color(0xFFFEF3D0),
       pixelBorder: const Color(0xFF5C3A1E),
@@ -67,26 +91,33 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
       xpBarTrack: const Color(0xFFD4C5A0),
       pixelAccentWarm: const Color(0xFFE8A87C),
       pixelAccentCool: const Color(0xFF7EC8E3),
+      pixelSuccess: const Color(0xFF2E8B57),
+      pixelWarning: const Color(0xFFDAA520),
       pixelTitle: _pixelFont(16, FontWeight.bold, scheme.onSurface),
       pixelHeading: _pixelFont(14, FontWeight.normal, scheme.onSurface),
-      pixelLabel: _pixelFont(12, FontWeight.normal, scheme.onSurfaceVariant),
+      pixelBody: _pixelFont(14, FontWeight.normal, scheme.onSurface),
+      pixelLabel: _pixelFont(14, FontWeight.normal, scheme.onSurfaceVariant),
       pixelName: _pixelFont(20, FontWeight.bold, scheme.onSurface),
     );
   }
 
-  /// 暗色主题
+  /// 暗色主题（边框色已提亮至 #A08B6D，在 #1A1A2E 上达到 4.6:1 对比度）
   factory PixelThemeExtension.dark(ColorScheme scheme) {
     return PixelThemeExtension(
+      isRetro: true,
       retroBackground: const Color(0xFF1A1A2E),
       retroSurface: const Color(0xFF252547),
-      pixelBorder: const Color(0xFF8B7355),
+      pixelBorder: const Color(0xFFA08B6D),
       xpBarFill: const Color(0xFFFFD700),
       xpBarTrack: const Color(0xFF3A3A5C),
       pixelAccentWarm: const Color(0xFFE8A87C),
       pixelAccentCool: const Color(0xFF7EC8E3),
+      pixelSuccess: const Color(0xFF5CDB95),
+      pixelWarning: const Color(0xFFFFD700),
       pixelTitle: _pixelFont(16, FontWeight.bold, scheme.onSurface),
       pixelHeading: _pixelFont(14, FontWeight.normal, scheme.onSurface),
-      pixelLabel: _pixelFont(12, FontWeight.normal, scheme.onSurfaceVariant),
+      pixelBody: _pixelFont(14, FontWeight.normal, scheme.onSurface),
+      pixelLabel: _pixelFont(14, FontWeight.normal, scheme.onSurfaceVariant),
       pixelName: _pixelFont(20, FontWeight.bold, scheme.onSurface),
     );
   }
@@ -94,6 +125,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   /// 测试用回退值
   factory PixelThemeExtension.fallback() {
     return PixelThemeExtension(
+      isRetro: false,
       retroBackground: const Color(0xFFFFF8E7),
       retroSurface: const Color(0xFFFEF3D0),
       pixelBorder: const Color(0xFF5C3A1E),
@@ -101,9 +133,12 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
       xpBarTrack: const Color(0xFFD4C5A0),
       pixelAccentWarm: const Color(0xFFE8A87C),
       pixelAccentCool: const Color(0xFF7EC8E3),
+      pixelSuccess: const Color(0xFF2E8B57),
+      pixelWarning: const Color(0xFFDAA520),
       pixelTitle: _pixelFont(16, FontWeight.bold, Colors.black),
       pixelHeading: _pixelFont(14, FontWeight.normal, Colors.black),
-      pixelLabel: _pixelFont(12, FontWeight.normal, Colors.grey),
+      pixelBody: _pixelFont(14, FontWeight.normal, Colors.black),
+      pixelLabel: _pixelFont(14, FontWeight.normal, Colors.grey),
       pixelName: _pixelFont(20, FontWeight.bold, Colors.black),
     );
   }
@@ -118,6 +153,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
 
   @override
   PixelThemeExtension copyWith({
+    bool? isRetro,
     Color? retroBackground,
     Color? retroSurface,
     Color? pixelBorder,
@@ -125,12 +161,16 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
     Color? xpBarTrack,
     Color? pixelAccentWarm,
     Color? pixelAccentCool,
+    Color? pixelSuccess,
+    Color? pixelWarning,
     TextStyle? pixelTitle,
     TextStyle? pixelHeading,
+    TextStyle? pixelBody,
     TextStyle? pixelLabel,
     TextStyle? pixelName,
   }) {
     return PixelThemeExtension(
+      isRetro: isRetro ?? this.isRetro,
       retroBackground: retroBackground ?? this.retroBackground,
       retroSurface: retroSurface ?? this.retroSurface,
       pixelBorder: pixelBorder ?? this.pixelBorder,
@@ -138,8 +178,11 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
       xpBarTrack: xpBarTrack ?? this.xpBarTrack,
       pixelAccentWarm: pixelAccentWarm ?? this.pixelAccentWarm,
       pixelAccentCool: pixelAccentCool ?? this.pixelAccentCool,
+      pixelSuccess: pixelSuccess ?? this.pixelSuccess,
+      pixelWarning: pixelWarning ?? this.pixelWarning,
       pixelTitle: pixelTitle ?? this.pixelTitle,
       pixelHeading: pixelHeading ?? this.pixelHeading,
+      pixelBody: pixelBody ?? this.pixelBody,
       pixelLabel: pixelLabel ?? this.pixelLabel,
       pixelName: pixelName ?? this.pixelName,
     );
@@ -149,6 +192,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   PixelThemeExtension lerp(covariant PixelThemeExtension? other, double t) {
     if (other == null) return this;
     return PixelThemeExtension(
+      isRetro: t < 0.5 ? isRetro : other.isRetro,
       retroBackground: Color.lerp(retroBackground, other.retroBackground, t)!,
       retroSurface: Color.lerp(retroSurface, other.retroSurface, t)!,
       pixelBorder: Color.lerp(pixelBorder, other.pixelBorder, t)!,
@@ -156,8 +200,11 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
       xpBarTrack: Color.lerp(xpBarTrack, other.xpBarTrack, t)!,
       pixelAccentWarm: Color.lerp(pixelAccentWarm, other.pixelAccentWarm, t)!,
       pixelAccentCool: Color.lerp(pixelAccentCool, other.pixelAccentCool, t)!,
+      pixelSuccess: Color.lerp(pixelSuccess, other.pixelSuccess, t)!,
+      pixelWarning: Color.lerp(pixelWarning, other.pixelWarning, t)!,
       pixelTitle: TextStyle.lerp(pixelTitle, other.pixelTitle, t)!,
       pixelHeading: TextStyle.lerp(pixelHeading, other.pixelHeading, t)!,
+      pixelBody: TextStyle.lerp(pixelBody, other.pixelBody, t)!,
       pixelLabel: TextStyle.lerp(pixelLabel, other.pixelLabel, t)!,
       pixelName: TextStyle.lerp(pixelName, other.pixelName, t)!,
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_icon_size.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
@@ -74,13 +75,14 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     });
 
     if (cat == null) {
-      return Scaffold(
+      return AppScaffold(
         appBar: AppBar(),
         body: Center(child: Text(context.l10n.chatCatNotFound)),
       );
     }
 
-    return Scaffold(
+    return AppScaffold(
+      pattern: PatternType.crosshatch,
       appBar: AppBar(
         title: Text(
           context.l10n.chatTitle(cat.name),
@@ -111,24 +113,21 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
             ),
         ],
       ),
-      body: RetroTiledBackground(
-        pattern: PatternType.crosshatch,
-        child: Column(
-          children: [
-            // 消息列表
-            Expanded(
-              child: chatState.status == ChatStatus.loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : chatState.messages.isEmpty &&
-                        chatState.status != ChatStatus.generating
-                  ? _buildEmptyState(textTheme, colorScheme, cat.name)
-                  : _buildMessageList(chatState),
-            ),
+      body: Column(
+        children: [
+          // 消息列表
+          Expanded(
+            child: chatState.status == ChatStatus.loading
+                ? const Center(child: CircularProgressIndicator())
+                : chatState.messages.isEmpty &&
+                      chatState.status != ChatStatus.generating
+                ? _buildEmptyState(textTheme, colorScheme, cat.name)
+                : _buildMessageList(chatState),
+          ),
 
-            // 输入区域
-            _buildInputBar(context, chatState, cat, habit),
-          ],
-        ),
+          // 输入区域
+          _buildInputBar(context, chatState, cat, habit),
+        ],
       ),
     );
   }

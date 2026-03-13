@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
@@ -17,7 +18,7 @@ class CheckInScreen extends ConsumerWidget {
     final monthlyAsync = ref.watch(monthlyCheckInProvider);
     final theme = Theme.of(context);
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(context.l10n.checkInTitle)),
       body: monthlyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

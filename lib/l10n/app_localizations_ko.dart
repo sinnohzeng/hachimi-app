@@ -821,6 +821,21 @@ class SKo extends S {
   String get settingsBackgroundAnimationSubtitle => '메시 그라디언트와 떠다니는 파티클';
 
   @override
+  String get settingsUiStyle => 'UI 스타일';
+
+  @override
+  String get settingsUiStyleMaterial => 'Material 3';
+
+  @override
+  String get settingsUiStyleRetroPixel => '레트로 픽셀';
+
+  @override
+  String get settingsUiStyleMaterialSubtitle => '모던한 라운드 Material 디자인';
+
+  @override
+  String get settingsUiStyleRetroPixelSubtitle => '따뜻한 픽셀 아트 스타일';
+
+  @override
   String get personalityLazy => '게으른';
 
   @override

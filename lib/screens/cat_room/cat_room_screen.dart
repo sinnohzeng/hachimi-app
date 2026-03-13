@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/theme/app_elevation.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
@@ -50,21 +51,19 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
     final allCatsAsync = ref.watch(allCatsProvider);
     final outerScaffold = Scaffold.maybeOf(context);
 
-    return Scaffold(
+    return AppScaffold(
+      pattern: PatternType.dots,
       appBar: _buildAppBar(context, theme, outerScaffold),
-      body: RetroTiledBackground(
-        pattern: PatternType.dots,
-        child: activeCatsAsync.when(
-          loading: () => const SkeletonGrid(),
-          error: (e, _) => ErrorState(
-            message: context.l10n.catRoomLoadError,
-            onRetry: () => ref.invalidate(catsProvider),
-          ),
-          data: (activeCats) {
-            final archivedCats = _extractArchivedCats(allCatsAsync);
-            return _buildBody(context, activeCats, archivedCats);
-          },
+      body: activeCatsAsync.when(
+        loading: () => const SkeletonGrid(),
+        error: (e, _) => ErrorState(
+          message: context.l10n.catRoomLoadError,
+          onRetry: () => ref.invalidate(catsProvider),
         ),
+        data: (activeCats) {
+          final archivedCats = _extractArchivedCats(allCatsAsync);
+          return _buildBody(context, activeCats, archivedCats);
+        },
       ),
     );
   }

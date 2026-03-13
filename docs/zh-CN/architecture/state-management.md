@@ -109,6 +109,43 @@ AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → fal
 - 纵深防御：服务层在达到限额时拒绝消息 + UI 禁用发送按钮。
 - 限额通过 RemoteConfig 可配置（`chat_daily_limit`，默认值：5）。
 
+## 主题状态 — 双 UI 风格
+
+### ThemeSettings
+
+`ThemeSettings`（位于 `theme_provider.dart`）持有所有主题相关状态：
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `mode` | `ThemeMode` | `system` | 亮色/暗色/跟随系统 |
+| `seedColor` | `Color` | `#4285F4` | M3 种子色 |
+| `useDynamicColor` | `bool` | `true` | Material You 壁纸取色 |
+| `enableBackgroundAnimation` | `bool` | `true` | 网格渐变 + 粒子动画 |
+| `uiStyle` | `AppUiStyle` | `retroPixel` | `material` 或 `retroPixel` |
+
+`effectiveDynamicColor` 在 `uiStyle == retroPixel` 时强制返回 `false` — 复古调色板本身即品牌标识。
+
+### ThemeSkin 策略模式
+
+`AppTheme._assemble()` 将所有组件主题委托给 `ThemeSkin` 实现：
+
+```
+ThemeSettings.uiStyle → _skinFor(style) → MaterialSkin | RetroPixelSkin
+                                              ↓
+                                    _assemble(colorScheme, textTheme, skin)
+                                              ↓
+                                    ThemeData（零分支）
+```
+
+- `MaterialSkin` — 从原 `_buildTheme()` 提取，行为零变化。
+- `RetroPixelSkin` — 将复古色映射到 `ColorScheme` 槽位，对所有组件主题应用 `PixelBorderShape`，显示文本使用 Silkscreen 字体，阶梯式页面过渡。
+
+关键文件：`lib/core/theme/skins/{theme_skin,material_skin,retro_pixel_skin}.dart`
+
+### AppScaffold
+
+`AppScaffold`（位于 `lib/widgets/app_scaffold.dart`）包裹 `Scaffold`，在复古模式下条件性叠加 `RetroTiledBackground`。所有屏幕使用 `AppScaffold` 替代 `Scaffold` — 23+ 个屏幕的唯一集成点。
+
 ## 约束
 - Screen 层禁止直接调用 Firebase SDK。
 - 导航副作用必须放在监听器/effect，不要写在 `build()` 中。
