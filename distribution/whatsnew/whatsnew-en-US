@@ -1,6 +1,5 @@
-v2.31.1
+v2.31.4
 
-- Fixed: Logging in with Google now correctly returns to the home screen
-- Fixed: Habits, coins, check-ins, cats, and achievements refresh immediately after login — no restart needed
-- Fixed: Returning users with cloud data are no longer sent to the new user guide
-- Fixed: Deleting your account now safely returns to the welcome screen, even if a network error occurs
+- Fixed: Logging out no longer gets stuck on a loading screen — you can now sign back in immediately
+- Fixed: Guest-to-account upgrade no longer fails with a database conflict error
+- Improved: Returning users skip the onboarding tutorial after logging out — jump straight back in

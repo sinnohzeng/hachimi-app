@@ -231,10 +231,7 @@ class LedgerService {
       }
 
       // 复合 PK 表 — 先删 newUid 默认行，再更新 oldUid→newUid
-      for (final table in [
-        'materialized_state',
-        'local_monthly_checkins',
-      ]) {
+      for (final table in ['materialized_state', 'local_monthly_checkins']) {
         await txn.delete(table, where: 'uid = ?', whereArgs: [newUid]);
         await txn.update(
           table,

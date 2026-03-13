@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.31.4] - 2026-03-13
+
+### Fixed
+- **登出卡死修复**：重构 `logout()` 为 Clean-Then-Navigate 模式，先清理 SharedPreferences + SQLite + Firebase Auth，再触发导航，消除旧会话与新会话的竞态条件
+- **访客升级 UNIQUE 约束修复**：`migrateUid()` 对复合主键表（materialized_state、local_monthly_checkins）改用 DELETE-then-UPDATE 策略，避免 `ensureProfile()` 写入的默认行与真实数据冲突
+- **`_isLoggingOut` 永久锁死修复**：用 try-finally 包裹 `logout()` 全流程，确保异常路径也能重置守卫标志
+
+### Added
+- **返回用户跳过引导**：新增 `hasOnboardedBefore` 持久化标记，登出后的返回用户自动跳过 3 页引导教程直接进入主页；删号时清除该标记以保证全新开始语义
+
 ## [2.31.3] - 2026-03-13
 
 ### Refactored
