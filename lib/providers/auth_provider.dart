@@ -19,33 +19,18 @@ final authStateProvider = StreamProvider<AuthUser?>((ref) {
 /// - [AuthenticatedState] — Firebase 已认证（Google / Email）
 /// - [GuestState] — 本地访客（uid 非空）或未初始化（uid 为空）
 final appAuthStateProvider = Provider<AppAuthState>((ref) {
-  final authAsync = ref.watch(authStateProvider);
-  final prefs = ref.read(sharedPreferencesProvider);
-
-  return authAsync.when(
-    data: (user) {
-      if (user != null) {
-        return AuthenticatedState(
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-        );
-      }
-      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
-      if (guestUid != null) return GuestState(uid: guestUid);
-      return const GuestState(uid: '');
-    },
-    loading: () {
-      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
-      if (guestUid != null) return GuestState(uid: guestUid);
-      return const GuestState(uid: '');
-    },
-    error: (_, _) {
-      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
-      if (guestUid != null) return GuestState(uid: guestUid);
-      return const GuestState(uid: '');
-    },
-  );
+  final user = ref.watch(authStateProvider).value;
+  if (user != null) {
+    return AuthenticatedState(
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+    );
+  }
+  final guestUid = ref
+      .read(sharedPreferencesProvider)
+      .getString(AppPrefsKeys.localGuestUid);
+  return GuestState(uid: guestUid ?? '');
 });
 
 /// Current user UID — 向后兼容派生 provider。
