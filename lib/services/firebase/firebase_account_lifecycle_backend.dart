@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/observability/operation_context.dart';
@@ -12,6 +14,8 @@ class FirebaseAccountLifecycleBackend implements AccountLifecycleBackend {
   @override
   String get id => 'firebase';
 
+  static const _deleteTimeout = Duration(seconds: 15);
+
   @override
   Future<void> deleteAccountHard({required OperationContext context}) async {
     await _functions
@@ -19,7 +23,8 @@ class FirebaseAccountLifecycleBackend implements AccountLifecycleBackend {
           'deleteAccountV2',
           options: HttpsCallableOptions(limitedUseAppCheckToken: true),
         )
-        .call(context.toJson());
+        .call(context.toJson())
+        .timeout(_deleteTimeout);
   }
 
   @override

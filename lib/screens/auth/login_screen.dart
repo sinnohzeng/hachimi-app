@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
@@ -64,6 +66,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  static const _setupTimeout = Duration(seconds: 8);
+
   /// 登录后账号初始化 — best-effort，失败不影响用户进入主页。
   /// 未完成的访客迁移由 _FirstHabitGate._recoverOrphanedGuestData 兜底恢复。
   Future<void> _finalizeAccountSetup({
@@ -71,23 +75,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required String? migrationSourceUid,
   }) async {
     try {
-      final notifier = ref.read(userProfileNotifierProvider.notifier);
-      await notifier.ensureProfile(
-        uid: result.uid,
-        email: result.email ?? '',
-        displayName: result.displayName,
-      );
-
-      if (result.isNewUser) {
-        await ref
-            .read(analyticsServiceProvider)
-            .logSignUp(method: widget.linkMode ? 'google_link' : 'google');
-      }
-
-      await _resolveGuestConflictIfNeeded(
+      await _doFinalizeSetup(
         result: result,
         migrationSourceUid: migrationSourceUid,
-      );
+      ).timeout(_setupTimeout);
+    } on TimeoutException {
+      debugPrint('[Auth] 登录后设置超时 — 进入主页，后台重试');
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -100,6 +93,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Navigator.of(context).popUntil((r) => r.isFirst);
       }
     }
+  }
+
+  Future<void> _doFinalizeSetup({
+    required AuthResult result,
+    required String? migrationSourceUid,
+  }) async {
+    final notifier = ref.read(userProfileNotifierProvider.notifier);
+    await notifier.ensureProfile(
+      uid: result.uid,
+      email: result.email ?? '',
+      displayName: result.displayName,
+    );
+
+    if (result.isNewUser) {
+      await ref
+          .read(analyticsServiceProvider)
+          .logSignUp(method: widget.linkMode ? 'google_link' : 'google');
+    }
+
+    await _resolveGuestConflictIfNeeded(
+      result: result,
+      migrationSourceUid: migrationSourceUid,
+    );
   }
 
   Future<void> _resolveGuestConflictIfNeeded({

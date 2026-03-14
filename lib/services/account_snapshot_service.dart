@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/models/account_data_snapshot.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 
 /// 存档快照服务：用于本地与云端冲突对比。
 class AccountSnapshotService {
+  static const _readCloudTimeout = Duration(seconds: 5);
+
   final LocalDatabaseService _localDb;
   final FirebaseFirestore _db;
 
@@ -47,6 +51,10 @@ class AccountSnapshotService {
   }
 
   Future<AccountDataSnapshot> readCloud(String uid) async {
+    return _doReadCloud(uid).timeout(_readCloudTimeout);
+  }
+
+  Future<AccountDataSnapshot> _doReadCloud(String uid) async {
     final userRef = _db.collection('users').doc(uid);
     final userDoc = await userRef.get();
     if (!userDoc.exists) return const AccountDataSnapshot();

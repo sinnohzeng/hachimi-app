@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 
 /// Firebase 认证后端实现。
 class FirebaseAuthBackend implements AuthBackend {
+  static const _authTimeout = Duration(seconds: 10);
+
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
 
@@ -43,10 +47,9 @@ class FirebaseAuthBackend implements AuthBackend {
     required String email,
     required String password,
   }) async {
-    final result = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    final result = await _auth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .timeout(_authTimeout);
     return _mapResult(result);
   }
 
@@ -55,10 +58,9 @@ class FirebaseAuthBackend implements AuthBackend {
     required String email,
     required String password,
   }) async {
-    final result = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    final result = await _auth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .timeout(_authTimeout);
     return _mapResult(result);
   }
 
@@ -66,7 +68,9 @@ class FirebaseAuthBackend implements AuthBackend {
   Future<AuthResult?> signInWithGoogle() async {
     try {
       final credential = await _getGoogleCredential();
-      final result = await _auth.signInWithCredential(credential);
+      final result = await _auth
+          .signInWithCredential(credential)
+          .timeout(_authTimeout);
       return _mapResult(result);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) return null;
@@ -76,7 +80,7 @@ class FirebaseAuthBackend implements AuthBackend {
 
   @override
   Future<AuthResult> signInAnonymously() async {
-    final result = await _auth.signInAnonymously();
+    final result = await _auth.signInAnonymously().timeout(_authTimeout);
     return _mapResult(result);
   }
 
@@ -87,15 +91,21 @@ class FirebaseAuthBackend implements AuthBackend {
       final user = _auth.currentUser;
       if (user != null) {
         try {
-          final result = await user.linkWithCredential(credential);
+          final result = await user
+              .linkWithCredential(credential)
+              .timeout(_authTimeout);
           return _mapResult(result);
         } on FirebaseAuthException catch (e) {
           if (!_isCredentialAlreadyInUse(e.code)) rethrow;
-          final result = await _auth.signInWithCredential(credential);
+          final result = await _auth
+              .signInWithCredential(credential)
+              .timeout(_authTimeout);
           return _mapResult(result);
         }
       }
-      final result = await _auth.signInWithCredential(credential);
+      final result = await _auth
+          .signInWithCredential(credential)
+          .timeout(_authTimeout);
       return _mapResult(result);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) return null;
@@ -115,20 +125,20 @@ class FirebaseAuthBackend implements AuthBackend {
     final user = _auth.currentUser;
     try {
       if (user != null) {
-        final result = await user.linkWithCredential(credential);
+        final result = await user
+            .linkWithCredential(credential)
+            .timeout(_authTimeout);
         return _mapResult(result);
       }
-      final result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final result = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .timeout(_authTimeout);
       return _mapResult(result);
     } on FirebaseAuthException catch (e) {
       if (!_isCredentialAlreadyInUse(e.code)) rethrow;
-      final result = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final result = await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(_authTimeout);
       return _mapResult(result);
     }
   }

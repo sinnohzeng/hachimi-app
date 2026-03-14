@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -133,21 +134,12 @@ class AccountDeletionOrchestrator {
       retryCount: retryCount,
       correlationId: correlationId,
     );
+
+    // ── 阶段 1：远程删除（决定 remoteDeleted 的唯一操作）──
     try {
       debugPrint('[AccountDeletion] 调用 deleteAccountHard...');
       await _lifecycleBackend.deleteAccountHard(context: opContext);
-      debugPrint('[AccountDeletion] 远程删除成功 — 签出用户');
-      await _authBackend.signOut();
-      ObservabilityRuntime.clearUidHash();
-      try {
-        await FirebaseCrashlytics.instance.setUserIdentifier('');
-      } catch (_) {}
-      await _clearPending();
-      return AccountDeletionResult(
-        localDeleted: localDeleted,
-        remoteDeleted: true,
-        queued: false,
-      );
+      debugPrint('[AccountDeletion] 远程删除成功');
     } catch (e, stack) {
       final retryable = _isRetryableRemoteError(e);
       final errorCode = _toRemoteErrorCode(e);
@@ -178,6 +170,45 @@ class AccountDeletionOrchestrator {
         errorCode: errorCode,
       );
     }
+
+    // ── 阶段 2：删除成功后清理（best-effort，不影响结果）──
+    await _clearPending();
+    await _postDeletionCleanup();
+    return AccountDeletionResult(
+      localDeleted: localDeleted,
+      remoteDeleted: true,
+      queued: false,
+    );
+  }
+
+  /// 删除成功后的 best-effort 清理 — 任何步骤失败不影响删除结果。
+  Future<void> _postDeletionCleanup() async {
+    final steps = <(String, Future<void> Function())>[
+      ('signout', _authBackend.signOut),
+      (
+        'clear_crashlytics',
+        () => FirebaseCrashlytics.instance.setUserIdentifier(''),
+      ),
+    ];
+    for (final (name, action) in steps) {
+      try {
+        await action();
+      } catch (e, stack) {
+        debugPrint('[AccountDeletion] 清理步骤 $name 失败: $e');
+        _recordCleanupError(e, stack, name);
+      }
+    }
+    ObservabilityRuntime.clearUidHash();
+  }
+
+  void _recordCleanupError(Object e, StackTrace stack, String step) {
+    ErrorHandler.recordOperation(
+      e,
+      stackTrace: stack,
+      feature: 'AccountDeletionOrchestrator',
+      operation: 'postDeletionCleanup_$step',
+      errorCode: 'cleanup_${step}_failed',
+    );
   }
 
   /// 用户主动放弃待处理的远程删除。

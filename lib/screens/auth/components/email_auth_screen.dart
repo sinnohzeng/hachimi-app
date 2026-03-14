@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -88,6 +90,8 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     }
   }
 
+  static const _setupTimeout = Duration(seconds: 8);
+
   /// 登录后账号初始化 — best-effort，失败不影响用户进入主页。
   /// 未完成的访客迁移由 _FirstHabitGate._recoverOrphanedGuestData 兜底恢复。
   Future<void> _finalizeAccountSetup({
@@ -95,17 +99,12 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     required String? migrationSourceUid,
   }) async {
     try {
-      final notifier = ref.read(userProfileNotifierProvider.notifier);
-      await notifier.ensureProfile(
-        uid: result.uid,
-        email: _emailController.text.trim(),
-        displayName: result.displayName,
-      );
-      await _logSignUpIfNeeded(result);
-      await _resolveGuestConflictIfNeeded(
+      await _doFinalizeSetup(
         result: result,
         migrationSourceUid: migrationSourceUid,
-      );
+      ).timeout(_setupTimeout);
+    } on TimeoutException {
+      debugPrint('[Auth] 登录后设置超时 — 进入主页，后台重试');
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,
@@ -116,6 +115,23 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     } finally {
       if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     }
+  }
+
+  Future<void> _doFinalizeSetup({
+    required AuthResult result,
+    required String? migrationSourceUid,
+  }) async {
+    final notifier = ref.read(userProfileNotifierProvider.notifier);
+    await notifier.ensureProfile(
+      uid: result.uid,
+      email: _emailController.text.trim(),
+      displayName: result.displayName,
+    );
+    await _logSignUpIfNeeded(result);
+    await _resolveGuestConflictIfNeeded(
+      result: result,
+      migrationSourceUid: migrationSourceUid,
+    );
   }
 
   Future<AuthResult> _authenticate(AuthBackend authBackend) async {

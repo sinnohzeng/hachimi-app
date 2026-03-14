@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.3] - 2026-03-14
+
+### Fixed
+- **账号删除"出了点问题"误报**：`deleteAccountHard()` 成功后 `signOut()` 异常不再否定删除结果；清理步骤独立 try-catch，任意步骤失败仅记录不影响成功判定
+- **离线优先超时加固**：7 个关键网络调用增加超时保护，弱网/离线下不再阻塞用户操作
+  - Cloud Function 删号：15s 超时，超时后排队下次重试
+  - Firebase Auth 登录/注册/关联：10s 超时
+  - Firestore 数据水化：8s 超时，超时后使用本地数据
+  - 登录后 Profile 设置：8s 超时，超时后直接进入主页
+  - 云端快照读取：5s 超时，加速 fallback 触发
+
 ## [2.33.2] - 2026-03-14
 
 ### Fixed

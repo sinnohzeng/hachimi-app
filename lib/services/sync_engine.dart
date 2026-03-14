@@ -42,31 +42,16 @@ class SyncEngine {
 
   /// 一次性数据水化：从 Firestore 拉取已有数据写入 SQLite。
   /// 仅在首次迁移时执行（SharedPreferences 标记控制幂等）。
+  static const _hydrateTimeout = Duration(seconds: 8);
+
   Future<void> hydrateFromFirestore(String uid) async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(AppPrefsKeys.dataHydrated) ?? false) return;
 
     try {
-      final userRef = _db.collection('users').doc(uid);
-      final db = await _ledger.database;
-
-      await _hydrateCollection<Habit>(
-        userRef.collection('habits'),
-        'local_habits',
-        db,
-        (doc) => Habit.fromFirestore(doc).toSqlite(uid),
-      );
-      await _hydrateCollection<Cat>(
-        userRef.collection('cats'),
-        'local_cats',
-        db,
-        (doc) => Cat.fromFirestore(doc).toSqlite(uid),
-      );
-      await _hydrateUserProfile(userRef, uid);
-
-      await prefs.setBool(AppPrefsKeys.dataHydrated, true);
-      _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
-      debugPrint('SyncEngine: hydration complete');
+      await _doHydrate(uid, prefs).timeout(_hydrateTimeout);
+    } on TimeoutException {
+      debugPrint('[SyncEngine] 水化超时 — 使用本地数据');
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,
@@ -76,6 +61,29 @@ class SyncEngine {
       );
       // 水化失败不阻塞启动，下次仍会重试
     }
+  }
+
+  Future<void> _doHydrate(String uid, SharedPreferences prefs) async {
+    final userRef = _db.collection('users').doc(uid);
+    final db = await _ledger.database;
+
+    await _hydrateCollection<Habit>(
+      userRef.collection('habits'),
+      'local_habits',
+      db,
+      (doc) => Habit.fromFirestore(doc).toSqlite(uid),
+    );
+    await _hydrateCollection<Cat>(
+      userRef.collection('cats'),
+      'local_cats',
+      db,
+      (doc) => Cat.fromFirestore(doc).toSqlite(uid),
+    );
+    await _hydrateUserProfile(userRef, uid);
+
+    await prefs.setBool(AppPrefsKeys.dataHydrated, true);
+    _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+    debugPrint('SyncEngine: hydration complete');
   }
 
   /// 泛型集合水化 — 从 Firestore 子集合拉取文档写入本地表。
