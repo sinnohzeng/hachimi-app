@@ -1,0 +1,6 @@
+v2.33.0
+
+- Migliorato: Sistema di accesso ricostruito per maggiore affidabilità — niente più utenti fantasma dopo il logout
+- Migliorato: Il logout ora mostra un indicatore di caricamento e si completa correttamente
+- Migliorato: La barra laterale mostra correttamente il prompt di accesso ospite dopo il logout
+- Rimosso: Accesso anonimo (gli ospiti ora funzionano completamente offline)

@@ -124,7 +124,7 @@ jobs:
         run: |
           ! rg -n "TODO|FIXME|TBD|占位" lib test functions/src functions/test .claude/memory
 
-      - name: Validate whatsnew is version-specific
+      - name: Validate whatsnew files
         run: |
           for f in distribution/whatsnew/whatsnew-*; do
             if head -1 "$f" | grep -qi "Welcome to Hachimi\|欢迎来到\|ようこそ\|환영합니다"; then
@@ -132,6 +132,16 @@ jobs:
               exit 1
             fi
           done
+          required="en-US zh-CN zh-TW ja-JP ko-KR es-ES pt-BR fr-FR de-DE it-IT hi-IN th vi id tr-TR"
+          for locale in $required; do
+            if [ ! -f "distribution/whatsnew/whatsnew-$locale" ]; then
+              echo "::error::Missing whatsnew file for $locale"
+              exit 1
+            fi
+          done
+
+      - name: Check l10n completeness
+        run: dart run tool/l10n_check.dart
 
       - name: Quality gate
         run: dart run tool/quality_gate.dart

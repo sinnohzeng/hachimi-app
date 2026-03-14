@@ -1,6 +1,8 @@
-v2.33.0
+v2.33.1
 
-- Improved: Login system rebuilt for reliability — no more ghost users after logout
-- Improved: Logout now shows loading indicator and completes cleanly
-- Improved: Sidebar correctly shows guest login prompt after signing out
-- Removed: Anonymous sign-in (guests now work fully offline)
+- Fixed: Data loss when switching between multiple accounts — logout no longer deletes local data
+- Fixed: Account deletion failure now properly signs out instead of leaving zombie state
+- Fixed: Infinite spinner after logout (Riverpod stream subscription rebuild)
+- Added: 10 new languages (DE, ES, FR, HI, ID, IT, PT, TH, TR, VI)
+- Added: Manual language switcher in settings
+- Added: Cat animation on login screen

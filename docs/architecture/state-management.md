@@ -70,7 +70,7 @@ sealed class AppAuthState
 ### Logout — 3-Step Provider Cascade
 Logout is centralized in `UserProfileNotifier.logout()` — the only logout entry point. The flow is 3 steps:
 1. Stop sync engine (before identity switch).
-2. Delete old user data + Firebase sign out.
+2. Firebase sign out — local data is preserved, not deleted. SQLite UID-scoped isolation (`uid` column on every table) makes per-user data naturally partitioned; `deleteUidData` is reserved exclusively for account deletion (`AccountDeletionOrchestrator`).
 3. Create fresh guest UID → triggers `appAuthStateProvider` to emit `GuestState(newUid)` → all downstream providers auto-invalidate.
 
 Non-critical cleanup (notification cancellation, Crashlytics user reset) runs as fire-and-forget after step 3. No manual SharedPreferences sweep — provider cascade replaces the old 10-key cleanup.
@@ -87,7 +87,13 @@ Non-critical cleanup (notification cancellation, Crashlytics user reset) runs as
   - fallback to pre-auth `currentUid`
 - `GuestUpgradeCoordinator` decides merge path using snapshots.
 - `GuestUpgradeCoordinator.resolve(...)` requires `migrationSourceUid` and aborts on source mismatch to avoid dangerous merges.
+- Empty-guest guard is built into `resolve()`: if `AccountSnapshotService.readLocal(migrationSourceUid).isEmpty`, coordinator clears `localGuestUid` pref and returns immediately — no merge dialog, no data mutation. This eliminates false guest upgrades after logout cycles.
 - Merge always goes through explicit service orchestration; no implicit UID migration in `AuthGate`.
+
+### FirstHabitGate Orphaned Guest Recovery
+`_recoverOrphanedGuestData` uses `AccountSnapshotService.readLocal(guestUid).isEmpty` (same criteria as `GuestUpgradeCoordinator`) to guard migration:
+- Snapshot non-empty → migrate UID + set `dataHydrated=true` (preserves offline data).
+- Snapshot empty → clear `localGuestUid` only, do NOT set `dataHydrated` (allows Firestore hydration to proceed normally for returning authenticated users).
 
 ## Deletion Flow
 - UI flow is three-step confirmation only.

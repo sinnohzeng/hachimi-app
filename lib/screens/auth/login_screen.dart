@@ -7,11 +7,13 @@ import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
+import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/screens/auth/components/auth_cat_hero.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   /// linkMode: 匿名用户关联账号（而非全新登录）。
@@ -137,157 +139,150 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final textTheme = theme.textTheme;
 
     return AppScaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              colorScheme.primary,
-              colorScheme.primary.withValues(alpha: 0.8),
-            ],
+      body: Stack(
+        children: [
+          const ParticleOverlay(
+            mode: ParticleMode.firefly,
+            child: SizedBox.expand(),
           ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Padding(
-                padding: AppSpacing.paddingHLg,
-                child: Column(
-                  children: [
-                    const Spacer(flex: 3),
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Padding(
+                  padding: AppSpacing.paddingHLg,
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 3),
 
-                    // App icon
-                    Icon(
-                      Icons.local_fire_department,
-                      size: 80,
-                      color: colorScheme.onPrimary,
-                      semanticLabel: 'Hachimi',
-                    ),
-                    const SizedBox(height: AppSpacing.base),
+                      // 像素猫主视觉
+                      const AuthCatHero(),
+                      const SizedBox(height: AppSpacing.base),
 
-                    // App name
-                    Text(
-                      context.l10n.loginAppName,
-                      style: textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-
-                    // Tagline
-                    Text(
-                      widget.linkMode
-                          ? context.l10n.loginLinkTagline
-                          : context.l10n.loginTagline,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                      ),
-                    ),
-
-                    const Spacer(flex: 4),
-
-                    // Google sign-in button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: FilledButton.icon(
-                        onPressed: _isGoogleLoading ? null : _signInWithGoogle,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.onPrimary,
-                          foregroundColor: colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppShape.borderLarge,
-                          ),
+                      // App name
+                      Text(
+                        context.l10n.loginAppName,
+                        style: textTheme.displaySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
                         ),
-                        icon: _isGoogleLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Image.network(
-                                'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                                width: 20,
-                                height: 20,
-                                semanticLabel: 'Google logo',
-                                errorBuilder: (_, _, _) =>
-                                    const Icon(Icons.g_mobiledata, size: 24),
-                              ),
-                        label: Text(context.l10n.loginContinueGoogle),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
+                      const SizedBox(height: AppSpacing.sm),
 
-                    // Email sign-in button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: FilledButton.icon(
-                        onPressed: _navigateToEmailAuth,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.onPrimary,
-                          foregroundColor: colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppShape.borderLarge,
-                          ),
+                      // Tagline
+                      Text(
+                        widget.linkMode
+                            ? context.l10n.loginLinkTagline
+                            : context.l10n.loginTagline,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
-                        icon: const Icon(Icons.email_outlined, size: 20),
-                        label: Text(context.l10n.loginContinueEmail),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.base),
 
-                    // Login link (hidden in linkMode)
-                    if (!widget.linkMode)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            context.l10n.loginAlreadyHaveAccount,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onPrimary.withValues(
-                                alpha: 0.7,
-                              ),
+                      const Spacer(flex: 4),
+
+                      // Google sign-in button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: FilledButton.icon(
+                          onPressed: _isGoogleLoading
+                              ? null
+                              : _signInWithGoogle,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: AppShape.borderLarge,
                             ),
                           ),
-                          Semantics(
-                            button: true,
-                            label: context.l10n.loginLogIn,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushNamed(
-                                  AppRouter.emailAuth,
-                                  arguments: {'startAsLogin': true},
-                                );
-                              },
-                              child: ExcludeSemantics(
-                                child: Text(
-                                  context.l10n.loginLogIn,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.onPrimary,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: colorScheme.onPrimary,
+                          icon: _isGoogleLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Image.network(
+                                  'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                                  width: 20,
+                                  height: 20,
+                                  semanticLabel: 'Google logo',
+                                  errorBuilder: (_, _, _) =>
+                                      const Icon(Icons.g_mobiledata, size: 24),
+                                ),
+                          label: Text(context.l10n.loginContinueGoogle),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Email sign-in button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: FilledButton.icon(
+                          onPressed: _navigateToEmailAuth,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: AppShape.borderLarge,
+                            ),
+                          ),
+                          icon: const Icon(Icons.email_outlined, size: 20),
+                          label: Text(context.l10n.loginContinueEmail),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.base),
+
+                      // Login link (hidden in linkMode)
+                      if (!widget.linkMode)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              context.l10n.loginAlreadyHaveAccount,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                            ),
+                            Semantics(
+                              button: true,
+                              label: context.l10n.loginLogIn,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(
+                                    AppRouter.emailAuth,
+                                    arguments: {'startAsLogin': true},
+                                  );
+                                },
+                                child: ExcludeSemantics(
+                                  child: Text(
+                                    context.l10n.loginLogIn,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
-                    const SizedBox(height: AppSpacing.xl),
-                  ],
+                      const SizedBox(height: AppSpacing.xl),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

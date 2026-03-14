@@ -29,11 +29,12 @@ class DiaryPreviewCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              PixelSectionHeader(
-                title: context.l10n.catDetailDiaryTitle,
-                icon: Icons.auto_stories,
+              Expanded(
+                child: PixelSectionHeader(
+                  title: context.l10n.catDetailDiaryTitle,
+                  icon: Icons.auto_stories,
+                ),
               ),
-              const Spacer(),
               Icon(
                 Icons.chevron_right,
                 color: colorScheme.onSurfaceVariant,

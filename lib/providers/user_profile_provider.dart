@@ -3,71 +3,62 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/ledger_stream.dart';
 
 /// 监听当前用户的 avatarId。
 ///
 /// SSOT: 本地 materialized_state（SQLite）。
 /// 监听 LedgerService 的 'profile_update' 变更事件自动刷新。
-final avatarIdProvider = StreamProvider<String?>((ref) async* {
+final avatarIdProvider = StreamProvider<String?>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield null;
-    return;
-  }
+  if (uid == null) return Stream.value(null);
 
   final ledger = ref.watch(ledgerServiceProvider);
 
-  // 初始读取
-  yield await ledger.getMaterialized(uid, 'avatar_id');
-
-  // 监听变更
-  await for (final change in ledger.changes) {
-    if (change.type == 'profile_update' || change.isGlobalRefresh) {
-      yield await ledger.getMaterialized(uid, 'avatar_id');
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) => c.type == 'profile_update' || c.isGlobalRefresh,
+    read: () => ledger.getMaterialized(uid, 'avatar_id'),
+  );
 });
 
 /// 监听当前用户佩戴的称号 ID。
 ///
 /// SSOT: 本地 materialized_state（SQLite）。
-final currentTitleProvider = StreamProvider<String?>((ref) async* {
+final currentTitleProvider = StreamProvider<String?>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield null;
-    return;
-  }
+  if (uid == null) return Stream.value(null);
 
   final ledger = ref.watch(ledgerServiceProvider);
-  yield await ledger.getMaterialized(uid, 'current_title');
 
-  await for (final change in ledger.changes) {
-    if (change.type == 'profile_update' || change.isGlobalRefresh) {
-      yield await ledger.getMaterialized(uid, 'current_title');
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) => c.type == 'profile_update' || c.isGlobalRefresh,
+    read: () => ledger.getMaterialized(uid, 'current_title'),
+  );
 });
 
 /// 监听当前用户已解锁的称号 ID 列表。
 ///
 /// SSOT: 本地 materialized_state（SQLite）。
-final unlockedTitlesProvider = StreamProvider<List<String>>((ref) async* {
+final unlockedTitlesProvider = StreamProvider<List<String>>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield [];
-    return;
-  }
+  if (uid == null) return Stream.value(<String>[]);
 
   final ledger = ref.watch(ledgerServiceProvider);
-  yield _decodeTitles(await ledger.getMaterialized(uid, 'unlocked_titles'));
 
-  await for (final change in ledger.changes) {
-    if (change.type == 'profile_update' ||
-        change.isGlobalRefresh ||
-        change.type == 'achievement_unlocked') {
-      yield _decodeTitles(await ledger.getMaterialized(uid, 'unlocked_titles'));
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.type == 'profile_update' ||
+        c.isGlobalRefresh ||
+        c.type == 'achievement_unlocked',
+    read: () async =>
+        _decodeTitles(await ledger.getMaterialized(uid, 'unlocked_titles')),
+  );
 });
 
 List<String> _decodeTitles(String? raw) {

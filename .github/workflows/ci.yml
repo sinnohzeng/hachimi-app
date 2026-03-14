@@ -136,6 +136,9 @@ jobs:
       - name: Dart quality gate
         run: dart run tool/quality_gate.dart
 
+      - name: Check l10n completeness
+        run: dart run tool/l10n_check.dart
+
       - name: Run Flutter tests
         run: flutter test --exclude-tags golden
 

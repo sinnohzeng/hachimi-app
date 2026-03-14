@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.1] - 2026-03-14
+
+### Fixed
+- **多用户切换数据丢失**：登出不再删除本地数据，SQLite UID 列天然隔离多用户数据；`deleteUidData` 仅保留给账号删除流程使用
+- **空访客虚假升级**：`GuestUpgradeCoordinator.resolve()` 内置空数据守卫，`readLocal().isEmpty` 时直接清理标记、跳过合并对话框
+- **`_recoverOrphanedGuestData` 盲设 `dataHydrated`**：空快照不再设置 `dataHydrated=true`，避免阻断 Firestore 水化
+- **账号删除僵尸态**：远程删除失败时 `finally` 块调用 `logout()` 强制签出 + 创建访客身份，防止用户停留在"认证有效但数据为空"的状态
+- **Riverpod 3.x `async*` 订阅断言崩溃**：11 个 StreamProvider 从 `async*` + `await for` 重构为 `StreamController` + `ref.onDispose`，消除 `pausedActiveSubscriptionCount` 不匹配的无限重建循环
+- **RenderFlex 布局警告**：`PixelSectionHeader` 分隔线从 `Expanded` 改为 `Flexible`，修复嵌套 Row 中无界宽度断言错误
+- **App Check Debug Token 随机化**：解码 Firebase SharedPreferences 文件名的 Base64 编码格式，从 `google-services.json` 注入正确的 `FIREBASE_APP_ID`
+
+### Added
+- **`ledgerDrivenStream<T>()` 共享助手**：封装 StreamController 模式，供所有 Ledger 驱动的 StreamProvider 复用
+- **结构化认证日志**：登出流程 `[Auth]` 前缀、账号删除 `[AccountDeletion]` 前缀，方便 `adb logcat` 快速过滤
+- **10 语种国际化**：新增德语、西班牙语、法语、印地语、印尼语、意大利语、葡萄牙语、泰语、土耳其语、越南语翻译
+- **语言选择对话框**：设置页新增手动语言切换功能，支持所有 15 种语言
+- **登录页猫咪动画**：`AuthCatHero` 像素猫动画组件，增强登录 / 注册页视觉体验
+
+### Changed
+- **SyncEngine 日志脱敏**：`debugPrint` 中移除明文 UID，遵循 PII 最小化原则
+- **文档同步**：`docs/architecture/state-management.md`（EN + zh-CN）更新登出语义、空访客守卫、FirstHabitGate 恢复逻辑
+
 ## [2.33.0] - 2026-03-13
 
 ### Changed

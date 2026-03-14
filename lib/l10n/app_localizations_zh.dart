@@ -1887,6 +1887,36 @@ class SZh extends S {
   String get settingsLanguageKorean => '한국어';
 
   @override
+  String get settingsLanguageSpanish => 'Español';
+
+  @override
+  String get settingsLanguagePortuguese => 'Português';
+
+  @override
+  String get settingsLanguageFrench => 'Français';
+
+  @override
+  String get settingsLanguageGerman => 'Deutsch';
+
+  @override
+  String get settingsLanguageItalian => 'Italiano';
+
+  @override
+  String get settingsLanguageHindi => 'हिन्दी';
+
+  @override
+  String get settingsLanguageThai => 'ไทย';
+
+  @override
+  String get settingsLanguageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get settingsLanguageIndonesian => 'Bahasa Indonesia';
+
+  @override
+  String get settingsLanguageTurkish => 'Türkçe';
+
+  @override
   String get notifFocusing => '专注中…';
 
   @override
@@ -4244,6 +4274,36 @@ class SZhHant extends SZh {
 
   @override
   String get settingsLanguageKorean => '한국어';
+
+  @override
+  String get settingsLanguageSpanish => 'Español';
+
+  @override
+  String get settingsLanguagePortuguese => 'Português';
+
+  @override
+  String get settingsLanguageFrench => 'Français';
+
+  @override
+  String get settingsLanguageGerman => 'Deutsch';
+
+  @override
+  String get settingsLanguageItalian => 'Italiano';
+
+  @override
+  String get settingsLanguageHindi => 'हिन्दी';
+
+  @override
+  String get settingsLanguageThai => 'ไทย';
+
+  @override
+  String get settingsLanguageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get settingsLanguageIndonesian => 'Bahasa Indonesia';
+
+  @override
+  String get settingsLanguageTurkish => 'Türkçe';
 
   @override
   String get notifFocusing => '專注中…';

@@ -6,27 +6,26 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/inventory_provider.dart';
+import 'package:hachimi_app/providers/ledger_stream.dart';
 
 /// 已解锁成就列表 — 从 SQLite local_achievements 读取。
 final unlockedAchievementsProvider = StreamProvider<List<LocalAchievement>>((
   ref,
-) async* {
+) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield [];
-    return;
-  }
+  if (uid == null) return Stream.value(<LocalAchievement>[]);
 
   final ledger = ref.watch(ledgerServiceProvider);
-  yield await _readUnlockedAchievements(ledger, uid);
 
-  await for (final change in ledger.changes) {
-    if (change.isGlobalRefresh ||
-        change.type == 'achievement_unlocked' ||
-        change.type == 'achievement_claimed') {
-      yield await _readUnlockedAchievements(ledger, uid);
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh ||
+        c.type == 'achievement_unlocked' ||
+        c.type == 'achievement_claimed',
+    read: () => _readUnlockedAchievements(ledger, uid),
+  );
 });
 
 Future<List<LocalAchievement>> _readUnlockedAchievements(

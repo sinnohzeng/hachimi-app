@@ -1,0 +1,6 @@
+v2.33.0
+
+- Ditingkatkan: Sistem login dibangun ulang agar lebih andal — tidak ada lagi pengguna hantu setelah logout
+- Ditingkatkan: Logout kini menampilkan indikator loading dan selesai dengan bersih
+- Ditingkatkan: Sidebar menampilkan prompt login tamu dengan benar setelah logout
+- Dihapus: Login anonim (tamu kini bisa digunakan sepenuhnya secara offline)

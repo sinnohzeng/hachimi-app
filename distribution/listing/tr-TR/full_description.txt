@@ -1,0 +1,26 @@
+Hachimi günlük alışkanlıklarını ödüllendirici bir maceraya dönüştürür. Sevimli sanal kediler sahiplen, odaklanırken onların büyümesini izle ve motivasyonunu koruyan seriler oluştur.
+
+🐱 Sanal Kediler Sahiplen ve Büyüt
+Oluşturduğun her alışkanlık benzersiz bir kedi arkadaşıyla gelir. Alışkanlıklarına odaklanarak kedine deneyim puanı kazan ve bebeklikten yetişkinliğe dört büyüme aşamasını izle.
+
+⏱️ Akıllı Odak Zamanlayıcı
+Özelleştirilebilir Pomodoro tarzı zamanlayıcıyla odak bölgesine gir. Odaklandığın her dakika için jeton kazan ve ayrıntılı istatistiklerle ilerlemenizi takip et.
+
+📊 İlerlemenizi Takip Edin
+Günlük, haftalık ve aylık istatistiklere göz at. Serilerini, toplam odak süresini ve alışkanlık tamamlama oranlarını güzel grafiklerle takip et.
+
+📝 AI Kedi Günlüğü
+Kedilerin odak seanslarına göre günlük yazıyor! Verimlilik yolculuğun hakkındaki sevimli düşünce ve yansımalarını oku.
+
+✨ Temel Özellikler
+• Sanal kedi arkadaşlarıyla oyunlaştırılmış alışkanlık takibi
+• Arka plan bildirimleriyle özelleştirilebilir odak zamanlayıcı
+• Günlük tutarlılık için seri takibi
+• Odak süresini ödüllendiren jeton sistemi
+• Çoklu kedi kişiliği ve evrim aşamaları
+• Ayrıntılı istatistikler ve ilerleme grafikleri
+• AI destekli kedi günlüğü
+• Güzel Material Design 3 ve retro piksel UI temaları
+• Çevrimdışı çalışır — hesap gerekmez
+
+Bugün Hachimi ile daha iyi alışkanlıklar edinmeye başla!

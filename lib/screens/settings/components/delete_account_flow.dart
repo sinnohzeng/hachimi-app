@@ -8,6 +8,7 @@ import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/account_deletion_result.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/user_profile_notifier.dart';
 
 /// 三段式账号删除流程：
 /// 1) 数据摘要确认
@@ -174,13 +175,10 @@ class DeleteAccountFlow {
       }
     } finally {
       progress.dispose();
-      // 结构性不变量：本地数据已销毁且尚未导航 → 必须 reset 回引导页
-      // 删号 = 全新开始，清除 hasOnboardedBefore 让用户看到完整引导教程。
+      // 结构性不变量：本地数据已销毁且尚未导航 → 必须签出 + 重置引导
+      // 不能让用户留在"认证有效但数据为空"的僵尸态
       if (localDataDestroyed && !navigatedAway && context.mounted) {
-        ref
-            .read(sharedPreferencesProvider)
-            .remove(AppPrefsKeys.hasOnboardedBefore);
-        ref.read(onboardingCompleteProvider.notifier).reset();
+        await ref.read(userProfileNotifierProvider.notifier).logout();
       }
     }
   }

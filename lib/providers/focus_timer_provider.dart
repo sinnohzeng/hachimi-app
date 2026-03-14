@@ -139,7 +139,6 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   static const _defaultDurationSeconds = 1500; // 25 分钟
   static const _autoCompleteThresholdMinutes = 30;
   static const _saveIntervalTicks = 5;
-  static const _habitNameMaxLength = 20;
 
   // SharedPreferences key prefix
   static const _prefix = 'focus_timer_';
@@ -307,6 +306,10 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     return fallback ?? 'Your cat';
   }
 
+  /// 通知标题统一入口 — habitName 为空时回退到英文默认值。
+  String get _notificationTitle =>
+      state.habitName.isNotEmpty ? state.habitName : 'Focus';
+
   /// 从 SharedPreferences 解析未结算的暂停时长（app 被杀时正处于暂停/后台）。
   static int _computePendingPauseDelta(String? pausedAtStr) {
     if (pausedAtStr == null) return 0;
@@ -409,26 +412,26 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   void _updateNotification() {
     final labels = _resolveDisplayLabels();
 
-    // 基础通知（fallback）— 时间优先显示，habitName 截断防止遮挡
-    final truncatedHabit = state.habitName.length > _habitNameMaxLength
-        ? '${state.habitName.substring(0, _habitNameMaxLength)}...'
-        : state.habitName;
+    // 基础通知 — 标题=任务名，副标题=时间+猫名+专注状态
     FocusTimerService.updateNotification(
-      title: '${labels.catName} ${labels.focusingLabel}',
-      text: '${state.displayTime} ${labels.label} \u{00B7} $truncatedHabit',
+      title: _notificationTitle,
+      text:
+          '${state.displayTime} ${labels.label} \u{00B7} ${labels.catName} ${labels.focusingLabel}',
     );
 
     // 富通知（触发 vivo 原子岛 + Android 16 ProgressStyle）
-    _updateAtomicIsland(labels.catName);
+    _updateAtomicIsland(labels);
   }
 
   /// 更新 vivo 原子岛 / Android 16 ProgressStyle 富通知。
-  void _updateAtomicIsland(String catDisplayName) {
+  void _updateAtomicIsland(
+    ({String catName, String focusingLabel, String label}) labels,
+  ) {
     if (state.startedAt == null) return;
     final isCountdown = state.mode == TimerMode.countdown;
     AtomicIslandService.updateNotification(
-      title: '$catDisplayName focusing...',
-      text: state.habitName,
+      title: _notificationTitle,
+      text: '${labels.catName} ${labels.focusingLabel}',
       isCountdown: isCountdown,
       isPaused: state.status == TimerStatus.paused,
       endTimeMs: isCountdown
@@ -525,12 +528,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       final focusingLabel = state.labelFocusing.isNotEmpty
           ? state.labelFocusing
           : 'focusing...';
-      final inProgressLabel = state.labelInProgress.isNotEmpty
-          ? state.labelInProgress
-          : 'Focus session in progress';
       FocusTimerService.updateNotification(
-        title: '${_resolveCatDisplayName()} $focusingLabel',
-        text: inProgressLabel,
+        title: _notificationTitle,
+        text: '${_resolveCatDisplayName()} $focusingLabel',
       );
     }
   }
@@ -626,8 +626,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
           .read(notificationServiceProvider)
           .scheduleTimerBackup(
             fireAt: fireAt,
-            title: _resolveCatDisplayName('Focus'),
-            body: '${state.habitName} \u{00B7} ${state.focusedMinutes} min',
+            title: _notificationTitle,
+            body:
+                '${_resolveCatDisplayName()} \u{00B7} ${state.focusedMinutes} min',
           );
     } catch (e) {
       debugPrint('[FocusTimer] backup alarm schedule error: $e');

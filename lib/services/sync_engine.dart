@@ -66,7 +66,7 @@ class SyncEngine {
 
       await prefs.setBool(AppPrefsKeys.dataHydrated, true);
       _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
-      debugPrint('SyncEngine: hydration complete for $uid');
+      debugPrint('SyncEngine: hydration complete');
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,

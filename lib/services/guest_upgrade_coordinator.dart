@@ -44,6 +44,12 @@ class GuestUpgradeCoordinator {
 
     final local = await _snapshotService.readLocal(migrationSourceUid);
 
+    // 空访客无数据 — 只清理标记，不执行合并
+    if (local.isEmpty) {
+      await _prefs.remove(AppPrefsKeys.localGuestUid);
+      return;
+    }
+
     // 云端快照读取 best-effort — 失败视为空（安全默认保留本地）
     final cloud = await _readCloudOrEmpty(newUid);
 

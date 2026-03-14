@@ -5,9 +5,19 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_hi.dart';
+import 'app_localizations_id.dart';
+import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
 import 'app_localizations_ko.dart';
+import 'app_localizations_pt.dart';
+import 'app_localizations_th.dart';
+import 'app_localizations_tr.dart';
+import 'app_localizations_vi.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -95,9 +105,19 @@ abstract class S {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('hi'),
+    Locale('id'),
+    Locale('it'),
     Locale('ja'),
     Locale('ko'),
+    Locale('pt'),
+    Locale('th'),
+    Locale('tr'),
+    Locale('vi'),
     Locale('zh'),
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
   ];
@@ -3558,6 +3578,66 @@ abstract class S {
   /// **'Korean'**
   String get settingsLanguageKorean;
 
+  /// No description provided for @settingsLanguageSpanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get settingsLanguageSpanish;
+
+  /// No description provided for @settingsLanguagePortuguese.
+  ///
+  /// In en, this message translates to:
+  /// **'Portuguese'**
+  String get settingsLanguagePortuguese;
+
+  /// No description provided for @settingsLanguageFrench.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get settingsLanguageFrench;
+
+  /// No description provided for @settingsLanguageGerman.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get settingsLanguageGerman;
+
+  /// No description provided for @settingsLanguageItalian.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get settingsLanguageItalian;
+
+  /// No description provided for @settingsLanguageHindi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hindi'**
+  String get settingsLanguageHindi;
+
+  /// No description provided for @settingsLanguageThai.
+  ///
+  /// In en, this message translates to:
+  /// **'Thai'**
+  String get settingsLanguageThai;
+
+  /// No description provided for @settingsLanguageVietnamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese'**
+  String get settingsLanguageVietnamese;
+
+  /// No description provided for @settingsLanguageIndonesian.
+  ///
+  /// In en, this message translates to:
+  /// **'Indonesian'**
+  String get settingsLanguageIndonesian;
+
+  /// No description provided for @settingsLanguageTurkish.
+  ///
+  /// In en, this message translates to:
+  /// **'Turkish'**
+  String get settingsLanguageTurkish;
+
   /// No description provided for @notifFocusing.
   ///
   /// In en, this message translates to:
@@ -4444,8 +4524,22 @@ class _SDelegate extends LocalizationsDelegate<S> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'ja', 'ko', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'hi',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'pt',
+    'th',
+    'tr',
+    'vi',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_SDelegate old) => false;
@@ -4466,12 +4560,32 @@ S lookupS(Locale locale) {
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return SDe();
     case 'en':
       return SEn();
+    case 'es':
+      return SEs();
+    case 'fr':
+      return SFr();
+    case 'hi':
+      return SHi();
+    case 'id':
+      return SId();
+    case 'it':
+      return SIt();
     case 'ja':
       return SJa();
     case 'ko':
       return SKo();
+    case 'pt':
+      return SPt();
+    case 'th':
+      return STh();
+    case 'tr':
+      return STr();
+    case 'vi':
+      return SVi();
     case 'zh':
       return SZh();
   }

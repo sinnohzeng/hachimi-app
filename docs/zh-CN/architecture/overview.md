@@ -76,6 +76,7 @@ Screens -> Providers -> Services -> Backend 抽象 -> Firebase SDK / Cloud Funct
 ## Android 平台配置
 - **Edge-to-edge**：`MainActivity.onCreate()` 中调用 `enableEdgeToEdge()`（原生窗口配置 SSOT）。
 - **基础 Activity**：`FlutterFragmentActivity`（提供 `ComponentActivity` 以支持 AndroidX edge-to-edge API）。
+- **App Check Debug Token**：固定 Token 通过 `local.properties` → Gradle `buildConfigField` → `BuildConfig.APP_CHECK_DEBUG_TOKEN` → `MainActivity.onCreate()` 写入 Firebase App Check SharedPreferences（SDK 初始化前）。Token 不进版本控制（`local.properties` 在 `.gitignore` 中）。
 - **主题**：`Theme.Material3.Light.NoActionBar` / `Theme.Material3.Dark.NoActionBar`。
 - **系统栏样式**：`app_theme.dart` 中的 `AppBarTheme.systemOverlayStyle`（Flutter 侧系统 UI 的 SSOT）。
 - **依赖**：`activity-ktx:1.10.1`、`material:1.12.0`（在 `build.gradle` 中显式声明）。

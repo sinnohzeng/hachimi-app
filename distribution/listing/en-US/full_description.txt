@@ -1,0 +1,26 @@
+Hachimi turns your daily habits into a rewarding adventure. Adopt adorable virtual cats, watch them grow as you stay focused, and build streaks that keep you motivated.
+
+🐱 Adopt & Raise Virtual Cats
+Each habit you create comes with a unique cat companion. Focus on your habits to feed your cats experience points and watch them evolve through four growth stages — from baby to adult.
+
+⏱️ Smart Focus Timer
+Stay in the zone with a customizable Pomodoro-style timer. Earn coins for every minute you focus, and track your progress with detailed statistics.
+
+📊 Track Your Progress
+View daily, weekly, and monthly stats. Monitor your streaks, total focus time, and habit completion rates with beautiful charts and insights.
+
+📝 AI Cat Diary
+Your cats write diary entries based on your focus sessions! Read their adorable thoughts and reflections about your productivity journey.
+
+✨ Key Features
+• Gamified habit tracking with virtual cat companions
+• Customizable focus timer with background notifications
+• Streak tracking to maintain daily consistency
+• Coins system to reward focused time
+• Multiple cat personalities and evolution stages
+• Detailed statistics and progress charts
+• AI-powered diary entries from your cats
+• Beautiful Material Design 3 & retro pixel UI themes
+• Works offline — no account required
+
+Start building better habits today with Hachimi!

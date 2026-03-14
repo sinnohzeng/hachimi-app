@@ -1914,6 +1914,36 @@ class SEn extends S {
   String get settingsLanguageKorean => 'Korean';
 
   @override
+  String get settingsLanguageSpanish => 'Spanish';
+
+  @override
+  String get settingsLanguagePortuguese => 'Portuguese';
+
+  @override
+  String get settingsLanguageFrench => 'French';
+
+  @override
+  String get settingsLanguageGerman => 'German';
+
+  @override
+  String get settingsLanguageItalian => 'Italian';
+
+  @override
+  String get settingsLanguageHindi => 'Hindi';
+
+  @override
+  String get settingsLanguageThai => 'Thai';
+
+  @override
+  String get settingsLanguageVietnamese => 'Vietnamese';
+
+  @override
+  String get settingsLanguageIndonesian => 'Indonesian';
+
+  @override
+  String get settingsLanguageTurkish => 'Turkish';
+
+  @override
   String get notifFocusing => 'focusing...';
 
   @override

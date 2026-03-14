@@ -422,21 +422,30 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   }
 
   /// 检测 localGuestUid 与当前 UID 不一致 → 补偿迁移。
-  /// 幂等：migrateUid 对已迁移数据是 no-op（UPDATE WHERE uid=oldUid 匹配 0 行）。
+  ///
+  /// 空数据访客（登出后自动生成的 guest UID）只清除标记，不设 dataHydrated，
+  /// 让后续 hydrateFromFirestore 正常拉取云端数据。
   Future<void> _recoverOrphanedGuestData(String currentUid) async {
     final prefs = ref.read(sharedPreferencesProvider);
     final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
     if (guestUid == null || guestUid == currentUid) return;
 
     try {
+      final snapshot = await ref
+          .read(accountSnapshotServiceProvider)
+          .readLocal(guestUid);
+      if (snapshot.isEmpty) {
+        await prefs.remove(AppPrefsKeys.localGuestUid);
+        debugPrint('[RECOVERY] cleared stale guest pref (no data)');
+        return;
+      }
+
       final ledger = ref.read(ledgerServiceProvider);
       await ledger.migrateUid(guestUid, currentUid);
       await prefs.remove(AppPrefsKeys.localGuestUid);
       await prefs.setBool(AppPrefsKeys.dataHydrated, true);
       ledger.notifyChange(const LedgerChange(type: 'hydrate'));
-      debugPrint(
-        '[RECOVERY] migrated orphaned guest data: $guestUid -> $currentUid',
-      );
+      debugPrint('[RECOVERY] migrated orphaned guest data');
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
         e,

@@ -2,30 +2,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/ledger_stream.dart';
 
 /// Habits list — SSOT from local SQLite.
 /// 监听 LedgerService 变更事件自动刷新。
-final habitsProvider = StreamProvider<List<Habit>>((ref) async* {
+final habitsProvider = StreamProvider<List<Habit>>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield [];
-    return;
-  }
+  if (uid == null) return Stream.value(<Habit>[]);
 
   final habitRepo = ref.watch(localHabitRepositoryProvider);
   final ledger = ref.watch(ledgerServiceProvider);
 
-  // 初始值：直接从 SQLite 读取
-  yield await habitRepo.getActiveHabits(uid);
-
-  // 监听变更：台账写入后 yield 最新数据
-  await for (final change in ledger.changes) {
-    if (change.isGlobalRefresh ||
-        change.type.startsWith('habit_') ||
-        change.type == 'focus_complete') {
-      yield await habitRepo.getActiveHabits(uid);
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh ||
+        c.type.startsWith('habit_') ||
+        c.type == 'focus_complete',
+    read: () => habitRepo.getActiveHabits(uid),
+  );
 });
 
 /// Today's sessions — from local SQLite.

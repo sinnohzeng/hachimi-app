@@ -1,0 +1,6 @@
+v2.33.0
+
+- Verbessert: Login-System für mehr Zuverlässigkeit neu aufgebaut — keine Geister-Nutzer mehr nach dem Abmelden
+- Verbessert: Abmelden zeigt jetzt Ladeindikator und wird sauber abgeschlossen
+- Verbessert: Seitenleiste zeigt nach dem Abmelden korrekt die Gast-Anmeldeaufforderung
+- Entfernt: Anonyme Anmeldung (Gäste funktionieren jetzt vollständig offline)

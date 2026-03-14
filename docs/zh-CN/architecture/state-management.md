@@ -70,7 +70,7 @@ sealed class AppAuthState
 ### 登出 — 3 步 Provider 级联
 登出统一由 `UserProfileNotifier.logout()` 编排 — 唯一登出入口。流程为 3 步：
 1. 停止同步引擎（身份切换前）。
-2. 删除旧用户数据 + Firebase 签出。
+2. Firebase 签出 — 本地数据保留，不删除。SQLite UID 列天然隔离多用户数据（每张表都有 `uid` 列），`deleteUidData` 仅保留给账号删除流程（`AccountDeletionOrchestrator`）专用。
 3. 创建新访客 UID → 触发 `appAuthStateProvider` 发出 `GuestState(newUid)` → 所有下游 Provider 自动失效。
 
 非关键清理（通知取消、Crashlytics 用户标识清理）在第 3 步后以 fire-and-forget 方式执行。不再需要手动清理 10 个 SharedPreferences key — Provider 级联替代了旧的手动清扫。
@@ -87,7 +87,13 @@ AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → fal
   - 缺失时回退认证前 `currentUid`
 - `GuestUpgradeCoordinator` 基于快照判定合并路径。
 - `GuestUpgradeCoordinator.resolve(...)` 必须接收 `migrationSourceUid`，若与本地访客 UID 不一致则中止危险迁移。
+- 空访客守卫内置于 `resolve()`：当 `AccountSnapshotService.readLocal(migrationSourceUid).isEmpty` 时，直接清理 `localGuestUid` 并返回 — 不弹合并对话框，不触发数据操作。此设计消除了登出循环后的虚假访客升级。
 - 不再在 `AuthGate` 中做隐式 UID 迁移。
+
+### FirstHabitGate 孤儿访客恢复
+`_recoverOrphanedGuestData` 使用 `AccountSnapshotService.readLocal(guestUid).isEmpty`（与 `GuestUpgradeCoordinator` 判断标准一致）守卫迁移：
+- 快照非空 → 执行 UID 迁移 + 设置 `dataHydrated=true`（保留离线数据）。
+- 快照为空 → 仅清理 `localGuestUid`，不设 `dataHydrated`（让 Firestore 水化正常进行）。
 
 ## 删号流程
 - UI 仅保留三段式确认。

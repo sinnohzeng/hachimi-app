@@ -42,8 +42,8 @@ class FocusTimerService {
     try {
       return await FlutterForegroundTask.startService(
         serviceTypes: [ForegroundServiceTypes.specialUse],
-        notificationTitle: '$catEmoji $habitName',
-        notificationText: 'Focus session starting...',
+        notificationTitle: habitName.isNotEmpty ? habitName : 'Focus',
+        notificationText: '$catEmoji Focus session starting...',
         notificationButtons: [
           const NotificationButton(id: 'pause', text: 'Pause'),
           const NotificationButton(id: 'end_session', text: 'End'),

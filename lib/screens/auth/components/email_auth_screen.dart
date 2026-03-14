@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
+import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -11,6 +12,7 @@ import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
+import 'package:hachimi_app/screens/auth/components/auth_cat_hero.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {
   final bool startAsLogin;
@@ -164,305 +166,255 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
     final textTheme = theme.textTheme;
 
     return AppScaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              colorScheme.primary,
-              colorScheme.primary.withValues(alpha: 0.8),
-            ],
+      body: Stack(
+        children: [
+          const ParticleOverlay(
+            mode: ParticleMode.firefly,
+            child: SizedBox.expand(),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // App bar
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
-                  onPressed: () => Navigator.of(context).pop(),
-                  tooltip: context.l10n.adoptionBack,
+          SafeArea(
+            child: Column(
+              children: [
+                // 返回按钮
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: context.l10n.adoptionBack,
+                  ),
                 ),
-              ),
 
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: AppSpacing.paddingHLg,
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppSpacing.base),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: AppSpacing.paddingHLg,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: AppSpacing.base),
 
-                        // App icon
-                        Icon(
-                          Icons.local_fire_department,
-                          size: 56,
-                          color: colorScheme.onPrimary,
-                          semanticLabel: 'Hachimi',
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          context.l10n.loginAppName,
-                          style: textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-
-                        // Toggle hint
-                        Text(
-                          _isLogin
-                              ? context.l10n.loginWelcomeBack
-                              : context.l10n.loginCreateAccount,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                          ),
-                        ),
-                        if (widget.linkMode) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ChoiceChip(
-                                label: Text(context.l10n.loginLogIn),
-                                selected: _isLogin,
-                                onSelected: (_) =>
-                                    setState(() => _isLogin = true),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              ChoiceChip(
-                                label: Text(
-                                  context.l10n.loginCreateAccountButton,
-                                ),
-                                selected: !_isLogin,
-                                onSelected: (_) =>
-                                    setState(() => _isLogin = false),
-                              ),
-                            ],
-                          ),
-                        ],
-                        const SizedBox(height: AppSpacing.xl),
-
-                        // Email field
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(color: colorScheme.onPrimary),
-                          decoration: _inputDecoration(
-                            colorScheme: colorScheme,
-                            label: context.l10n.loginEmail,
-                            icon: Icons.email_outlined,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return context.l10n.loginValidEmail;
-                            }
-                            if (!value.contains('@')) {
-                              return context.l10n.loginValidEmailFormat;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.base),
-
-                        // Password field
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          style: TextStyle(color: colorScheme.onPrimary),
-                          decoration: _inputDecoration(
-                            colorScheme: colorScheme,
-                            label: context.l10n.loginPassword,
-                            icon: Icons.lock_outlined,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: colorScheme.onPrimary.withValues(
-                                  alpha: 0.54,
-                                ),
-                              ),
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
-                              tooltip: _obscurePassword
-                                  ? context.l10n.loginShowPassword
-                                  : context.l10n.loginHidePassword,
+                          // 像素猫主视觉
+                          const AuthCatHero(size: 96),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            context.l10n.loginAppName,
+                            style: textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return context.l10n.loginValidPassword;
-                            }
-                            if (value.length < 6) {
-                              return context.l10n.loginValidPasswordLength;
-                            }
-                            return null;
-                          },
-                        ),
+                          const SizedBox(height: AppSpacing.sm),
 
-                        // Confirm password (register only)
-                        if (!_isLogin) ...[
-                          const SizedBox(height: AppSpacing.base),
+                          // 状态提示
+                          Text(
+                            _isLogin
+                                ? context.l10n.loginWelcomeBack
+                                : context.l10n.loginCreateAccount,
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
+                          ),
+                          if (widget.linkMode) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ChoiceChip(
+                                  label: Text(context.l10n.loginLogIn),
+                                  selected: _isLogin,
+                                  onSelected: (_) =>
+                                      setState(() => _isLogin = true),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                ChoiceChip(
+                                  label: Text(
+                                    context.l10n.loginCreateAccountButton,
+                                  ),
+                                  selected: !_isLogin,
+                                  onSelected: (_) =>
+                                      setState(() => _isLogin = false),
+                                ),
+                              ],
+                            ),
+                          ],
+                          const SizedBox(height: AppSpacing.xl),
+
+                          // Email field
                           TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _obscureConfirmPassword,
-                            style: TextStyle(color: colorScheme.onPrimary),
-                            decoration: _inputDecoration(
-                              colorScheme: colorScheme,
-                              label: context.l10n.loginConfirmPassword,
-                              icon: Icons.lock_outlined,
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.loginEmail,
+                              prefixIcon: const Icon(Icons.email_outlined),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return context.l10n.loginValidEmail;
+                              }
+                              if (!value.contains('@')) {
+                                return context.l10n.loginValidEmailFormat;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.base),
+
+                          // Password field
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.loginPassword,
+                              prefixIcon: const Icon(Icons.lock_outlined),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscureConfirmPassword
+                                  _obscurePassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: colorScheme.onPrimary.withValues(
-                                    alpha: 0.54,
-                                  ),
                                 ),
                                 onPressed: () => setState(
-                                  () => _obscureConfirmPassword =
-                                      !_obscureConfirmPassword,
+                                  () => _obscurePassword = !_obscurePassword,
                                 ),
-                                tooltip: _obscureConfirmPassword
+                                tooltip: _obscurePassword
                                     ? context.l10n.loginShowPassword
                                     : context.l10n.loginHidePassword,
                               ),
                             ),
                             validator: (value) {
-                              if (value != _passwordController.text) {
-                                return context.l10n.loginValidPasswordMatch;
+                              if (value == null || value.isEmpty) {
+                                return context.l10n.loginValidPassword;
+                              }
+                              if (value.length < 6) {
+                                return context.l10n.loginValidPasswordLength;
                               }
                               return null;
                             },
                           ),
-                        ],
-                        const SizedBox(height: AppSpacing.xl),
 
-                        // Submit button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton(
-                            onPressed: _isLoading ? null : _submit,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: colorScheme.onPrimary,
-                              foregroundColor: colorScheme.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: AppShape.borderLarge,
-                              ),
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    _isLogin
-                                        ? context.l10n.loginLogIn
-                                        : context.l10n.loginCreateAccountButton,
-                                    style: textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.primary,
-                                    ),
+                          // Confirm password (register only)
+                          if (!_isLogin) ...[
+                            const SizedBox(height: AppSpacing.base),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _obscureConfirmPassword,
+                              decoration: InputDecoration(
+                                labelText: context.l10n.loginConfirmPassword,
+                                prefixIcon: const Icon(Icons.lock_outlined),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                   ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Toggle login/register
-                        if (!widget.linkMode)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _isLogin
-                                    ? context.l10n.loginNoAccount
-                                    : context.l10n.loginAlreadyHaveAccount,
-                                style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onPrimary.withValues(
-                                    alpha: 0.7,
+                                  onPressed: () => setState(
+                                    () => _obscureConfirmPassword =
+                                        !_obscureConfirmPassword,
                                   ),
+                                  tooltip: _obscureConfirmPassword
+                                      ? context.l10n.loginShowPassword
+                                      : context.l10n.loginHidePassword,
                                 ),
                               ),
-                              Semantics(
-                                button: true,
-                                label: _isLogin
-                                    ? context.l10n.loginRegister
-                                    : context.l10n.loginLogIn,
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      setState(() => _isLogin = !_isLogin),
-                                  child: ExcludeSemantics(
-                                    child: Text(
+                              validator: (value) {
+                                if (value != _passwordController.text) {
+                                  return context.l10n.loginValidPasswordMatch;
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: AppSpacing.xl),
+
+                          // Submit button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: FilledButton(
+                              onPressed: _isLoading ? null : _submit,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: AppShape.borderLarge,
+                                ),
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
                                       _isLogin
-                                          ? context.l10n.loginRegister
-                                          : context.l10n.loginLogIn,
-                                      style: textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onPrimary,
+                                          ? context.l10n.loginLogIn
+                                          : context
+                                                .l10n
+                                                .loginCreateAccountButton,
+                                      style: textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: colorScheme.onPrimary,
+                                        color: colorScheme.onPrimary,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // Toggle login/register
+                          if (!widget.linkMode)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _isLogin
+                                      ? context.l10n.loginNoAccount
+                                      : context.l10n.loginAlreadyHaveAccount,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface.withValues(
+                                      alpha: 0.7,
+                                    ),
+                                  ),
+                                ),
+                                Semantics(
+                                  button: true,
+                                  label: _isLogin
+                                      ? context.l10n.loginRegister
+                                      : context.l10n.loginLogIn,
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        setState(() => _isLogin = !_isLogin),
+                                    child: ExcludeSemantics(
+                                      child: Text(
+                                        _isLogin
+                                            ? context.l10n.loginRegister
+                                            : context.l10n.loginLogIn,
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.primary,
+                                          fontWeight: FontWeight.bold,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: colorScheme.primary,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: AppSpacing.xl),
-                      ],
+                              ],
+                            ),
+                          const SizedBox(height: AppSpacing.xl),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
-    );
-  }
-
-  InputDecoration _inputDecoration({
-    required ColorScheme colorScheme,
-    required String label,
-    required IconData icon,
-    Widget? suffixIcon,
-  }) {
-    final onPrimary = colorScheme.onPrimary;
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(color: onPrimary.withValues(alpha: 0.7)),
-      prefixIcon: Icon(icon, color: onPrimary.withValues(alpha: 0.7)),
-      suffixIcon: suffixIcon,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: AppShape.borderMedium,
-        borderSide: BorderSide(color: onPrimary.withValues(alpha: 0.3)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: AppShape.borderMedium,
-        borderSide: BorderSide(color: onPrimary),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: AppShape.borderMedium,
-        borderSide: BorderSide(color: colorScheme.error),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: AppShape.borderMedium,
-        borderSide: BorderSide(color: colorScheme.error),
-      ),
-      filled: true,
-      fillColor: onPrimary.withValues(alpha: 0.1),
     );
   }
 }

@@ -1,0 +1,6 @@
+v2.33.0
+
+- Cải thiện: Hệ thống đăng nhập được xây dựng lại để ổn định hơn — không còn người dùng ảo sau khi đăng xuất
+- Cải thiện: Đăng xuất hiện hiển thị chỉ báo tải và hoàn tất gọn gàng
+- Cải thiện: Thanh bên hiển thị đúng lời nhắc đăng nhập khách sau khi đăng xuất
+- Đã xóa: Đăng nhập ẩn danh (khách giờ hoạt động hoàn toàn ngoại tuyến)

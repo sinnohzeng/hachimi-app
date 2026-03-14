@@ -76,6 +76,7 @@ Compatibility aliases (`V1`) still exist for safe migration.
 ## Android Platform Configuration
 - **Edge-to-edge**: `enableEdgeToEdge()` in `MainActivity.onCreate()` (SSOT for native window config).
 - **Base activity**: `FlutterFragmentActivity` (provides `ComponentActivity` for AndroidX edge-to-edge API).
+- **App Check debug token**: Fixed token injected via `local.properties` → Gradle `buildConfigField` → `BuildConfig.APP_CHECK_DEBUG_TOKEN` → `MainActivity.onCreate()` writes to Firebase App Check SharedPreferences before SDK init. Token is never committed to version control (`local.properties` is in `.gitignore`).
 - **Themes**: `Theme.Material3.Light.NoActionBar` / `Theme.Material3.Dark.NoActionBar`.
 - **System bar styling**: `AppBarTheme.systemOverlayStyle` in `app_theme.dart` (SSOT for Flutter-side system UI).
 - **Dependencies**: `activity-ktx:1.10.1`, `material:1.12.0` (explicit in `build.gradle`).

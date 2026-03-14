@@ -1,0 +1,6 @@
+v2.33.0
+
+- Amélioré : Système de connexion reconstruit pour plus de fiabilité — plus d'utilisateurs fantômes après déconnexion
+- Amélioré : La déconnexion affiche désormais un indicateur de chargement et se termine proprement
+- Amélioré : La barre latérale affiche correctement l'invite de connexion invité après déconnexion
+- Supprimé : Connexion anonyme (les invités fonctionnent désormais entièrement hors ligne)

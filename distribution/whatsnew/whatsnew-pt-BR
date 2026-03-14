@@ -1,0 +1,6 @@
+v2.33.0
+
+- Melhorado: Sistema de login reconstruído para maior confiabilidade — sem mais usuários fantasma após logout
+- Melhorado: Logout agora mostra indicador de carregamento e finaliza corretamente
+- Melhorado: Barra lateral mostra corretamente o aviso de login para visitantes após sair
+- Removido: Login anônimo (visitantes agora funcionam totalmente offline)

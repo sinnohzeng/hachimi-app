@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/ledger_stream.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/pixel_cat_generation_service.dart';
 
 /// Pixel cat generation service — singleton.
@@ -8,55 +10,45 @@ final pixelCatGenerationServiceProvider = Provider<PixelCatGenerationService>(
   (ref) => PixelCatGenerationService(),
 );
 
+bool _catChangeFilter(LedgerChange c) =>
+    c.isGlobalRefresh ||
+    c.type.startsWith('habit_') ||
+    c.type == 'cat_update' ||
+    c.type == 'focus_complete' ||
+    c.type == 'equip' ||
+    c.type == 'unequip';
+
 /// Active cats — SSOT from local SQLite.
 /// 监听 LedgerService 变更事件自动刷新。
-final catsProvider = StreamProvider<List<Cat>>((ref) async* {
+final catsProvider = StreamProvider<List<Cat>>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield [];
-    return;
-  }
+  if (uid == null) return Stream.value(<Cat>[]);
 
   final catRepo = ref.watch(localCatRepositoryProvider);
   final ledger = ref.watch(ledgerServiceProvider);
 
-  yield await catRepo.getActiveCats(uid);
-
-  await for (final change in ledger.changes) {
-    if (change.isGlobalRefresh ||
-        change.type.startsWith('habit_') ||
-        change.type == 'cat_update' ||
-        change.type == 'focus_complete' ||
-        change.type == 'equip' ||
-        change.type == 'unequip') {
-      yield await catRepo.getActiveCats(uid);
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: _catChangeFilter,
+    read: () => catRepo.getActiveCats(uid),
+  );
 });
 
 /// All cats — includes graduated and dormant cats for Cat Album.
-final allCatsProvider = StreamProvider<List<Cat>>((ref) async* {
+final allCatsProvider = StreamProvider<List<Cat>>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    yield [];
-    return;
-  }
+  if (uid == null) return Stream.value(<Cat>[]);
 
   final catRepo = ref.watch(localCatRepositoryProvider);
   final ledger = ref.watch(ledgerServiceProvider);
 
-  yield await catRepo.getAllCats(uid);
-
-  await for (final change in ledger.changes) {
-    if (change.isGlobalRefresh ||
-        change.type.startsWith('habit_') ||
-        change.type == 'cat_update' ||
-        change.type == 'focus_complete' ||
-        change.type == 'equip' ||
-        change.type == 'unequip') {
-      yield await catRepo.getAllCats(uid);
-    }
-  }
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: _catChangeFilter,
+    read: () => catRepo.getAllCats(uid),
+  );
 });
 
 /// Cat by habit ID — family provider for quick lookups.

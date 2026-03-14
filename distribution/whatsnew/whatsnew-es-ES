@@ -1,0 +1,6 @@
+v2.33.0
+
+- Mejorado: Sistema de inicio de sesión reconstruido para mayor fiabilidad — no más usuarios fantasma tras cerrar sesión
+- Mejorado: El cierre de sesión ahora muestra indicador de carga y se completa limpiamente
+- Mejorado: La barra lateral muestra correctamente el aviso de inicio de sesión para invitados tras cerrar sesión
+- Eliminado: Inicio de sesión anónimo (los invitados ahora funcionan completamente sin conexión)

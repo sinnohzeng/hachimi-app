@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/backend/account_lifecycle_backend.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
@@ -35,7 +36,9 @@ class AccountDeletionOrchestrator {
        _connectivity = connectivity ?? Connectivity();
 
   Future<AccountDeletionResult> deleteAccount({required String uid}) async {
+    debugPrint('[AccountDeletion] 开始删除账号');
     if (_isLocalGuestUid(uid)) {
+      debugPrint('[AccountDeletion] 访客账号 — 仅清理本地数据');
       await _deletionService.cleanLocalData();
       await _clearPending();
       return const AccountDeletionResult(
@@ -47,16 +50,19 @@ class AccountDeletionOrchestrator {
 
     final correlationId = CorrelationIdFactory.newId();
     await _storePending(uid: uid, retryCount: 0, correlationId: correlationId);
+    debugPrint('[AccountDeletion] 清理本地数据...');
     await _deletionService.cleanLocalData(
       preservePrefs: _pendingPrefsSnapshot(),
     );
     if (!await _isOnline()) {
+      debugPrint('[AccountDeletion] 离线 — 远程删除已排队');
       return const AccountDeletionResult(
         localDeleted: true,
         remoteDeleted: false,
         queued: true,
       );
     }
+    debugPrint('[AccountDeletion] 在线 — 尝试远程删除...');
     return _attemptRemoteDeletion(
       uid,
       correlationId: correlationId,
@@ -128,7 +134,9 @@ class AccountDeletionOrchestrator {
       correlationId: correlationId,
     );
     try {
+      debugPrint('[AccountDeletion] 调用 deleteAccountHard...');
       await _lifecycleBackend.deleteAccountHard(context: opContext);
+      debugPrint('[AccountDeletion] 远程删除成功 — 签出用户');
       await _authBackend.signOut();
       ObservabilityRuntime.clearUidHash();
       try {
@@ -143,6 +151,10 @@ class AccountDeletionOrchestrator {
     } catch (e, stack) {
       final retryable = _isRetryableRemoteError(e);
       final errorCode = _toRemoteErrorCode(e);
+      debugPrint(
+        '[AccountDeletion] 远程删除失败: $errorCode '
+        '(retryable=$retryable, retry=$retryCount)',
+      );
       if (retryable) {
         await _incrementRetry();
       } else {

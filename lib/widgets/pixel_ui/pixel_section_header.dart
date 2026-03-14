@@ -29,7 +29,7 @@ class PixelSectionHeader extends StatelessWidget {
       child: Row(
         children: [
           // 左装饰线
-          Expanded(child: _PixelDivider(color: lineColor)),
+          Flexible(child: _PixelDivider(color: lineColor)),
           const SizedBox(width: 8),
           if (icon != null) ...[
             Icon(icon, size: 16, color: pixel.pixelAccentWarm),
@@ -39,7 +39,7 @@ class PixelSectionHeader extends StatelessWidget {
           if (trailing != null) ...[const SizedBox(width: 6), trailing!],
           const SizedBox(width: 8),
           // 右装饰线
-          Expanded(child: _PixelDivider(color: lineColor)),
+          Flexible(child: _PixelDivider(color: lineColor)),
         ],
       ),
     );

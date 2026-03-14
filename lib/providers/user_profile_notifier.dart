@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
@@ -76,26 +77,21 @@ class UserProfileNotifier extends Notifier<void> {
     _isLoggingOut = true;
 
     try {
-      final oldUid = ref.read(appAuthStateProvider).uid;
-
       // Step 1: 停止后台引擎（在身份切换前停止 Firestore 监听）
+      debugPrint('[Auth] 登出 Step 1: 停止 SyncEngine');
       ref.read(syncEngineProvider).stop();
 
-      // Step 2: 清理旧用户数据 + Firebase 登出
-      if (oldUid.isNotEmpty) {
-        try {
-          await ref.read(ledgerServiceProvider).deleteUidData(oldUid);
-        } catch (e, stack) {
-          _recordLogoutError(e, stack, 'delete_uid_data');
-        }
-      }
+      // Step 2: Firebase 登出（本地数据保留，UID 列天然隔离多用户数据）
+      debugPrint('[Auth] 登出 Step 2: Firebase signOut');
       try {
         await ref.read(authBackendProvider).signOut();
       } catch (e, stack) {
+        debugPrint('[Auth] 登出 signOut 失败: $e');
         _recordLogoutError(e, stack, 'auth_signout');
       }
 
       // Step 3: 创建新访客身份 + 触发导航重置
+      debugPrint('[Auth] 登出 Step 3: 创建新访客身份');
       final prefs = ref.read(sharedPreferencesProvider);
       prefs.setString(AppPrefsKeys.localGuestUid, 'guest_${const Uuid().v4()}');
       prefs.remove(AppPrefsKeys.dataHydrated);
@@ -104,6 +100,7 @@ class UserProfileNotifier extends Notifier<void> {
       ObservabilityRuntime.clearUidHash();
       ref.read(onboardingCompleteProvider.notifier).reset();
       _cleanupNonCritical();
+      debugPrint('[Auth] 登出完成');
     } finally {
       _isLoggingOut = false;
     }

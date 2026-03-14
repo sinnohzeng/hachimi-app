@@ -1,0 +1,6 @@
+v2.33.0
+
+- İyileştirildi: Giriş sistemi güvenilirlik için yeniden oluşturuldu — çıkış sonrası hayalet kullanıcılar artık yok
+- İyileştirildi: Çıkış artık yükleme göstergesi gösteriyor ve düzgün tamamlanıyor
+- İyileştirildi: Kenar çubuğu çıkış sonrası misafir giriş istemini doğru gösteriyor
+- Kaldırıldı: Anonim giriş (misafirler artık tamamen çevrimdışı çalışıyor)

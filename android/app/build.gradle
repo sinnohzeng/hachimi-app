@@ -20,6 +20,10 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "29.0.13846066"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_17
@@ -41,6 +45,24 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // App Check debug token（从 local.properties 读取，不进版本控制）
+        def localProps = new Properties()
+        def localPropsFile = rootProject.file('local.properties')
+        if (localPropsFile.exists()) {
+            localProps.load(new FileInputStream(localPropsFile))
+        }
+        buildConfigField "String", "APP_CHECK_DEBUG_TOKEN",
+            "\"${localProps.getProperty('appcheck.debug.token', '')}\""
+
+        // Firebase App ID（从 google-services.json 提取，用于构建 App Check SharedPreferences 文件名）
+        def googleServicesFile = file('google-services.json')
+        def firebaseAppId = ''
+        if (googleServicesFile.exists()) {
+            def gsJson = new groovy.json.JsonSlurper().parse(googleServicesFile)
+            firebaseAppId = gsJson?.client?.getAt(0)?.client_info?.mobilesdk_app_id ?: ''
+        }
+        buildConfigField "String", "FIREBASE_APP_ID", "\"${firebaseAppId}\""
     }
 
     signingConfigs {
