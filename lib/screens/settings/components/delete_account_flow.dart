@@ -167,9 +167,7 @@ class DeleteAccountFlow {
       );
       await ref
           .read(analyticsServiceProvider)
-          .logAccountDeletionFailed(
-            errorCode: 'delete_account_execute_failed',
-          );
+          .logAccountDeletionFailed(errorCode: 'delete_account_execute_failed');
       if (context.mounted) {
         Navigator.of(context).pop();
         AppFeedback.error(context, l10n.deleteAccountError);

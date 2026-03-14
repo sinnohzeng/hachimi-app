@@ -48,9 +48,9 @@ Future<SharedPreferences> _initializeCriticalServices() async {
   await _activateAppCheck();
   final prefs = results[1] as SharedPreferences;
   await ObservabilityRuntime.initialize();
-  final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
-  if (cachedUid != null && cachedUid.isNotEmpty) {
-    ObservabilityRuntime.setUidHashFromUid(cachedUid);
+  final localUid = prefs.getString(AppPrefsKeys.localGuestUid);
+  if (localUid != null && localUid.isNotEmpty) {
+    ObservabilityRuntime.setUidHashFromUid(localUid);
   }
 
   FirebaseFirestore.instance.settings = const Settings(

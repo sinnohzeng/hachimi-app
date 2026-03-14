@@ -27,9 +27,10 @@
 - `accountDeletionOrchestratorProvider`
 
 ### Auth and identity providers
-- `authStateProvider`
-- `currentUidProvider`
-- `isGuestProvider`
+- `authStateProvider` — Firebase Auth stream (SSOT)
+- `appAuthStateProvider` — sealed class combining auth stream + local guest UID → `AuthenticatedState | GuestState`
+- `currentUidProvider` — derived from `appAuthStateProvider` (backward-compat, 26+ files)
+- `isGuestProvider` — derived from `appAuthStateProvider` (backward-compat, 5 files)
 - `onboardingCompleteProvider`
 
 ## Runtime State Model
@@ -42,18 +43,37 @@
 
 Affected providers: `habitsProvider`, `catsProvider`, `allCatsProvider`, `coinBalanceProvider`, `hasCheckedInTodayProvider`, `monthlyCheckInProvider`, `inventoryProvider`, `unlockedAchievementsProvider`, `avatarIdProvider`, `currentTitleProvider`, `unlockedTitlesProvider`.
 
+## AppAuthState — Sealed Class Identity Model
+
+`AppAuthState` (in `lib/models/app_auth_state.dart`) replaces the previous boolean `isGuest` approach with a sealed class that makes identity states exhaustive and pattern-matchable:
+
+```
+sealed class AppAuthState
+├── AuthenticatedState(uid, email?, displayName?)
+└── GuestState(uid)  // uid may be empty (pre-onboarding)
+```
+
+`appAuthStateProvider` is the single SSOT combining Firebase Auth stream + local guest UID. All downstream consumers (`currentUidProvider`, `isGuestProvider`, drawer, AuthGate) derive from this single source via `ref.watch(appAuthStateProvider)`.
+
 ## AuthGate Behavior
 1. If onboarding incomplete:
    - If `hasOnboardedBefore == false` → first-time user → show OnboardingScreen.
    - If `hasOnboardedBefore == true` → returning user after logout → auto-skip tutorial, create guest UID, restore onboarding state.
-2. If deletion tombstone/pending job exists -> pending deletion screen + retry loop.
-3. If authenticated -> boot app with auth uid.
-4. If unauthenticated but cached uid exists -> local guest boot + background anonymous sign-in.
+2. If deletion tombstone/pending job exists → pending deletion screen + retry loop.
+3. `switch (appAuthStateProvider)`:
+   - `AuthenticatedState` → boot app with auth UID.
+   - `GuestState` (uid non-empty) → local guest boot.
+   - `GuestState` (uid empty) → loading spinner (pre-onboarding).
 
 `hasOnboardedBefore` is a persistent SharedPreferences flag set on first onboarding completion. It survives logout but is cleared on account deletion (fresh start).
 
-### Logout — Clean-Then-Navigate
-Logout is centralized in `UserProfileNotifier.logout()` — the only logout entry point. The flow follows a **Clean-Then-Navigate** pattern: user state is fully cleaned (SharedPreferences cleared, SQLite user data deleted, Firebase signed out) **before** triggering navigation via `onboardingCompleteProvider.reset()`. Non-critical cleanup (notification cancellation, Crashlytics user reset) runs as fire-and-forget after navigation.
+### Logout — 3-Step Provider Cascade
+Logout is centralized in `UserProfileNotifier.logout()` — the only logout entry point. The flow is 3 steps:
+1. Stop sync engine (before identity switch).
+2. Delete old user data + Firebase sign out.
+3. Create fresh guest UID → triggers `appAuthStateProvider` to emit `GuestState(newUid)` → all downstream providers auto-invalidate.
+
+Non-critical cleanup (notification cancellation, Crashlytics user reset) runs as fire-and-forget after step 3. No manual SharedPreferences sweep — provider cascade replaces the old 10-key cleanup.
 
 `ref.listenManual(onboardingCompleteProvider)` in AuthGate detects `true → false` and calls `popUntil(isFirst)` to dismiss any open dialogs or pushed routes.
 

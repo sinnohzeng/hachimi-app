@@ -40,7 +40,6 @@ class AccountMergeService {
     }
 
     await _prefs.remove(AppPrefsKeys.localGuestUid);
-    await _prefs.setString(AppPrefsKeys.cachedUid, newUid);
     await _prefs.setBool(AppPrefsKeys.dataHydrated, false);
 
     await _syncEngine.hydrateFromFirestore(newUid);
@@ -71,9 +70,8 @@ class AccountMergeService {
       displayName: displayName,
     );
 
-    // 3. 更新本地认证缓存
+    // 3. 清理访客标记 + 标记数据已就绪
     await _prefs.remove(AppPrefsKeys.localGuestUid);
-    await _prefs.setString(AppPrefsKeys.cachedUid, newUid);
     await _prefs.setBool(AppPrefsKeys.dataHydrated, true);
 
     // 4. 恢复同步 + 通知 UI

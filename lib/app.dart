@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/models/app_auth_state.dart';
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -78,11 +78,12 @@ class HachimiApp extends ConsumerWidget {
   }
 }
 
-/// AuthGate — reactively switches between OnboardingScreen, LoginScreen,
-/// and HomeScreen based on onboarding state + Firebase Auth state.
-/// This is the SSOT for auth-based routing.
+/// AuthGate — 认证路由的单一入口。
 ///
-/// [A4] 乐观认证：cached UID 存在时直接渲染 HomeScreen，无需等待 Auth stream。
+/// 使用 [appAuthStateProvider] 的 sealed class 模式匹配（三路径）：
+/// - [AuthenticatedState] → 已登录主页
+/// - [GuestState] (uid 非空) → 访客主页
+/// - [GuestState] (uid 空) → 引导前的加载态
 class AuthGate extends ConsumerStatefulWidget {
   final Stopwatch? startupStopwatch;
   const AuthGate({super.key, this.startupStopwatch});
@@ -93,7 +94,6 @@ class AuthGate extends ConsumerStatefulWidget {
 
 class _AuthGateState extends ConsumerState<AuthGate> {
   bool _appOpenLogged = false;
-  bool _isAutoSigningIn = false;
   bool _isAutoSkipping = false;
   bool _isPendingDeletionRetry = false;
   Timer? _pendingDeletionTimer;
@@ -147,24 +147,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   /// 同步生成本地访客 UID — 零网络依赖，保证引导完成后立即进入主页。
   void _ensureLocalUid() {
     final prefs = ref.read(sharedPreferencesProvider);
-    if (prefs.getString(AppPrefsKeys.cachedUid) != null) return;
-    final guestUid = 'guest_${const Uuid().v4()}';
-    prefs.setString(AppPrefsKeys.localGuestUid, guestUid);
-    prefs.setString(AppPrefsKeys.cachedUid, guestUid);
-  }
-
-  /// 后台匿名登录 — 失败不影响 UI，下次联网再试。
-  Future<void> _autoSignInAnonymously() async {
-    if (_isAutoSigningIn) return;
-    _isAutoSigningIn = true;
-    try {
-      await ref.read(authBackendProvider).signInAnonymously();
-      debugPrint('[APP] background sign-in complete');
-    } catch (e) {
-      debugPrint('[APP] background sign-in failed: $e');
-    } finally {
-      _isAutoSigningIn = false;
-    }
+    if (prefs.getString(AppPrefsKeys.localGuestUid) != null) return;
+    prefs.setString(AppPrefsKeys.localGuestUid, 'guest_${const Uuid().v4()}');
   }
 
   Future<void> _resumePendingDeletion() async {
@@ -187,10 +171,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     await ref.read(userProfileNotifierProvider.notifier).logout();
   }
 
-  /// 认证用户就绪后：缓存 UID、设置 Crashlytics。
-  void _handleAuthUser(AuthUser user, SharedPreferences prefs) {
-    prefs.setString(AppPrefsKeys.cachedUid, user.uid);
-    _applyUidObservability(user.uid);
+  /// 认证用户就绪后：设置 Crashlytics 可观测性。
+  void _handleAuthUser(String uid) {
+    _applyUidObservability(uid);
     ErrorHandler.breadcrumb('auth_state: ${ObservabilityRuntime.uidHash}');
   }
 
@@ -264,40 +247,31 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     }
 
     final prefs = ref.read(sharedPreferencesProvider);
-    final authState = ref.watch(authStateProvider);
 
     if (_hasPendingDeletion(prefs)) {
       return _PendingDeletionScreen(onAbandon: _abandonPendingDeletion);
     }
 
-    // 已认证 → 使用认证 UID
-    final AuthUser? authUser = authState.whenOrNull(data: (u) => u);
-    if (authUser != null) {
-      _handleAuthUser(authUser, prefs);
-      _logAppOpened();
-      return _FirstHabitGate(
-        uid: authUser.uid,
-        startupStopwatch: widget.startupStopwatch,
-      );
+    final appAuth = ref.watch(appAuthStateProvider);
+    switch (appAuth) {
+      case AuthenticatedState():
+        _handleAuthUser(appAuth.uid);
+        _logAppOpened();
+        return _FirstHabitGate(
+          uid: appAuth.uid,
+          startupStopwatch: widget.startupStopwatch,
+        );
+      case GuestState() when appAuth.uid.isNotEmpty:
+        _applyUidObservability(appAuth.uid);
+        _logAppOpened();
+        return _FirstHabitGate(
+          uid: appAuth.uid,
+          startupStopwatch: widget.startupStopwatch,
+        );
+      case GuestState():
+        // UID 为空 = 引导前的初始状态
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    // Firebase 未就绪 → 使用缓存 UID（_ensureLocalUid 已保证存在）
-    final cachedUid = prefs.getString(AppPrefsKeys.cachedUid);
-    if (cachedUid != null) {
-      _applyUidObservability(cachedUid);
-      _autoSignInAnonymously();
-      _logAppOpened();
-      return _FirstHabitGate(
-        uid: cachedUid,
-        startupStopwatch: widget.startupStopwatch,
-      );
-    }
-
-    ObservabilityRuntime.clearUidHash();
-    FirebaseCrashlytics.instance.setUserIdentifier('');
-
-    // 无认证 + 无缓存 = 已登出，等 onboardingCompleteProvider reset 触发重建
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
   bool _hasPendingDeletion(SharedPreferences prefs) {

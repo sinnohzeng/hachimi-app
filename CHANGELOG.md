@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.0] - 2026-03-13
+
+### Changed
+- **认证架构简化 — sealed class 替代 boolean isGuest**：新增 `AppAuthState` sealed class（`AuthenticatedState | GuestState`），通过模式匹配消除登出过渡态盲区，根除"幽灵用户"bug
+- **`appAuthStateProvider` 单一认证 SSOT**：组合 Firebase Auth stream + 本地访客 UID，`currentUidProvider` 和 `isGuestProvider` 作为向后兼容的薄派生层保留（26+ 文件零改动）
+- **登出流程 3 步化**：从 6 阶段手动编排简化为 stop → signOut + delete → 新访客 UID，依赖 Provider 级联自动清理下游状态，移除 10 个 SharedPreferences key 的手动清扫
+- **AuthGate switch 模式匹配**：用 Dart 3 exhaustive switch 替代 7 层嵌套的 if-else 判断，3 条路径清晰可读
+- **移除 cachedUid 冗余层**：Firebase SDK 原生持久化 session，`cachedUid` SharedPreferences key 是不必要的双重缓存，已从全链路清除
+- **移除匿名登录**：`_autoSignInAnonymously()` 和 `wasAnonymous` 追踪已删除，访客纯本地运行，无 Firebase 匿名用户
+
+### Fixed
+- **侧边栏幽灵用户**：`app_drawer.dart` 改用 `appAuthStateProvider` 模式匹配，登出后正确显示访客登录引导而非 fallback 名字"用户"
+- **退出按钮无反馈**：`logout_confirmation.dart` 新增 loading 状态，确认后禁用按钮并显示进度指示器，防止重复点击
+- **访客升级 cachedUid 残留**：`AccountMergeService` 移除对已废弃 `cachedUid` key 的写入
+
 ## [2.32.1] - 2026-03-13
 
 ### Fixed

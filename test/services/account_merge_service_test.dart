@@ -134,7 +134,6 @@ void main() {
 
     SharedPreferences.setMockInitialValues({
       AppPrefsKeys.localGuestUid: 'guest_old',
-      AppPrefsKeys.cachedUid: 'guest_old',
     });
     prefs = await SharedPreferences.getInstance();
 
@@ -178,8 +177,6 @@ void main() {
 
       // localGuestUid 已清除
       expect(prefs.getString(AppPrefsKeys.localGuestUid), isNull);
-      // cachedUid 更新为新 UID
-      expect(prefs.getString(AppPrefsKeys.cachedUid), 'firebase_abc');
       // dataHydrated 标记为 true（本地数据是权威来源）
       expect(prefs.getBool(AppPrefsKeys.dataHydrated), isTrue);
     });
@@ -223,7 +220,6 @@ void main() {
       expect(fakeLedger.callLog.contains('deleteUidData'), isTrue);
       expect(fakeSyncEngine.callLog.contains('hydrate'), isTrue);
       expect(prefs.getString(AppPrefsKeys.localGuestUid), isNull);
-      expect(prefs.getString(AppPrefsKeys.cachedUid), 'firebase_abc');
       // dataHydrated 为 false — 等待水化完成后由 SyncEngine 标记
       expect(prefs.getBool(AppPrefsKeys.dataHydrated), isFalse);
     });

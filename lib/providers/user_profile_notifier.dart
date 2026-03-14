@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:uuid/uuid.dart';
 
 /// UserProfileNotifier — 用户资料变更的统一入口。
 ///
@@ -23,12 +24,10 @@ class UserProfileNotifier extends Notifier<void> {
     required String email,
     String? displayName,
   }) async {
-    // 1. Firestore 文档创建
     await ref
         .read(userProfileServiceProvider)
         .ensureProfile(uid: uid, email: email, displayName: displayName);
 
-    // 2. 本地 materialized_state 初始化
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'coins', '0');
     await ledger.setMaterialized(uid, 'last_check_in_date', '');
@@ -44,7 +43,6 @@ class UserProfileNotifier extends Notifier<void> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'display_name', newName);
     await ledger.append(
@@ -54,13 +52,10 @@ class UserProfileNotifier extends Notifier<void> {
       payload: {'field': 'displayName', 'value': newName},
     );
 
-    // 2. Firebase Auth best-effort（fire-and-forget）
     _syncBestEffort(
       () => ref.read(authBackendProvider).updateDisplayName(newName),
       'updateDisplayName(auth)',
     );
-
-    // 3. Firestore best-effort（fire-and-forget）
     _syncBestEffort(
       () => ref
           .read(userProfileServiceProvider)
@@ -71,56 +66,50 @@ class UserProfileNotifier extends Notifier<void> {
 
   bool _isLoggingOut = false;
 
-  /// 登出 — Clean-Then-Navigate：先清理关键状态，再触发导航。
+  /// 登出 — 简化为 3 步，依赖 Provider 级联自动清理下游状态。
   ///
-  /// 这是所有登出操作的唯一入口。屏幕层不得直接调用 authBackend.signOut()。
-  ///
-  /// 设计原则：关键状态（本地缓存 + Auth 会话）必须在导航重置前清除，
-  /// 否则新会话的 _ensureLocalUid / _autoSignInAnonymously 会与旧会话的
-  /// fire-and-forget signOut 产生竞态，导致用户卡死在加载页。
+  /// 行业最佳实践：signOut() 触发 authStateProvider 发出 null →
+  /// appAuthStateProvider 重算为 GuestState → 所有下游 provider 自动失效。
+  /// 不再需要手动清理 10 个 SharedPreferences key。
   Future<void> logout() async {
     if (_isLoggingOut) return;
     _isLoggingOut = true;
 
     try {
-      final uid = ref.read(currentUidProvider);
+      final oldUid = ref.read(appAuthStateProvider).uid;
 
-      ref.read(syncEngineProvider).stop(); // Phase 1: 停止后台引擎
-      _clearUserLocalState(); // Phase 2: SharedPreferences
-      await _destroySessionData(uid); // Phase 3-4: SQLite + Firebase
+      // Step 1: 停止后台引擎（在身份切换前停止 Firestore 监听）
+      ref.read(syncEngineProvider).stop();
 
-      // Phase 5: 导航触发 — 用户看到引导页（此时旧会话已彻底销毁）
+      // Step 2: 清理旧用户数据 + Firebase 登出
+      if (oldUid.isNotEmpty) {
+        try {
+          await ref.read(ledgerServiceProvider).deleteUidData(oldUid);
+        } catch (e, stack) {
+          _recordLogoutError(e, stack, 'delete_uid_data');
+        }
+      }
+      try {
+        await ref.read(authBackendProvider).signOut();
+      } catch (e, stack) {
+        _recordLogoutError(e, stack, 'auth_signout');
+      }
+
+      // Step 3: 创建新访客身份 + 触发导航重置
+      final prefs = ref.read(sharedPreferencesProvider);
+      prefs.setString(AppPrefsKeys.localGuestUid, 'guest_${const Uuid().v4()}');
+      prefs.remove(AppPrefsKeys.dataHydrated);
+      prefs.remove(AppPrefsKeys.onboardingComplete);
+
+      ObservabilityRuntime.clearUidHash();
       ref.read(onboardingCompleteProvider.notifier).reset();
-
-      _cleanupNonCritical(); // Phase 6: 通知 + Crashlytics（fire-and-forget）
+      _cleanupNonCritical();
     } finally {
       _isLoggingOut = false;
     }
   }
 
-  /// 销毁用户会话数据 — SQLite 台账 + Firebase Auth。
-  ///
-  /// 每个操作独立 try-catch，单个失败不影响后续清理。
-  Future<void> _destroySessionData(String? uid) async {
-    if (uid != null) {
-      try {
-        await ref.read(ledgerServiceProvider).deleteUidData(uid);
-      } catch (e, stack) {
-        _recordLogoutError(e, stack, 'delete_uid_data');
-      }
-    }
-    try {
-      await ref.read(authBackendProvider).signOut();
-    } catch (e, stack) {
-      _recordLogoutError(e, stack, 'auth_signout');
-    }
-    ObservabilityRuntime.clearUidHash();
-  }
-
   /// 登出后台清理 — 非关键操作，best-effort。
-  ///
-  /// 仅负责通知取消和 Crashlytics 用户标识清理。
-  /// SQLite 数据已在 Phase 3 同步清除，此处不再处理。
   void _cleanupNonCritical() {
     Future(() async {
       try {
@@ -148,29 +137,6 @@ class UserProfileNotifier extends Notifier<void> {
     }
   }
 
-  /// 清理全量用户级 SharedPreferences — 保留应用级设置。
-  ///
-  /// 以下键被刻意保留：
-  /// - [AppPrefsKeys.hasOnboardedBefore] — 登出后跳过引导教程
-  /// - theme / locale 等应用级设置由各自 Provider 管理，不在此清理范围
-  void _clearUserLocalState() {
-    final prefs = ref.read(sharedPreferencesProvider);
-    for (final key in const [
-      AppPrefsKeys.cachedUid,
-      AppPrefsKeys.localGuestUid,
-      AppPrefsKeys.dataHydrated,
-      AppPrefsKeys.onboardingComplete,
-      AppPrefsKeys.lastAppOpen,
-      AppPrefsKeys.consecutiveDays,
-      AppPrefsKeys.diaryPendingRetries,
-      AppPrefsKeys.pendingDeletionJob,
-      AppPrefsKeys.deletionTombstone,
-      AppPrefsKeys.deletionRetryCount,
-    ]) {
-      prefs.remove(key);
-    }
-  }
-
   void _recordLogoutError(Object e, StackTrace stack, String phase) {
     ErrorHandler.recordOperation(
       e,
@@ -186,7 +152,6 @@ class UserProfileNotifier extends Notifier<void> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'current_title', titleId ?? '');
     await ledger.append(
@@ -196,7 +161,6 @@ class UserProfileNotifier extends Notifier<void> {
       payload: {'field': 'currentTitle', 'value': titleId ?? ''},
     );
 
-    // 2. Firestore best-effort（fire-and-forget）
     _syncBestEffort(
       () => ref
           .read(userProfileServiceProvider)
@@ -210,7 +174,6 @@ class UserProfileNotifier extends Notifier<void> {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
 
-    // 1. 本地 SSOT（离线安全）
     final ledger = ref.read(ledgerServiceProvider);
     await ledger.setMaterialized(uid, 'avatar_id', avatarId);
     await ledger.append(
@@ -220,7 +183,6 @@ class UserProfileNotifier extends Notifier<void> {
       payload: {'field': 'avatarId', 'value': avatarId},
     );
 
-    // 2. Firestore best-effort（fire-and-forget）
     _syncBestEffort(
       () => ref
           .read(userProfileServiceProvider)

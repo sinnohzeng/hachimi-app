@@ -62,7 +62,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       final migrationSourceUid = ref
           .read(identityTransitionResolverProvider)
           .resolveMigrationSourceUid(currentUid: ref.read(currentUidProvider));
-      final wasAnonymous = authBackend.isAnonymous;
 
       // Phase A: 认证 — 失败才显示 SnackBar
       final result = await _authenticate(authBackend);
@@ -71,7 +70,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       await _finalizeAccountSetup(
         result: result,
         migrationSourceUid: migrationSourceUid,
-        wasAnonymous: wasAnonymous,
       );
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
@@ -93,7 +91,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   Future<void> _finalizeAccountSetup({
     required AuthResult result,
     required String? migrationSourceUid,
-    required bool wasAnonymous,
   }) async {
     try {
       final notifier = ref.read(userProfileNotifierProvider.notifier);
@@ -106,7 +103,6 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
       await _resolveGuestConflictIfNeeded(
         result: result,
         migrationSourceUid: migrationSourceUid,
-        wasAnonymous: wasAnonymous,
       );
     } on Exception catch (e) {
       ErrorHandler.recordOperation(
@@ -141,12 +137,9 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
   Future<void> _resolveGuestConflictIfNeeded({
     required AuthResult result,
     required String? migrationSourceUid,
-    required bool wasAnonymous,
   }) async {
     if (migrationSourceUid == null || !mounted) return;
-    if (!_shouldResolveConflict(migrationSourceUid, result.uid, wasAnonymous)) {
-      return;
-    }
+    if (!_shouldResolveConflict(migrationSourceUid, result.uid)) return;
     await ref
         .read(guestUpgradeCoordinatorProvider)
         .resolve(
@@ -158,10 +151,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         );
   }
 
-  bool _shouldResolveConflict(String oldUid, String newUid, bool wasAnonymous) {
+  bool _shouldResolveConflict(String oldUid, String newUid) {
     if (oldUid == newUid) return false;
     if (widget.linkMode) return true;
-    return oldUid.startsWith('guest_') || wasAnonymous;
+    return oldUid.startsWith('guest_');
   }
 
   @override

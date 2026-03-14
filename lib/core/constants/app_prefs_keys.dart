@@ -6,7 +6,6 @@ class AppPrefsKeys {
   AppPrefsKeys._();
 
   // ─── 认证 ───
-  static const cachedUid = 'cached_uid';
   static const localGuestUid = 'local_guest_uid';
 
   // ─── 引导 ───

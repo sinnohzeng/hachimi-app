@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/models/app_auth_state.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 
 // Re-export service_providers so existing imports continue to work.
@@ -12,38 +13,54 @@ final authStateProvider = StreamProvider<AuthUser?>((ref) {
   return ref.watch(authBackendProvider).authStateChanges;
 });
 
-/// Current user UID — convenience provider.
-/// [A4] 在 auth loading/error 状态下使用缓存 UID 实现乐观认证。
-/// 增加本地访客 UID 回退，保证离线首次安装也能获取 UID。
-final currentUidProvider = Provider<String?>((ref) {
-  final authState = ref.watch(authStateProvider);
+/// 应用认证状态 — 单一 SSOT，替代原来的 5 层身份回退链。
+///
+/// 组合 Firebase Auth stream + 本地访客 UID，输出 sealed class：
+/// - [AuthenticatedState] — Firebase 已认证（Google / Email）
+/// - [GuestState] — 本地访客（uid 非空）或未初始化（uid 为空）
+final appAuthStateProvider = Provider<AppAuthState>((ref) {
+  final authAsync = ref.watch(authStateProvider);
   final prefs = ref.read(sharedPreferencesProvider);
 
-  return authState.when(
-    data: (user) =>
-        user?.uid ??
-        prefs.getString(AppPrefsKeys.localGuestUid) ??
-        prefs.getString(AppPrefsKeys.cachedUid),
-    loading: () => prefs.getString(AppPrefsKeys.cachedUid),
-    error: (_, _) =>
-        prefs.getString(AppPrefsKeys.localGuestUid) ??
-        prefs.getString(AppPrefsKeys.cachedUid),
+  return authAsync.when(
+    data: (user) {
+      if (user != null) {
+        return AuthenticatedState(
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+        );
+      }
+      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
+      if (guestUid != null) return GuestState(uid: guestUid);
+      return const GuestState(uid: '');
+    },
+    loading: () {
+      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
+      if (guestUid != null) return GuestState(uid: guestUid);
+      return const GuestState(uid: '');
+    },
+    error: (_, _) {
+      final guestUid = prefs.getString(AppPrefsKeys.localGuestUid);
+      if (guestUid != null) return GuestState(uid: guestUid);
+      return const GuestState(uid: '');
+    },
   );
 });
 
-/// 当前用户是否为访客（未关联正式凭证）。
+/// Current user UID — 向后兼容派生 provider。
 ///
-/// 覆盖三种场景：
-/// 1. 本地访客 — Firebase 未认证，local_guest_uid 存在
-/// 2. Firebase 匿名 — signInAnonymously 成功，尚未关联凭证
-/// 3. 已注册用户 — 关联了 Google/Email 凭证 → 返回 false
+/// 从 [appAuthStateProvider] 单一来源派生，26+ 文件无需改动。
+final currentUidProvider = Provider<String?>((ref) {
+  final state = ref.watch(appAuthStateProvider);
+  return state.uid.isEmpty ? null : state.uid;
+});
+
+/// 当前用户是否为访客 — 向后兼容派生 provider。
 ///
-/// 监听 [authStateProvider]，auth 状态变化时自动重算。
+/// 从 [appAuthStateProvider] 单一来源派生，5 文件无需改动。
 final isGuestProvider = Provider<bool>((ref) {
-  final AuthUser? user = ref.watch(authStateProvider).value;
-  if (user != null) return user.isAnonymous;
-  final prefs = ref.read(sharedPreferencesProvider);
-  return prefs.getString(AppPrefsKeys.localGuestUid) != null;
+  return ref.watch(appAuthStateProvider).isGuest;
 });
 
 /// 引导完成状态 — 响应式，AuthGate 通过 watch 自动切换。

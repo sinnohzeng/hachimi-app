@@ -114,9 +114,8 @@ void main() {
       expect(prefs.getBool(AppPrefsKeys.hasOnboardedBefore), isTrue);
     });
 
-    test('_clearUserLocalState 不清除 hasOnboardedBefore', () async {
+    test('登出清理不清除 hasOnboardedBefore', () async {
       SharedPreferences.setMockInitialValues({
-        AppPrefsKeys.cachedUid: 'test_uid',
         AppPrefsKeys.localGuestUid: 'guest_123',
         AppPrefsKeys.hasOnboardedBefore: true,
         AppPrefsKeys.dataHydrated: true,
@@ -124,25 +123,18 @@ void main() {
       });
       final prefs = await SharedPreferences.getInstance();
 
-      // 模拟 _clearUserLocalState 的清理逻辑
+      // 模拟登出清理逻辑（仅清除 dataHydrated + onboardingComplete）
       for (final key in [
-        AppPrefsKeys.cachedUid,
-        AppPrefsKeys.localGuestUid,
         AppPrefsKeys.dataHydrated,
         AppPrefsKeys.onboardingComplete,
-        AppPrefsKeys.lastAppOpen,
-        AppPrefsKeys.consecutiveDays,
-        AppPrefsKeys.diaryPendingRetries,
-        AppPrefsKeys.pendingDeletionJob,
-        AppPrefsKeys.deletionTombstone,
-        AppPrefsKeys.deletionRetryCount,
       ]) {
         prefs.remove(key);
       }
 
       // hasOnboardedBefore 不在清理列表中，应存活
       expect(prefs.getBool(AppPrefsKeys.hasOnboardedBefore), isTrue);
-      expect(prefs.getString(AppPrefsKeys.cachedUid), isNull);
+      // localGuestUid 由 logout 重新生成，不会被删除
+      expect(prefs.getString(AppPrefsKeys.localGuestUid), isNotNull);
     });
   });
 
@@ -151,7 +143,6 @@ void main() {
   group('AppPrefsKeys', () {
     test('所有键名是不重复的字符串常量', () {
       final keys = [
-        AppPrefsKeys.cachedUid,
         AppPrefsKeys.localGuestUid,
         AppPrefsKeys.onboardingComplete,
         AppPrefsKeys.hasOnboardedBefore,

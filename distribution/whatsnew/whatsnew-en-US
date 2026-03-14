@@ -1,6 +1,6 @@
-v2.32.1
+v2.33.0
 
-- New: Switch between Material 3 and Retro Pixel visual styles in Settings
-- New: Pixel-art UI — stepped borders, segmented progress rings, rectangular toggles, retro page transitions
-- Improved: Background pattern renders as a cached texture for smoother scrolling
-- Fixed: App no longer crashes on startup if theme preferences are corrupted
+- Improved: Login system rebuilt for reliability — no more ghost users after logout
+- Improved: Logout now shows loading indicator and completes cleanly
+- Improved: Sidebar correctly shows guest login prompt after signing out
+- Removed: Anonymous sign-in (guests now work fully offline)

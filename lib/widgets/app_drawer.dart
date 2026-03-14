@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/core/constants/avatar_constants.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
+import 'package:hachimi_app/models/app_auth_state.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
@@ -26,18 +26,17 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AuthUser? user = ref.watch(authStateProvider).value;
-    final isGuest = ref.watch(isGuestProvider);
+    final appAuth = ref.watch(appAuthStateProvider);
     final avatarId = ref.watch(avatarIdProvider).value;
     final stats = ref.watch(statsProvider);
     final allCats = ref.watch(allCatsProvider).value ?? [];
     final l10n = context.l10n;
 
-    final displayName = isGuest
-        ? null
-        : (user?.displayName ??
-              user?.email?.split('@').first ??
-              l10n.profileFallbackUser);
+    final displayName = switch (appAuth) {
+      AuthenticatedState(:final displayName, :final email) =>
+        displayName ?? email?.split('@').first ?? l10n.profileFallbackUser,
+      GuestState() => null,
+    };
 
     return Drawer(
       child: SafeArea(
@@ -45,14 +44,14 @@ class AppDrawer extends ConsumerWidget {
           padding: EdgeInsets.zero,
           children: [
             // ─── 头部区域：访客 CTA / 已登录用户信息 ───
-            if (isGuest)
+            if (appAuth is GuestState)
               _GuestLoginHeader(
                 onSignIn: () => showGuestUpgradePrompt(context, ref),
               )
             else
               _DrawerHeader(
                 displayName: displayName!,
-                email: user?.email,
+                email: appAuth is AuthenticatedState ? appAuth.email : null,
                 avatarId: avatarId,
                 onEditAvatar: () => showAvatarPickerSheet(context, ref),
                 onEditName: () => showEditNameDialog(context, ref),
@@ -122,7 +121,7 @@ class AppDrawer extends ConsumerWidget {
             ),
 
             // ─── 账号（仅已登录用户） ───
-            if (!isGuest) ...[
+            if (appAuth is AuthenticatedState) ...[
               const Divider(indent: 16, endIndent: 16),
               _SectionHeader(label: l10n.drawerAccountSection),
               ListTile(
@@ -141,7 +140,7 @@ class AppDrawer extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
 
             // ─── 底部版本信息 ───
-            _DrawerFooter(uid: user?.uid),
+            _DrawerFooter(uid: appAuth.uid.isEmpty ? null : appAuth.uid),
           ],
         ),
       ),

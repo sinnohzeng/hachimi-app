@@ -27,9 +27,10 @@
 - `accountDeletionOrchestratorProvider`
 
 ### 认证与身份 Provider
-- `authStateProvider`
-- `currentUidProvider`
-- `isGuestProvider`
+- `authStateProvider` — Firebase Auth 流（SSOT）
+- `appAuthStateProvider` — sealed class 组合认证流 + 本地访客 UID → `AuthenticatedState | GuestState`
+- `currentUidProvider` — 从 `appAuthStateProvider` 派生（向后兼容，26+ 文件引用）
+- `isGuestProvider` — 从 `appAuthStateProvider` 派生（向后兼容，5 文件引用）
 - `onboardingCompleteProvider`
 
 ## 运行时状态模型
@@ -42,18 +43,37 @@
 
 受影响 Provider：`habitsProvider`、`catsProvider`、`allCatsProvider`、`coinBalanceProvider`、`hasCheckedInTodayProvider`、`monthlyCheckInProvider`、`inventoryProvider`、`unlockedAchievementsProvider`、`avatarIdProvider`、`currentTitleProvider`、`unlockedTitlesProvider`。
 
+## AppAuthState — Sealed Class 身份模型
+
+`AppAuthState`（位于 `lib/models/app_auth_state.dart`）用 sealed class 替代之前的 boolean `isGuest` 方案，使身份状态穷举且可模式匹配：
+
+```
+sealed class AppAuthState
+├── AuthenticatedState(uid, email?, displayName?)
+└── GuestState(uid)  // uid 可为空（引导前）
+```
+
+`appAuthStateProvider` 是组合 Firebase Auth 流 + 本地访客 UID 的单一 SSOT。所有下游消费者（`currentUidProvider`、`isGuestProvider`、侧边栏、AuthGate）均从该单一来源通过 `ref.watch(appAuthStateProvider)` 派生。
+
 ## AuthGate 行为
 1. onboarding 未完成：
    - `hasOnboardedBefore == false` → 首次用户 → 显示 OnboardingScreen。
    - `hasOnboardedBefore == true` → 登出后的返回用户 → 自动跳过教程，创建访客 UID，恢复 onboarding 状态。
-2. 存在删号 tombstone/pending -> 待删除页面 + 重试。
-3. 已认证 -> 用 auth uid 启动业务。
-4. 未认证但有 cached uid -> 本地访客启动 + 匿名登录后台补齐。
+2. 存在删号 tombstone/pending → 待删除页面 + 重试。
+3. `switch (appAuthStateProvider)`：
+   - `AuthenticatedState` → 用 auth UID 启动业务。
+   - `GuestState`（uid 非空）→ 本地访客启动。
+   - `GuestState`（uid 空）→ 加载动画（引导前）。
 
 `hasOnboardedBefore` 是在首次完成引导时设置的持久化 SharedPreferences 标记。登出后保留，删号时清除（全新开始）。
 
-### 登出 — Clean-Then-Navigate
-登出统一由 `UserProfileNotifier.logout()` 编排 — 唯一登出入口。流程遵循 **Clean-Then-Navigate** 模式：先完成用户状态清理（SharedPreferences 清空、SQLite 用户数据删除、Firebase 签出），**再**通过 `onboardingCompleteProvider.reset()` 触发导航。非关键清理（通知取消、Crashlytics 用户标识清理）在导航后以 fire-and-forget 方式执行。
+### 登出 — 3 步 Provider 级联
+登出统一由 `UserProfileNotifier.logout()` 编排 — 唯一登出入口。流程为 3 步：
+1. 停止同步引擎（身份切换前）。
+2. 删除旧用户数据 + Firebase 签出。
+3. 创建新访客 UID → 触发 `appAuthStateProvider` 发出 `GuestState(newUid)` → 所有下游 Provider 自动失效。
+
+非关键清理（通知取消、Crashlytics 用户标识清理）在第 3 步后以 fire-and-forget 方式执行。不再需要手动清理 10 个 SharedPreferences key — Provider 级联替代了旧的手动清扫。
 
 AuthGate 中 `ref.listenManual(onboardingCompleteProvider)` 监听 `true → false` 变化后调用 `popUntil(isFirst)`，关闭所有已打开的对话框或已推入的路由。
 
