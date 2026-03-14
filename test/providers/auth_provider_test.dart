@@ -1,6 +1,8 @@
 // ---
-// AuthProvider 单元测试 — 验证 AuthUser/AuthResult 值语义、
-// currentUidProvider 三态回退、isGuestProvider 场景覆盖。
+// AuthProvider 单元测试 — 验证 AppAuthState sealed class 派生语义、
+// currentUidProvider 回退逻辑、isGuestProvider 场景覆盖。
+//
+// v2.33.0 重写：移除 cachedUid 测试，新增 appAuthStateProvider 测试。
 // ---
 
 import 'dart:async';
@@ -9,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
+import 'package:hachimi_app/models/app_auth_state.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 
 /// 辅助函数：创建 ProviderContainer，订阅 authStateProvider 并等待事件循环处理。
@@ -101,6 +104,87 @@ void main() {
     });
   });
 
+  // --- appAuthStateProvider ---
+
+  group('appAuthStateProvider', () {
+    test('Firebase user → AuthenticatedState', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      const user = AuthUser(uid: 'fb-uid', email: 'u@t.com');
+
+      final container = await _createAndPump(
+        streamBuilder: (ref) async* {
+          yield user;
+        },
+        prefs: prefs,
+      );
+      addTearDown(container.dispose);
+
+      final state = container.read(appAuthStateProvider);
+      expect(state, isA<AuthenticatedState>());
+      expect(state.uid, equals('fb-uid'));
+      expect(state.isGuest, isFalse);
+    });
+
+    test('null user with local_guest_uid → GuestState', () async {
+      SharedPreferences.setMockInitialValues({'local_guest_uid': 'guest_abc'});
+      final prefs = await SharedPreferences.getInstance();
+
+      final container = await _createAndPump(
+        streamBuilder: (ref) async* {
+          yield null;
+        },
+        prefs: prefs,
+      );
+      addTearDown(container.dispose);
+
+      final state = container.read(appAuthStateProvider);
+      expect(state, isA<GuestState>());
+      expect(state.uid, equals('guest_abc'));
+      expect(state.isGuest, isTrue);
+    });
+
+    test(
+      'null user without local_guest_uid → GuestState with empty uid',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+
+        final container = await _createAndPump(
+          streamBuilder: (ref) async* {
+            yield null;
+          },
+          prefs: prefs,
+        );
+        addTearDown(container.dispose);
+
+        final state = container.read(appAuthStateProvider);
+        expect(state, isA<GuestState>());
+        expect(state.uid, isEmpty);
+        expect(state.isGuest, isTrue);
+      },
+    );
+
+    test('loading state with local_guest_uid → GuestState', () async {
+      SharedPreferences.setMockInitialValues({'local_guest_uid': 'guest_load'});
+      final prefs = await SharedPreferences.getInstance();
+
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith((ref) async* {
+            await Completer<void>().future; // 永不 yield → 持续 loading
+          }),
+          sharedPreferencesProvider.overrideWithValue(prefs),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final state = container.read(appAuthStateProvider);
+      expect(state, isA<GuestState>());
+      expect(state.uid, equals('guest_load'));
+    });
+  });
+
   // --- currentUidProvider ---
 
   group('currentUidProvider', () {
@@ -120,7 +204,7 @@ void main() {
       expect(container.read(currentUidProvider), equals('firebase-uid'));
     });
 
-    test('data state with null user: falls back to local_guest_uid', () async {
+    test('null user: falls back to local_guest_uid', () async {
       SharedPreferences.setMockInitialValues({'local_guest_uid': 'guest_abc'});
       final prefs = await SharedPreferences.getInstance();
 
@@ -135,8 +219,8 @@ void main() {
       expect(container.read(currentUidProvider), equals('guest_abc'));
     });
 
-    test('data state with null user: falls back to cached_uid', () async {
-      SharedPreferences.setMockInitialValues({'cached_uid': 'cached-only'});
+    test('null user without any uid: returns null', () async {
+      SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
 
       final container = await _createAndPump(
@@ -147,14 +231,13 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(container.read(currentUidProvider), equals('cached-only'));
+      expect(container.read(currentUidProvider), isNull);
     });
 
-    test('loading state: falls back to cached_uid', () async {
-      SharedPreferences.setMockInitialValues({'cached_uid': 'cached-123'});
+    test('loading state: falls back to local_guest_uid', () async {
+      SharedPreferences.setMockInitialValues({'local_guest_uid': 'guest_123'});
       final prefs = await SharedPreferences.getInstance();
 
-      // 永不 yield 的 stream → 持续 loading
       final container = ProviderContainer(
         overrides: [
           authStateProvider.overrideWith((ref) async* {
@@ -165,61 +248,17 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(container.read(currentUidProvider), equals('cached-123'));
+      expect(container.read(currentUidProvider), equals('guest_123'));
     });
-
-    test(
-      'loading with both guest and cached uid: prefers cached_uid',
-      () async {
-        SharedPreferences.setMockInitialValues({
-          'local_guest_uid': 'guest_xxx',
-          'cached_uid': 'cached-xxx',
-        });
-        final prefs = await SharedPreferences.getInstance();
-
-        // loading 状态 — currentUidProvider 返回 cached_uid
-        final container = ProviderContainer(
-          overrides: [
-            authStateProvider.overrideWith((ref) async* {
-              await Completer<void>().future;
-            }),
-            sharedPreferencesProvider.overrideWithValue(prefs),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        expect(container.read(currentUidProvider), equals('cached-xxx'));
-      },
-    );
   });
 
   // --- isGuestProvider ---
 
   group('isGuestProvider', () {
-    test('anonymous Firebase user → true', () async {
+    test('Firebase user (any) → false', () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
-      const user = AuthUser(uid: 'anon-uid', isAnonymous: true);
-
-      final container = await _createAndPump(
-        streamBuilder: (ref) async* {
-          yield user;
-        },
-        prefs: prefs,
-      );
-      addTearDown(container.dispose);
-
-      expect(container.read(isGuestProvider), isTrue);
-    });
-
-    test('registered Firebase user → false', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      const user = AuthUser(
-        uid: 'reg-uid',
-        email: 'user@test.com',
-        isAnonymous: false,
-      );
+      const user = AuthUser(uid: 'fb-uid', isAnonymous: false);
 
       final container = await _createAndPump(
         streamBuilder: (ref) async* {
@@ -247,19 +286,23 @@ void main() {
       expect(container.read(isGuestProvider), isTrue);
     });
 
-    test('no Firebase user without local_guest_uid → false', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
+    test(
+      'no Firebase user without local_guest_uid → true (empty guest)',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
 
-      final container = await _createAndPump(
-        streamBuilder: (ref) async* {
-          yield null;
-        },
-        prefs: prefs,
-      );
-      addTearDown(container.dispose);
+        final container = await _createAndPump(
+          streamBuilder: (ref) async* {
+            yield null;
+          },
+          prefs: prefs,
+        );
+        addTearDown(container.dispose);
 
-      expect(container.read(isGuestProvider), isFalse);
-    });
+        // GuestState(uid: '') 仍然是访客，isGuest = true
+        expect(container.read(isGuestProvider), isTrue);
+      },
+    );
   });
 }
