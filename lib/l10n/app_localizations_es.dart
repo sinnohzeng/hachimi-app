@@ -412,7 +412,7 @@ class SEs extends S {
   String get settingsLanguageSystem => 'Predeterminado del sistema';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Inglés';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -866,7 +866,7 @@ class SEs extends S {
   String get personalityBrave => 'Valiente';
 
   @override
-  String get personalityClingy => 'Pegajoso';
+  String get personalityClingy => 'Mimoso';
 
   @override
   String get personalityFlavorLazy =>
@@ -1971,7 +1971,7 @@ class SEs extends S {
   String get weekdayTue => 'M';
 
   @override
-  String get weekdayWed => 'M';
+  String get weekdayWed => 'X';
 
   @override
   String get weekdayThu => 'J';

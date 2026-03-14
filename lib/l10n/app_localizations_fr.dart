@@ -54,7 +54,7 @@ class SFr extends S {
   }
 
   @override
-  String get adoptionRefreshCat => 'Essayer un autre';
+  String get adoptionRefreshCat => 'Essayer un autre chat';
 
   @override
   String adoptionPersonality(String name) {
@@ -347,10 +347,10 @@ class SFr extends S {
   String get timerGiveUp => 'Abandonner';
 
   @override
-  String get timerRemaining => 'restant';
+  String get timerRemaining => 'Restant';
 
   @override
-  String get timerElapsed => 'écoulé';
+  String get timerElapsed => 'Écoulé';
 
   @override
   String get timerPaused => 'EN PAUSE';
@@ -378,7 +378,7 @@ class SFr extends S {
 
   @override
   String get giveUpMessage =>
-      'Si vous vous êtes concentré au moins 5 minutes, le temps compte quand même pour la croissance de votre chat. Votre chat comprendra !';
+      'Si tu t\'es concentré au moins 5 minutes, le temps compte quand même pour la croissance de ton chat. Ton chat comprendra !';
 
   @override
   String get giveUpKeepGoing => 'Continuer';
@@ -412,7 +412,7 @@ class SFr extends S {
   String get settingsLanguageSystem => 'Langue du système';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Anglais';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -890,7 +890,7 @@ class SFr extends S {
 
   @override
   String get personalityFlavorClingy =>
-      'A commencé à ronronner et ne veut plus vous lâcher.';
+      'A commencé à ronronner et ne veut plus te lâcher.';
 
   @override
   String get moodHappy => 'Content';
@@ -1218,7 +1218,7 @@ class SFr extends S {
 
   @override
   String notifReminderBody(String habitName) {
-    return 'C\'est l\'heure de $habitName — votre chat vous attend !';
+    return 'C\'est l\'heure de $habitName — ton chat t\'attend !';
   }
 
   @override
@@ -1228,7 +1228,7 @@ class SFr extends S {
 
   @override
   String notifStreakBody(int streak) {
-    return 'Votre série de $streak jours est en danger. Une petite session la sauvera !';
+    return 'Ta série de $streak jours est en danger. Une petite session la sauvera !';
   }
 
   @override
@@ -1561,7 +1561,7 @@ class SFr extends S {
 
   @override
   String get onboardBody3 =>
-      'Chaque quête apporte un nouveau chat à l\'apparence unique.\nDécouvrez-les tous et construisez la collection de vos rêves !';
+      'Chaque quête apporte un nouveau chat à l\'apparence unique.\nDécouvre-les tous et construis ta collection de rêves !';
 
   @override
   String get onboardSkip => 'Passer';
@@ -1783,7 +1783,7 @@ class SFr extends S {
   String get chatGenerating => 'Génération...';
 
   @override
-  String get chatTypeMessage => 'Écrivez un message...';
+  String get chatTypeMessage => 'Écris un message...';
 
   @override
   String get chatClearConfirmTitle => 'Effacer l\'historique du chat ?';
@@ -1974,10 +1974,10 @@ class SFr extends S {
   String get weekdayMon => 'L';
 
   @override
-  String get weekdayTue => 'M';
+  String get weekdayTue => 'Ma';
 
   @override
-  String get weekdayWed => 'M';
+  String get weekdayWed => 'Me';
 
   @override
   String get weekdayThu => 'J';
@@ -2232,7 +2232,7 @@ class SFr extends S {
 
   @override
   String reminderNotificationBody(String habitName) {
-    return 'C\'est l\'heure de $habitName — votre chat vous attend !';
+    return 'C\'est l\'heure de $habitName — ton chat t\'attend !';
   }
 
   @override

@@ -53,7 +53,7 @@ class SDe extends S {
   }
 
   @override
-  String get adoptionRefreshCat => 'Andere ausprobieren';
+  String get adoptionRefreshCat => 'Andere Katze ausprobieren';
 
   @override
   String adoptionPersonality(String name) {
@@ -346,10 +346,10 @@ class SDe extends S {
   String get timerGiveUp => 'Aufgeben';
 
   @override
-  String get timerRemaining => 'verbleibend';
+  String get timerRemaining => 'Verbleibend';
 
   @override
-  String get timerElapsed => 'vergangen';
+  String get timerElapsed => 'Vergangen';
 
   @override
   String get timerPaused => 'PAUSIERT';
@@ -411,7 +411,7 @@ class SDe extends S {
   String get settingsLanguageSystem => 'Systemstandard';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Englisch';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -1240,7 +1240,7 @@ class SDe extends S {
 
   @override
   String notifEvolutionBody(String catName, String stageName) {
-    return '$catName ist zu einem $stageName herangewachsen! Weiter so!';
+    return '$catName ist zu einem $stageName herangewachsen!';
   }
 
   @override
@@ -1552,7 +1552,7 @@ class SDe extends S {
 
   @override
   String get onboardBody2 =>
-      'Jede Minute Fokus hilft deiner Katze, sich zu entwickeln\nvom kleinen Kätzchen zum majestätischen Senior!';
+      'Jede Minute Fokus hilft deiner Katze, vom kleinen Kätzchen zum majestätischen Senior zu wachsen!';
 
   @override
   String get onboardTitle3 => 'Baue dein Katzenzimmer';
@@ -1972,25 +1972,25 @@ class SDe extends S {
   String get unitHourShort => 'h';
 
   @override
-  String get weekdayMon => 'M';
+  String get weekdayMon => 'Mo';
 
   @override
-  String get weekdayTue => 'D';
+  String get weekdayTue => 'Di';
 
   @override
-  String get weekdayWed => 'M';
+  String get weekdayWed => 'Mi';
 
   @override
-  String get weekdayThu => 'D';
+  String get weekdayThu => 'Do';
 
   @override
-  String get weekdayFri => 'F';
+  String get weekdayFri => 'Fr';
 
   @override
-  String get weekdaySat => 'S';
+  String get weekdaySat => 'Sa';
 
   @override
-  String get weekdaySun => 'S';
+  String get weekdaySun => 'So';
 
   @override
   String get statsTotalSessions => 'Sitzungen';

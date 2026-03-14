@@ -352,7 +352,7 @@ class SVi extends S {
   String get timerElapsed => 'đã trôi qua';
 
   @override
-  String get timerPaused => 'TẠM DỪNG';
+  String get timerPaused => 'Tạm dừng';
 
   @override
   String get timerQuestNotFound => 'Không tìm thấy nhiệm vụ';
@@ -411,7 +411,7 @@ class SVi extends S {
   String get settingsLanguageSystem => 'Mặc định hệ thống';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Tiếng Anh';
 
   @override
   String get settingsLanguageChinese => '中文';

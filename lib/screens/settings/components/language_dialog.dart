@@ -64,7 +64,11 @@ class LanguageDialog extends StatelessWidget {
   /// Locale → locale code 字符串（与 _localeCodes 中的值对应）。
   static String _localeToCode(Locale? locale) {
     if (locale == null) return 'system';
-    if (locale.scriptCode == 'Hant') return 'zh_Hant';
+    if (locale.scriptCode == 'Hant' ||
+        locale.countryCode == 'TW' ||
+        locale.countryCode == 'HK') {
+      return 'zh_Hant';
+    }
     return locale.languageCode;
   }
 }

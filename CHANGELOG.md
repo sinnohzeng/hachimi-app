@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.2] - 2026-03-14
+
+### Fixed
+- **10 语言翻译质量全面提升**：修复翻译地道性问题，从"功能可用"升级到"地道自然"
+  - **日历热图星期缩写重复**（CRITICAL）：DE（6/7 天重复）、FR/IT（二/三均为"M"）、PT（Mon/Fri/Sat 均为"S"）、ID（Mon/Tue/Sat 均为"S"）全部修复为无歧义缩写
+  - **意大利语德语文本污染**（CRITICAL）：`onboardBody2` 含德语原文，已替换为正确意大利语
+  - **全 10 语言 `settingsLanguageEnglish` 未翻译**（CRITICAL）：补齐 Inglés/Inglês/Anglais/Englisch/Inglese/अंग्रेज़ी/อังกฤษ/Tiếng Anh/Inggris/İngilizce
+  - **意大利语 "focus" 全替换**（HIGH）：28 个 key 中的英语借词 "focus" 统一改为 "concentrazione"
+  - **法语 vous/tu 语气混用**（HIGH）：通知 body 和猫咪对话 7 个 key 统一为非正式 "tu" 语气
+  - **德语拼写错误**（HIGH）：`notifEvolutionBody` 中 "devon" → "zu einem"；`onboardBody2` 语序修复
+  - **泰语 placeholder 缺空格**（HIGH）：3 个通知 key 中 `{habitName}`/`{stageName}` 前后补空格
+  - **ES/PT `personalityClingy` 词义不当**（HIGH）："Pegajoso"→"Mimoso"，"Grudento"→"Apegado"
+  - **多语言 timer 标签大写**（MEDIUM）：FR/IT/DE 的 `timerRemaining`/`timerElapsed` 首字母大写
+  - **FR/DE/IT `adoptionRefreshCat` 缺宾语**（MEDIUM）：补全缺失的"猫"宾语
+  - **单项修复**（MEDIUM）：TR 古语替换、VI/PT `timerPaused` 全大写改正常格式、ID/HI 单复数代词、PT 虚拟式
+- **`tool/l10n_check.dart` 代码质量**：占位符正则支持 Unicode（`\w+` → `[^}]+`）；空值检测加 `trim()`；`_setsEqual` 保留并补注 Dart `Set` 不重写 `==` 的说明
+- **`language_dialog.dart` 繁中检测**：`_localeToCode` 新增 `countryCode == 'TW'/'HK'` 兜底，台湾/香港地区码正确映射到 `zh_Hant`
+
 ## [2.33.1] - 2026-03-14
 
 ### Fixed

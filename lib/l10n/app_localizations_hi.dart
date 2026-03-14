@@ -411,7 +411,7 @@ class SHi extends S {
   String get settingsLanguageSystem => 'सिस्टम डिफ़ॉल्ट';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'अंग्रेज़ी';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -696,8 +696,7 @@ class SHi extends S {
   }
 
   @override
-  String get catDetailChatSubtitle =>
-      'अपनी बिल्ली से बात करें। वे अपने स्वभाव के अनुसार जवाब देंगे!';
+  String get catDetailChatSubtitle => 'वह अपने स्वभाव के अनुसार जवाब देगी!';
 
   @override
   String get catDetailActivity => 'गतिविधि';

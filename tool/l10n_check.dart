@@ -27,12 +27,15 @@ void main() {
   final templateEntries = _parseArb(templateFile);
   final templateKeys = templateEntries.keys.toSet();
 
-  final arbFiles = l10nDir
-      .listSync()
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final arbFiles =
+      l10nDir
+          .listSync()
+          .whereType<File>()
+          .where(
+            (f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'),
+          )
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
 
   if (arbFiles.isEmpty) {
     stderr.writeln('l10n_check: no non-template ARB files found');
@@ -68,9 +71,7 @@ void main() {
     return;
   }
 
-  stderr.writeln(
-    'l10n_check: FAIL (${violations.length} violations)',
-  );
+  stderr.writeln('l10n_check: FAIL (${violations.length} violations)');
   for (final v in violations) {
     stderr.writeln('  - $v');
   }
@@ -137,7 +138,7 @@ void _checkEmptyValues(
   List<String> violations,
 ) {
   for (final entry in entries.entries) {
-    if (entry.value.isEmpty) {
+    if (entry.value.trim().isEmpty) {
       violations.add('$locale: empty value for key "${entry.key}"');
     }
   }
@@ -198,18 +199,17 @@ Map<String, String> _parseArb(File file) {
 /// "lib/l10n/app_zh_Hant.arb" → "zh_Hant"
 String _localeFromPath(String path) {
   final fileName = path.split('/').last; // app_zh_Hant.arb
-  return fileName
-      .replaceFirst('app_', '')
-      .replaceFirst('.arb', '');
+  return fileName.replaceFirst('app_', '').replaceFirst('.arb', '');
 }
 
 /// 提取字符串中的 {placeholder} 名称集合。
 Set<String> _extractPlaceholders(String value) {
-  final regex = RegExp(r'\{(\w+)\}');
+  // \w+ 只匹配 ASCII，改用非括号字符匹配以支持 Unicode 占位符名
+  final regex = RegExp(r'\{([^}]+)\}');
   return regex.allMatches(value).map((m) => m.group(1)!).toSet();
 }
 
-/// 比较两个 Set 是否相等。
+/// 比较两个 Set 是否结构相等（Dart Set 不重写 ==，不能直接用 !=）。
 bool _setsEqual(Set<String> a, Set<String> b) {
   return a.length == b.length && a.containsAll(b);
 }

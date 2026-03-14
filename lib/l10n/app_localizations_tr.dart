@@ -412,7 +412,7 @@ class STr extends S {
   String get settingsLanguageSystem => 'Sistem varsayılanı';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'İngilizce';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -913,7 +913,7 @@ class STr extends S {
   String get moodMsgShyHappy => '...B-burada olduğuna sevindim.';
 
   @override
-  String get moodMsgBraveHappy => 'Bugünü birlikte fethetelim!';
+  String get moodMsgBraveHappy => 'Bugünü birlikte aşalım!';
 
   @override
   String get moodMsgClingyHappy => 'Yaşasın! Döndün! Bir daha gitme!';

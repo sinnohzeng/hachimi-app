@@ -412,7 +412,7 @@ class SId extends S {
   String get settingsLanguageSystem => 'Bawaan sistem';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Inggris';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -695,7 +695,8 @@ class SId extends S {
   }
 
   @override
-  String get catDetailChatSubtitle => 'Ngobrol dengan kucingmu';
+  String get catDetailChatSubtitle =>
+      'Dia akan membalas sesuai kepribadiannya!';
 
   @override
   String get catDetailActivity => 'Aktivitas';
@@ -1962,25 +1963,25 @@ class SId extends S {
   String get unitHourShort => 'j';
 
   @override
-  String get weekdayMon => 'S';
+  String get weekdayMon => 'Sen';
 
   @override
-  String get weekdayTue => 'S';
+  String get weekdayTue => 'Sel';
 
   @override
-  String get weekdayWed => 'R';
+  String get weekdayWed => 'Rab';
 
   @override
-  String get weekdayThu => 'K';
+  String get weekdayThu => 'Kam';
 
   @override
-  String get weekdayFri => 'J';
+  String get weekdayFri => 'Jum';
 
   @override
-  String get weekdaySat => 'S';
+  String get weekdaySat => 'Sab';
 
   @override
-  String get weekdaySun => 'M';
+  String get weekdaySun => 'Min';
 
   @override
   String get statsTotalSessions => 'Sesi';

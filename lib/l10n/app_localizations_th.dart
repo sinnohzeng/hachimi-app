@@ -410,7 +410,7 @@ class STh extends S {
   String get settingsLanguageSystem => 'ค่าเริ่มต้นของระบบ';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'อังกฤษ';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -1204,7 +1204,7 @@ class STh extends S {
 
   @override
   String notifReminderBody(String habitName) {
-    return 'ถึงเวลา$habitNameแล้ว — แมวกำลังรอคุณอยู่!';
+    return 'ถึงเวลา $habitName แล้ว';
   }
 
   @override
@@ -1224,7 +1224,7 @@ class STh extends S {
 
   @override
   String notifEvolutionBody(String catName, String stageName) {
-    return '$catName เติบโตเป็น$stageNameแล้ว! ทำดีต่อไปนะ!';
+    return '$catName เติบโตเป็น $stageName แล้ว!';
   }
 
   @override
@@ -2206,7 +2206,7 @@ class STh extends S {
 
   @override
   String reminderNotificationBody(String habitName) {
-    return 'ถึงเวลา$habitNameแล้ว — แมวกำลังรอคุณอยู่!';
+    return 'ถึงเวลา $habitName แล้ว — แมวกำลังรอคุณอยู่!';
   }
 
   @override

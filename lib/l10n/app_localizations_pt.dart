@@ -353,7 +353,7 @@ class SPt extends S {
   String get timerElapsed => 'decorrido';
 
   @override
-  String get timerPaused => 'PAUSADO';
+  String get timerPaused => 'Pausado';
 
   @override
   String get timerQuestNotFound => 'Missão não encontrada';
@@ -412,7 +412,7 @@ class SPt extends S {
   String get settingsLanguageSystem => 'Padrão do sistema';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Inglês';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -865,7 +865,7 @@ class SPt extends S {
   String get personalityBrave => 'Corajoso';
 
   @override
-  String get personalityClingy => 'Grudento';
+  String get personalityClingy => 'Apegado';
 
   @override
   String get personalityFlavorLazy =>
@@ -910,7 +910,7 @@ class SPt extends S {
   String get moodMsgPlayfulHappy => 'Nya~! Pronto pra trabalhar!';
 
   @override
-  String get moodMsgShyHappy => '...E-eu fico feliz que você está aqui.';
+  String get moodMsgShyHappy => '...E-eu fico feliz que você esteja aqui.';
 
   @override
   String get moodMsgBraveHappy => 'Vamos conquistar o dia juntos!';
@@ -1961,25 +1961,25 @@ class SPt extends S {
   String get unitHourShort => 'h';
 
   @override
-  String get weekdayMon => 'S';
+  String get weekdayMon => 'Seg';
 
   @override
-  String get weekdayTue => 'T';
+  String get weekdayTue => 'Ter';
 
   @override
-  String get weekdayWed => 'Q';
+  String get weekdayWed => 'Qua';
 
   @override
-  String get weekdayThu => 'Q';
+  String get weekdayThu => 'Qui';
 
   @override
-  String get weekdayFri => 'S';
+  String get weekdayFri => 'Sex';
 
   @override
-  String get weekdaySat => 'S';
+  String get weekdaySat => 'Sáb';
 
   @override
-  String get weekdaySun => 'D';
+  String get weekdaySun => 'Dom';
 
   @override
   String get statsTotalSessions => 'Sessões';

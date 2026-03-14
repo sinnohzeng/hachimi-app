@@ -131,7 +131,7 @@
   "settingsNotificationSubtitle": "รับการแจ้งเตือนรายวันเพื่อไม่ให้หลุดเป้า",
   "settingsLanguage": "ภาษา",
   "settingsLanguageSystem": "ค่าเริ่มต้นของระบบ",
-  "settingsLanguageEnglish": "English",
+  "settingsLanguageEnglish": "อังกฤษ",
   "settingsLanguageChinese": "中文",
   "settingsThemeMode": "โหมดธีม",
   "settingsThemeModeSystem": "ระบบ",
@@ -405,11 +405,11 @@
   "whiteTintPink": "โทนชมพู",
 
   "notifReminderTitle": "{catName} คิดถึงคุณ!",
-  "notifReminderBody": "ถึงเวลา{habitName}แล้ว — แมวกำลังรอคุณอยู่!",
+  "notifReminderBody": "ถึงเวลา {habitName} แล้ว",
   "notifStreakTitle": "{catName} เป็นห่วง!",
   "notifStreakBody": "สตรีค {streak} วันของคุณกำลังจะหาย เซสชันสั้นๆ จะช่วยรักษาได้!",
   "notifEvolutionTitle": "{catName} วิวัฒนาการแล้ว!",
-  "notifEvolutionBody": "{catName} เติบโตเป็น{stageName}แล้ว! ทำดีต่อไปนะ!",
+  "notifEvolutionBody": "{catName} เติบโตเป็น {stageName} แล้ว!",
 
   "durationHoursMinutes": "{hours} ชม. {minutes} น.",
 
@@ -726,7 +726,7 @@
   "reminderMaxReached": "ได้สูงสุด 5 รายการ",
   "reminderConfirm": "ยืนยัน",
   "reminderNotificationTitle": "{catName} คิดถึงคุณ!",
-  "reminderNotificationBody": "ถึงเวลา{habitName}แล้ว — แมวกำลังรอคุณอยู่!",
+  "reminderNotificationBody": "ถึงเวลา {habitName} แล้ว — แมวกำลังรอคุณอยู่!",
 
   "deleteAccountDataWarning": "ข้อมูลต่อไปนี้ทั้งหมดจะถูกลบอย่างถาวร:",
   "deleteAccountQuests": "เควสต์",

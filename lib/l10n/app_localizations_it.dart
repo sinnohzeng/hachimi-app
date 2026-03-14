@@ -54,7 +54,7 @@ class SIt extends S {
   }
 
   @override
-  String get adoptionRefreshCat => 'Prova un altro';
+  String get adoptionRefreshCat => 'Provane un altro';
 
   @override
   String adoptionPersonality(String name) {
@@ -102,7 +102,7 @@ class SIt extends S {
 
   @override
   String catDetailTotalMinutes(int minutes) {
-    return '$minutes min di focus';
+    return '$minutes min di concentrazione';
   }
 
   @override
@@ -117,7 +117,7 @@ class SIt extends S {
   String get catDetailAccessories => 'Accessori';
 
   @override
-  String get catDetailStartFocus => 'Inizia focus';
+  String get catDetailStartFocus => 'Inizia la concentrazione';
 
   @override
   String get catDetailBoundHabit => 'Abitudine collegata';
@@ -181,7 +181,7 @@ class SIt extends S {
 
   @override
   String focusCompleteFocusedFor(int minutes) {
-    return 'Hai mantenuto il focus per $minutes minuti';
+    return 'Ti sei concentrato per $minutes minuti';
   }
 
   @override
@@ -190,7 +190,7 @@ class SIt extends S {
   }
 
   @override
-  String get focusCompleteFocusTime => 'Tempo di focus';
+  String get focusCompleteFocusTime => 'Tempo di concentrazione';
 
   @override
   String get focusCompleteCoinsEarned => 'Monete guadagnate';
@@ -229,7 +229,7 @@ class SIt extends S {
 
   @override
   String focusCompleteNotifBody(String catName, int xp, int minutes) {
-    return '$catName ha guadagnato +$xp XP con $minutes min di focus';
+    return '$catName ha guadagnato +$xp XP con $minutes min di concentrazione';
   }
 
   @override
@@ -259,7 +259,7 @@ class SIt extends S {
 
   @override
   String sessionResumeMessage(String habitName, String elapsed) {
-    return 'Avevi una sessione di focus attiva ($habitName, $elapsed). Riprendere?';
+    return 'Avevi una sessione di concentrazione attiva ($habitName, $elapsed). Riprendere?';
   }
 
   @override
@@ -288,7 +288,7 @@ class SIt extends S {
       'Tocca + per iniziare una quest e adottare un gatto!';
 
   @override
-  String get todayFocus => 'Focus';
+  String get todayFocus => 'Concentrazione';
 
   @override
   String get todayDeleteQuestTitle => 'Eliminare la quest?';
@@ -329,7 +329,7 @@ class SIt extends S {
   String get todayNewQuest => 'Nuova quest';
 
   @override
-  String get todayStartFocus => 'Inizia focus';
+  String get todayStartFocus => 'Inizia la concentrazione';
 
   @override
   String get timerStart => 'Inizia';
@@ -347,10 +347,10 @@ class SIt extends S {
   String get timerGiveUp => 'Abbandona';
 
   @override
-  String get timerRemaining => 'rimanente';
+  String get timerRemaining => 'Rimanente';
 
   @override
-  String get timerElapsed => 'trascorso';
+  String get timerElapsed => 'Trascorso';
 
   @override
   String get timerPaused => 'IN PAUSA';
@@ -378,7 +378,7 @@ class SIt extends S {
 
   @override
   String get giveUpMessage =>
-      'Se hai mantenuto il focus per almeno 5 minuti, il tempo conta comunque per la crescita del tuo gatto. Il tuo gatto capirà!';
+      'Se hai mantenuto la concentrazione per almeno 5 minuti, il tempo conta comunque per la crescita del tuo gatto. Il tuo gatto capirà!';
 
   @override
   String get giveUpKeepGoing => 'Continua';
@@ -399,7 +399,7 @@ class SIt extends S {
   String get settingsNotifications => 'Notifiche';
 
   @override
-  String get settingsNotificationFocusReminders => 'Promemoria focus';
+  String get settingsNotificationFocusReminders => 'Promemoria concentrazione';
 
   @override
   String get settingsNotificationSubtitle =>
@@ -412,7 +412,7 @@ class SIt extends S {
   String get settingsLanguageSystem => 'Predefinito del sistema';
 
   @override
-  String get settingsLanguageEnglish => 'English';
+  String get settingsLanguageEnglish => 'Inglese';
 
   @override
   String get settingsLanguageChinese => '中文';
@@ -476,7 +476,7 @@ class SIt extends S {
   String get profileYourJourney => 'Il tuo percorso';
 
   @override
-  String get profileTotalFocus => 'Focus totale';
+  String get profileTotalFocus => 'Concentrazione totale';
 
   @override
   String get profileTotalCats => 'Gatti totali';
@@ -605,10 +605,10 @@ class SIt extends S {
   String get catDetailDailyGoal => 'Obiettivo giornaliero';
 
   @override
-  String get catDetailTodaysFocus => 'Focus di oggi';
+  String get catDetailTodaysFocus => 'Concentrazione di oggi';
 
   @override
-  String get catDetailTotalFocus => 'Focus totale';
+  String get catDetailTotalFocus => 'Concentrazione totale';
 
   @override
   String get catDetailTargetLabel => 'Obiettivo';
@@ -689,7 +689,7 @@ class SIt extends S {
 
   @override
   String get catDetailDiaryEmpty =>
-      'Nessuna voce nel diario oggi. Completa una sessione di focus!';
+      'Nessuna voce nel diario oggi. Completa una sessione di concentrazione!';
 
   @override
   String catDetailChatWith(String name) {
@@ -1258,7 +1258,7 @@ class SIt extends S {
 
   @override
   String get diaryEmptyHint =>
-      'Completa una sessione di focus e il tuo gatto scriverà la sua prima pagina di diario!';
+      'Completa una sessione di concentrazione e il tuo gatto scriverà la sua prima pagina di diario!';
 
   @override
   String get focusSetupCountdown => 'Conto alla rovescia';
@@ -1267,7 +1267,7 @@ class SIt extends S {
   String get focusSetupStopwatch => 'Cronometro';
 
   @override
-  String get focusSetupStartFocus => 'Inizia focus';
+  String get focusSetupStartFocus => 'Inizia la concentrazione';
 
   @override
   String get focusSetupQuestNotFound => 'Quest non trovata';
@@ -1314,13 +1314,14 @@ class SIt extends S {
 
   @override
   String get adoptionGrowthHint =>
-      'Il tuo gatto cresce man mano che accumuli tempo di focus';
+      'Il tuo gatto cresce man mano che accumuli tempo di concentrazione';
 
   @override
   String get adoptionCustom => 'Personalizzato';
 
   @override
-  String get adoptionDailyGoalLabel => 'Obiettivo focus giornaliero (min)';
+  String get adoptionDailyGoalLabel =>
+      'Obiettivo concentrazione giornaliero (min)';
 
   @override
   String get adoptionReminderLabel => 'Promemoria giornaliero (opzionale)';
@@ -1541,14 +1542,14 @@ class SIt extends S {
       'Fissa un obiettivo e adotta un gattino.\nConcentrati e guarda il tuo gatto crescere!';
 
   @override
-  String get onboardTitle2 => 'Focus, crescita, evoluzione';
+  String get onboardTitle2 => 'Concentrati, cresci, evolvi';
 
   @override
   String get onboardSubtitle2 => '4 stadi di crescita';
 
   @override
   String get onboardBody2 =>
-      'Ogni minuto di focus aiuta il tuo gatto a evolversi\nda piccolo gattino a magnifico senior!';
+      'Ogni minuto di concentrazione aiuta il tuo gatto a evolversi,\nda piccolo gattino a magnifico senior!';
 
   @override
   String get onboardTitle3 => 'Costruisci la tua stanza dei gatti';
@@ -1809,7 +1810,7 @@ class SIt extends S {
 
   @override
   String get diaryEmptySubtitle =>
-      'Completa una sessione di focus e il tuo gatto scriverà la sua prima pagina di diario!';
+      'Completa una sessione di concentrazione e il tuo gatto scriverà la sua prima pagina di diario!';
 
   @override
   String get statsTitle => 'Statistiche';
@@ -1956,10 +1957,10 @@ class SIt extends S {
   String get settingsLanguageTurkish => 'Türkçe';
 
   @override
-  String get notifFocusing => 'focus in corso...';
+  String get notifFocusing => 'concentrazione in corso...';
 
   @override
-  String get notifInProgress => 'Sessione di focus in corso';
+  String get notifInProgress => 'Sessione di concentrazione in corso';
 
   @override
   String get unitMinShort => 'min';
@@ -1971,10 +1972,10 @@ class SIt extends S {
   String get weekdayMon => 'L';
 
   @override
-  String get weekdayTue => 'M';
+  String get weekdayTue => 'Ma';
 
   @override
-  String get weekdayWed => 'M';
+  String get weekdayWed => 'Me';
 
   @override
   String get weekdayThu => 'G';
@@ -2001,13 +2002,13 @@ class SIt extends S {
   String get statsWeeklyTrend => 'Tendenza settimanale';
 
   @override
-  String get statsRecentSessions => 'Focus recente';
+  String get statsRecentSessions => 'Concentrazione recente';
 
   @override
   String get statsViewAllHistory => 'Vedi tutta la cronologia';
 
   @override
-  String get historyTitle => 'Cronologia focus';
+  String get historyTitle => 'Cronologia concentrazione';
 
   @override
   String get historyFilterAll => 'Tutti';
@@ -2023,11 +2024,12 @@ class SIt extends S {
   }
 
   @override
-  String get historyNoSessions => 'Ancora nessuna registrazione di focus';
+  String get historyNoSessions =>
+      'Ancora nessuna registrazione di concentrazione';
 
   @override
   String get historyNoSessionsHint =>
-      'Completa una sessione di focus per vederla qui';
+      'Completa una sessione di concentrazione per vederla qui';
 
   @override
   String get historyLoadMore => 'Carica altro';
@@ -2243,7 +2245,7 @@ class SIt extends S {
   String get deleteAccountCats => 'Gatti';
 
   @override
-  String get deleteAccountHours => 'Ore di focus';
+  String get deleteAccountHours => 'Ore di concentrazione';
 
   @override
   String get deleteAccountIrreversible => 'Questa azione è irreversibile';
@@ -2284,7 +2286,7 @@ class SIt extends S {
 
   @override
   String drawerMilestoneFocus(int hours, int minutes) {
-    return 'Focus totale: ${hours}h ${minutes}m';
+    return 'Concentrazione totale: ${hours}h ${minutes}m';
   }
 
   @override
@@ -2301,7 +2303,7 @@ class SIt extends S {
   String get drawerMySection => 'Il mio';
 
   @override
-  String get drawerSessionHistory => 'Cronologia focus';
+  String get drawerSessionHistory => 'Cronologia concentrazione';
 
   @override
   String get drawerCheckInCalendar => 'Calendario check-in';
