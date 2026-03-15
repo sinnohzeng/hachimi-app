@@ -16,7 +16,7 @@
 | V1 不依赖实时 AI | 所有叙事/对话预生成为本地模板 |
 | 胶水编程 | 拥抱成熟开源轮子（Rive/Flame/fl_chart 等），写好胶水 |
 | 协议红线 | 所有依赖必须开源可商用（MIT/Apache/BSD）。拒绝 GPL/CC-NC |
-| 后端可切换 | 通过现有 backend 抽象层保留切换能力 |
+| 后端可切换 | 代码和文档不得硬编码任何特定云服务商的 API 或概念。通过 `BackendRegistry` + 8 个 backend 接口实现可切换。中国大陆上线需对接非 Google 云服务 |
 | SRD 5.2.1 CC-BY-4.0 | 仅使用 SRD 开放规则，署名即可商用 |
 | 美术资产原创 | ClanGen 精灵图（CC BY-NC）不可商用，必须替换为原创 |
 
@@ -38,8 +38,8 @@
 |------|------|------|------|
 | 猫咪架构 | 主哈基米 + 伙伴猫（路线 C） | 兼具 Finch 情感深度和 Habitica 习惯广度 | [decisions/log.md](decisions/log.md) |
 | Tab 结构 | 保持 3 Tab | 导航简洁，冒险功能通过 Tab 3 子路由承载 | [spec/07-ui-and-navigation.md](spec/07-ui-and-navigation.md) |
-| 渲染引擎 | CustomPainter + PNG | 零新依赖，现有管线够用 | [decisions/log.md](decisions/log.md) |
-| 金币经济 | **待重新设计** | 现有 10 币/分钟通胀严重 | [spec/06-economy.md](spec/06-economy.md) |
+| 渲染引擎 | Phase 0: CustomPainter + PNG → Phase Art: Rive + Flame | Phase 0 用现有管线做占位，Phase Art 切换到 Rive 矢量动画 + Flame 场景引擎 | [art-pipeline.md](architecture/art-pipeline.md) |
+| 金币经济 | 双货币（金币 2/min + 星尘骰子检定） | 三档定价模型已定稿 | [spec/06-economy.md](spec/06-economy.md) |
 
 ---
 
@@ -59,6 +59,11 @@
 | [06-economy.md](spec/06-economy.md) | 双币种经济 | Draft | 3 |
 | [07-ui-and-navigation.md](spec/07-ui-and-navigation.md) | 导航 + 酒馆 + Onboarding | Draft | 1-3 |
 | [08-operational.md](spec/08-operational.md) | 运营级：离线 + 分析 + 无障碍 + 性能 + 测试 + 安全 | Draft | 1-3 |
+| [08-conditions-and-defenses.md](spec/08-conditions-and-defenses.md) | SRD 状态效果 + 豁免检定 + 陷阱 + 环境修正 | Draft | 2-3 |
+| [09-inventory-and-items.md](spec/09-inventory-and-items.md) | 物品库存：装备 + 药水 + Trinkets + 碎片合成 | Draft | 2-3 |
+| [10-rest-and-rhythm.md](spec/10-rest-and-rhythm.md) | 休息节奏：长休 + 短休 + 活动节奏 | Draft | 2-3 |
+| [11-social-and-origins.md](spec/11-social-and-origins.md) | 社交系统：NPC + 背景出身 + 公会 | Draft | 3 |
+| [12-crafting.md](spec/12-crafting.md) | 制作系统：材料 + 配方 + 合成 | Draft | 3+ |
 
 ### architecture/ — 技术架构（"怎么建"）
 
@@ -66,9 +71,12 @@
 
 | 文件 | 内容 |
 |------|------|
-| [data-model.md](architecture/data-model.md) | 8 个新 Dart 模型 + SQLite Schema + Firestore 规则 + Ledger 类型 |
+| [data-model.md](architecture/data-model.md) | 9 个新 Dart 模型 + SQLite Schema + 远端验证规则 + Ledger 类型 |
 | [services-and-providers.md](architecture/services-and-providers.md) | 6 Service + 5 Provider + Backend 接口 + 文件变更清单 |
 | [art-pipeline.md](architecture/art-pipeline.md) | 美术资源 + AI 工具链 + 技术选型 + 叙事文本工程化 |
+
+> art-pipeline.md 包含叙事文本 i18n 工程化管线：AI 生成 → 人工审核 → 翻译 → 母语者抽检。
+> ~564 段文本 × 15 语言，打包为 Dart 常量池，运行时零网络依赖。
 
 ### research/ — 调研归档（"为什么这么决定"）
 

@@ -14,12 +14,83 @@
 |------|------|
 | `dice_engine_service.dart` | 伪随机 d20 检定引擎：保底机制、优势/劣势、奖励计算 |
 | `adventure_service.dart` | 冒险生命周期管理：开始/推进/暂停/完成、星级评价 |
-| `primary_cat_service.dart` | 主哈基米 CRUD、SQLite + Firestore 双写 |
+| `primary_cat_service.dart` | 主哈基米 CRUD、SQLite + 远端双写 |
 | `completion_rate_service.dart` | 计算习惯完成率（DEX 属性依赖）|
 | `streak_service.dart` | 计算连续打卡天数（CON 属性依赖）|
 | `coverage_service.dart` | 计算 30 天覆盖率（WIS 属性依赖）|
 
 `CompletionRateService`、`StreakService`、`CoverageService` 为纯计算服务，无副作用，依赖本地数据，不发网络请求。
+
+### 类型约定
+
+> **`Cat` 类型统一**：在所有 DnD 文档和代码中，伙伴猫统一使用现有 `Cat` 模型（`lib/models/cat.dart`）。
+> 不定义独立的 `CompanionCat` 类。文档中出现的"伙伴猫"、"CompanionCat"均指 `Cat` 类型。
+> 在函数签名中使用 `List<Cat> companions` 而非 `List<CompanionCat>`。
+
+### 1.1 DiceEngineService 完整接口
+
+```dart
+/// 骰子引擎服务 — 纯函数式，无持久状态。
+/// 所有随机性通过 injectable [Random] 注入，确保可测试。
+class DiceEngineService {
+  final LedgerService _ledger;
+  final CoinService _coins;
+  final Random _rng;  // 生产环境用 Random.secure()，测试用 Random(seed)
+
+  DiceEngineService({
+    required LedgerService ledger,
+    required CoinService coins,
+    Random? rng,
+  }) : _ledger = ledger,
+       _coins = coins,
+       _rng = rng ?? Random.secure();
+
+  /// 专注完成后获得骰子。溢出时调用 CoinService.addCoins()。
+  Future<void> earnDice({
+    required String uid,
+    required String catId,
+    required String habitId,
+    required int focusMinutes,
+  });
+
+  /// 执行检定：消耗 PendingDice → 生成 DiceResult → 发放星尘。
+  /// 原子操作：删除骰子 + 写入结果 + 更新星尘在同一 SQLite 事务中。
+  Future<DiceResult> performCheck({
+    required PendingDice dice,
+    required SceneEvent event,
+    required PrimaryCat primary,
+    required List<Cat> companions,        // 使用 Cat 类型，非 CompanionCat
+    required int userLevel,
+    required String habitCategory,
+    required int currentStreak,
+    int conditionMod = 0,                 // 状态效果修正（Phase 2 默认 0）
+    int environmentMod = 0,               // 环境效果修正（Phase 2 默认 0）
+    int equipmentMod = 0,                 // 装备属性加成（Phase 2 默认 0）
+  });
+
+  /// 一键全投：快速消化所有 PendingDice。
+  Future<List<DiceResult>> rollAll({
+    required String uid,
+    required SceneEvent event,
+    required PrimaryCat primary,
+    required List<Cat> companions,        // 使用 Cat 类型，非 CompanionCat
+    required int userLevel,
+    required int currentStreak,
+  });
+
+  /// 监听待投骰子变化（SQLite stream）。
+  Stream<List<PendingDice>> watchPendingDice(String uid);
+}
+```
+
+**Random 策略**：
+- 生产环境：`Random.secure()`（密码学安全随机数）
+- 单元测试：`Random(42)`（固定种子，可复现）
+- 保底状态（PityState）为实例内部状态，App 重启重置
+
+**与 CoinService 的组合**：
+- 溢出时调用 `_coins.addCoins(uid, 5)` 而非内联金币逻辑
+- 确保 CoinService 的 Ledger 记录和 materialized_state 更新被正确触发
 
 ## 2. 新增 Provider（5 个）
 
@@ -30,6 +101,28 @@
 | `dice_provider.dart` | `StreamProvider<List<PendingDice>>` | 待投骰子列表 |
 | `class_provider.dart` | `FutureProvider<String?>` | 当前职业 |
 | `party_provider.dart` | `StreamProvider<Party?>` | 当前队伍 |
+
+### 2.1 userLevelProvider 完整定义
+
+```dart
+/// 冒险等级 Provider — 从物化 XP 查 20 级阈值表返回当前等级。
+final userLevelProvider = Provider<int>((ref) {
+  final adventureXP = ref.watch(materializedStateProvider)
+      .whenData((state) => state['adventure_xp'] as int? ?? 0)
+      .valueOrNull ?? 0;
+  return _xpToLevel(adventureXP);
+});
+
+/// XP → 等级查表（20 级阈值表，见 spec/05 §9.2）
+int _xpToLevel(int xp) {
+  const thresholds = [0, 120, 360, 720, 1080, 1200, 1800, 2700, 3600, 4800,
+                      5400, 6000, 7200, 8400, 9600, 12000, 15000, 18000, 24000, 36000];
+  for (var i = thresholds.length - 1; i >= 0; i--) {
+    if (xp >= thresholds[i]) return i + 1;
+  }
+  return 1;
+}
+```
 
 ## 3. Backend 抽象接口
 
@@ -60,7 +153,41 @@ abstract class AdventureBackend {
 }
 ```
 
-Firebase 实现：`lib/services/firebase/firebase_adventure_backend.dart`
+参考实现：`lib/services/firebase/firebase_adventure_backend.dart`（Firebase 版）。其他后端实现遵循相同的 `AdventureBackend` 接口契约。
+
+### 3.1 BackendRegistry 集成
+
+`AdventureBackend` 必须注册到现有的 `BackendRegistry`（`lib/core/backend/backend_registry.dart`）：
+
+```dart
+// 在 BackendRegistry 构造函数中新增：
+class BackendRegistry {
+  // ...现有字段...
+  final AdventureBackend adventureBackend;  // 新增
+
+  BackendRegistry({
+    // ...现有参数...
+    required this.adventureBackend,  // 新增
+  });
+}
+```
+
+**Firebase 实现注册**（在 `main.dart` 或 DI 初始化处）：
+
+```dart
+BackendRegistry(
+  // ...现有 backend 实例...
+  adventureBackend: FirebaseAdventureBackend(firestore),  // 新增
+);
+```
+
+**AccountDeletionService 级联**：`account_deletion_service.dart` 的删除编排中必须新增：
+1. 通过 `AdventureBackend` 清理远端主哈基米数据
+2. 通过 `AdventureBackend` 清理远端待投骰子
+3. 通过 `AdventureBackend` 清理远端检定结果
+4. 通过 `AdventureBackend` 清理远端冒险进度
+5. 通过 `AdventureBackend` 清理远端队伍数据
+6. 清空本地 DnD 相关 SQLite 表
 
 ## 4. 文件变更清单
 
@@ -105,7 +232,7 @@ Firebase 实现：`lib/services/firebase/firebase_adventure_backend.dart`
 |---------|---------|---------|------|
 | `DiceEngineService` | Singleton | 无缓存（每次调用实时计算） | 纯函数式，无状态 |
 | `AdventureService` | Singleton | 无缓存 | 管理冒险生命周期，操作 SQLite |
-| `PrimaryCatService` | Singleton | 无缓存 | CRUD 操作，SQLite + Firestore 双写 |
+| `PrimaryCatService` | Singleton | 无缓存 | CRUD 操作，SQLite + 远端双写 |
 | `CompletionRateService` | Singleton | **缓存 5 分钟** | SQL 聚合查询较重，短时缓存 |
 | `StreakService` | Singleton | **缓存 5 分钟** | 同上 |
 | `CoverageService` | Singleton | **缓存 5 分钟** | 同上 |
@@ -142,7 +269,7 @@ Firebase 实现：`lib/services/firebase/firebase_adventure_backend.dart`
 ┌───────────────▼─────────────────────────────────────────┐
 │ Data Layer                                               │
 │   LocalDatabaseService (SQLite)                          │
-│   AdventureBackend (Firestore 抽象)                       │
+│   AdventureBackend (远端抽象)                              │
 └─────────────────────────────────────────────────────────┘
 ```
 

@@ -31,8 +31,13 @@
 | DEX 敏捷 | 完成效率 | 近 30 次 `session.completionRatio` 均值 | ≥0.95→18，≥0.90→16，以此类推 |
 | CON 体质 | 坚持韧性 | 当前连续打卡天数（streak days） | 每 +7 天 → +1 |
 | INT 智力 | 目标难度 | `habit.goalMinutes` | 目标越高 → 基础越高，分段映射 |
+
+> **「活跃习惯」定义**：`state != 'graduated' && state != 'archived'`。`goalMinutes` 为 null 的习惯参与 INT 计数（多样性），使用默认值 25（Pomodoro 标准）计算 `avgGoalMinutes`。
+
 | WIS 感知 | 规律性 | 近 30 天有专注记录的天数 / 30 | ≥0.90→18，≥0.80→16，以此类推 |
 | CHA 魅力 | 幸福度 | `cat.computedMood` + `cat.displayStage` | happy+adult→20，阶梯映射 |
+
+> **设计意图**：DEX 衡量 **完成质量**（最近 30 次的平均完成率），与频率无关；WIS 衡量 **规律性**（30 天内有多少天活跃），与单次质量无关。两者使用不同窗口是有意设计，分别捕捉效率和坚持两个维度。
 
 ---
 
@@ -46,6 +51,8 @@ completionRatio = session.durationMinutes / habit.goalMinutes
 
 - 结果强制 clamp 至 **0.0–1.0**（已在 `FocusSession` 写入时保证）
 - **边界情况**：若 `habit.goalMinutes` 为 0 或 null，则 `completionRatio = 1.0`（视为完成）
+
+> **边界处理**：`goalMinutes = 0` 或 `null` 的习惯不参与 DEX（completionRatio）计算。这些习惯对应的专注仍然产生 STR 经验（totalMinutes），但不影响效率指标。上方"视为完成"仅用于 `FocusSession` 存储时的默认值，DEX 的 `CompletionRateService` 查询会过滤掉 `goal_minutes <= 0` 的记录。
 - 正计时模式（`mode = 'stopwatch'`）下 `completionRatio` 固定为 `1.0`（代码已如此设定）
 
 ---
@@ -197,6 +204,8 @@ int stageCapFor(Cat cat) => _stageCap[cat.displayStage] ?? 14;
 | 成年猫 Adult | ≥ 6,000 min | ≥ 100h |
 
 > **注意**：这与用户冒险等级的进化时刻（Lv 6 = 1,200 总 XP、Lv 12 = 6,000 总 XP）数值上对齐，但驱动机制不同。冒险等级看所有猫的总和，伙伴猫进化只看自己。一只专注 100h 的猫是成年猫，即使用户总 XP 只够 Lv 12。
+>
+> **进化时刻对齐说明**：伙伴猫在 `totalMinutes = 1200` 时从幼猫进化为少年猫（spec/02 个体计算）；用户冒险等级在 `XP = 1200` 时达到 Lv 6 触发主哈基米进化。两者阈值相同是 **有意设计** ——确保第一只猫达到 1200 分钟时，主哈基米也刚好进化，创造"双重庆祝"时刻。但多猫用户的 adventureXP（所有猫之和）可能更早达到 1200。
 
 ### 心情衰减机制
 
@@ -222,6 +231,30 @@ int stageCapFor(Cat cat) => _stageCap[cat.displayStage] ?? 14;
 ASI 选择持久化在 PrimaryCat 模型中（新增 `asiChoices: Map<int, String>` 字段）。
 
 > **SRD 对齐**：SRD 5.2.1 在 Level 4/8/12/16/19 提供 Ability Score Improvement。我们保留了相同的等级节点，但简化为 +1（SRD 原文是 +2/+1 二选一）。
+
+### ASI 叠加计算逻辑
+
+ASI 永久 +1 叠加在 extension 计算值之上。计算顺序：
+
+```dart
+/// ASI 叠加示例（在 primaryCatAbilitiesProvider 中执行）
+Map<String, int> computeWithASI(Map<String, int> baseAbilities, Map<int, String> asiChoices) {
+  final result = Map<String, int>.from(baseAbilities);
+  for (final entry in asiChoices.entries) {
+    final choice = entry.value;
+    if (choice.startsWith('feat:')) continue; // 专长不增加属性值
+    // choice 是属性名（如 'STR'）
+    final key = choice.toLowerCase(); // 'str', 'dex', etc.
+    if (result.containsKey(key)) {
+      result[key] = (result[key]! + 1).clamp(10, 20);
+    }
+  }
+  return result;
+}
+```
+
+> **计算顺序**：先通过 extension 公式计算基础属性值 → 再叠加 ASI +1 → 最终 clamp 到 [10, 20]。
+> ASI 永久 +1 存储在 `PrimaryCat.asiChoices`（见 [data-model.md](../architecture/data-model.md) §1.1）。
 
 ### 设计意图
 
@@ -383,6 +416,51 @@ WHERE uid = ?
 
 ---
 
+### SQL 查询参考
+
+以下 SQL 为各计算 Service 的核心查询逻辑，供实现参考。
+
+**CompletionRateService — DEX 依赖**
+```sql
+-- 近 30 次专注的 completion_ratio 均值
+SELECT AVG(CAST(duration_minutes AS REAL) / NULLIF(goal_minutes, 0))
+FROM (
+  SELECT s.duration_minutes, h.goal_minutes
+  FROM local_sessions s
+  JOIN local_habits h ON s.habit_id = h.id
+  WHERE s.uid = ? AND s.status = 'completed' AND h.goal_minutes > 0
+  ORDER BY s.ended_at DESC
+  LIMIT 30
+) sub;
+-- goal_minutes = 0 或 NULL 的习惯不参与计算
+-- 若无任何 completed session，返回 0.0
+```
+
+**StreakService — CON 依赖**
+```sql
+-- 所有习惯中最长的连续打卡天数
+-- 实现方式：Dart 端遍历（SQL 窗口函数在 sqflite 中不可靠）
+SELECT DISTINCT DATE(ended_at / 1000, 'unixepoch', 'localtime') AS day
+FROM local_sessions
+WHERE uid = ? AND status = 'completed'
+ORDER BY day DESC;
+-- Dart 端从最近日期向前遍历，计算连续天数
+-- 跨时区：使用 ended_at 的本地时间转换
+```
+
+**CoverageService — WIS 依赖**
+```sql
+-- 最近 30 天内有专注记录的天数
+SELECT COUNT(DISTINCT DATE(ended_at / 1000, 'unixepoch', 'localtime')) AS covered_days
+FROM local_sessions
+WHERE uid = ?
+  AND status = 'completed'
+  AND ended_at >= ?;  -- 30 天前的 epoch ms
+-- 覆盖率 = covered_days / 30.0
+```
+
+---
+
 ## 技术实现要点
 
 ### Extension 调用约定
@@ -429,3 +507,5 @@ final cha = cat.charismaScore(cap);
 - [ ] `CoverageService`：查询范围精确为 30 个自然日，不多不少
 - [ ] `modifier(10) == 0`，`modifier(20) == 5`，`modifier(11) == 0`，`modifier(13) == 1`（1000 次随机属性分单元测试）
 - [ ] Extension 方法不触发 `toSqlite`/`toFirestore`（序列化测试：Cat 序列化前后字段一致）
+- [ ] **时区变更**：用户更改设备时区后，StreakService 的连击天数计算仍基于 session 的本地时间，不因时区切换断裂
+- [ ] **浮点精度**：CompletionRateService 的 averageForAllCats 返回值为 double，精度至少保留 2 位小数；edge case: 仅 1 条 session 时均值 = 该条 completionRatio

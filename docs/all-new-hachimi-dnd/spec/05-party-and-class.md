@@ -57,7 +57,7 @@ class Party {
 ### 3.2 持久化
 
 - **SQLite**：`local_party` 表，单行（每用户一条记录，upsert by userId）
-- **Firestore**：`users/{uid}/party`（单文档，离线优先，Ledger 模式同步）
+- **远端**：通过 LedgerChange 同步（`party_update` ActionType）
 - 冒险开始时，将当前队伍的猫咪 ID 列表写入 `AdventureProgress.partyMemberIds`，之后队伍变更不影响进行中的冒险
 
 ### 3.3 队伍快照统一定义
@@ -112,6 +112,8 @@ int calculateCompanionBonus(Party party, String checkAbility) {
   if (party.companion2 != null && companionContributes(party.companion2!, checkAbility)) bonus += 2;
   return bonus; // 最大 +4（两只伙伴均匹配时）
 }
+
+> **阶段上限约束**：「最高属性」使用经过 `stageCapFor(cat)` 约束后的计算值。幼猫阶段上限 14 的伙伴猫，即使原始公式算出 STR=16，在匹配判定中使用 14。
 ```
 
 ### 4.3 优势判断逻辑
@@ -137,7 +139,7 @@ int calculateCompanionBonus(Party party, String checkAbility) {
 
 ### 5.1 锁定时机
 
-- 用户点击"开始冒险"（确认场景卡后）→ 队伍快照写入 `AdventureProgress.partySnapshot` → 锁定生效
+- 用户点击"开始冒险"（确认场景卡后）→ 队伍快照写入 `AdventureProgress.partyMemberIds` → 锁定生效
 - 锁定期间，Party Provider 中 companion1Id / companion2Id 仍可修改（为下次冒险准备），但当前冒险不受影响
 
 ### 5.2 解锁时机
@@ -148,9 +150,9 @@ int calculateCompanionBonus(Party party, String checkAbility) {
 ### 5.3 场景切换行为
 
 - 场景进行中，用户选择切换场景卡：
-  1. 当前冒险进度**暂停保存**（`AdventureProgress.status = paused`）
-  2. 可选择新场景卡并配置新队伍
-  3. 同时只能激活 **1 个**进行中的冒险，切换时旧进度置为 `abandoned`（不可恢复）
+  1. 当前冒险置为 `abandoned`（进度永久丢失，已获得的即时星尘不回收）
+  2. 用户选择新场景卡并配置新队伍
+  3. 同时只能激活 **1 个**进行中的冒险
   4. 新场景卡开始时重新锁定队伍
 
 ---
@@ -254,6 +256,8 @@ ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
 - 副职业的**被动技能不激活**（仅享受 XP 加成）
 - 同一次专注的 XP 加成计算：`XP × (1 + 主职加成%) × (1 + 副职加成% × 0.5)`
 
+> **取整规则**：副职 XP 加成 = `(mainClassBonus * 0.5).floor()`。示例：Ranger 副职 = floor(25% × 0.5) = floor(12.5%) = 12%。最终乘数为 `1 + 0.12 = 1.12`。
+
 ### 8.3 示例
 
 主职 Wizard（+25%，mental 习惯）+ 副职 Rogue（+25% × 50% = +12.5%）：
@@ -281,6 +285,8 @@ ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
 | 🛡️ 韧性 Resilient | Resilient | 选择一个属性获得该属性检定的熟练 | 弱项补强 |
 
 专长选择持久化在 PrimaryCat 模型（`asiChoices: Map<int, String>` 字段）。每个专长只能选择一次。
+
+> **不可修改**：ASI 和专长选择一经确认后**永久锁定**，不可撤销或重选。若用户后悔，需等待下一个 ASI 节点（Lv 8/12/16/19）。
 
 ### 验收标准
 - [ ] Level 4/8/12/16/19 触发选择界面
@@ -329,11 +335,18 @@ ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
 ### 9.1 XP 计算
 
 ```dart
-int get userXP => allCats.fold(0, (sum, cat) => sum + cat.totalMinutes);
-// 1 专注分钟 = 1 XP（应用职业加成后的分钟数，取整）
+/// 冒险等级 XP（materialized，含职业加成）
+///
+/// 基础公式：XP = sum(每次专注的加成后分钟数)
+/// 职业加成：选择职业后，匹配 category 的专注分钟数 × 职业加成率
+///
+/// 注意：职业加成不回溯。选择 Wizard 前的 360 分钟不受 +25% 影响。
+/// 实现方式：每次专注完成时，将加成后的 XP 增量写入 materialized_state['adventure_xp']，
+/// 而非运行时重新计算全部历史。
+int get adventureXP => materializedState['adventure_xp'] ?? allCatsTotalMinutes;
 ```
 
-注意：此 XP 与现有 `xp_service.dart` 的 XP 体系**相互独立**。现有 XP 包含 `fullHouseBonus` 和 Remote Config 倍率，DnD 等级系统使用**原始分钟数**，以保持简洁可预期。
+注意：此 XP 与现有 `xp_service.dart` 的 XP 体系**相互独立**。现有 XP 包含 `fullHouseBonus` 和 Remote Config 倍率，DnD 等级系统使用**物化累积值**（每次专注写入增量），以保持简洁可预期。
 
 ### XP 系统关系图
 
@@ -342,15 +355,18 @@ Hachimi 有两套独立的 XP 体系，互不干扰：
 ```
 ┌─────────────────────────────────────────────────────┐
 │  冒险等级 XP（Adventure Level XP）                    │
-│  计算：所有猫 totalMinutes 之和 × 职业加成           │
+│  计算：物化累积值（每次专注完成时写入增量）           │
+│  增量公式：专注分钟 × (1 + 职业加成率)               │
 │  用途：DnD 等级（1-20）、区域解锁、职业选择          │
-│  存储：实时计算，不持久化                             │
+│  存储：materialized_state['adventure_xp']            │
 │  受职业加成影响：✅（Ranger +25% physical 等）        │
+│  回退策略：若 adventure_xp 为空，降级为              │
+│            allCatsTotalMinutes（无加成的原始值）      │
 ├─────────────────────────────────────────────────────┤
 │  现有 XP（xp_service.dart）                          │
 │  计算：分钟 × Remote Config 倍率 + fullHouseBonus    │
 │  用途：成就系统、猫咪等级显示                         │
-│  存储：materialized_state                            │
+│  存储：materialized_state['xp']                      │
 │  受职业加成影响：❌（完全独立）                       │
 └─────────────────────────────────────────────────────┘
 ```
@@ -358,12 +374,16 @@ Hachimi 有两套独立的 XP 体系，互不干扰：
 **职业 XP 加成规则**：
 - 加成只作用于**冒险等级 XP**，不影响现有 xp_service
 - 加成从**选择职业后的首次相关类别专注**开始生效
-- **不回溯**历史 XP
-- 示例：用户在 Lv 3（360 min）选择 Wizard → 之后 mental 类专注 XP ×1.25 → 但前 360 min 不变
+- **不回溯**历史 XP — 选择职业前已物化的 adventure_xp 值不变
+- 每次专注完成时的写入流程：
+  1. 计算基础增量 = 本次专注分钟数
+  2. 若用户有职业且习惯 category 匹配 → 增量 × (1 + 加成率)
+  3. `adventure_xp += 增量`（写入 `materialized_state`）
+- 示例：用户在 Lv 3（360 min）选择 Wizard → 之后 mental 类专注 30 分钟 → 增量 = 30 × 1.25 = 37 XP → 但前 360 min 不变
 
 ### 9.2 冒险等级表（20 级）
 
-> **命名约定**：此等级系统称为"冒险等级"（Adventure Level），与现有 `xp_service.dart` 的经验值系统完全独立。冒险等级 XP = 所有猫 `totalMinutes` 之和，无乘数。
+> **命名约定**：此等级系统称为"冒险等级"（Adventure Level），与现有 `xp_service.dart` 的经验值系统完全独立。冒险等级 XP = `materialized_state['adventure_xp']`（物化累积值，含职业加成；降级值为所有猫 `totalMinutes` 之和）。
 
 | 等级 | 所需 XP (分钟) | 等效小时 | 进化阶段 | 熟练加值 | 解锁内容 |
 |------|--------------|---------|---------|---------|---------|
@@ -432,8 +452,8 @@ classProvider
 ## 11. 验收标准
 
 ### 队伍与锁定
-- [ ] Party 数据正确持久化（SQLite + Firestore，离线优先）
-- [ ] 冒险开始时锁定队伍快照，写入 `AdventureProgress.partySnapshot`
+- [ ] Party 数据正确持久化（SQLite + 远端，离线优先）
+- [ ] 冒险开始时锁定队伍快照，写入 `AdventureProgress.partyMemberIds`
 - [ ] 冒险进行中，修改 Party 不影响当前冒险结算
 
 ### 伙伴加成（双层机制）
@@ -450,7 +470,7 @@ classProvider
 - [ ] Habit `category` 字段：null 等同于 `general`，SQLite 迁移正确执行
 
 ### 等级系统
-- [ ] 用户 XP = 所有猫 `totalMinutes` 之和（原始分钟数，无倍率），与现有 `xp_service.dart` XP 体系独立
+- [ ] 用户冒险 XP = `materialized_state['adventure_xp']`（物化累积值，含职业加成），降级为所有猫 `totalMinutes` 之和；与现有 `xp_service.dart` XP 体系独立
 - [ ] 20 级等级表阈值与熟练加值（Proficiency Bonus）对应正确
 - [ ] 等级 6（XP = 1,200）和等级 12（XP = 6,000）触发进化动画
 - [ ] 三个进化阶段（幼猫 Kitten / 少年猫 Adolescent / 成年猫 Adult）对应正确图资
@@ -465,6 +485,9 @@ classProvider
 - [ ] 习惯设置页面可选择子技能标签（或不选）
 - [ ] 选择子技能后，对应检定获得熟练加值
 - [ ] 子技能选择不影响现有 6 大类分类逻辑
+- [ ] **职业变更后 XP**：选择新职业后，从该时刻起新职业加成生效；历史 adventureXP 物化值不变
+- [ ] **Lv 6/12 进化并发**：若多只猫同时达到进化阈值（unlikely but possible），进化动画仅播放 1 次（取最先触发的）
+- [ ] **ASI 不可逆**：已确认的 ASI/Feat 选择在 UI 中灰显为"已选"，不可修改
 
 ---
 

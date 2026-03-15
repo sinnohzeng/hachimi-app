@@ -1,14 +1,26 @@
 # 数据模型与存储架构
 
-> SSOT for v2.0 DnD 融合的所有新增数据模型、SQLite Schema 和 Firestore 安全规则。
+> **SSOT 声明**：本文件是所有 v2.0 新增数据模型的**唯一权威定义**。
+> 其他 spec 文件中出现的模型定义为引用摘要，当与本文件冲突时以本文件为准。
+> 远端存储规则使用 backend-agnostic 约束描述，不绑定任何特定云服务商。
+
+> SSOT for v2.0 DnD 融合的所有新增数据模型、SQLite Schema 和远端验证规则。
 > **Status:** Draft
 > **Evidence:** `lib/models/`、`lib/services/local_database_service.dart`、`firestore.rules`
 > **Related:** [spec/01-primary-cat.md](../spec/01-primary-cat.md) · [spec/03-dice-engine.md](../spec/03-dice-engine.md) · [spec/04-adventure.md](../spec/04-adventure.md)
-> **Changelog:** 2026-03-15 — 初版（整合自审查修复 + agent 起草）
+> **Changelog:**
+> - 2026-03-15 — Fix: 合并 background 字段、AdventureProgress 增加 abandoned 状态与 activeDeviceId、DiceResult 注释修正、新增 SceneDifficultyUnlock 模型、安全规则改为 backend-agnostic、SSOT 声明
+> - 2026-03-15 — 初版（整合自审查修复 + agent 起草）
 
 ---
 
-## 1. 新增 Dart 模型（8 个）
+## 1. 新增 Dart 模型（9 个）
+
+> **重要区分**：`PrimaryCat`（主哈基米）与 `Cat`（伙伴猫）是**两个完全独立的模型**，不共享任何继承关系。
+> - **PrimaryCat** = 用户本人的 RPG 化身，每用户唯一，属性从所有伙伴猫数据聚合计算
+> - **Cat** = 绑定单一习惯的伙伴猫，可有多只，属性仅反映自身习惯数据
+> - 两者都复用 `CatAppearance` 结构体，但存储在不同的 SQLite 表和远端路径中
+> - 详见 [spec/01-primary-cat.md §PrimaryCat 与 Cat 的关系](../spec/01-primary-cat.md)
 
 ### 1.1 PrimaryCat — 主哈基米
 
@@ -22,6 +34,7 @@ class PrimaryCat {
   final CatAppearance appearance;  // 复用现有 CatAppearance
   final String? equippedAccessory;
   final String? playerClass;       // 等级 3 后选择；null = 未选
+  final String background;         // 背景出身：'scholar'|'athlete'|'healer'|'performer'|'adventurer'（默认 'adventurer'）
   final Map<int, String> asiChoices;     // {4: 'STR', 8: 'feat:Alert', 12: 'DEX', ...}
   final List<String> selectedFeats;      // ['Alert', 'Lucky']
   final DateTime createdAt;
@@ -54,7 +67,7 @@ class DiceResult {
   final int naturalRoll;           // 1-20
   final int modifier;              // 属性修正值
   final int proficiencyBonus;      // 默认 0
-  final int totalResult;           // naturalRoll + modifier + proficiencyBonus
+  final int totalResult;           // 由 DiceEngineService 计算写入，完整公式见 spec/03 §6.5
   final int dc;
   final String outcome;            // 'critical_success' | 'success' | 'failure' | 'critical_failure'
   final bool hadAdvantage;
@@ -77,11 +90,24 @@ class AdventureProgress {
   final int currentEventIndex;
   final List<String> eventResultIds;
   final int successCount;
-  final String status;             // 'active' | 'paused' | 'completed'
+  final String status;             // 'active' | 'paused' | 'completed' | 'abandoned'
   final int? starRating;           // 1-3；完成后赋值
+  final String? activeDeviceId;    // 设备锁定，防止多设备冲突
   final DateTime startedAt;
   final DateTime? completedAt;
 }
+```
+
+**状态转换规则：**
+
+```
+active → paused     （用户主动暂停或开始新冒险）
+active → completed  （所有事件完成）
+active → abandoned  （用户切换场景卡）
+paused → active     （用户恢复冒险）
+paused → abandoned  （用户切换场景卡）
+completed → ×       （终态，不可变）
+abandoned → ×       （终态，不可变）
 ```
 
 ### 1.5 SceneCard — 场景卡模板
@@ -141,11 +167,51 @@ class Party {
 }
 ```
 
+### 1.9 SceneDifficultyUnlock — 场景难度解锁状态
+
+```dart
+/// 场景难度解锁状态 — 每个场景卡独立
+class SceneDifficultyUnlock {
+  final String id;               // = sceneCardId
+  final String uid;
+  final bool hardUnlocked;       // Normal 通关后为 true
+  final bool legendaryUnlocked;  // Hard 通关后为 true
+  final DateTime updatedAt;
+}
+```
+
 ---
 
 ## 2. SQLite Schema
 
-没有老用户，不需要迁移路径。直接定义目标态 schema。
+### 迁移策略
+
+**SQLite 版本：v3 → v4**
+
+虽然 DnD 功能对已有用户是全新的（无需迁移 PrimaryCat/Adventure 数据），但 `local_habits` 表已经存在且包含用户数据，必须通过 ALTER TABLE 添加 `category` 字段。
+
+```dart
+// LocalDatabaseService._onUpgrade
+if (oldVersion < 4) {
+  // 1. 新增 DnD 表（全新，无数据迁移）
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_primary_cat (...)''');
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_pending_dice (...)''');
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_dice_results (...)''');
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_adventure_progress (...)''');
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_party (...)''');
+  await db.execute('''CREATE TABLE IF NOT EXISTS local_scene_difficulty_unlock (...)''');
+
+  // 2. 现有表修改：添加习惯分类字段
+  await db.execute('ALTER TABLE local_habits ADD COLUMN category TEXT');
+  // NULL 视作 'general'，不自动填充默认值
+  // 用户可在习惯设置页手动选择分类
+}
+```
+
+**默认值策略**：
+- `category = NULL` 在所有计算中视为 `'general'`
+- 不自动根据习惯名推断分类（避免误判）
+- 用户首次进入职业选择（Lv 3）时，引导页提示"为习惯设置分类以获得职业 XP 加成"
 
 ### 2.1 新增表
 
@@ -159,9 +225,10 @@ CREATE TABLE IF NOT EXISTS local_primary_cat (
   appearance         TEXT NOT NULL,        -- JSON
   equipped_accessory TEXT,
   player_class       TEXT,
+  background         TEXT NOT NULL DEFAULT 'adventurer',  -- 背景出身
   asi_choices        TEXT NOT NULL DEFAULT '{}',     -- JSON: Map<int, String>
   selected_feats     TEXT NOT NULL DEFAULT '[]',     -- JSON: List<String>
-  created_at         TEXT NOT NULL,
+  created_at         TEXT NOT NULL,        -- ISO 8601
   UNIQUE(uid)
 );
 
@@ -204,6 +271,7 @@ CREATE TABLE IF NOT EXISTS local_adventure_progress (
   success_count        INTEGER NOT NULL DEFAULT 0,
   status               TEXT NOT NULL DEFAULT 'active',
   star_rating          INTEGER,
+  active_device_id     TEXT,                   -- 设备锁定 ID
   started_at           TEXT NOT NULL,
   completed_at         TEXT
 );
@@ -216,6 +284,15 @@ CREATE TABLE IF NOT EXISTS local_party (
   companion_2_id  TEXT,
   updated_at      TEXT NOT NULL,
   UNIQUE(uid)
+);
+
+CREATE TABLE IF NOT EXISTS local_scene_difficulty_unlock (
+  id                 TEXT PRIMARY KEY,  -- = sceneCardId
+  uid                TEXT NOT NULL,
+  hard_unlocked      INTEGER NOT NULL DEFAULT 0,
+  legendary_unlocked INTEGER NOT NULL DEFAULT 0,
+  updated_at         TEXT NOT NULL,
+  UNIQUE(uid, id)
 );
 ```
 
@@ -236,33 +313,42 @@ ALTER TABLE local_habits ADD COLUMN category TEXT;
 
 ---
 
-## 3. Firestore 安全规则增量
+## 3. 远端验证规则
 
-追加至 `firestore.rules` 的 `match /users/{uid}` 块：
+> 以下验证约束适用于任何后端实现（Firebase、CloudBase、自建服务等）。
+> 具体的 rules 语法由各 Backend 实现文档提供。
+> 参考实现见 `lib/services/firebase/firebase_adventure_backend.dart`。
 
-```js
-match /primaryCat/{document=**} {
-  allow read, write: if request.auth.uid == uid;
-}
+### 远端存储路径
 
-match /pendingDice/{diceId} {
-  allow read, create, update, delete: if request.auth.uid == uid;
-}
+| 路径 | 说明 |
+|------|------|
+| `users/{uid}/primaryCat` | 主哈基米（单文档/记录） |
+| `users/{uid}/pendingDice/{diceId}` | 待投骰子 |
+| `users/{uid}/diceResults/{resultId}` | 检定结果 |
+| `users/{uid}/adventureProgress/{progressId}` | 冒险进度 |
+| `users/{uid}/party` | 当前队伍（单文档/记录） |
+| `users/{uid}/sceneDifficultyUnlock/{sceneCardId}` | 场景难度解锁状态 |
 
-match /diceResults/{resultId} {
-  allow read: if request.auth.uid == uid;
-  allow create: if request.auth.uid == uid;
-  allow update, delete: if false;  // 结果不可篡改
-}
+### 字段验证约束
 
-match /adventureProgress/{progressId} {
-  allow read, create, update, delete: if request.auth.uid == uid;
-}
+| 集合 | 约束 | 说明 |
+|------|------|------|
+| primaryCat | 仅所有者可读写（`request.uid == uid`） | 每用户唯一 |
+| pendingDice | 仅所有者可 CRUD | — |
+| diceResults | 仅所有者可读、可创建；**不可更新、不可删除**（结果不可篡改） | 审计日志性质 |
+| adventureProgress | 仅所有者可 CRUD | — |
+| party | 仅所有者可读写 | 每用户唯一 |
+| sceneDifficultyUnlock | 仅所有者可读写 | — |
 
-match /party/{document=**} {
-  allow read, write: if request.auth.uid == uid;
-}
-```
+### 值域约束
+
+| 字段 | 约束 | 说明 |
+|------|------|------|
+| `diceResults.naturalRoll` | `∈ [1, 20]` | d20 骰子值域 |
+| `diceResults.stardustEarned` | `∈ [0, 20]` | 单次检定最大 15 + 场景奖励 |
+| `materializedState.gold` | `≥ 0` | 金币不可为负 |
+| `materializedState.stardust` | `≥ 0` | 星尘不可为负 |
 
 ---
 
@@ -289,6 +375,9 @@ party_update,
 
 // 职业
 class_select,
+
+// 难度解锁
+difficulty_unlock,
 
 // 星尘
 stardust_earn,

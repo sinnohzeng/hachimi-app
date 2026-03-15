@@ -76,12 +76,30 @@
 Rive 支持通过图层可见性和填充色替换实现换装：
 
 ```dart
-// 伪代码：运行时切换毛色
-artboard.fill('pelt_base').color = appearance.peltColor;
-// 切换配件可见性
-artboard.node('accessory_hat').isVisible = equippedAccessory == 'hat';
-artboard.node('accessory_collar').isVisible = equippedAccessory == 'collar';
+// Rive Flutter SDK 运行时换装（正确 API）
+// 1. 加载 .riv 文件并获取 artboard
+final file = await RiveFile.asset('assets/rive/cat_kitten.riv');
+final artboard = file.mainArtboard.instance();
+
+// 2. 使用 StateMachineController 控制状态机
+final controller = StateMachineController.fromArtboard(artboard);
+artboard.addController(controller!);
+
+// 3. 通过 SMIInput 输入控制换装
+final peltColorInput = controller.findInput<double>('pelt_color_index') as SMINumber;
+peltColorInput.value = appearance.peltColorIndex.toDouble();
+
+// 4. 通过 SMIBool 控制配件可见性
+final hatVisible = controller.findInput<bool>('hat_visible') as SMIBool;
+hatVisible.value = equippedAccessory == 'hat';
+
+// 5. 在 Widget 树中使用
+RiveAnimation.artboard(artboard, fit: BoxFit.contain)
 ```
+
+> **API 注意**：Rive Flutter SDK 使用 `StateMachineController` + `SMIInput`（Number/Bool/Trigger）控制运行时参数，
+> 而非直接操作 artboard 节点。.riv 文件设计时必须在 Rive Editor 中预设状态机输入参数。
+> 如果 Rive SDK 版本更新导致 API 变更，降级为 PNG 精灵 + `PixelCatRenderer`（现有代码保留直到 Phase Art 完成验证）。
 
 **优势**：一个 .riv 文件支持所有外观组合，不需要 677 个独立精灵条目。
 
@@ -100,14 +118,14 @@ artboard.node('accessory_collar').isVisible = equippedAccessory == 'collar';
 
 当从 PNG 管线迁移到 Rive 时，CatAppearance 的 15+ 参数需要映射到 Rive artboard 节点：
 
-| CatAppearance 参数 | Rive 节点类型 | 映射方式 |
+| CatAppearance 参数 | Rive 输入类型 | 映射方式 |
 |-------------------|-------------|---------|
-| `peltColor` | Shape fill color | `artboard.fill('pelt_base').color = peltColorToRgb(appearance.peltColor)` |
-| `peltType` | Shape visibility | 切换不同毛色图案图层的可见性 |
-| `eyeColor` | Shape fill color | `artboard.fill('eye_left').color = ...` |
-| `isLonghair` | Shape visibility | 长毛/短毛两组图层互斥显示 |
-| `equippedAccessory` | Shape visibility | 每个配件一个独立图层，通过 `isVisible` 控制 |
-| `whitePatches` | Shape visibility | 白色斑纹图层（可选） |
+| `peltColor` | SMINumber | `controller.findInput<double>('pelt_color_index')` → 颜色索引映射 |
+| `peltType` | SMINumber | `controller.findInput<double>('pelt_type_index')` → 切换毛色图案 |
+| `eyeColor` | SMINumber | `controller.findInput<double>('eye_color_index')` → 眼色索引映射 |
+| `isLonghair` | SMIBool | `controller.findInput<bool>('is_longhair')` → 长毛/短毛切换 |
+| `equippedAccessory` | SMIBool | `controller.findInput<bool>('hat_visible')` 等 → 每个配件一个 Bool 输入 |
+| `whitePatches` | SMIBool | `controller.findInput<bool>('white_patches_visible')` → 白色斑纹（可选） |
 
 **简化策略**（Phase Art MVP）：
 - 不复制 677 种精灵组合。Rive 通过**颜色填充替换**实现无限组合
@@ -204,6 +222,17 @@ onTabChanged: (index) {
 }
 ```
 
+### 4.4 Flame 边界场景处理
+
+| 场景 | 行为 | 实现方式 |
+|------|------|---------|
+| vivo/OPPO 后台杀进程后恢复 | Flame GameWidget 重建 | `AppLifecycleListener.onRestart` → 重新初始化 `TavernGame` 实例 |
+| 分屏模式 | Flame 暂停渲染 | `WidgetsBindingObserver.didChangeMetrics` → `game.paused = true` |
+| 系统字体放大（>1.3x） | Flame overlay 可能位移 | overlay 使用 `MediaQuery.textScaleFactor` 调整位置 |
+| 低内存警告 | 释放 Flame 资源 | `AppLifecycleListener.onMemoryPressure` → 释放 Tiled 瓦片缓存 |
+
+> **测试要点**：以上场景需在 vivo V2405A 上实际验证。分屏模式在部分厂商 ROM 上有不同行为。
+
 ## 5. 原创美术资产来源
 
 ### 5.1 猫咪角色（Rive）
@@ -244,24 +273,80 @@ Hachimi Style Guide:
 - 骰子：CustomPainter 几何绘制（不需要精灵图）
 ```
 
-## 7. 叙事文本工程化
+## 7. 叙事文本 i18n 工程化
 
-（保持不变，从之前版本延续）
+### 统一格式：Dart 常量 + ARB 同步
 
-### 7.1 文本量
+所有 DnD 叙事文本采用 **Dart 常量池**作为 SSOT，理由：
+1. 编译期类型安全（key 错误在编译时报错）
+2. 与现有 `lib/core/constants/` 模式一致
+3. 无需运行时 JSON 解析开销
+
+### 7.1 文件结构
+
+```
+lib/core/constants/
+├── adventure_dialogues_town.dart    # 猫镇场景卡文本（5 张卡）
+├── adventure_dialogues_forest.dart  # 迷雾森林场景卡文本（5 张卡）
+├── adventure_dialogues_ruins.dart   # 远古遗迹场景卡文本（5 张卡）
+├── primary_cat_dialogues.dart       # 主哈基米对话
+├── dice_result_dialogues.dart       # 骰子结果文案
+└── party_dialogues.dart             # 队伍互动对话
+```
+
+### 7.2 文本格式规范
+
+```dart
+/// 每个场景事件的文本结构
+class EventText {
+  final String prompt;       // 事件描述（展示给用户）
+  final String successText;  // 成功后文案
+  final String failText;     // 失败后文案
+}
+
+/// 常量池示例
+const townMarketEvents = <String, EventText>{
+  'market_01': EventText(
+    prompt: '热闹的市集中，一只猫咪摊主向你招手...',
+    successText: '你成功帮助摊主整理了货物，获得了她的感谢！',
+    failText: '货物散落一地...不过摊主笑着说没关系啦。',
+  ),
+  // ...
+};
+```
+
+### 7.3 文本量
 
 | 类别 | 数量 |
 |------|------|
-| 场景叙事 | 300 段（15场景×10事件×2） |
+| 场景叙事 | 300 段（15 场景 × 10 事件 × 2） |
 | 主哈基米对话 | 120 句 |
 | 骰子结果文案 | 72 句 |
 | 队伍互动 | 36 句 |
 | **合计** | ~528 段 × 15 语言 |
 
-### 7.2 国际化
+### 7.4 i18n 翻译流程
 
-叙事文本使用独立 JSON 文件（`assets/l10n/adventure/{locale}.json`），不进 ARB。
+1. **开发期**：中文 Dart 常量池作为源文本
+2. **翻译期**：导出为 CSV → 外部翻译 → 导入回 Dart 常量
+3. **运行时**：根据 `Localizations.localeOf(context)` 选择对应常量池
+4. **降级**：缺少翻译时 fallback 到中文（zh-CN）
 
-### 7.3 质量控制
+### 7.5 i18n 降级规则
+
+```dart
+EventText getEventText(String eventId, String locale) {
+  final pool = _localePools[locale] ?? _localePools['zh-CN']!;
+  return pool[eventId] ?? _fallbackText;
+}
+
+const _fallbackText = EventText(
+  prompt: '一个神秘的事件发生了...',
+  successText: '你成功了！',
+  failText: '这次没有成功，但你获得了经验。',
+);
+```
+
+### 7.6 质量控制
 
 AI 批量生成 → 人工审核 → AI 翻译 → 母语者抽检（CJK ≥50%）

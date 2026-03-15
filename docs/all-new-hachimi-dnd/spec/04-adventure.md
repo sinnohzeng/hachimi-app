@@ -21,6 +21,8 @@
 - 多个并发冒险会造成进度分散，破坏叙事连贯性
 - 简化数据模型，避免"哪只猫的骰子推进哪个场景"的歧义
 
+> **迁移说明**：当前不存在老版本"单猫绑定场景卡"的数据。v2.0 为全新功能，无需数据迁移脚本。
+
 ### 1.1 冒险入口
 
 | 入口位置 | 行为 |
@@ -112,12 +114,15 @@ class AdventureProgress {
   final int currentEventIndex;        // 当前推进到第几个事件（0-based）
   final List<String> eventResultIds;  // 已完成事件对应的 DiceResult ID 列表
   final int successCount;             // 成功（含大成功）事件数量
-  final String status;                // 'active' | 'paused' | 'completed'
+  final String status;                // 'active' | 'paused' | 'completed' | 'abandoned'
   final int? starRating;              // 完成后计算：1 | 2 | 3（null 表示未完成）
   final DateTime startedAt;           // 开始时间
   final DateTime? completedAt;        // 完成时间（null 表示未完成）
 }
 ```
+
+> **状态转换规则**：详见 [data-model.md](../architecture/data-model.md) §1.4。
+> `abandoned` = 用户切换场景卡时，旧冒险永久失效。已获得的即时星尘不回收。
 
 ### 4.1 约束
 
@@ -125,16 +130,20 @@ class AdventureProgress {
 - 开始新冒险时，如存在 active 冒险 → 自动将其置为 'paused'（进度保留，可恢复）
 - 已暂停的冒险可在 Tab 3 历史列表中恢复
 
-### 4.2 Firestore 路径
+> **状态不可逆性**：`paused` 可恢复（用户返回后继续）；`abandoned` 不可恢复（进度永久丢失，但已获得的即时星尘不回收）。切换场景卡时，旧冒险自动置为 `abandoned`。
 
-```
-users/{uid}/adventures/{adventureId}
-```
+### 4.2 远端存储
+
+通过 `AdventureBackend.saveAdventureProgress()` 同步。
+
+远端存储路径：`users/{uid}/adventureProgress/{progressId}`
+
+> 路径名统一为 `adventureProgress`（与 [data-model.md](../architecture/data-model.md) §3 一致）。
 
 ### 4.3 SQLite 表结构
 
 ```sql
-CREATE TABLE adventure_progress (
+CREATE TABLE local_adventure_progress (
   id                  TEXT PRIMARY KEY,
   uid                 TEXT NOT NULL,
   scene_card_id       TEXT NOT NULL,
@@ -147,10 +156,11 @@ CREATE TABLE adventure_progress (
   status              TEXT NOT NULL DEFAULT 'active',
   star_rating         INTEGER,        -- NULL 表示未完成
   started_at          TEXT NOT NULL,  -- ISO 8601
-  completed_at        TEXT            -- NULL 表示未完成
+  completed_at        TEXT,           -- NULL 表示未完成
+  active_device_id    TEXT               -- 设备锁定 ID
 );
 
-CREATE INDEX idx_adventure_uid_status ON adventure_progress(uid, status);
+CREATE INDEX idx_adventure_uid_status ON local_adventure_progress(uid, status);
 ```
 
 ---
@@ -209,18 +219,13 @@ CREATE INDEX idx_adventure_uid_status ON adventure_progress(uid, status);
 
 DC 调整在**运行时**叠加到 SceneEvent.dc 上，不修改原始数据。
 
+> **「通关」定义**：`AdventureProgress.status == 'completed'` 即视为通关。无最低星级或成功率要求。Normal 通关后 Hard 解锁，Hard 通关后 Legendary 解锁。
+
 ### 6.2 难度解锁状态存储
 
-```dart
-// 存储于 AdventureUnlockState，每个场景卡独立
-class SceneDifficultyUnlock {
-  final String sceneCardId;
-  final bool hardUnlocked;
-  final bool legendaryUnlocked;
-}
-```
+> **模型定义**见 [data-model.md](../architecture/data-model.md) §1.9。
 
-Firestore 路径：`users/{uid}/adventureUnlocks/{sceneCardId}`
+远端存储路径：`users/{uid}/sceneDifficultyUnlock/{sceneCardId}`（通过 `AdventureBackend` 同步）。
 
 ---
 
@@ -270,6 +275,8 @@ List<String> drawEvents(List<SceneEvent> pool, int count, Random rng) {
   final shuffled = [...pool]..shuffle(rng);
   return shuffled.take(count).map((e) => e.id).toList();
 }
+
+> **随机种子策略**：使用 `Random.secure()` 生成事件序列，不保存种子。每次冒险的事件抽取完全独立，不支持"分享冒险"（种子重放）。
 ```
 
 ### 9.2 多次游玩动力
@@ -351,7 +358,9 @@ final adventureNotifierProvider =
 2. 写入 `DiceResult`
 3. 更新 `AdventureProgress.currentEventIndex` + `successCount` + `eventResultIds`
 
-SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
+SQLite 使用事务（`txn.execute` 批次），远端使用 `SyncBackend.writeBatch()`。
+
+> **结算时序说明**：冒险完成时的"原子操作"仅包含冒险级别的额外奖励（星级加成、完成标记、成就触发）。每次检定的即时星尘已在检定时实时发放（详见 spec/03 §12.1），不在此处重复结算。
 
 ### 13.2 冒险完成结算原子操作
 
@@ -370,26 +379,51 @@ SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
 
 主哈基米的被动感知值 = `10 + WIS 修正值 + 熟练加值（如有 Perception 子技能）`
 
-每日首次打开 App 时，系统根据被动感知值判断是否触发酒馆/猫屋中的发现事件：
+每日首次打开 App 时，系统根据被动感知值判断是否触发酒馆/猫屋中的发现事件。
 
-| 被动感知 | 触发概率 | 发现类型 | 奖励 |
-|---------|---------|---------|------|
-| ≥ 12 | 30% | 普通发现（"沙发下发现了一枚古老金币"） | 5 金币 |
-| ≥ 15 | 20% | 稀有发现（"窗台出现了一只流浪猫带来的礼物"） | 装饰品碎片 |
-| ≥ 18 | 10% | 极稀有发现（"书架掉落了一本神秘书籍"） | 限定配件碎片 |
+### 14.1 触发机制（简化概率模型）
 
-### 设计约束
+每日首次打开 App 时，系统根据被动感知值计算触发概率：
+
+```
+trigger_rate = min(0.30, 0.05 × floor(passivePerception / 3))
+```
+
+| 被动感知值 | 触发概率 | 预期月均发现 | 发现类型 |
+|-----------|---------|------------|---------|
+| < 12 | 5% | ~1.5 次 | 普通发现（5 金币） |
+| 12-14 | 10% | ~3 次 | 普通/稀有发现 |
+| 15-17 | 15% | ~4.5 次 | 稀有发现（装饰品碎片） |
+| ≥ 18 | 20% | ~6 次 | 极稀有发现（限定配件碎片） |
+
+**简化决策**：去掉月度保证机制和时段分配。概率模型足够保证高感知用户获得更多发现，低感知用户也有偶发惊喜。
+
+**Remote Config 可调参数**：`passive_perception_discovery_enabled`（全局开关）。
+
+### 14.2 发现事件类型
+
+| 被动感知 | 发现类型 | 奖励 |
+|---------|---------|------|
+| ≥ 12 | 普通发现（"沙发下发现了一枚古老金币"） | 5 金币 |
+| ≥ 15 | 稀有发现（"窗台出现了一只流浪猫带来的礼物"） | 装饰品碎片 |
+| ≥ 18 | 极稀有发现（"书架掉落了一本神秘书籍"） | 限定配件碎片 |
+
+### 14.3 设计约束
 - 每日最多触发 1 次发现事件
-  > **"每日"定义**：基于用户本地时区的日历日。每天凌晨 00:00（本地时间）重置发现事件触发资格。使用 `SharedPreferences` key `last_discovery_date` 存储 `yyyy-MM-dd` 格式的上次触发日期。
 - 发现事件在 Tab 2（猫咪酒馆）中以气泡提示展示
 - 触发时有微弱触觉反馈 + 发现音效
 - **Phase 建议**：Phase 2（与冒险系统同步上线）
 
+**状态追踪**：使用 `SharedPreferences` key `last_discovery_date`（`yyyy-MM-dd`）追踪上次触发日期。每日凌晨 00:00（本地时间）重置。
+
+> 不需要 `last_discovery_month`、`discovery_guaranteed_count` 等额外 key。
+
 ### 验收标准
 - [ ] 被动感知值计算正确（10 + WIS modifier + proficiency if applicable）
 - [ ] 每日最多 1 次触发
-- [ ] 触发概率随被动感知提升
+- [ ] 触发概率与被动感知值正确对应
 - [ ] Alert 专长（+5 被动感知）正确影响触发率
+- [ ] Remote Config 参数 `passive_perception_discovery_enabled` 可控全局开关
 
 ---
 
@@ -399,7 +433,7 @@ SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
 
 ### 市集广场（Cat Town · DC 10-13）
 
-事件池（8 个事件，每次冒险随机抽取 4 个）：
+事件池（8 个事件，每次冒险随机抽取 3 个）：
 
 | ID | 属性 | DC | 提示文 | 成功文 | 失败文 |
 |----|------|-----|--------|--------|--------|
@@ -455,10 +489,13 @@ SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
 - [ ] **区域等级锁**：等级 < 5 时迷雾森林不可选；等级 < 10 时远古遗迹不可选
 - [ ] **DC 难度叠加**：Hard 难度下 DC 正确 +3；Legendary 下 DC 正确 +6（运行时叠加，不改原始数据）
 - [ ] **奖励倍率**：Hard 奖励 ×1.5；Legendary 奖励 ×2；数值向下取整
-- [ ] **离线支持**：冒险进度在无网络时正常推进，联网后同步至 Firestore
+- [ ] **离线支持**：冒险进度在无网络时正常推进，联网后同步至远端
 - [ ] 被动感知值在冒险者日志中正确显示
 - [ ] 24 个样板事件文本正确加载（8 × 3 张卡）
 - [ ] 事件文本支持 i18n（通过 JSON 资源文件，非 ARB）
+- [ ] **i18n 降级**：当 locale 无对应翻译时，事件文本 fallback 到 zh-CN；zh-CN 缺失时使用通用占位文案
+- [ ] **事件池约束**：eventsPerRun ≤ SceneCard.eventPool.length，若违反则使用 min(eventsPerRun, pool.length)，不抛异常
+- [ ] **状态不可逆**：abandoned 状态的冒险不可恢复（UI 不显示"继续"按钮）；paused 状态可恢复
 
 ---
 
