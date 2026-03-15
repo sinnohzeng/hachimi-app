@@ -7,6 +7,7 @@
 > **Changelog:**
 > - 2026-03-15 — 初版
 > - 2026-03-15 — 检定公式扩展：新增 conditionModifier + environmentModifier + equipmentModifier；新增豁免检定变体章节（详见 spec/08）
+> - 2026-03-15 — 新增辅助函数定义（_resolveAdvantage、_computeCompanionBonus）；新增 PityState 重启行为说明（D31）；新增批量保底规格；溢出方法名修正为 _coins.addCoins
 
 ---
 
@@ -119,7 +120,7 @@ Future<void> earnDice({required String uid, required String catId, ...}) async {
   final count = await _getPendingCount(uid);
   if (count >= 20) {
     // 溢出：不创建骰子，直接发放 5 金币
-    await _economyService.addGold(uid, 5);
+    await _coins.addCoins(uid, 5);
     await _notifyOverflow(uid);  // 显示 "+5🪙（骰子已满）" 提示
     return;
   }
@@ -134,6 +135,9 @@ Future<void> earnDice({required String uid, required String catId, ...}) async {
 ## 5. 伪随机保底系统（Pity System）
 
 保底计数器**存储在内存中**，App 重启后重置。这是可接受的设计取舍（避免数据库负担，偶发重置对体验影响极小）。
+
+> **已知行为（D31）**：PityState 仅存内存，App 重启后保底计数器归零。
+> 冒险中重启会丢失保底进度。这是有意的设计取舍——保底是体验优化而非游戏承诺。
 
 > **冒险级重置**：保底计数器在每次 **新冒险开始时** 也重置为 0（`consecutiveFailures = 0, consecutiveNonCrits = 0`）。同一冒险内的检定共享保底状态。
 
@@ -583,6 +587,35 @@ String _determineOutcome(int naturalRoll, int total, int dc) {
 
 **零惩罚保证**：即使 `critical_failure`（nat 1），用户仍获得 1⭐ 星尘 + 搞笑猫咪动画。不会丢失任何已有资源。
 
+### 10.1 辅助函数定义
+
+```dart
+/// 解析优势/劣势，决定投掷模式
+int _resolveAdvantage(int rawRoll, RollInput rollInput, Random rng) {
+  if (rollInput.hasAdvantage && !rollInput.hasDisadvantage) {
+    // 优势：投 2d20 取高
+    final secondRoll = rng.nextInt(20) + 1;
+    return max(rawRoll, secondRoll);
+  } else if (rollInput.hasDisadvantage && !rollInput.hasAdvantage) {
+    // 劣势：投 2d20 取低
+    final secondRoll = rng.nextInt(20) + 1;
+    return min(rawRoll, secondRoll);
+  }
+  // 两者抵消或都没有 → 正常投掷
+  return rawRoll;
+}
+
+/// 计算伙伴猫属性加成（详见 spec/05 §4.2）
+int _computeCompanionBonus(List<Cat> companions, String ability) {
+  int bonus = 0;
+  for (final cat in companions) {
+    final highestAbility = _getHighestAbility(cat);
+    if (highestAbility == ability) bonus += 2;
+  }
+  return min(bonus, 4);  // 最多 +4（2 只伙伴各 +2）
+}
+```
+
 ---
 
 ## 11. DiceResult 数据模型
@@ -702,6 +735,10 @@ class DiceResult {
 - 快速消化所有 PendingDice
 - 仅显示汇总结果（各结果数量 + 总星尘）
 - 不播放逐个动画，仅一次快速结算动画（0.5s）
+
+> **批量保底规格（D31）**：`rollAll()` 在处理所有骰子时共享单一 `PityState` 实例。
+> 这意味着如果批内第 1-3 枚骰子连续失败，第 4 枚骰子会触发保底下限 10。
+> 批量投掷不会为每枚骰子重置保底计数器。
 
 ---
 

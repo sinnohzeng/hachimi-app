@@ -76,7 +76,7 @@ class ItemDefinition {
   final String? slot;           // 装备槽位（仅 equipment）
   final Map<String, int>? statBonuses; // 属性加成 {'INT': 1, 'WIS': 1}（仅 equipment）
   final String? conditionGrant; // 使用时附加的状态（仅 potion）：'focused' | 'lucky' | ...
-  final String? conditionClear; // 使用时清除的状态（仅 potion）：'poisoned' | 'exhausted' | ...
+  final String? conditionClear; // 使用时清除的状态（仅 potion）：'poisoned' | 'frightened' | ...
   final String? microEffect;    // 微效果描述（仅 trinket）
 }
 ```
@@ -166,7 +166,7 @@ equipmentMod = sum(该猫所有装备对当前检定属性的加成)
 
 | 药水名 | 代码值 | 稀有度 | 效果 | 金币价格 | 星尘价格 | 制作成本 |
 |--------|--------|--------|------|---------|---------|---------|
-| 治愈药水 | `potion_healing` | 普通 | 清除 `poisoned` 或 `exhausted` | 30🪙 | — | 15🪙 + 1 草药 |
+| 治愈药水 | `potion_healing` | 普通 | 清除 `poisoned` | 30🪙 | — | 15🪙 + 1 草药 |
 | 勇气药水 | `potion_courage` | 普通 | 清除 `frightened` + CHA +1（2 事件） | 40🪙 | — | 20🪙 + 1 草药 |
 | 专注药水 | `potion_focus` | 精良 | 附加 `focused`（INT/WIS +2，本次冒险） | 80🪙 | — | 40🪙 + 2 草药 |
 | 幸运药水 | `potion_luck` | 精良 | 附加 `lucky`（可重投 1 次失败） | 100🪙 | — | 50🪙 + 1 宝石 |

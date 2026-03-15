@@ -4,7 +4,9 @@
 > **Status:** Draft
 > **Evidence:** `docs/all-new-hachimi-dnd/specs/2026-03-15-dnd-integration-design.md` §1, §2.2, §9
 > **Related:** `spec/01-primary-cat.md`, `spec/03-dice-and-checks.md`, `spec/04-scene-cards.md`, `lib/core/router/app_router.dart`, `lib/screens/home/home_screen.dart`
-> **Changelog:** 2026-03-15 — 初版
+> **Changelog:**
+> - 2026-03-15 — 初版
+> - 2026-03-15 — 职业选择改为纯派生判断（D25，去除 SharedPreferences）；新增零骰子引导横幅；背景选择推迟到 Phase 3；新增伙伴猫 Party 清理逻辑
 
 ---
 
@@ -149,6 +151,21 @@ Tab 2 的升级**仅限视觉层**，不修改任何业务逻辑：
 
 待投骰子数量实时监听 `pendingDiceCountProvider`（`StreamProvider<int>`），专注完成后自动刷新，不需要手动下拉刷新。
 
+### 零骰子引导
+
+当 `pendingDice.isEmpty` 且用户从未完成过专注会话时，Tab 3 的 Pending Dice 区域显示引导横幅：
+
+```
+┌──────────────────────────────────────┐
+│  🎲 完成你的第一次专注来获得骰子！     │
+│  [开始专注 →]                         │
+└──────────────────────────────────────┘
+```
+
+点击 [开始专注] 导航到 Tab 1。
+
+> **判断条件**：`pendingDiceCount == 0 && totalFocusMinutes == 0`（后者从 `materializedState` 获取）。
+
 ### 4.4 Section C：当前冒险进度
 
 | 状态 | 显示内容 |
@@ -215,7 +232,12 @@ GoRoute(
 
 - 如果用户在 **Tab 1/2/3 首页**：弹出模态对话框
 - 如果用户在 **冒险流程中**（`/scene-select`、`/dice-roll` 等）：**不中断**，等当前流程完成后在返回 Tab 时弹出
-- 触发标记持久化在 `SharedPreferences` key `class_select_pending`，防止重复弹出
+
+**职业选择触发条件（D25）**：不使用 SharedPreferences 标记。触发条件为纯派生判断：
+`primaryCat.playerClass == null && userLevel >= 3`
+当用户进入 Tab 3 且满足此条件时，弹出职业选择 Modal。用户可关闭 Modal（条件仍满足，下次进入 Tab 3 再次弹出）。
+选择职业后 `playerClass != null`，条件不再满足，不再弹出。
+
 - 用户可以稍后在 Tab 3 冒险者档案中手动进入职业选择
 
 ---
@@ -310,6 +332,13 @@ class StarterArchetype {
 - Onboarding 流程中不可通过返回键跳过（Android back button 在此流程禁用）
 
 > **延迟规则统一**：Onboarding 流程（`/starter-selection`）不可通过返回键跳过。但如果用户在步骤 2-5 期间强制退出 App（杀进程），下次打开 App 时从步骤 1 重新开始（因原子性保证，无部分数据残留）。不存在"延迟到下次"的选项——每次打开 App 若 `primaryCatProvider.valueOrNull == null`，必须走完 Onboarding。
+
+### 伙伴猫习惯删除时的 Party 清理
+
+当用户删除或毕业一个习惯，其绑定的伙伴猫变为 retired/deleted 状态时：
+- 若该猫在 `local_party.companion_1_id` 或 `companion_2_id` 中 → 自动设为 `null`
+- 活跃冒险的 `partyMemberIds` 快照不受影响（已冻结）
+- 触发 `party_update` LedgerChange
 
 ---
 
@@ -427,4 +456,6 @@ Stack(
 
 ### A.4 Onboarding 扩展
 
-- **背景选择步骤**（Phase 1）：在原型选择后、命名前新增背景出身选择（4 选 1，详见 spec/11 §4）
+- **背景选择步骤**（Phase 3）：在原型选择后、命名前新增背景出身选择（4 选 1，详见 spec/11 §4）
+
+> **背景选择**推迟到 Phase 3。Phase 1 使用默认值 `'adventurer'`。

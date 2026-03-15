@@ -4,7 +4,9 @@
 > **Status:** Draft
 > **Evidence:** `lib/services/`、`lib/providers/`、`lib/core/backend/`
 > **Related:** [data-model.md](data-model.md) · [spec/](../spec/)
-> **Changelog:** 2026-03-15 — 初版
+> **Changelog:**
+> - 2026-03-15 — 审计修复：PrimaryCatService/AdventureService 完整接口、SceneDifficultyUnlock CRUD、专注完成增强链、Provider 矩阵、缓存机制、成就调用点
+> - 2026-03-15 — 初版
 
 ---
 
@@ -92,6 +94,104 @@ class DiceEngineService {
 - 溢出时调用 `_coins.addCoins(uid, 5)` 而非内联金币逻辑
 - 确保 CoinService 的 Ledger 记录和 materialized_state 更新被正确触发
 
+> **API 映射**：文档中所有"加金币"操作统一使用现有 `CoinService.addCoins(uid, amount)`。
+> spec 中出现的 `addGold()` 或 `_economyService.addGold()` 均应理解为 `CoinService.addCoins()`。
+
+### 1.2 PrimaryCatService 完整接口
+
+```dart
+/// 主哈基米 CRUD 服务 — SQLite 优先 + 远端异步同步。
+class PrimaryCatService {
+  final LocalDatabaseService _db;
+  final LedgerService _ledger;
+
+  PrimaryCatService({required LocalDatabaseService db, required LedgerService ledger})
+    : _db = db, _ledger = ledger;
+
+  /// 创建主哈基米（Onboarding 完成时调用）。原子操作：插入 + Ledger 记录。
+  Future<PrimaryCat> create({
+    required String uid,
+    required String name,
+    required String archetype,
+    required CatAppearance appearance,
+  });
+
+  /// 读取当前用户的主哈基米。返回 null 表示未创建（未完成 Onboarding）。
+  Future<PrimaryCat?> load(String uid);
+
+  /// 监听主哈基米变化（SQLite stream）。
+  Stream<PrimaryCat?> watch(String uid);
+
+  /// 更新外观（花费 500 金币，由调用方校验余额）。
+  Future<void> updateAppearance(String uid, CatAppearance newAppearance);
+
+  /// 选择职业（Lv 3+，仅可选一次直到 Lv 10 解锁多职兼修）。
+  Future<void> selectClass(String uid, String playerClass);
+
+  /// 选择 ASI 或专长（Lv 4/8/12/16/19 各一次）。
+  Future<void> selectASI(String uid, int level, String choice);
+
+  /// 选择专长。
+  Future<void> selectFeat(String uid, String featName);
+
+  /// 选择背景（Phase 3，Onboarding 新增步骤时使用）。
+  Future<void> selectBackground(String uid, String background);
+}
+```
+
+### 1.3 AdventureService 完整接口
+
+```dart
+/// 冒险生命周期管理服务。
+class AdventureService {
+  final LocalDatabaseService _db;
+  final LedgerService _ledger;
+  final Random _eventRng;  // 事件池 Random（独立实例，不与 DiceEngine 共享）
+
+  AdventureService({
+    required LocalDatabaseService db,
+    required LedgerService ledger,
+    Random? eventRng,
+  }) : _db = db, _ledger = ledger, _eventRng = eventRng ?? Random.secure();
+
+  /// 开始新冒险。
+  /// 同场景卡的旧活跃冒险 → paused；不同场景卡的旧活跃冒险 → abandoned。
+  /// 原子操作：状态更新旧冒险 + 创建新冒险 + 冻结 Party 快照。
+  Future<AdventureProgress> startAdventure({
+    required String uid,
+    required SceneCard sceneCard,
+    required String difficulty,
+    required Party party,
+    required String deviceId,
+  });
+
+  /// 推进到下一个事件。写入 DiceResult ID 到 eventResultIds。
+  Future<void> advanceEvent(String uid, String adventureId, String diceResultId, bool success);
+
+  /// 暂停当前冒险。
+  Future<void> pauseAdventure(String uid, String adventureId);
+
+  /// 完成冒险。计算星级 + 发放奖励。
+  Future<void> completeAdventure(String uid, String adventureId);
+
+  /// 放弃冒险（永久，不可恢复）。
+  Future<void> abandonAdventure(String uid, String adventureId);
+
+  /// 监听当前活跃冒险。
+  Stream<AdventureProgress?> watchActiveAdventure(String uid);
+
+  /// 记录冒险 XP 增量（专注完成后调用）。
+  /// formula: focusMinutes × (1 + classBonus + secondaryClassBonus × 0.5)
+  Future<void> recordAdventureXP({
+    required String uid,
+    required int focusMinutes,
+    required String? habitCategory,
+    required String? playerClass,
+    required String? secondaryClass,
+  });
+}
+```
+
 ## 2. 新增 Provider（5 个）
 
 | 文件 | 类型签名 | 说明 |
@@ -101,6 +201,11 @@ class DiceEngineService {
 | `dice_provider.dart` | `StreamProvider<List<PendingDice>>` | 待投骰子列表 |
 | `class_provider.dart` | `FutureProvider<String?>` | 当前职业 |
 | `party_provider.dart` | `StreamProvider<Party?>` | 当前队伍 |
+| `rest_state_provider.dart` | `Provider<RestState>` | 休息状态（完全派生，无 Service 依赖） |
+
+> **Party 写入归属**：`local_party` 表由 `AdventureService.startAdventure()` 在冒险开始时冻结快照写入。
+> `partyProvider` 仅读取 SQLite，不涉及独立的 PartyService。用户在 `/party-select` 页面的选择通过
+> `AdventureService` 的参数传入，不直接写表。
 
 ### 2.1 userLevelProvider 完整定义
 
@@ -150,6 +255,11 @@ abstract class AdventureBackend {
   // 队伍
   Future<void> saveParty(String uid, Party party);
   Future<Party?> loadParty(String uid);
+
+  // 场景难度解锁
+  Future<void> saveSceneDifficultyUnlock(String uid, SceneDifficultyUnlock unlock);
+  Future<SceneDifficultyUnlock?> loadSceneDifficultyUnlock(String uid, String sceneCardId);
+  Future<List<SceneDifficultyUnlock>> loadAllSceneDifficultyUnlocks(String uid);
 }
 ```
 
@@ -188,6 +298,16 @@ BackendRegistry(
 4. 通过 `AdventureBackend` 清理远端冒险进度
 5. 通过 `AdventureBackend` 清理远端队伍数据
 6. 清空本地 DnD 相关 SQLite 表
+
+**执行顺序**：
+1. [现有] 远端清理：用户配置、习惯、会话、成就
+2. [新增] 远端 DnD 清理：primaryCat → pendingDice → diceResults → adventureProgress → party → sceneDifficultyUnlock
+3. [现有] 远端账户删除
+4. [新增] 本地 DnD SQLite 清理：DROP 所有 DnD 表数据
+5. [现有] 本地 SQLite 清理
+6. [现有] Firebase Auth 删除
+
+> **失败处理**：步骤 2 失败时标记为 partial deletion，下次登录时重试（与现有模式一致）。
 
 ## 4. 文件变更清单
 
@@ -236,6 +356,12 @@ BackendRegistry(
 | `CompletionRateService` | Singleton | **缓存 5 分钟** | SQL 聚合查询较重，短时缓存 |
 | `StreakService` | Singleton | **缓存 5 分钟** | 同上 |
 | `CoverageService` | Singleton | **缓存 5 分钟** | 同上 |
+
+**缓存机制详解**：
+- **缓存 key**：`uid`（全局，非 per-cat）
+- **缓存存储**：Service 实例内部 `_cachedResult` + `_cachedAt` 时间戳
+- **过期策略**：`DateTime.now() - _cachedAt > Duration(minutes: 5)` 时重新查询
+- **主动失效**：当 `LedgerChange.type == 'focus_complete'` 或 `isGlobalRefresh` 时，调用 `ref.invalidate(completionRateServiceProvider)` 等清除缓存
 
 ### 5.2 Provider → Service 调用链
 
@@ -293,6 +419,33 @@ final primaryCatAbilitiesProvider = FutureProvider<Map<String, int>>((ref) async
   // 聚合计算 6 维属性
   return computePrimaryCatAbilities(primaryCat, completionRate, streak, coverage);
 });
+
+/// 计算主哈基米 6 维属性的完整函数签名。
+/// PrimaryCat extension 方法无法访问外部数据，因此使用独立函数注入所有输入。
+Map<String, int> computePrimaryCatAbilities(
+  PrimaryCat primary,
+  CompletionRateService completionRate,
+  StreakService streak,
+  CoverageService coverage,
+) {
+  // 从各 Service 获取聚合数据
+  final allCatsTotalMinutes = completionRate.allCatsTotalMinutes(primary.userId);
+  final overallRate = completionRate.averageForAllCats(primary.userId, lastN: 30);
+  final longestStreak = streak.longestAcrossAllHabits(primary.userId);
+  final habitCount = completionRate.activeHabitCount(primary.userId);
+  final avgGoalMinutes = completionRate.averageGoalMinutes(primary.userId);
+  final coverage30 = coverage.coverageLastThirtyDays(primary.userId);
+
+  // 使用 spec/01 中的公式计算各属性
+  return {
+    'STR': _clamp(10 + allCatsTotalMinutes ~/ 120, primary),
+    'DEX': _clamp((10 + (overallRate * 10).round()), primary),
+    'CON': _clamp(10 + longestStreak ~/ 7, primary),
+    'INT': _clamp(10 + (habitCount * avgGoalMinutes ~/ 30), primary),
+    'WIS': _clamp((10 + (coverage30 * 10).round()), primary),
+    'CHA': _clamp(_computeCha(primary), primary),
+  };
+}
 ```
 
 ### 5.4 事务性操作
@@ -305,6 +458,37 @@ final primaryCatAbilitiesProvider = FutureProvider<Map<String, int>>((ref) async
 | 冒险切换 | `local_adventure_progress` + `local_party` | 暂停旧冒险 + 更新队伍 + 创建新冒险 |
 | 检定结算 | `local_pending_dice` + `local_dice_results` + `materialized_state` | 删骰子 + 写结果 + 加星尘 |
 | 主哈基米创建 | `local_primary_cat` + `action_ledger` | 插入 + 记录 Ledger |
+
+### 5.5 专注完成增强调用链
+
+专注会话完成后的完整调用顺序（在现有 `FocusTimerService.onSessionComplete` 中增强）：
+
+```
+onFocusComplete(uid, habitId, focusMinutes)
+  ├─ 1. [现有] XpService.addXP(focusMinutes)              → materialized_state['xp']
+  ├─ 2. [新增] AdventureService.recordAdventureXP(...)     → materialized_state['adventure_xp']
+  ├─ 3. [新增] DiceEngineService.earnDice(...)             → local_pending_dice / 溢出 → CoinService.addCoins
+  └─ 4. [现有] CoinService.addCoins(uid, focusMinutes × 2) → materialized_state['gold']
+```
+
+> **事务边界**：步骤 1-4 各自独立写 Ledger，不在同一 SQLite 事务中。任一步骤失败不影响其他步骤。
+> 这与现有的 Ledger 重试机制一致——每个 LedgerAction 独立重试。
+
+### 5.6 LedgerChange → Provider 失效矩阵
+
+| ActionType | 触发 Provider 失效 |
+|------------|-------------------|
+| `primary_cat_create`, `primary_cat_update` | `primaryCatProvider`, `primaryCatAbilitiesProvider` |
+| `dice_earned`, `dice_consumed`, `dice_overflow` | `diceProvider` |
+| `adventure_start`, `adventure_event`, `adventure_complete`, `adventure_pause`, `adventure_abandon` | `adventureProvider` |
+| `party_update` | `partyProvider` |
+| `class_select` | `classProvider`, `primaryCatProvider` |
+| `scene_difficulty_unlock` | （无专用 Provider，按需读取） |
+| `stardust_earn`, `stardust_spend` | `materializedStateProvider` |
+| `adventure_xp_earn` | `userLevelProvider`（通过 `materializedStateProvider`） |
+| `habit_category_update` | `habitsProvider` |
+
+> **全局刷新**：`LedgerChange.isGlobalRefresh == true` 时，所有 DnD Provider 重读本地数据（与现有模式一致）。
 
 ---
 
@@ -354,3 +538,15 @@ class AchievementEvaluator {
   Future<void> evaluateFeatSelected(String featName);
 }
 ```
+
+### 6.3 成就触发调用点
+
+| 方法 | 调用位置 |
+|------|---------|
+| `evaluateDiceResult(result)` | `DiceEngineService.performCheck()` 写入 DiceResult 后 |
+| `evaluateAdventureComplete(progress)` | `AdventureService.completeAdventure()` 状态更新后 |
+| `evaluateClassSelect(className)` | `PrimaryCatService.selectClass()` 写入后 |
+| `evaluateCatEvolution(cat, newStage)` | 现有 Cat 进化逻辑中 |
+| `evaluatePartyFormed(party)` | `AdventureService.startAdventure()` Party 冻结后 |
+| `evaluateDiscoveryEvent()` | 被动感知发现触发后 |
+| `evaluateFeatSelected(featName)` | `PrimaryCatService.selectFeat()` 写入后 |

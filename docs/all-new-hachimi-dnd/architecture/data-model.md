@@ -4,11 +4,15 @@
 > 其他 spec 文件中出现的模型定义为引用摘要，当与本文件冲突时以本文件为准。
 > 远端存储规则使用 backend-agnostic 约束描述，不绑定任何特定云服务商。
 
+> **⚠️ v2.0 大版本声明**：本文件定义全新 schema，**不兼容旧版本**。不存在从旧版本的数据迁移路径。
+> SQLite 建表为 v1 schema（`_onCreate`），非 `_onUpgrade` 迁移。用户从 v2.0 全新开始。
+
 > SSOT for v2.0 DnD 融合的所有新增数据模型、SQLite Schema 和远端验证规则。
 > **Status:** Draft
 > **Evidence:** `lib/models/`、`lib/services/local_database_service.dart`、`firestore.rules`
 > **Related:** [spec/01-primary-cat.md](../spec/01-primary-cat.md) · [spec/03-dice-engine.md](../spec/03-dice-engine.md) · [spec/04-adventure.md](../spec/04-adventure.md)
 > **Changelog:**
+> - 2026-03-15 — 审计修复：大版本声明、SceneEvent.type/trap 字段、SceneCard.environment、PrimaryCat 序列化与 lastDiscoveryDate、ActionType 补齐至 18 种、stardustEarned 上限 30、materializedState 结构、SQLite 索引、v1 schema（非迁移）
 > - 2026-03-15 — Fix: 合并 background 字段、AdventureProgress 增加 abandoned 状态与 activeDeviceId、DiceResult 注释修正、新增 SceneDifficultyUnlock 模型、安全规则改为 backend-agnostic、SSOT 声明
 > - 2026-03-15 — 初版（整合自审查修复 + agent 起草）
 
@@ -38,8 +42,26 @@ class PrimaryCat {
   final Map<int, String> asiChoices;     // {4: 'STR', 8: 'feat:Alert', 12: 'DEX', ...}
   final List<String> selectedFeats;      // ['Alert', 'Lucky']
   final DateTime createdAt;
+  final String? lastDiscoveryDate;  // 上次被动感知发现日期 'yyyy-MM-dd'（离线优先：存 SQLite 非 SharedPreferences）
 }
 ```
+
+/// 序列化方法（遵循现有 Cat.toSqlite/fromSqlite 模式）
+///
+/// toSqlite() → Map<String, dynamic>:
+///   - appearance: jsonEncode(appearance.toMap())
+///   - asi_choices: jsonEncode(asiChoices.map((k, v) => MapEntry(k.toString(), v)))
+///   - selected_feats: jsonEncode(selectedFeats)
+///   - created_at: createdAt.toIso8601String()
+///
+/// factory PrimaryCat.fromSqlite(Map<String, dynamic> map):
+///   - appearance: CatAppearance.fromMap(jsonDecode(map['appearance']))
+///   - asiChoices: (jsonDecode(map['asi_choices']) as Map).map((k, v) => MapEntry(int.parse(k), v as String))
+///   - selectedFeats: (jsonDecode(map['selected_feats']) as List).cast<String>()
+///   - createdAt: DateTime.parse(map['created_at'])
+///
+/// toFirestore() / fromFirestore() 遵循相同结构，
+/// DateTime 使用 Timestamp 类型而非 ISO 字符串。
 
 ### 1.2 PendingDice — 待投骰子
 
@@ -95,6 +117,7 @@ class AdventureProgress {
   final String? activeDeviceId;    // 设备锁定，防止多设备冲突
   final DateTime startedAt;
   final DateTime? completedAt;
+  final List<ActiveCondition> activeConditions;  // 当前状态效果（Phase 2，Phase 1 = const []）
 }
 ```
 
@@ -122,6 +145,7 @@ class SceneCard {
   final int eventsPerRun;
   final String completionRewardId;
   final String description;
+  final String? environment;       // 环境效果代码：'dim_light' | 'fog' | 'storm' 等（Phase 2，Phase 1 为 null）
 }
 ```
 
@@ -132,11 +156,19 @@ class SceneEvent {
   final String id;
   final String ability;            // 'STR' | 'DEX' | 'CON' | 'INT' | 'WIS' | 'CHA'
   final int dc;
+  final String type;               // 'ability_check' | 'saving_throw' | 'trap'（Phase 1 默认 'ability_check'）
   final String prompt;
   final String successText;
   final String failText;
+  // Phase 2 扩展字段（陷阱类事件使用）
+  final int? trapDetectDc;         // 陷阱感知 DC
+  final String? trapDisarmAbility; // 解除陷阱使用的属性
+  final int? trapDisarmDc;         // 解除陷阱 DC
 }
 ```
+
+> **序列化**：SceneCard 和 SceneEvent 同时支持 `const` 构造（用于 15 张基础场景卡常量）和 `fromJson()`/`toJson()`（用于 Phase 3+ Remote Config 季节性场景卡）。
+> 基础卡定义在 `lib/core/constants/adventure_constants.dart` 中作为 `const` 实例。
 
 ### 1.7 StarterArchetype — 御三家原型
 
@@ -184,34 +216,12 @@ class SceneDifficultyUnlock {
 
 ## 2. SQLite Schema
 
-### 迁移策略
+### Schema 策略
 
-**SQLite 版本：v3 → v4**
+**v2.0 全新 schema**：所有表（含 `local_habits`）在 `_onCreate` 中创建。
+`local_habits` 表定义直接包含 `category TEXT` 字段，无需 ALTER TABLE。
 
-虽然 DnD 功能对已有用户是全新的（无需迁移 PrimaryCat/Adventure 数据），但 `local_habits` 表已经存在且包含用户数据，必须通过 ALTER TABLE 添加 `category` 字段。
-
-```dart
-// LocalDatabaseService._onUpgrade
-if (oldVersion < 4) {
-  // 1. 新增 DnD 表（全新，无数据迁移）
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_primary_cat (...)''');
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_pending_dice (...)''');
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_dice_results (...)''');
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_adventure_progress (...)''');
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_party (...)''');
-  await db.execute('''CREATE TABLE IF NOT EXISTS local_scene_difficulty_unlock (...)''');
-
-  // 2. 现有表修改：添加习惯分类字段
-  await db.execute('ALTER TABLE local_habits ADD COLUMN category TEXT');
-  // NULL 视作 'general'，不自动填充默认值
-  // 用户可在习惯设置页手动选择分类
-}
-```
-
-**默认值策略**：
-- `category = NULL` 在所有计算中视为 `'general'`
-- 不自动根据习惯名推断分类（避免误判）
-- 用户首次进入职业选择（Lv 3）时，引导页提示"为习惯设置分类以获得职业 XP 加成"
+> ⚠️ v2.0 是大版本更新，不保留旧版数据。用户升级后从头开始。
 
 ### 2.1 新增表
 
@@ -229,6 +239,7 @@ CREATE TABLE IF NOT EXISTS local_primary_cat (
   asi_choices        TEXT NOT NULL DEFAULT '{}',     -- JSON: Map<int, String>
   selected_feats     TEXT NOT NULL DEFAULT '[]',     -- JSON: List<String>
   created_at         TEXT NOT NULL,        -- ISO 8601
+  last_discovery_date TEXT,          -- 被动感知上次发现日期 yyyy-MM-dd
   UNIQUE(uid)
 );
 
@@ -296,20 +307,25 @@ CREATE TABLE IF NOT EXISTS local_scene_difficulty_unlock (
 );
 ```
 
-### 2.2 现有表修改
+### 2.2 local_habits 表包含新字段
+
+`local_habits` 建表 DDL 中直接包含 `category TEXT` 列（无需迁移）。
+
+### 2.3 推荐索引
 
 ```sql
--- local_habits 新增可选分类字段
-ALTER TABLE local_habits ADD COLUMN category TEXT;
--- 可选值：'physical' | 'mental' | 'wellness' | 'social' | 'skill' | 'general'
--- NULL 视作 'general'
+-- 属性计算服务（CompletionRate/Coverage）的 30 天窗口查询优化
+CREATE INDEX IF NOT EXISTS idx_sessions_uid_status_ended
+  ON local_sessions(uid, status, ended_at);
 ```
 
-### 2.3 materialized_state 新增 key
+### 2.4 materialized_state 新增 key
 
 | Key | Value 类型 | 说明 |
 |-----|-----------|------|
 | `stardust` | INTEGER | 当前星尘余额 |
+| `adventure_xp` | INTEGER | 冒险等级 XP（含职业加成累积） |
+| `lucky_reroll_used_today` | TEXT | Lucky 专长今日重投日期 'yyyy-MM-dd'（非当天则可用） |
 
 ---
 
@@ -346,15 +362,36 @@ ALTER TABLE local_habits ADD COLUMN category TEXT;
 | 字段 | 约束 | 说明 |
 |------|------|------|
 | `diceResults.naturalRoll` | `∈ [1, 20]` | d20 骰子值域 |
-| `diceResults.stardustEarned` | `∈ [0, 20]` | 单次检定最大 15 + 场景奖励 |
+| `diceResults.stardustEarned` | `∈ [0, 30]` | 单次检定最大 15 × 职业加成 1.5 = 22.5，向上取整预留空间 |
 | `materializedState.gold` | `≥ 0` | 金币不可为负 |
 | `materializedState.stardust` | `≥ 0` | 星尘不可为负 |
+
+### 远端 materializedState 存储结构
+
+`materializedState` 存储为 `users/{uid}` 文档的嵌套 map 字段：
+
+```json
+{
+  "materializedState": {
+    "gold": 1234,
+    "stardust": 567,
+    "adventure_xp": 8900,
+    "lucky_reroll_used_today": "2026-03-15"
+  }
+}
+```
+
+安全规则应验证：
+- `request.resource.data.materializedState.gold >= 0`
+- `request.resource.data.materializedState.stardust >= 0`
 
 ---
 
 ## 4. LedgerChange 新增 ActionType
 
 ```dart
+// 18 种新增 ActionType
+
 // 主哈基米
 primary_cat_create,
 primary_cat_update,
@@ -369,6 +406,7 @@ adventure_start,
 adventure_event,
 adventure_complete,
 adventure_pause,
+adventure_abandon,
 
 // 队伍
 party_update,
@@ -377,7 +415,7 @@ party_update,
 class_select,
 
 // 难度解锁
-difficulty_unlock,
+scene_difficulty_unlock,
 
 // 星尘
 stardust_earn,
@@ -385,4 +423,10 @@ stardust_spend,
 
 // 习惯
 habit_category_update,
+
+// 冒险 XP
+adventure_xp_earn,
 ```
+
+> **前向兼容**：`ActionType.fromValue()` 必须改为 `tryFromValue()` 模式——遇到未知值返回 `null` 而非抛出 `ArgumentError`。
+> 这确保新版本写入的 ActionType 不会导致旧版本崩溃。

@@ -35,7 +35,7 @@ SRD 的休息系统（Short Rest / Long Rest）是角色恢复资源的核心节
 
 | # | 效果 | 条件 | 说明 |
 |---|------|------|------|
-| 1 | 清除 1 个负面状态 | 存在活跃负面状态时 | 按优先级清除：exhausted > poisoned > frightened |
+| 1 | 清除 1 个负面状态 | 存在活跃负面状态时 | 按优先级清除：poisoned > frightened |
 | 2 | 伙伴猫心情恢复 | 伙伴猫处于 lonely 或 missing 时 | 复用现有 `lastSessionAt` 机制，短休叙事包装 |
 | 3 | 充能物品恢复 1 点 | 持有"每短休充能"物品时 | Phase 3 功能，预留接口 |
 

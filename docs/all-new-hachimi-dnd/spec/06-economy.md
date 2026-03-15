@@ -4,7 +4,9 @@
 > **Status:** Draft（已定稿，待 Phase 3 实施后验证平衡性）
 > **Evidence:** `lib/services/gold_service.dart`、`lib/core/constants/`
 > **Related:** [spec/03-dice-engine.md](03-dice-engine.md) · [spec/05-party-and-class.md](05-party-and-class.md)
-> **Changelog:** 2026-03-15 — 金币经济从 [待定稿] 升级为完整三档定价模型
+> **Changelog:**
+> - 2026-03-15 — 金币经济从 [待定稿] 升级为完整三档定价模型
+> - 2026-03-15 — 额外骰子每日上限 3 枚（D22）；Remote Config 离线 Fallback（D29）；XP 体系去重引用 spec/05
 
 ---
 
@@ -80,6 +82,9 @@ Hachimi v2.0 采用**双货币体系**：
 | 毛线团 🧶 | 25 🪙 | 猫咪播放"玩耍"动画（Rive 状态机） | 酒馆互动 |
 | 检定 +2 加成 ⚔️ | 30 🪙 | 下一次骰子检定的**属性修正值额外 +2**（叠加在 modifier 上，不改变 d20 原始点数）。一次性消耗。 | 冒险系统 |
 | 额外骰子 🎲 | 50 🪙 | 获得 1 枚额外待投骰子（不受上限 20 限制） | 冒险系统 |
+
+> **每日购买上限（D22）**：额外骰子每日最多购买 3 枚。使用 `materialized_state['extra_dice_purchased_today']` 追踪。
+> 判断逻辑：`if (today != storedDate) → 重置计数为 0`。
 
 > **互动道具使用场景**：在 Tab 2（酒馆）中，点击猫咪 → 弹出互动菜单 → 选择食物/玩具 → 猫咪播放对应 Rive 动画。
 >
@@ -195,42 +200,29 @@ gold_dice_overflow_rate = 5
 
 物品价格暂时硬编码（Phase 3 实施时评估是否需要 Remote Config）。
 
+### Remote Config 离线 Fallback（D29）
+
+所有 Remote Config 参数在 `lib/core/constants/economy_constants.dart` 中有编译期硬编码默认值：
+
+```dart
+const kDefaultGoldIncomeRatePerMinute = 2;
+const kDefaultGoldCheckinReward = 30;
+const kDefaultGoldFullHouseReward = 20;
+const kDefaultGoldAchievementRewardSmall = 50;
+const kDefaultGoldAchievementRewardLarge = 200;
+const kDefaultGoldDiceOverflowRate = 5;
+```
+
+> **离线优先**：App 启动时尝试拉取 Remote Config。失败时使用编译期默认值。
+> 用户在离线状态下的所有经济操作使用默认值，体验无差异。
+
 > **热更新生效时机**：Remote Config 参数在 App 进入前台时拉取。**进行中的冒险不受影响**，仅对新开始的专注会话和新冒险生效。
 
 ---
 
 ## 6. 用户等级 XP
 
-> 此节与 `spec/05-party-and-class.md` §9 保持一致，此处为经济视角补充。
-
-### XP 系统关系图
-
-Hachimi 有两套独立的 XP 体系，互不干扰：
-
-```
-┌─────────────────────────────────────────────────────┐
-│  冒险等级 XP（Adventure Level XP）                    │
-│  计算：物化累积值（每次专注完成时写入增量）           │
-│  增量公式：专注分钟 × (1 + 职业加成率)               │
-│  用途：DnD 等级（1-20）、区域解锁、职业选择          │
-│  存储：materialized_state['adventure_xp']            │
-│  受职业加成影响：✅（Ranger +25% physical 等）        │
-│  回退策略：若 adventure_xp 为空，降级为              │
-│            allCatsTotalMinutes（无加成的原始值）      │
-├─────────────────────────────────────────────────────┤
-│  现有 XP（xp_service.dart）                          │
-│  计算：分钟 × Remote Config 倍率 + fullHouseBonus    │
-│  用途：成就系统、猫咪等级显示                         │
-│  存储：materialized_state['xp']                      │
-│  受职业加成影响：❌（完全独立）                       │
-└─────────────────────────────────────────────────────┘
-```
-
-**职业 XP 加成规则**：
-- 加成只作用于**冒险等级 XP**，不影响现有 xp_service
-- 加成从**选择职业后的首次相关类别专注**开始生效
-- **不回溯**历史 XP
-- 示例：用户在 Lv 3（360 min）选择 Wizard → 之后 mental 类专注 XP ×1.25 → 但前 360 min 不变
+> 冒险等级 XP 体系详见 [spec/05 §9](05-party-and-class.md)。本节不重复定义。
 
 ### 6.1 XP 计算
 

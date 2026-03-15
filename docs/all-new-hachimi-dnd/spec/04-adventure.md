@@ -7,6 +7,7 @@
 > **Changelog:**
 > - 2026-03-15 — 初版；修正场景卡绑定对象从「单只猫」改为「用户/队伍」
 > - 2026-03-15 — 新增陷阱事件子类型、环境修正器、状态效果追踪（SRD 深度借鉴，详见 spec/08）
+> - 2026-03-15 — SharedPreferences 改为 SQLite（D24）；新增 paused/abandoned 决策树（D19）；随机种子策略明确化（D32）；文本总量修正为 528 段；标注 12 张待填充场景卡；i18n 改用 Dart 常量池
 
 ---
 
@@ -131,6 +132,18 @@ class AdventureProgress {
 - 已暂停的冒险可在 Tab 3 历史列表中恢复
 
 > **状态不可逆性**：`paused` 可恢复（用户返回后继续）；`abandoned` 不可恢复（进度永久丢失，但已获得的即时星尘不回收）。切换场景卡时，旧冒险自动置为 `abandoned`。
+
+### paused vs abandoned 决策树（D19）
+
+```
+用户开始新冒险
+  ├─ 旧冒险与新冒险是同一场景卡？
+  │   ├─ YES → 旧冒险 status = 'paused'（可恢复，保留进度）
+  │   └─ NO  → 旧冒险 status = 'abandoned'（永久，不可恢复）
+  └─ 无旧活跃冒险 → 直接创建新冒险
+```
+
+> **语义区分**："重试"同一场景 = 暂停旧进度；"转战"不同场景 = 放弃旧进度。
 
 ### 4.2 远端存储
 
@@ -276,7 +289,9 @@ List<String> drawEvents(List<SceneEvent> pool, int count, Random rng) {
   return shuffled.take(count).map((e) => e.id).toList();
 }
 
-> **随机种子策略**：使用 `Random.secure()` 生成事件序列，不保存种子。每次冒险的事件抽取完全独立，不支持"分享冒险"（种子重放）。
+> **随机种子策略（D32）**：事件池抽取使用 `AdventureService._eventRng`（独立 Random 实例），
+> 不与 `DiceEngineService._rng` 共享。测试时通过构造函数注入 `Random(seed)`。
+> 种子不持久化到 Ledger——每次冒险的事件抽取完全独立。
 ```
 
 ### 9.2 多次游玩动力
@@ -300,7 +315,7 @@ List<String> drawEvents(List<SceneEvent> pool, int count, Random rng) {
 | 主哈基米对话 | 6 性格 × 4 心情 × 5 变体 | 120 句 |
 | 骰子结果文案 | 4 结果 × 6 属性 × 3 变体 | 72 句 |
 | 队伍互动对话 | 6×6 性格组合 × 2 | 72 句 |
-| **合计** | | **~564 段** |
+| **合计** | | **~528 段** |
 
 每段文本需覆盖所有 15 种语言（`lib/l10n/`），共约 8,460 条 i18n 字符串。
 
@@ -414,7 +429,10 @@ trigger_rate = min(0.30, 0.05 × floor(passivePerception / 3))
 - 触发时有微弱触觉反馈 + 发现音效
 - **Phase 建议**：Phase 2（与冒险系统同步上线）
 
-**状态追踪**：使用 `SharedPreferences` key `last_discovery_date`（`yyyy-MM-dd`）追踪上次触发日期。每日凌晨 00:00（本地时间）重置。
+**状态追踪**：使用 `local_primary_cat.last_discovery_date` 列（`yyyy-MM-dd` TEXT）追踪上次触发日期。每日凌晨 00:00（本地时间）重置判断。
+
+> **离线优先（D24）**：发现状态存储在 SQLite 中（非 SharedPreferences），确保与 Ledger 同步管线一致。
+> `PrimaryCatService.updateLastDiscoveryDate(uid, date)` 负责写入。
 
 > 不需要 `last_discovery_month`、`discovery_guaranteed_count` 等额外 key。
 
@@ -476,6 +494,26 @@ trigger_rate = min(0.30, 0.05 × floor(passivePerception / 3))
 | forest_trail_07 | WIS | 16 | 脚下的落叶中隐约有东西在闪光。你的猫咪能发现它吗？ | 你的猫咪拨开落叶，发现了一枚被遗忘的古老钱币。不知是谁在很久以前留下的。 | 闪光消失了——也许只是阳光的折射。你的猫咪耸耸肩继续前进。 |
 | forest_trail_08 | DEX | 13 | 一只蝴蝶停在了前方的花朵上。传说触碰它能带来好运。 | 你的猫咪轻手轻脚地靠近，温柔地用鼻尖碰了碰蝴蝶。它振翅而去，留下了一缕金色的粉末。 | 你的猫咪刚伸出爪子，蝴蝶就飞走了。也许好运会以别的方式降临。 |
 
+### 事件池待补充的场景卡
+
+> **事件池待补充**：以下场景卡已定义 ID、名称、区域和 DC 范围，事件池内容将在 Phase 2 内容冲刺中填充。
+> 每张卡需要 8-10 个 SceneEvent（含 prompt、successText、failText）。
+
+| 区域 | 场景卡 | 事件池状态 |
+|------|--------|----------|
+| 猫咪小镇 | 图书馆（Library） | 待填充 |
+| 猫咪小镇 | 酒馆（Tavern） | 待填充 |
+| 猫咪小镇 | 草药园（Herb Garden） | 待填充 |
+| 迷雾森林 | 精灵泉（Elven Spring） | 待填充 |
+| 迷雾森林 | 蘑菇洞（Mushroom Cave） | 待填充 |
+| 迷雾森林 | 瞭望塔（Watchtower） | 待填充 |
+| 迷雾森林 | 月光湖（Moonlight Lake） | 待填充 |
+| 远古遗迹 | 石像谜题（Statue Puzzle） | 待填充 |
+| 远古遗迹 | 浮空桥（Floating Bridge） | 待填充 |
+| 远古遗迹 | 宝藏室（Treasure Room） | 待填充 |
+| 远古遗迹 | 壁画厅（Mural Hall） | 待填充 |
+| 远古遗迹 | 封印之门（Sealed Gate） | 待填充 |
+
 ---
 
 ## 16. 验收标准（Acceptance Criteria）
@@ -492,7 +530,7 @@ trigger_rate = min(0.30, 0.05 × floor(passivePerception / 3))
 - [ ] **离线支持**：冒险进度在无网络时正常推进，联网后同步至远端
 - [ ] 被动感知值在冒险者日志中正确显示
 - [ ] 24 个样板事件文本正确加载（8 × 3 张卡）
-- [ ] 事件文本支持 i18n（通过 JSON 资源文件，非 ARB）
+- [ ] 事件文本支持 i18n（通过 Dart 常量池，非 ARB）
 - [ ] **i18n 降级**：当 locale 无对应翻译时，事件文本 fallback 到 zh-CN；zh-CN 缺失时使用通用占位文案
 - [ ] **事件池约束**：eventsPerRun ≤ SceneCard.eventPool.length，若违反则使用 min(eventsPerRun, pool.length)，不抛异常
 - [ ] **状态不可逆**：abandoned 状态的冒险不可恢复（UI 不显示"继续"按钮）；paused 状态可恢复

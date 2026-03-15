@@ -7,6 +7,7 @@
 > **Changelog:**
 > - 2026-03-15 — 初版
 > - 2026-03-15 — 增加 `background` 字段（SRD Backgrounds 适配，详见 spec/11）
+> - 2026-03-15 — 新增 PrimaryCat 生命周期状态图、各原型 peltColor 白名单；确认背景选择推迟到 Phase 3
 
 ---
 
@@ -37,6 +38,16 @@
 | 平衡派 Harmony | 🌿 | Shy | CON、CHA | 白/奶油柔色系 | "细水长流，温柔坚定" |
 
 **色系范围的技术含义**：限制随机外观时 `CatAppearance.peltColor` 的候选集合。各原型对应的 `peltColor` 白名单在 `lib/models/starter_archetype.dart` 中定义为常量列表，不在渲染层写死。
+
+### 各原型 peltColor 白名单
+
+```dart
+const archetypeColorRanges = {
+  'action': ['GINGER', 'GOLDEN', 'DARKGINGER', 'CREAM', 'APRICOT'],
+  'mind': ['BLUE', 'SILVER', 'GREY', 'PALEGREY', 'DARKGREY'],
+  'harmony': ['WHITE', 'CREAM', 'PALECREAM', 'GHOST', 'LILAC'],
+};
+```
 
 ### 属性映射规则
 
@@ -109,6 +120,23 @@
 **错误处理**：
 - SQLite 写入失败：显示重试 Toast，保持在步骤 5 画面
 - 远端写入失败：静默失败，本地数据有效，下次联网时通过 LedgerChange 同步
+
+### PrimaryCat 生命周期状态
+
+```
+null ──→ created ──→ updated ──→ ... (持续更新)
+                         │
+                         └──→ deleted（仅账户删除触发）
+```
+
+| 状态 | 触发 | 说明 |
+|------|------|------|
+| `null` | App 首次启动 | Onboarding 未完成 |
+| `created` | Onboarding 五步完成 | SQLite + Ledger 原子写入 |
+| `updated` | 外观/职业/ASI/专长变更 | 通过 PrimaryCatService 方法 |
+| `deleted` | 账户删除 | AccountDeletionService 级联清理 |
+
+> **不可重建**：主哈基米一旦创建，不存在"重置"流程。用户必须删除账户才能重新创建。
 
 ---
 

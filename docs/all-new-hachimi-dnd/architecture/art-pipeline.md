@@ -4,7 +4,9 @@
 > **Status:** Draft
 > **Evidence:** `pubspec.yaml`、`lib/core/theme/`、`assets/`
 > **Related:** [data-model.md](data-model.md) · [decisions/log.md](../decisions/log.md) D9
-> **Changelog:** 2026-03-15 — 从"零新依赖 PNG 管线"重写为"胶水编程 Rive+Flame 方案"
+> **Changelog:**
+> - 2026-03-15 — 审计修复：依赖按 Phase 分门、i18n 双系统边界声明、SQLite 索引建议
+> - 2026-03-15 — 从"零新依赖 PNG 管线"重写为"胶水编程 Rive+Flame 方案"
 
 ---
 
@@ -31,16 +33,20 @@
 
 ### 2.1 必装依赖
 
-| 包名 | 协议 | 版本 | 用途 |
-|------|------|------|------|
-| `rive` | MIT | ^0.13.0 | 猫咪骨骼动画 + 状态机 + 运行时换装 |
-| `flame` | MIT | ^1.x | 2D 游戏引擎（场景渲染、游戏循环） |
-| `flame_rive` | MIT | latest | Rive 组件嵌入 Flame 场景 |
-| `flame_riverpod` | MIT | latest | Riverpod ↔ Flame 状态桥接 |
-| `flame_audio` | MIT | latest | 游戏音效（检定音、环境音） |
-| `flame_tiled` | MIT | latest | Tiled 编辑器地图加载（酒馆布局） |
-| `fl_chart` | MIT | latest | 属性雷达图（Tab 3 冒险者档案） |
-| `audioplayers` | MIT | ^6.0.0 | 短音效（任务完成叮叮叮） |
+| 包名 | 协议 | 版本 | 用途 | Phase |
+|------|------|------|------|-------|
+| `fl_chart` | MIT | latest | 属性雷达图（Tab 3 冒险者档案） | **1** |
+| `flutter_animate` | BSD-3 | latest | 声明式动画链（Onboarding、骰子） | **1** |
+| `confetti` | MIT | latest | 庆祝粒子效果（大成功） | **1** |
+| `rive` | MIT | ^0.13.0 | 猫咪骨骼动画 + 状态机 + 运行时换装 | **Art** |
+| `audioplayers` | MIT | ^6.0.0 | 短音效（任务完成叮叮叮） | **2** |
+| `flame` | MIT | ^1.x | 2D 游戏引擎（场景渲染、游戏循环） | **3** |
+| `flame_rive` | MIT | latest | Rive 组件嵌入 Flame 场景 | **3** |
+| `flame_riverpod` | MIT | latest | Riverpod ↔ Flame 状态桥接 | **3** |
+| `flame_audio` | MIT | latest | 游戏音效（检定音、环境音） | **3** |
+| `flame_tiled` | MIT | latest | Tiled 编辑器地图加载（酒馆布局） | **3** |
+
+> **安装时机**：仅在对应 Phase 开始时添加到 pubspec.yaml。Phase 1 仅需 fl_chart + flutter_animate + confetti。
 
 ### 2.2 推荐依赖
 
@@ -48,8 +54,6 @@
 |------|------|------|---------|
 | `just_audio` | Apache-2.0 | 白噪音/BGM 循环播放 | Phase 3+ |
 | `lottie` | MIT | UI 庆祝动画（全屏粒子） | Phase 2 |
-| `flutter_animate` | BSD-3 | 声明式动画链 | Phase 1 |
-| `confetti` | MIT | 庆祝粒子效果 | Phase 1 |
 
 ### 2.3 明确拒绝
 
@@ -282,6 +286,16 @@ Hachimi Style Guide:
 2. 与现有 `lib/core/constants/` 模式一致
 3. 无需运行时 JSON 解析开销
 
+### i18n 双系统边界声明
+
+| 内容类型 | i18n 方案 | 文件位置 |
+|---------|----------|---------|
+| **UI 文案**（按钮、标题、提示） | ARB 文件（现有 `intl` + `flutter_localizations`） | `lib/l10n/app_*.arb` |
+| **叙事文本**（场景事件、对话、骰子结果） | Dart 常量池 | `lib/core/constants/adventure_dialogues_*.dart` |
+
+> **不使用 JSON 资源文件**。spec/04 中之前提到的"JSON 资源文件"引用已删除，统一为 Dart 常量。
+> 两套系统互不干扰：ARB 走 Flutter 标准 `AppLocalizations`，Dart 常量走 `getEventText(id, locale)` 函数。
+
 ### 7.1 文件结构
 
 ```
@@ -350,3 +364,15 @@ const _fallbackText = EventText(
 ### 7.6 质量控制
 
 AI 批量生成 → 人工审核 → AI 翻译 → 母语者抽检（CJK ≥50%）
+
+## 8. 性能优化：SQLite 索引
+
+属性计算服务（CompletionRateService、CoverageService）对 `local_sessions` 表执行 30 天窗口聚合查询。
+为避免全表扫描，建表时应创建复合索引：
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_sessions_uid_status_ended
+  ON local_sessions(uid, status, ended_at);
+```
+
+此索引覆盖所有 `WHERE uid = ? AND status = 'completed' AND ended_at >= ?` 模式的查询。

@@ -7,6 +7,7 @@
 > **Changelog:**
 > - 2026-03-15 — 初版
 > - 2026-03-15 — 深度增强：替换为完整 20 级冒险等级表（含进化阶段 + 熟练加值）；性格代码值统一为 brave/playful/lazy/curious/shy/clingy；伙伴加成改写为双层结构（主属性 +2 加值 + 性格 Advantage）；新增专长系统（§8b，Phase 3+）；新增技能子分类（§8c，Phase 3+）；里程碑触发表扩展为 8 个节点
+> - 2026-03-15 — 多职 XP 改为加法公式（D20）；SQL 表名修正为 local_habits；paused/abandoned 对齐 D19 决策树；Lucky 每日计数器存储位置；Sharpshooter 骰子引擎钩子
 
 ---
 
@@ -147,13 +148,15 @@ int calculateCompanionBonus(Party party, String checkAbility) {
 - 当前场景冒险**全部完成**（所有事件结算后）→ 自动解锁
 - 用户主动**放弃当前冒险**（进度丢失）→ 解锁
 
-### 5.3 场景切换行为
+### 5.3 场景切换行为（D19）
 
-- 场景进行中，用户选择切换场景卡：
-  1. 当前冒险置为 `abandoned`（进度永久丢失，已获得的即时星尘不回收）
-  2. 用户选择新场景卡并配置新队伍
+- 场景进行中，用户选择开始新冒险：
+  1. 若新冒险与旧冒险是**同一场景卡** → 旧冒险置为 `paused`（可恢复，保留进度）
+  2. 若新冒险与旧冒险是**不同场景卡** → 旧冒险置为 `abandoned`（永久，不可恢复，已获得的即时星尘不回收）
   3. 同时只能激活 **1 个**进行中的冒险
   4. 新场景卡开始时重新锁定队伍
+
+> **语义区分**："重试"同一场景 = 暂停旧进度；"转战"不同场景 = 放弃旧进度。详见 [spec/04 §4.1](04-adventure.md)。
 
 ---
 
@@ -233,13 +236,10 @@ class Habit {
 - 习惯编辑页（Habit Edit Screen）新增"分类"选择器（单选 Chip 或 DropdownButton）
 - 习惯卡片可选展示 category 小标签（视觉优化，非 MVP 必需）
 
-### 7.4 SQLite 迁移
+### 7.4 SQLite Schema
 
-```sql
-ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
-```
-
-数据库版本号需从当前版本 +1，通过 `sqflite` migration 回调执行。
+> **v2.0 大版本**：`local_habits` 建表 DDL 直接包含 `category TEXT` 列，无需 ALTER TABLE 迁移。
+> 详见 [architecture/data-model.md](../architecture/data-model.md) §2。
 
 ---
 
@@ -254,14 +254,23 @@ ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
 - 可选择一个**不同于主职**的副职业
 - 副职业提供其正常 XP 加成的 **50%**（Fighter 副职提供 +5%）
 - 副职业的**被动技能不激活**（仅享受 XP 加成）
-- 同一次专注的 XP 加成计算：`XP × (1 + 主职加成%) × (1 + 副职加成% × 0.5)`
+- 同一次专注的 XP 加成计算：
 
-> **取整规则**：副职 XP 加成 = `(mainClassBonus * 0.5).floor()`。示例：Ranger 副职 = floor(25% × 0.5) = floor(12.5%) = 12%。最终乘数为 `1 + 0.12 = 1.12`。
+```
+XP 增量 = focusMinutes × (1 + mainBonus + secondaryBonus × 0.5)
+
+示例：Wizard(+25%) + Rogue(+12.5%)
+  30 分钟 mental 习惯 → 30 × (1 + 0.25 + 0.125) = 30 × 1.375 = 41.25 → 41
+```
+
+> **决策 D20**：采用加法公式，可预测且可调试。乘法会导致高等级 XP 膨胀。
+
+> **取整规则**：副职 XP 加成 = `(mainClassBonus * 0.5).floor()`。示例：Ranger 副职 = floor(25% × 0.5) = floor(12.5%) = 12%。
 
 ### 8.3 示例
 
 主职 Wizard（+25%，mental 习惯）+ 副职 Rogue（+25% × 50% = +12.5%）：
-- mental 习惯专注 30 分钟 → XP = 30 × 1.25 × 1.125 ≈ 42 XP
+- mental 习惯专注 30 分钟 → XP = 30 × (1 + 0.25 + 0.125) = 30 × 1.375 ≈ 41 XP
 
 ---
 
@@ -281,7 +290,14 @@ ALTER TABLE habits ADD COLUMN category TEXT; -- nullable，默认 null
 | 📚 专精 Skilled | Skilled | 新增 1 个习惯分类获得熟练加值 | 多习惯用户 |
 | 💪 坚毅 Tough | Tough | CON 检定修正值额外 +1 | 连击型用户 |
 | 🍀 幸运 Lucky | Lucky | 每日 1 次重掷骰子（可选择保留新结果或旧结果） | 所有用户 |
+
+> **Lucky 每日计数器**：`materialized_state['lucky_reroll_used_today']` 存储最后使用日期（`'yyyy-MM-dd'`）。
+> 判断逻辑：`if (today != storedDate) → 可用`。每日自动重置，无需定时任务。
+
 | 🎯 专注射手 Sharpshooter | Sharpshooter | DEX 检定在 DC ≤ 12 时自动成功 | 高效率用户 |
+
+> **骰子引擎钩子**：`DiceEngineService.performCheck()` 在计算 total 之前检查 `selectedFeats.contains('Sharpshooter')`。
+> 若 `event.ability == 'DEX' && dc <= 12` → 跳过掷骰，直接返回 `outcome = 'success'`。
 | 🛡️ 韧性 Resilient | Resilient | 选择一个属性获得该属性检定的熟练 | 弱项补强 |
 
 专长选择持久化在 PrimaryCat 模型（`asiChoices: Map<int, String>` 字段）。每个专长只能选择一次。
