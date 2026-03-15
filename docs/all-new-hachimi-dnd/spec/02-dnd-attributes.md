@@ -29,7 +29,7 @@
 |------|------|--------|---------|
 | STR 力量 | 总投入量 | `cat.totalMinutes`（SQLite `local_cats.total_minutes`） | 每 +120 分钟 → +1 |
 | DEX 敏捷 | 完成效率 | 近 30 次 `session.completionRatio` 均值 | ≥0.95→18，≥0.90→16，以此类推 |
-| CON 体质 | 坚持韧性 | 当前连续打卡天数（streak days） | 每 +7 天 → +1 |
+| CON 体质 | 坚持韧性 | 历史最长连续打卡天数（longest ever streak days） | 每 +7 天 → +1 |
 | INT 智力 | 目标难度 | `habit.goalMinutes` | 目标越高 → 基础越高，分段映射 |
 
 > **「活跃习惯」定义**：`state != 'graduated' && state != 'archived'`。`goalMinutes` 为 null 的习惯参与 INT 计数（多样性），使用默认值 25（Pomodoro 标准）计算 `avgGoalMinutes`。
@@ -38,6 +38,8 @@
 | CHA 魅力 | 幸福度 | `cat.computedMood` + `cat.displayStage` | happy+adult→20，阶梯映射 |
 
 > **设计意图**：DEX 衡量 **完成质量**（最近 30 次的平均完成率），与频率无关；WIS 衡量 **规律性**（30 天内有多少天活跃），与单次质量无关。两者使用不同窗口是有意设计，分别捕捉效率和坚持两个维度。
+>
+> **零惩罚对齐（D34-审计修复）**：CON 使用 `longestEverStreak`（历史最长连续天数）而非 `currentStreak`，确保断连后 CON 不下降。用户曾经坚持的努力永远被记录。
 
 ---
 
@@ -74,9 +76,9 @@ extension CompanionCatAbilities on Cat {
   int dexterityScore(double avgCompletionRate, int capForStage) =>
       _capByStage(_completionToDex(avgCompletionRate), capForStage);
 
-  /// CON：当前连续打卡天数，每 7 天 +1
-  int constitutionScore(int streakDays, int capForStage) =>
-      _capByStage(_streakToCon(streakDays), capForStage);
+  /// CON：历史最长连续打卡天数，每 7 天 +1
+  int constitutionScore(int longestEverStreakDays, int capForStage) =>
+      _capByStage(_streakToCon(longestEverStreakDays), capForStage);
 
   /// INT：habit.goalMinutes 分段映射
   int intelligenceScore(int habitGoalMinutes, int capForStage) =>
@@ -260,6 +262,8 @@ Map<String, int> computeWithASI(Map<String, int> baseAbilities, Map<int, String>
 
 伙伴猫的属性公式与主哈基米不同，这是有意设计。伙伴猫的属性仅由其对应习惯的数据驱动，不受其他习惯影响。这确保每只猫都是其习惯的"忠实镜像"——运动猫的 STR 高说明用户运动做得好，而不是因为其他习惯拉高了平均值。
 
+**零惩罚对齐（D34-审计修复）**：CON 使用 `longestEverStreak`（历史最长连续天数）而非 `currentStreak`，确保断连后 CON 不下降。用户曾经坚持的努力永远被记录。
+
 ---
 
 ## 数值曲线
@@ -278,22 +282,23 @@ Map<String, int> computeWithASI(Map<String, int> baseAbilities, Map<int, String>
 
 > 注意：STR 提升较快（对比综合研究报告 §10.3 的"70h→STR16"设定，此处采用设计文档 §3.1 的"每 120 分钟 +1"公式，后者更贴近实际进度节奏）。阶段上限是实际约束：幼猫最多 STR 14，少年猫最多 STR 17，即使时长超过阈值也不突破上限，直到进化到下一阶段。
 
-### CON（体质）—— 连击天数驱动，曲线更陡
+### CON（体质）—— 历史最长连击天数驱动，曲线更陡
 
-公式：`CON = clamp(10 + streakDays ~/ 7, 10, stageCap)`
+公式：`CON = clamp(10 + longestEverStreak ~/ 7, 10, stageCap)`
 
-| CON 值 | 所需连续天数 | 设计意图 |
-|--------|-----------|---------|
+| CON 值 | 所需历史最长连续天数 | 设计意图 |
+|--------|-------------------|---------|
 | 10 | 0 天 | 初始值 |
-| 12 | 14 天 | 两周里程碑 |
-| 14 | 28 天 | 月度里程碑（幼猫上限） |
-| 17 | 49 天 | 七周（少年猫上限） |
-| 20 | 70 天 | 需成年猫阶段，约两个半月 |
+| 12 | 14 天 | 历史上曾连续两周 |
+| 14 | 28 天 | 历史上曾连续一个月（幼猫上限） |
+| 17 | 49 天 | 历史上曾连续七周（少年猫上限） |
+| 20 | 70 天 | 历史上曾连续约两个半月（需成年猫阶段） |
 
 **曲线设计原则：**
 
-- **前期快速成长**：10→14 相对容易，给予早期正反馈（约 28 天）
-- **后期指数放缓**：17→20 需要极大投入（连续 70 天 + 必须是成年猫），保证长期追求
+- **前期快速成长**：10→14 相对容易，给予早期正反馈（历史上曾连续 28 天即可）
+- **后期指数放缓**：17→20 需要极大投入（历史上曾连续 70 天 + 必须是成年猫），保证长期追求
+- **零惩罚保证**：使用 `longestEverStreak` 而非 `currentStreak`，断连后 CON 不下降，用户曾经的坚持永远被记录
 - 参考 SRD XP 表设计思路：前几级升得快，后续越来越慢
 
 ### WIS（感知）—— 覆盖率分段
@@ -357,7 +362,7 @@ FROM (
 
 **文件：** `lib/services/streak_service.dart`
 
-**职责：** 从 `local_sessions` 计算指定习惯（或所有习惯）的最长连续打卡天数。
+**职责：** 从 `local_sessions` 计算指定习惯（或所有习惯）的连续打卡天数（当前连击 + 历史最长连击）。
 
 ```dart
 class StreakService {
@@ -366,19 +371,60 @@ class StreakService {
 
   /// 返回 [habitId] 习惯的当前连续打卡天数（截止到今日）。
   /// "打卡"定义：该日期内有至少 1 条 status='completed' 的 session。
+  /// 用途：UI 连击展示。
   Future<int> currentStreakForHabit(String habitId) async { ... }
 
-  /// 返回所有习惯中最长的连续打卡天数（供 PrimaryCat CON 计算使用）。
-  Future<int> longestAcrossAllHabits(String uid) async { ... }
+  /// 返回 [habitId] 习惯的历史最长连续打卡天数。
+  /// 用途：伙伴猫 CON 计算。
+  Future<int> longestEverStreakForHabit(String habitId) async { ... }
+
+  /// 返回所有习惯合并后的历史最长连续打卡天数（供 PrimaryCat CON 计算使用）。
+  Future<int> longestEverAcrossAllHabits(String uid) async { ... }
 }
 ```
 
 **算法说明：**
 
+`currentStreakForHabit`（当前连击）：
 1. 查询该习惯所有 `status = 'completed'` 的 session，提取 `ended_at` 日期（本地时区，格式 `yyyy-MM-dd`）
 2. 去重为日期集合（Set），按降序排列
 3. 从最新日期向过去遍历，计算连续天数（相邻两天差值为 1）
 4. 遇到断层即停止，返回连续计数
+
+`longestEverStreakForHabit` / `longestEverAcrossAllHabits`（历史最长连击）：
+1. 查询所有 `status = 'completed'` 的 session，提取 `ended_at` 日期（本地时区）
+2. 去重为日期集合（Set），按**升序**排列
+3. 用滑动窗口遍历排序后的日期列表，追踪当前连续子序列长度
+4. 相邻两个日期差值为 1 天则延续连续计数，否则重置为 1
+5. 遍历过程中记录出现过的最大连续长度，遍历结束后返回该最大值
+
+```dart
+/// longestEverStreakForHabit 的 Dart 伪代码
+Future<int> longestEverStreakForHabit(String habitId) async {
+  final rows = await _db.query('''
+    SELECT DISTINCT DATE(ended_at / 1000, 'unixepoch', 'localtime') AS day
+    FROM local_sessions
+    WHERE habit_id = ? AND status = 'completed'
+    ORDER BY day ASC
+  ''', [habitId]);
+
+  if (rows.isEmpty) return 0;
+
+  final days = rows.map((r) => DateTime.parse(r['day'] as String)).toList();
+  int longest = 1;
+  int current = 1;
+
+  for (int i = 1; i < days.length; i++) {
+    if (days[i].difference(days[i - 1]).inDays == 1) {
+      current++;
+      if (current > longest) longest = current;
+    } else {
+      current = 1;
+    }
+  }
+  return longest;
+}
+```
 
 **时区处理：** 使用设备本地时区（`DateTime.now().toLocal()`），`ended_at` 存储为 `millisecondsSinceEpoch`，转换时用 `.toLocal()` 确保与用户日历对齐。
 
@@ -436,15 +482,15 @@ FROM (
 -- 若无任何 completed session，返回 0.0
 ```
 
-**StreakService — CON 依赖**
+**StreakService — CON 依赖（历史最长连击）**
 ```sql
--- 所有习惯中最长的连续打卡天数
--- 实现方式：Dart 端遍历（SQL 窗口函数在 sqflite 中不可靠）
+-- 所有习惯合并后的历史最长连续打卡天数
+-- 实现方式：Dart 端滑动窗口遍历（SQL 窗口函数在 sqflite 中不可靠）
 SELECT DISTINCT DATE(ended_at / 1000, 'unixepoch', 'localtime') AS day
 FROM local_sessions
 WHERE uid = ? AND status = 'completed'
-ORDER BY day DESC;
--- Dart 端从最近日期向前遍历，计算连续天数
+ORDER BY day ASC;
+-- Dart 端按升序遍历日期列表，用滑动窗口找最长连续子序列
 -- 跨时区：使用 ended_at 的本地时间转换
 ```
 
@@ -471,7 +517,7 @@ WHERE uid = ?
 // 在 cat_provider.dart 或专用 Provider 中：
 final cat = ref.watch(catByIdProvider(catId));
 final avgRate = await completionRateService.averageForCat(catId);
-final streak = await streakService.currentStreakForHabit(cat.boundHabitId);
+final streak = await streakService.longestEverStreakForHabit(cat.boundHabitId);
 final coverage = await coverageService.coverageLastThirtyDays(uid, catId: catId);
 final cap = stageCapFor(cat);
 
@@ -502,8 +548,9 @@ final cha = cat.charismaScore(cap);
 - [ ] 阶段上限严格执行：幼猫任意属性不超过 14，即使底层公式返回更高的值
 - [ ] SRD 修正值公式：STR=20→+5，STR=10→+0，STR=11→+0，STR=13→+1（整除行为正确）
 - [ ] `CompletionRateService`：无 session 时返回 `0.0`（不崩溃）
+- [ ] `StreakService`：`longestEverStreakForHabit` 返回历史最长连续天数，断连后不下降
+- [ ] `StreakService`：`currentStreakForHabit` 返回当前连击天数，中间断一天即停止计数（不跳过断层）
 - [ ] `StreakService`：跨时区切换时（`ended_at` 时区转换）连击天数计算正确
-- [ ] `StreakService`：中间断一天即停止计数（不跳过断层）
 - [ ] `CoverageService`：查询范围精确为 30 个自然日，不多不少
 - [ ] `modifier(10) == 0`，`modifier(20) == 5`，`modifier(11) == 0`，`modifier(13) == 1`（1000 次随机属性分单元测试）
 - [ ] Extension 方法不触发 `toSqlite`/`toFirestore`（序列化测试：Cat 序列化前后字段一致）

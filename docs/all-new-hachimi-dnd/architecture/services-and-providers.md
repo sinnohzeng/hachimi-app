@@ -316,12 +316,36 @@ BackendRegistry(
 | 目录 | 文件 |
 |------|------|
 | `lib/models/` | `primary_cat.dart`、`pending_dice.dart`、`dice_result.dart`、`adventure_progress.dart`、`scene_card.dart`、`starter_archetype.dart` |
-| `lib/core/constants/` | `adventure_constants.dart`、`class_constants.dart`、`adventure_dialogues_town.dart`、`adventure_dialogues_forest.dart`、`adventure_dialogues_ruins.dart`、`primary_cat_dialogues.dart`、`dice_result_dialogues.dart`、`party_dialogues.dart` |
+| `lib/core/constants/` | `adventure_constants.dart`、`class_constants.dart`、`adventure_dialogues/`（15 个场景卡文件，见下方拆分说明）、`primary_cat_dialogues.dart`、`dice_result_dialogues.dart`、`party_dialogues.dart` |
 | `lib/providers/` | `primary_cat_provider.dart`、`adventure_provider.dart`、`dice_provider.dart`、`class_provider.dart`、`party_provider.dart` |
 | `lib/services/` | `dice_engine_service.dart`、`adventure_service.dart`、`primary_cat_service.dart`、`completion_rate_service.dart`、`streak_service.dart`、`coverage_service.dart` |
 | `lib/screens/` | `starter_selection/`、`adventure_journal/`、`dice_roll/`、`party_select/`、`class_select/`、`scene_select/` |
 | `lib/core/backend/` | `adventure_backend.dart` |
 | `lib/services/firebase/` | `firebase_adventure_backend.dart` |
+
+#### 叙事文本拆分：adventure_dialogues/ 目录
+
+```
+lib/core/constants/
+├── adventure_dialogues/
+│   ├── cat_town_market.dart        // 市集广场（~60 行）
+│   ├── cat_town_blacksmith.dart    // 铁匠铺
+│   ├── cat_town_library.dart       // 图书馆
+│   ├── cat_town_tavern.dart        // 酒馆
+│   ├── cat_town_herb.dart          // 草药园
+│   ├── forest_ancient_trail.dart   // 古树小径
+│   ├── forest_elven_spring.dart    // 精灵泉
+│   ├── forest_mushroom_cave.dart   // 蘑菇洞
+│   ├── forest_watchtower.dart      // 瞭望塔
+│   ├── forest_moonlight_lake.dart  // 月光湖
+│   ├── ruins_statue_puzzle.dart    // 石像谜题
+│   ├── ruins_floating_bridge.dart  // 浮空桥
+│   ├── ruins_treasure_room.dart    // 宝藏室
+│   ├── ruins_mural_hall.dart       // 壁画厅
+│   └── ruins_sealed_gate.dart      // 封印之门
+```
+
+> **拆分理由**：每张场景卡 8-10 个事件 × 3 段文本（prompt + success + fail）× 双语 ≈ 48-60 行/卡。按区域合并为 3 文件会导致单文件 240-300 行（可接受但不优雅）。按场景卡拆分为 15 文件，每文件约 50-80 行，更符合单一职责原则和 800 行红线要求。
 
 ### 修改文件（~12 个）
 
@@ -361,7 +385,7 @@ BackendRegistry(
 - **缓存 key**：`uid`（全局，非 per-cat）
 - **缓存存储**：Service 实例内部 `_cachedResult` + `_cachedAt` 时间戳
 - **过期策略**：`DateTime.now() - _cachedAt > Duration(minutes: 5)` 时重新查询
-- **主动失效**：当 `LedgerChange.type == 'focus_complete'` 或 `isGlobalRefresh` 时，调用 `ref.invalidate(completionRateServiceProvider)` 等清除缓存
+- **主动失效**：当 `LedgerChange.type == ActionType.focusComplete`（对应现有 `'focus_complete'` 值，见 `lib/models/ledger_action.dart`）或 `isGlobalRefresh` 时，调用 `ref.invalidate(completionRateServiceProvider)` 等清除缓存
 
 ### 5.2 Provider → Service 调用链
 
@@ -407,46 +431,57 @@ final completionRateServiceProvider = Provider<CompletionRateService>((ref) {
   return CompletionRateService(ref.read(localDatabaseServiceProvider));
 });
 
-// 属性计算 Provider 使用 FutureProvider（因为需要异步 SQL 查询）
+// 属性计算 Provider — FutureProvider，异步查询后并行计算 6 维属性。
 final primaryCatAbilitiesProvider = FutureProvider<Map<String, int>>((ref) async {
   final primaryCat = await ref.watch(primaryCatProvider.future);
   if (primaryCat == null) return {};
 
+  final uid = primaryCat.userId;
+
+  // 从现有 Provider 获取已有数据（同步）
+  final cats = ref.watch(catsProvider).valueOrNull ?? [];
+  final activeCats = cats.where((c) => c.state != 'retired' && c.state != 'deleted').toList();
+  final habits = ref.watch(habitsProvider).valueOrNull ?? [];
+  final activeHabits = habits.where((h) => h.state != 'graduated' && h.state != 'archived').toList();
+
+  // 同步计算可直接获取的输入
+  final allCatsTotalMinutes = activeCats.fold<int>(0, (sum, c) => sum + c.totalMinutes);
+  final activeHabitCount = activeHabits.length;
+  final avgGoalMinutes = activeHabits.isEmpty
+      ? 25.0
+      : activeHabits.map((h) => h.goalMinutes ?? 25).reduce((a, b) => a + b) / activeHabits.length;
+
+  // 异步 Service 查询（3 个并行执行）
   final completionRate = ref.read(completionRateServiceProvider);
   final streak = ref.read(streakServiceProvider);
   final coverage = ref.read(coverageServiceProvider);
 
-  // 聚合计算 6 维属性
-  return computePrimaryCatAbilities(primaryCat, completionRate, streak, coverage);
-});
+  final [overallRate, longestEverStreak, thirtyDayCoverage] = await Future.wait([
+    completionRate.averageForAllCats(uid, lastN: 30),
+    streak.longestEverAcrossAllHabits(uid),
+    coverage.coverageLastThirtyDays(uid),
+  ]);
 
-/// 计算主哈基米 6 维属性的完整函数签名。
-/// PrimaryCat extension 方法无法访问外部数据，因此使用独立函数注入所有输入。
-Map<String, int> computePrimaryCatAbilities(
-  PrimaryCat primary,
-  CompletionRateService completionRate,
-  StreakService streak,
-  CoverageService coverage,
-) {
-  // 从各 Service 获取聚合数据
-  final allCatsTotalMinutes = completionRate.allCatsTotalMinutes(primary.userId);
-  final overallRate = completionRate.averageForAllCats(primary.userId, lastN: 30);
-  final longestStreak = streak.longestAcrossAllHabits(primary.userId);
-  final habitCount = completionRate.activeHabitCount(primary.userId);
-  final avgGoalMinutes = completionRate.averageGoalMinutes(primary.userId);
-  final coverage30 = coverage.coverageLastThirtyDays(primary.userId);
+  // 心情均值（同步计算）
+  final averageCatMood = activeCats.isEmpty
+      ? 1.0
+      : activeCats.map((c) => _moodToValue(c.computedMood)).reduce((a, b) => a + b) / activeCats.length;
 
   // 使用 spec/01 中的公式计算各属性
-  return {
-    'STR': _clamp(10 + allCatsTotalMinutes ~/ 120, primary),
-    'DEX': _clamp((10 + (overallRate * 10).round()), primary),
-    'CON': _clamp(10 + longestStreak ~/ 7, primary),
-    'INT': _clamp(10 + (habitCount * avgGoalMinutes ~/ 30), primary),
-    'WIS': _clamp((10 + (coverage30 * 10).round()), primary),
-    'CHA': _clamp(_computeCha(primary), primary),
-  };
-}
+  return _computeAbilities(
+    primaryCat,
+    allCatsTotalMinutes: allCatsTotalMinutes,
+    overallCompletionRate: overallRate as double,
+    longestEverStreak: (longestEverStreak as int),
+    activeHabitCount: activeHabitCount,
+    avgGoalMinutes: avgGoalMinutes,
+    thirtyDayCoverage: thirtyDayCoverage as double,
+    averageCatMood: averageCatMood,
+  );
+});
 ```
+
+> **性能优化（D37）**：`primaryCatAbilitiesProvider` 使用 `ref.watch(primaryCatProvider.future)` 监听完整 PrimaryCat 对象。若未来外观变更触发频繁重算，应改用 `ref.watch(primaryCatProvider.select((p) => p?.archetype))` 等仅监听属性相关字段。当前阶段外观变更频率极低（500 金币/次），暂不优化。
 
 ### 5.4 事务性操作
 

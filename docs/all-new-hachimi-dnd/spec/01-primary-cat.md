@@ -211,8 +211,8 @@ extension PrimaryCatAbilities on PrimaryCat {
   /// DEX：近 30 次专注的 completionRatio 均值驱动
   int get dexterity => _applyBonus('dex', _clamp(_efficiencyToScore(overallCompletionRate)));
 
-  /// CON：所有习惯中最长的连续打卡天数
-  int get constitution => _applyBonus('con', _clamp(_streakToScore(longestActiveStreak)));
+  /// CON：所有习惯合并后的历史最长连续打卡天数
+  int get constitution => _applyBonus('con', _clamp(_streakToScore(longestEverStreak)));
 
   /// INT：活跃习惯数量 + 平均目标时长的复合分
   int get intelligence => _applyBonus('int', _clamp(_habitDiversityToScore(activeHabitCount, avgGoalMinutes)));
@@ -257,7 +257,7 @@ extension PrimaryCatAbilities on PrimaryCat {
 
 > **「活跃伙伴猫」定义**：`state != 'retired' && state != 'deleted'`。已退休或已删除的猫不参与主哈基米属性计算。上述 SQL 查询需加上此过滤条件。
 | `overallCompletionRate` | `CompletionRateService.averageForAllCats(lastN: 30)` | **新增** `CompletionRateService` |
-| `longestActiveStreak` | `StreakService.longestAcrossAllHabits()` | **新增** `StreakService` |
+| `longestEverStreak` | `StreakService.longestEverAcrossAllHabits()` | **新增** `StreakService` |
 | `activeHabitCount` | 活跃习惯数：`local_habits` 中 `state != 'graduated'` 的行数 | 现有 `habitsProvider` |
 | `avgGoalMinutes` | 活跃习惯的 `goal_minutes` 均值 | 现有 `habitsProvider` |
 | `thirtyDayCoverage` | `CoverageService.coverageLastThirtyDays()` | **新增** `CoverageService` |

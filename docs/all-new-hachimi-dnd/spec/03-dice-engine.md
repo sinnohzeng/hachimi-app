@@ -8,6 +8,7 @@
 > - 2026-03-15 — 初版
 > - 2026-03-15 — 检定公式扩展：新增 conditionModifier + environmentModifier + equipmentModifier；新增豁免检定变体章节（详见 spec/08）
 > - 2026-03-15 — 新增辅助函数定义（_resolveAdvantage、_computeCompanionBonus）；新增 PityState 重启行为说明（D31）；新增批量保底规格；溢出方法名修正为 _coins.addCoins
+> - 2026-03-15 — PityState 从内存存储改为持久化到 AdventureProgress（D31 修正）；crash 后保底进度不再丢失
 
 ---
 
@@ -134,12 +135,12 @@ Future<void> earnDice({required String uid, required String catId, ...}) async {
 
 ## 5. 伪随机保底系统（Pity System）
 
-保底计数器**存储在内存中**，App 重启后重置。这是可接受的设计取舍（避免数据库负担，偶发重置对体验影响极小）。
+保底计数器**持久化到 `AdventureProgress`** 模型中（`pityConsecutiveFailures` + `pityConsecutiveNonCrits` 字段）。冒险恢复时一并恢复保底状态，避免 crash 后保底进度丢失。
 
-> **已知行为（D31）**：PityState 仅存内存，App 重启后保底计数器归零。
-> 冒险中重启会丢失保底进度。这是有意的设计取舍——保底是体验优化而非游戏承诺。
+> **持久化行为（D31 修正）**：PityState 持久化到 `AdventureProgress.pityConsecutiveFailures` 和 `pityConsecutiveNonCrits` 字段。
+> App 重启后保底计数器从冒险进度恢复，不归零。冒险完成或放弃时重置为 0。
 
-> **冒险级重置**：保底计数器在每次 **新冒险开始时** 也重置为 0（`consecutiveFailures = 0, consecutiveNonCrits = 0`）。同一冒险内的检定共享保底状态。
+> **冒险级重置**：保底计数器在每次 **新冒险开始时** 重置为 0（`consecutiveFailures = 0, consecutiveNonCrits = 0`）。同一冒险内的检定共享保底状态，保底进度从 `AdventureProgress` 读取并在每次检定后写回。
 
 ### 5.1 保底规则
 

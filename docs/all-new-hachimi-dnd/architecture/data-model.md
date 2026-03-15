@@ -118,6 +118,8 @@ class AdventureProgress {
   final DateTime startedAt;
   final DateTime? completedAt;
   final List<ActiveCondition> activeConditions;  // 当前状态效果（Phase 2，Phase 1 = const []）
+  final int pityConsecutiveFailures;    // 保底计数器：连续失败次数（冒险恢复时一并恢复）
+  final int pityConsecutiveNonCrits;    // 保底计数器：连续非大成功次数
 }
 ```
 
@@ -167,8 +169,8 @@ class SceneEvent {
 }
 ```
 
-> **序列化**：SceneCard 和 SceneEvent 同时支持 `const` 构造（用于 15 张基础场景卡常量）和 `fromJson()`/`toJson()`（用于 Phase 3+ Remote Config 季节性场景卡）。
-> 基础卡定义在 `lib/core/constants/adventure_constants.dart` 中作为 `const` 实例。
+> **序列化**：SceneCard 和 SceneEvent 使用 `static final` 列表定义（不使用 `const` 构造——`List<SceneEvent>` 字段在 const 上下文中无法使用 `fromJson()` 逻辑）。支持 `fromJson()`/`toJson()`（用于 Phase 3+ Remote Config 季节性场景卡）。
+> 基础卡定义在 `lib/core/constants/adventure_constants.dart` 中作为 `static final` 实例。
 
 ### 1.7 StarterArchetype — 御三家原型
 
@@ -283,6 +285,8 @@ CREATE TABLE IF NOT EXISTS local_adventure_progress (
   status               TEXT NOT NULL DEFAULT 'active',
   star_rating          INTEGER,
   active_device_id     TEXT,                   -- 设备锁定 ID
+  pity_consecutive_failures  INTEGER NOT NULL DEFAULT 0,
+  pity_consecutive_non_crits INTEGER NOT NULL DEFAULT 0,
   started_at           TEXT NOT NULL,
   completed_at         TEXT
 );
@@ -317,6 +321,10 @@ CREATE TABLE IF NOT EXISTS local_scene_difficulty_unlock (
 -- 属性计算服务（CompletionRate/Coverage）的 30 天窗口查询优化
 CREATE INDEX IF NOT EXISTS idx_sessions_uid_status_ended
   ON local_sessions(uid, status, ended_at);
+
+-- DiceResult 查询优化（按用户和时间排序）
+CREATE INDEX IF NOT EXISTS idx_dice_results_uid_rolled
+  ON local_dice_results(uid, rolled_at);
 ```
 
 ### 2.4 materialized_state 新增 key
@@ -430,3 +438,5 @@ adventure_xp_earn,
 
 > **前向兼容**：`ActionType.fromValue()` 必须改为 `tryFromValue()` 模式——遇到未知值返回 `null` 而非抛出 `ArgumentError`。
 > 这确保新版本写入的 ActionType 不会导致旧版本崩溃。
+>
+> **Phase 1 首个 PR 必须项**：`ActionType.fromValue()` 改为 `tryFromValue()` 模式。此变更属于 Phase 1 基础设施准备，必须在任何 DnD 功能代码之前完成。

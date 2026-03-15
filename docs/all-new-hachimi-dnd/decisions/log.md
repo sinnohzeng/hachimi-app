@@ -251,3 +251,90 @@
 **日期**：2026-03-15
 **决策**：`retention_day_n` 定义为用户打开 App 的日历天数。
 **理由**：与行业标准 DAU（Daily Active Users）定义一致。按日历天计算而非连续天数，更准确反映用户留存行为。
+
+---
+
+## 审计修复决策（2026-03-15 审计后新增）
+
+> 以下决策来自 v2.0 设计文档的上线前审计 + 架构审查，修复了 8 项 P0 阻塞问题和 6 项高价值改进。
+
+### D34. CON 属性改用 longestEverStreak（历史最长连击）
+
+**日期**：2026-03-15
+**决策**：CON（体质）属性的计算从 `currentStreak`（当前连续打卡天数）改为 `longestEverStreak`（历史最长连续天数）。StreakService 新增 `longestEverStreakForHabit` 和 `longestEverAcrossAllHabits` 方法，使用滑动窗口算法扫描所有日期集合。
+**理由**：原方案中断连一天后 CON 从 20 掉到 10，直接违反零惩罚红线 #4（"断连不清零"）。`longestEverStreak` 确保 CON 只增不减，用户曾经坚持的努力永远被记录。
+**否决方案**：
+- 暂停式连击（断连冻结，恢复后继续累加）：实现复杂，需额外 `pausedStreak` 字段
+- 累计总天数替代连击：丢失了 CON "坚韧"的语义
+
+### D35. Party 选择暂存内存，crash 重选可接受
+
+**日期**：2026-03-15
+**决策**：Party 选择仅暂存内存，不持久化到临时表。crash 后选择丢失，需重新选择。
+**理由**：Party 选择是 5 秒内的轻量操作（选 0-2 只伙伴猫），不值得引入临时持久化表增加系统复杂度。
+
+### D36. local_dice_results 加索引，暂不归档
+
+**日期**：2026-03-15
+**决策**：新增 `idx_dice_results_uid_rolled` 索引。不实施 180 天归档策略。
+**理由**：年 1,000 条 DiceResult 对 SQLite 性能无压力（<100KB），归档属过度工程。留到用户量超过 10k 再考虑。
+
+### D37. primaryCatAbilitiesProvider 暂不优化 select 过滤
+
+**日期**：2026-03-15
+**决策**：`primaryCatAbilitiesProvider` 暂时 watch 完整 PrimaryCat 对象，不使用 `.select()` 过滤属性相关字段。
+**理由**：外观变更频率极低（500 金币/次），过早优化得不偿失。若未来外观变更频率增加，再改用 `.select()` 仅监听 `archetype`、`asiChoices`、`selectedFeats` 等字段。
+
+### D38. ActionType.tryFromValue() 为 Phase 1 首个 PR 必须项
+
+**日期**：2026-03-15
+**决策**：`ActionType.fromValue()` 改为 `tryFromValue()` 模式（遇到未知值返回 `null`），必须在任何 DnD 功能代码之前完成。
+**理由**：前向兼容是架构级正确实践。新版本写入的 18 种 ActionType 不应导致旧版本崩溃。
+
+### D39. spec/06 Evidence 引用修正
+
+**日期**：2026-03-15
+**决策**：`spec/06-economy.md` 的 Evidence 从 `lib/services/gold_service.dart`（不存在）修正为 `lib/services/coin_service.dart`。
+**理由**：纯标注错误。
+
+### D40. crash 恢复依赖 SQLite 事务原子性
+
+**日期**：2026-03-15
+**决策**：不额外引入 `rewarded` 字段或 Ledger 级补发逻辑。骰子检定的三步操作在同一 SQLite 事务中执行，事务要么全成功要么全回滚。
+**理由**：SQLite 事务原子性已保证不存在"有结果无星尘"的中间态。远端推送失败由现有 SyncEngine 重试机制覆盖。
+
+### D41. 撤回 coins → gold 重命名
+
+**日期**：2026-03-15
+**决策**：保留现有 `coins` 命名（CoinService、`materialized_state.coins`），不重命名为 gold。spec/06 中的 `gold` 全部改回 `coins`。UI 层通过 i18n 展示为"金币"。
+**理由**：架构审查发现 CoinService 在 59+ 个文件中被引用，materialized_state key 为 `'coins'`，15 种 ARB 文件都有 coins key。仅为 DnD 风味一致性发起全代码库重命名是净负价值重构——投入数天纯重命名工作，引入大量回归风险，收益为零。
+
+### D42. DnD 设计文档暂不做中文镜像
+
+**日期**：2026-03-15
+**决策**：`docs/all-new-hachimi-dnd/` 目录不在 `docs/zh-CN/` 中创建镜像。
+**理由**：DnD 设计文档是独立设计包，不在 `docs/architecture/` 主架构树中。CLAUDE.md 的双语要求适用于主架构文档。DnD 文档本身已用中文写成，无需额外中文镜像。编码实现后若对 `docs/architecture/` 进行更新，则需中英双语。
+
+### D43. PityState 持久化到 AdventureProgress
+
+**日期**：2026-03-15
+**决策**：PityState 从仅存内存改为持久化到 `AdventureProgress` 模型（`pityConsecutiveFailures` + `pityConsecutiveNonCrits` 字段）。冒险恢复时一并恢复保底状态。
+**理由**：原方案（D31）中 PityState 仅存内存，App crash 后保底计数器归零。在长冒险（5 个事件）中，前 3 个事件连续失败后 crash，重启后保底重置，第 4 个事件不再有保底保护。这可能导致 4-5 连败体验，与零惩罚精神矛盾。持久化成本极低（2 个 int 字段），收益明确。
+
+### D44. computePrimaryCatAbilities 参数化 + 并行查询
+
+**日期**：2026-03-15
+**决策**：`computePrimaryCatAbilities` 从同步函数改为 async FutureProvider。3 个 Service 异步查询使用 `Future.wait` 并行执行。`allCatsTotalMinutes`、`activeHabitCount`、`avgGoalMinutes` 从现有 `catsProvider` / `habitsProvider` 同步获取，不再调用不存在的 Service 方法。
+**理由**：架构审查发现原函数调用了 3 个未在 CompletionRateService 中定义的方法（`allCatsTotalMinutes`、`activeHabitCount`、`averageGoalMinutes`）。重新划分数据获取职责：已有 Provider 提供的数据同步取，需要聚合计算的数据异步查并行执行。
+
+### D45. SceneCard 放弃 const 构造
+
+**日期**：2026-03-15
+**决策**：SceneCard 模型不使用 `const` 构造函数，改用 `static final` 列表。
+**理由**：`const` 构造函数要求所有字段编译期确定，而 `List<SceneEvent>` 作为复杂对象列表无法在 `const` 上下文中使用 `fromJson()` 逻辑。`static final` 牺牲微小的编译优化，换取 Phase 1（静态定义）和 Phase 3+（Remote Config 动态下发）的统一加载路径。
+
+### D46. 叙事文本按场景卡拆分为 15 个文件
+
+**日期**：2026-03-15
+**决策**：叙事常量文件从 3 个区域文件（town/forest/ruins）改为 15 个场景卡文件（每卡一个），存放在 `lib/core/constants/adventure_dialogues/` 目录下。
+**理由**：每张场景卡 8-10 事件 × 3 段文本 × 双语 ≈ 50-80 行/卡。按区域合并为 3 文件会导致单文件 240-300 行（虽未违反 800 行红线但不优雅），且修改某张卡时需要在大文件中定位。按场景卡拆分更符合单一职责原则。

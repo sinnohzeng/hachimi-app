@@ -61,6 +61,8 @@ class Party {
 - **远端**：通过 LedgerChange 同步（`party_update` ActionType）
 - 冒险开始时，将当前队伍的猫咪 ID 列表写入 `AdventureProgress.partyMemberIds`，之后队伍变更不影响进行中的冒险
 
+> **Party 选择暂存行为（D35）**：用户在 `/party-select` 页面的伙伴猫选择仅暂存在内存中（Screen 级 State），不写入 `local_party` 表。仅当用户确认"开始冒险"后，由 `AdventureService.startAdventure()` 将队伍快照写入 `AdventureProgress.partyMemberIds`。如果用户在选队界面中途退出或 App crash，选择丢失，下次进入需重新选择。这是可接受的设计取舍——Party 选择是 5 秒内的轻量操作，不值得为此引入临时持久化。
+
 ### 3.3 队伍快照统一定义
 
 > **统一定义**：冒险开始时，`AdventureProgress.partyMemberIds` 记录当前队伍的猫咪 ID 列表（`[primaryCatId, companion1Id?, companion2Id?]`）。这是一个 ID 快照，不是完整的 Party 对象副本。冒险期间即使 Party 记录被更新，`partyMemberIds` 不变。

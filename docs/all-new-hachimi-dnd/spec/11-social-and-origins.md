@@ -2,7 +2,7 @@
 
 > SSOT for 背景出身系统（Backgrounds）、酒馆 NPC 态度系统（NPC Attitudes）。
 > **Status:** Draft
-> **Phase:** 1（背景出身）、3（NPC 态度系统）
+> **Phase:** 3（背景出身 + NPC 态度系统）
 > **Evidence:** SRD 5.2.1 Ch.04（Character Origins — Backgrounds）、Ch.01（Social Interaction — NPC Attitudes）
 > **Related:** [spec/01-primary-cat.md](01-primary-cat.md)、[spec/06-economy.md](06-economy.md)、[spec/07-ui-and-navigation.md](07-ui-and-navigation.md)、[spec/09-inventory-and-items.md](09-inventory-and-items.md)
 > **Changelog:**

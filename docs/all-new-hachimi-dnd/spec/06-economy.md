@@ -2,7 +2,7 @@
 
 > SSOT for 双货币体系（金币 + 星尘）、三档定价模型、收支平衡和 Remote Config 参数。
 > **Status:** Draft（已定稿，待 Phase 3 实施后验证平衡性）
-> **Evidence:** `lib/services/gold_service.dart`、`lib/core/constants/`
+> **Evidence:** `lib/services/coin_service.dart`、`lib/core/constants/`
 > **Related:** [spec/03-dice-engine.md](03-dice-engine.md) · [spec/05-party-and-class.md](05-party-and-class.md)
 > **Changelog:**
 > - 2026-03-15 — 金币经济从 [待定稿] 升级为完整三档定价模型
@@ -179,7 +179,7 @@ Hachimi v2.0 采用**双货币体系**：
 | 主要来源 | 专注时间（2/min）+ 签到 | 骰子检定 |
 | 消费节奏 | 每次专注后就能花 | 每周 1-2 件 |
 | 消费对象 | 互动道具 + 配件 + 酒馆装饰 + buff | 冒险配件 + 骰子外观 |
-| 持久化 | `materialized_state.gold` | `materialized_state.stardust` |
+| 持久化 | `materialized_state.coins` | `materialized_state.stardust` |
 | 可兑换 | 否 | 否 |
 | Remote Config | 是（收入率可调） | 否（固定） |
 
@@ -290,7 +290,7 @@ Phase 3 实施后执行：
 - [ ] 专注完成后金币按 2/min 正确计入
 - [ ] 每日签到金币 30 正确发放（仅首次）
 - [ ] Full House 奖励 20 正确判定（当日全部习惯完成）
-- [ ] 金币持久化在 `materialized_state.gold`，重启不丢失
+- [ ] 金币持久化在 `materialized_state.coins`，重启不丢失
 - [ ] 金币收入率通过 Remote Config 控制，修改后下次前台生效
 - [ ] 互动道具在酒馆中正确触发猫咪 Rive 动画
 - [ ] 检定 +2 buff 正确叠加到下次骰子检定

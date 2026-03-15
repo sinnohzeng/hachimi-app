@@ -1048,7 +1048,7 @@ BG3 的首席编剧明确表示他们的目标是"让失败比成功更有趣" [
 
 | 资源类型 | 推荐工具 | 预估成本 | 信息来源 |
 |---------|---------|---------|---------|
-| 猫咪配件精灵图 | Gemini Flash 2.0 API | ~$0.13/张 | YouTube 工作流 [P10] |
+| 猫咪配件精灵图 | Gemini 3.1 Pro API | ~$0.13/张 | YouTube 工作流 [P10] |
 | 探险场景背景 | PixelLab（$9-22/月） | ~$15/月 | PixelLab 官网 [S29]、YouTube [P11] |
 | 猫屋家具精灵图 | Claude Code + Pixel Art Creator MCP | 包含在 Claude 订阅中 | MCP Market [P12] |
 | UI 图标/SVG | SVGMaker.io API | 免费/付费层 | There's An AI For That [P13]、SVGMaker [P14] |
