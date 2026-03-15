@@ -3,8 +3,10 @@
 > SSOT for 骰子获取、累积、伪随机保底、检定公式、奖励分发 的完整行为规格。
 > **Status:** Draft
 > **Evidence:** `lib/models/pending_dice.dart`（待创建）, `lib/models/dice_result.dart`（待创建）, `lib/services/dice_engine_service.dart`（待创建）, `lib/providers/dice_provider.dart`（待创建）, `docs/all-new-hachimi-dnd/specs/2026-03-15-dnd-integration-design.md §4`
-> **Related:** [spec/01-primary-cat.md](01-primary-cat.md), [spec/02-attributes.md](02-attributes.md), [spec/04-adventure.md](04-adventure.md), [architecture/state-management.md](../architecture/state-management.md)
-> **Changelog:** 2026-03-15 — 初版
+> **Related:** [spec/01-primary-cat.md](01-primary-cat.md), [spec/02-attributes.md](02-attributes.md), [spec/04-adventure.md](04-adventure.md), [spec/08-conditions-and-defenses.md](08-conditions-and-defenses.md), [architecture/state-management.md](../architecture/state-management.md)
+> **Changelog:**
+> - 2026-03-15 — 初版
+> - 2026-03-15 — 检定公式扩展：新增 conditionModifier + environmentModifier + equipmentModifier；新增豁免检定变体章节（详见 spec/08）
 
 ---
 
@@ -189,9 +191,14 @@ void updatePity(String outcome, PityState pity) {
          + 熟练加值（如适用）
          + 环境加成（如适用）
          + 坚持加成（如适用）
+         + conditionModifier（状态效果修正，详见 spec/08 §2.4）
+         + environmentModifier（环境效果修正，详见 spec/08 §4.5）
+         + equipmentModifier（装备属性加成，详见 spec/09 §4.2）
 
 通过条件：最终结果 ≥ 事件 DC
 ```
+
+> **豁免检定变体**：当场景事件 `type == 'saving_throw'` 时，熟练加值不再来自技能，而是来自职业豁免熟练表（详见 spec/08 §3.3）。公式其他部分不变。
 
 ### 6.1 属性修正值计算（SRD 标准）
 

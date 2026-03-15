@@ -3,8 +3,10 @@
 > SSOT for the Primary Cat model, starter selection flow, attribute computation, and onboarding integration.
 > **Status:** Draft
 > **Evidence:** `lib/models/cat.dart`, `lib/models/cat_appearance.dart`, `lib/core/constants/cat_constants.dart`, `lib/services/pixel_cat_renderer.dart`, `docs/all-new-hachimi-dnd/specs/2026-03-15-dnd-integration-design.md §2`
-> **Related:** `docs/all-new-hachimi-dnd/spec/02-dnd-attributes.md`, `docs/architecture/data-model.md`, `docs/architecture/state-management.md`
-> **Changelog:** 2026-03-15 — 初版
+> **Related:** `docs/all-new-hachimi-dnd/spec/02-dnd-attributes.md`, `docs/architecture/data-model.md`, `docs/architecture/state-management.md`, [spec/11-social-and-origins.md](11-social-and-origins.md)
+> **Changelog:**
+> - 2026-03-15 — 初版
+> - 2026-03-15 — 增加 `background` 字段（SRD Backgrounds 适配，详见 spec/11）
 
 ---
 
@@ -108,6 +110,7 @@ class PrimaryCat {
   final CatAppearance appearance;  // 复用现有 CatAppearance
   final String? equippedAccessory;
   final String? playerClass;       // 等级 3 后选择：'ranger'|'wizard'|'cleric'|'bard'|'rogue'|'fighter'
+  final String background;         // 背景出身：'scholar'|'athlete'|'healer'|'performer'（详见 spec/11）
   final DateTime createdAt;
 
   const PrimaryCat({
@@ -119,6 +122,7 @@ class PrimaryCat {
     required this.appearance,
     this.equippedAccessory,
     this.playerClass,
+    required this.background,
     required this.createdAt,
   });
 }
@@ -143,6 +147,7 @@ CREATE TABLE local_primary_cat (
   appearance       TEXT NOT NULL,  -- JSON，CatAppearance.toMap() 序列化
   equipped_accessory TEXT,
   player_class     TEXT,
+  background       TEXT NOT NULL,    -- 'scholar'|'athlete'|'healer'|'performer'（详见 spec/11）
   created_at       INTEGER NOT NULL  -- millisecondsSinceEpoch
 );
 ```

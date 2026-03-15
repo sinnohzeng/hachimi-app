@@ -3,8 +3,10 @@
 > SSOT for 场景卡定义、冒险进度管理、队伍绑定、难度分级、星级评价 的完整行为规格。
 > **Status:** Draft
 > **Evidence:** `lib/models/scene_card.dart`（待创建）, `lib/models/adventure_progress.dart`（待创建）, `lib/services/adventure_service.dart`（待创建）, `lib/providers/adventure_provider.dart`（待创建）, `docs/all-new-hachimi-dnd/specs/2026-03-15-dnd-integration-design.md §5`
-> **Related:** [spec/03-dice-engine.md](03-dice-engine.md), [spec/01-primary-cat.md](01-primary-cat.md), [architecture/data-model.md](../architecture/data-model.md)
-> **Changelog:** 2026-03-15 — 初版；修正场景卡绑定对象从「单只猫」改为「用户/队伍」
+> **Related:** [spec/03-dice-engine.md](03-dice-engine.md), [spec/01-primary-cat.md](01-primary-cat.md), [spec/08-conditions-and-defenses.md](08-conditions-and-defenses.md), [spec/09-inventory-and-items.md](09-inventory-and-items.md), [architecture/data-model.md](../architecture/data-model.md)
+> **Changelog:**
+> - 2026-03-15 — 初版；修正场景卡绑定对象从「单只猫」改为「用户/队伍」
+> - 2026-03-15 — 新增陷阱事件子类型、环境修正器、状态效果追踪（SRD 深度借鉴，详见 spec/08）
 
 ---
 
@@ -457,3 +459,49 @@ SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
 - [ ] 被动感知值在冒险者日志中正确显示
 - [ ] 24 个样板事件文本正确加载（8 × 3 张卡）
 - [ ] 事件文本支持 i18n（通过 JSON 资源文件，非 ARB）
+
+---
+
+## 17. SRD 深度借鉴扩展（Phase 2）
+
+> 以下扩展详见独立 spec 文件，此处仅列出集成钩子。
+
+### 17.1 陷阱事件（详见 spec/08 §方向 5）
+
+SceneEvent 新增 `type` 字段支持 `'trap'` 类型。陷阱事件使用三阶段流程：发现（被动感知）→ 拆除（属性检定）→ 触发（豁免检定）。
+
+```dart
+class SceneEvent {
+  // ... existing fields
+  final String type;              // 'ability_check' | 'saving_throw' | 'trap'
+  final int? trapDetectDc;        // 陷阱：发现所需被动感知
+  final String? trapDisarmAbility; // 陷阱：拆除检定属性
+  final int? trapDisarmDc;        // 陷阱：拆除 DC
+}
+```
+
+### 17.2 环境修正器（详见 spec/08 §4）
+
+SceneCard 新增 `environment` 字段，支持场景级全局修正。
+
+```dart
+class SceneCard {
+  // ... existing fields
+  final String? environment; // null | 'extreme_cold' | 'heavy_rain' | 'blessed_ground' | ...
+}
+```
+
+### 17.3 状态效果追踪（详见 spec/08 §2）
+
+AdventureProgress 新增 `activeConditions` 字段，追踪冒险进行中的临时 Buff/Debuff。
+
+```dart
+class AdventureProgress {
+  // ... existing fields
+  final List<ActiveCondition> activeConditions; // 冒险结束时强制清空
+}
+```
+
+### 17.4 冒险掉落扩展（详见 spec/09 §7.2）
+
+冒险结算时根据结果掉落物品（装备、药水、Trinket），掉落概率表定义在 spec/09 中。
