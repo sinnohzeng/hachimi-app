@@ -9,6 +9,7 @@
 > - 2026-03-15 — 新增陷阱事件子类型、环境修正器、状态效果追踪（SRD 深度借鉴，详见 spec/08）
 > - 2026-03-15 — SharedPreferences 改为 SQLite（D24）；新增 paused/abandoned 决策树（D19）；随机种子策略明确化（D32）；文本总量修正为 528 段；标注 12 张待填充场景卡；i18n 改用 Dart 常量池
 > - 2026-03-15 — 新增图书馆、酒馆、草药园 3 张场景卡完整事件池（共 24 个事件）；待填充场景卡缩减至 9 张
+> - 2026-03-15 — AdventureProgress 同步 data-model.md 完整字段（activeConditions D47、pityCounters、activeDeviceId）；AdventureNotifier 改为 Notifier + NotifierProvider（D50）；region 注释引用 D48；语言数修正为 5 种（D55）；新增 §8.5 冒险中伙伴猫删除处理
 
 ---
 
@@ -83,7 +84,7 @@
 class SceneCard {
   final String id;
   final String name;                    // 场景卡名称（i18n key）
-  final String region;                  // 所属区域（'cat_town' | 'misty_forest' | 'ancient_ruins'）
+  final String region;                  // 所属区域（'cat_town' | 'misty_forest' | 'ancient_ruins'）— D48：使用完整前缀命名，与 data-model.md 统一
   final int requiredLevel;              // 最低用户等级要求
   final List<SceneEvent> eventPool;     // 候选事件池（8-10 个）
   final int eventsPerRun;               // 每次冒险抽取事件数量（3-5 个）
@@ -118,8 +119,12 @@ class AdventureProgress {
   final int successCount;             // 成功（含大成功）事件数量
   final String status;                // 'active' | 'paused' | 'completed' | 'abandoned'
   final int? starRating;              // 完成后计算：1 | 2 | 3（null 表示未完成）
+  final String? activeDeviceId;       // 设备锁定，防止多设备冲突
   final DateTime startedAt;           // 开始时间
   final DateTime? completedAt;        // 完成时间（null 表示未完成）
+  final List<ActiveCondition> activeConditions; // 当前状态效果（Phase 2，Phase 1 = const []）— D47
+  final int pityConsecutiveFailures;  // 保底计数器：连续失败次数（冒险恢复时一并恢复）
+  final int pityConsecutiveNonCrits;  // 保底计数器：连续非大成功次数
 }
 ```
 
@@ -275,6 +280,17 @@ int calculateStarRating(int successCount, int totalEvents) {
 3. **空位无惩罚**：主哈基米可单独冒险，0 伙伴猫合法
 4. **冒险中猫咪心情变化**：心情变化会实时影响下一次骰子的优势/劣势，但不会改变队伍成员
 
+### 8.5 冒险中伙伴猫删除处理
+
+若用户在冒险进行中删除了某个习惯（及其对应的伙伴猫），而该猫在当前冒险的 `partyMemberIds` 快照中：
+
+- **冒险继续**，不中断
+- **已删除猫的 companion bonus 移除**：后续检定不再计算该猫的属性匹配加成和性格优势
+- **partyMemberIds 快照不变**：保持历史审计性，记录冒险开始时的队伍组成
+- **UI 处理**：队伍面板中该猫显示为灰色/半透明，标注"已离队"
+
+> **零惩罚保证**：失去伙伴猫 bonus 不算"惩罚"——用户主动选择了删除习惯，bonus 移除是自然结果。冒险本身的进度和已获星尘完全保留。
+
 ---
 
 ## 9. 可重复性设计
@@ -318,7 +334,7 @@ List<String> drawEvents(List<SceneEvent> pool, int count, Random rng) {
 | 队伍互动对话 | 6×6 性格组合 × 2 | 72 句 |
 | **合计** | | **~528 段** |
 
-每段文本需覆盖所有 15 种语言（`lib/l10n/`），共约 8,460 条 i18n 字符串。
+每段文本需覆盖 5 种语言（en / zh / zh-Hant / ja / ko，D55），共约 2,640 条 i18n 字符串。
 
 ### 10.2 文本工程规范
 
@@ -356,11 +372,16 @@ final availableScenesProvider = Provider<List<SceneCard>>((ref) {
       .toList();
 });
 
-// 冒险操作
+// 冒险操作（D50：统一使用 Riverpod 3.x Notifier API）
 final adventureNotifierProvider =
-    StateNotifierProvider<AdventureNotifier, AdventureState>((ref) {
-  return AdventureNotifier(ref.watch(adventureServiceProvider));
-});
+    NotifierProvider<AdventureNotifier, AdventureState>(
+  AdventureNotifier.new,
+);
+
+class AdventureNotifier extends Notifier<AdventureState> {
+  @override
+  AdventureState build() => const AdventureState.initial();
+}
 ```
 
 ---

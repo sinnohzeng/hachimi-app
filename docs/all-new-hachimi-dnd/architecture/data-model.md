@@ -12,6 +12,7 @@
 > **Evidence:** `lib/models/`、`lib/services/local_database_service.dart`、`firestore.rules`
 > **Related:** [spec/01-primary-cat.md](../spec/01-primary-cat.md) · [spec/03-dice-engine.md](../spec/03-dice-engine.md) · [spec/04-adventure.md](../spec/04-adventure.md)
 > **Changelog:**
+> - 2026-03-15 — 编码前全面修复：新增 ActiveCondition 空壳模型（D47）、region 值统一为完整前缀命名（D48）、background 字段明确 Phase 1 默认语义（D51）、SQLite DDL 补充 active_conditions 列
 > - 2026-03-15 — 审计修复：大版本声明、SceneEvent.type/trap 字段、SceneCard.environment、PrimaryCat 序列化与 lastDiscoveryDate、ActionType 补齐至 18 种、stardustEarned 上限 30、materializedState 结构、SQLite 索引、v1 schema（非迁移）
 > - 2026-03-15 — Fix: 合并 background 字段、AdventureProgress 增加 abandoned 状态与 activeDeviceId、DiceResult 注释修正、新增 SceneDifficultyUnlock 模型、安全规则改为 backend-agnostic、SSOT 声明
 > - 2026-03-15 — 初版（整合自审查修复 + agent 起草）
@@ -38,7 +39,7 @@ class PrimaryCat {
   final CatAppearance appearance;  // 复用现有 CatAppearance
   final String? equippedAccessory;
   final String? playerClass;       // 等级 3 后选择；null = 未选
-  final String background;         // 背景出身：'scholar'|'athlete'|'healer'|'performer'|'adventurer'（默认 'adventurer'）
+  final String background;         // Phase 1 默认 'adventurer'（非用户可选，D51）；Phase 3 提供 4 种可选：'scholar'|'athlete'|'healer'|'performer'
   final Map<int, String> asiChoices;     // {4: 'STR', 8: 'feat:Alert', 12: 'DEX', ...}
   final List<String> selectedFeats;      // ['Alert', 'Lucky']
   final DateTime createdAt;
@@ -141,7 +142,7 @@ abandoned → ×       （终态，不可变）
 class SceneCard {
   final String id;
   final String name;
-  final String region;             // 'town' | 'forest' | 'ruins'
+  final String region;             // 'cat_town' | 'misty_forest' | 'ancient_ruins'（D48：统一完整前缀命名）
   final int requiredLevel;
   final List<SceneEvent> eventPool;
   final int eventsPerRun;
@@ -214,6 +215,24 @@ class SceneDifficultyUnlock {
 }
 ```
 
+### 1.10 ActiveCondition — 状态效果（D47）
+
+```dart
+/// 冒险中的临时 Buff/Debuff 状态效果。
+/// Phase 1 中 AdventureProgress.activeConditions 始终为 const []。
+/// Phase 2 启用后，由 SceneEvent 结果触发，冒险结束时强制清空。
+class ActiveCondition {
+  final String id;                 // UUID
+  final String type;               // 'well_rested' | 'inspired' | 'poisoned' | 'blessed' 等
+  final int? remainingEvents;      // 剩余生效事件数（null = 持续到冒险结束）
+}
+```
+
+> **Phase 1 处理**：`ActiveCondition` 类定义必须存在（Dart 编译需要），但 `AdventureProgress` 构造时传入 `const []`。
+> Phase 2 实现状态效果系统时，在 spec/08-conditions-and-defenses.md 中定义完整的状态效果列表。
+>
+> **序列化**：`activeConditions` 序列化为 JSON 数组存入 SQLite TEXT 列，格式为 `[{"id":"...","type":"...","remainingEvents":3}]`。
+
 ---
 
 ## 2. SQLite Schema
@@ -285,6 +304,7 @@ CREATE TABLE IF NOT EXISTS local_adventure_progress (
   status               TEXT NOT NULL DEFAULT 'active',
   star_rating          INTEGER,
   active_device_id     TEXT,                   -- 设备锁定 ID
+  active_conditions          TEXT NOT NULL DEFAULT '[]',   -- JSON array of ActiveCondition（D47，Phase 1 = '[]'）
   pity_consecutive_failures  INTEGER NOT NULL DEFAULT 0,
   pity_consecutive_non_crits INTEGER NOT NULL DEFAULT 0,
   started_at           TEXT NOT NULL,

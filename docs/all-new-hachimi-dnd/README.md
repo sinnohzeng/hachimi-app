@@ -4,7 +4,9 @@
 > 所有设计变更必须 **先更新文档，再编写代码**。
 >
 > **Status:** Active
-> **Changelog:** 2026-03-15 — 从三份调研报告 + 规格书草稿整合而成
+> **Changelog:**
+> - 2026-03-15 — 编码前全面修复：10 项新决策（D47-D56）、UX 地图、19 项跨文档问题修复
+> - 2026-03-15 — 从三份调研报告 + 规格书草稿整合而成
 
 ---
 
@@ -16,7 +18,7 @@
 | V1 不依赖实时 AI | 所有叙事/对话预生成为本地模板 |
 | 胶水编程 | 拥抱成熟开源轮子（Rive/Flame/fl_chart 等），写好胶水 |
 | 协议红线 | 所有依赖必须开源可商用（MIT/Apache/BSD）。拒绝 GPL/CC-NC |
-| 后端可切换 | 代码和文档不得硬编码任何特定云服务商的 API 或概念。通过 `BackendRegistry` + 8 个 backend 接口实现可切换。中国大陆上线需对接非 Google 云服务 |
+| 后端可切换 | 代码和文档不得硬编码任何特定云服务商的 API 或概念。通过 `BackendRegistry` + 10 个 backend 接口实现可切换（D49：DnD 新增 3 个）。中国大陆上线需对接非 Google 云服务 |
 | SRD 5.2.1 CC-BY-4.0 | 仅使用 SRD 开放规则，署名即可商用 |
 | 美术资产原创 | ClanGen 精灵图（CC BY-NC）不可商用，必须替换为原创 |
 
@@ -36,10 +38,13 @@
 
 | 决策 | 选择 | 理由 | 详见 |
 |------|------|------|------|
-| 猫咪架构 | 主哈基米 + 伙伴猫（路线 C） | 兼具 Finch 情感深度和 Habitica 习惯广度 | [decisions/log.md](decisions/log.md) |
-| Tab 结构 | 保持 3 Tab | 导航简洁，冒险功能通过 Tab 3 子路由承载 | [spec/07-ui-and-navigation.md](spec/07-ui-and-navigation.md) |
-| 渲染引擎 | Phase 0: CustomPainter + PNG → Phase Art: Rive + Flame | Phase 0 用现有管线做占位，Phase Art 切换到 Rive 矢量动画 + Flame 场景引擎 | [art-pipeline.md](architecture/art-pipeline.md) |
-| 金币经济 | 双货币（金币 2/min + 星尘骰子检定） | 三档定价模型已定稿 | [spec/06-economy.md](spec/06-economy.md) |
+| 猫咪架构 | 主哈基米 + 伙伴猫（路线 C） | 兼具 Finch 情感深度和 Habitica 习惯广度 | D1 |
+| Tab 结构 | 保持 3 Tab | 导航简洁，冒险功能通过 Tab 3 子路由承载 | D3 |
+| 渲染引擎 | Phase 0: CustomPainter + PNG → Phase Art: Rive + Flame | Phase 0 用现有管线做占位，Phase Art 切换到 Rive 矢量动画 + Flame 场景引擎 | D9 |
+| 金币经济 | 双货币（金币 2/min + 星尘骰子检定） | 三档定价模型已定稿 | D5 |
+| Backend 拆分 | 3 个独立接口（PrimaryCat + Dice + Adventure） | 匹配项目已有的单职责 Backend 风格 | D49 |
+| Riverpod API | 统一 NotifierProvider + Notifier\<T\> | 弃用 StateNotifier，保持一致性 | D50 |
+| 属性计算 | Provider 编排 + 静态公式方法 | extension getter 无法接受参数 | D52 |
 
 ---
 
@@ -76,7 +81,7 @@
 | [art-pipeline.md](architecture/art-pipeline.md) | 美术资源 + AI 工具链 + 技术选型 + 叙事文本工程化 |
 
 > art-pipeline.md 包含叙事文本 i18n 工程化管线：AI 生成 → 人工审核 → 翻译 → 母语者抽检。
-> ~564 段文本 × 15 语言，打包为 Dart 常量池，运行时零网络依赖。
+> ~528 段文本 × 5 语言（en/zh/zh-Hant/ja/ko，D55），打包为 Dart 常量池，运行时零网络依赖。
 
 ### research/ — 调研归档（"为什么这么决定"）
 
@@ -94,6 +99,13 @@
 | 文件 | 内容 |
 |------|------|
 | [log.md](decisions/log.md) | 所有关键决策 + 理由 + 被否决的替代方案 + 审查记录 |
+
+### audit/ — 审计产出
+
+| 文件 | 内容 |
+|------|------|
+| [ux-map.md](audit/ux-map.md) | 用户体验地图：产品定位 + 用户旅程 + 屏幕清单 + 状态机 + 情感设计 |
+| [change-summary.md](audit/change-summary.md) | 编码前全面修复的变更摘要 |
 
 ### srd/ — SRD 5.2.1 原始参考
 

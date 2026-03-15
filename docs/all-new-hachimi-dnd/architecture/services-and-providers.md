@@ -5,6 +5,7 @@
 > **Evidence:** `lib/services/`、`lib/providers/`、`lib/core/backend/`
 > **Related:** [data-model.md](data-model.md) · [spec/](../spec/)
 > **Changelog:**
+> - 2026-03-15 — 编码前全面修复：Backend 接口拆分为 3 个（D49）、Riverpod API 模式裁定（D50）、PityState 注释修正引用 D43、primaryCatAbilitiesProvider 类型安全修复、设备 ID 策略补充（D54）
 > - 2026-03-15 — 审计修复：PrimaryCatService/AdventureService 完整接口、SceneDifficultyUnlock CRUD、专注完成增强链、Provider 矩阵、缓存机制、成就调用点
 > - 2026-03-15 — 初版
 
@@ -88,7 +89,7 @@ class DiceEngineService {
 **Random 策略**：
 - 生产环境：`Random.secure()`（密码学安全随机数）
 - 单元测试：`Random(42)`（固定种子，可复现）
-- 保底状态（PityState）为实例内部状态，App 重启重置
+- 保底状态（PityState）**持久化到 AdventureProgress**（D43），冒险恢复时一并恢复，不随 App 重启丢失
 
 **与 CoinService 的组合**：
 - 溢出时调用 `_coins.addCoins(uid, 5)` 而非内联金币逻辑
@@ -157,6 +158,11 @@ class AdventureService {
   /// 开始新冒险。
   /// 同场景卡的旧活跃冒险 → paused；不同场景卡的旧活跃冒险 → abandoned。
   /// 原子操作：状态更新旧冒险 + 创建新冒险 + 冻结 Party 快照。
+  ///
+  /// **设备 ID 策略（D54）**：`deviceId` 使用 `const Uuid().v4()` 生成，
+  /// 在 App 生命周期内缓存于内存（Provider 或 Service 实例变量）。
+  /// 用途：防止多设备同时推进同一冒险。另一设备检测到 deviceId 不匹配时，
+  /// 提示用户"是否在此设备继续"。
   Future<AdventureProgress> startAdventure({
     required String uid,
     required SceneCard sceneCard,
@@ -191,6 +197,12 @@ class AdventureService {
   });
 }
 ```
+
+### Riverpod API 模式裁定（D50）
+
+> **所有新增 Provider 统一使用 Riverpod 3.x 的 `Notifier<T>` + `NotifierProvider`**，不再使用已弃用的 `StateNotifier` / `StateNotifierProvider`。
+> spec/03 中的 `DiceRollNotifier` 和 spec/04 中的 `AdventureNotifier` 需相应更新。
+> 只读 Provider（`StreamProvider`、`FutureProvider`、`Provider`）不受影响。
 
 ## 2. 新增 Provider（5 个）
 
@@ -231,53 +243,63 @@ int _xpToLevel(int xp) {
 
 ## 3. Backend 抽象接口
 
-在 `lib/core/backend/adventure_backend.dart` 中定义：
+拆分为 3 个独立接口（D49），匹配项目已有的 7 个单职责 Backend 风格：
 
 ```dart
-abstract class AdventureBackend {
-  // 主哈基米
+/// 主哈基米远端同步接口
+/// 文件：lib/core/backend/primary_cat_backend.dart
+abstract class PrimaryCatBackend {
   Future<void> savePrimaryCat(String uid, PrimaryCat cat);
   Future<PrimaryCat?> loadPrimaryCat(String uid);
+}
 
-  // 待投骰子
+/// 骰子 + 检定结果远端同步接口
+/// 文件：lib/core/backend/dice_backend.dart
+abstract class DiceBackend {
   Future<void> savePendingDice(String uid, PendingDice dice);
   Future<void> deletePendingDice(String uid, String diceId);
   Future<List<PendingDice>> loadPendingDice(String uid);
-
-  // 检定结果
   Future<void> saveDiceResult(String uid, DiceResult result);
   Future<List<DiceResult>> loadDiceResults(String uid, {int limit = 50});
+}
 
-  // 冒险进度
+/// 冒险进度 + 队伍 + 难度解锁远端同步接口
+/// 文件：lib/core/backend/adventure_backend.dart
+abstract class AdventureBackend {
   Future<void> saveAdventureProgress(String uid, AdventureProgress progress);
   Future<AdventureProgress?> loadActiveAdventure(String uid);
-
-  // 队伍
   Future<void> saveParty(String uid, Party party);
   Future<Party?> loadParty(String uid);
-
-  // 场景难度解锁
   Future<void> saveSceneDifficultyUnlock(String uid, SceneDifficultyUnlock unlock);
   Future<SceneDifficultyUnlock?> loadSceneDifficultyUnlock(String uid, String sceneCardId);
   Future<List<SceneDifficultyUnlock>> loadAllSceneDifficultyUnlocks(String uid);
 }
 ```
 
-参考实现：`lib/services/firebase/firebase_adventure_backend.dart`（Firebase 版）。其他后端实现遵循相同的 `AdventureBackend` 接口契约。
+参考实现：
+- `lib/services/firebase/firebase_primary_cat_backend.dart`
+- `lib/services/firebase/firebase_dice_backend.dart`
+- `lib/services/firebase/firebase_adventure_backend.dart`
+
+所有后端实现遵循对应的接口契约。
 
 ### 3.1 BackendRegistry 集成
 
 `AdventureBackend` 必须注册到现有的 `BackendRegistry`（`lib/core/backend/backend_registry.dart`）：
 
 ```dart
-// 在 BackendRegistry 构造函数中新增：
+// 在 BackendRegistry 构造函数中新增 3 个接口（D49）：
 class BackendRegistry {
   // ...现有字段...
-  final AdventureBackend adventureBackend;  // 新增
+  final PrimaryCatBackend primaryCatBackend;   // 新增
+  final DiceBackend diceBackend;               // 新增
+  final AdventureBackend adventureBackend;     // 新增
 
   BackendRegistry({
     // ...现有参数...
-    required this.adventureBackend,  // 新增
+    required this.primaryCatBackend,   // 新增
+    required this.diceBackend,         // 新增
+    required this.adventureBackend,    // 新增
   });
 }
 ```
@@ -287,14 +309,16 @@ class BackendRegistry {
 ```dart
 BackendRegistry(
   // ...现有 backend 实例...
-  adventureBackend: FirebaseAdventureBackend(firestore),  // 新增
+  primaryCatBackend: FirebasePrimaryCatBackend(firestore),   // 新增
+  diceBackend: FirebaseDiceBackend(firestore),               // 新增
+  adventureBackend: FirebaseAdventureBackend(firestore),     // 新增
 );
 ```
 
 **AccountDeletionService 级联**：`account_deletion_service.dart` 的删除编排中必须新增：
-1. 通过 `AdventureBackend` 清理远端主哈基米数据
-2. 通过 `AdventureBackend` 清理远端待投骰子
-3. 通过 `AdventureBackend` 清理远端检定结果
+1. 通过 `PrimaryCatBackend` 清理远端主哈基米数据
+2. 通过 `DiceBackend` 清理远端待投骰子
+3. 通过 `DiceBackend` 清理远端检定结果
 4. 通过 `AdventureBackend` 清理远端冒险进度
 5. 通过 `AdventureBackend` 清理远端队伍数据
 6. 清空本地 DnD 相关 SQLite 表
@@ -456,26 +480,25 @@ final primaryCatAbilitiesProvider = FutureProvider<Map<String, int>>((ref) async
   final streak = ref.read(streakServiceProvider);
   final coverage = ref.read(coverageServiceProvider);
 
-  final [overallRate, longestEverStreak, thirtyDayCoverage] = await Future.wait([
-    completionRate.averageForAllCats(uid, lastN: 30),
-    streak.longestEverAcrossAllHabits(uid),
-    coverage.coverageLastThirtyDays(uid),
-  ]);
+  // 异步查询分别 await，避免 as 强转的运行时类型错误
+  final double overallRate = await completionRate.averageForAllCats(uid, lastN: 30);
+  final int longestEverStreak = await streak.longestEverAcrossAllHabits(uid);
+  final double thirtyDayCoverage = await coverage.coverageLastThirtyDays(uid);
 
   // 心情均值（同步计算）
   final averageCatMood = activeCats.isEmpty
       ? 1.0
       : activeCats.map((c) => _moodToValue(c.computedMood)).reduce((a, b) => a + b) / activeCats.length;
 
-  // 使用 spec/01 中的公式计算各属性
+  // 使用 spec/01 中的公式计算各属性（D52：公式逻辑在 PrimaryCatAbilities 静态方法中）
   return _computeAbilities(
     primaryCat,
     allCatsTotalMinutes: allCatsTotalMinutes,
-    overallCompletionRate: overallRate as double,
-    longestEverStreak: (longestEverStreak as int),
+    overallCompletionRate: overallRate,
+    longestEverStreak: longestEverStreak,
     activeHabitCount: activeHabitCount,
     avgGoalMinutes: avgGoalMinutes,
-    thirtyDayCoverage: thirtyDayCoverage as double,
+    thirtyDayCoverage: thirtyDayCoverage,
     averageCatMood: averageCatMood,
   );
 });

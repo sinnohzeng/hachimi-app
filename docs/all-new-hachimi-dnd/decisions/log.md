@@ -338,3 +338,77 @@
 **日期**：2026-03-15
 **决策**：叙事常量文件从 3 个区域文件（town/forest/ruins）改为 15 个场景卡文件（每卡一个），存放在 `lib/core/constants/adventure_dialogues/` 目录下。
 **理由**：每张场景卡 8-10 事件 × 3 段文本 × 双语 ≈ 50-80 行/卡。按区域合并为 3 文件会导致单文件 240-300 行（虽未违反 800 行红线但不优雅），且修改某张卡时需要在大文件中定位。按场景卡拆分更符合单一职责原则。
+
+---
+
+## 编码前全面修复决策（2026-03-15 架构审查后新增）
+
+> 以下决策来自编码前五轮审计 + architect-reviewer 架构审查，修复了 3 个编译阻塞、8 个设计矛盾、8 个缺失/模糊。
+
+### D47. ActiveCondition 空壳模型定义
+
+**日期**：2026-03-15
+**决策**：在 data-model.md §1.10 新增 `ActiveCondition` 类定义（`{String id, String type, int? remainingEvents}`）。Phase 1 中 `AdventureProgress.activeConditions` 始终为 `const []`，Phase 2 启用完整状态效果系统。
+**理由**：`AdventureProgress` 模型引用了 `List<ActiveCondition>` 类型，但该类型在整个文档体系中未定义。Dart 编译器在 Phase 1 就需要这个类型存在，否则无法编译。空壳定义成本极低（3 个字段），且为 Phase 2 预留了正确的扩展点。
+
+### D48. region 值统一为完整前缀命名
+
+**日期**：2026-03-15
+**决策**：`SceneCard.region` 的值从 `'town'/'forest'/'ruins'` 统一为 `'cat_town'/'misty_forest'/'ancient_ruins'`。
+**理由**：spec/04 中所有 15 张场景卡 ID 均使用 `cat_town_*`、`forest_*`、`ruins_*` 前缀，region 值与 ID 前缀保持一致更具语义性，减少映射歧义。data-model.md 作为 SSOT 同步更新。
+
+### D49. AdventureBackend 拆分为 3 个独立接口
+
+**日期**：2026-03-15
+**决策**：将原始的单一 `AdventureBackend`（13 个方法，6 类数据）拆分为：
+- `PrimaryCatBackend`（2 方法）：主哈基米 CRUD
+- `DiceBackend`（5 方法）：骰子 + 检定结果
+- `AdventureBackend`（6 方法）：冒险进度 + 队伍 + 难度解锁
+
+**理由**：项目已有 7 个独立 Backend 接口（AuthBackend、SyncBackend 等），每个职责单一。一个 13 方法的巨型接口违反了已有的架构模式，增加了 mock 测试复杂度和未来替换成本。拆分后每个接口方法数 ≤ 7，与现有风格一致。
+
+### D50. 所有新增 Provider 统一使用 NotifierProvider
+
+**日期**：2026-03-15
+**决策**：所有新增的有状态 Provider 统一使用 Riverpod 3.x 的 `Notifier<T>` + `NotifierProvider`，不再使用已弃用的 `StateNotifier` / `StateNotifierProvider`。
+**理由**：spec/03 中的 `DiceRollNotifier` 和 spec/04 中的 `AdventureNotifier` 均使用了 `StateNotifierProvider`，与 Riverpod 3.x 的推荐模式矛盾。统一使用新 API 可避免混用两套 Notifier 体系带来的维护成本和心智负担。只读 Provider（`StreamProvider`、`FutureProvider`、`Provider`）不受此决策影响。
+
+### D51. adventurer 为 Phase 1 默认背景
+
+**日期**：2026-03-15
+**决策**：`PrimaryCat.background` 在 Phase 1 默认为 `'adventurer'`，这是**非用户可选的占位值**。Phase 3 启用 spec/11 社交系统后，用户在 Onboarding 中从 4 种可选背景（scholar/athlete/healer/performer）中选择替换。
+**理由**：spec/11 定义了 4 种背景但不包含 `'adventurer'`，data-model.md 默认值却是 `'adventurer'`。此不一致源于 Phase 分期设计——Phase 1 不暴露背景选择 UI，需要一个合理的默认值。`'adventurer'` 作为"通用冒险者"语义上合理，且不提供任何属性加成（区别于 4 种可选背景各 +1），避免了默认值带来的数值偏差。
+
+### D52. PrimaryCatAbilities 计算统一放在 Provider 中
+
+**日期**：2026-03-15
+**决策**：主哈基米属性的完整计算逻辑放在 `primaryCatAbilitiesProvider`（FutureProvider）中。`PrimaryCatAbilities` extension 仅保留**纯函数式的公式逻辑**（静态方法），不使用 getter 风格。
+**理由**：spec/01 原始设计将属性定义为 `extension PrimaryCatAbilities on PrimaryCat` 的 getter（`int get strength`），但 Dart extension getter 无法接受外部参数（`allCatsTotalMinutes` 等需要从 Provider/Service 获取）。实际实现已在 services-and-providers.md 中移到了 Provider 层。统一为"Provider 编排 + extension 公式"模式，消除 spec 与实际实现的矛盾。
+
+### D53. crash 恢复依赖事务原子性，删除两阶段结算描述
+
+**日期**：2026-03-15
+**决策**：以 D40（SQLite 事务原子性保证）为准，删除 spec/08 §1.2 中关于"两阶段结算"和"crash 后自动补发"的描述。
+**理由**：D40 已明确骰子检定的三步操作（删骰子 + 写结果 + 加星尘）在同一 SQLite 事务中执行，事务要么全成功要么全回滚，不存在中间态。spec/08 §1.2 同时描述了两阶段结算和补发逻辑，与 D40 矛盾。保留两套方案会在实现时造成混乱。以 D40 为唯一方案。
+
+### D54. 设备 ID 使用 UUID v4
+
+**日期**：2026-03-15
+**决策**：`AdventureProgress.activeDeviceId` 使用 `const Uuid().v4()` 生成，在 App 生命周期内缓存于内存（Service 实例变量或 Provider）。
+**理由**：设备 ID 用于多设备冲突检测（防止两台设备同时推进同一冒险），不需要持久化到本地存储。UUID v4 保证全局唯一，App 重启后生成新 ID，正好触发冲突检测——如果用户在另一设备已有进行中的冒险，新设备会提示"是否在此设备继续"。
+
+**否决方案**：
+- Android device ID：涉及隐私权限，与 App 功能不匹配
+- 持久化到 SharedPreferences：过度设计，App 重启后重新生成 ID 的行为恰好是期望的
+
+### D55. 叙事文本目标语言修正为 5 种
+
+**日期**：2026-03-15
+**决策**：叙事文本目标语言从 15 种修正为 5 种（en/zh/zh-Hant/ja/ko），与项目实际 ARB 文件支持的语言列表一致。
+**理由**：spec/04 §10.1 原文写"15 种语言"，但项目 `lib/l10n/` 目录下实际只有 5 种语言的 ARB 文件。528 段叙事文本 × 15 语言 = 7,920 条翻译的工作量估算严重偏高。修正后为 528 × 5 = 2,640 条，更符合实际。
+
+### D56. 三个计算 Service 的 SSOT 归属 spec/02
+
+**日期**：2026-03-15
+**决策**：`CompletionRateService`、`StreakService`、`CoverageService` 的唯一权威定义在 spec/02-dnd-attributes.md 中。spec/01-primary-cat.md 仅引用 spec/02 的定义，不重复定义。
+**理由**：这 3 个 Service 同时出现在 spec/01（主哈基米属性输入）和 spec/02（伙伴猫属性 + Service 接口定义）中，导致重复定义和潜在不一致（例如 `averageForAllCats` 方法签名在两个文件中不同）。将 SSOT 归属到 spec/02（属性系统的技术核心），spec/01 改为引用，消除重复。

@@ -9,6 +9,7 @@
 > - 2026-03-15 — 检定公式扩展：新增 conditionModifier + environmentModifier + equipmentModifier；新增豁免检定变体章节（详见 spec/08）
 > - 2026-03-15 — 新增辅助函数定义（_resolveAdvantage、_computeCompanionBonus）；新增 PityState 重启行为说明（D31）；新增批量保底规格；溢出方法名修正为 _coins.addCoins
 > - 2026-03-15 — PityState 从内存存储改为持久化到 AdventureProgress（D31 修正）；crash 后保底进度不再丢失
+> - 2026-03-15 — DiceRollNotifier 改为 Notifier + NotifierProvider（D50）；rollDice/rollAll 签名补充 habitCategory 参数对齐 performCheck
 
 ---
 
@@ -58,7 +59,7 @@ PendingDice 累积于本地 + 远端
 │  ROLL（投掷）                                     │
 │  用户在 /dice-roll 选择 SceneEvent               │
 │  DiceEngineService.rollDice(pendingDiceId,        │
-│    sceneCardId, eventId)                          │
+│    sceneCardId, eventId, habitCategory)           │
 │  → 应用伪随机保底                                 │
 │  → 执行检定公式                                   │
 │  → 生成 DiceResult                               │
@@ -740,6 +741,8 @@ class DiceResult {
 > **批量保底规格（D31）**：`rollAll()` 在处理所有骰子时共享单一 `PityState` 实例。
 > 这意味着如果批内第 1-3 枚骰子连续失败，第 4 枚骰子会触发保底下限 10。
 > 批量投掷不会为每枚骰子重置保底计数器。
+>
+> **签名对齐**：`rollAll()` 内部对每枚骰子调用 `performCheck()`，需传入 `habitCategory`（从 `PendingDice.habitId` 查 `Habit.category` 获得）。签名与 `performCheck` 保持一致。
 
 ---
 
@@ -751,10 +754,15 @@ final pendingDiceProvider = StreamProvider<List<PendingDice>>((ref) {
   return ref.watch(diceServiceProvider).watchPendingDice();
 });
 
-// 投掷操作
-final diceRollNotifierProvider = StateNotifierProvider<DiceRollNotifier, DiceRollState>((ref) {
-  return DiceRollNotifier(ref.watch(diceEngineServiceProvider));
-});
+// 投掷操作（D50：统一使用 Riverpod 3.x Notifier API）
+final diceRollNotifierProvider = NotifierProvider<DiceRollNotifier, DiceRollState>(
+  DiceRollNotifier.new,
+);
+
+class DiceRollNotifier extends Notifier<DiceRollState> {
+  @override
+  DiceRollState build() => const DiceRollState.initial();
+}
 ```
 
 ---

@@ -4,7 +4,12 @@
 > **Status:** Draft
 > **Evidence:** `lib/models/cat.dart`, `lib/models/focus_session.dart`, `lib/models/habit.dart`, `docs/all-new-hachimi-dnd/specs/2026-03-15-dnd-integration-design.md §3`, `docs/all-new-hachimi-dnd/research/comprehensive-analysis.md §9.2–§10.3`
 > **Related:** `docs/all-new-hachimi-dnd/spec/01-primary-cat.md`, `docs/architecture/data-model.md`
-> **Changelog:** 2026-03-15 — 初版
+>
+> **SSOT 归属（D56）**：本文件是 `CompletionRateService`、`StreakService`、`CoverageService` 三个计算服务的**唯一权威定义**。spec/01 中的引用以本文件为准。
+>
+> **Changelog:**
+> - 2026-03-15 — 初版
+> - 2026-03-15 — 新增 SSOT 归属声明（D56）；CompletionRateService.averageForAllCats 补充 uid 参数
 
 ---
 
@@ -334,7 +339,7 @@ class CompletionRateService {
   Future<double> averageForCat(String catId, {int lastN = 30}) async { ... }
 
   /// 返回所有猫咪合并后最近 [lastN] 条的 completionRatio 均值（供 PrimaryCat 使用）。
-  Future<double> averageForAllCats({int lastN = 30}) async { ... }
+  Future<double> averageForAllCats(String uid, {int lastN = 30}) async { ... }
 }
 ```
 

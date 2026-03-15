@@ -7,6 +7,7 @@
 > **Changelog:**
 > - 2026-03-15 — 金币经济从 [待定稿] 升级为完整三档定价模型
 > - 2026-03-15 — 额外骰子每日上限 3 枚（D22）；Remote Config 离线 Fallback（D29）；XP 体系去重引用 spec/05
+> - 2026-03-15 — 代码层变量名/参数名 gold → coins 统一（D41）：Remote Config key、Dart 常量名全部改用 coins 前缀
 
 ---
 
@@ -57,7 +58,7 @@ Hachimi v2.0 采用**双货币体系**：
 3. 骰子的真正价值在星尘（6⭐ 均值），金币补偿仅为避免"浪费感"
 4. 若溢出补偿过高（如 50 🪙），会激励用户故意让骰子满仓再专注以"刷金币"
 
-**设计决策**：维持 5 🪙 / 枚的溢出补偿。通过 Remote Config `dice_overflow_gold` 参数可调。
+**设计决策**：维持 5 🪙 / 枚的溢出补偿。通过 Remote Config `dice_overflow_coins` 参数可调。
 
 ### 2.2 日收入估算
 
@@ -190,12 +191,12 @@ Hachimi v2.0 采用**双货币体系**：
 所有金币收入参数通过 Firebase Remote Config 控制，支持无需更新 App 的动态调整：
 
 ```
-gold_income_rate_per_minute = 2
-gold_checkin_reward = 30
-gold_full_house_reward = 20
-gold_achievement_reward_small = 50
-gold_achievement_reward_large = 200
-gold_dice_overflow_rate = 5
+coins_income_rate_per_minute = 2
+coins_checkin_reward = 30
+coins_full_house_reward = 20
+coins_achievement_reward_small = 50
+coins_achievement_reward_large = 200
+coins_dice_overflow_rate = 5
 ```
 
 物品价格暂时硬编码（Phase 3 实施时评估是否需要 Remote Config）。
@@ -205,12 +206,12 @@ gold_dice_overflow_rate = 5
 所有 Remote Config 参数在 `lib/core/constants/economy_constants.dart` 中有编译期硬编码默认值：
 
 ```dart
-const kDefaultGoldIncomeRatePerMinute = 2;
-const kDefaultGoldCheckinReward = 30;
-const kDefaultGoldFullHouseReward = 20;
-const kDefaultGoldAchievementRewardSmall = 50;
-const kDefaultGoldAchievementRewardLarge = 200;
-const kDefaultGoldDiceOverflowRate = 5;
+const kDefaultCoinsIncomeRatePerMinute = 2;
+const kDefaultCoinsCheckinReward = 30;
+const kDefaultCoinsFullHouseReward = 20;
+const kDefaultCoinsAchievementRewardSmall = 50;
+const kDefaultCoinsAchievementRewardLarge = 200;
+const kDefaultCoinsDiceOverflowRate = 5;
 ```
 
 > **离线优先**：App 启动时尝试拉取 Remote Config。失败时使用编译期默认值。
