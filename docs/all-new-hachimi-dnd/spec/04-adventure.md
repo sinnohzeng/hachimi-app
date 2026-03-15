@@ -378,6 +378,7 @@ SQLite 使用事务（`txn.execute` 批次），Firestore 使用 `WriteBatch`。
 
 ### 设计约束
 - 每日最多触发 1 次发现事件
+  > **"每日"定义**：基于用户本地时区的日历日。每天凌晨 00:00（本地时间）重置发现事件触发资格。使用 `SharedPreferences` key `last_discovery_date` 存储 `yyyy-MM-dd` 格式的上次触发日期。
 - 发现事件在 Tab 2（猫咪酒馆）中以气泡提示展示
 - 触发时有微弱触觉反馈 + 发现音效
 - **Phase 建议**：Phase 2（与冒险系统同步上线）

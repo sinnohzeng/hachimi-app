@@ -58,6 +58,7 @@
 | [05-party-and-class.md](spec/05-party-and-class.md) | 队伍 + 职业 + 用户等级 | Draft | 3 |
 | [06-economy.md](spec/06-economy.md) | 双币种经济 | Draft | 3 |
 | [07-ui-and-navigation.md](spec/07-ui-and-navigation.md) | 导航 + 酒馆 + Onboarding | Draft | 1-3 |
+| [08-operational.md](spec/08-operational.md) | 运营级：离线 + 分析 + 无障碍 + 性能 + 测试 + 安全 | Draft | 1-3 |
 
 ### architecture/ — 技术架构（"怎么建"）
 

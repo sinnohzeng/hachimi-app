@@ -58,20 +58,15 @@ class Party {
 
 - **SQLite**：`local_party` 表，单行（每用户一条记录，upsert by userId）
 - **Firestore**：`users/{uid}/party`（单文档，离线优先，Ledger 模式同步）
-- 冒险开始时，将当前 Party 快照写入 `adventure_progress.partySnapshot`，之后队伍变更不影响进行中的冒险
+- 冒险开始时，将当前队伍的猫咪 ID 列表写入 `AdventureProgress.partyMemberIds`，之后队伍变更不影响进行中的冒险
 
-### 3.3 AdventurePartySnapshot
+### 3.3 队伍快照统一定义
 
-```dart
-class AdventurePartySnapshot {
-  final String primaryCatId;
-  final String? companion1Id;
-  final String? companion2Id;
-  final DateTime lockedAt;
-}
-```
+> **统一定义**：冒险开始时，`AdventureProgress.partyMemberIds` 记录当前队伍的猫咪 ID 列表（`[primaryCatId, companion1Id?, companion2Id?]`）。这是一个 ID 快照，不是完整的 Party 对象副本。冒险期间即使 Party 记录被更新，`partyMemberIds` 不变。
 
-此快照存储于 `AdventureProgress` 中，冒险结算时使用快照数据计算奖励，不使用当前队伍状态。
+`partyMemberIds` 存储于 `AdventureProgress.partyMemberIds`（`List<String>`），冒险结算时使用此列表还原参与猫咪，不引用当前 `local_party` 表的状态。
+
+> **废弃说明**：此前规格草稿中出现的 `AdventurePartySnapshot` 独立类已废弃。所有队伍快照逻辑统一通过 `AdventureProgress.partyMemberIds` 实现，不存在独立的 snapshot 模型。
 
 ---
 
@@ -101,6 +96,8 @@ class AdventurePartySnapshot {
 | 空 Slot | 一个或两个 Slot 为空 | 无惩罚，主哈基米正常检定 |
 
 ### 4.2 属性匹配判断逻辑
+
+> **平局处理**：如果伙伴猫有多个属性并列最高，按 STR→DEX→CON→INT→WIS→CHA 的固定顺序取第一个。这个顺序与 SRD 5.2.1 的标准属性排列一致。
 
 ```dart
 // 伪代码，实现位于 dice_engine_service.dart
@@ -337,6 +334,32 @@ int get userXP => allCats.fold(0, (sum, cat) => sum + cat.totalMinutes);
 ```
 
 注意：此 XP 与现有 `xp_service.dart` 的 XP 体系**相互独立**。现有 XP 包含 `fullHouseBonus` 和 Remote Config 倍率，DnD 等级系统使用**原始分钟数**，以保持简洁可预期。
+
+### XP 系统关系图
+
+Hachimi 有两套独立的 XP 体系，互不干扰：
+
+```
+┌─────────────────────────────────────────────────────┐
+│  冒险等级 XP（Adventure Level XP）                    │
+│  计算：所有猫 totalMinutes 之和 × 职业加成           │
+│  用途：DnD 等级（1-20）、区域解锁、职业选择          │
+│  存储：实时计算，不持久化                             │
+│  受职业加成影响：✅（Ranger +25% physical 等）        │
+├─────────────────────────────────────────────────────┤
+│  现有 XP（xp_service.dart）                          │
+│  计算：分钟 × Remote Config 倍率 + fullHouseBonus    │
+│  用途：成就系统、猫咪等级显示                         │
+│  存储：materialized_state                            │
+│  受职业加成影响：❌（完全独立）                       │
+└─────────────────────────────────────────────────────┘
+```
+
+**职业 XP 加成规则**：
+- 加成只作用于**冒险等级 XP**，不影响现有 xp_service
+- 加成从**选择职业后的首次相关类别专注**开始生效
+- **不回溯**历史 XP
+- 示例：用户在 Lv 3（360 min）选择 Wizard → 之后 mental 类专注 XP ×1.25 → 但前 360 min 不变
 
 ### 9.2 冒险等级表（20 级）
 

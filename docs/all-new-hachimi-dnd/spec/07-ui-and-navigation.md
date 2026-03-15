@@ -100,7 +100,7 @@ Tab 2 的升级**仅限视觉层**，不修改任何业务逻辑：
 │  冒险者档案                         │  ← Section A：PrimaryCat 档案
 │  [头像] 橘子 · Lv.3 · 游侠         │
 │  STR  DEX  CON  INT  WIS  CHA    │
-│  [ 六边形雷达图 CustomPainter ]   │
+│  [ 六边形雷达图 fl_chart RadarChart ] │
 │  被动感知: 14  👁️               │  ← 10 + WIS mod + proficiency
 ├──────────────────────────────────┤
 │  🎲 待投骰子 ×3  [立即投掷]        │  ← Section B：骰子入口
@@ -127,27 +127,12 @@ Tab 2 的升级**仅限视觉层**，不修改任何业务逻辑：
 
 **雷达图技术实现**：
 
-- 使用 `CustomPainter` 绘制正六边形框 + 填充六边形
+> **技术决策**：属性雷达图使用 `fl_chart`（MIT，7090+ likes）的 `RadarChart` 组件。此前"零新依赖"约束已更新为"胶水编程"原则（见 decisions/log.md D9），`fl_chart` 作为 MIT 协议的成熟轮子，符合"用轮子+写胶水"理念。
+
+- 使用 `fl_chart` 的 `RadarChart` 组件渲染正六边形雷达图
 - 坐标系以中心点为原点，6 个顶点分别对应 6 个属性
 - 属性值 10–20 映射为内径 0%–100%
 - 颜色方案：填充色 = `AppTheme.primaryColor.withOpacity(0.3)`，边框色 = `AppTheme.primaryColor`
-- 不依赖 `fl_chart` 库（零新依赖原则），纯 `CustomPainter` 实现
-
-```dart
-// 核心绘制逻辑（伪代码）
-void paint(Canvas canvas, Size size) {
-  final center = Offset(size.width / 2, size.height / 2);
-  final radius = size.width / 2 * 0.8;
-  // 1. 绘制背景六边形网格（3 层：33%、66%、100%）
-  _drawHexGrid(canvas, center, radius);
-  // 2. 绘制属性多边形
-  final points = _buildAttributePoints(abilities, center, radius);
-  _drawFilledPolygon(canvas, points, fillPaint);
-  _drawPolygonBorder(canvas, points, strokePaint);
-  // 3. 绘制属性标签
-  _drawLabels(canvas, center, radius);
-}
-```
 
 ### 4.3 Section B：待投骰子入口
 
@@ -217,6 +202,15 @@ GoRoute(
 | `/class-select` | 无 | — | 弹窗形式，通过 `showDialog` 调用，不作为独立路由 |
 
 注：`/class-select` 使用 `showDialog` 覆盖当前页面（不 push 新路由），避免 Tab 导航被破坏。
+
+### 职业选择触发时机
+
+等级达到 Lv 3 时，通过 `ref.watch(adventureLevelProvider)` 监听触发：
+
+- 如果用户在 **Tab 1/2/3 首页**：弹出模态对话框
+- 如果用户在 **冒险流程中**（`/scene-select`、`/dice-roll` 等）：**不中断**，等当前流程完成后在返回 Tab 时弹出
+- 触发标记持久化在 `SharedPreferences` key `class_select_pending`，防止重复弹出
+- 用户可以稍后在 Tab 3 冒险者档案中手动进入职业选择
 
 ---
 
@@ -340,7 +334,7 @@ class StarterArchetype {
 ```
 AdventureJournalScreen
   ├── AdventurerProfileSection     (Section A)
-  │     └── AbilityRadarChart      (CustomPainter)
+  │     └── AbilityRadarChart      (fl_chart RadarChart)
   ├── PendingDiceSection           (Section B)
   ├── ActiveAdventureSection       (Section C)
   └── AchievementsSummarySection   (Section D)
@@ -383,7 +377,7 @@ Stack(
 ## 10. 验收标准
 
 - [ ] Tab 3 显示冒险者档案，数据来自正确的 PrimaryCat Provider
-- [ ] 雷达图通过 `CustomPainter` 正确渲染 6 个属性值，属性值变化时图形实时更新
+- [ ] 雷达图通过 `fl_chart` `RadarChart` 正确渲染 6 个属性值，属性值变化时图形实时更新
 - [ ] Tab 3 Section B：待投骰子数量实时更新（专注完成后无需手动刷新）
 - [ ] Tab 3 Section C：有进行中冒险时显示进度，无冒险时显示引导入口
 - [ ] Tab 3 Section D：成就列表仍可访问（折叠展开正常）

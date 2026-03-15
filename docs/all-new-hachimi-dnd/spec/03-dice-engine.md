@@ -435,6 +435,34 @@ String _determineOutcome(int naturalRoll, int total, int dc) {
 
 > **SRD 偏离说明**：SRD 5.2.1 中 nat 20/1 仅影响攻击骰和死亡豁免，对能力检定无特殊效果。我们有意扩展了这一规则，将 nat 20 和 nat 1 应用于所有检定，因为这是 D&D 社区最广泛接受的 house rule，也是用户期望的体验。
 
+### 检定结果优先级规则（House Rule）
+
+> **SRD 适配说明**：SRD 5.2.1 中 nat 20/1 仅影响攻击骰。我们将其扩展为所有检定的通用规则，因为这创造了更强的戏剧性和正反馈体验。
+
+**Nat 值始终覆盖数值计算**，优先级如下：
+
+| 情况 | d20 | 修正值 | total vs DC | 结果 | 理由 |
+|------|-----|--------|-------------|------|------|
+| 大成功 | 20 | 任意 | 任意 | `critical_success` | nat 20 覆盖一切 |
+| 大失败 | 1 | 任意 | 任意 | `critical_failure` | nat 1 覆盖一切（但仍给 1⭐，零惩罚） |
+| 超额成功 | 2-19 | 高 | total ≥ DC+10 | `critical_success` | 属性碾压 |
+| 普通成功 | 2-19 | — | total ≥ DC | `success` | 标准检定 |
+| 普通失败 | 2-19 | — | total < DC | `failure` | 标准检定（仍给 3⭐） |
+
+```dart
+String _determineOutcome(int naturalRoll, int total, int dc) {
+  // 第一优先级：nat 值
+  if (naturalRoll == 20) return 'critical_success';
+  if (naturalRoll == 1) return 'critical_failure';
+  // 第二优先级：数值计算
+  if (total >= dc + 10) return 'critical_success';
+  if (total >= dc) return 'success';
+  return 'failure';
+}
+```
+
+**零惩罚保证**：即使 `critical_failure`（nat 1），用户仍获得 1⭐ 星尘 + 搞笑猫咪动画。不会丢失任何已有资源。
+
 ---
 
 ## 11. DiceResult 数据模型
@@ -447,6 +475,7 @@ class DiceResult {
   final String sceneCardId;     // 所属场景卡 ID
   final String eventId;         // 所属事件 ID
   final int naturalRoll;        // d20 原始结果（优势/劣势处理后）
+  // > **明确定义**：`naturalRoll` 是优势/劣势处理**后**的最终 d20 值。如果有优势，投两次取高，`naturalRoll` = 较高值。如果有劣势，取低。这是用户看到的"骰子点数"。
   final int modifier;           // 属性修正值
   final int proficiencyBonus;   // 熟练加值（0 表示不适用）
   final int totalResult;        // 最终结果（含所有加成）

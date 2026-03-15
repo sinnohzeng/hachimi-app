@@ -96,7 +96,40 @@ artboard.node('accessory_collar').isVisible = equippedAccessory == 'collar';
 | 13 层合成管线 | **Phase Art 淘汰** |
 | ClanGen spritesheets | **Phase Art 删除**（CC BY-NC 不可商用） |
 
-### 3.4 推进策略：先逻辑后美术
+### 3.4 CatAppearance → Rive 映射规范（Phase Art）
+
+当从 PNG 管线迁移到 Rive 时，CatAppearance 的 15+ 参数需要映射到 Rive artboard 节点：
+
+| CatAppearance 参数 | Rive 节点类型 | 映射方式 |
+|-------------------|-------------|---------|
+| `peltColor` | Shape fill color | `artboard.fill('pelt_base').color = peltColorToRgb(appearance.peltColor)` |
+| `peltType` | Shape visibility | 切换不同毛色图案图层的可见性 |
+| `eyeColor` | Shape fill color | `artboard.fill('eye_left').color = ...` |
+| `isLonghair` | Shape visibility | 长毛/短毛两组图层互斥显示 |
+| `equippedAccessory` | Shape visibility | 每个配件一个独立图层，通过 `isVisible` 控制 |
+| `whitePatches` | Shape visibility | 白色斑纹图层（可选） |
+
+**简化策略**（Phase Art MVP）：
+- 不复制 677 种精灵组合。Rive 通过**颜色填充替换**实现无限组合
+- 第一版 .riv 文件只支持 6 种基础毛色 + 3 种眼色 + 5 种配件
+- 后续版本逐步扩展到与 CatAppearance 完全对齐
+
+**颜色转换函数**：
+```dart
+// lib/core/art/rive_appearance_mapper.dart
+Color peltColorToRgb(String peltColor) {
+  const map = {
+    'WHITE': Color(0xFFF5F5F5),
+    'PALEGREY': Color(0xFFBDBDBD),
+    'GINGER': Color(0xFFFF8A65),
+    'DARKBROWN': Color(0xFF5D4037),
+    // ... 19 种颜色
+  };
+  return map[peltColor] ?? const Color(0xFF9E9E9E);
+}
+```
+
+### 3.5 推进策略：先逻辑后美术
 
 ```
 Phase 0（当前）: 用 ClanGen 精灵做占位 → 实现所有 DnD 逻辑
@@ -135,6 +168,40 @@ GameWidget<TavernGame>(
   → flame_riverpod 桥接通知 Flame 组件
   → 猫咪 Rive 状态机切换到 'happy'
   → 酒馆场景中猫咪跳跃动画
+```
+
+### 4.3 Flame + GoRouter 共存策略
+
+**Phase 1-2：不引入 Flame**。Tab 2 酒馆使用纯 Flutter UI（背景图 + Rive 猫咪动画 + Flutter Widgets 叠加）。
+
+**Phase 3：引入 Flame**。集成协议：
+
+| 场景 | 处理方式 |
+|------|---------|
+| Tab 切换（离开 Tab 2） | Flame `GameWidget` 调用 `game.paused = true`，暂停游戏循环 |
+| Tab 切换（回到 Tab 2） | `game.paused = false`，恢复游戏循环 |
+| 路由 Push（从 Tab 2 进入子页面） | Flame 暂停，子页面覆盖 |
+| 路由 Pop（返回 Tab 2） | Flame 恢复 |
+| App 进入后台 | `AppLifecycleListener` → `game.paused = true` |
+| App 恢复前台 | `game.paused = false` |
+
+**实现方式**：
+```dart
+class TavernGame extends FlameGame with HasGameRef {
+  bool get shouldPause => !_isVisible;
+  bool _isVisible = true;
+
+  void setVisibility(bool visible) {
+    _isVisible = visible;
+    paused = !visible;
+  }
+}
+
+// 在 HomeScreen 的 TabBar 切换回调中
+onTabChanged: (index) {
+  if (index == 1) tavernGame.setVisibility(true);
+  else tavernGame.setVisibility(false);
+}
 ```
 
 ## 5. 原创美术资产来源

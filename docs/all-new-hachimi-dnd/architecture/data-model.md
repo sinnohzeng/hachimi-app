@@ -22,6 +22,8 @@ class PrimaryCat {
   final CatAppearance appearance;  // 复用现有 CatAppearance
   final String? equippedAccessory;
   final String? playerClass;       // 等级 3 后选择；null = 未选
+  final Map<int, String> asiChoices;     // {4: 'STR', 8: 'feat:Alert', 12: 'DEX', ...}
+  final List<String> selectedFeats;      // ['Alert', 'Lucky']
   final DateTime createdAt;
 }
 ```
@@ -157,6 +159,8 @@ CREATE TABLE IF NOT EXISTS local_primary_cat (
   appearance         TEXT NOT NULL,        -- JSON
   equipped_accessory TEXT,
   player_class       TEXT,
+  asi_choices        TEXT NOT NULL DEFAULT '{}',     -- JSON: Map<int, String>
+  selected_feats     TEXT NOT NULL DEFAULT '[]',     -- JSON: List<String>
   created_at         TEXT NOT NULL,
   UNIQUE(uid)
 );
