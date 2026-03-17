@@ -20,8 +20,8 @@ class AccessoryCard extends StatelessWidget {
     final status = info.isEquipped
         ? l10n.accessoryEquipped
         : info.isOwned
-            ? l10n.accessoryOwned
-            : l10n.coinBalance(info.price);
+        ? l10n.accessoryOwned
+        : l10n.coinBalance(info.price);
 
     return Semantics(
       label: '${info.displayName}, $status',

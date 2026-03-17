@@ -121,7 +121,11 @@ class _HabitCardState extends State<HabitCard> {
                     if (habit.totalCheckInDays > 0)
                       Chip(
                         avatar: const Icon(Icons.calendar_today, size: 14),
-                        label: Text(context.l10n.habitDetailDaysUnit(habit.totalCheckInDays)),
+                        label: Text(
+                          context.l10n.habitDetailDaysUnit(
+                            habit.totalCheckInDays,
+                          ),
+                        ),
                         visualDensity: VisualDensity.compact,
                         side: BorderSide.none,
                       ),

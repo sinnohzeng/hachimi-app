@@ -318,7 +318,12 @@ class PixelCatRenderer {
     image = next;
 
     // Layer 13：饰品
-    next = await _renderAccessories(image, appearance, spriteIndex, accessoryId);
+    next = await _renderAccessories(
+      image,
+      appearance,
+      spriteIndex,
+      accessoryId,
+    );
     if (!identical(next, image)) image.dispose();
     image = next;
 
@@ -364,8 +369,7 @@ class PixelCatRenderer {
         : '$patternSprite${appearance.tortieColor}';
     final maskName = 'tortiemask${appearance.tortiePattern}';
 
-    if (!index.containsKey(tortieSprite) ||
-        !index.containsKey(maskName)) {
+    if (!index.containsKey(tortieSprite) || !index.containsKey(maskName)) {
       return;
     }
 

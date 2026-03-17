@@ -84,8 +84,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
         ),
       ),
       data: (allCats) {
-        final cat =
-            allCats.where((c) => c.id == widget.catId).firstOrNull;
+        final cat = allCats.where((c) => c.id == widget.catId).firstOrNull;
         if (cat == null) {
           return AppScaffold(
             appBar: AppBar(),

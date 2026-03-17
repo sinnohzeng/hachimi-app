@@ -191,7 +191,11 @@ class AdoptionStep2CatPreview extends StatelessWidget {
   }
 
   Widget _buildRefreshButton(
-      BuildContext context, ColorScheme colorScheme, Cat cat, int index) {
+    BuildContext context,
+    ColorScheme colorScheme,
+    Cat cat,
+    int index,
+  ) {
     return Positioned(
       top: -6,
       right: -6,

@@ -82,8 +82,10 @@ class _PixelButtonState extends State<PixelButton>
               child: PixelBorder(
                 fillColor: bg,
                 borderColor: pixel.pixelBorder,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -91,8 +93,10 @@ class _PixelButtonState extends State<PixelButton>
                       Icon(widget.icon, size: 16, color: fg),
                       const SizedBox(width: 6),
                     ],
-                    Text(widget.label,
-                        style: pixel.pixelLabel.copyWith(color: fg)),
+                    Text(
+                      widget.label,
+                      style: pixel.pixelLabel.copyWith(color: fg),
+                    ),
                   ],
                 ),
               ),

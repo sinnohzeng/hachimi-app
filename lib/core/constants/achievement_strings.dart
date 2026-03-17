@@ -448,7 +448,6 @@ class AchievementStrings {
     'cat_all_happy': '所有活跃猫同时开心',
   };
 
-
   // ─── 称号名称 ───
 
   static const Map<String, String> _titleNamesEn = {

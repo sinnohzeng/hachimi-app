@@ -71,8 +71,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         ),
       ),
       data: (allCats) {
-        final cat =
-            allCats.where((c) => c.id == widget.catId).firstOrNull;
+        final cat = allCats.where((c) => c.id == widget.catId).firstOrNull;
         if (cat == null) {
           return AppScaffold(
             appBar: AppBar(),
@@ -138,19 +137,19 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
           // 消息列表
           Expanded(
             child: switch (chatState.status) {
-              ChatStatus.loading =>
-                const Center(child: CircularProgressIndicator()),
+              ChatStatus.loading => const Center(
+                child: CircularProgressIndicator(),
+              ),
               ChatStatus.error when chatState.messages.isEmpty => Center(
-                  child: ErrorState(
-                    message: chatState.error ??
-                        context.l10n.chatErrorGeneric,
-                    onRetry: () => ref.invalidate(
-                      chatNotifierProvider(widget.catId),
-                    ),
-                  ),
+                child: ErrorState(
+                  message: chatState.error ?? context.l10n.chatErrorGeneric,
+                  onRetry: () =>
+                      ref.invalidate(chatNotifierProvider(widget.catId)),
                 ),
+              ),
               ChatStatus.error => _buildMessageList(chatState),
-              _ when chatState.messages.isEmpty &&
+              _
+                  when chatState.messages.isEmpty &&
                       chatState.status != ChatStatus.generating =>
                 _buildEmptyState(textTheme, colorScheme, cat.name),
               _ => _buildMessageList(chatState),
@@ -204,8 +203,8 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     final isGenerating = chatState.status == ChatStatus.generating;
     final isError = chatState.status == ChatStatus.error;
     final partial = chatState.partialResponse;
-    final extraItems = (isGenerating && partial.isNotEmpty ? 1 : 0) +
-        (isError ? 1 : 0);
+    final extraItems =
+        (isGenerating && partial.isNotEmpty ? 1 : 0) + (isError ? 1 : 0);
 
     return ListView.builder(
       controller: _scrollController,

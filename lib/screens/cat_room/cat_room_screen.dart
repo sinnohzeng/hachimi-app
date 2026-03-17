@@ -61,23 +61,27 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
           onRetry: () => ref.invalidate(catsProvider),
         ),
         data: (activeCats) {
-          final (archivedCats, hasArchiveError) =
-              _extractArchivedCats(allCatsAsync);
-          return _buildBody(context, activeCats, archivedCats,
-              hasArchiveError: hasArchiveError);
+          final (archivedCats, hasArchiveError) = _extractArchivedCats(
+            allCatsAsync,
+          );
+          return _buildBody(
+            context,
+            activeCats,
+            archivedCats,
+            hasArchiveError: hasArchiveError,
+          );
         },
       ),
     );
   }
 
   /// 提取归档猫列表。返回 (cats, hasError) — hasError 时 UI 显示 inline 提示。
-  (List<Cat>, bool) _extractArchivedCats(
-    AsyncValue<List<Cat>> allCatsAsync,
-  ) {
+  (List<Cat>, bool) _extractArchivedCats(AsyncValue<List<Cat>> allCatsAsync) {
     final hasError = allCatsAsync is AsyncError;
     final allCats = allCatsAsync.value ?? [];
-    final archived =
-        allCats.where((c) => c.state == CatState.graduated).toList();
+    final archived = allCats
+        .where((c) => c.state == CatState.graduated)
+        .toList();
     return (archived, hasError);
   }
 

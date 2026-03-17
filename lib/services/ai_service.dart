@@ -19,11 +19,8 @@ class AiService {
   final void Function()? onFailure;
   Completer<void>? _inflight;
 
-  AiService({
-    required AiProvider provider,
-    this.onSuccess,
-    this.onFailure,
-  }) : _provider = provider;
+  AiService({required AiProvider provider, this.onSuccess, this.onFailure})
+    : _provider = provider;
 
   /// 当前提供商标识。
   String get providerId => _provider.id;

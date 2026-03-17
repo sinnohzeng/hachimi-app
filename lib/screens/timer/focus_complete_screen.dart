@@ -136,7 +136,10 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
           ? l10n.focusCompleteItsOkay
           : l10n.focusCompleteFocusedFor(widget.minutes);
       SemanticsService.sendAnnouncement(
-          View.of(context), message, Directionality.of(context));
+        View.of(context),
+        message,
+        Directionality.of(context),
+      );
     });
   }
 

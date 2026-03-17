@@ -471,26 +471,26 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             ),
             SafeArea(
               child: FocusTraversalGroup(
-              child: Column(
-                children: [
-                  if (_showPermissionBanner) _buildPermissionBanner(),
-                  _buildHabitHeader(habit, theme),
-                  const Spacer(flex: 2),
-                  _buildCatProgress(cat, timerState, colorScheme),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildTimerDisplay(timerState, theme),
-                  const Spacer(flex: 3),
-                  TimerControls(
-                    status: timerState.status,
-                    mode: timerState.mode,
-                    onStart: _startTimer,
-                    onPause: _pauseTimer,
-                    onResume: _resumeTimer,
-                    onComplete: _completeTimer,
-                  ),
-                  _buildGraceOrGiveUp(timerState, inGracePeriod, theme),
-                ],
-              ),
+                child: Column(
+                  children: [
+                    if (_showPermissionBanner) _buildPermissionBanner(),
+                    _buildHabitHeader(habit, theme),
+                    const Spacer(flex: 2),
+                    _buildCatProgress(cat, timerState, colorScheme),
+                    const SizedBox(height: AppSpacing.lg),
+                    _buildTimerDisplay(timerState, theme),
+                    const Spacer(flex: 3),
+                    TimerControls(
+                      status: timerState.status,
+                      mode: timerState.mode,
+                      onStart: _startTimer,
+                      onPause: _pauseTimer,
+                      onResume: _resumeTimer,
+                      onComplete: _completeTimer,
+                    ),
+                    _buildGraceOrGiveUp(timerState, inGracePeriod, theme),
+                  ],
+                ),
               ),
             ),
           ],

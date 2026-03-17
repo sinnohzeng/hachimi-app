@@ -116,13 +116,17 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
               children: [
                 // Top bar — pinned
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.of(context).pop(),
-                        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
                       ),
                       const Spacer(),
                       Text(

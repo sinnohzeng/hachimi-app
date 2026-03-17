@@ -94,9 +94,7 @@ class DeleteAccountFlow {
                 child: Text(l10n.commonCancel),
               ),
               FilledButton(
-                onPressed: isLoading
-                    ? null
-                    : () => Navigator.of(ctx).pop(true),
+                onPressed: isLoading ? null : () => Navigator.of(ctx).pop(true),
                 child: Text(l10n.deleteAccountContinue),
               ),
             ],

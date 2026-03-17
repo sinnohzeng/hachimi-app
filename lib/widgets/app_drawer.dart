@@ -180,54 +180,54 @@ class _GuestLoginHeader extends StatelessWidget {
             borderRadius: AppShape.borderMedium,
             onTap: onSignIn,
             child: Padding(
-            padding: AppSpacing.paddingBase,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      size: 36,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.guestUpgradeTitle,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          Text(
-                            l10n.drawerGuestLoginSubtitle,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ],
+              padding: AppSpacing.paddingBase,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 36,
+                        color: colorScheme.primary,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: onSignIn,
-                    icon: const Icon(Icons.login),
-                    label: Text(l10n.drawerGuestSignIn),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.guestUpgradeTitle,
+                              style: textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                            Text(
+                              l10n.drawerGuestLoginSubtitle,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: onSignIn,
+                      icon: const Icon(Icons.login),
+                      label: Text(l10n.drawerGuestSignIn),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }

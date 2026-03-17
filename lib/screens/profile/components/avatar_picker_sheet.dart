@@ -122,46 +122,46 @@ class _AvatarTile extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: onTap,
           child: AnimatedContainer(
-          duration: AppMotion.durationShort4,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isSelected
-                ? colorScheme.primaryContainer
-                : avatar.color.withValues(alpha: 0.15),
-            border: isSelected
-                ? Border.all(color: colorScheme.primary, width: 2)
-                : null,
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(
-                avatar.icon,
-                size: 28,
-                color: isSelected ? colorScheme.primary : avatar.color,
-              ),
-              if (isSelected)
-                Positioned(
-                  right: 4,
-                  bottom: 4,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.primary,
-                    ),
-                    child: Icon(
-                      Icons.check,
-                      size: 12,
-                      color: colorScheme.onPrimary,
+            duration: AppMotion.durationShort4,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected
+                  ? colorScheme.primaryContainer
+                  : avatar.color.withValues(alpha: 0.15),
+              border: isSelected
+                  ? Border.all(color: colorScheme.primary, width: 2)
+                  : null,
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  avatar.icon,
+                  size: 28,
+                  color: isSelected ? colorScheme.primary : avatar.color,
+                ),
+                if (isSelected)
+                  Positioned(
+                    right: 4,
+                    bottom: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.primary,
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        size: 12,
+                        color: colorScheme.onPrimary,
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

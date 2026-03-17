@@ -121,13 +121,13 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
       slider: true,
       onIncrease: widget.value < _maxMinutes
           ? () => widget.onChanged(
-                (widget.value + _stepMinutes).clamp(_minMinutes, _maxMinutes),
-              )
+              (widget.value + _stepMinutes).clamp(_minMinutes, _maxMinutes),
+            )
           : null,
       onDecrease: widget.value > _minMinutes
           ? () => widget.onChanged(
-                (widget.value - _stepMinutes).clamp(_minMinutes, _maxMinutes),
-              )
+              (widget.value - _stepMinutes).clamp(_minMinutes, _maxMinutes),
+            )
           : null,
       child: GestureDetector(
         onPanStart: (details) => _handlePanStart(details.localPosition),

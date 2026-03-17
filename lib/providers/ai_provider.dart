@@ -142,7 +142,6 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
         _applyBackoff();
       }
     } catch (e, stack) {
-
       _consecutiveFailures++;
       state = AiAvailability.error;
       _applyBackoff();

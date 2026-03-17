@@ -113,8 +113,8 @@ class CalendarGrid extends StatelessWidget {
         final semanticState = isChecked
             ? ', $checkedInLabel'
             : isToday
-                ? ', $todayLabel'
-                : '';
+            ? ', $todayLabel'
+            : '';
 
         cells.add(
           Expanded(
@@ -129,8 +129,9 @@ class CalendarGrid extends StatelessWidget {
                       ? colorScheme.primary
                       : isWeekendCol
                       ? colorScheme.surfaceContainerHighest.withValues(
-                          alpha:
-                              theme.brightness == Brightness.dark ? 0.8 : 0.5,
+                          alpha: theme.brightness == Brightness.dark
+                              ? 0.8
+                              : 0.5,
                         )
                       : null,
                   border: isToday && !isChecked
