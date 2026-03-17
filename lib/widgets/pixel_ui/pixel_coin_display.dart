@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/pixel_theme_extension.dart';
 
-/// 像素风金币显示 — 16×16 像素金币图标 + Silkscreen 计数。
+/// 金币显示 — 自适应双模式渲染。
+///
+/// - MD3：Material monetization_on 图标 + labelLarge 计数
+/// - Retro：16×16 像素金币 CustomPaint + Silkscreen 计数
 ///
 /// 数值变化时数字向上滚动（里程表效果）。
 class PixelCoinDisplay extends StatelessWidget {
@@ -13,7 +16,44 @@ class PixelCoinDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
 
+  Widget _buildMaterial(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.monetization_on, size: 18, color: scheme.tertiary),
+        const SizedBox(width: 4),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) {
+            return SlideTransition(
+              position: Tween(
+                begin: const Offset(0, 0.5),
+                end: Offset.zero,
+              ).animate(animation),
+              child: FadeTransition(opacity: animation, child: child),
+            );
+          },
+          child: Text(
+            '$amount',
+            key: ValueKey(amount),
+            style: textTheme.labelLarge?.copyWith(
+              color: scheme.tertiary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

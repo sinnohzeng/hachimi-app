@@ -5341,6 +5341,156 @@ abstract class S {
   /// In en, this message translates to:
   /// **'No pressure — come back whenever you\'re ready 🌿'**
   String get notifGentleReengagement;
+
+  /// No description provided for @calendarMon.
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get calendarMon;
+
+  /// No description provided for @calendarTue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get calendarTue;
+
+  /// No description provided for @calendarWed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get calendarWed;
+
+  /// No description provided for @calendarThu.
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get calendarThu;
+
+  /// No description provided for @calendarFri.
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get calendarFri;
+
+  /// No description provided for @calendarSat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get calendarSat;
+
+  /// No description provided for @calendarSun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get calendarSun;
+
+  /// No description provided for @historyWeeklyReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Reviews'**
+  String get historyWeeklyReviews;
+
+  /// No description provided for @historyHappyMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} happy moments'**
+  String historyHappyMoments(int count);
+
+  /// No description provided for @historyWeekRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{startDate} - {endDate}'**
+  String historyWeekRange(String startDate, String endDate);
+
+  /// No description provided for @dailyDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Detail'**
+  String get dailyDetailTitle;
+
+  /// No description provided for @dailyDetailEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Record'**
+  String get dailyDetailEdit;
+
+  /// No description provided for @dailyDetailLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Light'**
+  String get dailyDetailLight;
+
+  /// No description provided for @dailyDetailTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Timeline'**
+  String get dailyDetailTimeline;
+
+  /// No description provided for @dailyDetailNoRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'No record for this day'**
+  String get dailyDetailNoRecord;
+
+  /// No description provided for @dailyDetailGoRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Record'**
+  String get dailyDetailGoRecord;
+
+  /// No description provided for @awarenessStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awareness Stats'**
+  String get awarenessStatsTitle;
+
+  /// No description provided for @awarenessStatsMoodDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood Distribution'**
+  String get awarenessStatsMoodDistribution;
+
+  /// No description provided for @awarenessStatsLightDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Days'**
+  String get awarenessStatsLightDays;
+
+  /// No description provided for @awarenessStatsWeeklyReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get awarenessStatsWeeklyReviews;
+
+  /// No description provided for @awarenessStatsResolutionRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution Rate'**
+  String get awarenessStatsResolutionRate;
+
+  /// No description provided for @awarenessStatsTopTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Tags'**
+  String get awarenessStatsTopTags;
+
+  /// No description provided for @awarenessStatsMonthlyChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Challenge'**
+  String get awarenessStatsMonthlyChallenge;
+
+  /// No description provided for @awarenessStatsStartRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Start recording your first light'**
+  String get awarenessStatsStartRecording;
+
+  /// No description provided for @timelineEventHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened?'**
+  String get timelineEventHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

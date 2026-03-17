@@ -38,27 +38,29 @@ class AdoptionStep2CatPreview extends StatelessWidget {
     final theme = Theme.of(context);
     final cat = _selectedCat;
 
-    return RetroTiledBackground(
-      pattern: PatternType.grid,
-      child: SingleChildScrollView(
-        padding: AppSpacing.paddingLg,
-        child: Column(
-          children: [
-            _buildHeader(theme, context),
-            const SizedBox(height: AppSpacing.lg),
-            if (cat != null) _buildSelectedCatDetail(theme, context, cat),
-            const SizedBox(height: AppSpacing.lg),
-            _buildCatSelectionRow(theme, context),
-            const SizedBox(height: AppSpacing.base),
-            PixelButton(
-              label: context.l10n.adoptionRerollAll,
-              icon: Icons.refresh,
-              onPressed: onRerollAll,
-            ),
-          ],
-        ),
+    final isRetro = context.pixel.isRetro;
+
+    final content = SingleChildScrollView(
+      padding: AppSpacing.paddingLg,
+      child: Column(
+        children: [
+          _buildHeader(theme, context),
+          const SizedBox(height: AppSpacing.lg),
+          if (cat != null) _buildSelectedCatDetail(theme, context, cat),
+          const SizedBox(height: AppSpacing.lg),
+          _buildCatSelectionRow(theme, context),
+          const SizedBox(height: AppSpacing.base),
+          PixelButton(
+            label: context.l10n.adoptionRerollAll,
+            icon: Icons.refresh,
+            onPressed: onRerollAll,
+          ),
+        ],
       ),
     );
+
+    if (!isRetro) return content;
+    return RetroTiledBackground(pattern: PatternType.grid, child: content);
   }
 
   Widget _buildHeader(ThemeData theme, BuildContext context) {

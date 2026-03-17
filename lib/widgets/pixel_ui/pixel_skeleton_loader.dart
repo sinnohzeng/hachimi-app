@@ -11,6 +11,7 @@ import '../../core/theme/pixel_theme_extension.dart';
 ///
 /// 使用帧去重优化：AnimationController 仅在透明度状态切换时触发 rebuild，
 /// 从 ~48 次/800ms 降至 2 次/800ms（24 倍降频）。
+@Deprecated('零屏幕引用，维护期不再维护。')
 class PixelSkeletonLoader extends StatefulWidget {
   const PixelSkeletonLoader({
     super.key,

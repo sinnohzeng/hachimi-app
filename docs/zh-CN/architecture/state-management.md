@@ -188,7 +188,12 @@ ThemeSettings.uiStyle → _skinFor(style) → MaterialSkin | RetroPixelSkin
 | `activeWorriesProvider` | `StreamProvider<List<Worry>>` | 进行中烦恼 |
 | `resolvedWorriesProvider` | `StreamProvider<List<Worry>>` | 已终结烦恼 |
 | `awarenessStatsProvider` | `StreamProvider<Map<String, int>>` | 觉知统计 |
-| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | 月度一点光 |
+| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | 月度一点光；同时为月历网格提供 `Map<int, Mood>` 映射 |
+| `dailyLightByDateProvider` | `FutureProvider.family<DailyLight?, String>` | 按日期查询单日一点光（`yyyy-MM-dd`） |
+| `weeklyReviewsForMonthProvider` | `FutureProvider.family<List<WeeklyReview>, (int, int)>` | 按 (year, month) 查询当月周回顾列表 |
+| `moodDistributionProvider` | `FutureProvider<Map<Mood, int>>` | 心情分布计数，用于统计卡片 |
+
+**文件私有 Provider：** `AwarenessStatsCard` 使用文件私有的 `_tagFrequencyProvider` 从月度一点光数据计算标签频次。该 Provider 不导出，不属于公共 Provider 图。
 
 ### 新增 ActionType 值
 

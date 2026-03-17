@@ -14,6 +14,7 @@ import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/awareness/worry_item_card.dart';
 import 'package:hachimi_app/widgets/awareness/monthly_ritual_card.dart';
 import 'package:hachimi_app/widgets/error_state.dart';
+import 'package:hachimi_app/screens/awareness/awareness_history_screen.dart';
 
 /// 觉知主页 — 三子标签（今天 / 本周 / 回顾）。
 class AwarenessScreen extends ConsumerStatefulWidget {
@@ -62,7 +63,11 @@ class _AwarenessScreenState extends ConsumerState<AwarenessScreen>
         ],
         body: TabBarView(
           controller: _tabController,
-          children: const [_TodaySubTab(), _ThisWeekSubTab(), _ReviewSubTab()],
+          children: const [
+            _TodaySubTab(),
+            _ThisWeekSubTab(),
+            AwarenessHistoryScreen(),
+          ],
         ),
       ),
     );
@@ -296,28 +301,6 @@ class _ThisWeekSubTab extends ConsumerWidget {
         AppFeedback.error(context, context.l10n.awarenessSaveFailed);
       }
     }
-  }
-}
-
-// ─── 回顾 ───
-
-/// 回顾子标签 — Track 4 实现，暂用占位。
-class _ReviewSubTab extends StatelessWidget {
-  const _ReviewSubTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Text(
-        context.l10n.awarenessReviewComingSoon,
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
   }
 }
 

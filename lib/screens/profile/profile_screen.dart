@@ -20,6 +20,7 @@ import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/logout_confirmation.dart';
+import 'package:hachimi_app/widgets/awareness/awareness_stats_card.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 
 import 'components/edit_name_dialog.dart';
@@ -134,9 +135,11 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          const StaggeredListItem(index: 2, child: AwarenessStatsCard()),
+          const SizedBox(height: AppSpacing.lg),
           const Divider(),
           StaggeredListItem(
-            index: 2,
+            index: 3,
             child: ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(l10n.profileSettings),
@@ -147,7 +150,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           if (!isGuest)
             StaggeredListItem(
-              index: 3,
+              index: 4,
               child: ListTile(
                 leading: Icon(Icons.logout, color: theme.colorScheme.error),
                 title: Text(

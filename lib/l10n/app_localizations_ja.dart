@@ -2849,4 +2849,83 @@ class SJa extends S {
   @override
   String get notifGentleReengagement =>
       'No pressure — come back whenever you\'re ready 🌿';
+
+  @override
+  String get calendarMon => 'Mon';
+
+  @override
+  String get calendarTue => 'Tue';
+
+  @override
+  String get calendarWed => 'Wed';
+
+  @override
+  String get calendarThu => 'Thu';
+
+  @override
+  String get calendarFri => 'Fri';
+
+  @override
+  String get calendarSat => 'Sat';
+
+  @override
+  String get calendarSun => 'Sun';
+
+  @override
+  String get historyWeeklyReviews => 'Weekly Reviews';
+
+  @override
+  String historyHappyMoments(int count) {
+    return '$count happy moments';
+  }
+
+  @override
+  String historyWeekRange(String startDate, String endDate) {
+    return '$startDate - $endDate';
+  }
+
+  @override
+  String get dailyDetailTitle => 'Daily Detail';
+
+  @override
+  String get dailyDetailEdit => 'Edit Record';
+
+  @override
+  String get dailyDetailLight => 'Today\'s Light';
+
+  @override
+  String get dailyDetailTimeline => 'Today\'s Timeline';
+
+  @override
+  String get dailyDetailNoRecord => 'No record for this day';
+
+  @override
+  String get dailyDetailGoRecord => 'Go Record';
+
+  @override
+  String get awarenessStatsTitle => 'Awareness Stats';
+
+  @override
+  String get awarenessStatsMoodDistribution => 'Mood Distribution';
+
+  @override
+  String get awarenessStatsLightDays => 'Light Days';
+
+  @override
+  String get awarenessStatsWeeklyReviews => 'Reviews';
+
+  @override
+  String get awarenessStatsResolutionRate => 'Resolution Rate';
+
+  @override
+  String get awarenessStatsTopTags => 'Top Tags';
+
+  @override
+  String get awarenessStatsMonthlyChallenge => 'Monthly Challenge';
+
+  @override
+  String get awarenessStatsStartRecording => 'Start recording your first light';
+
+  @override
+  String get timelineEventHint => 'What happened?';
 }

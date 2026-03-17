@@ -8,6 +8,7 @@ import '../../core/theme/pixel_theme_extension.dart';
 ///
 /// 将圆弧离散化为 N 段直线段，已完成段高亮、未完成段暗淡，
 /// 形成类似 NES/SNES 游戏中的体力条视觉效果。
+@Deprecated('零屏幕引用，维护期不再维护。')
 class PixelProgressRing extends StatelessWidget {
   const PixelProgressRing({
     super.key,

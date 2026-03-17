@@ -6,7 +6,9 @@ import 'pixel_border.dart';
 
 /// 像素风日记条目 — 像素边框 + 日期标签 + 心情徽章 + 正文。
 ///
-/// 取代 CatDiaryScreen 中的 Material Card。
+/// 自适应双模式：
+/// - MD3：标准排版 + 普通分隔线（PixelBorder / PixelBadge 自行适配）
+/// - Retro Pixel：Silkscreen 像素字体 + 虚线分隔线
 class PixelDiaryEntry extends StatelessWidget {
   const PixelDiaryEntry({
     super.key,
@@ -42,6 +44,66 @@ class PixelDiaryEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
+
+  // ---------------------------------------------------------------------------
+  // MD3 模式
+  // ---------------------------------------------------------------------------
+
+  Widget _buildMaterial(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final entry = PixelBorder(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 顶行：日期 + 心情徽章
+          Row(
+            children: [
+              Text(date, style: theme.textTheme.titleSmall),
+              const Spacer(),
+              if (moodEmoji != null && moodName != null)
+                PixelBadge(
+                  text: moodName!,
+                  icon: Text(moodEmoji!, style: const TextStyle(fontSize: 12)),
+                ),
+            ],
+          ),
+
+          // 性格 + 阶段行
+          if (personality != null || stage != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              [personality, stage].whereType<String>().join(' · '),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+
+          // MD3 分隔线
+          const Divider(height: 16),
+
+          // 正文
+          Text(
+            content,
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+          ),
+        ],
+      ),
+    );
+
+    return _wrapTap(entry);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Retro Pixel 模式
+  // ---------------------------------------------------------------------------
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     final theme = Theme.of(context);
 
     final entry = PixelBorder(
@@ -93,8 +155,15 @@ class PixelDiaryEntry extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return entry;
+    return _wrapTap(entry);
+  }
 
+  // ---------------------------------------------------------------------------
+  // 共用：点击包装
+  // ---------------------------------------------------------------------------
+
+  Widget _wrapTap(Widget entry) {
+    if (onTap == null) return entry;
     return Semantics(
       button: true,
       child: GestureDetector(onTap: onTap, child: entry),

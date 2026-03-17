@@ -6,6 +6,7 @@ import '../../core/theme/pixel_theme_extension.dart';
 ///
 /// M3 的 Switch 有圆形 thumb 和圆角 track，无法通过主题级联改为矩形。
 /// 此组件使用 CustomPaint 绘制方形 thumb 在方形 track 中滑动的效果。
+@Deprecated('零屏幕引用，维护期不再维护。')
 class PixelSwitch extends StatelessWidget {
   const PixelSwitch({
     super.key,

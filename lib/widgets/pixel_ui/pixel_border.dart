@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
-/// 像素风阶梯边框 — 用 2px 阶梯角替代圆角，营造复古游戏 UI 感。
+/// 自适应边框容器 — Retro 模式使用阶梯角 CustomPaint，MD3 模式使用圆角 Container。
 ///
 /// 用法：
 /// ```dart
@@ -22,10 +23,10 @@ class PixelBorder extends StatelessWidget {
 
   final Widget child;
 
-  /// 边框颜色 — 默认取 PixelThemeExtension.pixelBorder
+  /// 边框颜色 — Retro 默认 pixelBorder，MD3 默认 outlineVariant
   final Color? borderColor;
 
-  /// 填充色 — 默认取 PixelThemeExtension.retroSurface
+  /// 填充色 — Retro 默认 retroSurface，MD3 默认 surfaceContainerLow
   final Color? fillColor;
 
   /// 边框宽度（像素）
@@ -37,13 +38,28 @@ class PixelBorder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
-    final effectiveBorder = borderColor ?? pixel.pixelBorder;
-    final effectiveFill = fillColor ?? pixel.retroSurface;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
 
+  Widget _buildMaterial(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: padding ?? const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: AppShape.borderMedium,
+        color: fillColor ?? scheme.surfaceContainerLow,
+        border: Border.all(color: borderColor ?? scheme.outlineVariant),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     return CustomPaint(
       painter: _PixelBorderPainter(
-        borderColor: effectiveBorder,
-        fillColor: effectiveFill,
+        borderColor: borderColor ?? pixel.pixelBorder,
+        fillColor: fillColor ?? pixel.retroSurface,
         borderWidth: borderWidth,
       ),
       child: Padding(
@@ -55,8 +71,6 @@ class PixelBorder extends StatelessWidget {
 }
 
 /// 绘制阶梯角矩形 — 四角各裁掉一个 step×step 的小方块。
-///
-/// Paint 对象在构造时缓存，避免 paint() 中分配，降低 GC 压力。
 class _PixelBorderPainter extends CustomPainter {
   _PixelBorderPainter({
     required this.borderColor,
@@ -82,25 +96,23 @@ class _PixelBorderPainter extends CustomPainter {
     canvas.drawPath(path, _strokePaint);
   }
 
-  /// 生成阶梯角路径 — 每个角切掉 step×step 像素。
   Path _steppedPath(Size size, double step) {
     final w = size.width;
     final h = size.height;
 
     return Path()
-      // 左上角 — 从 (step, 0) 开始
       ..moveTo(step, 0)
-      ..lineTo(w - step, 0) // 顶边
-      ..lineTo(w - step, step) // 右上阶梯 ↓
-      ..lineTo(w, step) // 右上阶梯 →
-      ..lineTo(w, h - step) // 右边
-      ..lineTo(w - step, h - step) // 右下阶梯 ←
-      ..lineTo(w - step, h) // 右下阶梯 ↓
-      ..lineTo(step, h) // 底边
-      ..lineTo(step, h - step) // 左下阶梯 ↑
-      ..lineTo(0, h - step) // 左下阶梯 ←
-      ..lineTo(0, step) // 左边
-      ..lineTo(step, step) // 左上阶梯 →
+      ..lineTo(w - step, 0)
+      ..lineTo(w - step, step)
+      ..lineTo(w, step)
+      ..lineTo(w, h - step)
+      ..lineTo(w - step, h - step)
+      ..lineTo(w - step, h)
+      ..lineTo(step, h)
+      ..lineTo(step, h - step)
+      ..lineTo(0, h - step)
+      ..lineTo(0, step)
+      ..lineTo(step, step)
       ..close();
   }
 

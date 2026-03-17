@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/pixel_border_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
 /// 像素风聊天气泡 — 阶梯角边框 + 像素三角尾巴。
 ///
+/// 自适应双模式：
+/// - MD3：圆角容器，无三角尾巴
+/// - Retro Pixel：阶梯角 CustomPaint + 像素三角尾巴
+///
 /// [isUser] = true 时气泡右对齐（主色填充），
-/// false 时左对齐（复古表面色填充 + 猫爪图标前缀）。
+/// false 时左对齐（猫爪图标前缀）。
 class PixelChatBubble extends StatelessWidget {
   const PixelChatBubble({
     super.key,
@@ -24,6 +29,71 @@ class PixelChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
+
+  // ---------------------------------------------------------------------------
+  // MD3 模式
+  // ---------------------------------------------------------------------------
+
+  Widget _buildMaterial(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
+    final bgColor = isUser
+        ? scheme.primaryContainer
+        : scheme.surfaceContainerHigh;
+    final fgColor = isUser ? scheme.onPrimaryContainer : scheme.onSurface;
+
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.75,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: AppShape.borderLarge,
+            color: bgColor,
+          ),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isUser) ...[
+                const ExcludeSemantics(
+                  child: Text('🐾 ', style: TextStyle(fontSize: 12)),
+                ),
+              ],
+              Flexible(
+                child: Text.rich(
+                  TextSpan(
+                    text: text,
+                    children: [
+                      if (isStreaming)
+                        WidgetSpan(child: _BlinkingCursor(color: fgColor)),
+                    ],
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: fgColor,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Retro Pixel 模式
+  // ---------------------------------------------------------------------------
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
 

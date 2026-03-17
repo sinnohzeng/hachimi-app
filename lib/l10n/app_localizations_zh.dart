@@ -2833,6 +2833,85 @@ class SZh extends S {
 
   @override
   String get notifGentleReengagement => '没关系，什么时候回来都好 🌿';
+
+  @override
+  String get calendarMon => '一';
+
+  @override
+  String get calendarTue => '二';
+
+  @override
+  String get calendarWed => '三';
+
+  @override
+  String get calendarThu => '四';
+
+  @override
+  String get calendarFri => '五';
+
+  @override
+  String get calendarSat => '六';
+
+  @override
+  String get calendarSun => '日';
+
+  @override
+  String get historyWeeklyReviews => '周回顾';
+
+  @override
+  String historyHappyMoments(int count) {
+    return '$count个幸福时刻';
+  }
+
+  @override
+  String historyWeekRange(String startDate, String endDate) {
+    return '$startDate - $endDate';
+  }
+
+  @override
+  String get dailyDetailTitle => '每日详情';
+
+  @override
+  String get dailyDetailEdit => '编辑记录';
+
+  @override
+  String get dailyDetailLight => '今日一点光';
+
+  @override
+  String get dailyDetailTimeline => '今日时间轴';
+
+  @override
+  String get dailyDetailNoRecord => '该日未记录';
+
+  @override
+  String get dailyDetailGoRecord => '去记录';
+
+  @override
+  String get awarenessStatsTitle => '觉知统计';
+
+  @override
+  String get awarenessStatsMoodDistribution => '心情分布';
+
+  @override
+  String get awarenessStatsLightDays => '光之日';
+
+  @override
+  String get awarenessStatsWeeklyReviews => '周回顾';
+
+  @override
+  String get awarenessStatsResolutionRate => '解忧率';
+
+  @override
+  String get awarenessStatsTopTags => '高频标签';
+
+  @override
+  String get awarenessStatsMonthlyChallenge => '本月挑战';
+
+  @override
+  String get awarenessStatsStartRecording => '开始记录你的第一点光';
+
+  @override
+  String get timelineEventHint => '发生了什么？';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
