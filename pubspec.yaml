@@ -45,7 +45,7 @@ dependencies:
   flutter_local_notifications: ^20.1.0
 
   # Background timer
-  flutter_foreground_task: ^9.2.0
+  flutter_foreground_task: ^9.2.1
 
   # Connectivity
   connectivity_plus: ^7.0.0
