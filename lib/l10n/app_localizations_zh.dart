@@ -2769,6 +2769,9 @@ class SZhHant extends SZh {
   String get focusCompleteDiaryWritten => '日記寫好喇！';
 
   @override
+  String get focusCompleteDiarySkipped => '日記已跳過';
+
+  @override
   String get focusCompleteNotifTitle => '任務完成！';
 
   @override

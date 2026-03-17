@@ -223,7 +223,7 @@ class SJa extends S {
   String get focusCompleteDiaryWritten => '日記を書きました！';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => '日記をスキップしました';
 
   @override
   String get focusCompleteNotifTitle => 'クエスト完了！';

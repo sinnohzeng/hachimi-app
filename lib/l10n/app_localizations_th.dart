@@ -224,7 +224,7 @@ class STh extends S {
   String get focusCompleteDiaryWritten => 'เขียนไดอารี่แล้ว!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'ข้ามไดอารี่แล้ว';
 
   @override
   String get focusCompleteNotifTitle => 'เควสต์สำเร็จ!';

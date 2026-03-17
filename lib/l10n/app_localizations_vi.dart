@@ -225,7 +225,7 @@ class SVi extends S {
   String get focusCompleteDiaryWritten => 'Đã viết nhật ký!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'Đã bỏ qua nhật ký';
 
   @override
   String get focusCompleteNotifTitle => 'Hoàn thành nhiệm vụ!';

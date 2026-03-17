@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "내 고양이",
   "focusCompleteDiaryWriting": "일기 작성 중...",
   "focusCompleteDiaryWritten": "일기 작성 완료!",
+  "focusCompleteDiarySkipped": "일기 건너뜀",
   "focusCompleteNotifTitle": "퀘스트 완료!",
   "focusCompleteNotifBody": "{catName}이(가) {minutes}분 집중으로 +{xp} XP를 획득했어요",
   "stageKitten": "아기 고양이",

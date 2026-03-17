@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "Kedin",
   "focusCompleteDiaryWriting": "Günlük yazılıyor...",
   "focusCompleteDiaryWritten": "Günlük yazıldı!",
+  "focusCompleteDiarySkipped": "Günlük atlandı",
   "focusCompleteNotifTitle": "Görev tamamlandı!",
   "focusCompleteNotifBody": "{catName} {minutes} dk odaklanarak +{xp} XP kazandı",
   "stageKitten": "Yavru Kedi",

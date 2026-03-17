@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "あなたのネコ",
   "focusCompleteDiaryWriting": "日記を書いています...",
   "focusCompleteDiaryWritten": "日記を書きました！",
+  "focusCompleteDiarySkipped": "日記をスキップしました",
   "focusCompleteNotifTitle": "クエスト完了！",
   "focusCompleteNotifBody": "{catName}が{minutes}分の集中で+{xp} XPを獲得しました",
   "stageKitten": "子猫",

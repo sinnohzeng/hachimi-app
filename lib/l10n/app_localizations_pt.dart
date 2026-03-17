@@ -225,7 +225,7 @@ class SPt extends S {
   String get focusCompleteDiaryWritten => 'Diário escrito!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'Diário ignorado';
 
   @override
   String get focusCompleteNotifTitle => 'Missão completa!';

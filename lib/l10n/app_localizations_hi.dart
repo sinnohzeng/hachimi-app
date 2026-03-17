@@ -224,7 +224,7 @@ class SHi extends S {
   String get focusCompleteDiaryWritten => 'डायरी लिखी गई!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'डायरी छोड़ दी गई';
 
   @override
   String get focusCompleteNotifTitle => 'क्वेस्ट पूरा!';

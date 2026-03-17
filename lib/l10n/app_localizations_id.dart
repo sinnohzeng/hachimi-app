@@ -225,7 +225,7 @@ class SId extends S {
   String get focusCompleteDiaryWritten => 'Diari sudah ditulis!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'Diari dilewati';
 
   @override
   String get focusCompleteNotifTitle => 'Misi selesai!';

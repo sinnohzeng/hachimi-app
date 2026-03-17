@@ -225,7 +225,7 @@ class SIt extends S {
   String get focusCompleteDiaryWritten => 'Diario scritto!';
 
   @override
-  String get focusCompleteDiarySkipped => 'Diary skipped';
+  String get focusCompleteDiarySkipped => 'Diario saltato';
 
   @override
   String get focusCompleteNotifTitle => 'Quest completata!';

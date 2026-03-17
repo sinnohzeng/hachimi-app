@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "Il tuo gatto",
   "focusCompleteDiaryWriting": "Scrittura del diario...",
   "focusCompleteDiaryWritten": "Diario scritto!",
+  "focusCompleteDiarySkipped": "Diario saltato",
   "focusCompleteNotifTitle": "Quest completata!",
   "focusCompleteNotifBody": "{catName} ha guadagnato +{xp} XP con {minutes} min di concentrazione",
   "stageKitten": "Gattino",
