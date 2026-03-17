@@ -199,6 +199,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   @override
   PixelThemeExtension lerp(covariant PixelThemeExtension? other, double t) {
     if (other == null) return this;
+    // 所有字段均为 non-nullable，Color.lerp / TextStyle.lerp 在双参非空时保证返回非空
     return PixelThemeExtension(
       isRetro: t < 0.5 ? isRetro : other.isRetro,
       retroBackground: Color.lerp(retroBackground, other.retroBackground, t)!,

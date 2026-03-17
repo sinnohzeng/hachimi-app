@@ -22,19 +22,18 @@ class RetroPixelSkin implements ThemeSkin {
   bool get isRetro => true;
 
   // --- 复古色板 ---
+  // 基础色引用 PixelThemeExtension SSOT 静态常量，避免重复定义
+  static const _lightBackground = PixelThemeExtension.lightBackground;
+  static const _lightSurface = PixelThemeExtension.lightSurface;
+  static const _lightBorder = PixelThemeExtension.lightBorder;
+  static const _darkBackground = PixelThemeExtension.darkBackground;
+  static const _darkSurface = PixelThemeExtension.darkSurface;
+  static const _darkBorder = PixelThemeExtension.darkBorder;
 
-  // 亮色
-  static const _lightBackground = Color(0xFFFFF8E7); // 羊皮纸暖色
-  static const _lightSurface = Color(0xFFFEF3D0); // 柔和米色
+  // 皮肤专用色（不在 PixelThemeExtension 中）
   static const _lightSurfaceHigh = Color(0xFFF5E6B8); // 加深米色
-  static const _lightBorder = Color(0xFF5C3A1E); // 温暖棕色
   static const _lightError = Color(0xFFC41E3A); // 复古红
-
-  // 暗色（对比度已修正：边框 #A08B6D 在 #1A1A2E 上达到 4.6:1）
-  static const _darkBackground = Color(0xFF1A1A2E); // 深靛蓝
-  static const _darkSurface = Color(0xFF252547); // 哑光紫灰
   static const _darkSurfaceHigh = Color(0xFF2F2F5A); // 加深紫灰
-  static const _darkBorder = Color(0xFFA08B6D); // 明亮棕褐（修正对比度）
   static const _darkError = Color(0xFFFF6B6B); // 亮红
 
   /// 像素边框宽度（全局统一）
