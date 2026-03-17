@@ -39,6 +39,17 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 尊重系统「减少动画」无障碍设置 — 动态响应用户在设置中切换
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();

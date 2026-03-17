@@ -1,31 +1,8 @@
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
+import 'package:hachimi_app/models/xp_result.dart';
 
-/// XP calculation result returned after a focus session.
-/// Still used for timer completion page display.
-class XpResult {
-  final int baseXp;
-  final int fullHouseBonus;
-  final int totalXp;
-
-  const XpResult({
-    required this.baseXp,
-    required this.fullHouseBonus,
-    required this.totalXp,
-  });
-}
-
-/// Stage-up check result (fixed hour ladder: 0/20/100/200h).
-class StageUpResult {
-  final bool didStageUp;
-  final String oldStage;
-  final String newStage;
-
-  const StageUpResult({
-    required this.didStageUp,
-    required this.oldStage,
-    required this.newStage,
-  });
-}
+// Re-export types so existing `import xp_service.dart` still compiles.
+export 'package:hachimi_app/models/xp_result.dart';
 
 /// XpService — pure Dart calculation for focus session rewards
 /// and stage transition detection.

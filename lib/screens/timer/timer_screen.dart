@@ -8,6 +8,7 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/core/constants/session_constants.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
@@ -20,8 +21,8 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:hachimi_app/models/session_rewards.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/xp_service.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/screens/timer/components/timer_controls.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
@@ -212,7 +213,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     if (mounted) _navigateToResult(timerState, habit, minutes, rewards);
   }
 
-  _SessionRewards _calculateRewards(int minutes, Habit habit) {
+  SessionRewards _calculateRewards(int minutes, Habit habit) {
     final coins = minutes * focusRewardCoinsPerMinute;
     final xpService = ref.read(xpServiceProvider);
     final todayMap = ref.read(todayMinutesPerHabitProvider);
@@ -234,14 +235,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
           )
         : null;
 
-    return _SessionRewards(coins: coins, xp: xp, stageUp: stageUp);
+    return SessionRewards(coins: coins, xp: xp, stageUp: stageUp);
   }
 
   FocusSession _buildSessionRecord(
     FocusTimerState timerState,
     Habit habit,
     int minutes,
-    _SessionRewards rewards,
+    SessionRewards rewards,
   ) {
     final modeStr = timerState.mode == TimerMode.countdown
         ? 'countdown'
@@ -265,8 +266,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       targetDurationMinutes: targetMinutes,
       pausedSeconds: timerState.totalPausedSeconds,
       status: timerState.status == TimerStatus.completed
-          ? 'completed'
-          : 'abandoned',
+          ? SessionStatus.completed
+          : SessionStatus.abandoned,
       completionRatio: completionRatio,
       xpEarned: rewards.xp.totalXp,
       coinsEarned: rewards.coins,
@@ -288,7 +289,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     FocusTimerState timerState,
     Habit habit,
     int minutes,
-    _SessionRewards rewards,
+    SessionRewards rewards,
   ) async {
     await ref.read(localSessionRepositoryProvider).logSession(uid, session);
 
@@ -334,7 +335,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     FocusTimerState timerState,
     Habit habit,
     int minutes,
-    _SessionRewards rewards,
+    SessionRewards rewards,
   ) {
     final isCompleted = timerState.status == TimerStatus.completed;
     final isAbandoned = timerState.status == TimerStatus.abandoned;
@@ -374,7 +375,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   void _logSessionAnalytics(
     FocusTimerState timerState,
     int minutes,
-    _SessionRewards rewards,
+    SessionRewards rewards,
   ) {
     final analytics = ref.read(analyticsServiceProvider);
     final targetMinutes = timerState.mode == TimerMode.countdown
@@ -674,13 +675,4 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             ),
     );
   }
-}
-
-/// 会话奖励计算结果 — 在 _saveSession 子方法间传递。
-class _SessionRewards {
-  final int coins;
-  final XpResult xp;
-  final StageUpResult? stageUp;
-
-  const _SessionRewards({required this.coins, required this.xp, this.stageUp});
 }
