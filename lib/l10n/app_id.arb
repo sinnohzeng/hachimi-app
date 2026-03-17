@@ -797,5 +797,13 @@
   "loginShowPassword": "Tampilkan kata sandi",
   "loginHidePassword": "Sembunyikan kata sandi",
   "errorGeneric": "Terjadi kesalahan. Coba lagi nanti",
-  "errorCreateHabit": "Gagal membuat kebiasaan. Coba lagi"
+  "errorCreateHabit": "Gagal membuat kebiasaan. Coba lagi",
+
+  "loginForgotPassword": "Forgot password?",
+  "loginForgotPasswordTitle": "Reset password",
+  "loginSendResetEmail": "Send reset email",
+  "loginResetEmailSent": "Password reset email sent. Check your inbox",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorInvalidEmail": "Please enter a valid email address",
+  "authErrorRequiresRecentLogin": "Please log in again to continue"
 }

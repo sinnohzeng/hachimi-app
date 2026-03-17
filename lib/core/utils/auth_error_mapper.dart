@@ -16,6 +16,9 @@ String mapAuthError(Object error, S l10n) {
       'admin-restricted-operation' => l10n.authErrorAdminRestricted,
       'credential-already-in-use' => l10n.authErrorEmailInUse,
       'weak-password' => l10n.authErrorWeakPassword,
+      'user-disabled' => l10n.authErrorUserDisabled,
+      'invalid-email' => l10n.authErrorInvalidEmail,
+      'requires-recent-login' => l10n.authErrorRequiresRecentLogin,
       _ => l10n.authErrorGeneric,
     };
   }

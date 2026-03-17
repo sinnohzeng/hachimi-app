@@ -169,6 +169,47 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
         );
   }
 
+  Future<void> _showForgotPasswordDialog() async {
+    final l10n = context.l10n;
+    final resetEmailController = TextEditingController(
+      text: _emailController.text.trim(),
+    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.loginForgotPasswordTitle),
+        content: TextField(
+          controller: resetEmailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            labelText: l10n.loginEmail,
+            prefixIcon: const Icon(Icons.email_outlined),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.loginSendResetEmail),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final email = resetEmailController.text.trim();
+    resetEmailController.dispose();
+    if (email.isEmpty) return;
+    try {
+      await ref.read(authBackendProvider).sendPasswordResetEmail(email);
+      if (mounted) AppFeedback.success(context, l10n.loginResetEmailSent);
+    } on Exception catch (e) {
+      if (mounted) AppFeedback.error(context, mapAuthError(e, l10n));
+    }
+  }
+
   bool _shouldResolveConflict(String oldUid, String newUid) {
     if (oldUid == newUid) return false;
     if (widget.linkMode) return true;
@@ -241,8 +282,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                 ChoiceChip(
                                   label: Text(context.l10n.loginLogIn),
                                   selected: _isLogin,
-                                  onSelected: (_) =>
-                                      setState(() => _isLogin = true),
+                                  onSelected: (_) => setState(() {
+                                    _isLogin = true;
+                                    _confirmPasswordController.clear();
+                                  }),
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
                                 ChoiceChip(
@@ -250,8 +293,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                     context.l10n.loginCreateAccountButton,
                                   ),
                                   selected: !_isLogin,
-                                  onSelected: (_) =>
-                                      setState(() => _isLogin = false),
+                                  onSelected: (_) => setState(() {
+                                    _isLogin = false;
+                                    _confirmPasswordController.clear();
+                                  }),
                                 ),
                               ],
                             ),
@@ -270,7 +315,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                               if (value == null || value.isEmpty) {
                                 return context.l10n.loginValidEmail;
                               }
-                              if (!value.contains('@')) {
+                              final emailRegex = RegExp(
+                                r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                              );
+                              if (!emailRegex.hasMatch(value.trim())) {
                                 return context.l10n.loginValidEmailFormat;
                               }
                               return null;
@@ -309,6 +357,17 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                               return null;
                             },
                           ),
+
+                          // Forgot password (login only)
+                          if (_isLogin) ...[
+                            Align(
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: TextButton(
+                                onPressed: _showForgotPasswordDialog,
+                                child: Text(context.l10n.loginForgotPassword),
+                              ),
+                            ),
+                          ],
 
                           // Confirm password (register only)
                           if (!_isLogin) ...[
@@ -401,8 +460,10 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen> {
                                       ? context.l10n.loginRegister
                                       : context.l10n.loginLogIn,
                                   child: GestureDetector(
-                                    onTap: () =>
-                                        setState(() => _isLogin = !_isLogin),
+                                    onTap: () => setState(() {
+                                      _isLogin = !_isLogin;
+                                      _confirmPasswordController.clear();
+                                    }),
                                     child: ExcludeSemantics(
                                       child: Text(
                                         _isLogin

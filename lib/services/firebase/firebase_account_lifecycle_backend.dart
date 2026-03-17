@@ -34,6 +34,7 @@ class FirebaseAccountLifecycleBackend implements AccountLifecycleBackend {
           'wipeUserDataV2',
           options: HttpsCallableOptions(limitedUseAppCheckToken: true),
         )
-        .call(context.toJson());
+        .call(context.toJson())
+        .timeout(_deleteTimeout);
   }
 }

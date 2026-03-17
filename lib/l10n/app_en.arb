@@ -1144,5 +1144,13 @@
   "loginShowPassword": "Show password",
   "loginHidePassword": "Hide password",
   "errorGeneric": "Something went wrong. Try again later",
-  "errorCreateHabit": "Failed to create habit. Try again"
+  "errorCreateHabit": "Failed to create habit. Try again",
+
+  "loginForgotPassword": "Forgot password?",
+  "loginForgotPasswordTitle": "Reset password",
+  "loginSendResetEmail": "Send reset email",
+  "loginResetEmailSent": "Password reset email sent. Check your inbox",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorInvalidEmail": "Please enter a valid email address",
+  "authErrorRequiresRecentLogin": "Please log in again to continue"
 }

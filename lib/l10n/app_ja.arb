@@ -856,5 +856,13 @@
   "loginShowPassword": "パスワードを表示",
   "loginHidePassword": "パスワードを非表示",
   "errorGeneric": "問題が発生しました。しばらくしてからもう一度お試しください",
-  "errorCreateHabit": "習慣の作成に失敗しました。もう一度お試しください"
+  "errorCreateHabit": "習慣の作成に失敗しました。もう一度お試しください",
+
+  "loginForgotPassword": "パスワードを忘れた場合",
+  "loginForgotPasswordTitle": "パスワードをリセット",
+  "loginSendResetEmail": "リセットメールを送信",
+  "loginResetEmailSent": "パスワードリセットメールを送信しました",
+  "authErrorUserDisabled": "このアカウントは無効化されています",
+  "authErrorInvalidEmail": "有効なメールアドレスを入力してください",
+  "authErrorRequiresRecentLogin": "続行するには再度ログインしてください"
 }

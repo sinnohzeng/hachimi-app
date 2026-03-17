@@ -162,9 +162,8 @@ class FirebaseAuthBackend implements AuthBackend {
   }
 
   @override
-  Future<void> deleteAccount() async {
-    await _googleSignIn.signOut();
-    await _auth.currentUser?.delete();
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email).timeout(_authTimeout);
   }
 
   @override

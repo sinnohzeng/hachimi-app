@@ -1099,5 +1099,13 @@
   "loginShowPassword": "显示密码",
   "loginHidePassword": "隐藏密码",
   "errorGeneric": "出了点问题，稍后再试",
-  "errorCreateHabit": "创建习惯失败，请重试"
+  "errorCreateHabit": "创建习惯失败，请重试",
+
+  "loginForgotPassword": "忘记密码？",
+  "loginForgotPasswordTitle": "重置密码",
+  "loginSendResetEmail": "发送重置邮件",
+  "loginResetEmailSent": "密码重置邮件已发送，请查收",
+  "authErrorUserDisabled": "此账号已被停用",
+  "authErrorInvalidEmail": "请输入有效的邮箱地址",
+  "authErrorRequiresRecentLogin": "请重新登录后继续"
 }
