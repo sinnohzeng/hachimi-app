@@ -494,6 +494,12 @@ abstract class S {
   /// **'Diary written!'**
   String get focusCompleteDiaryWritten;
 
+  /// No description provided for @focusCompleteDiarySkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary skipped'**
+  String get focusCompleteDiarySkipped;
+
   /// No description provided for @focusCompleteNotifTitle.
   ///
   /// In en, this message translates to:

@@ -163,6 +163,7 @@
   "focusCompleteYourCat": "Your cat",
   "focusCompleteDiaryWriting": "Writing diary...",
   "focusCompleteDiaryWritten": "Diary written!",
+  "focusCompleteDiarySkipped": "Diary skipped",
   "focusCompleteNotifTitle": "Quest complete!",
   "focusCompleteNotifBody": "{catName} earned +{xp} XP from {minutes}min of focus",
   "@focusCompleteNotifBody": {

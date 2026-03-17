@@ -251,7 +251,7 @@ void main() {
   group('saveState — error resilience', () {
     test('does not throw on save', () async {
       // 正常保存不应抛异常
-      final state = FocusTimerState(
+      const state = FocusTimerState(
         habitId: 'h1',
         catId: 'c1',
         catName: 'Mochi',

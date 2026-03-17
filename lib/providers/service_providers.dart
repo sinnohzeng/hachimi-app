@@ -11,6 +11,7 @@ import 'package:hachimi_app/core/backend/sync_backend.dart';
 import 'package:hachimi_app/core/backend/user_profile_backend.dart';
 import 'package:hachimi_app/services/account_deletion_orchestrator.dart';
 import 'package:hachimi_app/services/account_deletion_service.dart';
+import 'package:hachimi_app/providers/timer_persistence.dart';
 import 'package:hachimi_app/services/account_merge_service.dart';
 import 'package:hachimi_app/services/account_snapshot_service.dart';
 import 'package:hachimi_app/services/analytics_service.dart';
@@ -22,7 +23,7 @@ import 'package:hachimi_app/services/firebase/firebase_crash_backend.dart';
 import 'package:hachimi_app/services/firebase/firebase_remote_config_backend.dart';
 import 'package:hachimi_app/services/firebase/firebase_sync_backend.dart';
 import 'package:hachimi_app/services/firebase/firebase_user_profile_backend.dart';
-import 'package:hachimi_app/services/guest_upgrade_coordinator.dart';
+import 'package:hachimi_app/providers/guest_upgrade_coordinator.dart';
 import 'package:hachimi_app/services/identity_transition_resolver.dart';
 import 'package:hachimi_app/services/inventory_service.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
@@ -155,6 +156,7 @@ final accountDeletionServiceProvider = Provider<AccountDeletionService>((ref) {
   return AccountDeletionService(
     localDb: ref.watch(localDatabaseServiceProvider),
     notifications: ref.watch(notificationServiceProvider),
+    timerPersistence: ref.watch(timerPersistenceProvider),
   );
 });
 

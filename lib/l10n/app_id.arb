@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "Kucingmu",
   "focusCompleteDiaryWriting": "Menulis diari...",
   "focusCompleteDiaryWritten": "Diari sudah ditulis!",
+  "focusCompleteDiarySkipped": "Diari dilewati",
   "focusCompleteNotifTitle": "Misi selesai!",
   "focusCompleteNotifBody": "{catName} mendapat +{xp} XP dari {minutes} mnt fokus",
   "stageKitten": "Anak Kucing",

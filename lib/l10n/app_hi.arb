@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "आपकी बिल्ली",
   "focusCompleteDiaryWriting": "डायरी लिख रहे हैं...",
   "focusCompleteDiaryWritten": "डायरी लिखी गई!",
+  "focusCompleteDiarySkipped": "डायरी छोड़ दी गई",
   "focusCompleteNotifTitle": "क्वेस्ट पूरा!",
   "focusCompleteNotifBody": "{catName} ने {minutes} मिनट फ़ोकस से +{xp} XP कमाया",
   "stageKitten": "बिल्ली का बच्चा",

@@ -8,6 +8,9 @@ import '../../core/theme/pixel_theme_extension.dart';
 ///
 /// M3 的 shimmer 效果是平滑渐变扫过，不符合像素美学。
 /// 此组件使用脉冲虚线矩形，以 2 帧切换透明度模拟 8-bit 加载感。
+///
+/// 使用帧去重优化：AnimationController 仅在透明度状态切换时触发 rebuild，
+/// 从 ~48 次/800ms 降至 2 次/800ms（24 倍降频）。
 class PixelSkeletonLoader extends StatefulWidget {
   const PixelSkeletonLoader({
     super.key,
@@ -32,6 +35,7 @@ class PixelSkeletonLoader extends StatefulWidget {
 class _PixelSkeletonLoaderState extends State<PixelSkeletonLoader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  bool _isHigh = false;
 
   @override
   void initState() {
@@ -40,6 +44,15 @@ class _PixelSkeletonLoaderState extends State<PixelSkeletonLoader>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
+    _controller.addListener(_onTick);
+  }
+
+  /// 帧去重 — 仅在透明度状态跨越 0.5 阈值时触发 rebuild。
+  void _onTick() {
+    final newHigh = _controller.value >= 0.5;
+    if (newHigh != _isHigh) {
+      setState(() => _isHigh = newHigh);
+    }
   }
 
   @override
@@ -55,6 +68,7 @@ class _PixelSkeletonLoaderState extends State<PixelSkeletonLoader>
 
   @override
   void dispose() {
+    _controller.removeListener(_onTick);
     _controller.dispose();
     super.dispose();
   }
@@ -62,91 +76,58 @@ class _PixelSkeletonLoaderState extends State<PixelSkeletonLoader>
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    final opacity = _isHigh ? 0.6 : 0.3;
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        // 2 帧切换：0.3 ↔ 0.6 透明度
-        final opacity = _controller.value < 0.5 ? 0.3 : 0.6;
-        return CustomPaint(
-          size: Size(widget.width ?? double.infinity, widget.height),
-          painter: _DashedRectPainter(
-            color: pixel.pixelBorder.withValues(alpha: opacity),
-            borderWidth: widget.borderWidth,
-            fillColor: pixel.xpBarTrack.withValues(alpha: opacity * 0.5),
-          ),
-        );
-      },
+    return CustomPaint(
+      size: Size(widget.width ?? double.infinity, widget.height),
+      painter: _DashedRectPainter(
+        color: pixel.pixelBorder.withValues(alpha: opacity),
+        borderWidth: widget.borderWidth,
+        fillColor: pixel.xpBarTrack.withValues(alpha: opacity * 0.5),
+      ),
     );
   }
 }
 
 class _DashedRectPainter extends CustomPainter {
-  const _DashedRectPainter({
+  _DashedRectPainter({
     required this.color,
     required this.borderWidth,
     required this.fillColor,
-  });
+  }) : _fillPaint = Paint()..color = fillColor,
+       _strokePaint = Paint()
+         ..color = color
+         ..strokeWidth = borderWidth
+         ..style = PaintingStyle.stroke
+         ..isAntiAlias = false;
 
   final Color color;
   final double borderWidth;
   final Color fillColor;
+  final Paint _fillPaint;
+  final Paint _strokePaint;
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
 
     // 填充
-    canvas.drawRect(rect, Paint()..color = fillColor);
+    canvas.drawRect(rect, _fillPaint);
 
     // 虚线边框
     const dashLen = 4.0;
     const gapLen = 3.0;
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = borderWidth
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = false;
 
-    _drawDashedLine(
-      canvas,
-      rect.topLeft,
-      rect.topRight,
-      paint,
-      dashLen,
-      gapLen,
-    );
-    _drawDashedLine(
-      canvas,
-      rect.topRight,
-      rect.bottomRight,
-      paint,
-      dashLen,
-      gapLen,
-    );
-    _drawDashedLine(
-      canvas,
-      rect.bottomRight,
-      rect.bottomLeft,
-      paint,
-      dashLen,
-      gapLen,
-    );
-    _drawDashedLine(
-      canvas,
-      rect.bottomLeft,
-      rect.topLeft,
-      paint,
-      dashLen,
-      gapLen,
-    );
+    _drawDashedLine(canvas, rect.topLeft, rect.topRight, dashLen, gapLen);
+    _drawDashedLine(canvas, rect.topRight, rect.bottomRight, dashLen, gapLen);
+    _drawDashedLine(canvas, rect.bottomRight, rect.bottomLeft, dashLen, gapLen);
+    _drawDashedLine(canvas, rect.bottomLeft, rect.topLeft, dashLen, gapLen);
   }
 
   void _drawDashedLine(
     Canvas canvas,
     Offset start,
     Offset end,
-    Paint paint,
     double dashLen,
     double gapLen,
   ) {
@@ -154,8 +135,7 @@ class _DashedRectPainter extends CustomPainter {
     final dy = end.dy - start.dy;
     final totalLen = (dx * dx + dy * dy);
     if (totalLen == 0) return;
-    final len = totalLen > 0 ? totalLen : 1.0;
-    final sqrtLen = math.sqrt(len);
+    final sqrtLen = math.sqrt(totalLen);
     final unitDx = dx / sqrtLen;
     final unitDy = dy / sqrtLen;
 
@@ -168,7 +148,7 @@ class _DashedRectPainter extends CustomPainter {
         canvas.drawLine(
           Offset(start.dx + unitDx * drawn, start.dy + unitDy * drawn),
           Offset(start.dx + unitDx * end2, start.dy + unitDy * end2),
-          paint,
+          _strokePaint,
         );
       }
       drawn = end2;

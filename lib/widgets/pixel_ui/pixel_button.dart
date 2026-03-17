@@ -30,6 +30,7 @@ class PixelButton extends StatefulWidget {
 class _PixelButtonState extends State<PixelButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  late final CurvedAnimation _scaleCurve;
   late final Animation<double> _scale;
 
   @override
@@ -39,14 +40,13 @@ class _PixelButtonState extends State<PixelButton>
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
-    _scale = Tween(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _scaleCurve = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _scale = Tween(begin: 1.0, end: 0.95).animate(_scaleCurve);
   }
 
   @override
   void dispose() {
+    _scaleCurve.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -66,6 +66,13 @@ class _PixelButtonState extends State<PixelButton>
     final fg = widget.foregroundColor ?? scheme.onPrimary;
     final enabled = widget.onPressed != null;
 
+    // 用颜色 alpha 替代 Opacity widget — 避免不必要的 GPU 合成层
+    final effectiveBg = enabled ? bg : bg.withValues(alpha: 0.5);
+    final effectiveFg = enabled ? fg : fg.withValues(alpha: 0.5);
+    final effectiveBorder = enabled
+        ? pixel.pixelBorder
+        : pixel.pixelBorder.withValues(alpha: 0.5);
+
     return AnimatedBuilder(
       animation: _scale,
       builder: (context, child) =>
@@ -77,28 +84,22 @@ class _PixelButtonState extends State<PixelButton>
         child: GestureDetector(
           onTap: _handleTap,
           child: ExcludeSemantics(
-            child: Opacity(
-              opacity: enabled ? 1.0 : 0.5,
-              child: PixelBorder(
-                fillColor: bg,
-                borderColor: pixel.pixelBorder,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(widget.icon, size: 16, color: fg),
-                      const SizedBox(width: 6),
-                    ],
-                    Text(
-                      widget.label,
-                      style: pixel.pixelLabel.copyWith(color: fg),
-                    ),
+            child: PixelBorder(
+              fillColor: effectiveBg,
+              borderColor: effectiveBorder,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(widget.icon, size: 16, color: effectiveFg),
+                    const SizedBox(width: 6),
                   ],
-                ),
+                  Text(
+                    widget.label,
+                    style: pixel.pixelLabel.copyWith(color: effectiveFg),
+                  ),
+                ],
               ),
             ),
           ),

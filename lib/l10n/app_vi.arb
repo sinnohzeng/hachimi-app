@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "Mèo của bạn",
   "focusCompleteDiaryWriting": "Đang viết nhật ký...",
   "focusCompleteDiaryWritten": "Đã viết nhật ký!",
+  "focusCompleteDiarySkipped": "Đã bỏ qua nhật ký",
   "focusCompleteNotifTitle": "Hoàn thành nhiệm vụ!",
   "focusCompleteNotifBody": "{catName} nhận +{xp} XP từ {minutes} phút tập trung",
   "stageKitten": "Mèo con",

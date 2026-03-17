@@ -236,62 +236,69 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
     final colorScheme = theme.colorScheme;
     final step1 = _step1Key.currentState;
 
-    return AppScaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.isFirstHabit
-              ? context.l10n.adoptionTitleFirst
-              : context.l10n.adoptionTitleNew,
-        ),
-        leading: _currentStep > 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: _previousStep,
-                tooltip: context.l10n.adoptionBack,
-              )
-            : null,
-      ),
-      body: Column(
-        children: [
-          StepIndicator(
-            currentStep: _currentStep,
-            steps: [
-              context.l10n.adoptionStepDefineQuest,
-              context.l10n.adoptionStepAdoptCat2,
-              context.l10n.adoptionStepNameCat2,
-            ],
+    return PopScope(
+      canPop: _currentStep == 0 && !_isLoading,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _isLoading) return;
+        _previousStep();
+      },
+      child: AppScaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.isFirstHabit
+                ? context.l10n.adoptionTitleFirst
+                : context.l10n.adoptionTitleNew,
           ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                AdoptionStep1Form(
-                  key: _step1Key,
-                  isFirstHabit: widget.isFirstHabit,
-                  nameController: _nameController,
-                  motivationController: _motivationController,
-                ),
-                AdoptionStep2CatPreview(
-                  habitName: _nameController.text.trim(),
-                  previewCats: _previewCats,
-                  selectedCatIndex: _selectedCatIndex,
-                  onSelectCat: (i) => setState(() => _selectedCatIndex = i),
-                  onRegenerateCat: _regenerateSingleCat,
-                  onRerollAll: _generateCats,
-                ),
-                AdoptionStep3NameCat(
-                  selectedCat: _selectedCat,
-                  catNameController: _catNameController,
-                  isUnlimitedMode: step1?.isUnlimitedMode ?? false,
-                  habitName: _nameController.text.trim(),
-                  targetHours: step1?.targetHours ?? 100,
-                ),
+          leading: _currentStep > 0
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _previousStep,
+                  tooltip: context.l10n.adoptionBack,
+                )
+              : null,
+        ),
+        body: Column(
+          children: [
+            StepIndicator(
+              currentStep: _currentStep,
+              steps: [
+                context.l10n.adoptionStepDefineQuest,
+                context.l10n.adoptionStepAdoptCat2,
+                context.l10n.adoptionStepNameCat2,
               ],
             ),
-          ),
-          _buildBottomButton(theme, colorScheme),
-        ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  AdoptionStep1Form(
+                    key: _step1Key,
+                    isFirstHabit: widget.isFirstHabit,
+                    nameController: _nameController,
+                    motivationController: _motivationController,
+                  ),
+                  AdoptionStep2CatPreview(
+                    habitName: _nameController.text.trim(),
+                    previewCats: _previewCats,
+                    selectedCatIndex: _selectedCatIndex,
+                    onSelectCat: (i) => setState(() => _selectedCatIndex = i),
+                    onRegenerateCat: _regenerateSingleCat,
+                    onRerollAll: _generateCats,
+                  ),
+                  AdoptionStep3NameCat(
+                    selectedCat: _selectedCat,
+                    catNameController: _catNameController,
+                    isUnlimitedMode: step1?.isUnlimitedMode ?? false,
+                    habitName: _nameController.text.trim(),
+                    targetHours: step1?.targetHours ?? 100,
+                  ),
+                ],
+              ),
+            ),
+            _buildBottomButton(theme, colorScheme),
+          ],
+        ),
       ),
     );
   }

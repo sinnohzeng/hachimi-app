@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/screens/auth/login_screen.dart';
 
 /// 显示访客升级提示底部弹窗。
 void showGuestUpgradePrompt(BuildContext context, WidgetRef ref) {
@@ -54,11 +54,9 @@ class _GuestUpgradeContent extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(linkMode: true),
-                    ),
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRouter.login, arguments: true);
                 },
                 icon: const Icon(Icons.link),
                 label: Text(l10n.guestUpgradeLinkButton),

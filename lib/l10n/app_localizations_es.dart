@@ -225,6 +225,9 @@ class SEs extends S {
   String get focusCompleteDiaryWritten => '¡Diario escrito!';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diario omitido';
+
+  @override
   String get focusCompleteNotifTitle => '¡Misión completada!';
 
   @override

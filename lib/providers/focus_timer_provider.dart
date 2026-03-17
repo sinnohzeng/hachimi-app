@@ -145,19 +145,6 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     return const FocusTimerState();
   }
 
-  // ─── 向后兼容的静态方法（委托到 TimerPersistence） ───
-
-  /// Check if there's an interrupted session saved in SharedPreferences.
-  static Future<bool> hasInterruptedSession() =>
-      TimerPersistence().hasInterruptedSession();
-
-  /// Get saved session info for the recovery dialog.
-  static Future<Map<String, dynamic>?> getSavedSessionInfo() =>
-      TimerPersistence().getSavedSessionInfo();
-
-  /// Clear saved session data (called when user discards recovery).
-  static Future<void> clearSavedState() => TimerPersistence().clearSavedState();
-
   // ─── 配置 & 恢复 ───
 
   /// Initialize the timer with habit/cat info and duration.

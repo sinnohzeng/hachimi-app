@@ -55,6 +55,11 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   late final AnimationController _contentController;
   late final AnimationController _statsController;
 
+  late final CurvedAnimation _emojiScaleCurve;
+  late final CurvedAnimation _contentOpacityCurve;
+  late final CurvedAnimation _statsSlideCurve;
+  late final CurvedAnimation _statsOpacityCurve;
+
   late final Animation<double> _emojiScale;
   late final Animation<double> _contentOpacity;
   late final Animation<Offset> _statsSlide;
@@ -65,6 +70,7 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   bool _diaryTriggered = false;
   bool _diarySuccess = false;
   bool _diaryGenerating = false;
+  bool _diaryError = false;
 
   @override
   void initState() {
@@ -91,31 +97,37 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
   }
 
   /// 初始化 3 组动画控制器与曲线。
+  ///
+  /// CurvedAnimation 存储为命名字段以确保 dispose 时正确释放。
   void _initAnimations() {
     _emojiController = _createController(AppMotion.durationMedium4);
-    _emojiScale = CurvedAnimation(
+    _emojiScaleCurve = CurvedAnimation(
       parent: _emojiController,
       curve: Curves.elasticOut,
     );
+    _emojiScale = _emojiScaleCurve;
 
     _contentController = _createController(AppMotion.durationMedium2);
-    _contentOpacity = CurvedAnimation(
+    _contentOpacityCurve = CurvedAnimation(
       parent: _contentController,
       curve: AppMotion.standardDecelerate,
     );
+    _contentOpacity = _contentOpacityCurve;
 
     _statsController = _createController(AppMotion.durationMedium4);
-    _statsSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _statsController,
-            curve: AppMotion.emphasized,
-          ),
-        );
-    _statsOpacity = CurvedAnimation(
+    _statsSlideCurve = CurvedAnimation(
+      parent: _statsController,
+      curve: AppMotion.emphasized,
+    );
+    _statsSlide = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(_statsSlideCurve);
+    _statsOpacityCurve = CurvedAnimation(
       parent: _statsController,
       curve: AppMotion.standardDecelerate,
     );
+    _statsOpacity = _statsOpacityCurve;
   }
 
   /// 交错启动三组入场动画。
@@ -163,6 +175,10 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
 
   @override
   void dispose() {
+    _emojiScaleCurve.dispose();
+    _contentOpacityCurve.dispose();
+    _statsSlideCurve.dispose();
+    _statsOpacityCurve.dispose();
     _emojiController.dispose();
     _contentController.dispose();
     _statsController.dispose();
@@ -208,7 +224,12 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
       });
     } catch (e) {
       debugPrint('[DIARY] generation failed: $e');
-      if (mounted) setState(() => _diaryGenerating = false);
+      if (mounted) {
+        setState(() {
+          _diaryGenerating = false;
+          _diaryError = true;
+        });
+      }
     }
   }
 
@@ -439,6 +460,27 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    if (_diaryError)
+                      Padding(
+                        padding: AppSpacing.paddingTopMd,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              l10n.focusCompleteDiarySkipped,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 

@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "แมวของคุณ",
   "focusCompleteDiaryWriting": "กำลังเขียนไดอารี่...",
   "focusCompleteDiaryWritten": "เขียนไดอารี่แล้ว!",
+  "focusCompleteDiarySkipped": "ข้ามไดอารี่แล้ว",
   "focusCompleteNotifTitle": "เควสต์สำเร็จ!",
   "focusCompleteNotifBody": "{catName} ได้ +{xp} XP จากการโฟกัส {minutes} นาที",
   "stageKitten": "ลูกแมว",

@@ -62,6 +62,7 @@
   "focusCompleteYourCat": "你嘅貓咪",
   "focusCompleteDiaryWriting": "正在寫日記⋯",
   "focusCompleteDiaryWritten": "日記寫好喇！",
+  "focusCompleteDiarySkipped": "日記已跳過",
   "focusCompleteNotifTitle": "任務完成！",
   "focusCompleteNotifBody": "{catName} 透過 {minutes} 分鐘專注獲得咗 +{xp} XP",
   "stageKitten": "幼貓",

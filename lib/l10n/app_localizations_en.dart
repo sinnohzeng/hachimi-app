@@ -224,6 +224,9 @@ class SEn extends S {
   String get focusCompleteDiaryWritten => 'Diary written!';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diary skipped';
+
+  @override
   String get focusCompleteNotifTitle => 'Quest complete!';
 
   @override
