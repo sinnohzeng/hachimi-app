@@ -64,7 +64,7 @@ class RetroPixelSkin implements ThemeSkin {
         surfaceContainerHigh: _lightSurfaceHigh,
         surfaceContainerHighest: _lightSurfaceHigh,
         outline: _lightBorder,
-        outlineVariant: _lightBorder.withAlpha(128),
+        outlineVariant: _lightBorder.withValues(alpha: 0.5),
         error: _lightError,
       );
     }
@@ -76,7 +76,7 @@ class RetroPixelSkin implements ThemeSkin {
       surfaceContainerHigh: _darkSurfaceHigh,
       surfaceContainerHighest: _darkSurfaceHigh,
       outline: _darkBorder,
-      outlineVariant: _darkBorder.withAlpha(128),
+      outlineVariant: _darkBorder.withValues(alpha: 0.5),
       error: _darkError,
     );
   }
@@ -168,7 +168,7 @@ class RetroPixelSkin implements ThemeSkin {
   NavigationBarThemeData navigationBarTheme(ColorScheme scheme) {
     return NavigationBarThemeData(
       backgroundColor: scheme.surface,
-      indicatorColor: scheme.primaryContainer.withAlpha(128),
+      indicatorColor: scheme.primaryContainer.withValues(alpha: 0.5),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
     );
   }
@@ -176,7 +176,7 @@ class RetroPixelSkin implements ThemeSkin {
   @override
   NavigationRailThemeData navigationRailTheme(ColorScheme scheme) {
     return NavigationRailThemeData(
-      indicatorColor: scheme.primaryContainer.withAlpha(128),
+      indicatorColor: scheme.primaryContainer.withValues(alpha: 0.5),
       selectedIconTheme: IconThemeData(color: scheme.onPrimaryContainer),
       unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant),
       labelType: NavigationRailLabelType.all,

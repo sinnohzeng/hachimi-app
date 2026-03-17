@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/theme/pixel_border_shape.dart';
+import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// UI 风格选择对话框 — Material 3 与 Retro Pixel 两种模式。
@@ -109,12 +110,15 @@ class _PixelPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: 40,
       height: 32,
       child: CustomPaint(
         painter: _PixelPreviewPainter(
-          fillColor: const Color(0xFFFEF3D0),
+          fillColor: isDark
+              ? PixelThemeExtension.darkSurface
+              : PixelThemeExtension.lightSurface,
           borderColor: colorScheme.outline,
         ),
       ),

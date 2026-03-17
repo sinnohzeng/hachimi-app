@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/pixel_border_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
 /// 像素风徽章 — 用于阶段标签、心情标签、性格标签等。
@@ -56,8 +57,9 @@ class _PixelBadgeState extends State<PixelBadge>
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    final scheme = Theme.of(context).colorScheme;
     final bg = widget.backgroundColor ?? pixel.retroSurface;
-    final fg = widget.textColor ?? pixel.pixelLabel.color ?? Colors.grey;
+    final fg = widget.textColor ?? pixel.pixelLabel.color ?? scheme.onSurfaceVariant;
     final border = pixel.pixelBorder;
 
     Widget badge = CustomPaint(
@@ -96,21 +98,7 @@ class _BadgePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const step = 3.0;
-    final path = Path()
-      ..moveTo(step, 0)
-      ..lineTo(size.width - step, 0)
-      ..lineTo(size.width - step, step)
-      ..lineTo(size.width, step)
-      ..lineTo(size.width, size.height - step)
-      ..lineTo(size.width - step, size.height - step)
-      ..lineTo(size.width - step, size.height)
-      ..lineTo(step, size.height)
-      ..lineTo(step, size.height - step)
-      ..lineTo(0, size.height - step)
-      ..lineTo(0, step)
-      ..lineTo(step, step)
-      ..close();
+    final path = PixelBorderShape.steppedPath(Offset.zero & size, 3.0);
 
     canvas.drawPath(path, Paint()..color = fillColor);
     canvas.drawPath(

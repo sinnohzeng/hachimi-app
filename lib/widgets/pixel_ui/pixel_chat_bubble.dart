@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/pixel_border_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
 /// 像素风聊天气泡 — 阶梯角边框 + 像素三角尾巴。
@@ -153,21 +154,7 @@ class _BubblePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const step = 4.0;
-    final path = Path()
-      ..moveTo(step, 0)
-      ..lineTo(size.width - step, 0)
-      ..lineTo(size.width - step, step)
-      ..lineTo(size.width, step)
-      ..lineTo(size.width, size.height - step)
-      ..lineTo(size.width - step, size.height - step)
-      ..lineTo(size.width - step, size.height)
-      ..lineTo(step, size.height)
-      ..lineTo(step, size.height - step)
-      ..lineTo(0, size.height - step)
-      ..lineTo(0, step)
-      ..lineTo(step, step)
-      ..close();
+    final path = PixelBorderShape.steppedPath(Offset.zero & size, 4.0);
 
     canvas.drawPath(path, Paint()..color = fillColor);
     canvas.drawPath(

@@ -27,6 +27,7 @@ class PixelSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    final scheme = Theme.of(context).colorScheme;
     final active = activeColor ?? pixel.pixelSuccess;
     final inactive = inactiveColor ?? pixel.xpBarTrack;
     final border = pixel.pixelBorder;
@@ -52,7 +53,7 @@ class PixelSwitch extends StatelessWidget {
               width: 16,
               height: 16,
               margin: const EdgeInsets.all(1),
-              color: value ? Colors.white : border,
+              color: value ? scheme.onPrimary : border,
             ),
           ),
         ),
