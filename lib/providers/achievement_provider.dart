@@ -157,13 +157,12 @@ final newlyUnlockedProvider =
     );
 
 /// 成就评估器工厂 — 用于 app.dart 启动引擎，避免直接导入 Service。
-AchievementEvaluator createAchievementEvaluator(Ref ref) {
-  return AchievementEvaluator(
-    ledger: ref.read(ledgerServiceProvider),
-    onUnlocked: (ids) {
-      ref.read(newlyUnlockedProvider.notifier).addAll(ids);
-    },
-  );
+/// 接受显式依赖而非 Ref，兼容 Provider/Widget 两种上下文。
+AchievementEvaluator createAchievementEvaluator({
+  required LedgerService ledger,
+  required void Function(List<String> ids) onUnlocked,
+}) {
+  return AchievementEvaluator(ledger: ledger, onUnlocked: onUnlocked);
 }
 
 /// 成就进度数据

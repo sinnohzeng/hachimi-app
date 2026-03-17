@@ -21,7 +21,6 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
-import 'package:hachimi_app/models/xp_result.dart';
 import 'package:hachimi_app/models/session_rewards.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
@@ -677,4 +676,3 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
   }
 }
-

@@ -406,7 +406,10 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
   /// 初始化成就评估器 — 纯本地，不需要网络。
   void _initAchievementEvaluator(String uid) {
-    final evaluator = createAchievementEvaluator(ref);
+    final evaluator = createAchievementEvaluator(
+      ledger: ref.read(ledgerServiceProvider),
+      onUnlocked: (ids) => ref.read(newlyUnlockedProvider.notifier).addAll(ids),
+    );
     _evaluator?.stop();
     _evaluator = evaluator;
     evaluator.start(uid);
@@ -535,7 +538,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   /// 为单个 habit 调度提醒通知。
   Future<void> _scheduleHabitReminder(
     Habit habit,
-    dynamic notifService,
+    NotificationService notifService,
     List<Cat> cats,
     S l10n,
     String fallbackCatName,

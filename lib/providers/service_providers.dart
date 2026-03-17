@@ -31,6 +31,8 @@ import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/local_habit_repository.dart';
 import 'package:hachimi_app/services/local_session_repository.dart';
 import 'package:hachimi_app/services/notification_service.dart';
+export 'package:hachimi_app/services/notification_service.dart'
+    show NotificationService;
 import 'package:hachimi_app/services/sync_engine.dart';
 import 'package:hachimi_app/services/user_profile_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
