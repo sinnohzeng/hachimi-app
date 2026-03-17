@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Migliorato: Affidabilità del timer di concentrazione con migliore architettura di salvataggio sessione
-- Migliorato: Prevenuto doppio tocco sul pulsante Avvia durante il controllo permessi
-- Migliorato: Qualità del codice interno con 1288 righe di nuova copertura test
+- Tema pixel più fluido con meno cali di frame
+- Correzione perdite di memoria per maggiore stabilità
+- Miglior contrasto colori per accessibilità (WCAG 2.1 AA)
+- UX: protezione tasto indietro nell'adozione, feedback errori

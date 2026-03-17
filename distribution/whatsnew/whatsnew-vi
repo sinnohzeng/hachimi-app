@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Cải thiện: Độ tin cậy bộ hẹn giờ tập trung với kiến trúc lưu phiên tốt hơn
-- Cải thiện: Ngăn chạm đúp nút Bắt đầu khi kiểm tra quyền
-- Cải thiện: Chất lượng mã nội bộ với 1288 dòng kiểm thử mới
+- Giao diện pixel mượt hơn, ít giật lag hơn
+- Sửa lỗi rò rỉ bộ nhớ, ổn định hơn khi dùng lâu
+- Cải thiện độ tương phản màu sắc (WCAG 2.1 AA)
+- UX: bảo vệ nút quay lại khi nhận nuôi, phản hồi lỗi tốt hơn

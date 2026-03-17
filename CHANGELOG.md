@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.34.0] - 2026-03-17
+
+### Performance
+- **像素主题掉帧根治**：`RetroTiledBackground` 从 `toImageSync` 改为异步 `toImage`，页面转场不再阻塞 GPU
+- **移除静态 RepaintBoundary**：`PixelBorder` 不再为静态装饰创建独立 GPU 合成层，滚动性能大幅提升
+- **骨架屏 24 倍降频**：`PixelSkeletonLoader` 从 ~48 次/800ms rebuild 降至 2 次/800ms
+- **CustomPaint child 提取**：`PixelLoadingIndicator` 的 CustomPaint 只构建一次，builder 仅包装 Transform.rotate
+- **Paint 对象缓存**：`PixelBorderShape`、`PixelBorder`、`PixelLoadingIndicator` 的 Paint 对象在构造时缓存
+- **去除 Opacity widget**：`PixelButton` 禁用态改用颜色 alpha，消除不必要的 GPU 合成层
+
+### Fixed
+- **CurvedAnimation 内存泄漏**：修复 `StaggeredListItem`、`FocusCompleteScreen`、`PixelButton` 中 CurvedAnimation 未 dispose
+- **CelebrationOverlay 帧分配**：5 个 `Tween.animate()` 从 build() 移到 initState，避免每帧创建新对象
+- **日记生成错误反馈**：`FocusCompleteScreen` 失败时显示「已跳过」而非空白
+- **删除等待进度可见**：`PendingDeletionScreen` 始终显示 abandon 按钮 + 重试计数
+
+### Changed
+- **架构层依赖纯净化**：`AccountDeletionService` 去除 Provider 导入，通过构造函数注入 `TimerPersistence`
+- **GuestUpgradeCoordinator 迁移**：从 `services/` 移至 `providers/`（含 BuildContext 的 UI 协调逻辑）
+- **导航统一**：`GuestUpgradePrompt` 从直接 `Navigator.push` 改为 `AppRouter.pushNamed`
+- **Tab 状态保持**：`HomeScreen` 从 `PageTransitionSwitcher` 改为 `IndexedStack`，切换标签保持滚动位置
+
+### Added
+- **PopScope 返回保护**：`AdoptionFlowScreen` Step 1+ 按返回键回退上一步而非退出
+- **颜色对比度审计**：WCAG 2.1 AA 合规验证文档 + 主题常量集中化（SSOT）
+- **PixelThemeExtension 颜色常量**：复古色板提取为静态常量，消除 6 处颜色重复
+
 ## [2.33.5] - 2026-03-17
 
 ### Changed

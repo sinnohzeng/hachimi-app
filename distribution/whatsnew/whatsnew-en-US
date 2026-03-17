@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Improved: Focus timer reliability with better session save architecture
-- Improved: Prevented double-tap on Start button during permission check
-- Improved: Internal code quality with 1288 lines of new test coverage
+- Smoother pixel theme with fewer frame drops and faster loading
+- Fixed memory leaks for better long-session stability
+- Improved color contrast for accessibility (WCAG 2.1 AA)
+- UX: back-press protection in adoption, better error feedback

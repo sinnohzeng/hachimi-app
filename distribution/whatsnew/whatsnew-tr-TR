@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- İyileştirildi: Daha iyi oturum kaydetme mimarisi ile odak zamanlayıcı güvenilirliği
-- İyileştirildi: İzin kontrolü sırasında Başlat düğmesine çift dokunma engellendi
-- İyileştirildi: 1288 satır yeni test kapsamı ile dahili kod kalitesi
+- Piksel tema daha akıcı, daha az kare düşmesi
+- Bellek sızıntıları düzeltildi, daha kararlı çalışma
+- Renk kontrastı iyileştirildi (WCAG 2.1 AA uyumlu)
+- UX: evlat edinmede geri tuşu koruması, hata geri bildirimi

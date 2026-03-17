@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Amélioré : Fiabilité du minuteur de concentration avec meilleure architecture de sauvegarde
-- Amélioré : Double appui sur Démarrer empêché pendant la vérification des permissions
-- Amélioré : Qualité du code interne avec 1288 lignes de nouvelle couverture de tests
+- Thème pixel plus fluide avec moins de saccades
+- Correction de fuites mémoire pour plus de stabilité
+- Meilleur contraste des couleurs pour l'accessibilité (WCAG 2.1 AA)
+- UX : protection retour lors de l'adoption, meilleur feedback

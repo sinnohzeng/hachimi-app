@@ -59,7 +59,8 @@ class _PixelBadgeState extends State<PixelBadge>
     final pixel = context.pixel;
     final scheme = Theme.of(context).colorScheme;
     final bg = widget.backgroundColor ?? pixel.retroSurface;
-    final fg = widget.textColor ?? pixel.pixelLabel.color ?? scheme.onSurfaceVariant;
+    final fg =
+        widget.textColor ?? pixel.pixelLabel.color ?? scheme.onSurfaceVariant;
     final border = pixel.pixelBorder;
 
     Widget badge = CustomPaint(

@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Melhorado: Confiabilidade do timer de foco com melhor arquitetura de salvamento de sessão
-- Melhorado: Prevenção de toque duplo no botão Iniciar durante verificação de permissões
-- Melhorado: Qualidade de código interno com 1288 linhas de nova cobertura de testes
+- Tema pixel mais fluido com menos quedas de quadros
+- Correção de vazamentos de memória para mais estabilidade
+- Melhor contraste de cores para acessibilidade (WCAG 2.1 AA)
+- UX: proteção ao voltar na adoção, melhor feedback de erros

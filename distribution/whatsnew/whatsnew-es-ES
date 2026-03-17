@@ -1,5 +1,6 @@
-v2.33.5
+v2.34.0
 
-- Mejorado: Fiabilidad del temporizador de enfoque con mejor arquitectura de guardado de sesiones
-- Mejorado: Prevención de doble toque en el botón Iniciar durante verificación de permisos
-- Mejorado: Calidad de código interno con 1288 líneas de nueva cobertura de pruebas
+- Tema pixel más fluido con menos caídas de fotogramas
+- Corrección de fugas de memoria para mayor estabilidad
+- Mejor contraste de colores para accesibilidad (WCAG 2.1 AA)
+- UX: protección al retroceder en adopción, mejor feedback
