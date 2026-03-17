@@ -53,7 +53,10 @@ class PixelSwitch extends StatelessWidget {
               width: 16,
               height: 16,
               margin: const EdgeInsets.all(1),
-              color: value ? scheme.onPrimary : border,
+              // thumb 色需在 pixelSuccess track 上保持高对比度
+              // 亮色：onSurface（深色）在浅绿上 ≥ 7:1
+              // 暗色：retroBackground（#1A1A2E）在亮绿上 ≥ 7:1
+              color: value ? pixel.retroBackground : border,
             ),
           ),
         ),

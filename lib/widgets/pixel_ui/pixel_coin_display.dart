@@ -22,7 +22,8 @@ class PixelCoinDisplay extends StatelessWidget {
           size: const Size(16, 16),
           painter: _CoinPainter(
             color: pixel.xpBarFill,
-            letterColor: pixel.pixelBorder,
+            // 金币 "C" 字色：深棕在金色 (#FFD700) 上对比度 7.5:1（亮/暗色通用）
+            letterColor: const Color(0xFF3E2723),
           ),
         ),
         const SizedBox(width: 4),
