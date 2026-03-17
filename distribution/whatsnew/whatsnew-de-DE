@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Neu: Passwort-Zurücksetzung per E-Mail auf dem Anmeldebildschirm
-- Neu: Chat-Fehlerbehandlung mit Inline-Wiederholungsblase
-- Neu: KI-Schutzschalter (automatische Wiederherstellung nach Fehlern)
-- Neu: Erfolgsstrings für Japanisch, Koreanisch, Traditionelles Chinesisch
-- Verbessert: Barrierefreiheit — 20+ Komponenten mit Screenreader-Unterstützung
-- Verbessert: Katzen-Bildschirme mit korrekten Lade-/Fehlerzuständen
-- Verbessert: Kontolöschung-UX mit asynchroner Datenübersicht
+- Verbessert: Fokus-Timer-Zuverlässigkeit mit besserer Sitzungsspeicher-Architektur
+- Verbessert: Doppeltippen auf Start-Taste während Berechtigungsprüfung verhindert
+- Verbessert: Interne Codequalität mit 1288 Zeilen neuer Testabdeckung

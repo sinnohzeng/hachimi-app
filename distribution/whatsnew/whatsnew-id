@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Baru: Reset kata sandi via email di layar login
-- Baru: Penanganan error chat dengan gelembung coba ulang inline
-- Baru: Perlindungan circuit breaker AI (pemulihan otomatis setelah kegagalan)
-- Baru: String pencapaian untuk Jepang, Korea, Tionghoa Tradisional
-- Ditingkatkan: Aksesibilitas — 20+ komponen dengan dukungan pembaca layar
-- Ditingkatkan: Layar kucing dengan status loading/error yang tepat
-- Ditingkatkan: UX penghapusan akun dengan ringkasan data asinkron
+- Ditingkatkan: Keandalan timer fokus dengan arsitektur penyimpanan sesi yang lebih baik
+- Ditingkatkan: Mencegah ketuk ganda pada tombol Mulai saat pemeriksaan izin
+- Ditingkatkan: Kualitas kode internal dengan 1288 baris cakupan pengujian baru

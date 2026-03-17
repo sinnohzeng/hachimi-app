@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.5] - 2026-03-17
+
+### Changed
+- **计时器架构重构**：将 timer_screen.dart 中 150+ 行会话完成逻辑提取到 `SessionCompletionService`，实现 Screen → Provider → Service 严格依赖流
+- **计时器持久化提取**：SharedPreferences 操作封装到 `TimerPersistence`，支持 Clock 注入实现确定性测试
+- **通知调度纯函数化**：提取 `notification_scheduling.dart`，通知 ID 计算和时间调度逻辑可独立测试
+
+### Added
+- **防重复点击**：计时器启动按钮增加 `_isStarting` 状态，权限对话框期间禁止重复点击
+- **1288 行新测试**：`SessionCompletionService`、`TimerPersistence`、`FocusTimerNotifier tick`、`notification_scheduling` 四个测试文件
+
+### Fixed
+- **测试常量同步**：`focusRewardCoinsPerMinute` 测试期望值从 2 更新为 10
+
 ## [2.33.4] - 2026-03-17
 
 ### Added

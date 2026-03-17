@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Eklendi: Giriş ekranında e-posta ile şifre sıfırlama
-- Eklendi: Yeniden deneme balonu ile sohbet hata yönetimi
-- Eklendi: AI devre kesici koruması (otomatik kurtarma)
-- Eklendi: Japonca, Korece, Geleneksel Çince başarı metinleri
-- İyileştirildi: Erişilebilirlik — 20+ bileşende ekran okuyucu desteği
-- İyileştirildi: Kedi ekranları uygun yükleme/hata durumlarıyla
-- İyileştirildi: Veri özeti ile hesap silme UX'i
+- İyileştirildi: Daha iyi oturum kaydetme mimarisi ile odak zamanlayıcı güvenilirliği
+- İyileştirildi: İzin kontrolü sırasında Başlat düğmesine çift dokunma engellendi
+- İyileştirildi: 1288 satır yeni test kapsamı ile dahili kod kalitesi

@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Ajout : Réinitialisation du mot de passe par e-mail
-- Ajout : Gestion des erreurs de chat avec bulle de réessai
-- Ajout : Protection disjoncteur IA (récupération auto après erreurs)
-- Ajout : Textes de succès pour japonais, coréen, chinois traditionnel
-- Amélioré : Accessibilité — 20+ composants avec lecteur d'écran
-- Amélioré : Écrans de chats avec états chargement/erreur
-- Amélioré : Suppression de compte avec résumé de données async
+- Amélioré : Fiabilité du minuteur de concentration avec meilleure architecture de sauvegarde
+- Amélioré : Double appui sur Démarrer empêché pendant la vérification des permissions
+- Amélioré : Qualité du code interne avec 1288 lignes de nouvelle couverture de tests

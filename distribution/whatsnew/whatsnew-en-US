@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Added: Password reset via email on login screen
-- Added: Chat error handling with inline retry bubble
-- Added: AI circuit breaker protection (auto-recovery after failures)
-- Added: Achievement strings for Japanese, Korean, Traditional Chinese
-- Improved: Accessibility — 20+ components with screen reader support
-- Improved: Cat screens with proper loading/error states
-- Improved: Account deletion UX with async data summary
+- Improved: Focus timer reliability with better session save architecture
+- Improved: Prevented double-tap on Start button during permission check
+- Improved: Internal code quality with 1288 lines of new test coverage

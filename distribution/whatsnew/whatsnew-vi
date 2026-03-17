@@ -1,9 +1,5 @@
-v2.33.4
+v2.33.5
 
-- Thêm: Đặt lại mật khẩu qua email
-- Thêm: Xử lý lỗi chat với bong bóng thử lại
-- Thêm: Bảo vệ circuit breaker AI (tự phục hồi sau lỗi)
-- Thêm: Chuỗi thành tựu cho tiếng Nhật, Hàn, Trung phồn thể
-- Cải thiện: 20+ thành phần hỗ trợ trình đọc màn hình
-- Cải thiện: Màn hình mèo với trạng thái tải/lỗi phù hợp
-- Cải thiện: UX xóa tài khoản với tóm tắt dữ liệu
+- Cải thiện: Độ tin cậy bộ hẹn giờ tập trung với kiến trúc lưu phiên tốt hơn
+- Cải thiện: Ngăn chạm đúp nút Bắt đầu khi kiểm tra quyền
+- Cải thiện: Chất lượng mã nội bộ với 1288 dòng kiểm thử mới
