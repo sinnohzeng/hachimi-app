@@ -27,7 +27,6 @@ class PixelSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
-    final scheme = Theme.of(context).colorScheme;
     final active = activeColor ?? pixel.pixelSuccess;
     final inactive = inactiveColor ?? pixel.xpBarTrack;
     final border = pixel.pixelBorder;
