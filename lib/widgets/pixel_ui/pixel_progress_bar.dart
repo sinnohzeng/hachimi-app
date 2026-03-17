@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
 /// RPG 风格分段经验条 — 取代 LinearProgressIndicator。
@@ -33,6 +34,30 @@ class PixelProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
+
+  Widget _buildMaterial(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final filled = filledColor ?? scheme.primary;
+    final empty = emptyColor ?? scheme.surfaceContainerHighest;
+
+    return SizedBox(
+      height: height,
+      child: ClipRRect(
+        borderRadius: AppShape.borderFull,
+        child: LinearProgressIndicator(
+          value: value.clamp(0.0, 1.0),
+          backgroundColor: empty,
+          color: filled,
+          minHeight: height,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     final filled = filledColor ?? pixel.xpBarFill;
     final empty = emptyColor ?? pixel.xpBarTrack;
     final border = pixel.pixelBorder;

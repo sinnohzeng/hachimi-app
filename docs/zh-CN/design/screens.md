@@ -21,6 +21,7 @@ HomeScreen → AdoptionFlowScreen（FAB 或首个习惯）
 HomeScreen → AwarenessScreen → DailyLightScreen
                              → WeeklyReviewScreen
                              → WorryProcessorScreen → WorryEditScreen
+                             → AwarenessHistoryScreen → DailyDetailScreen
 CatRoomScreen → CatDetailScreen（通过底部弹窗）
 ProfileScreen → CatDetailScreen（通过猫咪相册）
 ```
@@ -318,8 +319,8 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 - 周日期范围显示（`weekStartDate` – `weekEndDate`）
 
 ### 回顾标签
-- 历史一点光列表（可滚动，逆序排列）
-- 月度日历热力图占位
+- 内嵌渲染 `AwarenessHistoryScreen`（不再是占位内容）
+- 月历心情网格 + 周回顾折叠卡片列表 + 觉知统计卡片
 
 ### 导航
 - 「记录今日之光」→ DailyLightScreen
@@ -413,6 +414,46 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 
 ---
 
+## S17：觉知历史界面
+**文件：** `lib/screens/awareness/awareness_history_screen.dart`
+
+### 布局（可滚动）
+1. **月份选择器**：左右箭头 + 「YYYY-MM」标签切换月份
+2. **MoodCalendar**：7 列网格展示所选月份每日心情；每格按当日心情着色（无记录日使用中性填充）。点击某日 → 导航至 DailyDetailScreen(date)
+3. **AwarenessStatsCard**：心情分布柱状图 + 标签频次排行，数据来自所选月份
+4. **周回顾列表**：所选月份内每周的折叠卡片；每张卡片展示周日期范围 + 摘要。空周显示淡化占位
+
+### 行为
+- 替换 AwarenessScreen「回顾」子 Tab 中的旧占位内容
+- 月份导航限制在最早记录月份到当前月份之间
+- 数据来源：`monthlyLightsProvider`、`weeklyReviewsForMonthProvider`、`moodDistributionProvider`
+
+### 路由
+- 内嵌于 AwarenessScreen 回顾标签中渲染（无独立路由）
+
+---
+
+## S18：日详情界面
+**文件：** `lib/screens/awareness/daily_detail_screen.dart`
+
+### 布局（可滚动，只读）
+1. **日期头部**：格式化日期 + 心情 Emoji
+2. **心情展示**：大号心情图标 + 标签
+3. **一点光文字**：当日反思文字（只读）
+4. **标签**：已记录标签的 Chip 列表
+5. **时间轴**：`TimelineEditor` 组件展示当日按时间排列的条目（只读模式）
+6. **操作栏**：「编辑」`FilledButton.tonal` → 导航至 DailyLightScreen(date) 进行编辑
+
+### 行为
+- 接收 `date` 参数（String，格式 `yyyy-MM-dd`）
+- 数据来源：`dailyLightByDateProvider(date)`
+- 若该日期无数据，显示空状态 + 创建 CTA
+
+### 路由
+- `/daily-detail?date=yyyy-MM-dd`
+
+---
+
 ## 空状态
 
 | 界面 | 触发条件 | 提示文案 |
@@ -424,3 +465,4 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 | 觉知今天 | 未记录一点光 | 「记录今天第一束光吧！」+ CTA 按钮 |
 | 烦恼处理器 | 无烦恼 | 「现在没有烦恼——真棒！」 |
 | 周回顾 | 未填写 | 「花点时间回顾这一周吧。」+ CTA 按钮 |
+| 日详情 | 该日无记录 | 「这一天还没有记录——点击创建吧。」+ CTA 按钮 |

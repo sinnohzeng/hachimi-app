@@ -188,7 +188,12 @@ Key files: `lib/core/theme/skins/{theme_skin,material_skin,retro_pixel_skin}.dar
 | `activeWorriesProvider` | `StreamProvider<List<Worry>>` | 进行中烦恼 |
 | `resolvedWorriesProvider` | `StreamProvider<List<Worry>>` | 已终结烦恼 |
 | `awarenessStatsProvider` | `StreamProvider<Map<String, int>>` | 觉知统计 |
-| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | 月度一点光 |
+| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | Monthly lights; also returns `Map<int, Mood>` for calendar grid coloring |
+| `dailyLightByDateProvider` | `FutureProvider.family<DailyLight?, String>` | Single day's light by date string (`yyyy-MM-dd`) |
+| `weeklyReviewsForMonthProvider` | `FutureProvider.family<List<WeeklyReview>, (int, int)>` | Weekly reviews for a given (year, month) pair |
+| `moodDistributionProvider` | `FutureProvider<Map<Mood, int>>` | Mood distribution counts for stats card |
+
+**File-private providers:** `AwarenessStatsCard` uses a file-private `_tagFrequencyProvider` to compute tag frequency from monthly lights. It is not exported and not part of the public provider graph.
 
 ### New ActionType Values
 

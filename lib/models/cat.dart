@@ -94,7 +94,7 @@ class Cat {
       totalMinutes: data['totalMinutes'] as int? ?? 0,
       accessories:
           (data['accessories'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.whereType<String>()
               .toList() ??
           const [],
       equippedAccessory: data['equippedAccessory'] as String?,

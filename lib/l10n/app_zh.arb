@@ -1612,5 +1612,52 @@
   "notifBedtimeLight": "今天过得怎么样？花一点时间，留意一件美好的事 ✨",
   "notifWeeklyReview": "周日晚上，适合回顾这一周 📖",
   "notifMonthlyRitual": "新的一个月开始了！选一个习惯来专注吧 🌙",
-  "notifGentleReengagement": "没关系，什么时候回来都好 🌿"
+  "notifGentleReengagement": "没关系，什么时候回来都好 🌿",
+
+  "calendarMon": "一",
+  "calendarTue": "二",
+  "calendarWed": "三",
+  "calendarThu": "四",
+  "calendarFri": "五",
+  "calendarSat": "六",
+  "calendarSun": "日",
+
+  "historyWeeklyReviews": "周回顾",
+  "historyHappyMoments": "{count}个幸福时刻",
+  "@historyHappyMoments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyWeekRange": "{startDate} - {endDate}",
+  "@historyWeekRange": {
+    "placeholders": {
+      "startDate": {
+        "type": "String"
+      },
+      "endDate": {
+        "type": "String"
+      }
+    }
+  },
+
+  "dailyDetailTitle": "每日详情",
+  "dailyDetailEdit": "编辑记录",
+  "dailyDetailLight": "今日一点光",
+  "dailyDetailTimeline": "今日时间轴",
+  "dailyDetailNoRecord": "该日未记录",
+  "dailyDetailGoRecord": "去记录",
+
+  "awarenessStatsTitle": "觉知统计",
+  "awarenessStatsMoodDistribution": "心情分布",
+  "awarenessStatsLightDays": "光之日",
+  "awarenessStatsWeeklyReviews": "周回顾",
+  "awarenessStatsResolutionRate": "解忧率",
+  "awarenessStatsTopTags": "高频标签",
+  "awarenessStatsMonthlyChallenge": "本月挑战",
+  "awarenessStatsStartRecording": "开始记录你的第一点光",
+
+  "timelineEventHint": "发生了什么？"
 }

@@ -1703,5 +1703,52 @@
   "notifBedtimeLight": "How was your day? Take a moment to notice something good ✨",
   "notifWeeklyReview": "Sunday evening — a good time to look back at your week 📖",
   "notifMonthlyRitual": "A new month begins! Pick a habit to focus on this month 🌙",
-  "notifGentleReengagement": "No pressure — come back whenever you're ready 🌿"
+  "notifGentleReengagement": "No pressure — come back whenever you're ready 🌿",
+
+  "calendarMon": "Mon",
+  "calendarTue": "Tue",
+  "calendarWed": "Wed",
+  "calendarThu": "Thu",
+  "calendarFri": "Fri",
+  "calendarSat": "Sat",
+  "calendarSun": "Sun",
+
+  "historyWeeklyReviews": "Weekly Reviews",
+  "historyHappyMoments": "{count} happy moments",
+  "@historyHappyMoments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyWeekRange": "{startDate} - {endDate}",
+  "@historyWeekRange": {
+    "placeholders": {
+      "startDate": {
+        "type": "String"
+      },
+      "endDate": {
+        "type": "String"
+      }
+    }
+  },
+
+  "dailyDetailTitle": "Daily Detail",
+  "dailyDetailEdit": "Edit Record",
+  "dailyDetailLight": "Today's Light",
+  "dailyDetailTimeline": "Today's Timeline",
+  "dailyDetailNoRecord": "No record for this day",
+  "dailyDetailGoRecord": "Go Record",
+
+  "awarenessStatsTitle": "Awareness Stats",
+  "awarenessStatsMoodDistribution": "Mood Distribution",
+  "awarenessStatsLightDays": "Light Days",
+  "awarenessStatsWeeklyReviews": "Reviews",
+  "awarenessStatsResolutionRate": "Resolution Rate",
+  "awarenessStatsTopTags": "Top Tags",
+  "awarenessStatsMonthlyChallenge": "Monthly Challenge",
+  "awarenessStatsStartRecording": "Start recording your first light",
+
+  "timelineEventHint": "What happened?"
 }

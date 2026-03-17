@@ -33,6 +33,7 @@ hachimi-app/
 - `widgets/celebration/`：成就庆祝弹层系统（6 个文件：`achievement_celebration_layer.dart`、`celebration_confetti_painter.dart`、`celebration_glow_icon.dart`、`celebration_overlay.dart`、`celebration_reward_badges.dart`、`celebration_tier.dart`）
 - `models/`：领域模型
 - `models/mood.dart`：5 级心情枚举
+- `models/awareness_stats.dart`：觉知统计数据类（心情分布、标签频次、连续记录）
 - `models/daily_light.dart`：每日一光模型
 - `models/weekly_review.dart`：周回顾模型
 - `models/worry.dart`：烦恼模型 + WorryStatus 枚举
@@ -40,13 +41,15 @@ hachimi-app/
 - `providers/awareness_providers.dart`：7 个觉知 Provider
 - `services/awareness_repository.dart`：DailyLight + WeeklyReview CRUD
 - `services/worry_repository.dart`：Worry CRUD
-- `screens/awareness/`：觉知功能页面（5 个文件）
+- `screens/awareness/`：觉知功能页面（7 个文件）
 - `screens/awareness/awareness_screen.dart`：觉知主屏（3 子 Tab）
 - `screens/awareness/daily_light_screen.dart`：一点光录入
 - `screens/awareness/weekly_review_screen.dart`：周回顾表单
 - `screens/awareness/worry_processor_screen.dart`：烦恼列表管理
 - `screens/awareness/worry_edit_screen.dart`：烦恼新建/编辑
-- `widgets/awareness/`：觉知复用组件（7 个文件）
+- `screens/awareness/awareness_history_screen.dart`：觉知历史（月历心情网格 + 周回顾列表）
+- `screens/awareness/daily_detail_screen.dart`：只读日详情（心情 + 文字 + 标签 + 时间轴）
+- `widgets/awareness/`：觉知复用组件（10 个文件）
 - `widgets/awareness/mood_selector.dart`：心情选择器
 - `widgets/awareness/light_input_card.dart`：一点光输入卡片
 - `widgets/awareness/tag_selector.dart`：标签选择器
@@ -54,6 +57,9 @@ hachimi-app/
 - `widgets/awareness/worry_item_card.dart`：烦恼条目卡片
 - `widgets/awareness/cat_bedtime_animation.dart`：猫咪心情感应动画
 - `widgets/awareness/awareness_empty_state.dart`：觉知空状态
+- `widgets/awareness/mood_calendar.dart`：月历心情网格
+- `widgets/awareness/awareness_stats_card.dart`：觉知统计卡片（心情分布、标签频次）
+- `widgets/awareness/timeline_editor.dart`：时间轴编辑器
 
 ## 账户生命周期关键文件
 - `lib/models/account_data_snapshot.dart`

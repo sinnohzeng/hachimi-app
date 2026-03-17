@@ -12,6 +12,7 @@ import '../../core/theme/pixel_theme_extension.dart';
 /// CustomPaint 作为 AnimatedBuilder.child 提取，仅构建一次；
 /// builder 回调只包装 Transform.rotate（GPU 加速矩阵变换）。
 /// RepaintBoundary 隔离旋转重绘区域。
+@Deprecated('零屏幕引用，维护期不再维护。')
 class PixelLoadingIndicator extends StatefulWidget {
   const PixelLoadingIndicator({
     super.key,

@@ -203,5 +203,5 @@ class ChatNotifier extends Notifier<ChatState> {
 }
 
 /// 聊天状态 Provider — 按 catId 分家族。
-final chatNotifierProvider =
-    NotifierProvider.family<ChatNotifier, ChatState, String>(ChatNotifier.new);
+final chatNotifierProvider = NotifierProvider.autoDispose
+    .family<ChatNotifier, ChatState, String>(ChatNotifier.new);

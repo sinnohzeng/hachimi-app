@@ -4,10 +4,11 @@ import 'package:flutter/services.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 import 'pixel_border.dart';
 
-/// 像素风主操作按钮 — 阶梯角边框 + Silkscreen 字体。
+/// 自适应主操作按钮 — MD3 / Retro Pixel 双模式。
 ///
-/// 取代猫咪屏幕中的 FilledButton / FilledButton.tonal。
-class PixelButton extends StatefulWidget {
+/// - MD3：FilledButton.tonal + 触觉反馈
+/// - Retro：阶梯角边框 + Silkscreen 字体 + 按压缩放动画
+class PixelButton extends StatelessWidget {
   const PixelButton({
     super.key,
     required this.label,
@@ -24,10 +25,67 @@ class PixelButton extends StatefulWidget {
   final Color? foregroundColor;
 
   @override
-  State<PixelButton> createState() => _PixelButtonState();
+  Widget build(BuildContext context) {
+    if (!context.pixel.isRetro) return _buildMaterial(context);
+    return _RetroPixelButton(
+      label: label,
+      onPressed: onPressed,
+      icon: icon,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+    );
+  }
+
+  Widget _buildMaterial(BuildContext context) {
+    return FilledButton.tonal(
+      onPressed: onPressed == null
+          ? null
+          : () {
+              HapticFeedback.lightImpact();
+              onPressed!();
+            },
+      style: FilledButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon!, size: 16),
+            const SizedBox(width: 6),
+          ],
+          Text(label),
+        ],
+      ),
+    );
+  }
 }
 
-class _PixelButtonState extends State<PixelButton>
+// ---------------------------------------------------------------------------
+// Retro Pixel 渲染 — 阶梯角边框 + Silkscreen 字体 + 按压缩放动画
+// ---------------------------------------------------------------------------
+
+class _RetroPixelButton extends StatefulWidget {
+  const _RetroPixelButton({
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.backgroundColor,
+    this.foregroundColor,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+
+  @override
+  State<_RetroPixelButton> createState() => _RetroPixelButtonState();
+}
+
+class _RetroPixelButtonState extends State<_RetroPixelButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final CurvedAnimation _scaleCurve;

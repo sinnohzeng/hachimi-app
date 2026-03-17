@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_shape.dart';
 import '../../core/theme/pixel_border_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
 
-/// 像素风徽章 — 用于阶段标签、心情标签、性格标签等。
+/// 自适应徽章 — 用于阶段标签、心情标签、性格标签等。
 ///
-/// 带阶梯角的小容器，可选入场弹跳动画。
-class PixelBadge extends StatefulWidget {
+/// 自动感知 UI 风格：当 [PixelThemeExtension.isRetro] 为 true 时使用
+/// 阶梯角 CustomPaint + Silkscreen 字体；否则使用 Material 3 圆角容器。
+class PixelBadge extends StatelessWidget {
   const PixelBadge({
     super.key,
     required this.text,
@@ -21,14 +23,110 @@ class PixelBadge extends StatefulWidget {
   final Color? backgroundColor;
   final Color? textColor;
 
-  /// 是否播放入场弹跳动画
+  /// 是否播放入场动画（复古模式：弹跳缩放；MD3 模式：AnimatedScale）
   final bool animate;
 
   @override
-  State<PixelBadge> createState() => _PixelBadgeState();
+  Widget build(BuildContext context) {
+    final pixel = context.pixel;
+
+    if (pixel.isRetro) {
+      return _RetroPixelBadge(
+        text: text,
+        icon: icon,
+        backgroundColor: backgroundColor,
+        textColor: textColor,
+        animate: animate,
+      );
+    }
+
+    return _Md3Badge(
+      text: text,
+      icon: icon,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      animate: animate,
+    );
+  }
 }
 
-class _PixelBadgeState extends State<PixelBadge>
+// ---------------------------------------------------------------------------
+// MD3 模式 — 圆角容器 + AnimatedScale 入场动画
+// ---------------------------------------------------------------------------
+
+class _Md3Badge extends StatelessWidget {
+  const _Md3Badge({
+    required this.text,
+    this.icon,
+    this.backgroundColor,
+    this.textColor,
+    this.animate = false,
+  });
+
+  final String text;
+  final Widget? icon;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final bool animate;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final bg = backgroundColor ?? scheme.surfaceContainerHigh;
+    final fg = textColor ?? scheme.onSurfaceVariant;
+
+    Widget badge = Container(
+      decoration: BoxDecoration(
+        borderRadius: AppShape.borderFull,
+        color: bg,
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[icon!, const SizedBox(width: 4)],
+          Text(text, style: theme.textTheme.labelMedium?.copyWith(color: fg)),
+        ],
+      ),
+    );
+
+    if (!animate) return badge;
+
+    return AnimatedScale(
+      scale: 1.0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      child: badge,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 复古像素模式 — 阶梯角 CustomPaint + Silkscreen 字体 + 弹跳动画
+// ---------------------------------------------------------------------------
+
+class _RetroPixelBadge extends StatefulWidget {
+  const _RetroPixelBadge({
+    required this.text,
+    this.icon,
+    this.backgroundColor,
+    this.textColor,
+    this.animate = false,
+  });
+
+  final String text;
+  final Widget? icon;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final bool animate;
+
+  @override
+  State<_RetroPixelBadge> createState() => _RetroPixelBadgeState();
+}
+
+class _RetroPixelBadgeState extends State<_RetroPixelBadge>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;

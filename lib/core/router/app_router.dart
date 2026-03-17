@@ -24,6 +24,7 @@ import 'package:hachimi_app/screens/awareness/daily_light_screen.dart';
 import 'package:hachimi_app/screens/awareness/weekly_review_screen.dart';
 import 'package:hachimi_app/screens/awareness/worry_processor_screen.dart';
 import 'package:hachimi_app/screens/awareness/worry_edit_screen.dart';
+import 'package:hachimi_app/screens/awareness/daily_detail_screen.dart';
 import 'package:hachimi_app/models/xp_result.dart';
 
 class AppRouter {
@@ -31,7 +32,6 @@ class AppRouter {
 
   static const String login = '/login';
   static const String home = '/home';
-  static const String addHabit = '/add-habit';
   static const String adoption = '/adoption';
   static const String focusSetup = '/focus-setup';
   static const String timer = '/timer';
@@ -52,6 +52,7 @@ class AppRouter {
   static const String weeklyReview = '/weekly-review';
   static const String worryProcessor = '/worry-processor';
   static const String worryEdit = '/worry-edit';
+  static const String dailyDetail = '/daily-detail';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -62,9 +63,6 @@ class AppRouter {
         );
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      case addHabit:
-        // Redirect to adoption flow
-        return MaterialPageRoute(builder: (_) => const AdoptionFlowScreen());
       case adoption:
         final isFirst = settings.arguments as bool? ?? false;
         return MaterialPageRoute(
@@ -139,6 +137,12 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => WorryEditScreen(worryId: worryId),
         );
+      case dailyDetail:
+        final date = settings.arguments as String?;
+        if (date == null) {
+          return MaterialPageRoute(builder: (_) => const HomeScreen());
+        }
+        return MaterialPageRoute(builder: (_) => DailyDetailScreen(date: date));
       // Settings sub-pages use Shared Axis transition (horizontal)
       case sessionHistory:
         return _sharedAxisRoute((_) => const SessionHistoryScreen());

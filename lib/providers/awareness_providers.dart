@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/daily_light.dart';
+import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/models/weekly_review.dart';
 import 'package:hachimi_app/models/worry.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -136,6 +137,82 @@ final resolvedWorriesProvider = StreamProvider<List<Worry>>((ref) {
     read: () => worryRepo.getResolvedWorries(uid),
   );
 });
+
+// ─── 按日期查询单条记录（Track 4） ───
+
+/// 按日期获取单条 DailyLight 记录。
+final dailyLightByDateProvider = FutureProvider.family<DailyLight?, String>((
+  ref,
+  date,
+) async {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return null;
+
+  final awarenessRepo = ref.watch(awarenessRepositoryProvider);
+  return awarenessRepo.getLightByDate(uid, date);
+});
+
+// ─── 按月周回顾列表（Track 4） ───
+
+/// 查询某月内所有 ISO 周的 WeeklyReview 记录。
+final weeklyReviewsForMonthProvider =
+    FutureProvider.family<List<WeeklyReview>, (int, int)>((ref, params) async {
+      final (year, month) = params;
+      final uid = ref.watch(currentUidProvider);
+      if (uid == null) return [];
+
+      final awarenessRepo = ref.watch(awarenessRepositoryProvider);
+
+      ref.listen(ledgerChangesProvider, (_, _) {});
+
+      final firstDay = DateTime(year, month, 1);
+      final lastDay = DateTime(year, month + 1, 0);
+
+      final startWeekId = _isoWeekId(firstDay);
+      final endWeekId = _isoWeekId(lastDay);
+
+      return awarenessRepo.getReviewsInRange(uid, startWeekId, endWeekId);
+    });
+
+// ─── 心情分布统计（Track 4） ───
+
+/// 心情分布统计 — 按 Mood 聚合所有 DailyLight 的计数。
+final moodDistributionProvider = FutureProvider<Map<Mood, int>>((ref) async {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return {};
+
+  final awarenessRepo = ref.watch(awarenessRepositoryProvider);
+
+  ref.listen(ledgerChangesProvider, (_, _) {});
+
+  // 查全量数据：从 2020 年到当前月末
+  final now = DateTime.now();
+  final lastDay = DateTime(now.year, now.month + 1, 0).day;
+  final endDate =
+      '${now.year}-${now.month.toString().padLeft(2, '0')}-'
+      '${lastDay.toString().padLeft(2, '0')}';
+  final lights = await awarenessRepo.getLightsInRange(
+    uid,
+    '2020-01-01',
+    endDate,
+  );
+
+  final distribution = <Mood, int>{};
+  for (final light in lights) {
+    distribution[light.mood] = (distribution[light.mood] ?? 0) + 1;
+  }
+  return distribution;
+});
+
+/// ISO 8601 周 ID 计算。
+String _isoWeekId(DateTime date) {
+  final thursday = date.add(Duration(days: DateTime.thursday - date.weekday));
+  final isoYear = thursday.year;
+  final jan4 = DateTime(isoYear, 1, 4);
+  final week1Monday = jan4.subtract(Duration(days: jan4.weekday - 1));
+  final weekNumber = (thursday.difference(week1Monday).inDays ~/ 7) + 1;
+  return '$isoYear-W${weekNumber.toString().padLeft(2, '0')}';
+}
 
 // ─── 统计 ───
 

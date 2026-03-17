@@ -21,6 +21,7 @@ HomeScreen → AdoptionFlowScreen (FAB or first habit)
 HomeScreen → AwarenessScreen → DailyLightScreen
                              → WeeklyReviewScreen
                              → WorryProcessorScreen → WorryEditScreen
+                             → AwarenessHistoryScreen → DailyDetailScreen
 CatRoomScreen → CatDetailScreen (via bottom sheet)
 ProfileScreen → CatDetailScreen (via Cat Album)
 ```
@@ -328,8 +329,8 @@ Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layou
 - Week date range display (`weekStartDate` – `weekEndDate`)
 
 ### Review Tab
-- Historical daily lights list (scrollable, reverse chronological)
-- Monthly calendar heatmap placeholder
+- Renders `AwarenessHistoryScreen` inline (no longer a placeholder)
+- Monthly mood calendar grid + weekly review collapsible card list + awareness stats card
 
 ### Navigation
 - "Record today's light" → DailyLightScreen
@@ -423,6 +424,46 @@ Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layou
 
 ---
 
+## S17: Awareness History Screen
+**File:** `lib/screens/awareness/awareness_history_screen.dart`
+
+### Layout (scrollable)
+1. **Month selector**: Left/right arrows + "YYYY-MM" label to switch months
+2. **MoodCalendar**: 7-column grid showing each day of the selected month; each cell colored by that day's mood (empty days use neutral fill). Tap a day → navigates to DailyDetailScreen(date)
+3. **AwarenessStatsCard**: Mood distribution bar chart + top tag frequency list, derived from the selected month's data
+4. **Weekly review list**: Collapsible cards for each week in the selected month; each card shows week date range + summary. Empty weeks display a muted placeholder
+
+### Behavior
+- Replaces the previous placeholder content of AwarenessScreen's "Review" sub-tab
+- Month navigation clamps to the earliest recorded month and the current month
+- Data sourced from `monthlyLightsProvider`, `weeklyReviewsForMonthProvider`, `moodDistributionProvider`
+
+### Routes
+- Rendered inline within AwarenessScreen Review tab (no standalone route)
+
+---
+
+## S18: Daily Detail Screen
+**File:** `lib/screens/awareness/daily_detail_screen.dart`
+
+### Layout (scrollable, read-only)
+1. **Date header**: Formatted date + mood emoji
+2. **Mood display**: Large mood icon with label
+3. **Light text**: The day's reflection text (read-only)
+4. **Tags**: Chip list of recorded tags
+5. **Timeline**: `TimelineEditor` widget showing time-stamped entries for the day (read-only mode)
+6. **Action bar**: "Edit" `FilledButton.tonal` → navigates to DailyLightScreen(date) for editing
+
+### Behavior
+- Receives `date` argument (String, format `yyyy-MM-dd`)
+- Data sourced from `dailyLightByDateProvider(date)`
+- If no data exists for the date, shows empty state with CTA to create
+
+### Routes
+- `/daily-detail?date=yyyy-MM-dd`
+
+---
+
 ## Empty States
 
 | Screen | Trigger | Message |
@@ -434,3 +475,4 @@ Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layou
 | Awareness Today | No light recorded | "Record your first light of the day!" + CTA |
 | Worry Processor | No worries | "No worries right now — that's great!" |
 | Weekly Review | No review | "Take a moment to reflect on your week." + CTA |
+| Daily Detail | No light for date | "No record for this day — tap to create one." + CTA |

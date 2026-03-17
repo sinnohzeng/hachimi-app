@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/pixel_theme_extension.dart';
 
-/// 像素风区块标题 — 两侧装饰线条 "━━━ Title ━━━"。
+/// 区块标题 — 自适应双模式渲染。
+///
+/// - MD3：简洁分隔线 + titleSmall 标题
+/// - Retro：像素虚线 "━━━ Title ━━━"
 ///
 /// 用于 CatDetailScreen 各卡片的区块标题。
 class PixelSectionHeader extends StatelessWidget {
@@ -22,6 +25,37 @@ class PixelSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pixel = context.pixel;
+    if (!pixel.isRetro) return _buildMaterial(context);
+    return _buildRetro(context, pixel);
+  }
+
+  Widget _buildMaterial(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final lineColor = scheme.outlineVariant.withValues(alpha: 0.3);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          // 左分隔线
+          Expanded(child: Divider(color: lineColor)),
+          const SizedBox(width: 8),
+          if (icon != null) ...[
+            Icon(icon, size: 16, color: scheme.primary),
+            const SizedBox(width: 6),
+          ],
+          Text(title, style: textTheme.titleSmall),
+          if (trailing != null) ...[const SizedBox(width: 6), trailing!],
+          const SizedBox(width: 8),
+          // 右分隔线
+          Expanded(child: Divider(color: lineColor)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
     final lineColor = pixel.pixelBorder.withValues(alpha: 0.3);
 
     return Padding(

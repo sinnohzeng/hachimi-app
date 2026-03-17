@@ -33,6 +33,7 @@ hachimi-app/
 - `widgets/celebration/`: achievement celebration overlay system (6 files: `achievement_celebration_layer.dart`, `celebration_confetti_painter.dart`, `celebration_glow_icon.dart`, `celebration_overlay.dart`, `celebration_reward_badges.dart`, `celebration_tier.dart`)
 - `models/`: domain models
 - `models/mood.dart`: 5-level mood enum for awareness
+- `models/awareness_stats.dart`: AwarenessStats data class (mood distribution, tag frequency, streaks)
 - `models/daily_light.dart`: DailyLight model
 - `models/weekly_review.dart`: WeeklyReview model
 - `models/worry.dart`: Worry model + WorryStatus enum
@@ -40,13 +41,15 @@ hachimi-app/
 - `providers/awareness_providers.dart`: 7 awareness providers
 - `services/awareness_repository.dart`: DailyLight + WeeklyReview CRUD
 - `services/worry_repository.dart`: Worry CRUD
-- `screens/awareness/`: awareness feature screens (5 files)
+- `screens/awareness/`: awareness feature screens (7 files)
 - `screens/awareness/awareness_screen.dart`: awareness main screen (3 sub-tabs)
 - `screens/awareness/daily_light_screen.dart`: daily light entry
 - `screens/awareness/weekly_review_screen.dart`: weekly review form
 - `screens/awareness/worry_processor_screen.dart`: worry list management
 - `screens/awareness/worry_edit_screen.dart`: worry create/edit
-- `widgets/awareness/`: awareness reusable widgets (7 files)
+- `screens/awareness/awareness_history_screen.dart`: awareness history (mood calendar + weekly review list)
+- `screens/awareness/daily_detail_screen.dart`: read-only daily detail (mood + text + tags + timeline)
+- `widgets/awareness/`: awareness reusable widgets (10 files)
 - `widgets/awareness/mood_selector.dart`: mood picker
 - `widgets/awareness/light_input_card.dart`: daily light input card
 - `widgets/awareness/tag_selector.dart`: tag picker
@@ -54,6 +57,9 @@ hachimi-app/
 - `widgets/awareness/worry_item_card.dart`: worry item card
 - `widgets/awareness/cat_bedtime_animation.dart`: cat mood-sensing animation
 - `widgets/awareness/awareness_empty_state.dart`: awareness empty state
+- `widgets/awareness/mood_calendar.dart`: monthly mood calendar grid
+- `widgets/awareness/awareness_stats_card.dart`: awareness stats card (mood distribution, tag frequency)
+- `widgets/awareness/timeline_editor.dart`: timeline editor for daily light entries
 
 ## Account Lifecycle Files
 - `lib/models/account_data_snapshot.dart`
