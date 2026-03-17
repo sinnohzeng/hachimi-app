@@ -1,21 +1,38 @@
 # Hachimi
 
-Cat-focused habit app built with Flutter + Firebase, with offline-first data flow.
+Cat-focused habit tracking app. Adopt pixel cats, build habits through focused work,
+watch them grow. Built with Flutter + Firebase + Material Design 3.
 
-## Highlights
-- Offline-first runtime: local SQLite ledger/materialized state as SSOT.
-- Guest-to-account upgrade with archive conflict comparison and explicit keep-local/keep-cloud choice.
-- Account deletion redesign: summary + `DELETE` confirmation + local-first wipe + queued cloud hard delete.
-- Firebase Cloud Functions callable hard-delete API:
-  - `deleteAccountV1`
-  - `wipeUserDataV1`
-- Quality gate for `lib/` hand-written code:
-  - file <= 800 lines
-  - function <= 30 lines
-  - nesting <= 3
-  - branches <= 3
+[![CI](https://github.com/sinnohzeng/hachimi-app/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sinnohzeng/hachimi-app/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/sinnohzeng/hachimi-app)](https://github.com/sinnohzeng/hachimi-app/releases/latest)
+
+## What it does
+
+Each habit you create is paired with a unique pixel cat companion.
+Focus sessions grow your cat — from kitten (0 h) through adolescent (20 h) and adult
+(100 h) to senior (200 h). An AI generates a daily diary in your cat's voice and enables
+in-app chat, all shaped by their personality and mood.
+
+## Architecture Highlights
+
+- **Offline-first**: SQLite action ledger + materialized state as runtime SSOT; Firestore for cloud sync
+- **Dual UI**: Material 3 and Retro Pixel (Stardew Valley–inspired) via `ThemeSkin` strategy pattern
+- **AI pipeline**: Gemini / MiniMax with circuit breaker, diary retry queue, and per-cat daily chat limits
+- **Account lifecycle**: guest-to-account migration with explicit local/cloud conflict resolution
+- **Supply-chain hardening**: Sigstore attestation, Workload Identity Federation, deny-by-default CI permissions
+
+## Quality Gates
+
+| Metric | Limit |
+| ------ | ----- |
+| File size | ≤ 800 lines |
+| Function size | ≤ 30 lines |
+| Nesting depth | ≤ 3 |
+| Branch count | ≤ 5 / function |
 
 ## Tech Stack
+
 - Flutter 3.41.x / Dart 3.11.x
 - Riverpod 3.x
 - Firebase Auth + Firestore + Cloud Functions
@@ -23,6 +40,12 @@ Cat-focused habit app built with Flutter + Firebase, with offline-first data flo
 - sqflite + SharedPreferences
 
 ## Quick Start
+
+**Prerequisites:**
+- JDK 17 — `brew install openjdk@17` (JDK 21+ breaks Gradle 8.x)
+- Android SDK — Android Studio or `commandlinetools`
+- Flutter 3.41.x stable channel
+
 ```bash
 flutter pub get
 cd functions && npm install && cd ..
@@ -40,6 +63,7 @@ firebase deploy --only firestore:rules,firestore:indexes,functions
 ```
 
 ## Validation
+
 ```bash
 dart analyze lib test
 flutter test --exclude-tags golden
@@ -48,6 +72,7 @@ cd functions && npm test
 ```
 
 ## Documentation
+
 - [Docs Index](docs/README.md)
 - [Architecture Overview](docs/architecture/overview.md)
 - [State Management](docs/architecture/state-management.md)
@@ -55,5 +80,10 @@ cd functions && npm test
 - [Firebase Setup](docs/firebase/setup-guide.md)
 - [Chinese README](README.zh-CN.md)
 
+## Security
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
 ## License
+
 Copyright (c) 2025–2026 Zixuan Zeng. All Rights Reserved.

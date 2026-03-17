@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.35.0] - 2026-03-17
+
+### Added
+
+- `SECURITY.md`：漏洞报告流程，覆盖 Firebase Auth / Firestore / Cloud Functions 数据范围，7 天响应承诺
+- `CONTRIBUTING.md`：贡献指南，含专有许可声明与 DDD 开发规范摘要
+- `CODE_OF_CONDUCT.md`：行为准则，基于 Contributor Covenant 2.1 简化版
+- `.github/ISSUE_TEMPLATE/bug_report.yml`：结构化 Bug 报告模板，含版本下拉选择、自动标签与自动指派
+- `.github/ISSUE_TEMPLATE/feature_request.yml`：功能请求模板，含自动标签 enhancement
+- `.github/ISSUE_TEMPLATE/config.yml`：禁用空白 issue，引导安全漏洞走私有报告流程
+- `.github/pull_request_template.md`：PR 模板，内嵌 DDD 工作流清单与质量门自检清单
+- `docs/hachimi-product-context.md`：产品全景上下文文档，供 AI 辅助产品讨论使用
+
+### Changed
+
+- `.github/workflows/ci.yml`：补入 `dart format --set-exit-if-changed` 步骤，与 `release.yml` 保持一致，防止格式不合规代码合并到 main
+- `.github/dependabot.yml`：扩展覆盖 npm（/functions）和 pub（/）生态，各生态统一限制 `open-pull-requests-limit: 5`
+- `README.md`：重构为三段式结构（产品简介 / 架构亮点 / 质量红线），加入动态 CI、License、Release badge
+- `README.zh-CN.md`：同步英文版重构，翻译为中文
+- `CHANGELOG.md`：底部补全全部 70 个版本（v1.7.0 → v2.34.0）的 reference links，符合 Keep a Changelog 规范
+- `LICENSE`：版权年份更新为 2025–2026
+- `docs/plan/`：规范化计划目录，统一使用中文，删除 `docs/zh-CN/plan/` 重复版本
+
 ## [2.34.0] - 2026-03-17
 
 ### Performance
@@ -1124,3 +1147,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Migrated to llama_cpp_dart, upgraded to Riverpod 3.x
+
+<!-- Release links -->
+[2.35.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.34.0...v2.35.0
+[2.34.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.5...v2.34.0
+[2.33.5]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.4...v2.33.5
+[2.33.4]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.3...v2.33.4
+[2.33.3]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.2...v2.33.3
+[2.33.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.1...v2.33.2
+[2.33.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.0...v2.33.1
+[2.33.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.32.1...v2.33.0
+[2.32.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.32.0...v2.32.1
+[2.32.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.31.4...v2.32.0
+[2.31.4]: https://github.com/sinnohzeng/hachimi-app/compare/v2.31.3...v2.31.4
+[2.31.3]: https://github.com/sinnohzeng/hachimi-app/compare/v2.31.2...v2.31.3
+[2.31.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.31.1...v2.31.2
+[2.31.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.31.0...v2.31.1
+[2.31.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.30.2...v2.31.0
+[2.30.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.30.1...v2.30.2
+[2.30.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.30.0...v2.30.1
+[2.30.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.29.1...v2.30.0
+[2.29.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.29.0...v2.29.1
+[2.29.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.28.2...v2.29.0
+[2.28.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.28.1...v2.28.2
+[2.28.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.28.0...v2.28.1
+[2.28.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.27.0...v2.28.0
+[2.27.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.26.0...v2.27.0
+[2.26.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.25.0...v2.26.0
+[2.25.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.24.0...v2.25.0
+[2.24.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.23.0...v2.24.0
+[2.23.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.22.0...v2.23.0
+[2.22.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.21.0...v2.22.0
+[2.21.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.20.0...v2.21.0
+[2.20.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.11...v2.20.0
+[2.19.11]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.10...v2.19.11
+[2.19.10]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.9...v2.19.10
+[2.19.9]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.8...v2.19.9
+[2.19.8]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.7...v2.19.8
+[2.19.7]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.6...v2.19.7
+[2.19.6]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.5...v2.19.6
+[2.19.5]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.4...v2.19.5
+[2.19.4]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.3...v2.19.4
+[2.19.3]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.2...v2.19.3
+[2.19.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.1...v2.19.2
+[2.19.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.19.0...v2.19.1
+[2.19.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.18.1...v2.19.0
+[2.18.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.18.0...v2.18.1
+[2.18.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.17.0...v2.18.0
+[2.17.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.16.0...v2.17.0
+[2.16.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.15.0...v2.16.0
+[2.15.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.14.0...v2.15.0
+[2.14.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.13.0...v2.14.0
+[2.13.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.12.0...v2.13.0
+[2.12.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.11.0...v2.12.0
+[2.11.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.10.0...v2.11.0
+[2.10.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.9.1...v2.10.0
+[2.9.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.9.0...v2.9.1
+[2.9.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.8.4...v2.9.0
+[2.8.4]: https://github.com/sinnohzeng/hachimi-app/compare/v2.8.3...v2.8.4
+[2.8.3]: https://github.com/sinnohzeng/hachimi-app/compare/v2.8.2...v2.8.3
+[2.8.2]: https://github.com/sinnohzeng/hachimi-app/compare/v2.8.1...v2.8.2
+[2.8.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.8.0...v2.8.1
+[2.8.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.7.0...v2.8.0
+[2.7.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.6.0...v2.7.0
+[2.6.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.0.0...v2.2.0
+[2.0.0]: https://github.com/sinnohzeng/hachimi-app/compare/v1.9.0...v2.0.0
+[1.9.0]: https://github.com/sinnohzeng/hachimi-app/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/sinnohzeng/hachimi-app/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/sinnohzeng/hachimi-app/releases/tag/v1.7.0
