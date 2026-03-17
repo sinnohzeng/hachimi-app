@@ -2736,4 +2736,121 @@ class SKo extends S {
 
   @override
   String get tagCustom => '+Custom';
+
+  @override
+  String get homeTabAwareness => 'Awareness';
+
+  @override
+  String get homeTabHabits => 'Habits';
+
+  @override
+  String get monthlyRitualSetupTitle =>
+      'A new month — pick a habit to focus on';
+
+  @override
+  String get monthlyRitualSetupDesc =>
+      'Choose your focus habit, set a flexible goal, and promise yourself a reward.';
+
+  @override
+  String get monthlyRitualSetupButton => 'Set up';
+
+  @override
+  String get monthlyRitualDialogTitle => 'Monthly ritual';
+
+  @override
+  String get monthlyRitualHabitLabel => 'Focus habit';
+
+  @override
+  String get monthlyRitualTargetLabel => 'Target days';
+
+  @override
+  String monthlyRitualTargetValue(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get monthlyRitualRewardHint => 'Reward myself with...';
+
+  @override
+  String get monthlyRitualRewardLabel => 'Reward';
+
+  @override
+  String monthlyRitualProgress(int completed, int target) {
+    return '$completed/$target days done ✨';
+  }
+
+  @override
+  String get monthlyRitualAchieved => 'Goal achieved! 🎉';
+
+  @override
+  String get monthlyRitualEncouragement => 'Every day counts';
+
+  @override
+  String get achievementLightFirstName => 'First Light';
+
+  @override
+  String get achievementLightFirstDesc => 'Record your first daily light';
+
+  @override
+  String get achievementLight7Name => 'Week of Light';
+
+  @override
+  String get achievementLight7Desc =>
+      'Record daily light for 7 days (cumulative)';
+
+  @override
+  String get achievementLight30Name => 'Month of Light';
+
+  @override
+  String get achievementLight30Desc =>
+      'Record daily light for 30 days (cumulative)';
+
+  @override
+  String get achievementLight100Name => 'Century of Light';
+
+  @override
+  String get achievementLight100Desc =>
+      'Record daily light for 100 days (cumulative)';
+
+  @override
+  String get achievementReviewFirstName => 'First Review';
+
+  @override
+  String get achievementReviewFirstDesc => 'Complete your first weekly review';
+
+  @override
+  String get achievementReview4Name => 'Monthly Reviewer';
+
+  @override
+  String get achievementReview4Desc => 'Complete 4 weekly reviews (cumulative)';
+
+  @override
+  String get achievementWorryResolved1Name => 'First Release';
+
+  @override
+  String get achievementWorryResolved1Desc =>
+      'Resolve or release your first worry';
+
+  @override
+  String get achievementWorryResolved10Name => 'Worry Whisperer';
+
+  @override
+  String get achievementWorryResolved10Desc =>
+      'Resolve or release 10 worries (cumulative)';
+
+  @override
+  String get notifBedtimeLight =>
+      'How was your day? Take a moment to notice something good ✨';
+
+  @override
+  String get notifWeeklyReview =>
+      'Sunday evening — a good time to look back at your week 📖';
+
+  @override
+  String get notifMonthlyRitual =>
+      'A new month begins! Pick a habit to focus on this month 🌙';
+
+  @override
+  String get notifGentleReengagement =>
+      'No pressure — come back whenever you\'re ready 🌿';
 }

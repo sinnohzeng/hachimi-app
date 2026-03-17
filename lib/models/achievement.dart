@@ -69,6 +69,10 @@ enum AchievementTrigger {
   checkInCompleted,
   accessoryEquipped,
   appStartup,
+  // V3 觉知新增
+  lightRecorded,
+  weeklyReviewCompleted,
+  worryResolved,
 }
 
 /// 成就评估上下文 — 传递给评估引擎的快照数据
@@ -90,6 +94,11 @@ class AchievementEvalContext {
   final bool hasCompletedGoalAhead; // 在截止日期前 7+ 天达成目标
   final Set<String> unlockedIds;
 
+  // V3 觉知新增
+  final int totalLightDays; // 累计记录一点光的天数
+  final int totalWeeklyReviews; // 累计完成周回顾的次数
+  final int totalWorriesResolved; // 累计解决/消失的烦恼数
+
   const AchievementEvalContext({
     required this.totalSessionCount,
     required this.activeHabitCount,
@@ -107,5 +116,8 @@ class AchievementEvalContext {
     this.hasCompletedGoalOnTime = false,
     this.hasCompletedGoalAhead = false,
     required this.unlockedIds,
+    this.totalLightDays = 0,
+    this.totalWeeklyReviews = 0,
+    this.totalWorriesResolved = 0,
   });
 }

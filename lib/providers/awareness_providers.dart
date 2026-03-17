@@ -57,8 +57,13 @@ final todayLightProvider = StreamProvider<DailyLight?>((ref) {
 });
 
 /// 今日是否已记录每日一光 — 从 todayLightProvider 派生。
+/// 加载中和错误状态均视为「未知」（返回 false），避免在错误时误导用户。
+/// FocusCompleteScreen 桥接横幅依赖此 provider；错误时横幅仍会显示，
+/// 但录入操作会独立降级，MVP 阶段可接受。
 final hasRecordedTodayLightProvider = Provider<bool>((ref) {
-  return ref.watch(todayLightProvider).value != null;
+  final async = ref.watch(todayLightProvider);
+  // 仅在数据成功加载且非 null 时返回 true
+  return async.whenData((light) => light != null).value ?? false;
 });
 
 /// 指定月份的每日一光列表 — 按月加载（参数格式：'YYYY-MM'）。

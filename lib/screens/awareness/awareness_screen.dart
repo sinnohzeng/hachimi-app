@@ -12,6 +12,7 @@ import 'package:hachimi_app/providers/awareness_providers.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/awareness/worry_item_card.dart';
+import 'package:hachimi_app/widgets/awareness/monthly_ritual_card.dart';
 import 'package:hachimi_app/widgets/error_state.dart';
 
 /// 觉知主页 — 三子标签（今天 / 本周 / 回顾）。
@@ -97,8 +98,9 @@ class _TodaySubTab extends ConsumerWidget {
             onRetry: () => ref.invalidate(todayLightProvider),
           ),
         ),
-        // Track 3 月度挑战占位
-        const SizedBox.shrink(),
+        // 月度仪式卡片
+        const SizedBox(height: AppSpacing.md),
+        const MonthlyRitualCard(),
         const SizedBox(height: AppSpacing.lg),
         _buildHabitsSection(context, ref),
       ],

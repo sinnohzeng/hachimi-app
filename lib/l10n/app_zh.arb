@@ -818,15 +818,15 @@
       }
     }
   },
-  "onboardTitle1": "认识你的伙伴",
-  "onboardSubtitle1": "每段旅程从一只小猫开始",
-  "onboardBody1": "设定目标，领养一只小猫。\n专注目标，看着你的猫咪成长！",
-  "onboardTitle2": "专注、成长、进化",
-  "onboardSubtitle2": "4 个成长阶段",
-  "onboardBody2": "每分钟的专注都帮助猫咪进化，\n从小小幼猫到威风凛凛的大猫！",
-  "onboardTitle3": "打造你的猫房",
-  "onboardSubtitle3": "收集独特猫咪",
-  "onboardBody3": "每个任务都带来一只独特外观的新猫。\n收集它们，打造你的梦想收藏！",
+  "onboardTitle1": "认识哈奇米",
+  "onboardSubtitle1": "你的觉知伴侣",
+  "onboardBody1": "哈奇米是一只会感应你心情的猫咪，陪你在每天的小事中觉察自己。",
+  "onboardTitle2": "每天 5 分钟",
+  "onboardSubtitle2": "记录你的一点光",
+  "onboardBody2": "睡前记录一个让你微笑的瞬间，选一个心情，写一句话就够了。",
+  "onboardTitle3": "猫咪陪你觉知自己",
+  "onboardSubtitle3": "慢慢变好",
+  "onboardBody3": "专注习惯、记录心情、觉察烦恼。不完美也没关系，猫咪一直在。",
   "onboardSkip": "跳过",
   "onboardLetsGo": "开始吧！",
   "onboardNext": "下一步",
@@ -1557,5 +1557,60 @@
   "worryDescriptionRequired": "请描述你的烦恼",
   "worryLoadFailed": "加载烦恼失败",
   "awarenessLoginRequired": "请先登录",
-  "tagCustom": "+自定义"
+  "tagCustom": "+自定义",
+
+  "homeTabAwareness": "觉知",
+  "homeTabHabits": "习惯",
+
+  "monthlyRitualSetupTitle": "新的一月，选一个习惯来专注",
+  "monthlyRitualSetupDesc": "选一个这个月最想坚持的习惯，设定一个灵活的目标，给自己一个小奖励。",
+  "monthlyRitualSetupButton": "开始设定",
+  "monthlyRitualDialogTitle": "月度仪式",
+  "monthlyRitualHabitLabel": "专注习惯",
+  "monthlyRitualTargetLabel": "目标天数",
+  "monthlyRitualTargetValue": "{count} 天",
+  "@monthlyRitualTargetValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyRitualRewardHint": "完成后我要奖励自己...",
+  "monthlyRitualRewardLabel": "奖励",
+  "monthlyRitualProgress": "已完成 {completed}/{target} 天 ✨",
+  "@monthlyRitualProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyRitualAchieved": "达成目标！🎉",
+  "monthlyRitualEncouragement": "每一天都算数",
+
+  "achievementLightFirstName": "第一缕光",
+  "achievementLightFirstDesc": "记录第一个每日一点光",
+  "achievementLight7Name": "一周之光",
+  "achievementLight7Desc": "累计记录 7 天一点光",
+  "achievementLight30Name": "月光收集者",
+  "achievementLight30Desc": "累计记录 30 天一点光",
+  "achievementLight100Name": "百日之光",
+  "achievementLight100Desc": "累计记录 100 天一点光",
+  "achievementReviewFirstName": "初次回顾",
+  "achievementReviewFirstDesc": "完成第一次周回顾",
+  "achievementReview4Name": "每月回顾家",
+  "achievementReview4Desc": "累计完成 4 次周回顾",
+  "achievementWorryResolved1Name": "第一次释然",
+  "achievementWorryResolved1Desc": "解决或释放你的第一个烦恼",
+  "achievementWorryResolved10Name": "烦恼轻语者",
+  "achievementWorryResolved10Desc": "累计解决或释放 10 个烦恼",
+
+  "notifBedtimeLight": "今天过得怎么样？花一点时间，留意一件美好的事 ✨",
+  "notifWeeklyReview": "周日晚上，适合回顾这一周 📖",
+  "notifMonthlyRitual": "新的一个月开始了！选一个习惯来专注吧 🌙",
+  "notifGentleReengagement": "没关系，什么时候回来都好 🌿"
 }

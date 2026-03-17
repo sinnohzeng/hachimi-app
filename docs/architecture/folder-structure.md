@@ -32,6 +32,28 @@ hachimi-app/
 - `widgets/pixel_ui/`: pixel-art UI components for Retro Pixel mode (16 files: `pixel_border.dart`, `pixel_badge.dart`, `pixel_button.dart`, `pixel_card.dart`, `pixel_chat_bubble.dart`, `pixel_coin_display.dart`, `pixel_diary_entry.dart`, `pixel_loading_indicator.dart`, `pixel_milestone.dart`, `pixel_progress_bar.dart`, `pixel_progress_ring.dart`, `pixel_section_header.dart`, `pixel_skeleton_loader.dart`, `pixel_stat_row.dart`, `pixel_switch.dart`, `retro_tiled_background.dart`)
 - `widgets/celebration/`: achievement celebration overlay system (6 files: `achievement_celebration_layer.dart`, `celebration_confetti_painter.dart`, `celebration_glow_icon.dart`, `celebration_overlay.dart`, `celebration_reward_badges.dart`, `celebration_tier.dart`)
 - `models/`: domain models
+- `models/mood.dart`: 5-level mood enum for awareness
+- `models/daily_light.dart`: DailyLight model
+- `models/weekly_review.dart`: WeeklyReview model
+- `models/worry.dart`: Worry model + WorryStatus enum
+- `core/constants/awareness_constants.dart`: preset tags + cat reaction seed copy
+- `providers/awareness_providers.dart`: 7 awareness providers
+- `services/awareness_repository.dart`: DailyLight + WeeklyReview CRUD
+- `services/worry_repository.dart`: Worry CRUD
+- `screens/awareness/`: awareness feature screens (5 files)
+- `screens/awareness/awareness_screen.dart`: awareness main screen (3 sub-tabs)
+- `screens/awareness/daily_light_screen.dart`: daily light entry
+- `screens/awareness/weekly_review_screen.dart`: weekly review form
+- `screens/awareness/worry_processor_screen.dart`: worry list management
+- `screens/awareness/worry_edit_screen.dart`: worry create/edit
+- `widgets/awareness/`: awareness reusable widgets (7 files)
+- `widgets/awareness/mood_selector.dart`: mood picker
+- `widgets/awareness/light_input_card.dart`: daily light input card
+- `widgets/awareness/tag_selector.dart`: tag picker
+- `widgets/awareness/happy_moment_card.dart`: happy moment card
+- `widgets/awareness/worry_item_card.dart`: worry item card
+- `widgets/awareness/cat_bedtime_animation.dart`: cat mood-sensing animation
+- `widgets/awareness/awareness_empty_state.dart`: awareness empty state
 
 ## Account Lifecycle Files
 - `lib/models/account_data_snapshot.dart`

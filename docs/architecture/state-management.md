@@ -172,6 +172,32 @@ Key files: `lib/core/theme/skins/{theme_skin,material_skin,retro_pixel_skin}.dar
 
 `AppScaffold` (in `lib/widgets/app_scaffold.dart`) wraps `Scaffold` and conditionally overlays `RetroTiledBackground` in retro mode. All screens use `AppScaffold` instead of `Scaffold` — single integration point for 23+ screens.
 
+## V3 Awareness Providers
+
+### Service Providers (in `service_providers.dart`)
+- `awarenessRepositoryProvider` — `AwarenessRepository`（DailyLight + WeeklyReview CRUD）
+- `worryRepositoryProvider` — `WorryRepository`（Worry CRUD）
+
+### State Providers (in `awareness_providers.dart`)
+
+| Provider | Type | Description |
+|----------|------|-------------|
+| `todayLightProvider` | `StreamProvider<DailyLight?>` | 今日一点光，filter: `light_recorded` / `light_deleted` |
+| `hasRecordedTodayLightProvider` | `Provider<bool>` | 派生自 `todayLightProvider` |
+| `currentWeekReviewProvider` | `StreamProvider<WeeklyReview?>` | 本周回顾 |
+| `activeWorriesProvider` | `StreamProvider<List<Worry>>` | 进行中烦恼 |
+| `resolvedWorriesProvider` | `StreamProvider<List<Worry>>` | 已终结烦恼 |
+| `awarenessStatsProvider` | `StreamProvider<Map<String, int>>` | 觉知统计 |
+| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | 月度一点光 |
+
+### New ActionType Values
+
+`lightRecorded`, `weeklyReviewCompleted`, `worryCreated`, `worryUpdated`, `worryResolved`, `monthlyRitualSet`
+
+These values are used in `LedgerChange` domain-specific filters for the awareness StreamProviders.
+
+Affected LedgerChange refresh: awareness providers respond to `isGlobalRefresh` plus the above domain-specific action types.
+
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Navigation side-effects must be handled by listeners/effects, not inside `build()`.

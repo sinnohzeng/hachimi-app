@@ -818,15 +818,15 @@
       }
     }
   },
-  "onboardTitle1": "Meet Your Companion",
-  "onboardSubtitle1": "Every quest begins with a kitten",
-  "onboardBody1": "Set a goal and adopt a kitten.\nFocus on it, and watch your cat grow!",
-  "onboardTitle2": "Focus, Grow, Evolve",
-  "onboardSubtitle2": "4 stages of growth",
-  "onboardBody2": "Every minute of focus helps your cat evolve\nfrom a tiny kitten to a magnificent senior!",
-  "onboardTitle3": "Build Your Cat Room",
-  "onboardSubtitle3": "Collect unique cats",
-  "onboardBody3": "Each quest brings a new cat with unique looks.\nDiscover them all and build your dream collection!",
+  "onboardTitle1": "Meet Hachimi",
+  "onboardSubtitle1": "Your awareness companion",
+  "onboardBody1": "Hachimi is a cat who senses your mood, keeping you company as you notice the little things each day.",
+  "onboardTitle2": "5 Minutes a Day",
+  "onboardSubtitle2": "Record your daily light",
+  "onboardBody2": "Before bed, capture a moment that made you smile. Pick a mood, write one line — that's enough.",
+  "onboardTitle3": "A Cat That Grows With You",
+  "onboardSubtitle3": "Getting better, slowly",
+  "onboardBody3": "Focus on habits, record your mood, notice your worries. It's okay to be imperfect — your cat is always here.",
   "onboardSkip": "Skip",
   "onboardLetsGo": "Let's Go!",
   "onboardNext": "Next",
@@ -1648,5 +1648,60 @@
   "worryDescriptionRequired": "Please describe your worry",
   "worryLoadFailed": "Failed to load worry",
   "awarenessLoginRequired": "Please log in first",
-  "tagCustom": "+Custom"
+  "tagCustom": "+Custom",
+
+  "homeTabAwareness": "Awareness",
+  "homeTabHabits": "Habits",
+
+  "monthlyRitualSetupTitle": "A new month — pick a habit to focus on",
+  "monthlyRitualSetupDesc": "Choose your focus habit, set a flexible goal, and promise yourself a reward.",
+  "monthlyRitualSetupButton": "Set up",
+  "monthlyRitualDialogTitle": "Monthly ritual",
+  "monthlyRitualHabitLabel": "Focus habit",
+  "monthlyRitualTargetLabel": "Target days",
+  "monthlyRitualTargetValue": "{count} days",
+  "@monthlyRitualTargetValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyRitualRewardHint": "Reward myself with...",
+  "monthlyRitualRewardLabel": "Reward",
+  "monthlyRitualProgress": "{completed}/{target} days done ✨",
+  "@monthlyRitualProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyRitualAchieved": "Goal achieved! 🎉",
+  "monthlyRitualEncouragement": "Every day counts",
+
+  "achievementLightFirstName": "First Light",
+  "achievementLightFirstDesc": "Record your first daily light",
+  "achievementLight7Name": "Week of Light",
+  "achievementLight7Desc": "Record daily light for 7 days (cumulative)",
+  "achievementLight30Name": "Month of Light",
+  "achievementLight30Desc": "Record daily light for 30 days (cumulative)",
+  "achievementLight100Name": "Century of Light",
+  "achievementLight100Desc": "Record daily light for 100 days (cumulative)",
+  "achievementReviewFirstName": "First Review",
+  "achievementReviewFirstDesc": "Complete your first weekly review",
+  "achievementReview4Name": "Monthly Reviewer",
+  "achievementReview4Desc": "Complete 4 weekly reviews (cumulative)",
+  "achievementWorryResolved1Name": "First Release",
+  "achievementWorryResolved1Desc": "Resolve or release your first worry",
+  "achievementWorryResolved10Name": "Worry Whisperer",
+  "achievementWorryResolved10Desc": "Resolve or release 10 worries (cumulative)",
+
+  "notifBedtimeLight": "How was your day? Take a moment to notice something good ✨",
+  "notifWeeklyReview": "Sunday evening — a good time to look back at your week 📖",
+  "notifMonthlyRitual": "A new month begins! Pick a habit to focus on this month 🌙",
+  "notifGentleReengagement": "No pressure — come back whenever you're ready 🌿"
 }
