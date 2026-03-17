@@ -149,3 +149,4 @@ TimerScreen._navigateToResult()
 | 2026-02-21 | 渠道 ID 从 `hachimi_focus`（与前台服务共用）改为 `hachimi_focus_complete`（专用）。后台完成通知现在在倒计时归零时从 `_onTick()` 触发。 |
 | 2026-02-22 | 修复通知重叠：`FocusTimerService.stop()` 现在在 `_onTick()`、`complete()` 和 `abandon()` 中于完成通知之前调用。新增通过 `zonedSchedule()` 的备用闹钟以应对前台服务被系统杀死的情况。通知文本重新排序：时间优先于任务名显示，任务名超 20 字符截断。 |
 | 2026-03-17 | 架构重构：（1）移除 provider 中重复的 `showFocusComplete()` —— 通知现在仅从 TimerScreen 触发（单一来源）。（2）提取 `TimerPersistence`，注入可控 Clock 实现可测试的崩溃恢复。（3）提取 `SessionCompletionService`，使用显式依赖注入编排会话完成业务逻辑。（4）`scheduleStreakAtRisk` 和 `showCelebration` L10N 参数化（接受 title/body 而非硬编码英文）。 |
+| 2026-03-17 | P2 测试补全：（1）提取 `notification_scheduling.dart` —— 时间计算和 ID 生成纯函数，通过 `now` 参数注入实现可测试性。（2）新增 `focus_timer_notifier_tick_test.dart` —— 15 个测试覆盖 `_onTick`、`onAppResumed`、`_handleCountdownComplete`、`restoreSession`、`_shouldAutoComplete`，通过 Clock 注入验证。（3）新增 `notification_scheduling_test.dart` —— 15 个测试覆盖 `nextInstanceOfTime`、`nextInstanceOfWeekdayTime`、ID 计算。 |

@@ -6,9 +6,8 @@
 //         abandon, reset）。
 //
 // Note: Timer-ticking tests (countdown auto-complete, elapsed increments)
-// are not included because _onTick() uses DateTime.now() for wall-clock
-// calculations, which is not overridden by fakeAsync. Testing those
-// requires an injectable clock, which is out of scope.
+// are in focus_timer_notifier_tick_test.dart, which uses Clock injection
+// via TimerPersistence to achieve deterministic wall-clock verification.
 //
 // 🧩 文件结构：
 // - FocusTimerState: defaults, remainingSeconds, progress, displayTime,
@@ -257,8 +256,7 @@ void main() {
   // ─── Part 2: FocusTimerNotifier lifecycle tests ───
   //
   // These tests verify the state-machine transitions of FocusTimerNotifier.
-  // Timer-ticking tests are excluded because _onTick() uses DateTime.now()
-  // for wall-clock calculations, which is not overridden by fakeAsync.
+  // Timer-ticking tests are in focus_timer_notifier_tick_test.dart.
 
   group('FocusTimerNotifier — lifecycle', () {
     late ProviderContainer container;
