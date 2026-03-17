@@ -12,8 +12,11 @@ import 'package:hachimi_app/core/constants/session_constants.dart';
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
+import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/models/weekly_review.dart';
+import 'package:hachimi_app/models/worry.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 
 /// 后台静默同步引擎 — 将未同步台账条目推送到 Firestore。
@@ -79,6 +82,24 @@ class SyncEngine {
       'local_cats',
       db,
       (doc) => Cat.fromFirestore(doc).toSqlite(uid),
+    );
+    await _hydrateCollection<DailyLight>(
+      userRef.collection('dailyLights'),
+      'local_daily_lights',
+      db,
+      (doc) => DailyLight.fromFirestore(doc).toSqlite(uid),
+    );
+    await _hydrateCollection<WeeklyReview>(
+      userRef.collection('weeklyReviews'),
+      'local_weekly_reviews',
+      db,
+      (doc) => WeeklyReview.fromFirestore(doc).toSqlite(uid),
+    );
+    await _hydrateCollection<Worry>(
+      userRef.collection('worries'),
+      'local_worries',
+      db,
+      (doc) => Worry.fromFirestore(doc).toSqlite(uid),
     );
     await _hydrateUserProfile(userRef, uid);
 
@@ -279,6 +300,18 @@ class SyncEngine {
           _syncAchievement(batch, uid, action);
         case ActionType.profileUpdate:
           _syncProfileUpdate(batch, uid, action);
+        case ActionType.lightRecorded:
+          await _syncDailyLight(batch, uid, action);
+        case ActionType.weeklyReviewCompleted:
+          await _syncWeeklyReview(batch, uid, action);
+        case ActionType.worryCreated:
+        case ActionType.worryUpdated:
+        case ActionType.worryResolved:
+          await _syncWorry(batch, uid, action);
+        case ActionType.monthlyRitualSet:
+          // 月度仪式仅本地存储，无需同步
+          await _ledger.markSynced(action.id);
+          return;
         case ActionType.accountCreated:
         case ActionType.accountLinked:
         case ActionType.achievementClaimed:
@@ -525,6 +558,87 @@ class SyncEngine {
 
     final userRef = _db.collection('users').doc(uid);
     batch.update(userRef, {field: value});
+  }
+
+  /// 同步每日一光到 Firestore。
+  Future<void> _syncDailyLight(
+    WriteBatch batch,
+    String uid,
+    LedgerAction action,
+  ) async {
+    final date = action.payload['date'] as String?;
+    if (date == null) return;
+
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_daily_lights',
+      where: 'uid = ? AND date = ?',
+      whereArgs: [uid, date],
+      limit: 1,
+    );
+    if (rows.isEmpty) return;
+
+    final light = DailyLight.fromSqlite(rows.first);
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('dailyLights')
+        .doc(date);
+    batch.set(ref, light.toFirestore());
+  }
+
+  /// 同步周回顾到 Firestore。
+  Future<void> _syncWeeklyReview(
+    WriteBatch batch,
+    String uid,
+    LedgerAction action,
+  ) async {
+    final weekId = action.payload['weekId'] as String?;
+    if (weekId == null) return;
+
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_weekly_reviews',
+      where: 'uid = ? AND week_id = ?',
+      whereArgs: [uid, weekId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return;
+
+    final review = WeeklyReview.fromSqlite(rows.first);
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('weeklyReviews')
+        .doc(weekId);
+    batch.set(ref, review.toFirestore());
+  }
+
+  /// 同步烦恼到 Firestore（merge 模式，支持增量更新）。
+  Future<void> _syncWorry(
+    WriteBatch batch,
+    String uid,
+    LedgerAction action,
+  ) async {
+    final worryId = action.payload['worryId'] as String?;
+    if (worryId == null) return;
+
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_worries',
+      where: 'id = ? AND uid = ?',
+      whereArgs: [worryId, uid],
+      limit: 1,
+    );
+    if (rows.isEmpty) return;
+
+    final worry = Worry.fromSqlite(rows.first);
+    final ref = _db
+        .collection('users')
+        .doc(uid)
+        .collection('worries')
+        .doc(worryId);
+    batch.set(ref, worry.toFirestore(), SetOptions(merge: true));
   }
 
   void _syncAchievement(WriteBatch batch, String uid, LedgerAction action) {

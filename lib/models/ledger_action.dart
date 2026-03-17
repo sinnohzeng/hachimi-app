@@ -17,7 +17,15 @@ enum ActionType {
   accountLinked('account_linked'),
   achievementUnlocked('achievement_unlocked'),
   achievementClaimed('achievement_claimed'),
-  profileUpdate('profile_update');
+  profileUpdate('profile_update'),
+
+  // V3 觉知模块
+  lightRecorded('light_recorded'),
+  weeklyReviewCompleted('weekly_review_completed'),
+  worryCreated('worry_created'),
+  worryUpdated('worry_updated'),
+  worryResolved('worry_resolved'),
+  monthlyRitualSet('monthly_ritual_set');
 
   const ActionType(this.value);
   final String value;

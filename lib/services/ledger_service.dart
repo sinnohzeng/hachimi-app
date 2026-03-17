@@ -221,6 +221,7 @@ class LedgerService {
         'local_cats',
         'local_sessions',
         'local_achievements',
+        'local_worries',
       ]) {
         await txn.update(
           table,
@@ -231,7 +232,12 @@ class LedgerService {
       }
 
       // 复合 PK 表 — 先删 newUid 默认行，再更新 oldUid→newUid
-      for (final table in ['materialized_state', 'local_monthly_checkins']) {
+      for (final table in [
+        'materialized_state',
+        'local_monthly_checkins',
+        'local_daily_lights',
+        'local_weekly_reviews',
+      ]) {
         await txn.delete(table, where: 'uid = ?', whereArgs: [newUid]);
         await txn.update(
           table,
@@ -240,6 +246,19 @@ class LedgerService {
           whereArgs: [oldUid],
         );
       }
+
+      // uid 即为 PK 的统计表 — 先删 newUid 行，再更新 oldUid→newUid
+      await txn.delete(
+        'local_awareness_stats',
+        where: 'uid = ?',
+        whereArgs: [newUid],
+      );
+      await txn.update(
+        'local_awareness_stats',
+        {'uid': newUid},
+        where: 'uid = ?',
+        whereArgs: [oldUid],
+      );
     });
   }
 
@@ -255,6 +274,10 @@ class LedgerService {
         'local_monthly_checkins',
         'materialized_state',
         'local_achievements',
+        'local_daily_lights',
+        'local_weekly_reviews',
+        'local_worries',
+        'local_awareness_stats',
       ]) {
         await txn.delete(table, where: 'uid = ?', whereArgs: [uid]);
       }

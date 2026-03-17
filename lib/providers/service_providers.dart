@@ -35,8 +35,10 @@ import 'package:hachimi_app/services/notification_service.dart';
 export 'package:hachimi_app/services/notification_service.dart'
     show NotificationService;
 import 'package:hachimi_app/services/session_completion_service.dart';
+import 'package:hachimi_app/services/awareness_repository.dart';
 import 'package:hachimi_app/services/sync_engine.dart';
 import 'package:hachimi_app/services/user_profile_service.dart';
+import 'package:hachimi_app/services/worry_repository.dart';
 import 'package:hachimi_app/services/xp_service.dart';
 
 /// SharedPreferences 在 main() 中预加载并通过 ProviderScope.overrides 注入。
@@ -103,6 +105,14 @@ final localSessionRepositoryProvider = Provider<LocalSessionRepository>((ref) {
 
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   return SyncEngine(ledger: ref.watch(ledgerServiceProvider));
+});
+
+final awarenessRepositoryProvider = Provider<AwarenessRepository>((ref) {
+  return AwarenessRepository(ledger: ref.watch(ledgerServiceProvider));
+});
+
+final worryRepositoryProvider = Provider<WorryRepository>((ref) {
+  return WorryRepository(ledger: ref.watch(ledgerServiceProvider));
 });
 
 // ─── 后端抽象 ───
