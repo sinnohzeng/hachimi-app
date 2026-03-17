@@ -1,5 +1,5 @@
-v2.34.0
+v2.35.1
 
-- पिक्सेल थीम तेज़, कम फ़्रेम ड्रॉप
-- मेमोरी लीक ठीक, बेहतर स्थिरता
-- रंग कंट्रास्ट में सुधार (WCAG 2.1 AA)
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

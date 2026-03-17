@@ -202,14 +202,4 @@ class MaterialSkin implements ThemeSkin {
       textStyle: textTheme.bodySmall?.copyWith(color: scheme.onInverseSurface),
     );
   }
-
-  @override
-  PageTransitionsTheme pageTransitions() {
-    return const PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      },
-    );
-  }
 }

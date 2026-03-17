@@ -47,12 +47,67 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
   double? _cachedOffset;
   Size? _cachedSize;
   bool _isGenerating = false;
+  bool _cacheScheduled = false;
+
+  // 缓存 theme 依赖值，避免在 build() 中产生副作用
+  Color? _effectiveColor;
+  double _effectiveOffset = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateThemeValues();
+    _scheduleCache();
+  }
+
+  @override
+  void didUpdateWidget(RetroTiledBackground oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pattern != widget.pattern ||
+        oldWidget.scrollOffset != widget.scrollOffset ||
+        oldWidget.color != widget.color ||
+        oldWidget.opacity != widget.opacity) {
+      _updateThemeValues();
+      _scheduleCache();
+    }
+  }
 
   @override
   void dispose() {
     _cachedImage?.dispose();
     _cachedImage = null;
     super.dispose();
+  }
+
+  /// 根据 Theme 和 widget 参数计算有效颜色与偏移。
+  void _updateThemeValues() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final patternColor =
+        widget.color ?? Theme.of(context).colorScheme.onSurface;
+    final patternOpacity = widget.opacity ?? (isDark ? 0.03 : 0.05);
+    _effectiveColor = patternColor.withValues(alpha: patternOpacity);
+    _effectiveOffset = widget.scrollOffset % 16;
+  }
+
+  /// 在下一帧回调中触发缓存生成 — 去重防止同帧多次排队。
+  void _scheduleCache() {
+    if (_cacheScheduled) return;
+    _cacheScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _cacheScheduled = false;
+      if (!mounted) return;
+      final color = _effectiveColor;
+      if (color == null) return;
+      final renderBox = context.findRenderObject() as RenderBox?;
+      if (renderBox != null && renderBox.hasSize) {
+        _ensureCacheAsync(
+          renderBox.size,
+          widget.pattern,
+          color,
+          _effectiveOffset,
+        );
+      }
+    });
   }
 
   /// 异步检查并更新缓存 — 将 GPU 纹理分配移出关键帧路径。
@@ -96,35 +151,13 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final patternColor =
-        widget.color ?? Theme.of(context).colorScheme.onSurface;
-    final patternOpacity = widget.opacity ?? (isDark ? 0.03 : 0.05);
-    final effectiveColor = patternColor.withValues(alpha: patternOpacity);
-    final effectiveOffset = widget.scrollOffset % 16;
-
-    // 触发异步缓存生成（不阻塞当前帧）
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final renderBox = context.findRenderObject() as RenderBox?;
-      if (renderBox != null && renderBox.hasSize) {
-        _ensureCacheAsync(
-          renderBox.size,
-          widget.pattern,
-          effectiveColor,
-          effectiveOffset,
-        );
-      }
-    });
-
+    // 纯渲染，不再注册回调 — 副作用已移至生命周期方法
     return Stack(
       children: [
         if (_cachedImage != null)
           Positioned.fill(
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: _CachedPatternPainter(image: _cachedImage!),
-              ),
+            child: CustomPaint(
+              painter: _CachedPatternPainter(image: _cachedImage!),
             ),
           ),
         widget.child,
@@ -154,14 +187,19 @@ Future<ui.Image?> _renderToImageAsync(
       ..color = color
       ..isAntiAlias = false;
 
+    // 各图案所需 strokeWidth 不同，在调用前显式设置，
+    // 避免 paint 函数内部隐式修改传入参数。
     switch (pattern) {
       case PatternType.dots:
         _paintDots(offscreen, size, paint, offset);
       case PatternType.diagonal:
+        paint.strokeWidth = 1;
         _paintDiagonal(offscreen, size, paint, offset);
       case PatternType.crosshatch:
+        paint.strokeWidth = 0.5;
         _paintCrosshatch(offscreen, size, paint, offset);
       case PatternType.grid:
+        paint.strokeWidth = 0.5;
         _paintGrid(offscreen, size, paint, offset);
     }
 
@@ -187,7 +225,6 @@ void _paintDots(Canvas canvas, Size size, Paint paint, double offset) {
 
 void _paintDiagonal(Canvas canvas, Size size, Paint paint, double offset) {
   const spacing = 12.0;
-  paint.strokeWidth = 1;
   final maxDim = size.width + size.height;
   for (var i = -maxDim; i < maxDim; i += spacing) {
     canvas.drawLine(
@@ -200,7 +237,6 @@ void _paintDiagonal(Canvas canvas, Size size, Paint paint, double offset) {
 
 void _paintCrosshatch(Canvas canvas, Size size, Paint paint, double offset) {
   const spacing = 14.0;
-  paint.strokeWidth = 0.5;
   final maxDim = size.width + size.height;
 
   for (var i = -maxDim; i < maxDim; i += spacing) {
@@ -221,7 +257,6 @@ void _paintCrosshatch(Canvas canvas, Size size, Paint paint, double offset) {
 
 void _paintGrid(Canvas canvas, Size size, Paint paint, double offset) {
   const spacing = 16.0;
-  paint.strokeWidth = 0.5;
 
   for (var y = offset; y < size.height; y += spacing) {
     canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);

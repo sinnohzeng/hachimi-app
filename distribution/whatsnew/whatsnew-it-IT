@@ -1,6 +1,5 @@
-v2.34.0
+v2.35.1
 
-- Tema pixel più fluido con meno cali di frame
-- Correzione perdite di memoria per maggiore stabilità
-- Miglior contrasto colori per accessibilità (WCAG 2.1 AA)
-- UX: protezione tasto indietro nell'adozione, feedback errori
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

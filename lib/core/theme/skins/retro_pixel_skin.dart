@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../router/pixel_page_transitions.dart';
 import '../app_breakpoints.dart';
 import '../app_spacing.dart';
 import '../pixel_border_shape.dart';
@@ -14,7 +13,6 @@ import 'theme_skin.dart';
 /// 1. 将复古色映射到 [ColorScheme] 语义槽，使所有 Material 组件自动适配
 /// 2. 所有组件主题使用 [PixelBorderShape] 替代圆角
 /// 3. 标题/标签使用 Silkscreen 像素字体，正文保留 Roboto 确保可读性
-/// 4. 动效更快更干脆（120ms + linear），模拟 8-bit 手感
 class RetroPixelSkin implements ThemeSkin {
   const RetroPixelSkin();
 
@@ -291,16 +289,6 @@ class RetroPixelSkin implements ThemeSkin {
         border: Border.all(color: scheme.outline, width: _borderWidth),
       ),
       textStyle: textTheme.bodySmall?.copyWith(color: scheme.onInverseSurface),
-    );
-  }
-
-  @override
-  PageTransitionsTheme pageTransitions() {
-    return const PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: PixelPageTransitionsBuilder(),
-        TargetPlatform.iOS: PixelPageTransitionsBuilder(),
-      },
     );
   }
 }

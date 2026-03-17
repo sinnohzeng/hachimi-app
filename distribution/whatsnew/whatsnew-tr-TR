@@ -1,6 +1,5 @@
-v2.34.0
+v2.35.1
 
-- Piksel tema daha akıcı, daha az kare düşmesi
-- Bellek sızıntıları düzeltildi, daha kararlı çalışma
-- Renk kontrastı iyileştirildi (WCAG 2.1 AA uyumlu)
-- UX: evlat edinmede geri tuşu koruması, hata geri bildirimi
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

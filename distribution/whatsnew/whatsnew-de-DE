@@ -1,6 +1,5 @@
-v2.34.0
+v2.35.1
 
-- Flüssigeres Pixel-Theme mit weniger Rucklern
-- Speicherlecks behoben für bessere Stabilität
-- Verbesserter Farbkontrast für Barrierefreiheit (WCAG 2.1 AA)
-- UX: Zurück-Schutz bei Adoption, besseres Fehler-Feedback
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

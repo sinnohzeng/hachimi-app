@@ -38,5 +38,4 @@ abstract class ThemeSkin {
   SwitchThemeData switchTheme(ColorScheme scheme);
   PopupMenuThemeData popupMenuTheme(ColorScheme scheme);
   TooltipThemeData tooltipTheme(ColorScheme scheme, TextTheme textTheme);
-  PageTransitionsTheme pageTransitions();
 }

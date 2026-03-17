@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.35.1] - 2026-03-17
+
+### Fixed
+
+- **像素风页面过渡掉帧修复**：删除自定义 `PixelPageTransitionsBuilder`（离散 4 步淡入），改用 Flutter 原生 `PredictiveBackPageTransitionsBuilder`（Android）和 `CupertinoPageTransitionsBuilder`（iOS），页面过渡流畅度对齐 Material 3 水平
+- **RetroTiledBackground 副作用消除**：将 `addPostFrameCallback` 从 `build()` 移至 `didChangeDependencies` / `didUpdateWidget` 生命周期方法，防止过渡动画期间 GPU 纹理生成与动画帧竞争
+- **移除多余 RepaintBoundary**：`_CachedPatternPainter` 极少重绘，额外合成层属于负优化
+
+### Changed
+
+- **页面过渡从 skin 层提升为平台常量**：`pageTransitions()` 从 `ThemeSkin` 接口移除，在 `AppTheme._assemble()` 中统一定义，遵循关注点分离原则（页面过渡是平台行为，非皮肤行为）
+- **RetroTiledBackground 防御性重构**：`_effectiveColor` 改为 nullable、新增 `_cacheScheduled` 去重 flag、paint 函数 strokeWidth 副作用上提至调用处
+
 ## [2.35.0] - 2026-03-17
 
 ### Added
@@ -1149,6 +1162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated to llama_cpp_dart, upgraded to Riverpod 3.x
 
 <!-- Release links -->
+[2.35.1]: https://github.com/sinnohzeng/hachimi-app/compare/v2.35.0...v2.35.1
 [2.35.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.34.0...v2.35.0
 [2.34.0]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.5...v2.34.0
 [2.33.5]: https://github.com/sinnohzeng/hachimi-app/compare/v2.33.4...v2.33.5

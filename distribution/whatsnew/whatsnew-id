@@ -1,6 +1,5 @@
-v2.34.0
+v2.35.1
 
-- Tema pixel lebih mulus dengan lebih sedikit frame drop
-- Perbaikan kebocoran memori untuk stabilitas lebih baik
-- Peningkatan kontras warna untuk aksesibilitas (WCAG 2.1 AA)
-- UX: perlindungan tombol kembali saat adopsi, feedback error
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

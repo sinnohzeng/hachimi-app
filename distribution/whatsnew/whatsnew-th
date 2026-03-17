@@ -1,5 +1,5 @@
-v2.34.0
+v2.35.1
 
-- ธีมพิกเซลลื่นขึ้น ลดอาการกระตุก
-- แก้ไขปัญหาหน่วยความจำรั่ว เสถียรขึ้น
-- ปรับปรุงคอนทราสต์สี (WCAG 2.1 AA)
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

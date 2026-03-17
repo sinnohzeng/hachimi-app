@@ -1,6 +1,5 @@
-v2.34.0
+v2.35.1
 
-- Giao diện pixel mượt hơn, ít giật lag hơn
-- Sửa lỗi rò rỉ bộ nhớ, ổn định hơn khi dùng lâu
-- Cải thiện độ tương phản màu sắc (WCAG 2.1 AA)
-- UX: bảo vệ nút quay lại khi nhận nuôi, phản hồi lỗi tốt hơn
+- Fixed page transition jank in pixel theme
+- Native platform transitions for smoother navigation
+- Background pattern rendering optimized

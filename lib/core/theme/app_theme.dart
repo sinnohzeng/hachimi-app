@@ -100,6 +100,14 @@ class AppTheme {
     return _assemble(colorScheme, baseText, skin);
   }
 
+  /// 页面过渡 — 平台行为，与皮肤无关，全局统一。
+  static const _pageTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    },
+  );
+
   /// 组装最终 ThemeData — 全部委托给皮肤，零分支。
   static ThemeData _assemble(
     ColorScheme colorScheme,
@@ -121,7 +129,7 @@ class AppTheme {
       scaffoldBackgroundColor: colorScheme.surface,
       textTheme: textTheme,
       materialTapTargetSize: MaterialTapTargetSize.padded,
-      pageTransitionsTheme: skin.pageTransitions(),
+      pageTransitionsTheme: _pageTransitions,
       appBarTheme: skin
           .appBarTheme(colorScheme, pixelExt)
           .copyWith(systemOverlayStyle: _systemOverlay(colorScheme)),
