@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/core/constants/session_constants.dart';
 
 /// Focus session model — maps to Firestore `users/{uid}/habits/{habitId}/sessions/{sessionId}`.
 /// Records each focus session with duration, rewards, and completion status.
@@ -40,10 +41,10 @@ class FocusSession {
   });
 
   /// 会话是否正常完成。
-  bool get isCompleted => status == 'completed';
+  bool get isCompleted => status == SessionStatus.completed;
 
   /// 会话是否被放弃。
-  bool get isAbandoned => status == 'abandoned';
+  bool get isAbandoned => status == SessionStatus.abandoned;
 
   factory FocusSession.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -56,7 +57,7 @@ class FocusSession {
       durationMinutes: data['durationMinutes'] as int? ?? 0,
       targetDurationMinutes: data['targetDurationMinutes'] as int? ?? 0,
       pausedSeconds: data['pausedSeconds'] as int? ?? 0,
-      status: data['status'] as String? ?? 'completed',
+      status: data['status'] as String? ?? SessionStatus.completed,
       completionRatio: (data['completionRatio'] as num?)?.toDouble() ?? 1.0,
       xpEarned: data['xpEarned'] as int? ?? 0,
       coinsEarned: data['coinsEarned'] as int? ?? 0,
@@ -99,7 +100,7 @@ class FocusSession {
       durationMinutes: map['duration_minutes'] as int? ?? 0,
       targetDurationMinutes: map['target_duration_minutes'] as int? ?? 0,
       pausedSeconds: map['paused_seconds'] as int? ?? 0,
-      status: map['status'] as String? ?? 'completed',
+      status: map['status'] as String? ?? SessionStatus.completed,
       completionRatio: (map['completion_ratio'] as num?)?.toDouble() ?? 1.0,
       xpEarned: map['xp_earned'] as int? ?? 0,
       coinsEarned: map['coins_earned'] as int? ?? 0,

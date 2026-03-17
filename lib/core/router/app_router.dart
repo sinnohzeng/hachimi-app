@@ -18,7 +18,7 @@ import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
 import 'package:hachimi_app/screens/cat_room/inventory_screen.dart';
 import 'package:hachimi_app/screens/check_in/check_in_screen.dart';
 import 'package:hachimi_app/screens/stats/session_history_screen.dart';
-import 'package:hachimi_app/services/xp_service.dart';
+import 'package:hachimi_app/models/xp_result.dart';
 
 class AppRouter {
   AppRouter._();

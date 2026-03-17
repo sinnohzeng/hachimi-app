@@ -21,17 +21,14 @@ import 'package:hachimi_app/providers/focus_timer_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
-import 'package:hachimi_app/services/notification_service.dart';
 import 'package:hachimi_app/widgets/celebration/achievement_celebration_layer.dart';
 import 'package:hachimi_app/providers/locale_provider.dart';
 import 'package:hachimi_app/providers/theme_provider.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
 import 'package:hachimi_app/screens/onboarding/onboarding_screen.dart';
-// NotificationService accessed via notificationServiceProvider (re-exported from auth_provider)
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
 import 'package:hachimi_app/providers/user_profile_notifier.dart';
-import 'package:hachimi_app/services/achievement_evaluator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -409,13 +406,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
 
   /// 初始化成就评估器 — 纯本地，不需要网络。
   void _initAchievementEvaluator(String uid) {
-    final ledger = ref.read(ledgerServiceProvider);
-    final evaluator = AchievementEvaluator(
-      ledger: ledger,
-      onUnlocked: (ids) {
-        ref.read(newlyUnlockedProvider.notifier).addAll(ids);
-      },
-    );
+    final evaluator = createAchievementEvaluator(ref);
     _evaluator?.stop();
     _evaluator = evaluator;
     evaluator.start(uid);
@@ -544,7 +535,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   /// 为单个 habit 调度提醒通知。
   Future<void> _scheduleHabitReminder(
     Habit habit,
-    NotificationService notifService,
+    dynamic notifService,
     List<Cat> cats,
     S l10n,
     String fallbackCatName,

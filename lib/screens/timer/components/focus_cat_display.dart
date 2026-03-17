@@ -3,7 +3,7 @@ import 'package:hachimi_app/core/constants/cat_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
-import 'package:hachimi_app/services/xp_service.dart';
+import 'package:hachimi_app/models/xp_result.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 
 /// 专注完成页的猫咪展示区：sprite + 名字 + 阶段进化标签。

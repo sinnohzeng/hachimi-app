@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
 import 'package:hachimi_app/models/unlocked_achievement.dart';
+import 'package:hachimi_app/services/achievement_evaluator.dart';
+export 'package:hachimi_app/services/achievement_evaluator.dart'
+    show AchievementEvaluator;
 import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
@@ -152,6 +155,16 @@ final newlyUnlockedProvider =
     NotifierProvider<NewlyUnlockedNotifier, List<String>>(
       NewlyUnlockedNotifier.new,
     );
+
+/// 成就评估器工厂 — 用于 app.dart 启动引擎，避免直接导入 Service。
+AchievementEvaluator createAchievementEvaluator(Ref ref) {
+  return AchievementEvaluator(
+    ledger: ref.read(ledgerServiceProvider),
+    onUnlocked: (ids) {
+      ref.read(newlyUnlockedProvider.notifier).addAll(ids);
+    },
+  );
+}
 
 /// 成就进度数据
 class AchievementProgress {

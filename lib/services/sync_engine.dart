@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Database;
 
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/constants/session_constants.dart';
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -360,8 +361,8 @@ class SyncEngine {
       'endedAt': Timestamp.fromDate(action.endedAt ?? action.startedAt),
       'durationMinutes': minutes,
       'status': action.type == ActionType.focusComplete
-          ? 'completed'
-          : 'abandoned',
+          ? SessionStatus.completed
+          : SessionStatus.abandoned,
       'mode': action.payload['mode'] ?? 'countdown',
       'xpEarned': xp,
       'coinsEarned': coins,

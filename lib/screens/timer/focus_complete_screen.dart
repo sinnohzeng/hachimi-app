@@ -18,8 +18,8 @@ import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/screens/timer/components/stat_row.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
-import 'package:hachimi_app/services/diary_service.dart';
-import 'package:hachimi_app/services/xp_service.dart';
+import 'package:hachimi_app/models/diary_generation_context.dart';
+import 'package:hachimi_app/models/xp_result.dart';
 import 'package:vibration/vibration.dart';
 
 /// Focus complete celebration screen.

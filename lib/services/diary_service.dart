@@ -12,24 +12,13 @@ import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/performance_traces.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/diary_entry.dart';
+import 'package:hachimi_app/models/diary_generation_context.dart';
 import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/services/ai_service.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 
-/// 日记生成参数。
-class DiaryGenerationContext {
-  final Cat cat;
-  final Habit habit;
-  final int todayMinutes;
-  final bool isZhLocale;
-
-  const DiaryGenerationContext({
-    required this.cat,
-    required this.habit,
-    required this.todayMinutes,
-    required this.isZhLocale,
-  });
-}
+// Re-export so existing `import diary_service.dart` still compiles.
+export 'package:hachimi_app/models/diary_generation_context.dart';
 
 /// 日记服务 — prompt 构建 + AI 生成 + SQLite 存储。
 class DiaryService {

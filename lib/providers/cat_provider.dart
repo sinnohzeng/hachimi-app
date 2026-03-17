@@ -54,19 +54,11 @@ final allCatsProvider = StreamProvider<List<Cat>>((ref) {
 /// Cat by habit ID — family provider for quick lookups.
 final catByHabitProvider = Provider.family<Cat?, String>((ref, habitId) {
   final cats = ref.watch(catsProvider).value ?? [];
-  try {
-    return cats.firstWhere((c) => c.boundHabitId == habitId);
-  } catch (_) {
-    return null;
-  }
+  return cats.where((c) => c.boundHabitId == habitId).firstOrNull;
 });
 
 /// Cat by ID — family provider.
 final catByIdProvider = Provider.family<Cat?, String>((ref, catId) {
   final cats = ref.watch(allCatsProvider).value ?? [];
-  try {
-    return cats.firstWhere((c) => c.id == catId);
-  } catch (_) {
-    return null;
-  }
+  return cats.where((c) => c.id == catId).firstOrNull;
 });

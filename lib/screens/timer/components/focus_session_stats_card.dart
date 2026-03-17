@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/timer/components/stat_row.dart';
-import 'package:hachimi_app/services/xp_service.dart';
+import 'package:hachimi_app/models/xp_result.dart';
 
 /// 专注完成页的会话统计卡片：时间、金币、XP 明细。
 class FocusSessionStatsCard extends StatelessWidget {
