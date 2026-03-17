@@ -81,9 +81,12 @@ class _SectionHeader extends StatelessWidget {
     final pixel = context.pixel;
     final theme = Theme.of(context);
 
-    return InkWell(
-      onTap: onToggle,
-      child: Padding(
+    return Semantics(
+      button: true,
+      label: '$title, ${expanded ? MaterialLocalizations.of(context).expandedIconTapHint : MaterialLocalizations.of(context).collapsedIconTapHint}',
+      child: InkWell(
+        onTap: onToggle,
+        child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
@@ -108,6 +111,7 @@ class _SectionHeader extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

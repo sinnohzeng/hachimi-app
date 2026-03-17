@@ -81,10 +81,13 @@ class _PixelCardState extends State<PixelCard>
       animation: _scaleAnimation,
       builder: (context, child) =>
           Transform.scale(scale: _scaleAnimation.value, child: child),
-      child: GestureDetector(
-        onTap: _handleTap,
-        onLongPress: widget.onLongPress,
-        child: card,
+      child: Semantics(
+        button: true,
+        child: GestureDetector(
+          onTap: _handleTap,
+          onLongPress: widget.onLongPress,
+          child: card,
+        ),
       ),
     );
   }
