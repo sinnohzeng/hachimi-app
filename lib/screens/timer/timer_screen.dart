@@ -5,31 +5,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
-import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/background_color_utils.dart';
-import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/core/constants/session_constants.dart';
-import 'package:hachimi_app/models/focus_session.dart';
-import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/core/utils/session_checksum.dart';
 import 'package:hachimi_app/providers/app_info_provider.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
-import 'package:hachimi_app/models/session_rewards.dart';
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/services/session_completion_service.dart';
 import 'package:hachimi_app/screens/timer/components/timer_controls.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart'
     show ServiceRequestFailure;
-import 'package:uuid/uuid.dart';
 
 /// Focus timer in-progress screen with pixel cat, circular progress, and timer.
 class TimerScreen extends ConsumerStatefulWidget {
@@ -45,6 +37,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   bool _hasStarted = false;
   bool _sessionSaved = false;
   bool _showPermissionBanner = false;
+  bool _isStarting = false;
 
   @override
   void initState() {
@@ -91,10 +84,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
   // ─── Timer controls ───
 
-  void _startTimer() async {
+  Future<void> _startTimer() async {
     final timerState = ref.read(focusTimerProvider);
     final habits = ref.read(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
+
+    setState(() => _isStarting = true);
 
     await _ensureNotificationPermission();
 
@@ -110,7 +105,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
 
     if (!mounted) return;
     ref.read(focusTimerProvider.notifier).start();
-    setState(() => _hasStarted = true);
+    setState(() {
+      _hasStarted = true;
+      _isStarting = false;
+    });
 
     ref
         .read(analyticsServiceProvider)
@@ -170,13 +168,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     }
   }
 
-  // ─── Session save ───
+  // ─── Session save (delegates to SessionCompletionService) ───
 
   /// 监听计时器终态（完成/放弃），触发会话保存。
   void _onTimerTerminated(FocusTimerState? prev, FocusTimerState next) {
     if (_sessionSaved) return;
-    final isTerminal =
-        next.status == TimerStatus.completed ||
+    final isTerminal = next.status == TimerStatus.completed ||
         next.status == TimerStatus.abandoned;
     if (!isTerminal) return;
     _sessionSaved = true;
@@ -195,154 +192,42 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
     if (habit == null) return;
 
-    final minutes = timerState.focusedMinutes;
-    final isAbandoned = timerState.status == TimerStatus.abandoned;
+    final cat = habit.catId != null
+        ? ref.read(catByIdProvider(habit.catId!))
+        : null;
+    final todayMap = ref.read(todayMinutesPerHabitProvider);
+    final activeHabits = habits.where((h) => h.isActive).toList();
+    final clientVersion = ref.read(appInfoProvider).value?.version ?? '';
 
-    if (isAbandoned && minutes < 5) {
+    final result = await ref
+        .read(sessionCompletionServiceProvider)
+        .completeSession(
+          uid: uid,
+          habitId: widget.habitId,
+          timerState: timerState,
+          habit: habit,
+          clientVersion: clientVersion,
+          todayMinutesPerHabit: todayMap,
+          activeHabits: activeHabits,
+          cat: cat,
+        );
+
+    if (result.isDiscarded) {
       if (mounted) Navigator.of(context).pop();
       return;
     }
 
-    final rewards = _calculateRewards(minutes, habit);
-    final session = _buildSessionRecord(timerState, habit, minutes, rewards);
-    ErrorHandler.breadcrumb(
-      'focus_completed: ${habit.name}, ${minutes}min, ${rewards.coins}coins',
-    );
-
-    await _persistSession(uid, session, timerState, habit, minutes, rewards);
-    if (mounted) _navigateToResult(timerState, habit, minutes, rewards);
+    if (mounted) _navigateToResult(timerState, result);
   }
 
-  SessionRewards _calculateRewards(int minutes, Habit habit) {
-    final coins = minutes * focusRewardCoinsPerMinute;
-    final xpService = ref.read(xpServiceProvider);
-    final todayMap = ref.read(todayMinutesPerHabitProvider);
-    final habits = ref.read(habitsProvider).value ?? [];
-    final activeHabits = habits.where((h) => h.isActive).toList();
-    final allDone =
-        activeHabits.isNotEmpty &&
-        activeHabits.every((h) => (todayMap[h.id] ?? 0) >= h.goalMinutes);
-
-    final xp = xpService.calculateXp(minutes: minutes, allHabitsDone: allDone);
-
-    final cat = habit.catId != null
-        ? ref.read(catByIdProvider(habit.catId!))
-        : null;
-    final stageUp = cat != null
-        ? xpService.checkStageUp(
-            oldTotalMinutes: cat.totalMinutes,
-            newTotalMinutes: cat.totalMinutes + minutes,
-          )
-        : null;
-
-    return SessionRewards(coins: coins, xp: xp, stageUp: stageUp);
-  }
-
-  FocusSession _buildSessionRecord(
-    FocusTimerState timerState,
-    Habit habit,
-    int minutes,
-    SessionRewards rewards,
-  ) {
-    final modeStr = timerState.mode == TimerMode.countdown
-        ? 'countdown'
-        : 'stopwatch';
-    final targetMinutes = timerState.mode == TimerMode.countdown
-        ? timerState.totalSeconds ~/ 60
-        : 0;
-    final completionRatio = targetMinutes > 0
-        ? (minutes / targetMinutes).clamp(0.0, 1.0)
-        : 1.0;
-    final startedAt = timerState.startedAt ?? DateTime.now();
-    final clientVersion = ref.read(appInfoProvider).value?.version ?? '';
-
-    return FocusSession(
-      id: const Uuid().v4(),
-      habitId: widget.habitId,
-      catId: habit.catId ?? '',
-      startedAt: startedAt,
-      endedAt: DateTime.now(),
-      durationMinutes: minutes,
-      targetDurationMinutes: targetMinutes,
-      pausedSeconds: timerState.totalPausedSeconds,
-      status: timerState.status == TimerStatus.completed
-          ? SessionStatus.completed
-          : SessionStatus.abandoned,
-      completionRatio: completionRatio,
-      xpEarned: rewards.xp.totalXp,
-      coinsEarned: rewards.coins,
-      mode: modeStr,
-      checksum: SessionChecksum.compute(
-        habitId: widget.habitId,
-        durationMinutes: minutes,
-        coinsEarned: rewards.coins,
-        xpEarned: rewards.xp.totalXp,
-        startedAt: startedAt,
-      ),
-      clientVersion: clientVersion,
-    );
-  }
-
-  Future<void> _persistSession(
-    String uid,
-    FocusSession session,
-    FocusTimerState timerState,
-    Habit habit,
-    int minutes,
-    SessionRewards rewards,
-  ) async {
-    await ref.read(localSessionRepositoryProvider).logSession(uid, session);
-
-    if (timerState.status == TimerStatus.completed) {
-      await _updateHabitAndCatProgress(uid, habit, minutes);
-    }
-
-    if (rewards.coins > 0) {
-      await ref
-          .read(coinServiceProvider)
-          .earnCoins(uid: uid, amount: rewards.coins);
-    }
-  }
-
-  /// 更新习惯和猫的累计进度（仅已完成 session 调用）。
-  Future<void> _updateHabitAndCatProgress(
-    String uid,
-    Habit habit,
-    int minutes,
-  ) async {
-    final today = AppDateUtils.todayString();
-    await ref
-        .read(localHabitRepositoryProvider)
-        .updateProgress(
-          uid,
-          widget.habitId,
-          addMinutes: minutes,
-          checkInDate: today,
-        );
-    if (habit.catId != null) {
-      await ref
-          .read(localCatRepositoryProvider)
-          .updateProgress(
-            uid,
-            habit.catId!,
-            addMinutes: minutes,
-            sessionAt: DateTime.now(),
-          );
-    }
-  }
-
-  void _navigateToResult(
-    FocusTimerState timerState,
-    Habit habit,
-    int minutes,
-    SessionRewards rewards,
-  ) {
+  void _navigateToResult(FocusTimerState timerState, SessionResult result) {
     final isCompleted = timerState.status == TimerStatus.completed;
     final isAbandoned = timerState.status == TimerStatus.abandoned;
+    final habits = ref.read(habitsProvider).value ?? [];
+    final habit = habits.where((h) => h.id == widget.habitId).firstOrNull;
 
-    _logSessionAnalytics(timerState, minutes, rewards);
-
-    if (isCompleted) {
+    // 完成通知（仅成功完成时）
+    if (isCompleted && habit != null) {
       final cat = habit.catId != null
           ? ref.read(catByIdProvider(habit.catId!))
           : null;
@@ -353,8 +238,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
             title: context.l10n.focusCompleteNotifTitle,
             body: context.l10n.focusCompleteNotifBody(
               catName,
-              rewards.xp.totalXp,
-              minutes,
+              result.rewards?.xp.totalXp ?? 0,
+              result.minutes,
             ),
           );
     }
@@ -363,51 +248,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       AppRouter.focusComplete,
       arguments: {
         'habitId': widget.habitId,
-        'minutes': minutes,
-        'xpResult': rewards.xp,
-        'stageUp': rewards.stageUp,
+        'minutes': result.minutes,
+        'xpResult': result.rewards?.xp,
+        'stageUp': result.rewards?.stageUp,
         'isAbandoned': isAbandoned,
-        'coinsEarned': rewards.coins,
+        'coinsEarned': result.rewards?.coins ?? 0,
       },
     );
-  }
-
-  void _logSessionAnalytics(
-    FocusTimerState timerState,
-    int minutes,
-    SessionRewards rewards,
-  ) {
-    final analytics = ref.read(analyticsServiceProvider);
-    final targetMinutes = timerState.mode == TimerMode.countdown
-        ? timerState.totalSeconds ~/ 60
-        : 0;
-    final completionRatio = targetMinutes > 0
-        ? (minutes / targetMinutes).clamp(0.0, 1.0)
-        : 1.0;
-
-    if (timerState.status == TimerStatus.completed) {
-      analytics.logFocusSessionCompleted(
-        habitId: widget.habitId,
-        actualMinutes: minutes,
-        xpEarned: rewards.xp.totalXp,
-        targetDurationMinutes: targetMinutes,
-        pausedSeconds: timerState.totalPausedSeconds,
-        completionRatio: completionRatio,
-      );
-    } else {
-      analytics.logFocusSessionAbandoned(
-        habitId: widget.habitId,
-        minutesCompleted: minutes,
-        reason: 'user_abandoned',
-        targetDurationMinutes: targetMinutes,
-        pausedSeconds: timerState.totalPausedSeconds,
-        completionRatio: completionRatio,
-      );
-    }
-
-    if (rewards.coins > 0) {
-      analytics.logCoinsEarned(amount: rewards.coins, source: 'focus_session');
-    }
   }
 
   // ─── UI ───
@@ -424,7 +271,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         ? ref.watch(catByIdProvider(habit!.catId!))
         : null;
 
-    // 监听终态变化，触发保存（替代 build() 内副作用）
+    // 监听终态变化，触发保存
     ref.listen(focusTimerProvider, _onTimerTerminated);
 
     if (habit == null) {
@@ -434,14 +281,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    final bgColor = cat != null
-        ? stageColor(cat.displayStage)
-        : colorScheme.primary;
+    final bgColor =
+        cat != null ? stageColor(cat.displayStage) : colorScheme.primary;
     final meshColors = timerMeshColors(bgColor, colorScheme);
-    final isRunningOrPaused =
-        timerState.status == TimerStatus.running ||
+    final isRunningOrPaused = timerState.status == TimerStatus.running ||
         timerState.status == TimerStatus.paused;
-    final inGracePeriod = isRunningOrPaused && timerState.elapsedSeconds <= 10;
+    final inGracePeriod =
+        isRunningOrPaused && timerState.elapsedSeconds <= 10;
 
     return PopScope(
       canPop: !isRunningOrPaused || inGracePeriod,
@@ -483,6 +329,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                     TimerControls(
                       status: timerState.status,
                       mode: timerState.mode,
+                      isLoading: _isStarting,
                       onStart: _startTimer,
                       onPause: _pauseTimer,
                       onResume: _resumeTimer,
@@ -524,7 +371,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     );
   }
 
-  Widget _buildHabitHeader(Habit habit, ThemeData theme) {
+  Widget _buildHabitHeader(dynamic habit, ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
@@ -535,7 +382,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         children: [
           Text(
             habit.name,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style:
+                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           if (habit.totalCheckInDays > 0) ...[
             const SizedBox(width: AppSpacing.md),
@@ -648,8 +496,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     bool inGracePeriod,
     ThemeData theme,
   ) {
-    final isActive =
-        _hasStarted &&
+    final isActive = _hasStarted &&
         timerState.status != TimerStatus.completed &&
         timerState.status != TimerStatus.abandoned;
     if (!isActive) return const SizedBox.shrink();

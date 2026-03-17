@@ -33,6 +33,7 @@ import 'package:hachimi_app/services/local_session_repository.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 export 'package:hachimi_app/services/notification_service.dart'
     show NotificationService;
+import 'package:hachimi_app/services/session_completion_service.dart';
 import 'package:hachimi_app/services/sync_engine.dart';
 import 'package:hachimi_app/services/user_profile_service.dart';
 import 'package:hachimi_app/services/xp_service.dart';
@@ -59,6 +60,18 @@ final inventoryServiceProvider = Provider<InventoryService>((ref) {
 });
 
 final xpServiceProvider = Provider<XpService>((ref) => XpService());
+
+final sessionCompletionServiceProvider =
+    Provider<SessionCompletionService>((ref) {
+  return SessionCompletionService(
+    sessions: ref.watch(localSessionRepositoryProvider),
+    habits: ref.watch(localHabitRepositoryProvider),
+    cats: ref.watch(localCatRepositoryProvider),
+    coins: ref.watch(coinServiceProvider),
+    analytics: ref.watch(analyticsServiceProvider),
+    xp: ref.watch(xpServiceProvider),
+  );
+});
 
 final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),

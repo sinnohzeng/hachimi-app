@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
+import 'package:hachimi_app/services/notification_scheduling.dart' as sched;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_10y.dart' as tz;
 
@@ -220,13 +221,11 @@ class NotificationService {
     required String body,
   }) async {
     await cancelAllRemindersForHabit(habitId);
-    final base = habitId.hashCode.abs() % 100000;
 
     for (int i = 0; i < reminders.length; i++) {
       try {
         await _scheduleByMode(
           reminders[i],
-          base: base,
           index: i,
           habitId: habitId,
           title: title,
@@ -246,7 +245,6 @@ class NotificationService {
   /// 按提醒模式分发调度。
   Future<void> _scheduleByMode(
     ReminderConfig reminder, {
-    required int base,
     required int index,
     required String habitId,
     required String title,
@@ -254,25 +252,24 @@ class NotificationService {
   }) async {
     switch (reminder.mode) {
       case 'daily':
-        await _scheduleDaily(reminder, base, index, habitId, title, body);
+        await _scheduleDaily(reminder, index, habitId, title, body);
       case 'weekdays':
-        await _scheduleWeekdays(reminder, base, index, habitId, title, body);
+        await _scheduleWeekdays(reminder, index, habitId, title, body);
       default:
-        await _scheduleSpecificDay(reminder, base, index, habitId, title, body);
+        await _scheduleSpecificDay(reminder, index, habitId, title, body);
     }
   }
 
   Future<void> _scheduleDaily(
     ReminderConfig r,
-    int base,
     int i,
     String habitId,
     String title,
     String body,
   ) async {
     await _localNotifications.zonedSchedule(
-      id: base * 100 + i * 10,
-      scheduledDate: _nextInstanceOfTime(r.hour, r.minute),
+      id: sched.computeReminderNotificationId(habitId, i, 0),
+      scheduledDate: sched.nextInstanceOfTime(r.hour, r.minute),
       notificationDetails: _reminderDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       title: title,
@@ -284,7 +281,6 @@ class NotificationService {
 
   Future<void> _scheduleWeekdays(
     ReminderConfig r,
-    int base,
     int i,
     String habitId,
     String title,
@@ -292,8 +288,8 @@ class NotificationService {
   ) async {
     for (int d = 0; d < 5; d++) {
       await _localNotifications.zonedSchedule(
-        id: base * 100 + i * 10 + d,
-        scheduledDate: _nextInstanceOfWeekdayTime(
+        id: sched.computeReminderNotificationId(habitId, i, d),
+        scheduledDate: sched.nextInstanceOfWeekdayTime(
           DateTime.monday + d,
           r.hour,
           r.minute,
@@ -310,7 +306,6 @@ class NotificationService {
 
   Future<void> _scheduleSpecificDay(
     ReminderConfig r,
-    int base,
     int i,
     String habitId,
     String title,
@@ -319,8 +314,8 @@ class NotificationService {
     final weekday = r.weekday;
     if (weekday == null) return;
     await _localNotifications.zonedSchedule(
-      id: base * 100 + i * 10,
-      scheduledDate: _nextInstanceOfWeekdayTime(weekday, r.hour, r.minute),
+      id: sched.computeReminderNotificationId(habitId, i, 0),
+      scheduledDate: sched.nextInstanceOfWeekdayTime(weekday, r.hour, r.minute),
       notificationDetails: _reminderDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       title: title,
@@ -332,10 +327,9 @@ class NotificationService {
 
   /// 取消该 habit 的所有提醒通知（最多 5 reminders × 10 slots each）。
   Future<void> cancelAllRemindersForHabit(String habitId) async {
-    final base = habitId.hashCode.abs() % 100000;
     for (int i = 0; i < 5; i++) {
       for (int d = 0; d < 10; d++) {
-        final id = base * 100 + i * 10 + d;
+        final id = sched.computeReminderNotificationId(habitId, i, d);
         await _localNotifications.cancel(id: id);
       }
     }
@@ -352,12 +346,14 @@ class NotificationService {
   );
 
   /// Schedule a streak-at-risk notification for 20:00 today.
+  ///
+  /// [title] and [body] are pre-localized strings from the caller.
   Future<void> scheduleStreakAtRisk({
     required String habitId,
-    required String catName,
-    required int streak,
+    required String title,
+    required String body,
   }) async {
-    final id = (habitId.hashCode.abs() % 100000) + 100000;
+    final id = sched.computeStreakNotificationId(habitId);
 
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
@@ -383,8 +379,8 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      title: '$catName is worried!',
-      body: 'Your $streak-day streak is at risk. A quick session will save it!',
+      title: title,
+      body: body,
       payload: 'streak:$habitId',
     );
   }
@@ -449,14 +445,16 @@ class NotificationService {
   }
 
   /// Show a celebration notification after level-up.
+  ///
+  /// [title] and [body] are pre-localized strings from the caller.
   Future<void> showCelebration({
-    required String catName,
-    required String newStageName,
+    required String title,
+    required String body,
   }) async {
     await _localNotifications.show(
       id: DateTime.now().millisecondsSinceEpoch % 100000 + 200000,
-      title: '$catName evolved!',
-      body: '$catName grew into a $newStageName! Keep up the great work!',
+      title: title,
+      body: body,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
@@ -477,46 +475,4 @@ class NotificationService {
     return await _messaging.getToken();
   }
 
-  /// Compute the next instance of a given time (today or tomorrow).
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-    return scheduled;
-  }
-
-  /// 计算下一个指定星期几 + 时间的实例。
-  /// [weekday] 遵循 DateTime.monday(1) ~ DateTime.sunday(7)。
-  tz.TZDateTime _nextInstanceOfWeekdayTime(int weekday, int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-
-    // 调整到目标星期几
-    while (scheduled.weekday != weekday) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-
-    // 如果已过去，推到下周
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 7));
-    }
-
-    return scheduled;
-  }
 }
