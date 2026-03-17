@@ -10,6 +10,7 @@ const double _buttonHeight = 56;
 class TimerControls extends StatelessWidget {
   final TimerStatus status;
   final TimerMode mode;
+  final bool isLoading;
   final VoidCallback onStart;
   final VoidCallback onPause;
   final VoidCallback onResume;
@@ -19,6 +20,7 @@ class TimerControls extends StatelessWidget {
     super.key,
     required this.status,
     required this.mode,
+    this.isLoading = false,
     required this.onStart,
     required this.onPause,
     required this.onResume,
@@ -39,6 +41,23 @@ class TimerControls extends StatelessWidget {
   }
 
   Widget _buildIdleButton(BuildContext context) {
+    if (isLoading) {
+      return SizedBox(
+        width: double.infinity,
+        height: _buttonHeight,
+        child: FilledButton(
+          onPressed: null,
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+        ),
+      );
+    }
     return _TimerActionButton(
       onPressed: onStart,
       icon: Icons.play_arrow,
