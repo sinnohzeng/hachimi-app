@@ -565,6 +565,9 @@ class SKo extends S {
   String get catDetailNotFound => '고양이를 찾을 수 없어요';
 
   @override
+  String get catDetailLoadError => '고양이 데이터를 불러오지 못했어요';
+
+  @override
   String get catDetailChatTooltip => '채팅';
 
   @override
@@ -1619,6 +1622,18 @@ class SKo extends S {
   }
 
   @override
+  String get catRoomArchiveError => '고양이 보관에 실패했어요';
+
+  @override
+  String get catRoomReactivateError => '고양이 복구에 실패했어요';
+
+  @override
+  String get catRoomArchiveLoadError => '보관된 고양이를 불러오지 못했어요';
+
+  @override
+  String get catRoomRenameError => '고양이 이름 변경에 실패했어요';
+
+  @override
   String get addHabitTitle => '새 퀘스트';
 
   @override
@@ -1762,16 +1777,19 @@ class SKo extends S {
   String get chatClearButton => '삭제';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => '보내기';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => '중지';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => '문제가 발생했어요. 다시 시도해 주세요';
 
   @override
   String diaryTitle(String name) {

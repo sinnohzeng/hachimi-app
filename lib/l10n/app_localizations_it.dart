@@ -573,6 +573,9 @@ class SIt extends S {
   String get catDetailNotFound => 'Gatto non trovato';
 
   @override
+  String get catDetailLoadError => 'Impossibile caricare i dati del gatto';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1648,6 +1651,19 @@ class SIt extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Impossibile archiviare il gatto';
+
+  @override
+  String get catRoomReactivateError => 'Impossibile riattivare il gatto';
+
+  @override
+  String get catRoomArchiveLoadError =>
+      'Impossibile caricare i gatti archiviati';
+
+  @override
+  String get catRoomRenameError => 'Impossibile rinominare il gatto';
+
+  @override
   String get addHabitTitle => 'Nuova quest';
 
   @override
@@ -1795,16 +1811,19 @@ class SIt extends S {
   String get chatClearButton => 'Cancella';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Invia';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Ferma';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Qualcosa è andato storto. Riprova.';
 
   @override
   String diaryTitle(String name) {

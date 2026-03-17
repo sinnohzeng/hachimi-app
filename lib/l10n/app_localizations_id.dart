@@ -571,6 +571,9 @@ class SId extends S {
   String get catDetailNotFound => 'Kucing tidak ditemukan';
 
   @override
+  String get catDetailLoadError => 'Gagal memuat data kucing';
+
+  @override
   String get catDetailChatTooltip => 'Obrolan';
 
   @override
@@ -1643,6 +1646,18 @@ class SId extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Gagal mengarsipkan kucing';
+
+  @override
+  String get catRoomReactivateError => 'Gagal mengaktifkan kembali kucing';
+
+  @override
+  String get catRoomArchiveLoadError => 'Gagal memuat kucing yang diarsipkan';
+
+  @override
+  String get catRoomRenameError => 'Gagal mengganti nama kucing';
+
+  @override
   String get addHabitTitle => 'Misi Baru';
 
   @override
@@ -1790,16 +1805,19 @@ class SId extends S {
   String get chatClearButton => 'Hapus';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Kirim';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Berhenti';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Terjadi kesalahan. Coba lagi.';
 
   @override
   String diaryTitle(String name) {

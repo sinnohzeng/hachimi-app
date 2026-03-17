@@ -5,7 +5,6 @@ import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/theme/pixel_theme_extension.dart';
-import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -14,7 +13,6 @@ import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/cat.dart';
-import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -25,6 +23,8 @@ import 'package:hachimi_app/core/utils/background_color_utils.dart';
 import 'package:hachimi_app/widgets/animated_mesh_background.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/particle_overlay.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
+import 'package:hachimi_app/widgets/rename_cat_dialog.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
 import 'package:hachimi_app/widgets/guest_upgrade_prompt.dart';
 
@@ -69,14 +69,35 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cat = ref.watch(catByIdProvider(widget.catId));
-    if (cat == null) {
-      return AppScaffold(
-        appBar: AppBar(),
-        body: Center(child: Text(context.l10n.catDetailNotFound)),
-      );
-    }
+    final allCatsAsync = ref.watch(allCatsProvider);
 
+    return allCatsAsync.when(
+      loading: () => AppScaffold(
+        appBar: AppBar(),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => AppScaffold(
+        appBar: AppBar(),
+        body: ErrorState(
+          message: context.l10n.catDetailLoadError,
+          onRetry: () => ref.invalidate(allCatsProvider),
+        ),
+      ),
+      data: (allCats) {
+        final cat =
+            allCats.where((c) => c.id == widget.catId).firstOrNull;
+        if (cat == null) {
+          return AppScaffold(
+            appBar: AppBar(),
+            body: Center(child: Text(context.l10n.catDetailNotFound)),
+          );
+        }
+        return _buildCatDetail(context, cat);
+      },
+    );
+  }
+
+  Widget _buildCatDetail(BuildContext context, Cat cat) {
     final habits = ref.watch(habitsProvider).value ?? [];
     final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
     final personality = personalityMap[cat.personality];
@@ -452,62 +473,7 @@ class _CatDetailScreenState extends ConsumerState<CatDetailScreen> {
   }
 
   void _showRenameDialog(BuildContext context, Cat cat) {
-    final controller = TextEditingController(text: cat.name);
-    final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.catDetailRenameTitle),
-        content: TextField(
-          controller: controller,
-          maxLength: Cat.maxNameLength,
-          decoration: InputDecoration(
-            labelText: l10n.catDetailNewName,
-            prefixIcon: const Icon(Icons.pets),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => _performRename(ctx, cat, controller.text),
-            child: Text(l10n.catDetailRename),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 执行猫咪重命名：校验 → 持久化 → 同步通知。
-  Future<void> _performRename(
-    BuildContext dialogCtx,
-    Cat cat,
-    String rawName,
-  ) async {
-    final newName = rawName.trim();
-    if (newName.isEmpty) return;
-    final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
-
-    try {
-      HapticFeedback.mediumImpact();
-      final renamedCat = cat.copyWith(name: newName);
-      await ref.read(localCatRepositoryProvider).update(uid, renamedCat);
-      ref
-          .read(ledgerServiceProvider)
-          .notifyChange(const LedgerChange(type: 'cat_update'));
-    } catch (e) {
-      debugPrint('[CatDetail] rename failed: $e');
-      return;
-    }
-
-    if (dialogCtx.mounted) {
-      Navigator.of(dialogCtx).pop();
-      AppFeedback.success(dialogCtx, dialogCtx.l10n.catDetailRenamed);
-    }
+    showRenameCatDialog(context, ref, cat);
   }
 }
 

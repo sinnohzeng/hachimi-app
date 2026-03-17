@@ -572,6 +572,9 @@ class SDe extends S {
   String get catDetailNotFound => 'Katze nicht gefunden';
 
   @override
+  String get catDetailLoadError => 'Katzendaten konnten nicht geladen werden';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1651,6 +1654,19 @@ class SDe extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Archivierung der Katze fehlgeschlagen';
+
+  @override
+  String get catRoomReactivateError => 'Reaktivierung der Katze fehlgeschlagen';
+
+  @override
+  String get catRoomArchiveLoadError =>
+      'Archivierte Katzen konnten nicht geladen werden';
+
+  @override
+  String get catRoomRenameError => 'Umbenennung der Katze fehlgeschlagen';
+
+  @override
   String get addHabitTitle => 'Neue Quest';
 
   @override
@@ -1797,16 +1813,19 @@ class SDe extends S {
   String get chatClearButton => 'Löschen';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Senden';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Stopp';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Etwas ist schiefgelaufen. Erneut versuchen.';
 
   @override
   String diaryTitle(String name) {

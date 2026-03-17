@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "Les fonctionnalités IA sont temporairement indisponibles",
 
   "catDetailNotFound": "Chat introuvable",
+  "catDetailLoadError": "Échec du chargement des données du chat",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Renommer",
   "catDetailGrowthTitle": "Progression de croissance",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Archivé",
   "catRoomArchiveSuccess": "« {name} » archivé",
   "catRoomReactivateSuccess": "« {name} » réactivé",
+  "catRoomArchiveError": "Échec de l'archivage du chat",
+  "catRoomReactivateError": "Échec de la réactivation du chat",
+  "catRoomArchiveLoadError": "Échec du chargement des chats archivés",
+  "catRoomRenameError": "Échec du renommage du chat",
 
   "addHabitTitle": "Nouvelle quête",
   "addHabitQuestName": "Nom de la quête",
@@ -591,6 +596,9 @@
   "chatStop": "Stop",
   "chatErrorMessage": "Failed to send message. Tap to retry.",
   "chatRetry": "Retry",
+  "chatSend": "Envoyer",
+  "chatStop": "Arrêter",
+  "chatErrorGeneric": "Une erreur est survenue. Réessayez.",
 
   "diaryTitle": "Journal de {name}",
   "diaryLoadFailed": "Échec du chargement du journal",

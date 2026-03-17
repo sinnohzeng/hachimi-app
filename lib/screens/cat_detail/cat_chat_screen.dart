@@ -13,6 +13,7 @@ import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/chat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
+import 'package:hachimi_app/widgets/error_state.dart';
 import 'package:hachimi_app/widgets/pixel_ui/pixel_badge.dart';
 import 'package:hachimi_app/widgets/pixel_ui/pixel_button.dart';
 import 'package:hachimi_app/widgets/pixel_ui/pixel_chat_bubble.dart';
@@ -55,16 +56,42 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final allCatsAsync = ref.watch(allCatsProvider);
+
+    return allCatsAsync.when(
+      loading: () => AppScaffold(
+        appBar: AppBar(),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => AppScaffold(
+        appBar: AppBar(),
+        body: ErrorState(
+          message: context.l10n.chatCatNotFound,
+          onRetry: () => ref.invalidate(allCatsProvider),
+        ),
+      ),
+      data: (allCats) {
+        final cat =
+            allCats.where((c) => c.id == widget.catId).firstOrNull;
+        if (cat == null) {
+          return AppScaffold(
+            appBar: AppBar(),
+            body: Center(child: Text(context.l10n.chatCatNotFound)),
+          );
+        }
+        return _buildChatScreen(context, cat);
+      },
+    );
+  }
+
+  Widget _buildChatScreen(BuildContext context, Cat cat) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    final cat = ref.watch(catByIdProvider(widget.catId));
     final chatState = ref.watch(chatNotifierProvider(widget.catId));
     final habits = ref.watch(habitsProvider).value ?? [];
-    final habit = cat != null
-        ? habits.where((h) => h.id == cat.boundHabitId).firstOrNull
-        : null;
+    final habit = habits.where((h) => h.id == cat.boundHabitId).firstOrNull;
 
     // 自动滚动到底部
     ref.listen(chatNotifierProvider(widget.catId), (prev, next) {
@@ -73,13 +100,6 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         _scrollToBottom();
       }
     });
-
-    if (cat == null) {
-      return AppScaffold(
-        appBar: AppBar(),
-        body: Center(child: Text(context.l10n.chatCatNotFound)),
-      );
-    }
 
     return AppScaffold(
       pattern: PatternType.crosshatch,
@@ -117,12 +137,24 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         children: [
           // 消息列表
           Expanded(
-            child: chatState.status == ChatStatus.loading
-                ? const Center(child: CircularProgressIndicator())
-                : chatState.messages.isEmpty &&
-                      chatState.status != ChatStatus.generating
-                ? _buildEmptyState(textTheme, colorScheme, cat.name)
-                : _buildMessageList(chatState),
+            child: switch (chatState.status) {
+              ChatStatus.loading =>
+                const Center(child: CircularProgressIndicator()),
+              ChatStatus.error when chatState.messages.isEmpty => Center(
+                  child: ErrorState(
+                    message: chatState.error ??
+                        context.l10n.chatErrorGeneric,
+                    onRetry: () => ref.invalidate(
+                      chatNotifierProvider(widget.catId),
+                    ),
+                  ),
+                ),
+              ChatStatus.error => _buildMessageList(chatState),
+              _ when chatState.messages.isEmpty &&
+                      chatState.status != ChatStatus.generating =>
+                _buildEmptyState(textTheme, colorScheme, cat.name),
+              _ => _buildMessageList(chatState),
+            },
           ),
 
           // 输入区域
@@ -207,6 +239,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
     );
   }
 
+  /// 内联错误气泡 — 带重试按钮，显示在消息列表末尾。
   Widget _buildErrorBubble(ChatState chatState) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(

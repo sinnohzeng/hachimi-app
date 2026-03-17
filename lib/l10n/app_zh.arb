@@ -264,6 +264,7 @@
   "aiTemporarilyUnavailable": "AI 功能暂时不可用",
 
   "catDetailNotFound": "未找到猫猫",
+  "catDetailLoadError": "加载猫咪数据失败",
   "catDetailChatTooltip": "聊天",
   "catDetailRenameTooltip": "重命名",
   "catDetailGrowthTitle": "成长进度",
@@ -722,6 +723,10 @@
   "@catRoomReactivateSuccess": {
     "placeholders": { "name": { "type": "String" } }
   },
+  "catRoomArchiveError": "归档猫咪失败",
+  "catRoomReactivateError": "恢复猫咪失败",
+  "catRoomArchiveLoadError": "加载归档猫咪失败",
+  "catRoomRenameError": "重命名猫咪失败",
 
   "addHabitTitle": "新任务",
   "addHabitQuestName": "任务名称",
@@ -808,6 +813,7 @@
   "chatStop": "停止",
   "chatErrorMessage": "发送失败，点击重试",
   "chatRetry": "重试",
+  "chatErrorGeneric": "出了点问题，请重试",
 
   "diaryTitle": "{name}的日记",
   "@diaryTitle": {

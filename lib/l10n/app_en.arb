@@ -264,6 +264,7 @@
   "aiTemporarilyUnavailable": "AI features are temporarily unavailable",
 
   "catDetailNotFound": "Cat not found",
+  "catDetailLoadError": "Failed to load cat data",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Rename",
   "catDetailGrowthTitle": "Growth Progress",
@@ -722,6 +723,10 @@
   "@catRoomReactivateSuccess": {
     "placeholders": { "name": { "type": "String" } }
   },
+  "catRoomArchiveError": "Failed to archive cat",
+  "catRoomReactivateError": "Failed to reactivate cat",
+  "catRoomArchiveLoadError": "Failed to load archived cats",
+  "catRoomRenameError": "Failed to rename cat",
 
   "addHabitTitle": "New Quest",
   "addHabitQuestName": "Quest name",
@@ -808,6 +813,7 @@
   "chatStop": "Stop",
   "chatErrorMessage": "Failed to send message. Tap to retry.",
   "chatRetry": "Retry",
+  "chatErrorGeneric": "Something went wrong. Try again.",
 
   "diaryTitle": "{name} Diary",
   "@diaryTitle": {

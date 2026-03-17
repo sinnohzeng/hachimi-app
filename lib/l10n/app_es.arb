@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "Las funciones de IA no están disponibles temporalmente",
 
   "catDetailNotFound": "Gato no encontrado",
+  "catDetailLoadError": "Error al cargar los datos del gato",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Renombrar",
   "catDetailGrowthTitle": "Progreso de crecimiento",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Archivado",
   "catRoomArchiveSuccess": "\"{name}\" archivado",
   "catRoomReactivateSuccess": "\"{name}\" reactivado",
+  "catRoomArchiveError": "Error al archivar el gato",
+  "catRoomReactivateError": "Error al reactivar el gato",
+  "catRoomArchiveLoadError": "Error al cargar los gatos archivados",
+  "catRoomRenameError": "Error al renombrar el gato",
 
   "addHabitTitle": "Nueva misión",
   "addHabitQuestName": "Nombre de la misión",
@@ -591,6 +596,9 @@
   "chatStop": "Stop",
   "chatErrorMessage": "Failed to send message. Tap to retry.",
   "chatRetry": "Retry",
+  "chatSend": "Enviar",
+  "chatStop": "Detener",
+  "chatErrorGeneric": "Algo salió mal. Inténtalo de nuevo.",
 
   "diaryTitle": "Diario de {name}",
   "diaryLoadFailed": "Error al cargar el diario",

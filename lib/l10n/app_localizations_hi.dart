@@ -572,6 +572,9 @@ class SHi extends S {
   String get catDetailNotFound => 'बिल्ली नहीं मिली';
 
   @override
+  String get catDetailLoadError => 'बिल्ली का डेटा लोड नहीं हो सका';
+
+  @override
   String get catDetailChatTooltip => 'चैट';
 
   @override
@@ -1643,6 +1646,18 @@ class SHi extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'बिल्ली को संग्रह करने में विफल';
+
+  @override
+  String get catRoomReactivateError => 'बिल्ली को पुनः सक्रिय करने में विफल';
+
+  @override
+  String get catRoomArchiveLoadError => 'संग्रहीत बिल्लियों को लोड नहीं हो सका';
+
+  @override
+  String get catRoomRenameError => 'बिल्ली का नाम बदलने में विफल';
+
+  @override
   String get addHabitTitle => 'नया क्वेस्ट';
 
   @override
@@ -1790,16 +1805,19 @@ class SHi extends S {
   String get chatClearButton => 'मिटाएँ';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'भेजें';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'रोकें';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'कुछ गलत हो गया। फिर से कोशिश करें।';
 
   @override
   String diaryTitle(String name) {

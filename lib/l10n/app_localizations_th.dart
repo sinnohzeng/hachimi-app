@@ -569,6 +569,9 @@ class STh extends S {
   String get catDetailNotFound => 'ไม่พบแมว';
 
   @override
+  String get catDetailLoadError => 'โหลดข้อมูลแมวไม่สำเร็จ';
+
+  @override
   String get catDetailChatTooltip => 'แชท';
 
   @override
@@ -1630,6 +1633,18 @@ class STh extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'เก็บถาวรแมวไม่สำเร็จ';
+
+  @override
+  String get catRoomReactivateError => 'เปิดใช้งานแมวอีกครั้งไม่สำเร็จ';
+
+  @override
+  String get catRoomArchiveLoadError => 'โหลดแมวที่เก็บถาวรไม่สำเร็จ';
+
+  @override
+  String get catRoomRenameError => 'เปลี่ยนชื่อแมวไม่สำเร็จ';
+
+  @override
   String get addHabitTitle => 'เควสต์ใหม่';
 
   @override
@@ -1773,16 +1788,19 @@ class STh extends S {
   String get chatClearButton => 'ล้าง';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'ส่ง';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'หยุด';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'เกิดข้อผิดพลาด ลองอีกครั้ง';
 
   @override
   String diaryTitle(String name) {

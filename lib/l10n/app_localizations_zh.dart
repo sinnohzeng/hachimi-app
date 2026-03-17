@@ -563,6 +563,9 @@ class SZh extends S {
   String get catDetailNotFound => '未找到猫猫';
 
   @override
+  String get catDetailLoadError => '加载猫咪数据失败';
+
+  @override
   String get catDetailChatTooltip => '聊天';
 
   @override
@@ -1614,6 +1617,18 @@ class SZh extends S {
   }
 
   @override
+  String get catRoomArchiveError => '归档猫咪失败';
+
+  @override
+  String get catRoomReactivateError => '恢复猫咪失败';
+
+  @override
+  String get catRoomArchiveLoadError => '加载归档猫咪失败';
+
+  @override
+  String get catRoomRenameError => '重命名猫咪失败';
+
+  @override
   String get addHabitTitle => '新任务';
 
   @override
@@ -1767,6 +1782,9 @@ class SZh extends S {
 
   @override
   String get chatRetry => '重试';
+
+  @override
+  String get chatErrorGeneric => '出了点问题，请重试';
 
   @override
   String diaryTitle(String name) {
@@ -2985,6 +3003,9 @@ class SZhHant extends SZh {
   String get catDetailNotFound => '搵唔到貓咪';
 
   @override
+  String get catDetailLoadError => '載入貓咪資料失敗';
+
+  @override
   String get catDetailChatTooltip => '聊天';
 
   @override
@@ -4036,6 +4057,18 @@ class SZhHant extends SZh {
   }
 
   @override
+  String get catRoomArchiveError => '歸檔貓咪失敗';
+
+  @override
+  String get catRoomReactivateError => '恢復貓咪失敗';
+
+  @override
+  String get catRoomArchiveLoadError => '載入歸檔貓咪失敗';
+
+  @override
+  String get catRoomRenameError => '重新命名貓咪失敗';
+
+  @override
   String get addHabitTitle => '新任務';
 
   @override
@@ -4189,6 +4222,9 @@ class SZhHant extends SZh {
 
   @override
   String get chatRetry => '重試';
+
+  @override
+  String get chatErrorGeneric => '出了點問題，請重試';
 
   @override
   String diaryTitle(String name) {

@@ -191,6 +191,7 @@
   "aiTemporarilyUnavailable": "AI 功能暫時無法使用",
 
   "catDetailNotFound": "搵唔到貓咪",
+  "catDetailLoadError": "載入貓咪資料失敗",
   "catDetailChatTooltip": "聊天",
   "catDetailRenameTooltip": "改名",
   "catDetailGrowthTitle": "成長進度",
@@ -558,6 +559,10 @@
   "@catRoomReactivateSuccess": {
     "placeholders": { "name": { "type": "String" } }
   },
+  "catRoomArchiveError": "歸檔貓咪失敗",
+  "catRoomReactivateError": "恢復貓咪失敗",
+  "catRoomArchiveLoadError": "載入歸檔貓咪失敗",
+  "catRoomRenameError": "重新命名貓咪失敗",
 
   "addHabitTitle": "新任務",
   "addHabitQuestName": "任務名稱",
@@ -601,6 +606,9 @@
   "chatClearConfirmTitle": "清除聊天紀錄？",
   "chatClearConfirmMessage": "呢個操作會刪除所有訊息，無法復原。",
   "chatClearButton": "清除",
+  "chatSend": "傳送",
+  "chatStop": "停止",
+  "chatErrorGeneric": "出了點問題，請重試",
 
   "diaryTitle": "{name} 嘅日記",
   "diaryLoadFailed": "載入日記失敗",

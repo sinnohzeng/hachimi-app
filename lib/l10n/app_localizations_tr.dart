@@ -573,6 +573,9 @@ class STr extends S {
   String get catDetailNotFound => 'Kedi bulunamadı';
 
   @override
+  String get catDetailLoadError => 'Kedi verileri yüklenemedi';
+
+  @override
   String get catDetailChatTooltip => 'Sohbet';
 
   @override
@@ -1640,6 +1643,18 @@ class STr extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Kedi arşivlenemedi';
+
+  @override
+  String get catRoomReactivateError => 'Kedi yeniden etkinleştirilemedi';
+
+  @override
+  String get catRoomArchiveLoadError => 'Arşivlenmiş kediler yüklenemedi';
+
+  @override
+  String get catRoomRenameError => 'Kedi yeniden adlandırılamadı';
+
+  @override
   String get addHabitTitle => 'Yeni Görev';
 
   @override
@@ -1786,16 +1801,19 @@ class STr extends S {
   String get chatClearButton => 'Temizle';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Gönder';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Durdur';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Bir sorun oluştu. Tekrar deneyin.';
 
   @override
   String diaryTitle(String name) {

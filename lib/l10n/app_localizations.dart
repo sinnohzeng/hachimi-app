@@ -1142,6 +1142,12 @@ abstract class S {
   /// **'Cat not found'**
   String get catDetailNotFound;
 
+  /// No description provided for @catDetailLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load cat data'**
+  String get catDetailLoadError;
+
   /// No description provided for @catDetailChatTooltip.
   ///
   /// In en, this message translates to:
@@ -3128,6 +3134,30 @@ abstract class S {
   /// **'\"{name}\" reactivated'**
   String catRoomReactivateSuccess(String name);
 
+  /// No description provided for @catRoomArchiveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to archive cat'**
+  String get catRoomArchiveError;
+
+  /// No description provided for @catRoomReactivateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reactivate cat'**
+  String get catRoomReactivateError;
+
+  /// No description provided for @catRoomArchiveLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load archived cats'**
+  String get catRoomArchiveLoadError;
+
+  /// No description provided for @catRoomRenameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename cat'**
+  String get catRoomRenameError;
+
   /// No description provided for @addHabitTitle.
   ///
   /// In en, this message translates to:
@@ -3385,6 +3415,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Retry'**
   String get chatRetry;
+
+  /// No description provided for @chatErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get chatErrorGeneric;
 
   /// No description provided for @diaryTitle.
   ///

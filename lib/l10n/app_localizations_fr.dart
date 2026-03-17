@@ -573,6 +573,9 @@ class SFr extends S {
   String get catDetailNotFound => 'Chat introuvable';
 
   @override
+  String get catDetailLoadError => 'Échec du chargement des données du chat';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1650,6 +1653,19 @@ class SFr extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Échec de l\'archivage du chat';
+
+  @override
+  String get catRoomReactivateError => 'Échec de la réactivation du chat';
+
+  @override
+  String get catRoomArchiveLoadError =>
+      'Échec du chargement des chats archivés';
+
+  @override
+  String get catRoomRenameError => 'Échec du renommage du chat';
+
+  @override
   String get addHabitTitle => 'Nouvelle quête';
 
   @override
@@ -1796,16 +1812,19 @@ class SFr extends S {
   String get chatClearButton => 'Effacer';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Envoyer';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Arrêter';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Une erreur est survenue. Réessayez.';
 
   @override
   String diaryTitle(String name) {

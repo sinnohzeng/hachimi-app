@@ -573,6 +573,9 @@ class SPt extends S {
   String get catDetailNotFound => 'Gato não encontrado';
 
   @override
+  String get catDetailLoadError => 'Falha ao carregar dados do gato';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1641,6 +1644,18 @@ class SPt extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Falha ao arquivar o gato';
+
+  @override
+  String get catRoomReactivateError => 'Falha ao reativar o gato';
+
+  @override
+  String get catRoomArchiveLoadError => 'Falha ao carregar gatos arquivados';
+
+  @override
+  String get catRoomRenameError => 'Falha ao renomear o gato';
+
+  @override
   String get addHabitTitle => 'Nova missão';
 
   @override
@@ -1787,16 +1802,19 @@ class SPt extends S {
   String get chatClearButton => 'Limpar';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Enviar';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Parar';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Algo deu errado. Tente novamente.';
 
   @override
   String diaryTitle(String name) {

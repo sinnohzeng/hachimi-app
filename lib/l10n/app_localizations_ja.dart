@@ -565,6 +565,9 @@ class SJa extends S {
   String get catDetailNotFound => 'ネコが見つかりません';
 
   @override
+  String get catDetailLoadError => '猫データの読み込みに失敗しました';
+
+  @override
   String get catDetailChatTooltip => 'チャット';
 
   @override
@@ -1616,6 +1619,18 @@ class SJa extends S {
   }
 
   @override
+  String get catRoomArchiveError => '猫のアーカイブに失敗しました';
+
+  @override
+  String get catRoomReactivateError => '猫の復帰に失敗しました';
+
+  @override
+  String get catRoomArchiveLoadError => 'アーカイブ済みの猫の読み込みに失敗しました';
+
+  @override
+  String get catRoomRenameError => '猫の名前変更に失敗しました';
+
+  @override
   String get addHabitTitle => '新しいクエスト';
 
   @override
@@ -1759,16 +1774,19 @@ class SJa extends S {
   String get chatClearButton => '削除';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => '送信';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => '停止';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'エラーが発生しました。再試行してください';
 
   @override
   String diaryTitle(String name) {

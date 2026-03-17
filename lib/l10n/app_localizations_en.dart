@@ -570,6 +570,9 @@ class SEn extends S {
   String get catDetailNotFound => 'Cat not found';
 
   @override
+  String get catDetailLoadError => 'Failed to load cat data';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1637,6 +1640,18 @@ class SEn extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Failed to archive cat';
+
+  @override
+  String get catRoomReactivateError => 'Failed to reactivate cat';
+
+  @override
+  String get catRoomArchiveLoadError => 'Failed to load archived cats';
+
+  @override
+  String get catRoomRenameError => 'Failed to rename cat';
+
+  @override
   String get addHabitTitle => 'New Quest';
 
   @override
@@ -1793,6 +1808,9 @@ class SEn extends S {
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Something went wrong. Try again.';
 
   @override
   String diaryTitle(String name) {

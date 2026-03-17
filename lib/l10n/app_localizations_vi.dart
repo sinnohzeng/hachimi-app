@@ -570,6 +570,9 @@ class SVi extends S {
   String get catDetailNotFound => 'Không tìm thấy mèo';
 
   @override
+  String get catDetailLoadError => 'Không thể tải dữ liệu mèo';
+
+  @override
   String get catDetailChatTooltip => 'Trò chuyện';
 
   @override
@@ -1635,6 +1638,18 @@ class SVi extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Không thể lưu trữ mèo';
+
+  @override
+  String get catRoomReactivateError => 'Không thể kích hoạt lại mèo';
+
+  @override
+  String get catRoomArchiveLoadError => 'Không thể tải mèo đã lưu trữ';
+
+  @override
+  String get catRoomRenameError => 'Không thể đổi tên mèo';
+
+  @override
   String get addHabitTitle => 'Nhiệm vụ mới';
 
   @override
@@ -1780,16 +1795,19 @@ class SVi extends S {
   String get chatClearButton => 'Xóa';
 
   @override
-  String get chatSend => 'Send';
+  String get chatSend => 'Gửi';
 
   @override
-  String get chatStop => 'Stop';
+  String get chatStop => 'Dừng';
 
   @override
   String get chatErrorMessage => 'Failed to send message. Tap to retry.';
 
   @override
   String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Đã xảy ra lỗi. Thử lại.';
 
   @override
   String diaryTitle(String name) {

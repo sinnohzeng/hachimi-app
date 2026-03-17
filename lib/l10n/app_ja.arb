@@ -191,6 +191,7 @@
   "aiTemporarilyUnavailable": "AI 機能は一時的に利用できません",
 
   "catDetailNotFound": "ネコが見つかりません",
+  "catDetailLoadError": "猫データの読み込みに失敗しました",
   "catDetailChatTooltip": "チャット",
   "catDetailRenameTooltip": "名前を変更",
   "catDetailGrowthTitle": "成長の進捗",
@@ -558,6 +559,10 @@
   "@catRoomReactivateSuccess": {
     "placeholders": { "name": { "type": "String" } }
   },
+  "catRoomArchiveError": "猫のアーカイブに失敗しました",
+  "catRoomReactivateError": "猫の復帰に失敗しました",
+  "catRoomArchiveLoadError": "アーカイブ済みの猫の読み込みに失敗しました",
+  "catRoomRenameError": "猫の名前変更に失敗しました",
 
   "addHabitTitle": "新しいクエスト",
   "addHabitQuestName": "クエスト名",
@@ -605,6 +610,9 @@
   "chatStop": "Stop",
   "chatErrorMessage": "Failed to send message. Tap to retry.",
   "chatRetry": "Retry",
+  "chatSend": "送信",
+  "chatStop": "停止",
+  "chatErrorGeneric": "エラーが発生しました。再試行してください",
 
   "diaryTitle": "{name}の日記",
   "diaryLoadFailed": "日記の読み込みに失敗しました",
