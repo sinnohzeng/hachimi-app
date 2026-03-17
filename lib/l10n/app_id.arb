@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "Fitur AI sementara tidak tersedia",
 
   "catDetailNotFound": "Kucing tidak ditemukan",
+  "catDetailLoadError": "Gagal memuat data kucing",
   "catDetailChatTooltip": "Obrolan",
   "catDetailRenameTooltip": "Ubah Nama",
   "catDetailGrowthTitle": "Progres Pertumbuhan",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Diarsipkan",
   "catRoomArchiveSuccess": "\"{name}\" diarsipkan",
   "catRoomReactivateSuccess": "\"{name}\" diaktifkan kembali",
+  "catRoomArchiveError": "Gagal mengarsipkan kucing",
+  "catRoomReactivateError": "Gagal mengaktifkan kembali kucing",
+  "catRoomArchiveLoadError": "Gagal memuat kucing yang diarsipkan",
+  "catRoomRenameError": "Gagal mengganti nama kucing",
 
   "addHabitTitle": "Misi Baru",
   "addHabitQuestName": "Nama misi",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "Hapus riwayat obrolan?",
   "chatClearConfirmMessage": "Ini akan menghapus semua pesan. Tindakan ini tidak bisa dibatalkan.",
   "chatClearButton": "Hapus",
+  "chatSend": "Kirim",
+  "chatStop": "Berhenti",
+  "chatErrorGeneric": "Terjadi kesalahan. Coba lagi.",
 
   "diaryTitle": "Diari {name}",
   "diaryLoadFailed": "Gagal memuat diari",

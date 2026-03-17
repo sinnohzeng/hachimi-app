@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "ฟีเจอร์ AI ไม่พร้อมใช้งานชั่วคราว",
 
   "catDetailNotFound": "ไม่พบแมว",
+  "catDetailLoadError": "โหลดข้อมูลแมวไม่สำเร็จ",
   "catDetailChatTooltip": "แชท",
   "catDetailRenameTooltip": "เปลี่ยนชื่อ",
   "catDetailGrowthTitle": "ความก้าวหน้าการเติบโต",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "เก็บในอัลบั้ม",
   "catRoomArchiveSuccess": "เก็บ \"{name}\" เข้าอัลบั้มแล้ว",
   "catRoomReactivateSuccess": "เปิดใช้ \"{name}\" อีกครั้งแล้ว",
+  "catRoomArchiveError": "เก็บถาวรแมวไม่สำเร็จ",
+  "catRoomReactivateError": "เปิดใช้งานแมวอีกครั้งไม่สำเร็จ",
+  "catRoomArchiveLoadError": "โหลดแมวที่เก็บถาวรไม่สำเร็จ",
+  "catRoomRenameError": "เปลี่ยนชื่อแมวไม่สำเร็จ",
 
   "addHabitTitle": "เควสต์ใหม่",
   "addHabitQuestName": "ชื่อเควสต์",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "ล้างประวัติแชท?",
   "chatClearConfirmMessage": "จะลบข้อความทั้งหมด ไม่สามารถยกเลิกได้",
   "chatClearButton": "ล้าง",
+  "chatSend": "ส่ง",
+  "chatStop": "หยุด",
+  "chatErrorGeneric": "เกิดข้อผิดพลาด ลองอีกครั้ง",
 
   "diaryTitle": "ไดอารี่ {name}",
   "diaryLoadFailed": "โหลดไดอารี่ไม่สำเร็จ",

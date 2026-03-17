@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "Tính năng AI tạm thời không khả dụng",
 
   "catDetailNotFound": "Không tìm thấy mèo",
+  "catDetailLoadError": "Không thể tải dữ liệu mèo",
   "catDetailChatTooltip": "Trò chuyện",
   "catDetailRenameTooltip": "Đổi tên",
   "catDetailGrowthTitle": "Tiến trình tăng trưởng",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Đã lưu trữ",
   "catRoomArchiveSuccess": "Đã lưu trữ \"{name}\"",
   "catRoomReactivateSuccess": "Đã kích hoạt lại \"{name}\"",
+  "catRoomArchiveError": "Không thể lưu trữ mèo",
+  "catRoomReactivateError": "Không thể kích hoạt lại mèo",
+  "catRoomArchiveLoadError": "Không thể tải mèo đã lưu trữ",
+  "catRoomRenameError": "Không thể đổi tên mèo",
 
   "addHabitTitle": "Nhiệm vụ mới",
   "addHabitQuestName": "Tên nhiệm vụ",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "Xóa lịch sử trò chuyện?",
   "chatClearConfirmMessage": "Thao tác này sẽ xóa tất cả tin nhắn. Không thể hoàn tác.",
   "chatClearButton": "Xóa",
+  "chatSend": "Gửi",
+  "chatStop": "Dừng",
+  "chatErrorGeneric": "Đã xảy ra lỗi. Thử lại.",
 
   "diaryTitle": "Nhật ký {name}",
   "diaryLoadFailed": "Không tải được nhật ký",

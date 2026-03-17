@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "AI सुविधाएँ अस्थायी रूप से अनुपलब्ध हैं",
 
   "catDetailNotFound": "बिल्ली नहीं मिली",
+  "catDetailLoadError": "बिल्ली का डेटा लोड नहीं हो सका",
   "catDetailChatTooltip": "चैट",
   "catDetailRenameTooltip": "नाम बदलें",
   "catDetailGrowthTitle": "विकास प्रगति",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "आर्काइव किया गया",
   "catRoomArchiveSuccess": "\"{name}\" आर्काइव हो गई",
   "catRoomReactivateSuccess": "\"{name}\" पुनः सक्रिय हो गई",
+  "catRoomArchiveError": "बिल्ली को संग्रह करने में विफल",
+  "catRoomReactivateError": "बिल्ली को पुनः सक्रिय करने में विफल",
+  "catRoomArchiveLoadError": "संग्रहीत बिल्लियों को लोड नहीं हो सका",
+  "catRoomRenameError": "बिल्ली का नाम बदलने में विफल",
 
   "addHabitTitle": "नया क्वेस्ट",
   "addHabitQuestName": "क्वेस्ट का नाम",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "चैट इतिहास मिटाएँ?",
   "chatClearConfirmMessage": "इससे सभी संदेश हट जाएँगे। यह पूर्ववत नहीं किया जा सकता।",
   "chatClearButton": "मिटाएँ",
+  "chatSend": "भेजें",
+  "chatStop": "रोकें",
+  "chatErrorGeneric": "कुछ गलत हो गया। फिर से कोशिश करें।",
 
   "diaryTitle": "{name} की डायरी",
   "diaryLoadFailed": "डायरी लोड नहीं हो पाई",

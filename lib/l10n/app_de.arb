@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "KI-Funktionen sind vorübergehend nicht verfügbar",
 
   "catDetailNotFound": "Katze nicht gefunden",
+  "catDetailLoadError": "Katzendaten konnten nicht geladen werden",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Umbenennen",
   "catDetailGrowthTitle": "Wachstumsfortschritt",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Archiviert",
   "catRoomArchiveSuccess": "\"{name}\" archiviert",
   "catRoomReactivateSuccess": "\"{name}\" reaktiviert",
+  "catRoomArchiveError": "Archivierung der Katze fehlgeschlagen",
+  "catRoomReactivateError": "Reaktivierung der Katze fehlgeschlagen",
+  "catRoomArchiveLoadError": "Archivierte Katzen konnten nicht geladen werden",
+  "catRoomRenameError": "Umbenennung der Katze fehlgeschlagen",
 
   "addHabitTitle": "Neue Quest",
   "addHabitQuestName": "Questname",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "Chatverlauf löschen?",
   "chatClearConfirmMessage": "Dadurch werden alle Nachrichten gelöscht. Dies kann nicht rückgängig gemacht werden.",
   "chatClearButton": "Löschen",
+  "chatSend": "Senden",
+  "chatStop": "Stopp",
+  "chatErrorGeneric": "Etwas ist schiefgelaufen. Erneut versuchen.",
 
   "diaryTitle": "{name}s Tagebuch",
   "diaryLoadFailed": "Tagebuch konnte nicht geladen werden",

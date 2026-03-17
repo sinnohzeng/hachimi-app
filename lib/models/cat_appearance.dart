@@ -52,6 +52,20 @@ class CatAppearance {
   /// sprite 变体 (0, 1, 2)，每阶段 3 个姿势变体
   final int spriteVariant;
 
+  /// 默认外观 — 当 Firestore/SQLite 数据缺失时的兜底值。
+  static const defaultAppearance = CatAppearance(
+    peltType: 'SingleColour',
+    peltColor: 'WHITE',
+    tint: 'none',
+    eyeColor: 'YELLOW',
+    whitePatchesTint: 'none',
+    skinColor: 'PINK',
+    isTortie: false,
+    isLonghair: false,
+    reverse: false,
+    spriteVariant: 0,
+  );
+
   const CatAppearance({
     required this.peltType,
     required this.peltColor,

@@ -188,6 +188,7 @@
   "aiTemporarilyUnavailable": "AI özellikleri geçici olarak kullanılamıyor",
 
   "catDetailNotFound": "Kedi bulunamadı",
+  "catDetailLoadError": "Kedi verileri yüklenemedi",
   "catDetailChatTooltip": "Sohbet",
   "catDetailRenameTooltip": "Yeniden Adlandır",
   "catDetailGrowthTitle": "Büyüme İlerlemesi",
@@ -544,6 +545,10 @@
   "catRoomArchivedLabel": "Arşivlendi",
   "catRoomArchiveSuccess": "\"{name}\" arşivlendi",
   "catRoomReactivateSuccess": "\"{name}\" yeniden etkinleştirildi",
+  "catRoomArchiveError": "Kedi arşivlenemedi",
+  "catRoomReactivateError": "Kedi yeniden etkinleştirilemedi",
+  "catRoomArchiveLoadError": "Arşivlenmiş kediler yüklenemedi",
+  "catRoomRenameError": "Kedi yeniden adlandırılamadı",
 
   "addHabitTitle": "Yeni Görev",
   "addHabitQuestName": "Görev adı",
@@ -587,6 +592,9 @@
   "chatClearConfirmTitle": "Sohbet geçmişi silinsin mi?",
   "chatClearConfirmMessage": "Tüm mesajlar silinecek. Bu işlem geri alınamaz.",
   "chatClearButton": "Temizle",
+  "chatSend": "Gönder",
+  "chatStop": "Durdur",
+  "chatErrorGeneric": "Bir sorun oluştu. Tekrar deneyin.",
 
   "diaryTitle": "{name} Günlüğü",
   "diaryLoadFailed": "Günlük yüklenemedi",
