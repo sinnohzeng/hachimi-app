@@ -1,6 +1,9 @@
-v2.33.0
+v2.33.4
 
-- Ditingkatkan: Sistem login dibangun ulang agar lebih andal — tidak ada lagi pengguna hantu setelah logout
-- Ditingkatkan: Logout kini menampilkan indikator loading dan selesai dengan bersih
-- Ditingkatkan: Sidebar menampilkan prompt login tamu dengan benar setelah logout
-- Dihapus: Login anonim (tamu kini bisa digunakan sepenuhnya secara offline)
+- Baru: Reset kata sandi via email di layar login
+- Baru: Penanganan error chat dengan gelembung coba ulang inline
+- Baru: Perlindungan circuit breaker AI (pemulihan otomatis setelah kegagalan)
+- Baru: String pencapaian untuk Jepang, Korea, Tionghoa Tradisional
+- Ditingkatkan: Aksesibilitas — 20+ komponen dengan dukungan pembaca layar
+- Ditingkatkan: Layar kucing dengan status loading/error yang tepat
+- Ditingkatkan: UX penghapusan akun dengan ringkasan data asinkron

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.33.4] - 2026-03-17
+
+### Added
+- **15 语言国际化**：新增 German、Spanish、French、Portuguese、Hindi、Indonesian 等语言完整支持，成就系统扩展 Japanese/Korean/Traditional Chinese 本地化（617 条成就数据）
+- **密码重置功能**：登录页新增"忘记密码"入口，支持邮箱重置密码
+- **聊天错误处理**：AI 聊天引入 `ChatResult` 三态模型（成功/取消/错误），错误时显示内联重试气泡
+- **熔断器保护**：AI 服务层新增断路器机制，连续 3 次失败自动 5 分钟回退
+
+### Changed
+- **无障碍增强**：20+ 组件添加 Semantics 标签和 ExcludeSemantics 包裹，改善屏幕阅读器体验
+- **猫咪屏幕重构**：重命名对话框提取为共享 widget、猫咪详情/聊天/猫舍页面增加加载/错误状态处理
+- **账号删除优化**：删除确认对话框改为异步加载用户数据摘要，删除重试定时器生命周期优化
+- **PixelCatRenderer 内存管理**：渲染管线中显式释放 native texture，减少内存泄漏
+
+### Fixed
+- **孤立测试文件**：删除 `sse_parser_test.dart`（引用的源文件已移除）
+- **未使用字段**：移除 `AiAvailabilityNotifier._validated`
+- **弃用 API**：`SemanticsService.announce` 替换为 `sendAnnouncement`
+
 ## [2.33.3] - 2026-03-14
 
 ### Fixed

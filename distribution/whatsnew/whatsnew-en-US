@@ -1,8 +1,9 @@
-v2.33.1
+v2.33.4
 
-- Fixed: Data loss when switching between multiple accounts — logout no longer deletes local data
-- Fixed: Account deletion failure now properly signs out instead of leaving zombie state
-- Fixed: Infinite spinner after logout (Riverpod stream subscription rebuild)
-- Added: 10 new languages (DE, ES, FR, HI, ID, IT, PT, TH, TR, VI)
-- Added: Manual language switcher in settings
-- Added: Cat animation on login screen
+- Added: Password reset via email on login screen
+- Added: Chat error handling with inline retry bubble
+- Added: AI circuit breaker protection (auto-recovery after failures)
+- Added: Achievement strings for Japanese, Korean, Traditional Chinese
+- Improved: Accessibility — 20+ components with screen reader support
+- Improved: Cat screens with proper loading/error states
+- Improved: Account deletion UX with async data summary

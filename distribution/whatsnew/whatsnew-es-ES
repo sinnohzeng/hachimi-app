@@ -1,6 +1,9 @@
-v2.33.0
+v2.33.4
 
-- Mejorado: Sistema de inicio de sesión reconstruido para mayor fiabilidad — no más usuarios fantasma tras cerrar sesión
-- Mejorado: El cierre de sesión ahora muestra indicador de carga y se completa limpiamente
-- Mejorado: La barra lateral muestra correctamente el aviso de inicio de sesión para invitados tras cerrar sesión
-- Eliminado: Inicio de sesión anónimo (los invitados ahora funcionan completamente sin conexión)
+- Nuevo: Restablecimiento de contraseña por correo en la pantalla de inicio de sesión
+- Nuevo: Manejo de errores de chat con burbuja de reintento en línea
+- Nuevo: Protección de disyuntor de IA (recuperación automática tras fallos)
+- Nuevo: Textos de logros para japonés, coreano y chino tradicional
+- Mejorado: Accesibilidad — 20+ componentes con soporte para lector de pantalla
+- Mejorado: Pantallas de gatos con estados de carga/error adecuados
+- Mejorado: UX de eliminación de cuenta con resumen de datos asíncrono

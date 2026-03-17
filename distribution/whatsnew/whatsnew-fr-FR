@@ -1,6 +1,9 @@
-v2.33.0
+v2.33.4
 
-- Amélioré : Système de connexion reconstruit pour plus de fiabilité — plus d'utilisateurs fantômes après déconnexion
-- Amélioré : La déconnexion affiche désormais un indicateur de chargement et se termine proprement
-- Amélioré : La barre latérale affiche correctement l'invite de connexion invité après déconnexion
-- Supprimé : Connexion anonyme (les invités fonctionnent désormais entièrement hors ligne)
+- Ajouté : Réinitialisation du mot de passe par e-mail sur l'écran de connexion
+- Ajouté : Gestion des erreurs de chat avec bulle de réessai en ligne
+- Ajouté : Protection par disjoncteur IA (récupération automatique après erreurs)
+- Ajouté : Textes de succès pour le japonais, le coréen et le chinois traditionnel
+- Amélioré : Accessibilité — 20+ composants avec support lecteur d'écran
+- Amélioré : Écrans de chats avec états de chargement/erreur appropriés
+- Amélioré : UX de suppression de compte avec résumé de données asynchrone
