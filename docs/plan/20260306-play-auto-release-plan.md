@@ -1,48 +1,48 @@
-# Plan: Play Auto-Release + Supply-Chain Hardening
+# 计划：Play 自动发布 + 供应链安全加固
 
-> Date: 2026-03-06 | Status: Active | Scope: CI/CD pipeline
+> 日期：2026-03-06 | 状态：Active | 范围：CI/CD 管线
 
-## Goal
+## 目标
 
-Upgrade the release pipeline from "tag > internal track > manual promote" to "tag > production track (automatic)" while hardening supply-chain security.
+将发布管线从"tag > internal 轨道 > 手动推广"升级为"tag > 生产轨道（自动）"，同时加固供应链安全。
 
-## Key Decisions
+## 关键决策
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Release track | production (100% rollout) | Near-daily cadence makes staged rollout impractical |
-| Auth | WIF/OIDC (unchanged) | Already best-practice keyless auth |
-| Action pinning | Commit SHA + Dependabot | Prevents tag-repointing supply-chain attacks |
-| Secrets isolation | GitHub `production` Environment | Only `v*` tags can access release secrets |
-| Build provenance | Sigstore attestation | Verifiable APK origin |
+| 决策 | 选择 | 理由 |
+|------|------|------|
+| 发布轨道 | 生产轨道（100% 发布） | 近乎每日的发布节奏使分阶段发布不现实 |
+| 认证方式 | WIF/OIDC（不变） | 已是最佳实践的无密钥认证 |
+| Action 锁定 | Commit SHA + Dependabot | 防止 tag 重指向供应链攻击 |
+| Secrets 隔离 | GitHub `production` Environment | 仅 `v*` tag 可访问发布 secrets |
+| 构建来源证明 | Sigstore attestation | 可验证的 APK 来源 |
 
-## Changes Made
+## 已执行变更
 
-| File | Change |
-|------|--------|
-| `.github/workflows/release.yml` | SHA pins, `permissions: {}`, `environment: production`, `track: production`, whatsnew guard, provenance, enhanced release body + summary |
-| `.github/workflows/ci.yml` | SHA pins for 4 actions |
-| `.github/dependabot.yml` | New — weekly GitHub Actions updates |
-| `distribution/whatsnew/*` | Version-specific content (was generic) |
-| `docs/release/process.md` | Production track, rollback procedure, supply-chain security |
-| `docs/release/google-play-setup.md` | Environment setup, production track |
-| `docs/release/play-auto-release-runbook.md` | New — manual setup guide + operations |
-| `.claude/rules/12-workflow-release.md` | Production track, whatsnew guard failure pattern |
+| 文件 | 变更内容 |
+|------|----------|
+| `.github/workflows/release.yml` | SHA 锁定、`permissions: {}`、`environment: production`、`track: production`、whatsnew 校验、来源证明、增强版 release body + summary |
+| `.github/workflows/ci.yml` | 4 个 action 的 SHA 锁定 |
+| `.github/dependabot.yml` | 新增——每周更新 GitHub Actions |
+| `distribution/whatsnew/*` | 版本特定内容（原为通用描述） |
+| `docs/release/process.md` | 生产轨道、回滚流程、供应链安全 |
+| `docs/release/google-play-setup.md` | Environment 设置、生产轨道 |
+| `docs/release/play-auto-release-runbook.md` | 新增——手动设置指南 + 运维操作 |
+| `.claude/rules/12-workflow-release.md` | 生产轨道、whatsnew 校验失败模式 |
 
-## Items Deferred (Over-Engineering)
+## 延后事项（过度工程）
 
-- RC tag routing (`vX.Y.Z-rc.N`) — zero historical usage
-- Auto-generated whatsnew via Dart script — fragile with 500-char limit
-- Country availability drift detection — no exclusions exist
-- 4-job workflow split — adds overhead without benefit
-- Staged rollout — incompatible with daily release cadence
+- RC tag 路由（`vX.Y.Z-rc.N`）——历史上从未使用
+- 通过 Dart 脚本自动生成 whatsnew——在 500 字符限制下易出错
+- 国家可用性漂移检测——当前无排除项
+- 4-job workflow 拆分——增加开销但无实际收益
+- 分阶段发布——与每日发布节奏不兼容
 
-## Manual Steps Required
+## 所需手动步骤
 
-See `docs/release/play-auto-release-runbook.md` for detailed instructions.
+详细说明参见 `docs/release/play-auto-release-runbook.md`。
 
-## Changelog
+## 变更记录
 
-| Date | Change |
-|------|--------|
-| 2026-03-06 | Initial plan created and executed |
+| 日期 | 变更 |
+|------|------|
+| 2026-03-06 | 初始计划创建并执行 |

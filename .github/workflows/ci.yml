@@ -130,6 +130,9 @@ jobs:
         run: |
           ! rg -n "TODO|FIXME|TBD|占位" lib test functions/src functions/test .claude/memory
 
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
       - name: Analyze Dart
         run: dart analyze lib test
 

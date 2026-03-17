@@ -1,54 +1,54 @@
-# 2026-03-05 Execution Plan: Cloud Credentials & AI Security Modernization
+# 2026-03-05 执行计划：云端凭据与 AI 安全现代化整改
 
-## Summary
-This plan is the single source of truth for migrating Hachimi from client static AI keys and manually rotated long-lived credentials to Google-native short-lived identity and IaC-managed security controls.
+## 摘要
+本计划是 Hachimi 从“客户端静态 AI Key + 手工轮换长期密钥”迁移到“Google 原生短期身份 + IaC 治理”的唯一真值文档。
 
-Core direction:
-- Google-first AI path: Firebase AI Logic + Vertex AI
-- App Check enforced on sensitive callables
-- GitHub App token flow (no long-lived PAT)
-- Terraform as the long-term control plane for observability and security resources
-- Alerting channels fixed to Google Chat + Email
+核心方向：
+- AI 路径统一为 Firebase AI Logic + Vertex AI
+- 敏感 callable 强制 App Check
+- GitHub 鉴权改为 GitHub App 安装令牌（不再使用长期 PAT）
+- Terraform 作为可观测与安全资源的长期控制面
+- 告警通道固定为 Google Chat + Email
 
-## Scope
-Included in one-time delivery:
-1. Flutter(Android) AI and security runtime migration
-2. Firebase Functions V2 security contract and GitHub App auth
-3. Terraform IaC for `obs` data plane, alerts, budget, secrets, IAM
-4. CI/CD credential hygiene and release secret health checks
-5. DDD/SSOT document synchronization (EN + ZH)
-6. Long-term memory synchronization
+## 范围
+本次一次性交付包含：
+1. Flutter(Android) AI 与安全运行时迁移
+2. Firebase Functions V2 安全契约与 GitHub App 鉴权
+3. Terraform IaC（obs 数据面、告警、预算、Secrets、IAM）
+4. CI/CD 凭据治理与 release secret 健康检查
+5. 中英文 DDD/SSOT 文档同步
+6. 长期记忆同步
 
-Excluded:
-1. iOS/Web code migration
-2. Automatic PR merge/release by AI
+不包含：
+1. iOS/Web 代码改造
+2. AI 自动合并/自动发布
 
-## Final Architecture Contract
-1. AI provider: `firebase_gemini` only (Firebase AI Logic)
-2. Sensitive callables:
+## 最终架构契约
+1. AI 提供商：仅保留 `firebase_gemini`（Firebase AI Logic）
+2. 敏感 callable：
 - `deleteAccountV2`
 - `wipeUserDataV2`
-3. App Check:
-- Android release: Play Integrity
-- Debug build: Debug provider
-- Sensitive callable calls use limited-use tokens
-4. Functions configuration:
-- Parameterized config + Secret parameters
-- no runtime dependency on client-side static AI keys
-5. GitHub auth:
+3. App Check：
+- Android release：Play Integrity
+- Debug：Debug provider
+- 敏感 callable 使用 limited-use token
+4. Functions 配置：
+- 参数化配置 + Secret 参数
+- 不依赖客户端静态 AI key
+5. GitHub 鉴权：
 - `GITHUB_APP_ID`
 - `GITHUB_APP_INSTALLATION_ID`
-- `GITHUB_APP_PRIVATE_KEY` (Secret Manager)
-6. Alerting:
-- Google Chat + Email only
+- `GITHUB_APP_PRIVATE_KEY`（Secret Manager）
+6. 告警通道：
+- 仅 `Google Chat + Email`
 
-## IaC Deliverables
-Directory:
+## IaC 交付物
+目录：
 - `infra/terraform/modules/observability`
 - `infra/terraform/envs/prod`
 
-Managed resources:
-1. BigQuery dataset and observability objects:
+托管资源：
+1. BigQuery 数据集与可观测对象：
 - `issue_daily_v1`
 - `issue_velocity_v1`
 - `issue_user_impact_v1`
@@ -56,77 +56,77 @@ Managed resources:
 - `release_stability_v1`
 - `ai_debug_tasks_v1`
 - `ai_debug_reports_v1`
-2. Scheduled query refresh (`every 15 minutes`)
-3. Cloud Logging sink to BigQuery
-4. Monitoring policies and notification bindings
-5. Billing budget and threshold rules
-6. Secret Manager and IAM split
+2. 定时 SQL 刷新（每 15 分钟）
+3. Cloud Logging 到 BigQuery sink
+4. Monitoring 告警策略与通知绑定
+5. Billing 预算与阈值规则
+6. Secret Manager 与 IAM 最小权限拆分
 
-Outputs:
+输出契约：
 - `obs_dataset_id`
 - `notification_channel_ids`
 - `alert_policy_ids`
 - `budget_id`
 
-## Manual Cooperation (Minimal Set)
-Required once by project owner:
-1. Google Chat:
-- Create spaces:
+## 你需要手工配合（最小集合）
+项目负责人仅需一次性完成：
+1. Google Chat：
+- 创建空间：
   - `hachimi-alerts-prod-p1`
   - `hachimi-alerts-prod-ops`
-- Install Google Cloud Monitoring app in each space
-- Provide Monitoring notification channel IDs
-2. GitHub:
-- Create GitHub App with minimum permissions:
+- 每个空间安装 Google Cloud Monitoring 应用
+- 提供 Monitoring notification channel ID
+2. GitHub：
+- 创建 GitHub App（最小权限）
   - `Issues: Read & Write`
   - `Metadata: Read-only`
-- Install app to `sinnohzeng/hachimi-app`
-- Provide:
+- 安装到 `sinnohzeng/hachimi-app`
+- 提供：
   - `APP_ID`
   - `INSTALLATION_ID`
   - `PRIVATE_KEY_PEM`
-3. Firebase/GCP:
-- Enable App Check (Play Integrity) for Android app
-- Complete Firebase AI Logic initial setup (Vertex provider)
-- Approve IAM grants for Terraform/deploy identities
+3. Firebase/GCP：
+- 为 Android 应用启用 App Check（Play Integrity）
+- 完成 Firebase AI Logic 首次向导（Vertex provider）
+- 批准 Terraform/部署身份所需 IAM 授权
 
-## Locked Execution Inputs (2026-03-05)
-1. Project and billing:
-- `PROJECT_ID=hachimi-ai` (single prod environment)
+## 已锁定执行输入（2026-03-05）
+1. 项目与计费：
+- `PROJECT_ID=hachimi-ai`（单环境 prod）
 - `BILLING_ACCOUNT_ID=billingAccounts/01E301-C31477-88FDAB`
-2. GitHub App:
+2. GitHub App：
 - `APP_ID=3015633`
 - `INSTALLATION_ID=114226962`
-- Private key file: `/data/workspace/hachimi-app/hachimi-ai-debug-bot.2026-03-05.private-key.pem`
-3. Google Chat channels:
-- prod ops: `projects/hachimi-ai/notificationChannels/7202234633594020254`
-- prod p1: `projects/hachimi-ai/notificationChannels/7564813615993522229`
+- 私钥文件：`/data/workspace/hachimi-app/hachimi-ai-debug-bot.2026-03-05.private-key.pem`
+3. Google Chat 通道：
+- prod ops：`projects/hachimi-ai/notificationChannels/7202234633594020254`
+- prod p1：`projects/hachimi-ai/notificationChannels/7564813615993522229`
 
-## Remaining Manual Actions
-1. Enable Android App Check (Play Integrity) in Firebase Console.
-2. Complete Firebase AI Logic initial setup (Vertex provider) in Firebase Console.
-3. Confirm Crashlytics and Analytics BigQuery exports are enabled and have produced datasets/tables.
-4. Update `infra/terraform/envs/prod/terraform.tfvars`:
+## 当前剩余人工事项
+1. Firebase Console 开启 Android App Check（Play Integrity）。
+2. Firebase Console 完成 Firebase AI Logic 首次开通（Vertex provider）。
+3. 确认 Crashlytics/Analytics BigQuery 导出均已启用并已产生数据集/数据表。
+4. 回填 `infra/terraform/envs/prod/terraform.tfvars`：
    - `analytics_dataset = "analytics_<real_property_id>"`
    - `enable_export_dependent_resources = true`
-5. Run `cd infra/terraform/envs/prod && terraform apply` to provision export-dependent objects.
+5. 执行 `cd infra/terraform/envs/prod && terraform apply` 完成导出依赖对象落地。
 
-## Automated by Repository Changes
-1. Client AI provider migration
-2. App Check runtime activation and limited-use token path
-3. Functions V2 callable and triage hardening
-4. GitHub App token exchange integration
-5. Release workflow secret hygiene and checks
-6. Terraform resource definitions and output contracts
-7. EN/ZH docs and long-memory updates
+## 由仓库改造自动完成的内容
+1. 客户端 AI provider 迁移
+2. App Check 运行时接入与 limited-use token 路径
+3. Functions V2 callable 与 AI 分诊后端加固
+4. GitHub App 安装令牌链路
+5. release workflow secrets 健康检查
+6. Terraform 资源定义与输出契约
+7. 中英文文档与长期记忆同步
 
-## Acceptance Criteria
-1. `deleteAccountV2/wipeUserDataV2` reject requests without valid App Check
-2. AI features run without client-side static AI keys
-3. `runAiDebugTriageV2` writes reports and can create draft GitHub issues through GitHub App auth
-4. Alert drill reaches Google Chat + Email channels
-5. No plaintext UID/email/phone in logs and observability reports
-6. Quality gates pass:
+## 验收标准
+1. 无有效 App Check 的 `deleteAccountV2/wipeUserDataV2` 调用必须拒绝
+2. AI 功能可用且不依赖客户端静态 AI key
+3. `runAiDebugTriageV2` 可写表并通过 GitHub App 创建草稿 issue
+4. 告警演练可同时触达 Google Chat 与 Email
+5. 日志与报表中无明文 UID/邮箱/手机号
+6. 质量门禁通过：
 - `dart analyze lib test`
 - `flutter test --exclude-tags golden`
 - `dart run tool/quality_gate.dart`

@@ -1,0 +1,69 @@
+name: Bug Report
+description: Report a bug in Hachimi
+labels: ["bug"]
+assignees: ["sinnohzeng"]
+body:
+  - type: dropdown
+    id: app_version
+    attributes:
+      label: App Version
+      description: Which version of Hachimi are you running?
+      options:
+        - v2.34.0
+        - v2.33.x
+        - older
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Device model (e.g. vivo V2405A, Pixel 8)
+      placeholder: e.g. vivo V2405A
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android Version
+      description: Android version and API level (e.g. Android 16, API 36)
+      placeholder: e.g. Android 14, API 34
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Clear steps that reliably trigger the issue
+      placeholder: |
+        1. Open the app
+        2. Go to ...
+        3. Tap ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: Paste any relevant log output. You can copy logs from Settings → About → Copy Logs.
+      render: text
