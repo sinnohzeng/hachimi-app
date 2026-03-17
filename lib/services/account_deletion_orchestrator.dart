@@ -266,7 +266,8 @@ class AccountDeletionOrchestrator {
       };
       return retryableCodes.contains(error.code);
     }
-    return true;
+    // 非 Cloud Functions 异常（编程错误、类型错误等）不应重试
+    return false;
   }
 
   String _toRemoteErrorCode(Object error) {

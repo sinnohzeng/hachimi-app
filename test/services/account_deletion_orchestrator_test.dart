@@ -195,14 +195,14 @@ void main() {
       expect(fakeLifecycleBackend.deleteAccountHardCalled, isFalse);
     });
 
-    test('remote failure increments retry count', () async {
+    test('retryable Functions error increments retry count', () async {
       final values = <String, Object>{};
       _seedPendingJob(values, 'uid_abc', retryCount: 1);
       await buildOrchestrator(values);
 
       fakeAuthBackend._currentUid = 'uid_abc';
-      fakeLifecycleBackend.deleteAccountHardError = Exception(
-        'remote_delete_failed',
+      fakeLifecycleBackend.deleteAccountHardError = FakeFunctionsException(
+        'internal',
       );
 
       await orchestrator.resumePendingDeletion();
@@ -210,6 +210,22 @@ void main() {
       expect(prefs.getInt(AppPrefsKeys.deletionRetryCount), 2);
       // markers 仍存在，等待下次重试
       expect(prefs.getString(AppPrefsKeys.pendingDeletionJob), isNotNull);
+    });
+
+    test('non-Functions exception clears pending markers', () async {
+      final values = <String, Object>{};
+      _seedPendingJob(values, 'uid_abc', retryCount: 1);
+      await buildOrchestrator(values);
+
+      fakeAuthBackend._currentUid = 'uid_abc';
+      // 编程错误等非 Functions 异常不应重试
+      fakeLifecycleBackend.deleteAccountHardError = Exception(
+        'programming_error',
+      );
+
+      await orchestrator.resumePendingDeletion();
+
+      expect(_hasNoMarkers(prefs), isTrue);
     });
 
     test('non-retryable functions error clears pending markers', () async {

@@ -38,56 +38,70 @@ class DeleteAccountFlow {
     String uid,
   ) async {
     final l10n = context.l10n;
-    final summary = await ref
+    final summaryFuture = ref
         .read(accountDeletionServiceProvider)
         .getUserDataSummary(uid);
-    if (!context.mounted) return false;
 
     return showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteAccountTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.deleteAccountDataWarning),
-            const SizedBox(height: AppSpacing.md),
-            _DataRow(
-              icon: Icons.flag_outlined,
-              label: l10n.deleteAccountQuests,
-              value: '${summary.questCount}',
-            ),
-            _DataRow(
-              icon: Icons.pets,
-              label: l10n.deleteAccountCats,
-              value: '${summary.catCount}',
-            ),
-            _DataRow(
-              icon: Icons.timer,
-              label: l10n.deleteAccountHours,
-              value: '${summary.totalHours}h',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              l10n.deleteAccountIrreversible,
-              style: TextStyle(
-                color: Theme.of(ctx).colorScheme.error,
-                fontWeight: FontWeight.w600,
+      builder: (ctx) => FutureBuilder(
+        future: summaryFuture,
+        builder: (ctx, snapshot) {
+          final isLoading = !snapshot.hasData && !snapshot.hasError;
+          return AlertDialog(
+            title: Text(l10n.deleteAccountTitle),
+            content: isLoading
+                ? const SizedBox(
+                    height: 120,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.deleteAccountDataWarning),
+                      const SizedBox(height: AppSpacing.md),
+                      if (snapshot.hasData) ...[
+                        _DataRow(
+                          icon: Icons.flag_outlined,
+                          label: l10n.deleteAccountQuests,
+                          value: '${snapshot.data!.questCount}',
+                        ),
+                        _DataRow(
+                          icon: Icons.pets,
+                          label: l10n.deleteAccountCats,
+                          value: '${snapshot.data!.catCount}',
+                        ),
+                        _DataRow(
+                          icon: Icons.timer,
+                          label: l10n.deleteAccountHours,
+                          value: '${snapshot.data!.totalHours}h',
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        l10n.deleteAccountIrreversible,
+                        style: TextStyle(
+                          color: Theme.of(ctx).colorScheme.error,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l10n.commonCancel),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.deleteAccountContinue),
-          ),
-        ],
+              FilledButton(
+                onPressed: isLoading
+                    ? null
+                    : () => Navigator.of(ctx).pop(true),
+                child: Text(l10n.deleteAccountContinue),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

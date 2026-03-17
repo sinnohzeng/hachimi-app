@@ -797,5 +797,13 @@
   "loginShowPassword": "Şifreyi göster",
   "loginHidePassword": "Şifreyi gizle",
   "errorGeneric": "Bir şeyler ters gitti. Daha sonra tekrar dene",
-  "errorCreateHabit": "Alışkanlık oluşturulamadı. Tekrar dene"
+  "errorCreateHabit": "Alışkanlık oluşturulamadı. Tekrar dene",
+
+  "loginForgotPassword": "Forgot password?",
+  "loginForgotPasswordTitle": "Reset password",
+  "loginSendResetEmail": "Send reset email",
+  "loginResetEmailSent": "Password reset email sent. Check your inbox",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorInvalidEmail": "Please enter a valid email address",
+  "authErrorRequiresRecentLogin": "Please log in again to continue"
 }

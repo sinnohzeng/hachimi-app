@@ -220,14 +220,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : Image.network(
-                                  'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                                  width: 20,
-                                  height: 20,
-                                  semanticLabel: 'Google logo',
-                                  errorBuilder: (_, _, _) =>
-                                      const Icon(Icons.g_mobiledata, size: 24),
-                                ),
+                              : const Icon(Icons.g_mobiledata, size: 24),
                           label: Text(context.l10n.loginContinueGoogle),
                         ),
                       ),

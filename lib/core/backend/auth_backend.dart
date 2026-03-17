@@ -54,8 +54,8 @@ abstract class AuthBackend {
   /// 登出。
   Future<void> signOut();
 
-  /// 删除当前用户账号。
-  Future<void> deleteAccount();
+  /// 发送密码重置邮件。
+  Future<void> sendPasswordResetEmail(String email);
 
   /// 当前用户的认证提供商 ID 列表（如 'google.com'、'password'）。
   List<String> get providerIds;

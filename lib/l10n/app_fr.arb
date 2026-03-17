@@ -797,5 +797,13 @@
   "loginShowPassword": "Afficher le mot de passe",
   "loginHidePassword": "Masquer le mot de passe",
   "errorGeneric": "Une erreur est survenue. Réessayez plus tard",
-  "errorCreateHabit": "Échec de la création de l'habitude. Réessayez"
+  "errorCreateHabit": "Échec de la création de l'habitude. Réessayez",
+
+  "loginForgotPassword": "Forgot password?",
+  "loginForgotPasswordTitle": "Reset password",
+  "loginSendResetEmail": "Send reset email",
+  "loginResetEmailSent": "Password reset email sent. Check your inbox",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorInvalidEmail": "Please enter a valid email address",
+  "authErrorRequiresRecentLogin": "Please log in again to continue"
 }
