@@ -42,5 +42,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(PixelBadge), findsOneWidget);
     });
+
+    testWidgets('Retro mode with animate=true does not crash', (tester) async {
+      await tester.pumpWidget(
+        _buildTestApp(
+          isRetro: true,
+          child: const PixelBadge(text: 'Test', animate: true),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Test'), findsOneWidget);
+    });
+
+    testWidgets('survives mode switch retro -> MD3', (tester) async {
+      await tester.pumpWidget(
+        _buildTestApp(isRetro: true, child: const PixelBadge(text: 'Test')),
+      );
+      await tester.pumpWidget(
+        _buildTestApp(isRetro: false, child: const PixelBadge(text: 'Test')),
+      );
+      await tester.pump();
+      expect(find.text('Test'), findsOneWidget);
+    });
   });
 }

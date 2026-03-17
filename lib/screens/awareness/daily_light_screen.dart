@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/awareness_constants.dart';
+import 'package:hachimi_app/core/constants/cat_response_templates.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
@@ -99,9 +101,21 @@ class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
 
   /// 猫咪睡前动画对话框 — 3 秒自动关闭。返回 Future 以便调用方 await。
   Future<void> _showCatBedtimeDialog() {
-    final response =
-        AwarenessConstants.seedCatResponses[Mood.fromValue(_selectedMood!)] ??
-        '';
+    final cats = ref.read(catsProvider).value ?? [];
+    final catName = cats.isNotEmpty ? cats.first.name : 'Hachimi';
+    final locale = Localizations.localeOf(context).languageCode;
+    final scene = switch (Mood.fromValue(_selectedMood!)) {
+      Mood.veryHappy => CatResponseScene.lightVeryHappy,
+      Mood.happy => CatResponseScene.lightHappy,
+      Mood.calm => CatResponseScene.lightCalm,
+      Mood.down => CatResponseScene.lightDown,
+      Mood.veryDown => CatResponseScene.lightVeryDown,
+    };
+    final response = getRandomCatResponse(
+      scene,
+      locale: locale,
+      params: {'catName': catName},
+    );
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 

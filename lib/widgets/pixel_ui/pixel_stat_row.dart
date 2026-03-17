@@ -33,8 +33,8 @@ class PixelStatRow extends StatelessWidget {
   }
 
   Widget _buildMaterial(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -46,14 +46,16 @@ class PixelStatRow extends StatelessWidget {
           ],
           Text(
             label,
-            style: textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: scheme.onSurfaceVariant,
             ),
           ),
           const Spacer(),
           Text(
             value,
-            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

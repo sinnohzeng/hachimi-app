@@ -95,6 +95,8 @@ Screens -> Providers -> Services -> Backend 抽象 -> Firebase SDK / Cloud Funct
 - 复古色映射到 `ColorScheme` 槽位（如 `surface` → 复古背景色、`outline` → 像素边框色），所有 Material 组件零改动自动适配。
 - `AppScaffold` 包裹 `Scaffold`，在复古模式下条件性叠加 `RetroTiledBackground` — 23+ 个屏幕的唯一集成点。
 - `PixelThemeExtension` 承载像素专用令牌（经验条、成功/警告色、Silkscreen 字体样式）。
+- **自适应像素组件**：所有 `lib/widgets/pixel_ui/Pixel*` 组件检查 `context.pixel.isRetro`，Material 模式下渲染标准 M3 组件（`Container`、`FilledButton.tonal`、`Card`、`LinearProgressIndicator`、`Divider`），Retro 模式下渲染像素风 CustomPaint。StatefulWidget 组件（PixelButton、PixelBadge、PixelCard）使用外层 StatelessWidget 外壳模式，避免在 MD3 模式下创建 AnimationController。
+- 公共 MD3 helper 位于 `lib/widgets/pixel_ui/_md3_helpers.dart`，减少自适应组件间的重复代码。
 
 ## SSOT 映射
 | 关注点 | SSOT |

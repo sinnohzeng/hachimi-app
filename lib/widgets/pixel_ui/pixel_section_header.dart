@@ -30,8 +30,8 @@ class PixelSectionHeader extends StatelessWidget {
   }
 
   Widget _buildMaterial(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final lineColor = scheme.outlineVariant.withValues(alpha: 0.3);
 
     return Padding(
@@ -45,7 +45,7 @@ class PixelSectionHeader extends StatelessWidget {
             Icon(icon, size: 16, color: scheme.primary),
             const SizedBox(width: 6),
           ],
-          Text(title, style: textTheme.titleSmall),
+          Text(title, style: theme.textTheme.titleSmall),
           if (trailing != null) ...[const SizedBox(width: 6), trailing!],
           const SizedBox(width: 8),
           // 右分隔线

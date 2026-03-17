@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/pixel_theme_extension.dart';
+import '_md3_helpers.dart';
 
 /// 金币显示 — 自适应双模式渲染。
 ///
@@ -21,32 +22,19 @@ class PixelCoinDisplay extends StatelessWidget {
   }
 
   Widget _buildMaterial(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.monetization_on, size: 18, color: scheme.tertiary),
         const SizedBox(width: 4),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (child, animation) {
-            return SlideTransition(
-              position: Tween(
-                begin: const Offset(0, 0.5),
-                end: Offset.zero,
-              ).animate(animation),
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          child: Text(
-            '$amount',
-            key: ValueKey(amount),
-            style: textTheme.labelLarge?.copyWith(
-              color: scheme.tertiary,
-              fontWeight: FontWeight.bold,
-            ),
+        md3AnimatedCounter(
+          amount: amount,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: scheme.tertiary,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -67,24 +55,11 @@ class PixelCoinDisplay extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (child, animation) {
-            return SlideTransition(
-              position: Tween(
-                begin: const Offset(0, 0.5),
-                end: Offset.zero,
-              ).animate(animation),
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          child: Text(
-            '$amount',
-            key: ValueKey(amount),
-            style: pixel.pixelLabel.copyWith(
-              color: pixel.xpBarFill,
-              fontWeight: FontWeight.bold,
-            ),
+        md3AnimatedCounter(
+          amount: amount,
+          style: pixel.pixelLabel.copyWith(
+            color: pixel.xpBarFill,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

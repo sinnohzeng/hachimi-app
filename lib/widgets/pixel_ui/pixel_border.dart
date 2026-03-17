@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_shape.dart';
 import '../../core/theme/pixel_theme_extension.dart';
+import '_md3_helpers.dart';
 
 /// 自适应边框容器 — Retro 模式使用阶梯角 CustomPaint，MD3 模式使用圆角 Container。
 ///
@@ -43,14 +43,11 @@ class PixelBorder extends StatelessWidget {
   }
 
   Widget _buildMaterial(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: padding ?? const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: AppShape.borderMedium,
-        color: fillColor ?? scheme.surfaceContainerLow,
-        border: Border.all(color: borderColor ?? scheme.outlineVariant),
-      ),
+    return md3Container(
+      scheme: Theme.of(context).colorScheme,
+      padding: padding,
+      fillColor: fillColor,
+      borderColor: borderColor,
       child: child,
     );
   }

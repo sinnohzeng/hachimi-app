@@ -73,5 +73,35 @@ void main() {
       await tester.pump();
       expect(find.byType(PixelCard), findsOneWidget);
     });
+
+    testWidgets('MD3 interactive card fires onTap callback', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          isRetro: false,
+          child: PixelCard(
+            child: const Text('test'),
+            onTap: () => tapped = true,
+          ),
+        ),
+      );
+      await tester.tap(find.text('test'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('Retro interactive card fires onTap callback', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          isRetro: true,
+          child: PixelCard(
+            child: const Text('test'),
+            onTap: () => tapped = true,
+          ),
+        ),
+      );
+      await tester.tap(find.text('test'));
+      expect(tapped, isTrue);
+    });
   });
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hachimi_app/core/constants/awareness_constants.dart';
+import 'package:hachimi_app/core/constants/cat_response_templates.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -76,8 +76,20 @@ class _CatBedtimeAnimationState extends ConsumerState<CatBedtimeAnimation>
     // 装饰性动画：加载中/错误时显示空占位即可，无需阻断用户流程。
     final cats = ref.watch(catsProvider).value ?? [];
     final cat = cats.isNotEmpty ? cats.first : null;
-    final responseText =
-        AwarenessConstants.seedCatResponses[Mood.fromValue(widget.mood)] ?? '';
+    final catName = cat?.name ?? 'Hachimi';
+    final locale = Localizations.localeOf(context).languageCode;
+    final scene = switch (Mood.fromValue(widget.mood)) {
+      Mood.veryHappy => CatResponseScene.lightVeryHappy,
+      Mood.happy => CatResponseScene.lightHappy,
+      Mood.calm => CatResponseScene.lightCalm,
+      Mood.down => CatResponseScene.lightDown,
+      Mood.veryDown => CatResponseScene.lightVeryDown,
+    };
+    final responseText = getRandomCatResponse(
+      scene,
+      locale: locale,
+      params: {'catName': catName},
+    );
 
     return GestureDetector(
       onTap: _dismiss,

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' show Database, Transaction;
 
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -351,8 +350,13 @@ class AchievementEvaluator {
         weeklyReviews: totalWeeklyReviews,
         worriesResolved: totalWorriesResolved,
       );
-    } catch (e) {
-      debugPrint('[AchievementEvaluator] Awareness stats query failed: $e');
+    } catch (e, stack) {
+      ErrorHandler.recordOperation(
+        e,
+        stackTrace: stack,
+        feature: 'AchievementEvaluator',
+        operation: '_queryAwarenessStats',
+      );
       return const _AwarenessStats(
         lightDays: 0,
         weeklyReviews: 0,

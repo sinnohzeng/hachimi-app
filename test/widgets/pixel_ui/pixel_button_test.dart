@@ -67,5 +67,43 @@ void main() {
       await tester.pump();
       expect(find.byType(PixelButton), findsOneWidget);
     });
+
+    testWidgets('MD3 mode fires onPressed callback on tap', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          isRetro: false,
+          child: PixelButton(label: 'Test', onPressed: () => tapped = true),
+        ),
+      );
+      await tester.tap(find.byType(FilledButton));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('Retro mode fires onPressed callback on tap', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          isRetro: true,
+          child: PixelButton(label: 'Test', onPressed: () => tapped = true),
+        ),
+      );
+      await tester.tap(find.text('Test'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('Retro mode disabled button does not fire callback', (
+      tester,
+    ) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        buildTestApp(
+          isRetro: true,
+          child: const PixelButton(label: 'Test', onPressed: null),
+        ),
+      );
+      await tester.tap(find.text('Test'));
+      expect(tapped, isFalse);
+    });
   });
 }
