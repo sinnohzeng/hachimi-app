@@ -111,73 +111,79 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Top bar — pinned
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                      tooltip: 'Close',
-                    ),
-                    const Spacer(),
-                    Text(
-                      habit.name,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    const SizedBox(width: AppSpacing.xxl),
-                  ],
-                ),
-              ),
-
-              // Scrollable content area
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: _isDraggingDial
-                      ? const NeverScrollableScrollPhysics()
-                      : const ClampingScrollPhysics(),
-                  child: Column(
+          child: FocusTraversalGroup(
+            child: Column(
+              children: [
+                // Top bar — pinned
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                  ),
+                  child: Row(
                     children: [
-                      const SizedBox(height: AppSpacing.lg),
-                      _buildCatSection(cat, habit, textTheme, colorScheme),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildDurationControls(textTheme, colorScheme),
-                      const SizedBox(height: AppSpacing.xl),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
+                      ),
+                      const Spacer(),
+                      Text(
+                        habit.name,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      const SizedBox(width: AppSpacing.xxl),
                     ],
                   ),
                 ),
-              ),
 
-              // Start button — pinned at bottom
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  0,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
+                // Scrollable content area
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: _isDraggingDial
+                        ? const NeverScrollableScrollPhysics()
+                        : const ClampingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: AppSpacing.lg),
+                        _buildCatSection(cat, habit, textTheme, colorScheme),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildDurationControls(textTheme, colorScheme),
+                        const SizedBox(height: AppSpacing.xl),
+                      ],
+                    ),
+                  ),
                 ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: FilledButton(
-                    onPressed: _startFocus,
-                    child: Text(
-                      context.l10n.focusSetupStartFocus,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
+
+                // Start button — pinned at bottom
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: FilledButton(
+                      onPressed: _startFocus,
+                      child: Text(
+                        context.l10n.focusSetupStartFocus,
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -248,25 +254,31 @@ class _FocusSetupScreenState extends ConsumerState<FocusSetupScreen> {
         const SizedBox(height: AppSpacing.base),
 
         // Mode toggle
-        Padding(
-          padding: AppSpacing.paddingHLg,
-          child: SegmentedButton<TimerMode>(
-            segments: [
-              ButtonSegment(
-                value: TimerMode.countdown,
-                label: Text(context.l10n.focusSetupCountdown),
-                icon: const Icon(Icons.hourglass_bottom, size: 18),
-              ),
-              ButtonSegment(
-                value: TimerMode.stopwatch,
-                label: Text(context.l10n.focusSetupStopwatch),
-                icon: const Icon(Icons.timer, size: 18),
-              ),
-            ],
-            selected: {_selectedMode},
-            onSelectionChanged: (modes) => setState(() {
-              _selectedMode = modes.first;
-            }),
+        Semantics(
+          label: _selectedMode == TimerMode.countdown
+              ? context.l10n.focusSetupCountdown
+              : context.l10n.focusSetupStopwatch,
+          liveRegion: true,
+          child: Padding(
+            padding: AppSpacing.paddingHLg,
+            child: SegmentedButton<TimerMode>(
+              segments: [
+                ButtonSegment(
+                  value: TimerMode.countdown,
+                  label: Text(context.l10n.focusSetupCountdown),
+                  icon: const Icon(Icons.hourglass_bottom, size: 18),
+                ),
+                ButtonSegment(
+                  value: TimerMode.stopwatch,
+                  label: Text(context.l10n.focusSetupStopwatch),
+                  icon: const Icon(Icons.timer, size: 18),
+                ),
+              ],
+              selected: {_selectedMode},
+              onSelectionChanged: (modes) => setState(() {
+                _selectedMode = modes.first;
+              }),
+            ),
           ),
         ),
       ],

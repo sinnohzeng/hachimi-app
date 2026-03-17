@@ -262,7 +262,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           Icons.event,
           size: 20,
           color: colorScheme.onSurfaceVariant,
-          semanticLabel: 'Deadline',
+          semanticLabel: context.l10n.a11yDeadline,
         ),
         const SizedBox(width: AppSpacing.sm),
         Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
@@ -278,7 +278,7 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
           IconButton(
             icon: const Icon(Icons.close, size: 20),
             onPressed: () => setState(() => _deadlineDate = null),
-            tooltip: 'Clear deadline',
+            tooltip: l10n.adoptionClearDeadline,
           ),
         ] else
           TextButton(

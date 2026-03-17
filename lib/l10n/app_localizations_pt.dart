@@ -573,6 +573,9 @@ class SPt extends S {
   String get catDetailNotFound => 'Gato não encontrado';
 
   @override
+  String get catDetailLoadError => 'Falha ao carregar dados do gato';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1641,6 +1644,18 @@ class SPt extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Falha ao arquivar o gato';
+
+  @override
+  String get catRoomReactivateError => 'Falha ao reativar o gato';
+
+  @override
+  String get catRoomArchiveLoadError => 'Falha ao carregar gatos arquivados';
+
+  @override
+  String get catRoomRenameError => 'Falha ao renomear o gato';
+
+  @override
   String get addHabitTitle => 'Nova missão';
 
   @override
@@ -1785,6 +1800,21 @@ class SPt extends S {
 
   @override
   String get chatClearButton => 'Limpar';
+
+  @override
+  String get chatSend => 'Enviar';
+
+  @override
+  String get chatStop => 'Parar';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Algo deu errado. Tente novamente.';
 
   @override
   String diaryTitle(String name) {
@@ -2440,4 +2470,129 @@ class SPt extends S {
 
   @override
   String get errorCreateHabit => 'Falha ao criar hábito. Tente novamente';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'Copiar ID';
+
+  @override
+  String get adoptionClearDeadline => 'Limpar prazo';
+
+  @override
+  String get commonIdCopied => 'ID copiado';
+
+  @override
+  String get pickerDurationLabel => 'Seletor de duração';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count minutos';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Gato $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, toque para interagir';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% concluído';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count dias ativos';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Modo offline';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Conquista desbloqueada: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'registrado';
+
+  @override
+  String get calendarToday => 'hoje';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Equipar em $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'Regenerar $name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Temporizador: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Página $current de $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Editar nome: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Página não encontrada';
+
+  @override
+  String get routeGoHome => 'Ir para início';
+
+  @override
+  String get a11yError => 'Erro';
+
+  @override
+  String get a11yDeadline => 'Prazo';
+
+  @override
+  String get a11yReminder => 'Lembrete';
+
+  @override
+  String get a11yFocusMeditation => 'Meditação focada';
+
+  @override
+  String get a11yUnlocked => 'Desbloqueado';
+
+  @override
+  String get a11ySelected => 'Selecionado';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Cor dinâmica do papel de parede';
 }

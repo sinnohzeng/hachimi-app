@@ -173,54 +173,58 @@ class _GuestLoginHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Card(
         color: colorScheme.primaryContainer,
-        child: InkWell(
-          borderRadius: AppShape.borderMedium,
-          onTap: onSignIn,
-          child: Padding(
-            padding: AppSpacing.paddingBase,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      size: 36,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.guestUpgradeTitle,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          Text(
-                            l10n.drawerGuestLoginSubtitle,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                        ],
+        child: Semantics(
+          button: true,
+          label: l10n.guestUpgradeTitle,
+          child: InkWell(
+            borderRadius: AppShape.borderMedium,
+            onTap: onSignIn,
+            child: Padding(
+              padding: AppSpacing.paddingBase,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 36,
+                        color: colorScheme.primary,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: onSignIn,
-                    icon: const Icon(Icons.login),
-                    label: Text(l10n.drawerGuestSignIn),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.guestUpgradeTitle,
+                              style: textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                            Text(
+                              l10n.drawerGuestLoginSubtitle,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: onSignIn,
+                      icon: const Icon(Icons.login),
+                      label: Text(l10n.drawerGuestSignIn),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -256,24 +260,36 @@ class _DrawerHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: onEditAvatar,
-            child: _buildAvatar(avatar, colorScheme, textTheme),
+          Semantics(
+            button: true,
+            label: context.l10n.profileChooseAvatar,
+            child: GestureDetector(
+              onTap: onEditAvatar,
+              child: ExcludeSemantics(
+                child: _buildAvatar(avatar, colorScheme, textTheme),
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: onEditName,
-                  child: Text(
-                    displayName,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                Semantics(
+                  button: true,
+                  label: context.l10n.a11yEditDisplayName(displayName),
+                  child: GestureDetector(
+                    onTap: onEditName,
+                    child: ExcludeSemantics(
+                      child: Text(
+                        displayName,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (email != null)
@@ -414,9 +430,9 @@ class _DrawerFooter extends StatelessWidget {
                   icon: const Icon(Icons.copy, size: 14),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: uid!));
-                    AppFeedback.info(context, 'ID copied');
+                    AppFeedback.info(context, context.l10n.commonIdCopied);
                   },
-                  tooltip: 'Copy ID',
+                  tooltip: context.l10n.commonCopyId,
                   visualDensity: VisualDensity.compact,
                 ),
               ],

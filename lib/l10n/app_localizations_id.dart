@@ -571,6 +571,9 @@ class SId extends S {
   String get catDetailNotFound => 'Kucing tidak ditemukan';
 
   @override
+  String get catDetailLoadError => 'Gagal memuat data kucing';
+
+  @override
   String get catDetailChatTooltip => 'Obrolan';
 
   @override
@@ -1643,6 +1646,18 @@ class SId extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Gagal mengarsipkan kucing';
+
+  @override
+  String get catRoomReactivateError => 'Gagal mengaktifkan kembali kucing';
+
+  @override
+  String get catRoomArchiveLoadError => 'Gagal memuat kucing yang diarsipkan';
+
+  @override
+  String get catRoomRenameError => 'Gagal mengganti nama kucing';
+
+  @override
   String get addHabitTitle => 'Misi Baru';
 
   @override
@@ -1788,6 +1803,21 @@ class SId extends S {
 
   @override
   String get chatClearButton => 'Hapus';
+
+  @override
+  String get chatSend => 'Kirim';
+
+  @override
+  String get chatStop => 'Berhenti';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Terjadi kesalahan. Coba lagi.';
 
   @override
   String diaryTitle(String name) {
@@ -2440,4 +2470,129 @@ class SId extends S {
 
   @override
   String get errorCreateHabit => 'Gagal membuat kebiasaan. Coba lagi';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'Salin ID';
+
+  @override
+  String get adoptionClearDeadline => 'Hapus tenggat';
+
+  @override
+  String get commonIdCopied => 'ID disalin';
+
+  @override
+  String get pickerDurationLabel => 'Pemilih durasi';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count menit';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Kucing $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, ketuk untuk berinteraksi';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% selesai';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count hari aktif';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Mode offline';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Pencapaian terbuka: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'sudah absen';
+
+  @override
+  String get calendarToday => 'hari ini';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Pasang ke $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'Buat ulang $name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Timer: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Halaman $current dari $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Edit nama tampilan: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Halaman tidak ditemukan';
+
+  @override
+  String get routeGoHome => 'Ke beranda';
+
+  @override
+  String get a11yError => 'Error';
+
+  @override
+  String get a11yDeadline => 'Tenggat';
+
+  @override
+  String get a11yReminder => 'Pengingat';
+
+  @override
+  String get a11yFocusMeditation => 'Meditasi fokus';
+
+  @override
+  String get a11yUnlocked => 'Terbuka';
+
+  @override
+  String get a11ySelected => 'Dipilih';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Warna wallpaper dinamis';
 }

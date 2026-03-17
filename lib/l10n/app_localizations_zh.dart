@@ -563,6 +563,9 @@ class SZh extends S {
   String get catDetailNotFound => '未找到猫猫';
 
   @override
+  String get catDetailLoadError => '加载猫咪数据失败';
+
+  @override
   String get catDetailChatTooltip => '聊天';
 
   @override
@@ -1614,6 +1617,18 @@ class SZh extends S {
   }
 
   @override
+  String get catRoomArchiveError => '归档猫咪失败';
+
+  @override
+  String get catRoomReactivateError => '恢复猫咪失败';
+
+  @override
+  String get catRoomArchiveLoadError => '加载归档猫咪失败';
+
+  @override
+  String get catRoomRenameError => '重命名猫咪失败';
+
+  @override
   String get addHabitTitle => '新任务';
 
   @override
@@ -1755,6 +1770,21 @@ class SZh extends S {
 
   @override
   String get chatClearButton => '清除';
+
+  @override
+  String get chatSend => '发送';
+
+  @override
+  String get chatStop => '停止';
+
+  @override
+  String get chatErrorMessage => '发送失败，点击重试';
+
+  @override
+  String get chatRetry => '重试';
+
+  @override
+  String get chatErrorGeneric => '出了点问题，请重试';
 
   @override
   String diaryTitle(String name) {
@@ -2391,6 +2421,130 @@ class SZh extends S {
 
   @override
   String get errorCreateHabit => '创建习惯失败，请重试';
+
+  @override
+  String get loginForgotPassword => '忘记密码？';
+
+  @override
+  String get loginForgotPasswordTitle => '重置密码';
+
+  @override
+  String get loginSendResetEmail => '发送重置邮件';
+
+  @override
+  String get loginResetEmailSent => '密码重置邮件已发送，请查收';
+
+  @override
+  String get authErrorUserDisabled => '此账号已被停用';
+
+  @override
+  String get authErrorInvalidEmail => '请输入有效的邮箱地址';
+
+  @override
+  String get authErrorRequiresRecentLogin => '请重新登录后继续';
+
+  @override
+  String get commonCopyId => '复制 ID';
+
+  @override
+  String get adoptionClearDeadline => '清除截止日期';
+
+  @override
+  String get commonIdCopied => 'ID 已复制';
+
+  @override
+  String get pickerDurationLabel => '时长选择器';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count 分钟';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return '猫咪 $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name，点击互动';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '已完成 $percent%';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count 个活跃日';
+  }
+
+  @override
+  String get a11yOfflineStatus => '离线模式';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return '成就解锁：$name';
+  }
+
+  @override
+  String get calendarCheckedIn => '已签到';
+
+  @override
+  String get calendarToday => '今天';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '装备给$name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '重新生成$name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return '计时器：$time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '第 $current 页，共 $total 页';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return '编辑显示名：$name';
+  }
+
+  @override
+  String get routeNotFound => '页面未找到';
+
+  @override
+  String get routeGoHome => '返回首页';
+
+  @override
+  String get a11yError => '错误';
+
+  @override
+  String get a11yDeadline => '截止日期';
+
+  @override
+  String get a11yReminder => '提醒';
+
+  @override
+  String get a11yFocusMeditation => '专注冥想';
+
+  @override
+  String get a11yUnlocked => '已解锁';
+
+  @override
+  String get a11ySelected => '已选中';
+
+  @override
+  String get a11yDynamicWallpaperColor => '动态壁纸颜色';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2950,6 +3104,9 @@ class SZhHant extends SZh {
 
   @override
   String get catDetailNotFound => '搵唔到貓咪';
+
+  @override
+  String get catDetailLoadError => '載入貓咪資料失敗';
 
   @override
   String get catDetailChatTooltip => '聊天';
@@ -4003,6 +4160,18 @@ class SZhHant extends SZh {
   }
 
   @override
+  String get catRoomArchiveError => '歸檔貓咪失敗';
+
+  @override
+  String get catRoomReactivateError => '恢復貓咪失敗';
+
+  @override
+  String get catRoomArchiveLoadError => '載入歸檔貓咪失敗';
+
+  @override
+  String get catRoomRenameError => '重新命名貓咪失敗';
+
+  @override
   String get addHabitTitle => '新任務';
 
   @override
@@ -4144,6 +4313,21 @@ class SZhHant extends SZh {
 
   @override
   String get chatClearButton => '清除';
+
+  @override
+  String get chatSend => '傳送';
+
+  @override
+  String get chatStop => '停止';
+
+  @override
+  String get chatErrorMessage => '傳送失敗，點擊重試';
+
+  @override
+  String get chatRetry => '重試';
+
+  @override
+  String get chatErrorGeneric => '出了點問題，請重試';
 
   @override
   String diaryTitle(String name) {
@@ -4780,4 +4964,128 @@ class SZhHant extends SZh {
 
   @override
   String get errorCreateHabit => '建立習慣失敗，請重試';
+
+  @override
+  String get loginForgotPassword => '忘記密碼？';
+
+  @override
+  String get loginForgotPasswordTitle => '重置密碼';
+
+  @override
+  String get loginSendResetEmail => '發送重置郵件';
+
+  @override
+  String get loginResetEmailSent => '密碼重置郵件已發送，請查收';
+
+  @override
+  String get authErrorUserDisabled => '此帳號已被停用';
+
+  @override
+  String get authErrorInvalidEmail => '請輸入有效的電子郵件地址';
+
+  @override
+  String get authErrorRequiresRecentLogin => '請重新登錄後繼續';
+
+  @override
+  String get commonCopyId => '複製 ID';
+
+  @override
+  String get adoptionClearDeadline => '清除截止日期';
+
+  @override
+  String get commonIdCopied => 'ID 已複製';
+
+  @override
+  String get pickerDurationLabel => '時長選擇器';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count 分鐘';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return '貓咪 $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name，點擊互動';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '已完成 $percent%';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count 個活躍日';
+  }
+
+  @override
+  String get a11yOfflineStatus => '離線模式';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return '成就解鎖：$name';
+  }
+
+  @override
+  String get calendarCheckedIn => '已簽到';
+
+  @override
+  String get calendarToday => '今天';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '裝備給$name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '重新生成$name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return '計時器：$time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '第 $current 頁，共 $total 頁';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return '編輯顯示名：$name';
+  }
+
+  @override
+  String get routeNotFound => '頁面未找到';
+
+  @override
+  String get routeGoHome => '返回首頁';
+
+  @override
+  String get a11yError => '錯誤';
+
+  @override
+  String get a11yDeadline => '截止日期';
+
+  @override
+  String get a11yReminder => '提醒';
+
+  @override
+  String get a11yFocusMeditation => '專注冥想';
+
+  @override
+  String get a11yUnlocked => '已解鎖';
+
+  @override
+  String get a11ySelected => '已選中';
+
+  @override
+  String get a11yDynamicWallpaperColor => '動態桌布顏色';
 }

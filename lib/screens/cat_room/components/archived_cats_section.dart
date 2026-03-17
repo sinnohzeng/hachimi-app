@@ -81,31 +81,36 @@ class _SectionHeader extends StatelessWidget {
     final pixel = context.pixel;
     final theme = Theme.of(context);
 
-    return InkWell(
-      onTap: onToggle,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.photo_album_outlined,
-              size: 20,
-              color: pixel.pixelAccentWarm,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(child: Text(title, style: pixel.pixelHeading)),
-            AnimatedRotation(
-              turns: expanded ? 0.5 : 0,
-              duration: AppMotion.durationShort4,
-              child: Icon(
-                Icons.expand_more,
-                color: theme.colorScheme.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      label:
+          '$title, ${expanded ? MaterialLocalizations.of(context).expandedIconTapHint : MaterialLocalizations.of(context).collapsedIconTapHint}',
+      child: InkWell(
+        onTap: onToggle,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.photo_album_outlined,
+                size: 20,
+                color: pixel.pixelAccentWarm,
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(child: Text(title, style: pixel.pixelHeading)),
+              AnimatedRotation(
+                turns: expanded ? 0.5 : 0,
+                duration: AppMotion.durationShort4,
+                child: Icon(
+                  Icons.expand_more,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

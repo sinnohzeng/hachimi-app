@@ -572,6 +572,9 @@ class SHi extends S {
   String get catDetailNotFound => 'बिल्ली नहीं मिली';
 
   @override
+  String get catDetailLoadError => 'बिल्ली का डेटा लोड नहीं हो सका';
+
+  @override
   String get catDetailChatTooltip => 'चैट';
 
   @override
@@ -1643,6 +1646,18 @@ class SHi extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'बिल्ली को संग्रह करने में विफल';
+
+  @override
+  String get catRoomReactivateError => 'बिल्ली को पुनः सक्रिय करने में विफल';
+
+  @override
+  String get catRoomArchiveLoadError => 'संग्रहीत बिल्लियों को लोड नहीं हो सका';
+
+  @override
+  String get catRoomRenameError => 'बिल्ली का नाम बदलने में विफल';
+
+  @override
   String get addHabitTitle => 'नया क्वेस्ट';
 
   @override
@@ -1788,6 +1803,21 @@ class SHi extends S {
 
   @override
   String get chatClearButton => 'मिटाएँ';
+
+  @override
+  String get chatSend => 'भेजें';
+
+  @override
+  String get chatStop => 'रोकें';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'कुछ गलत हो गया। फिर से कोशिश करें।';
 
   @override
   String diaryTitle(String name) {
@@ -2441,4 +2471,129 @@ class SHi extends S {
 
   @override
   String get errorCreateHabit => 'आदत बनाने में विफल। पुनः प्रयास करें';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'ID कॉपी करें';
+
+  @override
+  String get adoptionClearDeadline => 'समय सीमा हटाएं';
+
+  @override
+  String get commonIdCopied => 'ID कॉपी हो गई';
+
+  @override
+  String get pickerDurationLabel => 'अवधि चयनकर्ता';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count मिनट';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'बिल्ली $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, बातचीत के लिए टैप करें';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% पूर्ण';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count सक्रिय दिन';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'ऑफ़लाइन मोड';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'उपलब्धि अनलॉक: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'चेक इन किया';
+
+  @override
+  String get calendarToday => 'आज';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '$name को लगाएँ';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$name पुनः बनाएँ';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'टाइमर: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '$total में से $current पेज';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'प्रदर्शन नाम संपादित करें: $name';
+  }
+
+  @override
+  String get routeNotFound => 'पेज नहीं मिला';
+
+  @override
+  String get routeGoHome => 'होम पर जाएँ';
+
+  @override
+  String get a11yError => 'त्रुटि';
+
+  @override
+  String get a11yDeadline => 'समय सीमा';
+
+  @override
+  String get a11yReminder => 'रिमाइंडर';
+
+  @override
+  String get a11yFocusMeditation => 'ध्यान';
+
+  @override
+  String get a11yUnlocked => 'अनलॉक किया गया';
+
+  @override
+  String get a11ySelected => 'चयनित';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'डायनामिक वॉलपेपर रंग';
 }

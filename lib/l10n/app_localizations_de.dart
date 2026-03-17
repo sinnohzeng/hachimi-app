@@ -572,6 +572,9 @@ class SDe extends S {
   String get catDetailNotFound => 'Katze nicht gefunden';
 
   @override
+  String get catDetailLoadError => 'Katzendaten konnten nicht geladen werden';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1651,6 +1654,19 @@ class SDe extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Archivierung der Katze fehlgeschlagen';
+
+  @override
+  String get catRoomReactivateError => 'Reaktivierung der Katze fehlgeschlagen';
+
+  @override
+  String get catRoomArchiveLoadError =>
+      'Archivierte Katzen konnten nicht geladen werden';
+
+  @override
+  String get catRoomRenameError => 'Umbenennung der Katze fehlgeschlagen';
+
+  @override
   String get addHabitTitle => 'Neue Quest';
 
   @override
@@ -1795,6 +1811,21 @@ class SDe extends S {
 
   @override
   String get chatClearButton => 'Löschen';
+
+  @override
+  String get chatSend => 'Senden';
+
+  @override
+  String get chatStop => 'Stopp';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Etwas ist schiefgelaufen. Erneut versuchen.';
 
   @override
   String diaryTitle(String name) {
@@ -2456,4 +2487,129 @@ class SDe extends S {
   @override
   String get errorCreateHabit =>
       'Gewohnheit konnte nicht erstellt werden. Versuche es erneut';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'ID kopieren';
+
+  @override
+  String get adoptionClearDeadline => 'Frist löschen';
+
+  @override
+  String get commonIdCopied => 'ID kopiert';
+
+  @override
+  String get pickerDurationLabel => 'Dauerauswahl';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count Minuten';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Katze $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, tippen zum Interagieren';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% abgeschlossen';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count aktive Tage';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Offline-Modus';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Erfolg freigeschaltet: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'eingecheckt';
+
+  @override
+  String get calendarToday => 'heute';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Ausrüsten für $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$name neu generieren';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Timer: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Seite $current von $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Anzeigename bearbeiten: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Seite nicht gefunden';
+
+  @override
+  String get routeGoHome => 'Zur Startseite';
+
+  @override
+  String get a11yError => 'Fehler';
+
+  @override
+  String get a11yDeadline => 'Frist';
+
+  @override
+  String get a11yReminder => 'Erinnerung';
+
+  @override
+  String get a11yFocusMeditation => 'Fokus-Meditation';
+
+  @override
+  String get a11yUnlocked => 'Freigeschaltet';
+
+  @override
+  String get a11ySelected => 'Ausgewählt';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Dynamische Hintergrundfarbe';
 }

@@ -90,18 +90,7 @@ class Cat {
       personality: data['personality'] as String? ?? 'playful',
       appearance: appearanceMap != null
           ? CatAppearance.fromMap(appearanceMap)
-          : const CatAppearance(
-              peltType: 'SingleColour',
-              peltColor: 'WHITE',
-              tint: 'none',
-              eyeColor: 'YELLOW',
-              whitePatchesTint: 'none',
-              skinColor: 'PINK',
-              isTortie: false,
-              isLonghair: false,
-              reverse: false,
-              spriteVariant: 0,
-            ),
+          : CatAppearance.defaultAppearance,
       totalMinutes: data['totalMinutes'] as int? ?? 0,
       accessories:
           (data['accessories'] as List<dynamic>?)
@@ -166,18 +155,7 @@ class Cat {
       personality: map['personality'] as String? ?? 'playful',
       appearance: appearanceMap.isNotEmpty
           ? CatAppearance.fromMap(appearanceMap)
-          : const CatAppearance(
-              peltType: 'SingleColour',
-              peltColor: 'WHITE',
-              tint: 'none',
-              eyeColor: 'YELLOW',
-              whitePatchesTint: 'none',
-              skinColor: 'PINK',
-              isTortie: false,
-              isLonghair: false,
-              reverse: false,
-              spriteVariant: 0,
-            ),
+          : CatAppearance.defaultAppearance,
       totalMinutes: map['total_minutes'] as int? ?? 0,
       accessories: const [], // 配饰列表从 materialized_state 管理
       equippedAccessory: map['equipped_accessory'] as String?,

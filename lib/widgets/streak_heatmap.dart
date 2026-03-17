@@ -41,126 +41,133 @@ class StreakHeatmap extends StatelessWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Heatmap grid
-        Center(
-          child: SizedBox(
-            height: 7 * (14.0 + 2.0), // 7 cells × (14 height + 2 margin)
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(totalWeeks, (weekIndex) {
-                return Column(
-                  children: List.generate(7, (dayIndex) {
-                    final dayOffset =
-                        weekIndex * 7 + dayIndex - (startDate.weekday % 7);
-                    final date = startDate.add(Duration(days: dayOffset));
+    return Semantics(
+      label: context.l10n.a11yStreakActiveDays(totalDays),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Heatmap grid
+          Center(
+            child: SizedBox(
+              height: 7 * (14.0 + 2.0), // 7 cells × (14 height + 2 margin)
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(totalWeeks, (weekIndex) {
+                  return Column(
+                    children: List.generate(7, (dayIndex) {
+                      final dayOffset =
+                          weekIndex * 7 + dayIndex - (startDate.weekday % 7);
+                      final date = startDate.add(Duration(days: dayOffset));
 
-                    // Skip cells outside our range
-                    if (dayOffset < 0 || date.isAfter(today)) {
-                      return Container(
-                        width: 14,
-                        height: 14,
-                        margin: const EdgeInsets.all(1),
-                      );
-                    }
+                      // Skip cells outside our range
+                      if (dayOffset < 0 || date.isAfter(today)) {
+                        return Container(
+                          width: 14,
+                          height: 14,
+                          margin: const EdgeInsets.all(1),
+                        );
+                      }
 
-                    final key =
-                        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-                    final minutes = dailyMinutes[key] ?? 0;
-                    final intensity = minutes > 0
-                        ? (minutes / maxMinutes).clamp(0.2, 1.0)
-                        : 0.0;
+                      final key =
+                          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                      final minutes = dailyMinutes[key] ?? 0;
+                      final intensity = minutes > 0
+                          ? (minutes / maxMinutes).clamp(0.2, 1.0)
+                          : 0.0;
 
-                    return Semantics(
-                      label: '${date.month}/${date.day}, $minutes minutes',
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        margin: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          color: intensity > 0
-                              ? colorScheme.primary.withValues(alpha: intensity)
-                              : colorScheme.outlineVariant.withValues(
-                                  alpha:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? 0.5
-                                      : 0.3,
-                                ),
-                          borderRadius: AppShape.borderExtraSmall,
+                      return Semantics(
+                        label:
+                            '${date.month}/${date.day}, ${context.l10n.pickerMinutesValue(minutes)}',
+                        child: Container(
+                          width: 14,
+                          height: 14,
+                          margin: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: intensity > 0
+                                ? colorScheme.primary.withValues(
+                                    alpha: intensity,
+                                  )
+                                : colorScheme.outlineVariant.withValues(
+                                    alpha:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? 0.5
+                                        : 0.3,
+                                  ),
+                            borderRadius: AppShape.borderExtraSmall,
+                          ),
                         ),
-                      ),
-                    );
-                  }),
-                );
-              }),
+                      );
+                    }),
+                  );
+                }),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
 
-        // Stats row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _HeatmapStat(
-              label: context.l10n.heatmapActiveDays,
-              value: '$totalDays',
-            ),
-            _HeatmapStat(
-              label: context.l10n.heatmapTotal,
-              value: '${totalMin ~/ 60}h ${totalMin % 60}m',
-            ),
-            _HeatmapStat(
-              label: context.l10n.heatmapRate,
-              value: days > 0 ? '${(totalDays / days * 100).round()}%' : '0%',
-            ),
-          ],
-        ),
-
-        // Legend
-        const SizedBox(height: AppSpacing.xs),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              context.l10n.heatmapLess,
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+          // Stats row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _HeatmapStat(
+                label: context.l10n.heatmapActiveDays,
+                value: '$totalDays',
               ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            ...List.generate(4, (i) {
-              final alpha = [0.0, 0.3, 0.6, 1.0][i];
-              return Container(
-                width: 12,
-                height: 12,
-                margin: const EdgeInsets.symmetric(horizontal: 1),
-                decoration: BoxDecoration(
-                  color: alpha > 0
-                      ? colorScheme.primary.withValues(alpha: alpha)
-                      : colorScheme.outlineVariant.withValues(
-                          alpha: Theme.of(context).brightness == Brightness.dark
-                              ? 0.5
-                              : 0.3,
-                        ),
-                  borderRadius: AppShape.borderExtraSmall,
+              _HeatmapStat(
+                label: context.l10n.heatmapTotal,
+                value: '${totalMin ~/ 60}h ${totalMin % 60}m',
+              ),
+              _HeatmapStat(
+                label: context.l10n.heatmapRate,
+                value: days > 0 ? '${(totalDays / days * 100).round()}%' : '0%',
+              ),
+            ],
+          ),
+
+          // Legend
+          const SizedBox(height: AppSpacing.xs),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                context.l10n.heatmapLess,
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-              );
-            }),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              context.l10n.heatmapMore,
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
               ),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(width: AppSpacing.xs),
+              ...List.generate(4, (i) {
+                final alpha = [0.0, 0.3, 0.6, 1.0][i];
+                return Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                  decoration: BoxDecoration(
+                    color: alpha > 0
+                        ? colorScheme.primary.withValues(alpha: alpha)
+                        : colorScheme.outlineVariant.withValues(
+                            alpha:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? 0.5
+                                : 0.3,
+                          ),
+                    borderRadius: AppShape.borderExtraSmall,
+                  ),
+                );
+              }),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                context.l10n.heatmapMore,
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

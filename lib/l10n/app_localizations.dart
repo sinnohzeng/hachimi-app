@@ -1142,6 +1142,12 @@ abstract class S {
   /// **'Cat not found'**
   String get catDetailNotFound;
 
+  /// No description provided for @catDetailLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load cat data'**
+  String get catDetailLoadError;
+
   /// No description provided for @catDetailChatTooltip.
   ///
   /// In en, this message translates to:
@@ -3128,6 +3134,30 @@ abstract class S {
   /// **'\"{name}\" reactivated'**
   String catRoomReactivateSuccess(String name);
 
+  /// No description provided for @catRoomArchiveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to archive cat'**
+  String get catRoomArchiveError;
+
+  /// No description provided for @catRoomReactivateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reactivate cat'**
+  String get catRoomReactivateError;
+
+  /// No description provided for @catRoomArchiveLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load archived cats'**
+  String get catRoomArchiveLoadError;
+
+  /// No description provided for @catRoomRenameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename cat'**
+  String get catRoomRenameError;
+
   /// No description provided for @addHabitTitle.
   ///
   /// In en, this message translates to:
@@ -3361,6 +3391,36 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Clear'**
   String get chatClearButton;
+
+  /// No description provided for @chatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get chatSend;
+
+  /// No description provided for @chatStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get chatStop;
+
+  /// No description provided for @chatErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send message. Tap to retry.'**
+  String get chatErrorMessage;
+
+  /// No description provided for @chatRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get chatRetry;
+
+  /// No description provided for @chatErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get chatErrorGeneric;
 
   /// No description provided for @diaryTitle.
   ///
@@ -4513,6 +4573,210 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Failed to create habit. Try again'**
   String get errorCreateHabit;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get loginForgotPassword;
+
+  /// No description provided for @loginForgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get loginForgotPasswordTitle;
+
+  /// No description provided for @loginSendResetEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset email'**
+  String get loginSendResetEmail;
+
+  /// No description provided for @loginResetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent. Check your inbox'**
+  String get loginResetEmailSent;
+
+  /// No description provided for @authErrorUserDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled'**
+  String get authErrorUserDisabled;
+
+  /// No description provided for @authErrorInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get authErrorInvalidEmail;
+
+  /// No description provided for @authErrorRequiresRecentLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in again to continue'**
+  String get authErrorRequiresRecentLogin;
+
+  /// No description provided for @commonCopyId.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get commonCopyId;
+
+  /// No description provided for @adoptionClearDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear deadline'**
+  String get adoptionClearDeadline;
+
+  /// No description provided for @commonIdCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'ID copied'**
+  String get commonIdCopied;
+
+  /// No description provided for @pickerDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration picker'**
+  String get pickerDurationLabel;
+
+  /// No description provided for @pickerMinutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes'**
+  String pickerMinutesValue(int count);
+
+  /// No description provided for @a11yCatImage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} cat'**
+  String a11yCatImage(String name);
+
+  /// No description provided for @a11yCatTapToInteract.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, tap to interact'**
+  String a11yCatTapToInteract(String name);
+
+  /// No description provided for @a11yProgressPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% complete'**
+  String a11yProgressPercent(int percent);
+
+  /// No description provided for @a11yStreakActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active days'**
+  String a11yStreakActiveDays(int count);
+
+  /// No description provided for @a11yOfflineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline mode'**
+  String get a11yOfflineStatus;
+
+  /// No description provided for @a11yAchievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement unlocked: {name}'**
+  String a11yAchievementUnlocked(String name);
+
+  /// No description provided for @calendarCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'checked in'**
+  String get calendarCheckedIn;
+
+  /// No description provided for @calendarToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get calendarToday;
+
+  /// No description provided for @a11yEquipToCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip to {name}'**
+  String a11yEquipToCat(Object name);
+
+  /// No description provided for @a11yRegenerateCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate {name}'**
+  String a11yRegenerateCat(Object name);
+
+  /// No description provided for @a11yTimerDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Timer: {time}'**
+  String a11yTimerDisplay(Object time);
+
+  /// No description provided for @a11yOnboardingPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String a11yOnboardingPage(Object current, Object total);
+
+  /// No description provided for @a11yEditDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit display name: {name}'**
+  String a11yEditDisplayName(Object name);
+
+  /// No description provided for @routeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get routeNotFound;
+
+  /// No description provided for @routeGoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Go home'**
+  String get routeGoHome;
+
+  /// No description provided for @a11yError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get a11yError;
+
+  /// No description provided for @a11yDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get a11yDeadline;
+
+  /// No description provided for @a11yReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get a11yReminder;
+
+  /// No description provided for @a11yFocusMeditation.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus meditation'**
+  String get a11yFocusMeditation;
+
+  /// No description provided for @a11yUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get a11yUnlocked;
+
+  /// No description provided for @a11ySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get a11ySelected;
+
+  /// No description provided for @a11yDynamicWallpaperColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic wallpaper color'**
+  String get a11yDynamicWallpaperColor;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

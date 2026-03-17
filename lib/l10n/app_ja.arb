@@ -1,12 +1,10 @@
 {
   "@@locale": "ja",
   "appTitle": "Hachimi",
-
   "homeTabToday": "今日",
   "homeTabCatHouse": "ネコハウス",
   "homeTabStats": "統計",
   "homeTabProfile": "プロフィール",
-
   "adoptionStepDefineHabit": "習慣を決める",
   "adoptionStepAdoptCat": "ネコを迎える",
   "adoptionStepNameCat": "名前をつける",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "ネコの名前",
   "adoptionCatNameHint": "例: もち",
   "adoptionRandomNameTooltip": "ランダムな名前",
-
   "catHouseTitle": "ネコハウス",
   "catHouseEmpty": "まだネコがいません！習慣を作成して最初のネコを迎えましょう。",
   "catHouseGrowth": "{minutes} / {target}分",
-
   "catDetailGrowthProgress": "成長の進捗",
   "catDetailTotalMinutes": "{minutes}分集中しました",
   "catDetailTargetMinutes": "目標: {minutes}分",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "集中を開始",
   "catDetailBoundHabit": "紐づけた習慣",
   "catDetailStage": "ステージ: {stage}",
-
   "coinBalance": "{amount}コイン",
   "coinCheckInReward": "+{amount}コイン！",
   "coinCheckInTitle": "デイリーチェックイン",
   "coinInsufficientBalance": "コインが足りません",
-
   "shopTitle": "アクセサリーショップ",
   "shopPrice": "{price}コイン",
   "shopPurchase": "購入",
   "shopEquipped": "装備中",
-
   "focusCompleteMinutes": "+{minutes}分",
   "focusCompleteStageUp": "ステージアップ！",
   "focusCompleteGreatJob": "よく頑張りました！",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "日記を書きました！",
   "focusCompleteNotifTitle": "クエスト完了！",
   "focusCompleteNotifBody": "{catName}が{minutes}分の集中で+{xp} XPを獲得しました",
-
   "stageKitten": "子猫",
   "stageAdolescent": "若猫",
   "stageAdult": "成猫",
   "stageSenior": "長老猫",
-
   "migrationTitle": "データの更新が必要です",
   "migrationMessage": "Hachimiが新しいピクセルネコシステムにアップデートされました！以前のネコデータは互換性がありません。新しい体験を始めるためにリセットしてください。",
   "migrationResetButton": "リセットして始める",
-
   "sessionResumeTitle": "セッションを再開しますか？",
   "sessionResumeMessage": "アクティブな集中セッションがあります（{habitName}、{elapsed}）。再開しますか？",
   "sessionResumeButton": "再開",
   "sessionDiscard": "破棄",
-
   "todaySummaryMinutes": "今日",
   "todaySummaryTotal": "合計",
   "todaySummaryCats": "ネコ",
@@ -104,7 +93,6 @@
   "todayNoHabits": "最初の習慣を作成して始めましょう！",
   "todayNewQuest": "新しいクエスト",
   "todayStartFocus": "集中を開始",
-
   "timerStart": "開始",
   "timerPause": "一時停止",
   "timerResume": "再開",
@@ -122,7 +110,6 @@
   "giveUpMessage": "5分以上集中していれば、その時間はネコの成長に反映されます。ネコは理解してくれますよ！",
   "giveUpKeepGoing": "続ける",
   "giveUpConfirm": "やめる",
-
   "settingsTitle": "設定",
   "settingsGeneral": "一般",
   "settingsAppearance": "外観",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "アカウントを削除しますか？",
   "deleteAccountMessage": "アカウントとすべてのデータが完全に削除されます。この操作は取り消せません。",
   "deleteAccountWarning": "この操作は取り消せません",
-
   "profileTitle": "プロフィール",
   "profileYourJourney": "あなたの軌跡",
   "profileTotalFocus": "合計集中時間",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "アバターを選択",
   "profileSaved": "保存しました",
   "profileSettings": "設定",
-
   "habitDetailStreak": "連続日数",
   "habitDetailBestStreak": "最長",
   "habitDetailTotalMinutes": "合計",
-
   "commonCancel": "キャンセル",
   "commonConfirm": "確認",
   "commonSave": "保存",
@@ -182,15 +166,18 @@
   "commonLogOut": "ログアウト",
   "commonDeleteAccount": "アカウントを削除",
   "commonYes": "はい",
-
   "chatDailyRemaining": "今日残り {count} 件のメッセージ",
   "@chatDailyRemaining": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "chatDailyLimitReached": "本日のメッセージ上限に達しました",
   "aiTemporarilyUnavailable": "AI 機能は一時的に利用できません",
-
   "catDetailNotFound": "ネコが見つかりません",
+  "catDetailLoadError": "猫データの読み込みに失敗しました",
   "catDetailChatTooltip": "チャット",
   "catDetailRenameTooltip": "名前を変更",
   "catDetailGrowthTitle": "成長の進捗",
@@ -257,7 +244,6 @@
   "catDetailTortiePattern": "三毛柄",
   "catDetailTortieColor": "三毛色",
   "catDetailSkin": "肌",
-
   "offlineMessage": "オフラインです — 再接続時に変更が同期されます",
   "offlineModeLabel": "オフラインモード",
   "habitTodayMinutes": "今日: {count}分",
@@ -270,35 +256,29 @@
   "accessoryEquipped": "装備中",
   "accessoryOwned": "所持中",
   "pickerMinUnit": "分",
-
   "settingsBackgroundAnimation": "アニメーション背景",
   "settingsBackgroundAnimationSubtitle": "メッシュグラデーションと浮遊パーティクル",
-
   "settingsUiStyle": "UIスタイル",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "レトロピクセル",
   "settingsUiStyleMaterialSubtitle": "モダンな丸角マテリアルデザイン",
   "settingsUiStyleRetroPixelSubtitle": "あたたかいピクセルアートスタイル",
-
   "personalityLazy": "のんびり屋",
   "personalityCurious": "好奇心旺盛",
   "personalityPlayful": "遊び好き",
   "personalityShy": "恥ずかしがり屋",
   "personalityBrave": "勇敢",
   "personalityClingy": "甘えん坊",
-
   "personalityFlavorLazy": "1日23時間お昼寝します。残りの1時間も…お昼寝です。",
   "personalityFlavorCurious": "もう何でもクンクン嗅ぎ回っています！",
   "personalityFlavorPlayful": "蝶々を追いかけるのが止まりません！",
   "personalityFlavorShy": "箱からちらっと覗くまで3分かかりました…",
   "personalityFlavorBrave": "箱を開ける前に飛び出してきました！",
   "personalityFlavorClingy": "すぐにゴロゴロ鳴り始めて離れません。",
-
   "moodHappy": "ハッピー",
   "moodNeutral": "ふつう",
   "moodLonely": "さみしい",
   "moodMissing": "会いたい",
-
   "moodMsgLazyHappy": "にゃ〜！ゆっくりお昼寝の時間…",
   "moodMsgCuriousHappy": "今日は何を探検するの？",
   "moodMsgPlayfulHappy": "にゃ〜！お仕事がんばろ！",
@@ -316,14 +296,13 @@
   "moodMsgPlayfulLonely": "一人じゃおもちゃも楽しくない…",
   "moodMsgShyLonely": "…静かに丸まる…",
   "moodMsgBraveLonely": "待ち続けるよ。ぼくは勇敢だから。",
-  "moodMsgClingyLonely": "どこに行っちゃったの… \uD83E\uDD7A",
+  "moodMsgClingyLonely": "どこに行っちゃったの… 🥺",
   "moodMsgLazyMissing": "…片目だけそっと開ける…",
   "moodMsgCuriousMissing": "何かあったのかな…？",
   "moodMsgPlayfulMissing": "お気に入りのおもちゃ、とっておいたよ…",
   "moodMsgShyMissing": "…隠れてるけど、ドアをじっと見てる…",
   "moodMsgBraveMissing": "きっと帰ってくる。信じてるよ。",
   "moodMsgClingyMissing": "すごく会いたいよ…お願い、帰ってきて。",
-
   "peltTypeTabby": "クラシックタビー縞",
   "peltTypeTicked": "ティックドアグーチ柄",
   "peltTypeMackerel": "マッカレルタビー",
@@ -339,7 +318,6 @@
   "peltTypeBengal": "ベンガル柄",
   "peltTypeMarbled": "マーブル柄",
   "peltTypeMasked": "マスクフェイス",
-
   "peltColorWhite": "ホワイト",
   "peltColorPaleGrey": "ペールグレー",
   "peltColorSilver": "シルバー",
@@ -359,7 +337,6 @@
   "peltColorGoldenBrown": "ゴールデンブラウン",
   "peltColorDarkBrown": "ダークブラウン",
   "peltColorChocolate": "チョコレート",
-
   "eyeColorYellow": "イエロー",
   "eyeColorAmber": "アンバー",
   "eyeColorHazel": "ヘーゼル",
@@ -381,10 +358,8 @@
   "eyeColorBronze": "ブロンズ",
   "eyeColorSilver": "シルバー",
   "eyeColorPaleYellow": "ペールイエロー",
-
   "eyeDescNormal": "{color}の目",
   "eyeDescHeterochromia": "オッドアイ ({primary} / {secondary})",
-
   "skinColorPink": "ピンク",
   "skinColorRed": "レッド",
   "skinColorBlack": "ブラック",
@@ -397,38 +372,30 @@
   "skinColorDarkSalmon": "ダークサーモン",
   "skinColorSalmon": "サーモン",
   "skinColorPeach": "ピーチ",
-
   "furLengthLonghair": "長毛",
   "furLengthShorthair": "短毛",
-
   "whiteTintOffwhite": "オフホワイト",
   "whiteTintCream": "クリーム",
   "whiteTintDarkCream": "ダーククリーム",
   "whiteTintGray": "グレー",
   "whiteTintPink": "ピンク",
-
   "notifReminderTitle": "{catName}が会いたがっています！",
   "notifReminderBody": "{habitName}の時間です — ネコが待っています！",
   "notifStreakTitle": "{catName}が心配しています！",
   "notifStreakBody": "{streak}日連続の記録が途切れそうです。少しだけ集中して記録を守りましょう！",
   "notifEvolutionTitle": "{catName}が進化しました！",
   "notifEvolutionBody": "{catName}が{stageName}に成長しました！この調子で頑張りましょう！",
-
   "durationHoursMinutes": "{hours}時間{minutes}分",
-
   "diaryScreenTitle": "{name}の日記",
   "diaryFailedToLoad": "日記の読み込みに失敗しました",
   "diaryEmptyTitle": "まだ日記がありません",
   "diaryEmptyHint": "集中セッションを完了すると、ネコが最初の日記を書きます！",
-
   "focusSetupCountdown": "カウントダウン",
   "focusSetupStopwatch": "ストップウォッチ",
   "focusSetupStartFocus": "集中を開始",
   "focusSetupQuestNotFound": "クエストが見つかりません",
-
   "checkInButtonLogMore": "時間を追加記録",
   "checkInButtonStart": "タイマーを開始",
-
   "adoptionTitleFirst": "最初のネコを迎えよう！",
   "adoptionTitleNew": "新しいクエスト",
   "adoptionStepDefineQuest": "クエストを決める",
@@ -477,7 +444,6 @@
   "adoptionMotivationLabel": "メモ",
   "adoptionMotivationHint": "メモを書く...",
   "adoptionMotivationSwap": "ランダム入力",
-
   "loginAppName": "Hachimi",
   "loginTagline": "ネコを育てて、クエストを達成しよう。",
   "loginContinueGoogle": "Googleで続ける",
@@ -497,7 +463,6 @@
   "loginCreateAccountButton": "アカウントを作成",
   "loginNoAccount": "アカウントをお持ちでないですか？ ",
   "loginRegister": "登録",
-
   "checkInTitle": "月間チェックイン",
   "checkInDays": "日",
   "checkInCoinsEarned": "獲得コイン",
@@ -510,7 +475,6 @@
   "checkInWeekdayReward": "{coins}コイン/日",
   "checkInWeekend": "週末（土〜日）",
   "checkInNDays": "{count}日",
-
   "onboardTitle1": "仲間に会おう",
   "onboardSubtitle1": "すべての冒険は子猫から始まる",
   "onboardBody1": "目標を決めて、子猫を迎えよう。\n集中すれば、ネコが成長していくよ！",
@@ -523,7 +487,6 @@
   "onboardSkip": "スキップ",
   "onboardLetsGo": "はじめよう！",
   "onboardNext": "次へ",
-
   "catRoomTitle": "ネコハウス",
   "catRoomInventory": "インベントリ",
   "catRoomShop": "アクセサリーショップ",
@@ -540,25 +503,44 @@
   "catRoomArchive": "アーカイブ",
   "catRoomAlbumSection": "アルバム（{count}）",
   "@catRoomAlbumSection": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catRoomReactivateCat": "再アクティブ化",
   "catRoomReactivateTitle": "ネコを再アクティブ化しますか？",
   "catRoomReactivateMessage": "「{name}」と紐づいたクエストをネコハウスに戻します。",
   "@catRoomReactivateMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivate": "再アクティブ化",
   "catRoomArchivedLabel": "アーカイブ済み",
   "catRoomArchiveSuccess": "「{name}」をアーカイブしました",
   "@catRoomArchiveSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivateSuccess": "「{name}」を再アクティブ化しました",
   "@catRoomReactivateSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
-
+  "catRoomArchiveError": "猫のアーカイブに失敗しました",
+  "catRoomReactivateError": "猫の復帰に失敗しました",
+  "catRoomArchiveLoadError": "アーカイブ済みの猫の読み込みに失敗しました",
+  "catRoomRenameError": "猫の名前変更に失敗しました",
   "addHabitTitle": "新しいクエスト",
   "addHabitQuestName": "クエスト名",
   "addHabitQuestHint": "例: LeetCode練習",
@@ -569,7 +551,6 @@
   "addHabitValidNumber": "有効な数値を入力してください",
   "addHabitCreate": "クエストを作成",
   "addHabitHoursSuffix": "時間",
-
   "shopTabPlants": "植物 ({count})",
   "shopTabWild": "ワイルド ({count})",
   "shopTabCollars": "首輪 ({count})",
@@ -579,7 +560,6 @@
   "shopNotEnoughCoinsButton": "コインが足りません",
   "shopPurchaseSuccess": "購入しました！{name}をインベントリに追加しました",
   "shopPurchaseFailed": "コインが足りません（{price}コイン必要）",
-
   "inventoryTitle": "インベントリ",
   "inventoryInBox": "ボックス内 ({count})",
   "inventoryEmpty": "インベントリは空です。\nショップでアクセサリーを手に入れましょう！",
@@ -590,7 +570,6 @@
   "inventoryEquipTo": "{name}を装備する:",
   "inventoryEquipSuccess": "{name}を装備しました",
   "inventoryUnequipSuccess": "{catName}の装備を外しました",
-
   "chatCatNotFound": "ネコが見つかりません",
   "chatTitle": "{name}とチャット",
   "chatClearHistory": "履歴を削除",
@@ -601,13 +580,16 @@
   "chatClearConfirmTitle": "チャット履歴を削除しますか？",
   "chatClearConfirmMessage": "すべてのメッセージが削除されます。この操作は取り消せません。",
   "chatClearButton": "削除",
-
+  "chatSend": "送信",
+  "chatStop": "停止",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
+  "chatErrorGeneric": "エラーが発生しました。再試行してください",
   "diaryTitle": "{name}の日記",
   "diaryLoadFailed": "日記の読み込みに失敗しました",
   "diaryRetry": "再試行",
   "diaryEmptyTitle2": "まだ日記がありません",
   "diaryEmptySubtitle": "集中セッションを完了すると、ネコが最初の日記を書きます！",
-
   "statsTitle": "統計",
   "statsTotalHours": "合計時間",
   "statsTimeValue": "{hours}時間{minutes}分",
@@ -620,7 +602,6 @@
   "statsNoQuestData": "クエストデータがありません",
   "statsNoQuestHint": "クエストを始めて進捗を確認しましょう！",
   "statsLast30Days": "過去30日間",
-
   "habitDetailQuestNotFound": "クエストが見つかりません",
   "habitDetailComplete": "達成",
   "habitDetailTotalTime": "合計時間",
@@ -628,14 +609,12 @@
   "habitDetailTarget": "目標",
   "habitDetailDaysUnit": "{count}日",
   "habitDetailHoursUnit": "{count}時間",
-
   "checkInBannerSuccess": "+{coins}コイン！デイリーチェックイン完了",
   "checkInBannerBonus": " + {bonus}マイルストーンボーナス！",
   "checkInBannerSemantics": "デイリーチェックイン",
   "checkInBannerLoading": "チェックイン状況を読み込み中...",
   "checkInBannerPrompt": "チェックインで+{coins}コイン",
   "checkInBannerSummary": "{count}/{total}日  ·  今日+{coins}",
-
   "commonErrorWithDetail": "エラー: {error}",
   "profileFallbackUser": "ユーザー",
   "fallbackCatName": "ネコ",
@@ -652,10 +631,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "集中中…",
   "notifInProgress": "集中セッション実行中",
-
   "unitMinShort": "分",
   "unitHourShort": "時間",
   "weekdayMon": "月",
@@ -675,11 +652,19 @@
   "historyFilterAll": "すべて",
   "historySessionCount": "{count} 回",
   "@historySessionCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "historyTotalMinutes": "{minutes} 分",
   "@historyTotalMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "historyNoSessions": "集中記録がありません",
   "historyNoSessionsHint": "集中セッションを完了すると、ここに表示されます",
@@ -695,7 +680,6 @@
   "historySelectMonth": "月を選択",
   "historyAllMonths": "すべての月",
   "historyAllHabits": "すべて",
-
   "homeTabAchievements": "実績",
   "achievementTitle": "実績",
   "achievementTabOverview": "概要",
@@ -706,11 +690,19 @@
   "achievementSummaryTitle": "実績の進捗",
   "achievementUnlockedCount": "{count}個解除済み",
   "@achievementUnlockedCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "achievementTotalCoins": "{coins}コイン獲得",
   "@achievementTotalCoins": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "achievementUnlocked": "実績解除！",
   "achievementAwesome": "すばらしい！",
@@ -719,20 +711,26 @@
   "achievementHiddenDesc": "これは隠し実績です",
   "achievementPersistDesc": "任意のクエストで{days}日チェックイン",
   "@achievementPersistDesc": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "achievementTitleCount": "{count}個の称号を解除",
   "@achievementTitleCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "growthPathTitle": "成長の道",
   "growthPathKitten": "新しい旅の始まり",
   "growthPathAdolescent": "基礎を築く",
   "growthPathAdult": "スキルの定着",
   "growthPathSenior": "深い習熟",
   "growthPathTip": "研究によると、20時間の集中練習で新しいスキルの基礎を築くことができます —— Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} コイン",
   "achievementCelebrationTitle": "称号獲得：{title}",
   "achievementCelebrationDismiss": "すごい！",
@@ -741,7 +739,6 @@
   "achievementUnlockedAt": "{date} に解除",
   "achievementLocked": "まだ解除されていません",
   "achievementRewardCoins": "+{count} コイン",
-
   "reminderModeDaily": "毎日",
   "reminderModeWeekdays": "平日",
   "reminderModeMonday": "月曜日",
@@ -759,13 +756,20 @@
   "reminderConfirm": "確認",
   "reminderNotificationTitle": "{catName}が会いたがってるよ！",
   "@reminderNotificationTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "reminderNotificationBody": "{habitName}の時間だよ。猫が待ってるよ！",
   "@reminderNotificationBody": {
-    "placeholders": { "habitName": { "type": "String" } }
+    "placeholders": {
+      "habitName": {
+        "type": "String"
+      }
+    }
   },
-
   "deleteAccountDataWarning": "以下のすべてのデータが完全に削除されます：",
   "deleteAccountQuests": "クエスト",
   "deleteAccountCats": "猫",
@@ -777,28 +781,43 @@
   "deleteAccountAuthCancelled": "認証がキャンセルされました",
   "deleteAccountAuthFailed": "認証に失敗しました：{error}",
   "@deleteAccountAuthFailed": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "deleteAccountProgress": "アカウントを削除中...",
   "deleteAccountSuccess": "アカウントが削除されました",
-
   "drawerGuestLoginSubtitle": "データ同期、AI機能を解除",
   "drawerGuestSignIn": "ログイン",
   "drawerMilestones": "マイルストーン",
   "drawerMilestoneFocus": "合計集中：{hours}h {minutes}m",
   "@drawerMilestoneFocus": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "drawerMilestoneCats": "ネコ家族：{count}匹",
   "@drawerMilestoneCats": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMilestoneQuests": "進行中クエスト：{count}個",
   "@drawerMilestoneQuests": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMySection": "マイ",
   "drawerSessionHistory": "集中履歴",
@@ -807,24 +826,28 @@
   "settingsResetData": "すべてのデータをリセット",
   "settingsResetDataTitle": "すべてのデータをリセットしますか？",
   "settingsResetDataMessage": "ローカルデータがすべて削除され、ウェルカム画面に戻ります。この操作は取り消せません。",
-
   "guestUpgradeTitle": "データを保護する",
   "guestUpgradeMessage": "アカウント連携で進捗をバックアップし、AI日記やチャット機能を解除し、デバイス間で同期できます。",
   "guestUpgradeLinkButton": "アカウント連携",
   "guestUpgradeLater": "あとで",
-
   "loginLinkTagline": "アカウントを連携してデータを保護する",
-
   "aiTeaserTitle": "ネコ日記",
   "aiTeaserPreview": "今日もご主人と一緒に勉強した…{catName}はまた賢くなった気がするにゃ〜",
   "@aiTeaserPreview": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "aiTeaserCta": "アカウントを連携して、{catName}が何を言いたいか見てみよう",
   "@aiTeaserCta": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
-
   "authErrorEmailInUse": "このメールアドレスは既に登録されています",
   "authErrorWrongPassword": "メールアドレスまたはパスワードが正しくありません",
   "authErrorUserNotFound": "このメールアドレスのアカウントが見つかりません",
@@ -833,7 +856,6 @@
   "authErrorAdminRestricted": "ログインは一時的に制限されています",
   "authErrorWeakPassword": "パスワードが弱すぎます。6文字以上にしてください",
   "authErrorGeneric": "問題が発生しました。もう一度お試しください",
-
   "deleteAccountReauthEmail": "続けるにはパスワードを入力してください",
   "deleteAccountReauthPasswordHint": "パスワード",
   "deleteAccountError": "問題が発生しました。あとでもう一度お試しください。",
@@ -852,9 +874,84 @@
   "archiveConflictCloud": "クラウドアーカイブ",
   "archiveConflictKeepCloud": "クラウドを保持",
   "archiveConflictKeepLocal": "ローカルを保持",
-
   "loginShowPassword": "パスワードを表示",
   "loginHidePassword": "パスワードを非表示",
   "errorGeneric": "問題が発生しました。しばらくしてからもう一度お試しください",
-  "errorCreateHabit": "習慣の作成に失敗しました。もう一度お試しください"
+  "errorCreateHabit": "習慣の作成に失敗しました。もう一度お試しください",
+  "loginForgotPassword": "パスワードを忘れた場合",
+  "loginForgotPasswordTitle": "パスワードをリセット",
+  "loginSendResetEmail": "リセットメールを送信",
+  "loginResetEmailSent": "パスワードリセットメールを送信しました",
+  "authErrorUserDisabled": "このアカウントは無効化されています",
+  "authErrorInvalidEmail": "有効なメールアドレスを入力してください",
+  "authErrorRequiresRecentLogin": "続行するには再度ログインしてください",
+  "commonCopyId": "ID をコピー",
+  "adoptionClearDeadline": "期限をクリア",
+  "commonIdCopied": "ID をコピーしました",
+  "pickerDurationLabel": "時間選択",
+  "pickerMinutesValue": "{count} 分",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "猫の{name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}、タップして触れ合う",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% 完了",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} 日アクティブ",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "オフラインモード",
+  "a11yAchievementUnlocked": "実績解除：{name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "チェックイン済み",
+  "calendarToday": "今日",
+  "a11yEquipToCat": "{name}に装備",
+  "a11yRegenerateCat": "{name}を再生成",
+  "a11yTimerDisplay": "タイマー：{time}",
+  "a11yOnboardingPage": "{total}ページ中{current}ページ",
+  "a11yEditDisplayName": "表示名を編集：{name}",
+  "routeNotFound": "ページが見つかりません",
+  "routeGoHome": "ホームへ",
+  "a11yError": "エラー",
+  "a11yDeadline": "締切",
+  "a11yReminder": "リマインダー",
+  "a11yFocusMeditation": "集中瞑想",
+  "a11yUnlocked": "アンロック済み",
+  "a11ySelected": "選択済み",
+  "a11yDynamicWallpaperColor": "ダイナミック壁紙カラー"
 }

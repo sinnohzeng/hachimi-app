@@ -1,3 +1,5 @@
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
+    show stageHourThresholds, stageList;
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
@@ -279,19 +281,14 @@ class LocalCatRepository {
     );
   }
 
-  /// 将猫设为毕业状态。
-  @Deprecated('Use archive() instead — atomic with ledger + notification')
-  Future<void> graduate(String uid, String catId) async {
-    await archive(uid, catId, '');
-  }
-
   // ─── 内部工具 ───
 
+  /// 阶段计算 — 使用 pixel_cat_constants.dart 中的 SSOT 阈值。
   static String _computeStage(int totalMinutes) {
     final hours = totalMinutes / 60.0;
-    if (hours >= 200) return 'senior';
-    if (hours >= 100) return 'adult';
-    if (hours >= 20) return 'adolescent';
+    for (final stage in stageList.reversed) {
+      if (hours >= stageHourThresholds[stage]!) return stage;
+    }
     return 'kitten';
   }
 

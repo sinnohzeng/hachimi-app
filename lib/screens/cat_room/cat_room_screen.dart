@@ -16,7 +16,6 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
-import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/coin_provider.dart';
@@ -28,6 +27,7 @@ import 'package:hachimi_app/widgets/pixel_ui/pixel_coin_display.dart';
 import 'package:hachimi_app/widgets/pixel_ui/pixel_progress_bar.dart';
 import 'package:hachimi_app/widgets/pixel_ui/retro_tiled_background.dart';
 import 'package:hachimi_app/widgets/staggered_list_item.dart';
+import 'package:hachimi_app/widgets/rename_cat_dialog.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/skeleton_loader.dart';
 import 'package:hachimi_app/widgets/empty_state.dart';
@@ -61,23 +61,36 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
           onRetry: () => ref.invalidate(catsProvider),
         ),
         data: (activeCats) {
-          final archivedCats = _extractArchivedCats(allCatsAsync);
-          return _buildBody(context, activeCats, archivedCats);
+          final (archivedCats, hasArchiveError) = _extractArchivedCats(
+            allCatsAsync,
+          );
+          return _buildBody(
+            context,
+            activeCats,
+            archivedCats,
+            hasArchiveError: hasArchiveError,
+          );
         },
       ),
     );
   }
 
-  List<Cat> _extractArchivedCats(AsyncValue<List<Cat>> allCatsAsync) {
+  /// 提取归档猫列表。返回 (cats, hasError) — hasError 时 UI 显示 inline 提示。
+  (List<Cat>, bool) _extractArchivedCats(AsyncValue<List<Cat>> allCatsAsync) {
+    final hasError = allCatsAsync is AsyncError;
     final allCats = allCatsAsync.value ?? [];
-    return allCats.where((c) => c.state == 'graduated').toList();
+    final archived = allCats
+        .where((c) => c.state == CatState.graduated)
+        .toList();
+    return (archived, hasError);
   }
 
   Widget _buildBody(
     BuildContext context,
     List<Cat> activeCats,
-    List<Cat> archivedCats,
-  ) {
+    List<Cat> archivedCats, {
+    bool hasArchiveError = false,
+  }) {
     if (activeCats.isEmpty && archivedCats.isEmpty) {
       return RefreshIndicator(
         onRefresh: () async => ref.invalidate(catsProvider),
@@ -92,6 +105,16 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
           if (activeCats.isNotEmpty) _buildActiveCatsGrid(activeCats),
           if (activeCats.isEmpty && archivedCats.isNotEmpty)
             SliverToBoxAdapter(child: _buildEmpty(context)),
+          if (hasArchiveError && archivedCats.isEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: AppSpacing.paddingBase,
+                child: ErrorState(
+                  message: context.l10n.catRoomArchiveLoadError,
+                  onRetry: () => ref.invalidate(allCatsProvider),
+                ),
+              ),
+            ),
           if (archivedCats.isNotEmpty)
             ArchivedCatsSection(
               cats: archivedCats,
@@ -314,45 +337,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
   // ─── 对话框 ───
 
   void _showRenameDialog(BuildContext context, Cat cat) {
-    final controller = TextEditingController(text: cat.name);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.catRoomRenameCat),
-        content: TextField(
-          controller: controller,
-          maxLength: Cat.maxNameLength,
-          decoration: InputDecoration(
-            labelText: context.l10n.catRoomNewName,
-            prefixIcon: const Icon(Icons.pets),
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final newName = controller.text.trim();
-              if (newName.isEmpty) return;
-              final uid = ref.read(currentUidProvider);
-              if (uid == null) return;
-              final renamedCat = cat.copyWith(name: newName);
-              await ref
-                  .read(localCatRepositoryProvider)
-                  .update(uid, renamedCat);
-              ref
-                  .read(ledgerServiceProvider)
-                  .notifyChange(const LedgerChange(type: 'cat_update'));
-              if (ctx.mounted) Navigator.of(ctx).pop();
-            },
-            child: Text(context.l10n.catRoomRename),
-          ),
-        ],
-      ),
-    );
+    showRenameCatDialog(context, ref, cat);
   }
 
   void _confirmArchive(BuildContext context, Cat cat) {
@@ -384,11 +369,19 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
   Future<void> _executeArchive(Cat cat) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    await ref
-        .read(localCatRepositoryProvider)
-        .archive(uid, cat.id, cat.boundHabitId);
-    if (!mounted) return;
-    AppFeedback.success(context, context.l10n.catRoomArchiveSuccess(cat.name));
+    try {
+      await ref
+          .read(localCatRepositoryProvider)
+          .archive(uid, cat.id, cat.boundHabitId);
+      if (!mounted) return;
+      AppFeedback.success(
+        context,
+        context.l10n.catRoomArchiveSuccess(cat.name),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      AppFeedback.error(context, context.l10n.catRoomArchiveError);
+    }
   }
 
   void _confirmReactivate(BuildContext context, Cat cat) {
@@ -417,14 +410,19 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
   Future<void> _executeReactivate(Cat cat) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    await ref
-        .read(localCatRepositoryProvider)
-        .reactivate(uid, cat.id, cat.boundHabitId);
-    if (!mounted) return;
-    AppFeedback.success(
-      context,
-      context.l10n.catRoomReactivateSuccess(cat.name),
-    );
+    try {
+      await ref
+          .read(localCatRepositoryProvider)
+          .reactivate(uid, cat.id, cat.boundHabitId);
+      if (!mounted) return;
+      AppFeedback.success(
+        context,
+        context.l10n.catRoomReactivateSuccess(cat.name),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      AppFeedback.error(context, context.l10n.catRoomReactivateError);
+    }
   }
 }
 

@@ -70,23 +70,36 @@ class _PixelButtonState extends State<PixelButton>
       animation: _scale,
       builder: (context, child) =>
           Transform.scale(scale: _scale.value, child: child),
-      child: GestureDetector(
-        onTap: _handleTap,
-        child: Opacity(
-          opacity: enabled ? 1.0 : 0.5,
-          child: PixelBorder(
-            fillColor: bg,
-            borderColor: pixel.pixelBorder,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (widget.icon != null) ...[
-                  Icon(widget.icon, size: 16, color: fg),
-                  const SizedBox(width: 6),
-                ],
-                Text(widget.label, style: pixel.pixelLabel.copyWith(color: fg)),
-              ],
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        label: widget.label,
+        child: GestureDetector(
+          onTap: _handleTap,
+          child: ExcludeSemantics(
+            child: Opacity(
+              opacity: enabled ? 1.0 : 0.5,
+              child: PixelBorder(
+                fillColor: bg,
+                borderColor: pixel.pixelBorder,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon, size: 16, color: fg),
+                      const SizedBox(width: 6),
+                    ],
+                    Text(
+                      widget.label,
+                      style: pixel.pixelLabel.copyWith(color: fg),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

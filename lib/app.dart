@@ -122,11 +122,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       }
     });
 
-    _resumePendingDeletion();
-    _pendingDeletionTimer = Timer.periodic(
-      const Duration(seconds: 15),
-      (_) => _resumePendingDeletion(),
-    );
+    _startDeletionRetryTimerIfNeeded();
   }
 
   @override
@@ -148,6 +144,22 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     prefs.setString(AppPrefsKeys.localGuestUid, 'guest_${const Uuid().v4()}');
   }
 
+  /// 仅在有待处理的删除任务时启动定时重试。
+  void _startDeletionRetryTimerIfNeeded() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (!_hasPendingDeletion(prefs)) return;
+    _resumePendingDeletion();
+    _pendingDeletionTimer ??= Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _resumePendingDeletion(),
+    );
+  }
+
+  void _stopDeletionRetryTimer() {
+    _pendingDeletionTimer?.cancel();
+    _pendingDeletionTimer = null;
+  }
+
   Future<void> _resumePendingDeletion() async {
     if (_isPendingDeletionRetry) return;
     _isPendingDeletionRetry = true;
@@ -155,13 +167,19 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       final changed = await ref
           .read(accountDeletionOrchestratorProvider)
           .resumePendingDeletion();
-      if (changed && mounted) setState(() {});
+      if (changed && mounted) {
+        // 删除完成后停止定时器
+        final prefs = ref.read(sharedPreferencesProvider);
+        if (!_hasPendingDeletion(prefs)) _stopDeletionRetryTimer();
+        setState(() {});
+      }
     } finally {
       _isPendingDeletionRetry = false;
     }
   }
 
   Future<void> _abandonPendingDeletion() async {
+    _stopDeletionRetryTimer();
     await ref
         .read(accountDeletionOrchestratorProvider)
         .abandonPendingDeletion();

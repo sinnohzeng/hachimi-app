@@ -1,12 +1,10 @@
 {
   "@@locale": "hi",
   "appTitle": "Hachimi",
-
   "homeTabToday": "आज",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "आँकड़े",
   "homeTabProfile": "प्रोफ़ाइल",
-
   "adoptionStepDefineHabit": "आदत तय करें",
   "adoptionStepAdoptCat": "बिल्ली अपनाएँ",
   "adoptionStepNameCat": "नाम रखें",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "बिल्ली का नाम",
   "adoptionCatNameHint": "जैसे: मोची",
   "adoptionRandomNameTooltip": "रैंडम नाम",
-
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "अभी कोई बिल्ली नहीं! आदत बनाकर अपनी पहली बिल्ली अपनाएँ।",
   "catHouseGrowth": "{minutes} / {target} मिनट",
-
   "catDetailGrowthProgress": "विकास प्रगति",
   "catDetailTotalMinutes": "{minutes} मिनट फ़ोकस",
   "catDetailTargetMinutes": "लक्ष्य: {minutes} मिनट",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "फ़ोकस शुरू करें",
   "catDetailBoundHabit": "जुड़ी आदत",
   "catDetailStage": "चरण: {stage}",
-
   "coinBalance": "{amount} सिक्के",
   "coinCheckInReward": "+{amount} सिक्के!",
   "coinCheckInTitle": "दैनिक चेक-इन",
   "coinInsufficientBalance": "पर्याप्त सिक्के नहीं हैं",
-
   "shopTitle": "एक्सेसरी शॉप",
   "shopPrice": "{price} सिक्के",
   "shopPurchase": "ख़रीदें",
   "shopEquipped": "पहना हुआ",
-
   "focusCompleteMinutes": "+{minutes} मिनट",
   "focusCompleteStageUp": "चरण बढ़ा!",
   "focusCompleteGreatJob": "शाबाश!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "डायरी लिखी गई!",
   "focusCompleteNotifTitle": "क्वेस्ट पूरा!",
   "focusCompleteNotifBody": "{catName} ने {minutes} मिनट फ़ोकस से +{xp} XP कमाया",
-
   "stageKitten": "बिल्ली का बच्चा",
   "stageAdolescent": "किशोर",
   "stageAdult": "वयस्क",
   "stageSenior": "वरिष्ठ",
-
   "migrationTitle": "डेटा अपडेट ज़रूरी",
   "migrationMessage": "Hachimi को नए पिक्सल कैट सिस्टम के साथ अपडेट किया गया है! आपका पुराना कैट डेटा अब संगत नहीं है। नए अनुभव के लिए रीसेट करें।",
   "migrationResetButton": "रीसेट करें और नई शुरुआत करें",
-
   "sessionResumeTitle": "सत्र जारी रखें?",
   "sessionResumeMessage": "आपका एक सक्रिय फ़ोकस सत्र था ({habitName}, {elapsed})। जारी रखें?",
   "sessionResumeButton": "जारी रखें",
   "sessionDiscard": "छोड़ें",
-
   "todaySummaryMinutes": "आज",
   "todaySummaryTotal": "कुल",
   "todaySummaryCats": "बिल्लियाँ",
@@ -104,7 +93,6 @@
   "todayNoHabits": "शुरू करने के लिए अपनी पहली आदत बनाएँ!",
   "todayNewQuest": "नया क्वेस्ट",
   "todayStartFocus": "फ़ोकस शुरू करें",
-
   "timerStart": "शुरू",
   "timerPause": "रुकें",
   "timerResume": "जारी रखें",
@@ -122,7 +110,6 @@
   "giveUpMessage": "अगर आपने कम से कम 5 मिनट फ़ोकस किया है, तो वह समय आपकी बिल्ली की वृद्धि में गिना जाएगा। आपकी बिल्ली समझेगी!",
   "giveUpKeepGoing": "जारी रखें",
   "giveUpConfirm": "छोड़ दें",
-
   "settingsTitle": "सेटिंग्स",
   "settingsGeneral": "सामान्य",
   "settingsAppearance": "दिखावट",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "खाता हटाएँ?",
   "deleteAccountMessage": "इससे आपका खाता और सारा डेटा हमेशा के लिए हट जाएगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
   "deleteAccountWarning": "यह क्रिया पूर्ववत नहीं की जा सकती",
-
   "profileTitle": "प्रोफ़ाइल",
   "profileYourJourney": "आपकी यात्रा",
   "profileTotalFocus": "कुल फ़ोकस",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "अवतार चुनें",
   "profileSaved": "प्रोफ़ाइल सहेजी गई",
   "profileSettings": "सेटिंग्स",
-
   "habitDetailStreak": "स्ट्रीक",
   "habitDetailBestStreak": "सर्वश्रेष्ठ",
   "habitDetailTotalMinutes": "कुल",
-
   "commonCancel": "रद्द करें",
   "commonConfirm": "पुष्टि करें",
   "commonSave": "सहेजें",
@@ -182,12 +166,11 @@
   "commonLogOut": "लॉग आउट",
   "commonDeleteAccount": "खाता हटाएँ",
   "commonYes": "हाँ",
-
   "chatDailyRemaining": "आज {count} संदेश बाकी हैं",
   "chatDailyLimitReached": "दैनिक संदेश सीमा पूरी हो गई",
   "aiTemporarilyUnavailable": "AI सुविधाएँ अस्थायी रूप से अनुपलब्ध हैं",
-
   "catDetailNotFound": "बिल्ली नहीं मिली",
+  "catDetailLoadError": "बिल्ली का डेटा लोड नहीं हो सका",
   "catDetailChatTooltip": "चैट",
   "catDetailRenameTooltip": "नाम बदलें",
   "catDetailGrowthTitle": "विकास प्रगति",
@@ -254,7 +237,6 @@
   "catDetailTortiePattern": "टॉर्टी पैटर्न",
   "catDetailTortieColor": "टॉर्टी रंग",
   "catDetailSkin": "त्वचा",
-
   "offlineMessage": "आप ऑफ़लाइन हैं — कनेक्ट होने पर बदलाव सिंक होंगे",
   "offlineModeLabel": "ऑफ़लाइन मोड",
   "habitTodayMinutes": "आज: {count} मिनट",
@@ -267,35 +249,29 @@
   "accessoryEquipped": "पहना हुआ",
   "accessoryOwned": "खरीदा हुआ",
   "pickerMinUnit": "मिनट",
-
   "settingsBackgroundAnimation": "एनिमेटेड बैकग्राउंड",
   "settingsBackgroundAnimationSubtitle": "मेश ग्रेडिएंट और फ़्लोटिंग पार्टिकल्स",
-
   "settingsUiStyle": "UI शैली",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "रेट्रो पिक्सल",
   "settingsUiStyleMaterialSubtitle": "आधुनिक, गोलाकार Material डिज़ाइन",
   "settingsUiStyleRetroPixelSubtitle": "गरम पिक्सल-आर्ट शैली",
-
   "personalityLazy": "आलसी",
   "personalityCurious": "जिज्ञासु",
   "personalityPlayful": "चंचल",
   "personalityShy": "शर्मीली",
   "personalityBrave": "बहादुर",
   "personalityClingy": "चिपकू",
-
   "personalityFlavorLazy": "दिन में 23 घंटे सोएगी। बाकी 1 घंटा? वो भी सोएगी।",
   "personalityFlavorCurious": "पहले से ही सब कुछ सूँघ रही है!",
   "personalityFlavorPlayful": "तितलियों का पीछा करना बंद ही नहीं करती!",
   "personalityFlavorShy": "बॉक्स से झाँकने में 3 मिनट लगे...",
   "personalityFlavorBrave": "बॉक्स खुलने से पहले ही बाहर कूद गई!",
   "personalityFlavorClingy": "तुरंत गड़गड़ाने लगी और छोड़ने को तैयार नहीं।",
-
   "moodHappy": "खुश",
   "moodNeutral": "सामान्य",
   "moodLonely": "अकेली",
   "moodMissing": "याद आ रही है",
-
   "moodMsgLazyHappy": "न्या~! अब एक अच्छी सी नींद का समय है...",
   "moodMsgCuriousHappy": "आज क्या खोजने वाले हैं?",
   "moodMsgPlayfulHappy": "न्या~! काम के लिए तैयार!",
@@ -313,14 +289,13 @@
   "moodMsgPlayfulLonely": "खिलौने तुम्हारे बिना मज़ेदार नहीं हैं...",
   "moodMsgShyLonely": "*चुपचाप सिमट गई*",
   "moodMsgBraveLonely": "मैं इंतज़ार करूँगी। मैं बहादुर हूँ।",
-  "moodMsgClingyLonely": "तुम कहाँ चले गए... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "तुम कहाँ चले गए... 🥺",
   "moodMsgLazyMissing": "*उम्मीद से एक आँख खोलती है*",
   "moodMsgCuriousMissing": "क्या कुछ हो गया...?",
   "moodMsgPlayfulMissing": "मैंने तुम्हारा पसंदीदा खिलौना बचाकर रखा है...",
   "moodMsgShyMissing": "*छिपी हुई, लेकिन दरवाज़े की ओर देख रही है*",
   "moodMsgBraveMissing": "मुझे पता है तुम वापस आओगे। मुझे विश्वास है।",
   "moodMsgClingyMissing": "मुझे तुम्हारी बहुत याद आ रही है... कृपया वापस आओ।",
-
   "peltTypeTabby": "क्लासिक टैबी धारियाँ",
   "peltTypeTicked": "टिक्ड एगूटी पैटर्न",
   "peltTypeMackerel": "मैकरेल टैबी",
@@ -336,7 +311,6 @@
   "peltTypeBengal": "बंगाल पैटर्न",
   "peltTypeMarbled": "मार्बल्ड पैटर्न",
   "peltTypeMasked": "नकाबपोश चेहरा",
-
   "peltColorWhite": "सफ़ेद",
   "peltColorPaleGrey": "हल्का स्लेटी",
   "peltColorSilver": "चाँदी",
@@ -356,7 +330,6 @@
   "peltColorGoldenBrown": "सुनहरा भूरा",
   "peltColorDarkBrown": "गहरा भूरा",
   "peltColorChocolate": "चॉकलेट",
-
   "eyeColorYellow": "पीला",
   "eyeColorAmber": "एम्बर",
   "eyeColorHazel": "हेज़ल",
@@ -378,10 +351,8 @@
   "eyeColorBronze": "काँसा",
   "eyeColorSilver": "चाँदी",
   "eyeColorPaleYellow": "हल्का पीला",
-
   "eyeDescNormal": "{color} आँखें",
   "eyeDescHeterochromia": "हेटरोक्रोमिया ({primary} / {secondary})",
-
   "skinColorPink": "गुलाबी",
   "skinColorRed": "लाल",
   "skinColorBlack": "काला",
@@ -394,38 +365,30 @@
   "skinColorDarkSalmon": "गहरा सैल्मन",
   "skinColorSalmon": "सैल्मन",
   "skinColorPeach": "पीच",
-
   "furLengthLonghair": "लंबे बाल",
   "furLengthShorthair": "छोटे बाल",
-
   "whiteTintOffwhite": "ऑफ़-वाइट रंगत",
   "whiteTintCream": "क्रीम रंगत",
   "whiteTintDarkCream": "गहरी क्रीम रंगत",
   "whiteTintGray": "स्लेटी रंगत",
   "whiteTintPink": "गुलाबी रंगत",
-
   "notifReminderTitle": "{catName} को आपकी याद आ रही है!",
   "notifReminderBody": "{habitName} का समय — आपकी बिल्ली इंतज़ार कर रही है!",
   "notifStreakTitle": "{catName} चिंतित है!",
   "notifStreakBody": "आपकी {streak} दिन की स्ट्रीक ख़तरे में है। एक छोटा सत्र बचा लेगा!",
   "notifEvolutionTitle": "{catName} का विकास हुआ!",
   "notifEvolutionBody": "{catName} अब {stageName} बन गई! शानदार काम जारी रखें!",
-
   "durationHoursMinutes": "{hours} घंटे {minutes} मिनट",
-
   "diaryScreenTitle": "{name} की डायरी",
   "diaryFailedToLoad": "डायरी लोड नहीं हो पाई",
   "diaryEmptyTitle": "अभी कोई डायरी एंट्री नहीं",
   "diaryEmptyHint": "एक फ़ोकस सत्र पूरा करें और आपकी बिल्ली अपनी पहली डायरी लिखेगी!",
-
   "focusSetupCountdown": "काउंटडाउन",
   "focusSetupStopwatch": "स्टॉपवॉच",
   "focusSetupStartFocus": "फ़ोकस शुरू करें",
   "focusSetupQuestNotFound": "क्वेस्ट नहीं मिला",
-
   "checkInButtonLogMore": "और समय जोड़ें",
   "checkInButtonStart": "टाइमर शुरू करें",
-
   "adoptionTitleFirst": "अपनी पहली बिल्ली अपनाएँ!",
   "adoptionTitleNew": "नया क्वेस्ट",
   "adoptionStepDefineQuest": "क्वेस्ट तय करें",
@@ -462,7 +425,6 @@
   "adoptionValidQuestName": "कृपया क्वेस्ट का नाम डालें",
   "adoptionValidCatName": "कृपया अपनी बिल्ली का नाम रखें",
   "adoptionError": "त्रुटि: {message}",
-
   "adoptionBasicInfo": "मूल जानकारी",
   "adoptionGoals": "लक्ष्य",
   "adoptionUnlimitedMode": "अनलिमिटेड मोड",
@@ -475,7 +437,6 @@
   "adoptionMotivationLabel": "नोट",
   "adoptionMotivationHint": "एक नोट लिखें...",
   "adoptionMotivationSwap": "रैंडम भरें",
-
   "loginAppName": "Hachimi",
   "loginTagline": "बिल्लियाँ पालें। क्वेस्ट पूरे करें।",
   "loginContinueGoogle": "Google से जारी रखें",
@@ -495,7 +456,6 @@
   "loginCreateAccountButton": "खाता बनाएँ",
   "loginNoAccount": "खाता नहीं है? ",
   "loginRegister": "रजिस्टर करें",
-
   "checkInTitle": "मासिक चेक-इन",
   "checkInDays": "दिन",
   "checkInCoinsEarned": "अर्जित सिक्के",
@@ -508,7 +468,6 @@
   "checkInWeekdayReward": "{coins} सिक्के/दिन",
   "checkInWeekend": "सप्ताहांत (शनि–रवि)",
   "checkInNDays": "{count} दिन",
-
   "onboardTitle1": "अपने साथी से मिलें",
   "onboardSubtitle1": "हर क्वेस्ट एक बिल्ली के बच्चे से शुरू होता है",
   "onboardBody1": "एक लक्ष्य तय करें और बिल्ली का बच्चा अपनाएँ।\nफ़ोकस करें, और अपनी बिल्ली को बढ़ते देखें!",
@@ -521,7 +480,6 @@
   "onboardSkip": "छोड़ें",
   "onboardLetsGo": "चलो शुरू करें!",
   "onboardNext": "आगे",
-
   "catRoomTitle": "CatHouse",
   "catRoomInventory": "इन्वेंट्री",
   "catRoomShop": "एक्सेसरी शॉप",
@@ -544,7 +502,10 @@
   "catRoomArchivedLabel": "आर्काइव किया गया",
   "catRoomArchiveSuccess": "\"{name}\" आर्काइव हो गई",
   "catRoomReactivateSuccess": "\"{name}\" पुनः सक्रिय हो गई",
-
+  "catRoomArchiveError": "बिल्ली को संग्रह करने में विफल",
+  "catRoomReactivateError": "बिल्ली को पुनः सक्रिय करने में विफल",
+  "catRoomArchiveLoadError": "संग्रहीत बिल्लियों को लोड नहीं हो सका",
+  "catRoomRenameError": "बिल्ली का नाम बदलने में विफल",
   "addHabitTitle": "नया क्वेस्ट",
   "addHabitQuestName": "क्वेस्ट का नाम",
   "addHabitQuestHint": "जैसे: LeetCode अभ्यास",
@@ -555,7 +516,6 @@
   "addHabitValidNumber": "कृपया मान्य संख्या डालें",
   "addHabitCreate": "क्वेस्ट बनाएँ",
   "addHabitHoursSuffix": "घंटे",
-
   "shopTabPlants": "पौधे ({count})",
   "shopTabWild": "जंगली ({count})",
   "shopTabCollars": "कॉलर ({count})",
@@ -565,7 +525,6 @@
   "shopNotEnoughCoinsButton": "पर्याप्त सिक्के नहीं",
   "shopPurchaseSuccess": "ख़रीद लिया! {name} इन्वेंट्री में जोड़ दिया गया",
   "shopPurchaseFailed": "पर्याप्त सिक्के नहीं ({price} चाहिए)",
-
   "inventoryTitle": "इन्वेंट्री",
   "inventoryInBox": "बॉक्स में ({count})",
   "inventoryEmpty": "आपकी इन्वेंट्री खाली है।\nएक्सेसरीज़ पाने के लिए शॉप पर जाएँ!",
@@ -576,7 +535,6 @@
   "inventoryEquipTo": "{name} पहनाएँ:",
   "inventoryEquipSuccess": "{name} पहनाया",
   "inventoryUnequipSuccess": "{catName} से उतारा",
-
   "chatCatNotFound": "बिल्ली नहीं मिली",
   "chatTitle": "{name} से चैट",
   "chatClearHistory": "इतिहास मिटाएँ",
@@ -587,13 +545,16 @@
   "chatClearConfirmTitle": "चैट इतिहास मिटाएँ?",
   "chatClearConfirmMessage": "इससे सभी संदेश हट जाएँगे। यह पूर्ववत नहीं किया जा सकता।",
   "chatClearButton": "मिटाएँ",
-
+  "chatSend": "भेजें",
+  "chatStop": "रोकें",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
+  "chatErrorGeneric": "कुछ गलत हो गया। फिर से कोशिश करें।",
   "diaryTitle": "{name} की डायरी",
   "diaryLoadFailed": "डायरी लोड नहीं हो पाई",
   "diaryRetry": "पुनः प्रयास",
   "diaryEmptyTitle2": "अभी कोई डायरी एंट्री नहीं",
   "diaryEmptySubtitle": "एक फ़ोकस सत्र पूरा करें और आपकी बिल्ली अपनी पहली डायरी लिखेगी!",
-
   "statsTitle": "आँकड़े",
   "statsTotalHours": "कुल घंटे",
   "statsTimeValue": "{hours} घंटे {minutes} मिनट",
@@ -606,7 +567,6 @@
   "statsNoQuestData": "अभी कोई क्वेस्ट डेटा नहीं",
   "statsNoQuestHint": "अपनी प्रगति देखने के लिए क्वेस्ट शुरू करें!",
   "statsLast30Days": "पिछले 30 दिन",
-
   "habitDetailQuestNotFound": "क्वेस्ट नहीं मिला",
   "habitDetailComplete": "पूरा",
   "habitDetailTotalTime": "कुल समय",
@@ -614,14 +574,12 @@
   "habitDetailTarget": "लक्ष्य",
   "habitDetailDaysUnit": "{count} दिन",
   "habitDetailHoursUnit": "{count} घंटे",
-
   "checkInBannerSuccess": "+{coins} सिक्के! दैनिक चेक-इन पूरा",
   "checkInBannerBonus": " + {bonus} माइलस्टोन बोनस!",
   "checkInBannerSemantics": "दैनिक चेक-इन",
   "checkInBannerLoading": "चेक-इन स्थिति लोड हो रही है...",
   "checkInBannerPrompt": "+{coins} सिक्कों के लिए चेक इन करें",
   "checkInBannerSummary": "{count}/{total} दिन  ·  आज +{coins}",
-
   "commonErrorWithDetail": "त्रुटि: {error}",
   "profileFallbackUser": "उपयोगकर्ता",
   "fallbackCatName": "बिल्ली",
@@ -638,10 +596,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "फ़ोकस कर रहे हैं...",
   "notifInProgress": "फ़ोकस सत्र चल रहा है",
-
   "unitMinShort": "मिनट",
   "unitHourShort": "घंटे",
   "weekdayMon": "सो",
@@ -675,7 +631,6 @@
   "historySelectMonth": "महीना चुनें",
   "historyAllMonths": "सभी महीने",
   "historyAllHabits": "सभी",
-
   "homeTabAchievements": "उपलब्धियाँ",
   "achievementTitle": "उपलब्धियाँ",
   "achievementTabOverview": "सिंहावलोकन",
@@ -693,14 +648,12 @@
   "achievementHiddenDesc": "यह एक छिपी उपलब्धि है",
   "achievementPersistDesc": "किसी भी क्वेस्ट पर {days} चेक-इन दिन जमा करें",
   "achievementTitleCount": "{count} उपाधियाँ अनलॉक",
-
   "growthPathTitle": "विकास पथ",
   "growthPathKitten": "एक नई यात्रा शुरू करें",
   "growthPathAdolescent": "प्रारंभिक नींव बनाएँ",
   "growthPathAdult": "कौशल मजबूत होते हैं",
   "growthPathSenior": "गहन महारत",
   "growthPathTip": "शोध बताता है कि किसी नए कौशल की नींव बनाने के लिए 20 घंटे का केंद्रित अभ्यास पर्याप्त है — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} सिक्के",
   "achievementCelebrationTitle": "उपाधि अर्जित: {title}",
   "achievementCelebrationDismiss": "शानदार!",
@@ -709,7 +662,6 @@
   "achievementUnlockedAt": "{date} को अनलॉक हुआ",
   "achievementLocked": "अभी अनलॉक नहीं हुआ",
   "achievementRewardCoins": "+{count} सिक्के",
-
   "reminderModeDaily": "हर दिन",
   "reminderModeWeekdays": "सप्ताह के दिन",
   "reminderModeMonday": "सोमवार",
@@ -727,7 +679,6 @@
   "reminderConfirm": "पुष्टि करें",
   "reminderNotificationTitle": "{catName} को आपकी याद आ रही है!",
   "reminderNotificationBody": "{habitName} का समय — आपकी बिल्ली इंतज़ार कर रही है!",
-
   "deleteAccountDataWarning": "निम्नलिखित सभी डेटा हमेशा के लिए हटा दिया जाएगा:",
   "deleteAccountQuests": "क्वेस्ट",
   "deleteAccountCats": "बिल्लियाँ",
@@ -740,7 +691,6 @@
   "deleteAccountAuthFailed": "प्रमाणीकरण विफल: {error}",
   "deleteAccountProgress": "खाता हटाया जा रहा है...",
   "deleteAccountSuccess": "खाता हटाया गया",
-
   "drawerGuestLoginSubtitle": "डेटा सिंक करें और AI सुविधाएँ अनलॉक करें",
   "drawerGuestSignIn": "साइन इन करें",
   "drawerMilestones": "माइलस्टोन",
@@ -754,18 +704,14 @@
   "settingsResetData": "सारा डेटा रीसेट करें",
   "settingsResetDataTitle": "सारा डेटा रीसेट करें?",
   "settingsResetDataMessage": "इससे सारा लोकल डेटा हट जाएगा और स्वागत स्क्रीन पर लौट जाएँगे। यह पूर्ववत नहीं किया जा सकता।",
-
   "guestUpgradeTitle": "अपना डेटा सुरक्षित रखें",
   "guestUpgradeMessage": "अपनी प्रगति का बैकअप लेने, AI डायरी और चैट सुविधाएँ अनलॉक करने, और सभी डिवाइस पर सिंक करने के लिए खाता लिंक करें।",
   "guestUpgradeLinkButton": "खाता लिंक करें",
   "guestUpgradeLater": "बाद में",
-
   "loginLinkTagline": "अपना डेटा सुरक्षित रखने के लिए खाता लिंक करें",
-
   "aiTeaserTitle": "बिल्ली की डायरी",
   "aiTeaserPreview": "आज मैंने फिर से अपने इंसान के साथ पढ़ाई की... {catName} हर दिन ज़्यादा स्मार्ट महसूस कर रही है~",
   "aiTeaserCta": "{catName} क्या कहना चाहती है, देखने के लिए खाता लिंक करें",
-
   "authErrorEmailInUse": "यह ईमेल पहले से रजिस्टर है",
   "authErrorWrongPassword": "ग़लत ईमेल या पासवर्ड",
   "authErrorUserNotFound": "इस ईमेल से कोई खाता नहीं मिला",
@@ -774,7 +720,6 @@
   "authErrorAdminRestricted": "साइन-इन अस्थायी रूप से प्रतिबंधित है",
   "authErrorWeakPassword": "पासवर्ड कमज़ोर है। कम से कम 6 अक्षर इस्तेमाल करें",
   "authErrorGeneric": "कुछ गड़बड़ हो गई। पुनः प्रयास करें",
-
   "deleteAccountReauthEmail": "जारी रखने के लिए अपना पासवर्ड डालें",
   "deleteAccountReauthPasswordHint": "पासवर्ड",
   "deleteAccountError": "कुछ गड़बड़ हो गई। बाद में पुनः प्रयास करें।",
@@ -793,9 +738,84 @@
   "archiveConflictCloud": "क्लाउड आर्काइव",
   "archiveConflictKeepCloud": "क्लाउड रखें",
   "archiveConflictKeepLocal": "लोकल रखें",
-
   "loginShowPassword": "पासवर्ड दिखाएँ",
   "loginHidePassword": "पासवर्ड छिपाएँ",
   "errorGeneric": "कुछ गड़बड़ हो गई। बाद में पुनः प्रयास करें",
-  "errorCreateHabit": "आदत बनाने में विफल। पुनः प्रयास करें"
+  "errorCreateHabit": "आदत बनाने में विफल। पुनः प्रयास करें",
+  "loginForgotPassword": "Forgot password?",
+  "loginForgotPasswordTitle": "Reset password",
+  "loginSendResetEmail": "Send reset email",
+  "loginResetEmailSent": "Password reset email sent. Check your inbox",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorInvalidEmail": "Please enter a valid email address",
+  "authErrorRequiresRecentLogin": "Please log in again to continue",
+  "commonCopyId": "ID कॉपी करें",
+  "adoptionClearDeadline": "समय सीमा हटाएं",
+  "commonIdCopied": "ID कॉपी हो गई",
+  "pickerDurationLabel": "अवधि चयनकर्ता",
+  "pickerMinutesValue": "{count} मिनट",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "बिल्ली {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, बातचीत के लिए टैप करें",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% पूर्ण",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} सक्रिय दिन",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "ऑफ़लाइन मोड",
+  "a11yAchievementUnlocked": "उपलब्धि अनलॉक: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "चेक इन किया",
+  "calendarToday": "आज",
+  "a11yEquipToCat": "{name} को लगाएँ",
+  "a11yRegenerateCat": "{name} पुनः बनाएँ",
+  "a11yTimerDisplay": "टाइमर: {time}",
+  "a11yOnboardingPage": "{total} में से {current} पेज",
+  "a11yEditDisplayName": "प्रदर्शन नाम संपादित करें: {name}",
+  "routeNotFound": "पेज नहीं मिला",
+  "routeGoHome": "होम पर जाएँ",
+  "a11yError": "त्रुटि",
+  "a11yDeadline": "समय सीमा",
+  "a11yReminder": "रिमाइंडर",
+  "a11yFocusMeditation": "ध्यान",
+  "a11yUnlocked": "अनलॉक किया गया",
+  "a11ySelected": "चयनित",
+  "a11yDynamicWallpaperColor": "डायनामिक वॉलपेपर रंग"
 }

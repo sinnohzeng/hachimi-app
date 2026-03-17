@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
     show computeSpriteIndex;
@@ -94,11 +95,15 @@ class _TappableCatSpriteState extends ConsumerState<TappableCatSprite>
     );
 
     if (!widget.enableTap) {
-      return Semantics(label: '${cat.name} cat', image: true, child: sprite);
+      return Semantics(
+        label: context.l10n.a11yCatImage(cat.name),
+        image: true,
+        child: sprite,
+      );
     }
 
     return Semantics(
-      label: '${cat.name}, tap to interact',
+      label: context.l10n.a11yCatTapToInteract(cat.name),
       button: true,
       child: GestureDetector(
         onTap: _cyclePose,

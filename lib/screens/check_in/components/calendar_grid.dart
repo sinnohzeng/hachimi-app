@@ -73,6 +73,8 @@ class CalendarGrid extends StatelessWidget {
               firstWeekday: firstWeekday,
               today: today,
               colorScheme: colorScheme,
+              checkedInLabel: l10n.calendarCheckedIn,
+              todayLabel: l10n.calendarToday,
             ),
           ],
         ),
@@ -85,6 +87,8 @@ class CalendarGrid extends StatelessWidget {
     required int firstWeekday,
     required int today,
     required ColorScheme colorScheme,
+    required String checkedInLabel,
+    required String todayLabel,
   }) {
     final weeks = <Widget>[];
     // firstWeekday: 1=Mon → offset 0, 7=Sun → offset 6
@@ -106,40 +110,55 @@ class CalendarGrid extends StatelessWidget {
         final isPast = currentDay < today;
         final isWeekendCol = col >= 5;
 
+        final semanticState = isChecked
+            ? ', $checkedInLabel'
+            : isToday
+            ? ', $todayLabel'
+            : '';
+
         cells.add(
           Expanded(
-            child: Container(
-              height: 40,
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isChecked
-                    ? colorScheme.primary
-                    : isWeekendCol
-                    ? colorScheme.surfaceContainerHighest.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.8 : 0.5,
-                      )
-                    : null,
-                border: isToday && !isChecked
-                    ? Border.all(color: colorScheme.primary, width: 2)
-                    : null,
-              ),
-              child: Center(
-                child: isChecked
-                    ? Icon(Icons.check, size: 16, color: colorScheme.onPrimary)
-                    : Text(
-                        '$currentDay',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isPast
-                              ? colorScheme.onSurfaceVariant.withValues(
-                                  alpha: 0.5,
-                                )
-                              : isToday
-                              ? colorScheme.primary
-                              : colorScheme.onSurfaceVariant,
-                          fontWeight: isToday ? FontWeight.bold : null,
+            child: Semantics(
+              label: '$currentDay$semanticState',
+              child: Container(
+                height: 40,
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isChecked
+                      ? colorScheme.primary
+                      : isWeekendCol
+                      ? colorScheme.surfaceContainerHighest.withValues(
+                          alpha: theme.brightness == Brightness.dark
+                              ? 0.8
+                              : 0.5,
+                        )
+                      : null,
+                  border: isToday && !isChecked
+                      ? Border.all(color: colorScheme.primary, width: 2)
+                      : null,
+                ),
+                child: Center(
+                  child: isChecked
+                      ? Icon(
+                          Icons.check,
+                          size: 16,
+                          color: colorScheme.onPrimary,
+                        )
+                      : Text(
+                          '$currentDay',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: isPast
+                                ? colorScheme.onSurfaceVariant.withValues(
+                                    alpha: 0.5,
+                                  )
+                                : isToday
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
+                            fontWeight: isToday ? FontWeight.bold : null,
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
           ),

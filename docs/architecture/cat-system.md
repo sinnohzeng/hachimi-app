@@ -479,12 +479,17 @@ The diary prompt uses ChatML format (`<|im_start|>system/assistant<|im_end|>`) a
 
 **Constants:** `lib/core/constants/ai_constants.dart` -> `class DiaryPrompt`
 
+### Provider Invalidation
+
+After successful diary generation in `FocusCompleteScreen`, `todayDiaryProvider` and `diaryEntriesProvider` are invalidated so the DiaryPreviewCard in CatDetailScreen reflects the new entry immediately without requiring a manual refresh.
+
 ### Diary Retry Queue
 
 Failed diary generations are queued for retry via SharedPreferences (JSON-serialized):
 - Maximum 3 retry attempts per entry.
 - Entries expire after 1 day (no retry after expiry).
 - Retries are attempted on next `CatDetailScreen` open or focus session completion.
+- A reentry guard (`_retryInProgress` bool) prevents duplicate retry processing within the same frame.
 
 ### Cat Detail Page Integration
 
@@ -533,6 +538,23 @@ Standard message list layout:
 - Bottom text input + send button
 - Typing indicator during generation
 - Token-by-token streaming display
+
+### Error Handling & Circuit Breaker
+
+The AI module uses a layered error handling strategy:
+
+1. **AiService** (gateway) — manages concurrency control and circuit breaker callbacks
+   - On AI call success → `onSuccess` notifies `AiAvailabilityNotifier` to reset failure count
+   - On AI call failure (excluding `busy`/`cancelled`) → `onFailure` notifies circuit breaker
+   - Concurrent call attempts throw `AiErrorType.busy` (not counted as failure)
+2. **ChatService** — returns `ChatResult` (sealed class: `ChatSuccess` / `ChatCancelled` / `ChatError`)
+   - Always saves a message to DB (either AI response or fallback)
+   - Never swallows errors — callers can distinguish success from failure
+   - On user cancel: `_streamGenerate()` catches `AiErrorType.cancelled` and returns partial content
+3. **ChatNotifier** — maps `ChatResult` to UI state
+   - `ChatSuccess` / `ChatCancelled` → `ChatStatus.idle`
+   - `ChatError` → `ChatStatus.error` with user-facing message
+4. **CatChatScreen** — renders inline error bubble with retry button when `ChatStatus.error`
 
 ### Context Window Management
 

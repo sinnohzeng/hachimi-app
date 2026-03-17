@@ -573,6 +573,9 @@ class SFr extends S {
   String get catDetailNotFound => 'Chat introuvable';
 
   @override
+  String get catDetailLoadError => 'Échec du chargement des données du chat';
+
+  @override
   String get catDetailChatTooltip => 'Chat';
 
   @override
@@ -1650,6 +1653,19 @@ class SFr extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'Échec de l\'archivage du chat';
+
+  @override
+  String get catRoomReactivateError => 'Échec de la réactivation du chat';
+
+  @override
+  String get catRoomArchiveLoadError =>
+      'Échec du chargement des chats archivés';
+
+  @override
+  String get catRoomRenameError => 'Échec du renommage du chat';
+
+  @override
   String get addHabitTitle => 'Nouvelle quête';
 
   @override
@@ -1794,6 +1810,21 @@ class SFr extends S {
 
   @override
   String get chatClearButton => 'Effacer';
+
+  @override
+  String get chatSend => 'Envoyer';
+
+  @override
+  String get chatStop => 'Arrêter';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'Une erreur est survenue. Réessayez.';
 
   @override
   String diaryTitle(String name) {
@@ -2452,4 +2483,129 @@ class SFr extends S {
   @override
   String get errorCreateHabit =>
       'Échec de la création de l\'habitude. Réessayez';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'Copier l\'ID';
+
+  @override
+  String get adoptionClearDeadline => 'Effacer la date limite';
+
+  @override
+  String get commonIdCopied => 'ID copié';
+
+  @override
+  String get pickerDurationLabel => 'Sélecteur de durée';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count minutes';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Chat $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, appuyez pour interagir';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% terminé';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count jours actifs';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Mode hors ligne';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Succès débloqué : $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'enregistré';
+
+  @override
+  String get calendarToday => 'aujourd\'hui';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Équiper à $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'Régénérer $name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Minuteur : $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Page $current sur $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Modifier le nom : $name';
+  }
+
+  @override
+  String get routeNotFound => 'Page introuvable';
+
+  @override
+  String get routeGoHome => 'Retour à l\'accueil';
+
+  @override
+  String get a11yError => 'Erreur';
+
+  @override
+  String get a11yDeadline => 'Échéance';
+
+  @override
+  String get a11yReminder => 'Rappel';
+
+  @override
+  String get a11yFocusMeditation => 'Méditation de concentration';
+
+  @override
+  String get a11yUnlocked => 'Débloqué';
+
+  @override
+  String get a11ySelected => 'Sélectionné';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Couleur dynamique du fond';
 }

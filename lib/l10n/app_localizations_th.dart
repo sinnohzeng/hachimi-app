@@ -569,6 +569,9 @@ class STh extends S {
   String get catDetailNotFound => 'ไม่พบแมว';
 
   @override
+  String get catDetailLoadError => 'โหลดข้อมูลแมวไม่สำเร็จ';
+
+  @override
   String get catDetailChatTooltip => 'แชท';
 
   @override
@@ -1630,6 +1633,18 @@ class STh extends S {
   }
 
   @override
+  String get catRoomArchiveError => 'เก็บถาวรแมวไม่สำเร็จ';
+
+  @override
+  String get catRoomReactivateError => 'เปิดใช้งานแมวอีกครั้งไม่สำเร็จ';
+
+  @override
+  String get catRoomArchiveLoadError => 'โหลดแมวที่เก็บถาวรไม่สำเร็จ';
+
+  @override
+  String get catRoomRenameError => 'เปลี่ยนชื่อแมวไม่สำเร็จ';
+
+  @override
   String get addHabitTitle => 'เควสต์ใหม่';
 
   @override
@@ -1771,6 +1786,21 @@ class STh extends S {
 
   @override
   String get chatClearButton => 'ล้าง';
+
+  @override
+  String get chatSend => 'ส่ง';
+
+  @override
+  String get chatStop => 'หยุด';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'เกิดข้อผิดพลาด ลองอีกครั้ง';
 
   @override
   String diaryTitle(String name) {
@@ -2419,4 +2449,129 @@ class STh extends S {
 
   @override
   String get errorCreateHabit => 'สร้างนิสัยไม่สำเร็จ ลองอีกครั้ง';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'คัดลอก ID';
+
+  @override
+  String get adoptionClearDeadline => 'ล้างกำหนดเวลา';
+
+  @override
+  String get commonIdCopied => 'คัดลอก ID แล้ว';
+
+  @override
+  String get pickerDurationLabel => 'ตัวเลือกเวลา';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count นาที';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'แมว $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name แตะเพื่อโต้ตอบ';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return 'เสร็จ $percent%';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count วันที่ใช้งาน';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'โหมดออฟไลน์';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'ปลดล็อกความสำเร็จ: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'เช็คอินแล้ว';
+
+  @override
+  String get calendarToday => 'วันนี้';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'สวมให้ $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'สร้าง $name ใหม่';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'ตั้งเวลา: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'หน้า $current จาก $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'แก้ไขชื่อ: $name';
+  }
+
+  @override
+  String get routeNotFound => 'ไม่พบหน้า';
+
+  @override
+  String get routeGoHome => 'กลับหน้าหลัก';
+
+  @override
+  String get a11yError => 'ข้อผิดพลาด';
+
+  @override
+  String get a11yDeadline => 'กำหนดเวลา';
+
+  @override
+  String get a11yReminder => 'การเตือน';
+
+  @override
+  String get a11yFocusMeditation => 'สมาธิ';
+
+  @override
+  String get a11yUnlocked => 'ปลดล็อกแล้ว';
+
+  @override
+  String get a11ySelected => 'เลือกแล้ว';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'สีวอลเปเปอร์แบบไดนามิก';
 }

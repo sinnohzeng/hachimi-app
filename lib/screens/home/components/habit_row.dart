@@ -109,7 +109,7 @@ class HabitRow extends StatelessWidget {
                     borderRadius: AppShape.borderMedium,
                   ),
                   child: Text(
-                    '${habit.totalCheckInDays}d',
+                    context.l10n.habitDetailDaysUnit(habit.totalCheckInDays),
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ),

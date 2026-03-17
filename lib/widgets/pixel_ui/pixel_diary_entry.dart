@@ -44,59 +44,60 @@ class PixelDiaryEntry extends StatelessWidget {
     final pixel = context.pixel;
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: PixelBorder(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 顶行：日期 + 心情徽章
-            Row(
-              children: [
-                Text(date, style: pixel.pixelHeading),
-                const Spacer(),
-                if (moodEmoji != null && moodName != null)
-                  PixelBadge(
-                    text: moodName!,
-                    icon: Text(
-                      moodEmoji!,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-              ],
-            ),
-
-            // 性格 + 阶段行
-            if (personality != null || stage != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                [personality, stage].whereType<String>().join(' · '),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+    final entry = PixelBorder(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 顶行：日期 + 心情徽章
+          Row(
+            children: [
+              Text(date, style: pixel.pixelHeading),
+              const Spacer(),
+              if (moodEmoji != null && moodName != null)
+                PixelBadge(
+                  text: moodName!,
+                  icon: Text(moodEmoji!, style: const TextStyle(fontSize: 12)),
                 ),
-              ),
             ],
+          ),
 
-            // 像素分隔线
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: CustomPaint(
-                size: const Size(double.infinity, 1),
-                painter: _PixelDividerPainter(
-                  color: pixel.pixelBorder.withValues(alpha: 0.2),
-                ),
-              ),
-            ),
-
-            // 正文
+          // 性格 + 阶段行
+          if (personality != null || stage != null) ...[
+            const SizedBox(height: 6),
             Text(
-              content,
-              style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+              [personality, stage].whereType<String>().join(' · '),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
-        ),
+
+          // 像素分隔线
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: CustomPaint(
+              size: const Size(double.infinity, 1),
+              painter: _PixelDividerPainter(
+                color: pixel.pixelBorder.withValues(alpha: 0.2),
+              ),
+            ),
+          ),
+
+          // 正文
+          Text(
+            content,
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+          ),
+        ],
       ),
+    );
+
+    if (onTap == null) return entry;
+
+    return Semantics(
+      button: true,
+      child: GestureDetector(onTap: onTap, child: entry),
     );
   }
 }

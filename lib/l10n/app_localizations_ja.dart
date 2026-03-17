@@ -565,6 +565,9 @@ class SJa extends S {
   String get catDetailNotFound => 'ネコが見つかりません';
 
   @override
+  String get catDetailLoadError => '猫データの読み込みに失敗しました';
+
+  @override
   String get catDetailChatTooltip => 'チャット';
 
   @override
@@ -1616,6 +1619,18 @@ class SJa extends S {
   }
 
   @override
+  String get catRoomArchiveError => '猫のアーカイブに失敗しました';
+
+  @override
+  String get catRoomReactivateError => '猫の復帰に失敗しました';
+
+  @override
+  String get catRoomArchiveLoadError => 'アーカイブ済みの猫の読み込みに失敗しました';
+
+  @override
+  String get catRoomRenameError => '猫の名前変更に失敗しました';
+
+  @override
   String get addHabitTitle => '新しいクエスト';
 
   @override
@@ -1757,6 +1772,21 @@ class SJa extends S {
 
   @override
   String get chatClearButton => '削除';
+
+  @override
+  String get chatSend => '送信';
+
+  @override
+  String get chatStop => '停止';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => 'エラーが発生しました。再試行してください';
 
   @override
   String diaryTitle(String name) {
@@ -2396,4 +2426,128 @@ class SJa extends S {
 
   @override
   String get errorCreateHabit => '習慣の作成に失敗しました。もう一度お試しください';
+
+  @override
+  String get loginForgotPassword => 'パスワードを忘れた場合';
+
+  @override
+  String get loginForgotPasswordTitle => 'パスワードをリセット';
+
+  @override
+  String get loginSendResetEmail => 'リセットメールを送信';
+
+  @override
+  String get loginResetEmailSent => 'パスワードリセットメールを送信しました';
+
+  @override
+  String get authErrorUserDisabled => 'このアカウントは無効化されています';
+
+  @override
+  String get authErrorInvalidEmail => '有効なメールアドレスを入力してください';
+
+  @override
+  String get authErrorRequiresRecentLogin => '続行するには再度ログインしてください';
+
+  @override
+  String get commonCopyId => 'ID をコピー';
+
+  @override
+  String get adoptionClearDeadline => '期限をクリア';
+
+  @override
+  String get commonIdCopied => 'ID をコピーしました';
+
+  @override
+  String get pickerDurationLabel => '時間選択';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count 分';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return '猫の$name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name、タップして触れ合う';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% 完了';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count 日アクティブ';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'オフラインモード';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return '実績解除：$name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'チェックイン済み';
+
+  @override
+  String get calendarToday => '今日';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '$nameに装備';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$nameを再生成';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'タイマー：$time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '$totalページ中$currentページ';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return '表示名を編集：$name';
+  }
+
+  @override
+  String get routeNotFound => 'ページが見つかりません';
+
+  @override
+  String get routeGoHome => 'ホームへ';
+
+  @override
+  String get a11yError => 'エラー';
+
+  @override
+  String get a11yDeadline => '締切';
+
+  @override
+  String get a11yReminder => 'リマインダー';
+
+  @override
+  String get a11yFocusMeditation => '集中瞑想';
+
+  @override
+  String get a11yUnlocked => 'アンロック済み';
+
+  @override
+  String get a11ySelected => '選択済み';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'ダイナミック壁紙カラー';
 }

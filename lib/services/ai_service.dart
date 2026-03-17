@@ -10,11 +10,17 @@ import 'package:hachimi_app/core/ai/ai_provider.dart';
 ///
 /// [ChatService] 和 [DiaryService] 通过此服务调用 AI，
 /// 不直接接触具体的 Provider 实现。
+///
+/// 断路器回调在此层统一接入 — AiService 是所有 AI 调用的唯一入口，
+/// 一处接入即可保护所有消费方。
 class AiService {
   final AiProvider _provider;
+  final void Function()? onSuccess;
+  final void Function()? onFailure;
   Completer<void>? _inflight;
 
-  AiService({required AiProvider provider}) : _provider = provider;
+  AiService({required AiProvider provider, this.onSuccess, this.onFailure})
+    : _provider = provider;
 
   /// 当前提供商标识。
   String get providerId => _provider.id;
@@ -28,7 +34,7 @@ class AiService {
   /// 是否有请求正在执行。
   bool get isGenerating => _inflight != null;
 
-  /// 一次性生成 — 带并发控制。
+  /// 一次性生成 — 带并发控制与断路器回调。
   Future<AiResponse> generate(
     List<AiMessage> messages,
     AiRequestConfig config,
@@ -38,14 +44,21 @@ class AiService {
     try {
       final response = await _provider.generate(messages, config);
       _logUsage('generate', response.usage);
+      onSuccess?.call();
       return response;
+    } catch (e) {
+      _notifyFailureIfApplicable(e);
+      rethrow;
     } finally {
       _inflight?.complete();
       _inflight = null;
     }
   }
 
-  /// 流式生成 — 带并发控制。
+  /// 流式生成 — 带并发控制与断路器回调。
+  ///
+  /// 流正常完成时通知 [onSuccess]，
+  /// 异常（非 busy/cancelled）时通知 [onFailure]。
   Stream<String> generateStream(
     List<AiMessage> messages,
     AiRequestConfig config,
@@ -54,6 +67,10 @@ class AiService {
     _inflight = Completer<void>();
     try {
       yield* _provider.generateStream(messages, config);
+      onSuccess?.call();
+    } catch (e) {
+      _notifyFailureIfApplicable(e);
+      rethrow;
     } finally {
       _inflight?.complete();
       _inflight = null;
@@ -75,10 +92,20 @@ class AiService {
   void _guardConcurrency() {
     if (_inflight != null) {
       throw const AiException(
-        AiErrorType.serverError,
+        AiErrorType.busy,
         'A generation is already in progress',
       );
     }
+  }
+
+  /// 仅对真正的 AI 故障通知断路器，忽略本地冲突和用户取消。
+  void _notifyFailureIfApplicable(Object error) {
+    if (error is AiException &&
+        (error.type == AiErrorType.busy ||
+            error.type == AiErrorType.cancelled)) {
+      return;
+    }
+    onFailure?.call();
   }
 
   void _logUsage(String operation, AiUsage? usage) {

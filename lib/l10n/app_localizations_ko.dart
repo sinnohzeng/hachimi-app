@@ -565,6 +565,9 @@ class SKo extends S {
   String get catDetailNotFound => '고양이를 찾을 수 없어요';
 
   @override
+  String get catDetailLoadError => '고양이 데이터를 불러오지 못했어요';
+
+  @override
   String get catDetailChatTooltip => '채팅';
 
   @override
@@ -1619,6 +1622,18 @@ class SKo extends S {
   }
 
   @override
+  String get catRoomArchiveError => '고양이 보관에 실패했어요';
+
+  @override
+  String get catRoomReactivateError => '고양이 복구에 실패했어요';
+
+  @override
+  String get catRoomArchiveLoadError => '보관된 고양이를 불러오지 못했어요';
+
+  @override
+  String get catRoomRenameError => '고양이 이름 변경에 실패했어요';
+
+  @override
   String get addHabitTitle => '새 퀘스트';
 
   @override
@@ -1760,6 +1775,21 @@ class SKo extends S {
 
   @override
   String get chatClearButton => '삭제';
+
+  @override
+  String get chatSend => '보내기';
+
+  @override
+  String get chatStop => '중지';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatErrorGeneric => '문제가 발생했어요. 다시 시도해 주세요';
 
   @override
   String diaryTitle(String name) {
@@ -2400,4 +2430,128 @@ class SKo extends S {
 
   @override
   String get errorCreateHabit => '습관 만들기에 실패했어요. 다시 시도해 주세요';
+
+  @override
+  String get loginForgotPassword => '비밀번호를 잊으셨나요?';
+
+  @override
+  String get loginForgotPasswordTitle => '비밀번호 재설정';
+
+  @override
+  String get loginSendResetEmail => '재설정 이메일 보내기';
+
+  @override
+  String get loginResetEmailSent => '비밀번호 재설정 이메일이 전송되었습니다';
+
+  @override
+  String get authErrorUserDisabled => '이 계정은 비활성화되었습니다';
+
+  @override
+  String get authErrorInvalidEmail => '유효한 이메일 주소를 입력하세요';
+
+  @override
+  String get authErrorRequiresRecentLogin => '계속하려면 다시 로그인하세요';
+
+  @override
+  String get commonCopyId => 'ID 복사';
+
+  @override
+  String get adoptionClearDeadline => '기한 지우기';
+
+  @override
+  String get commonIdCopied => 'ID 복사됨';
+
+  @override
+  String get pickerDurationLabel => '시간 선택기';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count분';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return '고양이 $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, 탭하여 상호작용';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% 완료';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '활동 $count일';
+  }
+
+  @override
+  String get a11yOfflineStatus => '오프라인 모드';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return '업적 달성: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => '체크인 완료';
+
+  @override
+  String get calendarToday => '오늘';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '$name에게 장착';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$name 재생성';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return '타이머: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '$total페이지 중 $current페이지';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return '표시 이름 편집: $name';
+  }
+
+  @override
+  String get routeNotFound => '페이지를 찾을 수 없습니다';
+
+  @override
+  String get routeGoHome => '홈으로';
+
+  @override
+  String get a11yError => '오류';
+
+  @override
+  String get a11yDeadline => '마감일';
+
+  @override
+  String get a11yReminder => '알림';
+
+  @override
+  String get a11yFocusMeditation => '집중 명상';
+
+  @override
+  String get a11yUnlocked => '잠금 해제됨';
+
+  @override
+  String get a11ySelected => '선택됨';
+
+  @override
+  String get a11yDynamicWallpaperColor => '동적 배경화면 색상';
 }

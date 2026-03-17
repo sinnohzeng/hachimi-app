@@ -44,7 +44,9 @@ class PixelCatRenderer {
 
   // ─── Config 加载 ───
 
-  /// 加载 config JSON（懒加载，只执行一次）
+  /// 加载 config JSON（懒加载）。
+  /// 成功后 _spritesIndex != null，不再重试。
+  /// 失败时保持 null，下次调用自动重试；_drawSprite 等方法有 null guard 安全降级。
   Future<void> _ensureConfigLoaded() async {
     if (_spritesIndex != null) return;
 
@@ -61,7 +63,7 @@ class PixelCatRenderer {
         feature: 'PixelCatRenderer',
         operation: '_ensureConfigLoaded',
       );
-      _initEmptyDefaults();
+      // 不设置默认值 → 下次调用会重试
     }
   }
 
@@ -119,16 +121,6 @@ class PixelCatRenderer {
     };
   }
 
-  /// 初始化空默认值防止重复尝试
-  void _initEmptyDefaults() {
-    _spritesIndex ??= {};
-    _offsetMap ??= [];
-    _tintColors ??= {};
-    _diluteTintColors ??= {};
-    _whitePatchesTintColors ??= {};
-    _peltInfo ??= {};
-  }
-
   Map<String, List<int>?> _parseTintMap(Map<String, dynamic>? map) {
     if (map == null) return {};
     return {
@@ -174,10 +166,15 @@ class PixelCatRenderer {
     int spriteNumber,
     ui.Canvas canvas,
   ) async {
-    final info = _spritesIndex![spriteName];
-    if (info == null) return;
+    final index = _spritesIndex;
+    final offsets = _offsetMap;
+    if (index == null || offsets == null) return;
 
-    final grid = _offsetMap![spriteNumber];
+    final info = index[spriteName];
+    if (info == null) return;
+    if (spriteNumber < 0 || spriteNumber >= offsets.length) return;
+
+    final grid = offsets[spriteNumber];
     final sheet = await _loadSpritesheet(info.spritesheet);
     final size = spriteSize.toDouble();
 
@@ -288,7 +285,8 @@ class PixelCatRenderer {
 
   // ─── 渲染管线 ───
 
-  /// 渲染完整的猫猫图像
+  /// 渲染完整的猫猫图像。
+  /// 每步完成后 dispose 前一步的中间 Image，释放 native 纹理内存。
   Future<ui.Image> renderCat(
     CatAppearance appearance,
     int spriteIndex, {
@@ -305,24 +303,34 @@ class PixelCatRenderer {
     var image = await _renderBasePelt(appearance, spriteIndex);
 
     // Layer 3：色调叠加
-    image = await _applyPeltTint(image, appearance);
+    var next = await _applyPeltTint(image, appearance);
+    if (!identical(next, image)) image.dispose();
+    image = next;
 
     // Layer 4-7：白色斑块 + 重点色 + 白斑病
-    image = await _renderOverlays(image, appearance, spriteIndex);
+    next = await _renderOverlays(image, appearance, spriteIndex);
+    image.dispose();
+    image = next;
 
     // Layer 8-12：眼睛 + 线稿 + 皮肤
-    image = await _renderFaceAndSkin(image, appearance, spriteIndex);
+    next = await _renderFaceAndSkin(image, appearance, spriteIndex);
+    image.dispose();
+    image = next;
 
     // Layer 13：饰品
-    image = await _renderAccessories(
+    next = await _renderAccessories(
       image,
       appearance,
       spriteIndex,
       accessoryId,
     );
+    if (!identical(next, image)) image.dispose();
+    image = next;
 
-    // 翻转 + 缓存
-    return _finalizeImage(image, appearance, cacheKey);
+    // 翻转 + 缓存（_finalizeImage 创建新 image，原 image 可 dispose）
+    final result = await _finalizeImage(image, appearance, cacheKey);
+    image.dispose();
+    return result;
   }
 
   /// Layer 1-2：底层皮毛 + 玳瑁叠加
@@ -350,6 +358,9 @@ class PixelCatRenderer {
     CatAppearance appearance,
     int spriteIndex,
   ) async {
+    final index = _spritesIndex;
+    if (index == null) return;
+
     final patternSprite =
         peltTypeToSpriteName[appearance.tortiePattern!] ??
         appearance.tortiePattern!.toLowerCase();
@@ -358,8 +369,7 @@ class PixelCatRenderer {
         : '$patternSprite${appearance.tortieColor}';
     final maskName = 'tortiemask${appearance.tortiePattern}';
 
-    if (!_spritesIndex!.containsKey(tortieSprite) ||
-        !_spritesIndex!.containsKey(maskName)) {
+    if (!index.containsKey(tortieSprite) || !index.containsKey(maskName)) {
       return;
     }
 
@@ -485,13 +495,16 @@ class PixelCatRenderer {
   }
 
   String? _resolveAccessoryPrefix(String accessoryId) {
-    if (_peltInfo!['plant_accessories']?.contains(accessoryId) == true) {
+    final info = _peltInfo;
+    if (info == null) return null;
+
+    if (info['plant_accessories']?.contains(accessoryId) == true) {
       return 'acc_herbs';
     }
-    if (_peltInfo!['wild_accessories']?.contains(accessoryId) == true) {
+    if (info['wild_accessories']?.contains(accessoryId) == true) {
       return 'acc_wild';
     }
-    if (_peltInfo!['collars']?.contains(accessoryId) == true) return 'collars';
+    if (info['collars']?.contains(accessoryId) == true) return 'collars';
     return null;
   }
 

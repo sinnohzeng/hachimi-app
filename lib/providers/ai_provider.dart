@@ -16,12 +16,18 @@ final localDatabaseProvider = Provider<LocalDatabaseService>(
 );
 
 /// AI 门面服务 — 根据用户选择的提供商动态实例化。
+/// 断路器回调在此处注入，AiService 统一管理成功/失败通知。
 final aiServiceProvider = Provider<AiService>((ref) {
   final selected = ref.watch(aiProviderSelectionProvider);
   final provider = switch (selected) {
     AiProviderId.firebaseGemini => FirebaseAiProvider(),
   };
-  return AiService(provider: provider);
+  final availability = ref.read(aiAvailabilityProvider.notifier);
+  return AiService(
+    provider: provider,
+    onSuccess: availability.recordSuccess,
+    onFailure: availability.recordFailure,
+  );
 });
 
 final diaryServiceProvider = Provider<DiaryService>((ref) {
@@ -103,7 +109,6 @@ enum AiAvailability {
 /// - 断路器：连续 3 次失败 → 5 分钟回退期，不再重试。
 /// - 回退到期后自动进入 half-open 状态（下次请求探测）。
 class AiAvailabilityNotifier extends Notifier<AiAvailability> {
-  bool _validated = false;
   int _consecutiveFailures = 0;
   DateTime? _backoffUntil;
 
@@ -112,9 +117,13 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
 
   @override
   AiAvailability build() {
+    // 重置实例状态 — Riverpod rebuild 不会重新创建 Notifier 实例
+    _consecutiveFailures = 0;
+    _backoffUntil = null;
+
     final aiService = ref.read(aiServiceProvider);
     if (!aiService.isConfigured) return AiAvailability.error;
-    if (!_validated) _lazyValidate();
+    _lazyValidate();
     return AiAvailability.ready; // 乐观返回
   }
 
@@ -123,7 +132,7 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
     if (_isInBackoff) return;
     try {
       final ok = await ref.read(aiServiceProvider).validateConnection();
-      _validated = true;
+
       if (ok) {
         _consecutiveFailures = 0;
         state = AiAvailability.ready;
@@ -133,7 +142,6 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
         _applyBackoff();
       }
     } catch (e, stack) {
-      _validated = true;
       _consecutiveFailures++;
       state = AiAvailability.error;
       _applyBackoff();
@@ -148,7 +156,6 @@ class AiAvailabilityNotifier extends Notifier<AiAvailability> {
 
   /// 重新检查可用性（重置断路器）。
   void refresh() {
-    _validated = false;
     _consecutiveFailures = 0;
     _backoffUntil = null;
     final aiService = ref.read(aiServiceProvider);

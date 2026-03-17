@@ -27,7 +27,7 @@ void main() {
 
   group('AiErrorType — enum', () {
     test('has all expected values', () {
-      expect(AiErrorType.values.length, equals(7));
+      expect(AiErrorType.values.length, equals(8));
       expect(AiErrorType.values, contains(AiErrorType.networkError));
       expect(AiErrorType.values, contains(AiErrorType.authFailure));
       expect(AiErrorType.values, contains(AiErrorType.rateLimited));
@@ -35,6 +35,7 @@ void main() {
       expect(AiErrorType.values, contains(AiErrorType.serverError));
       expect(AiErrorType.values, contains(AiErrorType.cancelled));
       expect(AiErrorType.values, contains(AiErrorType.unconfigured));
+      expect(AiErrorType.values, contains(AiErrorType.busy));
     });
   });
 
