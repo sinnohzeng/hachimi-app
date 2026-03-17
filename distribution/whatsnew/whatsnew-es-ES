@@ -1,9 +1,9 @@
 v2.33.4
 
-- Nuevo: Restablecimiento de contraseña por correo en la pantalla de inicio de sesión
-- Nuevo: Manejo de errores de chat con burbuja de reintento en línea
-- Nuevo: Protección de disyuntor de IA (recuperación automática tras fallos)
-- Nuevo: Textos de logros para japonés, coreano y chino tradicional
-- Mejorado: Accesibilidad — 20+ componentes con soporte para lector de pantalla
-- Mejorado: Pantallas de gatos con estados de carga/error adecuados
-- Mejorado: UX de eliminación de cuenta con resumen de datos asíncrono
+- Nuevo: Restablecer contraseña por correo en inicio de sesión
+- Nuevo: Errores de chat con burbuja de reintento
+- Nuevo: Protección de IA con recuperación automática
+- Nuevo: Logros en japonés, coreano y chino tradicional
+- Mejorado: Accesibilidad en 20+ componentes
+- Mejorado: Pantallas de gatos con estados de carga/error
+- Mejorado: Eliminación de cuenta con resumen de datos

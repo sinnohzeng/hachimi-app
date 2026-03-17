@@ -1,9 +1,9 @@
 v2.33.4
 
 - Eklendi: Giriş ekranında e-posta ile şifre sıfırlama
-- Eklendi: Satır içi yeniden deneme balonu ile sohbet hata yönetimi
-- Eklendi: Yapay zeka devre kesici koruması (hatalardan sonra otomatik kurtarma)
-- Eklendi: Japonca, Korece, Geleneksel Çince için başarı metinleri
+- Eklendi: Yeniden deneme balonu ile sohbet hata yönetimi
+- Eklendi: AI devre kesici koruması (otomatik kurtarma)
+- Eklendi: Japonca, Korece, Geleneksel Çince başarı metinleri
 - İyileştirildi: Erişilebilirlik — 20+ bileşende ekran okuyucu desteği
 - İyileştirildi: Kedi ekranları uygun yükleme/hata durumlarıyla
-- İyileştirildi: Eşzamansız veri özeti ile hesap silme UX'i
+- İyileştirildi: Veri özeti ile hesap silme UX'i

@@ -1,9 +1,9 @@
 v2.33.4
 
-- Ajouté : Réinitialisation du mot de passe par e-mail sur l'écran de connexion
-- Ajouté : Gestion des erreurs de chat avec bulle de réessai en ligne
-- Ajouté : Protection par disjoncteur IA (récupération automatique après erreurs)
-- Ajouté : Textes de succès pour le japonais, le coréen et le chinois traditionnel
-- Amélioré : Accessibilité — 20+ composants avec support lecteur d'écran
-- Amélioré : Écrans de chats avec états de chargement/erreur appropriés
-- Amélioré : UX de suppression de compte avec résumé de données asynchrone
+- Ajout : Réinitialisation du mot de passe par e-mail
+- Ajout : Gestion des erreurs de chat avec bulle de réessai
+- Ajout : Protection disjoncteur IA (récupération auto après erreurs)
+- Ajout : Textes de succès pour japonais, coréen, chinois traditionnel
+- Amélioré : Accessibilité — 20+ composants avec lecteur d'écran
+- Amélioré : Écrans de chats avec états chargement/erreur
+- Amélioré : Suppression de compte avec résumé de données async

@@ -1,9 +1,9 @@
 v2.33.4
 
-- Thêm: Đặt lại mật khẩu qua email trên màn hình đăng nhập
-- Thêm: Xử lý lỗi chat với bong bóng thử lại nội tuyến
-- Thêm: Bảo vệ circuit breaker AI (tự động phục hồi sau lỗi)
+- Thêm: Đặt lại mật khẩu qua email
+- Thêm: Xử lý lỗi chat với bong bóng thử lại
+- Thêm: Bảo vệ circuit breaker AI (tự phục hồi sau lỗi)
 - Thêm: Chuỗi thành tựu cho tiếng Nhật, Hàn, Trung phồn thể
-- Cải thiện: Khả năng truy cập — 20+ thành phần hỗ trợ trình đọc màn hình
+- Cải thiện: 20+ thành phần hỗ trợ trình đọc màn hình
 - Cải thiện: Màn hình mèo với trạng thái tải/lỗi phù hợp
-- Cải thiện: UX xóa tài khoản với tóm tắt dữ liệu bất đồng bộ
+- Cải thiện: UX xóa tài khoản với tóm tắt dữ liệu

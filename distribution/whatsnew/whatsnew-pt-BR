@@ -1,9 +1,9 @@
 v2.33.4
 
 - Novo: Redefinição de senha por e-mail na tela de login
-- Novo: Tratamento de erros de chat com bolha de nova tentativa inline
-- Novo: Proteção de circuit breaker de IA (recuperação automática após falhas)
-- Novo: Textos de conquistas para japonês, coreano e chinês tradicional
-- Melhorado: Acessibilidade — 20+ componentes com suporte a leitor de tela
-- Melhorado: Telas de gatos com estados de carregamento/erro adequados
-- Melhorado: UX de exclusão de conta com resumo de dados assíncrono
+- Novo: Tratamento de erros de chat com bolha de nova tentativa
+- Novo: Proteção circuit breaker de IA (recuperação auto após falhas)
+- Novo: Textos de conquistas para japonês, coreano, chinês tradicional
+- Melhorado: Acessibilidade — 20+ componentes com leitor de tela
+- Melhorado: Telas de gatos com estados de carregamento/erro
+- Melhorado: UX de exclusão de conta com resumo de dados async

@@ -2,8 +2,8 @@ v2.33.4
 
 - Aggiunto: Reimpostazione password via email nella schermata di accesso
 - Aggiunto: Gestione errori chat con bolla di ripetizione inline
-- Aggiunto: Protezione circuit breaker IA (recupero automatico dopo errori)
-- Aggiunto: Stringhe di achievement per giapponese, coreano e cinese tradizionale
-- Migliorato: Accessibilità — 20+ componenti con supporto screen reader
-- Migliorato: Schermate dei gatti con stati di caricamento/errore appropriati
-- Migliorato: UX eliminazione account con riepilogo dati asincrono
+- Aggiunto: Protezione circuit breaker IA (recupero auto dopo errori)
+- Aggiunto: Testi achievement per giapponese, coreano, cinese tradizionale
+- Migliorato: Accessibilità — 20+ componenti con screen reader
+- Migliorato: Schermate gatti con stati caricamento/errore
+- Migliorato: UX eliminazione account con riepilogo dati async
