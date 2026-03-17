@@ -32,6 +32,12 @@ When dynamic color is active, the seed color setting is ignored and the system-p
 
 **Settings entry point (v2.8.2+):** Dynamic color and preset colors are unified into a single **Settings > Theme Color** dialog (`ThemeColorDialog`). The dialog shows a "Dynamic" option (gradient circle with wallpaper icon) at the top, followed by the 8 preset colors. Selecting "Dynamic" calls `setDynamicColor(true)`; selecting a preset calls `setDynamicColor(false)` + `setSeedColor(color)`. The previous standalone Material You `SwitchListTile` has been removed.
 
+### Color Contrast (Accessibility)
+
+All hardcoded color pairs in the Retro Pixel theme have been audited against WCAG 2.1 AA requirements. Material 3 `ColorScheme.fromSeed()` provides automatic AA compliance for standard token pairs.
+
+See **[Color Contrast Verification](color-contrast-verification.md)** for the full matrix of audited pairs, ratios, and verification method.
+
 ### Color Tokens
 
 **Do not hardcode colors.** Always access via `Theme.of(context).colorScheme`:
