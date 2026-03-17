@@ -1528,34 +1528,34 @@ class SEn extends S {
   }
 
   @override
-  String get onboardTitle1 => 'Meet Your Companion';
+  String get onboardTitle1 => 'Meet Hachimi';
 
   @override
-  String get onboardSubtitle1 => 'Every quest begins with a kitten';
+  String get onboardSubtitle1 => 'Your awareness companion';
 
   @override
   String get onboardBody1 =>
-      'Set a goal and adopt a kitten.\nFocus on it, and watch your cat grow!';
+      'Hachimi is a cat who senses your mood, keeping you company as you notice the little things each day.';
 
   @override
-  String get onboardTitle2 => 'Focus, Grow, Evolve';
+  String get onboardTitle2 => '5 Minutes a Day';
 
   @override
-  String get onboardSubtitle2 => '4 stages of growth';
+  String get onboardSubtitle2 => 'Record your daily light';
 
   @override
   String get onboardBody2 =>
-      'Every minute of focus helps your cat evolve\nfrom a tiny kitten to a magnificent senior!';
+      'Before bed, capture a moment that made you smile. Pick a mood, write one line — that\'s enough.';
 
   @override
-  String get onboardTitle3 => 'Build Your Cat Room';
+  String get onboardTitle3 => 'A Cat That Grows With You';
 
   @override
-  String get onboardSubtitle3 => 'Collect unique cats';
+  String get onboardSubtitle3 => 'Getting better, slowly';
 
   @override
   String get onboardBody3 =>
-      'Each quest brings a new cat with unique looks.\nDiscover them all and build your dream collection!';
+      'Focus on habits, record your mood, notice your worries. It\'s okay to be imperfect — your cat is always here.';
 
   @override
   String get onboardSkip => 'Skip';
@@ -2588,4 +2588,300 @@ class SEn extends S {
 
   @override
   String get a11yDynamicWallpaperColor => 'Dynamic wallpaper color';
+
+  @override
+  String get awarenessTitle => 'Awareness';
+
+  @override
+  String get awarenessTabToday => 'Today';
+
+  @override
+  String get awarenessTabThisWeek => 'This Week';
+
+  @override
+  String get awarenessTabReview => 'Review';
+
+  @override
+  String get moodVeryHappy => 'Very Happy';
+
+  @override
+  String get moodCalm => 'Calm';
+
+  @override
+  String get moodDown => 'Down';
+
+  @override
+  String get moodVeryDown => 'Very Down';
+
+  @override
+  String get awarenessLightPlaceholder => 'What made you smile today?';
+
+  @override
+  String get awarenessLightSaved => 'Light recorded ✨';
+
+  @override
+  String get awarenessLightEdit => 'Edit';
+
+  @override
+  String get weeklyReviewTitle => 'Weekly Review';
+
+  @override
+  String weeklyReviewHappyMoment(int number) {
+    return 'Happy Moment #$number';
+  }
+
+  @override
+  String get weeklyReviewHappyMomentHint => 'What made you happy this week?';
+
+  @override
+  String get weeklyReviewGratitude => 'Gratitude';
+
+  @override
+  String get weeklyReviewGratitudeHint => 'Who or what are you grateful for?';
+
+  @override
+  String get weeklyReviewLearning => 'Learning';
+
+  @override
+  String get weeklyReviewLearningHint => 'What did you learn this week?';
+
+  @override
+  String get weeklyReviewSave => 'Save Review';
+
+  @override
+  String get weeklyReviewSaved => 'Review saved ✨';
+
+  @override
+  String get worryProcessorTitle => 'Worry Processor';
+
+  @override
+  String get worryDescriptionHint => 'What\'s bothering you?';
+
+  @override
+  String get worrySolutionHint => 'What could you do about it?';
+
+  @override
+  String get worryStatusOngoing => 'Ongoing';
+
+  @override
+  String get worryStatusResolved => 'Resolved';
+
+  @override
+  String get worryStatusDisappeared => 'Gone';
+
+  @override
+  String get worryAdd => 'Add Worry';
+
+  @override
+  String get worrySave => 'Save';
+
+  @override
+  String get worryResolvedSection => 'Resolved & Gone';
+
+  @override
+  String get worryManageAll => 'Manage all worries';
+
+  @override
+  String get awarenessEmptyLightTitle => 'No light recorded yet';
+
+  @override
+  String get awarenessEmptyLightSubtitle => 'Whenever you\'re ready ✨';
+
+  @override
+  String get awarenessEmptyLightAction => 'Record';
+
+  @override
+  String get awarenessEmptyReviewTitle => 'Take your time';
+
+  @override
+  String get awarenessEmptyReviewSubtitle => 'Review when you feel like it 🐱';
+
+  @override
+  String get awarenessEmptyReviewAction => 'Start Review';
+
+  @override
+  String get awarenessEmptyHistoryTitle => 'Every light matters';
+
+  @override
+  String get awarenessEmptyHistorySubtitle => 'Your history will appear here';
+
+  @override
+  String get awarenessEmptyWorriesTitle => 'No worries? Great! 🎉';
+
+  @override
+  String get awarenessEmptyWorriesSubtitle => 'That\'s wonderful';
+
+  @override
+  String get catReactVeryHappy => 'So happy today! Meow~ 🎉';
+
+  @override
+  String get catReactHappy => 'Another light recorded ✨';
+
+  @override
+  String get catReactCalm => 'A calm day is a good day 🍃';
+
+  @override
+  String get catReactDown => 'I\'m here with you 💛';
+
+  @override
+  String get catReactVeryDown => 'Not going anywhere 🫂';
+
+  @override
+  String get awarenessBridgePrompt => 'What made you smile today? ✨';
+
+  @override
+  String get awarenessBridgeRecord => 'Record';
+
+  @override
+  String get awarenessBridgeSkip => 'Skip';
+
+  @override
+  String get awarenessHabitsSection => 'Today\'s Habits';
+
+  @override
+  String get awarenessHabitsEmpty => 'No habits yet. Adopt a cat to start!';
+
+  @override
+  String get awarenessReviewComingSoon => 'Coming soon';
+
+  @override
+  String get awarenessMoodRequired => 'Please select today\'s mood';
+
+  @override
+  String get awarenessSaveFailed => 'Save failed, please try again';
+
+  @override
+  String get awarenessLoadFailed => 'Failed to load, please go back and retry';
+
+  @override
+  String get awarenessSaved => 'Saved';
+
+  @override
+  String get worryDescriptionRequired => 'Please describe your worry';
+
+  @override
+  String get worryLoadFailed => 'Failed to load worry';
+
+  @override
+  String get awarenessLoginRequired => 'Please log in first';
+
+  @override
+  String get tagCustom => '+Custom';
+
+  @override
+  String get homeTabAwareness => 'Awareness';
+
+  @override
+  String get homeTabHabits => 'Habits';
+
+  @override
+  String get monthlyRitualSetupTitle =>
+      'A new month — pick a habit to focus on';
+
+  @override
+  String get monthlyRitualSetupDesc =>
+      'Choose your focus habit, set a flexible goal, and promise yourself a reward.';
+
+  @override
+  String get monthlyRitualSetupButton => 'Set up';
+
+  @override
+  String get monthlyRitualDialogTitle => 'Monthly ritual';
+
+  @override
+  String get monthlyRitualHabitLabel => 'Focus habit';
+
+  @override
+  String get monthlyRitualTargetLabel => 'Target days';
+
+  @override
+  String monthlyRitualTargetValue(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get monthlyRitualRewardHint => 'Reward myself with...';
+
+  @override
+  String get monthlyRitualRewardLabel => 'Reward';
+
+  @override
+  String monthlyRitualProgress(int completed, int target) {
+    return '$completed/$target days done ✨';
+  }
+
+  @override
+  String get monthlyRitualAchieved => 'Goal achieved! 🎉';
+
+  @override
+  String get monthlyRitualEncouragement => 'Every day counts';
+
+  @override
+  String get achievementLightFirstName => 'First Light';
+
+  @override
+  String get achievementLightFirstDesc => 'Record your first daily light';
+
+  @override
+  String get achievementLight7Name => 'Week of Light';
+
+  @override
+  String get achievementLight7Desc =>
+      'Record daily light for 7 days (cumulative)';
+
+  @override
+  String get achievementLight30Name => 'Month of Light';
+
+  @override
+  String get achievementLight30Desc =>
+      'Record daily light for 30 days (cumulative)';
+
+  @override
+  String get achievementLight100Name => 'Century of Light';
+
+  @override
+  String get achievementLight100Desc =>
+      'Record daily light for 100 days (cumulative)';
+
+  @override
+  String get achievementReviewFirstName => 'First Review';
+
+  @override
+  String get achievementReviewFirstDesc => 'Complete your first weekly review';
+
+  @override
+  String get achievementReview4Name => 'Monthly Reviewer';
+
+  @override
+  String get achievementReview4Desc => 'Complete 4 weekly reviews (cumulative)';
+
+  @override
+  String get achievementWorryResolved1Name => 'First Release';
+
+  @override
+  String get achievementWorryResolved1Desc =>
+      'Resolve or release your first worry';
+
+  @override
+  String get achievementWorryResolved10Name => 'Worry Whisperer';
+
+  @override
+  String get achievementWorryResolved10Desc =>
+      'Resolve or release 10 worries (cumulative)';
+
+  @override
+  String get notifBedtimeLight =>
+      'How was your day? Take a moment to notice something good ✨';
+
+  @override
+  String get notifWeeklyReview =>
+      'Sunday evening — a good time to look back at your week 📖';
+
+  @override
+  String get notifMonthlyRitual =>
+      'A new month begins! Pick a habit to focus on this month 🌙';
+
+  @override
+  String get notifGentleReengagement =>
+      'No pressure — come back whenever you\'re ready 🌿';
 }

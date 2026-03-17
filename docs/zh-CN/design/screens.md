@@ -18,6 +18,9 @@ HomeScreen ─ 4 标签 NavigationBar 外壳 ─┬─ 今日标签
 
 HomeScreen → FocusSetupScreen → TimerScreen → FocusCompleteScreen
 HomeScreen → AdoptionFlowScreen（FAB 或首个习惯）
+HomeScreen → AwarenessScreen → DailyLightScreen
+                             → WeeklyReviewScreen
+                             → WorryProcessorScreen → WorryEditScreen
 CatRoomScreen → CatDetailScreen（通过底部弹窗）
 ProfileScreen → CatDetailScreen（通过猫咪相册）
 ```
@@ -298,6 +301,118 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 
 ---
 
+## S12：觉知界面（3 标签枢纽）
+**文件：** `lib/screens/awareness/awareness_screen.dart`
+
+### 布局
+- AppBar 标题「觉知」
+- 3 个子标签通过 `TabBar` 切换：**今天** / **本周** / **回顾**
+
+### 今天标签
+- **每日一光状态卡片**：已记录时显示今日心情 + 一点光文字，否则显示录入 CTA
+- **月度挑战占位**：预留给未来月度仪式功能
+- **习惯快速勾选**：快速切换今日习惯完成状态
+
+### 本周标签
+- 周回顾卡片：已完成则展示本周回顾，否则显示创建 CTA
+- 周日期范围显示（`weekStartDate` – `weekEndDate`）
+
+### 回顾标签
+- 历史一点光列表（可滚动，逆序排列）
+- 月度日历热力图占位
+
+### 导航
+- 「记录今日之光」→ DailyLightScreen
+- 「填写周回顾」→ WeeklyReviewScreen
+- 「管理烦恼」→ WorryProcessorScreen
+
+### 路由
+- `/awareness`
+
+---
+
+## S13：一点光界面
+**文件：** `lib/screens/awareness/daily_light_screen.dart`
+
+### 布局
+- `MoodSelector` 组件 — 5 级心情选择器（mood 枚举：1-5）
+- 一点光 `TextField` — 自由反思文字输入
+- `TagSelector` 组件 — 来自 `awareness_constants.dart` 的预设标签片段
+- `CatBedtimeAnimation` — 猫咪根据选中心情做出反应
+- 「保存」`FilledButton`
+
+### 快速模式
+- 以底部弹窗形式打开时（`quickMode: true`），显示精简版，不含猫咪动画
+- 用于从 AwarenessScreen CTA 快速每日记录
+
+### 行为
+- Upsert 语义：若今日一点光已存在则预填充并更新，否则创建
+- 保存 → 写入 `AwarenessRepository` → 台账操作 `lightRecorded`
+
+### 路由
+- `/daily-light`
+
+---
+
+## S14：周回顾界面
+**文件：** `lib/screens/awareness/weekly_review_screen.dart`
+
+### 布局
+- 周标题显示日期范围
+- 3 张 `HappyMomentCard` — 各含文字输入 + 标签选择器
+- 感恩 `TextField` — 「这周你感恩什么？」
+- 学习 `TextField` — 「这周你学到了什么？」
+- 进行中烦恼状态更新区 — 展示进行中烦恼并提供终结/保留切换
+- 「保存」`FilledButton`
+
+### 行为
+- 与 DailyLight 相同的 upsert 语义
+- 保存 → `AwarenessRepository` → 台账操作 `weeklyReviewCompleted`
+- 周回顾中的烦恼状态变更批量通过 `WorryRepository` 写入
+
+### 路由
+- `/weekly-review`
+
+---
+
+## S15：烦恼处理器界面
+**文件：** `lib/screens/awareness/worry_processor_screen.dart`
+
+### 布局
+- **进行中烦恼区**：`WorryItemCard` 组件列表（按 `createdAt` 降序排列）
+- **已终结烦恼区**：可折叠，显示已解决/已放下的烦恼
+- FAB → WorryEditScreen（创建模式）
+- 每张 `WorryItemCard`：描述预览 + 状态片段 + 点击 → WorryEditScreen（编辑模式）
+
+### 行为
+- 活跃烦恼卡片支持滑动终结手势
+- 下拉刷新触发 `WorryRepository` 重新读取
+
+### 路由
+- `/worry-processor`
+
+---
+
+## S16：烦恼编辑界面
+**文件：** `lib/screens/awareness/worry_edit_screen.dart`
+
+### 布局
+- AppBar 标题「新建烦恼」/「编辑烦恼」
+- 描述 `TextField` — 多行烦恼描述（必填）
+- 解法 `TextField` — 可选的行动方案 / 应对策略
+- 状态选择器（创建模式：隐藏，默认 `ongoing`；编辑模式：`ongoing` / `resolved` / `dismissed`）
+- 「保存」`FilledButton`
+
+### 行为
+- 创建模式：`WorryRepository.createWorry()` → 台账操作 `worryCreated`
+- 编辑模式：`WorryRepository.updateWorry()` → 台账操作 `worryUpdated`
+- 状态变更为 resolved/dismissed → 台账操作 `worryResolved`
+
+### 路由
+- `/worry-edit`
+
+---
+
 ## 空状态
 
 | 界面 | 触发条件 | 提示文案 |
@@ -306,3 +421,6 @@ ProfileScreen → CatDetailScreen（通过猫咪相册）
 | 猫咪房间 | 无活跃猫咪 | 「你还没有猫咪，创建一个习惯来领养吧。」 |
 | 统计界面 | 无习惯 | 「完成第一次专注会话后即可查看统计数据。」 |
 | 猫咪相册 | 无猫咪 | 「相册空空如也——开始领养吧！」 |
+| 觉知今天 | 未记录一点光 | 「记录今天第一束光吧！」+ CTA 按钮 |
+| 烦恼处理器 | 无烦恼 | 「现在没有烦恼——真棒！」 |
+| 周回顾 | 未填写 | 「花点时间回顾这一周吧。」+ CTA 按钮 |

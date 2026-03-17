@@ -15,7 +15,9 @@ class LocalDatabaseService {
   /// - v2: action_ledger, local_habits, local_cats, local_sessions,
   ///        local_monthly_checkins, materialized_state, local_achievements
   /// - v3: local_cats.display_pose 列（纯本地，不同步）
-  static const _dbVersion = 3;
+  /// - v4: V3 觉知模块 — local_daily_lights, local_weekly_reviews,
+  ///        local_worries, local_awareness_stats
+  static const _dbVersion = 4;
 
   Database? _db;
 
@@ -84,6 +86,9 @@ class LocalDatabaseService {
     if (version >= 3) {
       await _createV3Columns(db);
     }
+    if (version >= 4) {
+      await _createV4Tables(db);
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldV, int newV) async {
@@ -92,6 +97,9 @@ class LocalDatabaseService {
     }
     if (oldV < 3) {
       await _createV3Columns(db);
+    }
+    if (oldV < 4) {
+      await _createV4Tables(db);
     }
   }
 
@@ -293,6 +301,96 @@ class LocalDatabaseService {
   /// v3: 猫姿势偏好列（纯本地，不同步到 Firestore）。
   Future<void> _createV3Columns(Database db) async {
     await db.execute('ALTER TABLE local_cats ADD COLUMN display_pose INTEGER');
+  }
+
+  /// v4: V3 觉知模块 — 每日一光、周回顾、烦恼、觉知统计。
+  Future<void> _createV4Tables(Database db) async {
+    await _createDailyLightsTable(db);
+    await _createWeeklyReviewsTable(db);
+    await _createWorriesTable(db);
+    await _createAwarenessStatsTable(db);
+  }
+
+  Future<void> _createDailyLightsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_daily_lights (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        date TEXT NOT NULL,
+        mood INTEGER NOT NULL DEFAULT 2,
+        light_text TEXT,
+        tags TEXT NOT NULL DEFAULT '[]',
+        timeline_events TEXT,
+        habit_completions TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(uid, date)
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_daily_lights_uid_date '
+      'ON local_daily_lights(uid, date)',
+    );
+  }
+
+  Future<void> _createWeeklyReviewsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_weekly_reviews (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        week_id TEXT NOT NULL,
+        week_start_date TEXT NOT NULL,
+        week_end_date TEXT NOT NULL,
+        happy_moment_1 TEXT,
+        happy_moment_1_tags TEXT NOT NULL DEFAULT '[]',
+        happy_moment_2 TEXT,
+        happy_moment_2_tags TEXT NOT NULL DEFAULT '[]',
+        happy_moment_3 TEXT,
+        happy_moment_3_tags TEXT NOT NULL DEFAULT '[]',
+        gratitude TEXT,
+        learning TEXT,
+        cat_weekly_summary TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(uid, week_id)
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_weekly_reviews_uid '
+      'ON local_weekly_reviews(uid, week_start_date)',
+    );
+  }
+
+  Future<void> _createWorriesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_worries (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        description TEXT NOT NULL,
+        solution TEXT,
+        status TEXT NOT NULL DEFAULT 'ongoing',
+        resolved_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_worries_uid_status '
+      'ON local_worries(uid, status)',
+    );
+  }
+
+  Future<void> _createAwarenessStatsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_awareness_stats (
+        uid TEXT PRIMARY KEY,
+        total_light_days INTEGER NOT NULL DEFAULT 0,
+        total_weekly_reviews INTEGER NOT NULL DEFAULT 0,
+        total_worries_resolved INTEGER NOT NULL DEFAULT 0,
+        last_light_date TEXT,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
   }
 
   // ─── Diary CRUD ───

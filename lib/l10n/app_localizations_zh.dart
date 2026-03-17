@@ -1508,31 +1508,31 @@ class SZh extends S {
   }
 
   @override
-  String get onboardTitle1 => '认识你的伙伴';
+  String get onboardTitle1 => '认识哈奇米';
 
   @override
-  String get onboardSubtitle1 => '每段旅程从一只小猫开始';
+  String get onboardSubtitle1 => '你的觉知伴侣';
 
   @override
-  String get onboardBody1 => '设定目标，领养一只小猫。\n专注目标，看着你的猫咪成长！';
+  String get onboardBody1 => '哈奇米是一只会感应你心情的猫咪，陪你在每天的小事中觉察自己。';
 
   @override
-  String get onboardTitle2 => '专注、成长、进化';
+  String get onboardTitle2 => '每天 5 分钟';
 
   @override
-  String get onboardSubtitle2 => '4 个成长阶段';
+  String get onboardSubtitle2 => '记录你的一点光';
 
   @override
-  String get onboardBody2 => '每分钟的专注都帮助猫咪进化，\n从小小幼猫到威风凛凛的大猫！';
+  String get onboardBody2 => '睡前记录一个让你微笑的瞬间，选一个心情，写一句话就够了。';
 
   @override
-  String get onboardTitle3 => '打造你的猫房';
+  String get onboardTitle3 => '猫咪陪你觉知自己';
 
   @override
-  String get onboardSubtitle3 => '收集独特猫咪';
+  String get onboardSubtitle3 => '慢慢变好';
 
   @override
-  String get onboardBody3 => '每个任务都带来一只独特外观的新猫。\n收集它们，打造你的梦想收藏！';
+  String get onboardBody3 => '专注习惯、记录心情、觉察烦恼。不完美也没关系，猫咪一直在。';
 
   @override
   String get onboardSkip => '跳过';
@@ -2548,6 +2548,291 @@ class SZh extends S {
 
   @override
   String get a11yDynamicWallpaperColor => '动态壁纸颜色';
+
+  @override
+  String get awarenessTitle => '觉知';
+
+  @override
+  String get awarenessTabToday => '今天';
+
+  @override
+  String get awarenessTabThisWeek => '本周';
+
+  @override
+  String get awarenessTabReview => '回顾';
+
+  @override
+  String get moodVeryHappy => '很开心';
+
+  @override
+  String get moodCalm => '平静';
+
+  @override
+  String get moodDown => '低落';
+
+  @override
+  String get moodVeryDown => '很低落';
+
+  @override
+  String get awarenessLightPlaceholder => '今天有什么让你微笑的事？';
+
+  @override
+  String get awarenessLightSaved => '已记录今天的光 ✨';
+
+  @override
+  String get awarenessLightEdit => '编辑';
+
+  @override
+  String get weeklyReviewTitle => '周回顾';
+
+  @override
+  String weeklyReviewHappyMoment(int number) {
+    return '幸福时刻 #$number';
+  }
+
+  @override
+  String get weeklyReviewHappyMomentHint => '这周有什么让你开心的？';
+
+  @override
+  String get weeklyReviewGratitude => '感恩';
+
+  @override
+  String get weeklyReviewGratitudeHint => '这周想感谢谁或什么？';
+
+  @override
+  String get weeklyReviewLearning => '学到了什么';
+
+  @override
+  String get weeklyReviewLearningHint => '这周学到了什么？';
+
+  @override
+  String get weeklyReviewSave => '保存回顾';
+
+  @override
+  String get weeklyReviewSaved => '回顾已保存 ✨';
+
+  @override
+  String get worryProcessorTitle => '烦恼处理器';
+
+  @override
+  String get worryDescriptionHint => '什么在烦你？';
+
+  @override
+  String get worrySolutionHint => '你打算怎么应对？';
+
+  @override
+  String get worryStatusOngoing => '还在';
+
+  @override
+  String get worryStatusResolved => '搞定了';
+
+  @override
+  String get worryStatusDisappeared => '消失了';
+
+  @override
+  String get worryAdd => '添加烦恼';
+
+  @override
+  String get worrySave => '保存';
+
+  @override
+  String get worryResolvedSection => '已解决';
+
+  @override
+  String get worryManageAll => '管理全部烦恼';
+
+  @override
+  String get awarenessEmptyLightTitle => '今天还没有记录光哦';
+
+  @override
+  String get awarenessEmptyLightSubtitle => '什么时候都可以来 ✨';
+
+  @override
+  String get awarenessEmptyLightAction => '记录';
+
+  @override
+  String get awarenessEmptyReviewTitle => '慢慢来';
+
+  @override
+  String get awarenessEmptyReviewSubtitle => '等你准备好了再回顾 🐱';
+
+  @override
+  String get awarenessEmptyReviewAction => '开始回顾';
+
+  @override
+  String get awarenessEmptyHistoryTitle => '每一天的光都值得被记住';
+
+  @override
+  String get awarenessEmptyHistorySubtitle => '你的历史记录会出现在这里';
+
+  @override
+  String get awarenessEmptyWorriesTitle => '没有烦恼？太好了！🎉';
+
+  @override
+  String get awarenessEmptyWorriesSubtitle => '这真是太棒了';
+
+  @override
+  String get catReactVeryHappy => '铲屎官今天好开心，本猫也开心！🎉';
+
+  @override
+  String get catReactHappy => '记录了今天的光，真棒 ✨';
+
+  @override
+  String get catReactCalm => '平静的一天也很好呢 🍃';
+
+  @override
+  String get catReactDown => '不开心的日子，本猫陪着你 💛';
+
+  @override
+  String get catReactVeryDown => '没事的，本猫哪都不去 🫂';
+
+  @override
+  String get awarenessBridgePrompt => '今天有什么让你微笑的事？✨';
+
+  @override
+  String get awarenessBridgeRecord => '记录';
+
+  @override
+  String get awarenessBridgeSkip => '跳过';
+
+  @override
+  String get awarenessHabitsSection => '今日习惯';
+
+  @override
+  String get awarenessHabitsEmpty => '还没有习惯，去领养一只猫吧';
+
+  @override
+  String get awarenessReviewComingSoon => '即将推出';
+
+  @override
+  String get awarenessMoodRequired => '请先选择今天的心情';
+
+  @override
+  String get awarenessSaveFailed => '保存失败，请重试';
+
+  @override
+  String get awarenessLoadFailed => '加载失败，请返回重试';
+
+  @override
+  String get awarenessSaved => '已保存';
+
+  @override
+  String get worryDescriptionRequired => '请描述你的烦恼';
+
+  @override
+  String get worryLoadFailed => '加载烦恼失败';
+
+  @override
+  String get awarenessLoginRequired => '请先登录';
+
+  @override
+  String get tagCustom => '+自定义';
+
+  @override
+  String get homeTabAwareness => '觉知';
+
+  @override
+  String get homeTabHabits => '习惯';
+
+  @override
+  String get monthlyRitualSetupTitle => '新的一月，选一个习惯来专注';
+
+  @override
+  String get monthlyRitualSetupDesc => '选一个这个月最想坚持的习惯，设定一个灵活的目标，给自己一个小奖励。';
+
+  @override
+  String get monthlyRitualSetupButton => '开始设定';
+
+  @override
+  String get monthlyRitualDialogTitle => '月度仪式';
+
+  @override
+  String get monthlyRitualHabitLabel => '专注习惯';
+
+  @override
+  String get monthlyRitualTargetLabel => '目标天数';
+
+  @override
+  String monthlyRitualTargetValue(int count) {
+    return '$count 天';
+  }
+
+  @override
+  String get monthlyRitualRewardHint => '完成后我要奖励自己...';
+
+  @override
+  String get monthlyRitualRewardLabel => '奖励';
+
+  @override
+  String monthlyRitualProgress(int completed, int target) {
+    return '已完成 $completed/$target 天 ✨';
+  }
+
+  @override
+  String get monthlyRitualAchieved => '达成目标！🎉';
+
+  @override
+  String get monthlyRitualEncouragement => '每一天都算数';
+
+  @override
+  String get achievementLightFirstName => '第一缕光';
+
+  @override
+  String get achievementLightFirstDesc => '记录第一个每日一点光';
+
+  @override
+  String get achievementLight7Name => '一周之光';
+
+  @override
+  String get achievementLight7Desc => '累计记录 7 天一点光';
+
+  @override
+  String get achievementLight30Name => '月光收集者';
+
+  @override
+  String get achievementLight30Desc => '累计记录 30 天一点光';
+
+  @override
+  String get achievementLight100Name => '百日之光';
+
+  @override
+  String get achievementLight100Desc => '累计记录 100 天一点光';
+
+  @override
+  String get achievementReviewFirstName => '初次回顾';
+
+  @override
+  String get achievementReviewFirstDesc => '完成第一次周回顾';
+
+  @override
+  String get achievementReview4Name => '每月回顾家';
+
+  @override
+  String get achievementReview4Desc => '累计完成 4 次周回顾';
+
+  @override
+  String get achievementWorryResolved1Name => '第一次释然';
+
+  @override
+  String get achievementWorryResolved1Desc => '解决或释放你的第一个烦恼';
+
+  @override
+  String get achievementWorryResolved10Name => '烦恼轻语者';
+
+  @override
+  String get achievementWorryResolved10Desc => '累计解决或释放 10 个烦恼';
+
+  @override
+  String get notifBedtimeLight => '今天过得怎么样？花一点时间，留意一件美好的事 ✨';
+
+  @override
+  String get notifWeeklyReview => '周日晚上，适合回顾这一周 📖';
+
+  @override
+  String get notifMonthlyRitual => '新的一个月开始了！选一个习惯来专注吧 🌙';
+
+  @override
+  String get notifGentleReengagement => '没关系，什么时候回来都好 🌿';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

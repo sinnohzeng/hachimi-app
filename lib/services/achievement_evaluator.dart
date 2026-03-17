@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' show Database, Transaction;
 
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -22,6 +23,11 @@ const _triggerMap = {
   'check_in': AchievementTrigger.checkInCompleted,
   'equip': AchievementTrigger.accessoryEquipped,
   'purchase': AchievementTrigger.accessoryEquipped,
+  // V3 觉知
+  'light_recorded': AchievementTrigger.lightRecorded,
+  'weekly_review_completed': AchievementTrigger.weeklyReviewCompleted,
+  'worry_resolved': AchievementTrigger.worryResolved,
+  'worry_vanished': AchievementTrigger.worryResolved,
 };
 
 /// 事件驱动成就评估器 — 监听台账变更自动检查成就。
@@ -157,6 +163,9 @@ class AchievementEvaluator {
     final lastMinutes = await _queryLastSessionMinutes(db, uid);
     final goalStatus = _evaluateGoalStatus(habitData.rows);
 
+    // V3 觉知统计
+    final awarenessStats = await _queryAwarenessStats(db, uid);
+
     return AchievementEvalContext(
       totalSessionCount: sessionCount ?? 0,
       activeHabitCount: habitData.rows.length,
@@ -175,6 +184,9 @@ class AchievementEvaluator {
       hasCompletedGoalOnTime: goalStatus.onTime,
       hasCompletedGoalAhead: goalStatus.ahead,
       unlockedIds: unlockedIds,
+      totalLightDays: awarenessStats.lightDays,
+      totalWeeklyReviews: awarenessStats.weeklyReviews,
+      totalWorriesResolved: awarenessStats.worriesResolved,
     );
   }
 
@@ -311,6 +323,44 @@ class AchievementEvaluator {
     });
   }
 
+  /// 查询觉知模块聚合数据。
+  Future<_AwarenessStats> _queryAwarenessStats(Database db, String uid) async {
+    try {
+      final lightDays = await db.rawQuery(
+        'SELECT COUNT(DISTINCT date) AS cnt FROM local_daily_lights WHERE uid = ?',
+        [uid],
+      );
+      final totalLightDays = lightDays.firstOrNull?['cnt'] as int? ?? 0;
+
+      final reviewCount = await db.rawQuery(
+        'SELECT COUNT(*) AS cnt FROM local_weekly_reviews WHERE uid = ?',
+        [uid],
+      );
+      final totalWeeklyReviews = reviewCount.firstOrNull?['cnt'] as int? ?? 0;
+
+      final resolvedCount = await db.rawQuery(
+        'SELECT COUNT(*) AS cnt FROM local_worries '
+        'WHERE uid = ? AND status IN (\'resolved\', \'disappeared\')',
+        [uid],
+      );
+      final totalWorriesResolved =
+          resolvedCount.firstOrNull?['cnt'] as int? ?? 0;
+
+      return _AwarenessStats(
+        lightDays: totalLightDays,
+        weeklyReviews: totalWeeklyReviews,
+        worriesResolved: totalWorriesResolved,
+      );
+    } catch (e) {
+      debugPrint('[AchievementEvaluator] Awareness stats query failed: $e');
+      return const _AwarenessStats(
+        lightDays: 0,
+        weeklyReviews: 0,
+        worriesResolved: 0,
+      );
+    }
+  }
+
   /// 查询已解锁成就 ID 集合。
   Future<Set<String>> _queryUnlockedIds(Database db, String uid) async {
     final rows = await db.query(
@@ -351,6 +401,15 @@ class AchievementEvaluator {
         'cat_accessory': (ctx, _) => ctx.equippedAccessories.isNotEmpty,
         'cat_5_accessories': (ctx, _) => ctx.accessoryCount >= 5,
         'cat_all_happy': (ctx, _) => ctx.allCatsHappy && ctx.totalCatCount >= 2,
+        // 觉知成就
+        'light_first': (ctx, _) => ctx.totalLightDays >= 1,
+        'light_7': (ctx, _) => ctx.totalLightDays >= 7,
+        'light_30': (ctx, _) => ctx.totalLightDays >= 30,
+        'light_100': (ctx, _) => ctx.totalLightDays >= 100,
+        'review_first': (ctx, _) => ctx.totalWeeklyReviews >= 1,
+        'review_4': (ctx, _) => ctx.totalWeeklyReviews >= 4,
+        'worry_resolved_1': (ctx, _) => ctx.totalWorriesResolved >= 1,
+        'worry_resolved_10': (ctx, _) => ctx.totalWorriesResolved >= 10,
       };
 
   /// 检查单个成就的解锁条件 — 谓词表查表，persist 类走通用分支。
@@ -393,9 +452,13 @@ class AchievementEvaluator {
 
   static List<String> _decodeInventory(String? raw) {
     if (raw == null) return [];
-    final decoded = jsonDecode(raw);
-    if (decoded is List) return decoded.whereType<String>().toList();
-    return [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) return decoded.whereType<String>().toList();
+      return [];
+    } on FormatException {
+      return [];
+    }
   }
 }
 
@@ -418,6 +481,19 @@ class _GoalStatus {
   final bool ahead;
 
   const _GoalStatus({required this.onTime, required this.ahead});
+}
+
+/// 觉知聚合数据（内部使用）。
+class _AwarenessStats {
+  final int lightDays;
+  final int weeklyReviews;
+  final int worriesResolved;
+
+  const _AwarenessStats({
+    required this.lightDays,
+    required this.weeklyReviews,
+    required this.worriesResolved,
+  });
 }
 
 /// 猫聚合数据（内部使用）。

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.36.0] - 2026-03-18
+
+### Added
+
+- **V3 觉知伴侣**：从「习惯打卡工具」转型为「觉知伴侣」，核心三幕结构全面上线
+- **每日一光**：睡前记录心情（5 级 emoji）+ 一句话 + 标签（家人/朋友/学习/户外/工作），30 秒完成
+- **周回顾**：每周记录三个幸福时刻 + 感恩 + 学习心得 + 烦恼状态更新，猫咪生成模板周总结
+- **烦恼处理器**：写下烦恼 + 解法 → 追踪三态（进行中/已解决/自然消失），外化减轻认知负荷
+- **月初仪式**：每月选一个重点习惯 + 灵活目标（默认 20 天）+ 奖励承诺 + 30 天进度网格
+- **觉知飞轮桥接**：专注完成后自动弹出「一点光」快速录入 Banner，闭合专注→觉知→猫咪反应的产品飞轮
+- **猫咪心情感应**：保存一点光后根据心情播放 5 种猫咪动画（蹦跳/蹭蹭/呼吸/靠近/蜷缩）+ 模板文案
+- **8 个觉知成就**：全部累计制（非连续），一点光 1/7/30/100 天 + 周回顾 1/4 次 + 解忧 1/10 个
+- **4 种通知**：睡前一点光（可配置时间）、周日复盘、月初仪式、温柔召回（最多每两周 1 次）
+- **4 张新 SQLite 表**：daily_lights / weekly_reviews / worries / awareness_stats（DB v4 migration）
+- **3 个 Firestore 集合**：dailyLights / weeklyReviews / worries（含安全规则）
+
+### Changed
+
+- **导航重组**：底部 Tab 从 3 个升级为 4 个（✨觉知 / 📋习惯 / 🐱猫咪 / 👤我的），觉知成为默认首页
+- **Onboarding 文案**：更新为「觉知伴侣」定位（认识哈奇米 / 每天 5 分钟记录一点光 / 猫咪陪你觉知自己）
+- **成就系统**：新增 `awareness` 分类 + 3 个触发器 + 聚合统计查询（防御性隔离，不阻断现有成就评估）
+- **L10n**：新增 ~100 个本地化 key（EN + ZH-CN），覆盖觉知全模块文案
+- **SSOT 文档同步**：data-model / state-management / folder-structure / screens（含 zh-CN 镜像共 8 文档）
+
 ## [2.35.1] - 2026-03-17
 
 ### Fixed

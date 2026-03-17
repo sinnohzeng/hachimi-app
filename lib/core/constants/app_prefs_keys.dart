@@ -26,4 +26,10 @@ class AppPrefsKeys {
 
   // ─── AI 日记重试队列 ───
   static const diaryPendingRetries = 'diary_pending_retries';
+
+  // ─── 觉知通知 ───
+  static const awarenessReminderHour = 'awareness_reminder_hour';
+  static const awarenessReminderMinute = 'awareness_reminder_minute';
+  static const lastGentleReengagementAt = 'last_gentle_reengagement_at';
+  static const monthlyRitualLastReminded = 'monthly_ritual_last_reminded';
 }

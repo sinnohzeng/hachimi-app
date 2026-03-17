@@ -48,6 +48,12 @@ class AnalyticsEvents {
   static const String aiChatLimitReached = 'ai_chat_limit_reached';
   static const String aiTokenUsage = 'ai_token_usage';
 
+  // Awareness
+  static const String lightRecorded = 'light_recorded';
+  static const String weeklyReviewCompleted = 'weekly_review_completed';
+  static const String worryCreated = 'worry_created';
+  static const String worryResolved = 'worry_resolved';
+
   // Session quality
   static const String sessionQuality = 'session_quality';
 
@@ -118,6 +124,13 @@ class AnalyticsEvents {
   static const String paramCompletionTokens = 'completion_tokens';
   static const String paramOperation = 'operation';
   static const String paramProvider = 'provider';
+
+  // Awareness params
+  static const String paramMood = 'mood';
+  static const String paramTagCount = 'tag_count';
+  static const String paramHappyMomentCount = 'happy_moment_count';
+  static const String paramWorryStatus = 'worry_status';
+  static const String paramQuickMode = 'quick_mode';
 
   // Enhanced session params
   static const String paramTargetDurationMinutes = 'target_duration_minutes';

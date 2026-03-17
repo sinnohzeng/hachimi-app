@@ -42,8 +42,9 @@ class AchievementCategory {
   static const String quest = 'quest';
   static const String cat = 'cat';
   static const String persist = 'persist';
+  static const String awareness = 'awareness';
 
-  static const List<String> all = [quest, cat, persist];
+  static const List<String> all = [quest, cat, persist, awareness];
 }
 
 // ─── 坚持成就数据表 (days, coins, titleReward?, isHidden?) ───
@@ -391,6 +392,86 @@ class AchievementDefinitions {
     ),
   ];
 
+  // ─── 觉知成就 (Awareness, 8 个) ───
+
+  static const List<AchievementDef> awarenessAchievements = [
+    // 一点光系列（累计记录天数）
+    AchievementDef(
+      id: 'light_first',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementLightFirstName',
+      descKey: 'achievementLightFirstDesc',
+      icon: Icons.auto_awesome,
+      targetValue: 1,
+      coinReward: 50,
+    ),
+    AchievementDef(
+      id: 'light_7',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementLight7Name',
+      descKey: 'achievementLight7Desc',
+      icon: Icons.auto_awesome,
+      targetValue: 7,
+      coinReward: 100,
+    ),
+    AchievementDef(
+      id: 'light_30',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementLight30Name',
+      descKey: 'achievementLight30Desc',
+      icon: Icons.auto_awesome,
+      targetValue: 30,
+      coinReward: 300,
+    ),
+    AchievementDef(
+      id: 'light_100',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementLight100Name',
+      descKey: 'achievementLight100Desc',
+      icon: Icons.auto_awesome,
+      targetValue: 100,
+      coinReward: 500,
+    ),
+    // 周回顾系列（累计完成次数）
+    AchievementDef(
+      id: 'review_first',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementReviewFirstName',
+      descKey: 'achievementReviewFirstDesc',
+      icon: Icons.calendar_view_week,
+      targetValue: 1,
+      coinReward: 50,
+    ),
+    AchievementDef(
+      id: 'review_4',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementReview4Name',
+      descKey: 'achievementReview4Desc',
+      icon: Icons.calendar_view_week,
+      targetValue: 4,
+      coinReward: 200,
+    ),
+    // 烦恼处理系列（累计解决/消失数）
+    AchievementDef(
+      id: 'worry_resolved_1',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementWorryResolved1Name',
+      descKey: 'achievementWorryResolved1Desc',
+      icon: Icons.sentiment_satisfied_alt,
+      targetValue: 1,
+      coinReward: 50,
+    ),
+    AchievementDef(
+      id: 'worry_resolved_10',
+      category: AchievementCategory.awareness,
+      nameKey: 'achievementWorryResolved10Name',
+      descKey: 'achievementWorryResolved10Desc',
+      icon: Icons.sentiment_satisfied_alt,
+      targetValue: 10,
+      coinReward: 200,
+    ),
+  ];
+
   // ─── 单项目坚持成就 (Persist, 138 个) ───
 
   static final List<AchievementDef> persistAchievements = _persistData
@@ -414,6 +495,7 @@ class AchievementDefinitions {
     ...questAchievements,
     ...hoursAchievements,
     ...catAchievements,
+    ...awarenessAchievements,
     ...persistAchievements,
   ];
 

@@ -18,6 +18,9 @@ HomeScreen ─ 4-tab NavigationBar shell ─┬─ Today Tab
 
 HomeScreen → FocusSetupScreen → TimerScreen → FocusCompleteScreen
 HomeScreen → AdoptionFlowScreen (FAB or first habit)
+HomeScreen → AwarenessScreen → DailyLightScreen
+                             → WeeklyReviewScreen
+                             → WorryProcessorScreen → WorryEditScreen
 CatRoomScreen → CatDetailScreen (via bottom sheet)
 ProfileScreen → CatDetailScreen (via Cat Album)
 ```
@@ -308,6 +311,118 @@ Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layou
 
 ---
 
+## S12: Awareness Screen (3-Tab Hub)
+**File:** `lib/screens/awareness/awareness_screen.dart`
+
+### Layout
+- AppBar with title "Awareness"
+- 3 sub-tabs via `TabBar`: **Today** / **This Week** / **Review**
+
+### Today Tab
+- **Daily Light status card**: shows today's mood + light text if recorded, otherwise CTA to record
+- **Monthly challenge placeholder**: reserved for future monthly ritual feature
+- **Habit quick-check section**: quick toggle for today's habit completions
+
+### This Week Tab
+- Weekly review card: shows current week's review if completed, otherwise CTA to create
+- Week date range display (`weekStartDate` – `weekEndDate`)
+
+### Review Tab
+- Historical daily lights list (scrollable, reverse chronological)
+- Monthly calendar heatmap placeholder
+
+### Navigation
+- "Record today's light" → DailyLightScreen
+- "Write weekly review" → WeeklyReviewScreen
+- "Manage worries" → WorryProcessorScreen
+
+### Routes
+- `/awareness`
+
+---
+
+## S13: Daily Light Screen
+**File:** `lib/screens/awareness/daily_light_screen.dart`
+
+### Layout
+- `MoodSelector` widget — 5-level mood picker (mood enum: 1–5)
+- Light text `TextField` — free-form reflection input
+- `TagSelector` widget — preset tag chips from `awareness_constants.dart`
+- `CatBedtimeAnimation` — cat reacts to selected mood
+- "Save" `FilledButton`
+
+### Quick Mode
+- When opened as bottom sheet (`quickMode: true`), shows compact version without cat animation
+- Used for rapid daily recording from AwarenessScreen CTA
+
+### Behavior
+- Upsert semantics: if today's light exists, pre-fill and update; otherwise create
+- On save → write to `AwarenessRepository` → ledger action `lightRecorded`
+
+### Routes
+- `/daily-light`
+
+---
+
+## S14: Weekly Review Screen
+**File:** `lib/screens/awareness/weekly_review_screen.dart`
+
+### Layout
+- Week header showing date range
+- 3x `HappyMomentCard` — each with text input + tag selector
+- Gratitude `TextField` — "What are you grateful for this week?"
+- Learning `TextField` — "What did you learn?"
+- Active worries status update section — shows ongoing worries with resolve/keep toggles
+- "Save" `FilledButton`
+
+### Behavior
+- Upsert semantics like DailyLight
+- On save → `AwarenessRepository` → ledger action `weeklyReviewCompleted`
+- Worry status changes within weekly review are batched and written via `WorryRepository`
+
+### Routes
+- `/weekly-review`
+
+---
+
+## S15: Worry Processor Screen
+**File:** `lib/screens/awareness/worry_processor_screen.dart`
+
+### Layout
+- **Active worries section**: list of `WorryItemCard` widgets (sorted by `createdAt` desc)
+- **Resolved worries section**: collapsible, shows resolved/dismissed worries
+- FAB → WorryEditScreen (create mode)
+- Each `WorryItemCard`: description preview + status chip + tap → WorryEditScreen (edit mode)
+
+### Behavior
+- Swipe-to-resolve gesture on active worry cards
+- Pull-to-refresh triggers `WorryRepository` re-read
+
+### Routes
+- `/worry-processor`
+
+---
+
+## S16: Worry Edit Screen
+**File:** `lib/screens/awareness/worry_edit_screen.dart`
+
+### Layout
+- AppBar with title "New Worry" / "Edit Worry"
+- Description `TextField` — multi-line worry description (required)
+- Solution `TextField` — optional action plan / coping strategy
+- Status selector (create mode: hidden, defaults to `ongoing`; edit mode: `ongoing` / `resolved` / `dismissed`)
+- "Save" `FilledButton`
+
+### Behavior
+- Create mode: `WorryRepository.createWorry()`  → ledger action `worryCreated`
+- Edit mode: `WorryRepository.updateWorry()` → ledger action `worryUpdated`
+- Status change to resolved/dismissed → ledger action `worryResolved`
+
+### Routes
+- `/worry-edit`
+
+---
+
 ## Empty States
 
 | Screen | Trigger | Message |
@@ -316,3 +431,6 @@ Navigated via `Navigator.push` from the "Edit" button in Focus Stats card. Layou
 | Cat Room | No active cats | "You don't have any cats yet. Create a habit to adopt one." |
 | Stats Screen | No habits | "Track your first focus session to see stats." |
 | Cat Album | No cats | "Your album is empty — start adopting!" |
+| Awareness Today | No light recorded | "Record your first light of the day!" + CTA |
+| Worry Processor | No worries | "No worries right now — that's great!" |
+| Weekly Review | No review | "Take a moment to reflect on your week." + CTA |

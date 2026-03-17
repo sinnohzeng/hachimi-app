@@ -172,6 +172,32 @@ ThemeSettings.uiStyle → _skinFor(style) → MaterialSkin | RetroPixelSkin
 
 `AppScaffold`（位于 `lib/widgets/app_scaffold.dart`）包裹 `Scaffold`，在复古模式下条件性叠加 `RetroTiledBackground`。所有屏幕使用 `AppScaffold` 替代 `Scaffold` — 23+ 个屏幕的唯一集成点。
 
+## V3 觉知 Provider
+
+### 服务 Provider（位于 `service_providers.dart`）
+- `awarenessRepositoryProvider` — `AwarenessRepository`（DailyLight + WeeklyReview CRUD）
+- `worryRepositoryProvider` — `WorryRepository`（Worry CRUD）
+
+### 状态 Provider（位于 `awareness_providers.dart`）
+
+| Provider | 类型 | 说明 |
+|----------|------|------|
+| `todayLightProvider` | `StreamProvider<DailyLight?>` | 今日一点光，filter：`light_recorded` / `light_deleted` |
+| `hasRecordedTodayLightProvider` | `Provider<bool>` | 派生自 `todayLightProvider` |
+| `currentWeekReviewProvider` | `StreamProvider<WeeklyReview?>` | 本周回顾 |
+| `activeWorriesProvider` | `StreamProvider<List<Worry>>` | 进行中烦恼 |
+| `resolvedWorriesProvider` | `StreamProvider<List<Worry>>` | 已终结烦恼 |
+| `awarenessStatsProvider` | `StreamProvider<Map<String, int>>` | 觉知统计 |
+| `monthlyLightsProvider` | `FutureProvider.family<List<DailyLight>, String>` | 月度一点光 |
+
+### 新增 ActionType 值
+
+`lightRecorded`、`weeklyReviewCompleted`、`worryCreated`、`worryUpdated`、`worryResolved`、`monthlyRitualSet`
+
+以上值用于觉知 StreamProvider 的 `LedgerChange` 领域过滤器。
+
+受影响的 LedgerChange 刷新：觉知 Provider 响应 `isGlobalRefresh` 加上述领域特定 action type。
+
 ## 约束
 - Screen 层禁止直接调用 Firebase SDK。
 - 导航副作用必须放在监听器/effect，不要写在 `build()` 中。

@@ -9,7 +9,10 @@ users/{uid}
 │   └── sessions/{sessionId}
 ├── cats/{catId}
 ├── achievements/{achievementId}
-└── monthlyCheckIns/{yyyy-MM}
+├── monthlyCheckIns/{yyyy-MM}
+├── dailyLights/{date}
+├── weeklyReviews/{weekId}
+└── worries/{worryId}
 ```
 
 ## 用户文档（`users/{uid}`）
@@ -35,6 +38,10 @@ users/{uid}
 - `local_sessions`
 - `local_monthly_checkins`
 - `local_achievements`
+- `local_daily_lights`（v4）
+- `local_weekly_reviews`（v4）
+- `local_worries`（v4）
+- `local_awareness_stats`（v4）
 
 ## SharedPreferences 键
 ### 身份
@@ -74,3 +81,108 @@ users/{uid}
 - 本地先删不可恢复。
 - 云端/Auth 在线立即硬删，离线则排队补删。
 - 启动期与轮询重试自动推进 pending job。
+
+## V3 觉知数据层
+
+### 本地 SQLite — 觉知表（DB v4）
+
+DB 版本从 v3 升级至 v4，迁移新增 4 张表。
+
+**`local_daily_lights`** — 每日一光记录
+| 字段 | 类型 | 约束 |
+|------|------|------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `date` | TEXT | NOT NULL |
+| `mood` | INTEGER | NOT NULL |
+| `light_text` | TEXT | |
+| `tags` | TEXT（JSON） | |
+| `timeline_events` | TEXT（JSON） | |
+| `habit_completions` | TEXT（JSON） | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+| | | UNIQUE(uid, date) |
+
+**`local_weekly_reviews`** — 周回顾
+| 字段 | 类型 | 约束 |
+|------|------|------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `week_id` | TEXT | NOT NULL |
+| `week_start_date` | TEXT | |
+| `week_end_date` | TEXT | |
+| `happy_moment_1` | TEXT | |
+| `happy_moment_1_tags` | TEXT（JSON） | |
+| `happy_moment_2` | TEXT | |
+| `happy_moment_2_tags` | TEXT（JSON） | |
+| `happy_moment_3` | TEXT | |
+| `happy_moment_3_tags` | TEXT（JSON） | |
+| `gratitude` | TEXT | |
+| `learning` | TEXT | |
+| `cat_weekly_summary` | TEXT | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+| | | UNIQUE(uid, week_id) |
+
+**`local_worries`** — 烦恼处理器
+| 字段 | 类型 | 约束 |
+|------|------|------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `description` | TEXT | NOT NULL |
+| `solution` | TEXT | |
+| `status` | TEXT | DEFAULT 'ongoing' |
+| `resolved_at` | INTEGER | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+
+**`local_awareness_stats`** — 觉知聚合统计
+| 字段 | 类型 | 约束 |
+|------|------|------|
+| `uid` | TEXT | PK |
+| `total_light_days` | INTEGER | DEFAULT 0 |
+| `total_weekly_reviews` | INTEGER | DEFAULT 0 |
+| `total_worries_resolved` | INTEGER | DEFAULT 0 |
+| `last_light_date` | TEXT | |
+| `updated_at` | INTEGER | |
+
+### Firestore — 觉知集合
+
+位于 `users/{uid}/` 下：
+
+```
+users/{uid}
+├── ...既有集合...
+├── dailyLights/{date}
+├── weeklyReviews/{weekId}
+└── worries/{worryId}
+```
+
+**`dailyLights/{date}`**
+- `mood`（int）
+- `lightText`（string）
+- `tags`（array<string>）
+- `timelineEvents`（array<map>）
+- `habitCompletions`（array<map>）
+- `createdAt`（timestamp）
+- `updatedAt`（timestamp）
+
+**`weeklyReviews/{weekId}`**
+- `weekStartDate`（string）
+- `weekEndDate`（string）
+- `happyMoment1` / `happyMoment1Tags`（string / array）
+- `happyMoment2` / `happyMoment2Tags`（string / array）
+- `happyMoment3` / `happyMoment3Tags`（string / array）
+- `gratitude`（string）
+- `learning`（string）
+- `catWeeklySummary`（string）
+- `createdAt`（timestamp）
+- `updatedAt`（timestamp）
+
+**`worries/{worryId}`**
+- `description`（string）
+- `solution`（string）
+- `status`（string，默认：`"ongoing"`）
+- `resolvedAt`（timestamp，可空）
+- `createdAt`（timestamp）
+- `updatedAt`（timestamp）

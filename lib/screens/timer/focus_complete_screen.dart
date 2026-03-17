@@ -22,6 +22,8 @@ import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/models/diary_generation_context.dart';
 import 'package:hachimi_app/models/xp_result.dart';
+import 'package:hachimi_app/providers/awareness_providers.dart';
+import 'package:hachimi_app/screens/awareness/daily_light_screen.dart';
 import 'package:vibration/vibration.dart';
 
 /// Focus complete celebration screen.
@@ -484,6 +486,12 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                         ),
                       ),
 
+                    // 觉知桥接 Banner
+                    if (!widget.isAbandoned)
+                      _AwarenessBridgeBanner(
+                        onRecord: () => _showQuickLight(context),
+                      ),
+
                     const Spacer(),
                     _buildDoneButton(colorScheme, textTheme, l10n),
                   ],
@@ -493,6 +501,23 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
           ),
           _buildConfettiOverlay(colorScheme),
         ],
+      ),
+    );
+  }
+
+  /// 弹出快速录入一点光的 BottomSheet。
+  void _showQuickLight(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) =>
+            const DailyLightScreen(quickMode: true),
       ),
     );
   }
@@ -537,6 +562,62 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
         minBlastForce: 8,
         gravity: 0.1,
         colors: BrandColors.confetti(colorScheme),
+      ),
+    );
+  }
+}
+
+// ─── 觉知桥接 Banner ───
+
+/// 专注完成后引导用户记录「一点光」的轻量级卡片。
+/// 仅在今日尚未记录一点光时显示，用户可跳过。
+class _AwarenessBridgeBanner extends ConsumerStatefulWidget {
+  final VoidCallback onRecord;
+
+  const _AwarenessBridgeBanner({required this.onRecord});
+
+  @override
+  ConsumerState<_AwarenessBridgeBanner> createState() =>
+      _AwarenessBridgeBannerState();
+}
+
+class _AwarenessBridgeBannerState
+    extends ConsumerState<_AwarenessBridgeBanner> {
+  bool _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // 用户已点击跳过，直接隐藏
+    if (_dismissed) return const SizedBox.shrink();
+
+    // 如果今天已经记录过一点光，不显示 Banner
+    final hasRecorded = ref.watch(hasRecordedTodayLightProvider);
+    if (hasRecorded) return const SizedBox.shrink();
+
+    final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: AppSpacing.paddingTopMd,
+      child: Card(
+        color: colorScheme.secondaryContainer,
+        child: ListTile(
+          leading: const Text('\u2728', style: TextStyle(fontSize: 24)),
+          title: Text(l10n.awarenessBridgePrompt),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () => setState(() => _dismissed = true),
+                child: Text(l10n.awarenessBridgeSkip),
+              ),
+              FilledButton.tonal(
+                onPressed: widget.onRecord,
+                child: Text(l10n.awarenessBridgeRecord),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

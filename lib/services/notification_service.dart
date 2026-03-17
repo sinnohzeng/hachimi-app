@@ -1,9 +1,13 @@
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/reminder_config.dart';
+import 'package:intl/intl.dart';
 import 'package:hachimi_app/services/notification_scheduling.dart' as sched;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_10y.dart' as tz;
 
@@ -32,6 +36,11 @@ class NotificationService {
   static const String _focusChannelId = 'hachimi_focus_complete';
   static const String _focusChannelName = 'Focus Complete';
   static const String _focusChannelDesc = 'Focus session completion alerts';
+
+  static const String _awarenessChannelId = 'hachimi_awareness';
+  static const String _awarenessChannelName = 'Awareness Reminders';
+  static const String _awarenessChannelDesc =
+      'Daily light, weekly review, and monthly ritual reminders';
 
   bool _pluginsInitialized = false;
 
@@ -95,6 +104,14 @@ class NotificationService {
         _focusChannelName,
         description: _focusChannelDesc,
         importance: Importance.high,
+      ),
+    );
+    await androidPlugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _awarenessChannelId,
+        _awarenessChannelName,
+        description: _awarenessChannelDesc,
+        importance: Importance.defaultImportance,
       ),
     );
     // 清理旧版本通道
@@ -464,6 +481,136 @@ class NotificationService {
         ),
       ),
     );
+  }
+
+  // ─── Awareness Notifications ───
+
+  /// 通知详情（觉知通道）。
+  static const _awarenessDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _awarenessChannelId,
+      _awarenessChannelName,
+      channelDescription: _awarenessChannelDesc,
+      largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+    ),
+  );
+
+  /// 调度每日睡前一点光提醒（ID: 200001）。
+  /// 调用时机：App 启动 + 设置页修改提醒时间后。
+  Future<void> scheduleAwarenessBedtimeReminder({
+    required int hour,
+    required int minute,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _localNotifications.cancel(id: 200001);
+      await _localNotifications.zonedSchedule(
+        id: 200001,
+        scheduledDate: sched.nextInstanceOfTime(hour, minute),
+        notificationDetails: _awarenessDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        title: title,
+        body: body,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: 'awareness:daily_light',
+      );
+    } catch (e) {
+      debugPrint('[Notification] Schedule bedtime reminder failed: $e');
+    }
+  }
+
+  /// 调度每周日 20:00 的周回顾提醒（ID: 200002）。
+  Future<void> scheduleWeeklyReviewReminder({
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _localNotifications.cancel(id: 200002);
+      await _localNotifications.zonedSchedule(
+        id: 200002,
+        scheduledDate: sched.nextInstanceOfWeekdayTime(DateTime.sunday, 20, 0),
+        notificationDetails: _awarenessDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        title: title,
+        body: body,
+        matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        payload: 'awareness:weekly_review',
+      );
+    } catch (e) {
+      debugPrint('[Notification] Schedule weekly review reminder failed: $e');
+    }
+  }
+
+  /// 月初仪式提醒（ID: 200003）— App 启动时检查。
+  /// 不使用 zonedSchedule（不支持每月 N 日），改用即时显示。
+  Future<void> checkMonthlyRitualReminder({
+    required String title,
+    required String body,
+  }) async {
+    try {
+      final now = DateTime.now();
+      if (now.day != 1) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final lastReminded =
+          prefs.getString(AppPrefsKeys.monthlyRitualLastReminded) ?? '';
+      final todayStr = DateFormat('yyyy-MM-dd').format(now);
+      if (lastReminded == todayStr) return;
+
+      await _localNotifications.show(
+        id: 200003,
+        title: title,
+        body: body,
+        notificationDetails: _awarenessDetails,
+      );
+      await prefs.setString(AppPrefsKeys.monthlyRitualLastReminded, todayStr);
+    } catch (e) {
+      debugPrint('[Notification] Check monthly ritual reminder failed: $e');
+    }
+  }
+
+  /// 温柔召回通知调度（ID: 200004）。
+  /// 调用时机：每次一点光保存后。最多每两周一次。
+  Future<void> scheduleGentleReengagement({
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _localNotifications.cancel(id: 200004);
+
+      // 检查上次召回时间，如果 < 14 天前则跳过
+      final prefs = await SharedPreferences.getInstance();
+      final lastReengagement =
+          prefs.getString(AppPrefsKeys.lastGentleReengagementAt) ?? '';
+      if (lastReengagement.isNotEmpty) {
+        final lastDate = DateTime.tryParse(lastReengagement);
+        if (lastDate != null &&
+            DateTime.now().difference(lastDate).inDays < 14) {
+          return;
+        }
+      }
+
+      // 调度 3 天后的通知
+      final fireAt = tz.TZDateTime.now(tz.local).add(const Duration(days: 3));
+      await _localNotifications.zonedSchedule(
+        id: 200004,
+        scheduledDate: fireAt,
+        notificationDetails: _awarenessDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        title: title,
+        body: body,
+        payload: 'awareness:gentle_reengagement',
+      );
+
+      // 记录预期触发时间（用于 14 天间隔检查）
+      await prefs.setString(
+        AppPrefsKeys.lastGentleReengagementAt,
+        DateTime.now().add(const Duration(days: 3)).toIso8601String(),
+      );
+    } catch (e) {
+      debugPrint('[Notification] Schedule gentle reengagement failed: $e');
+    }
   }
 
   /// Cancel all scheduled notifications.
