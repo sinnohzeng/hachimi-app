@@ -11,16 +11,16 @@
     "test": "npm run build && node --test lib/test/*.test.js"
   },
   "dependencies": {
-    "@google-cloud/bigquery": "^7.9.2",
+    "@google-cloud/bigquery": "^8.1.1",
     "@octokit/rest": "^22.0.1",
     "firebase-admin": "^13.4.0",
     "firebase-functions": "^7.2.0",
-    "google-auth-library": "^10.6.1",
+    "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.13.11",
+    "@types/node": "^25.5.0",
     "typescript": "^5.8.2"
   }
 }
