@@ -1757,6 +1757,18 @@ class SZh extends S {
   String get chatClearButton => '清除';
 
   @override
+  String get chatSend => '发送';
+
+  @override
+  String get chatStop => '停止';
+
+  @override
+  String get chatErrorMessage => '发送失败，点击重试';
+
+  @override
+  String get chatRetry => '重试';
+
+  @override
   String diaryTitle(String name) {
     return '$name的日记';
   }
@@ -4144,6 +4156,18 @@ class SZhHant extends SZh {
 
   @override
   String get chatClearButton => '清除';
+
+  @override
+  String get chatSend => '傳送';
+
+  @override
+  String get chatStop => '停止';
+
+  @override
+  String get chatErrorMessage => '傳送失敗，點擊重試';
+
+  @override
+  String get chatRetry => '重試';
 
   @override
   String diaryTitle(String name) {

@@ -88,6 +88,9 @@ class DiaryService {
 
   static const _maxRetryAttempts = 3;
 
+  /// 防止同一帧内多次触发重试（如 initState + didChangeDependencies）。
+  bool _retryInProgress = false;
+
   /// 保存待重试条目。
   Future<void> savePendingRetry(DiaryGenerationContext ctx) async {
     final prefs = await SharedPreferences.getInstance();
@@ -112,6 +115,20 @@ class DiaryService {
   /// 处理待重试队列中指定 catId 的条目。
   /// 由 CatDetailScreen 打开时调用。
   Future<DiaryEntry?> processPendingRetries(
+    String catId,
+    Cat cat,
+    Habit habit,
+  ) async {
+    if (_retryInProgress) return null;
+    _retryInProgress = true;
+    try {
+      return await _doProcessPendingRetries(catId, cat, habit);
+    } finally {
+      _retryInProgress = false;
+    }
+  }
+
+  Future<DiaryEntry?> _doProcessPendingRetries(
     String catId,
     Cat cat,
     Habit habit,
@@ -241,9 +258,13 @@ class DiaryService {
   }
 
   /// 格式化日记内容 — 确保以日记开头。
+  ///
+  /// 大小写不敏感检查：AI 可能回复 "dear diary," 或 "Dear Diary,"，
+  /// 都不应再重复添加前缀。
   String _formatContent(String raw, bool isZhLocale) {
     final prefix = isZhLocale ? '亲爱的日记，\n\n' : 'Dear diary,\n\n';
-    final text = raw.startsWith(prefix) ? raw : '$prefix$raw';
-    return text.trimRight();
+    final prefixBody = prefix.trimRight().toLowerCase();
+    if (raw.toLowerCase().startsWith(prefixBody)) return raw.trimRight();
+    return '$prefix$raw'.trimRight();
   }
 }

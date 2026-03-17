@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "चैट इतिहास मिटाएँ?",
   "chatClearConfirmMessage": "इससे सभी संदेश हट जाएँगे। यह पूर्ववत नहीं किया जा सकता।",
   "chatClearButton": "मिटाएँ",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name} की डायरी",
   "diaryLoadFailed": "डायरी लोड नहीं हो पाई",

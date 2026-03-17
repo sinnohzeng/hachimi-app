@@ -804,6 +804,10 @@
   "chatClearConfirmTitle": "Clear chat history?",
   "chatClearConfirmMessage": "This will delete all messages. This cannot be undone.",
   "chatClearButton": "Clear",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name} Diary",
   "@diaryTitle": {

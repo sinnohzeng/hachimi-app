@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Xóa lịch sử trò chuyện?",
   "chatClearConfirmMessage": "Thao tác này sẽ xóa tất cả tin nhắn. Không thể hoàn tác.",
   "chatClearButton": "Xóa",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "Nhật ký {name}",
   "diaryLoadFailed": "Không tải được nhật ký",

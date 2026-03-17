@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Cancellare la cronologia chat?",
   "chatClearConfirmMessage": "Questo eliminerà tutti i messaggi. Non può essere annullato.",
   "chatClearButton": "Cancella",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "Diario di {name}",
   "diaryLoadFailed": "Impossibile caricare il diario",

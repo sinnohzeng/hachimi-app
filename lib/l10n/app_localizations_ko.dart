@@ -1762,6 +1762,18 @@ class SKo extends S {
   String get chatClearButton => '삭제';
 
   @override
+  String get chatSend => 'Send';
+
+  @override
+  String get chatStop => 'Stop';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
   String diaryTitle(String name) {
     return '$name의 일기';
   }

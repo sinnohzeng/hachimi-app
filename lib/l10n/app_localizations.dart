@@ -3362,6 +3362,30 @@ abstract class S {
   /// **'Clear'**
   String get chatClearButton;
 
+  /// No description provided for @chatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get chatSend;
+
+  /// No description provided for @chatStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get chatStop;
+
+  /// No description provided for @chatErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send message. Tap to retry.'**
+  String get chatErrorMessage;
+
+  /// No description provided for @chatRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get chatRetry;
+
   /// No description provided for @diaryTitle.
   ///
   /// In en, this message translates to:

@@ -804,6 +804,10 @@
   "chatClearConfirmTitle": "清除聊天记录？",
   "chatClearConfirmMessage": "这将删除所有消息，此操作无法撤销。",
   "chatClearButton": "清除",
+  "chatSend": "发送",
+  "chatStop": "停止",
+  "chatErrorMessage": "发送失败，点击重试",
+  "chatRetry": "重试",
 
   "diaryTitle": "{name}的日记",
   "@diaryTitle": {

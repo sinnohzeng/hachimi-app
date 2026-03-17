@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Sohbet geçmişi silinsin mi?",
   "chatClearConfirmMessage": "Tüm mesajlar silinecek. Bu işlem geri alınamaz.",
   "chatClearButton": "Temizle",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name} Günlüğü",
   "diaryLoadFailed": "Günlük yüklenemedi",

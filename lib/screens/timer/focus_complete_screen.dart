@@ -14,6 +14,7 @@ import 'package:hachimi_app/models/habit.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/ai_provider.dart';
+import 'package:hachimi_app/providers/diary_provider.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/screens/timer/components/stat_row.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
@@ -179,6 +180,9 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     try {
       await ref.read(diaryServiceProvider).generateTodayDiary(ctx);
       if (!mounted) return;
+      // 立即刷新日记 Provider，用户返回详情页时无需等待
+      ref.invalidate(todayDiaryProvider(cat.id));
+      ref.invalidate(diaryEntriesProvider(cat.id));
       setState(() {
         _diaryGenerating = false;
         _diarySuccess = true;

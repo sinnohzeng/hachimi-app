@@ -601,6 +601,10 @@
   "chatClearConfirmTitle": "채팅 기록을 삭제할까요?",
   "chatClearConfirmMessage": "모든 메시지가 삭제돼요. 이 작업은 되돌릴 수 없어요.",
   "chatClearButton": "삭제",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name}의 일기",
   "diaryLoadFailed": "일기를 불러오지 못했어요",

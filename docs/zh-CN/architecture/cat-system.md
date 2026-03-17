@@ -483,12 +483,17 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 
 **常量定义：** `lib/core/constants/ai_constants.dart` -> `class DiaryPrompt`
 
+### Provider 失效机制
+
+在 `FocusCompleteScreen` 中日记生成成功后，会立即 invalidate `todayDiaryProvider` 和 `diaryEntriesProvider`，使 CatDetailScreen 的日记预览卡无需手动刷新即可显示新条目。
+
 ### 日记重试队列
 
 失败的日记生成通过 SharedPreferences（JSON 序列化）排队重试：
 - 每条最多重试 3 次。
 - 条目在 1 天后过期（不再重试）。
 - 重试在下次打开 `CatDetailScreen` 或完成专注会话时触发。
+- 重入保护（`_retryInProgress` bool 标记）防止同一帧内重复触发重试处理。
 
 ### 猫咪详情页集成
 
@@ -537,6 +542,23 @@ Hachimi 日记赋予每只猫每天撰写日记的能力，日记内容基于用
 - 底部文本输入框 + 发送按钮
 - 生成中显示 typing indicator
 - Token-by-token 流式显示
+
+### 错误处理与断路器
+
+AI 模块采用分层错误处理策略：
+
+1. **AiService**（网关层）— 管理并发控制与断路器回调
+   - AI 调用成功 → `onSuccess` 通知 `AiAvailabilityNotifier` 重置失败计数
+   - AI 调用失败（`busy` / `cancelled` 除外）→ `onFailure` 通知断路器
+   - 并发调用抛出 `AiErrorType.busy`（不计入失败）
+2. **ChatService** — 返回 `ChatResult`（密封类：`ChatSuccess` / `ChatCancelled` / `ChatError`）
+   - 始终保存消息到 DB（AI 回复或兜底语）
+   - 不吞没错误 — 调用方可区分成功与失败
+   - 用户取消时：`_streamGenerate()` 捕获 `AiErrorType.cancelled` 并返回已接收的部分内容
+3. **ChatNotifier** — 将 `ChatResult` 映射到 UI 状态
+   - `ChatSuccess` / `ChatCancelled` → `ChatStatus.idle`
+   - `ChatError` → `ChatStatus.error` + 用户可见的错误文案
+4. **CatChatScreen** — 当 `ChatStatus.error` 时渲染内联错误气泡 + 重试按钮
 
 ### 上下文窗口管理
 

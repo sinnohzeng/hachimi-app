@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hachimi_app/core/ai/ai_config.dart';
+import 'package:hachimi_app/core/ai/ai_exception.dart';
 import 'package:hachimi_app/core/ai/ai_message.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/models/cat.dart';
@@ -23,6 +24,32 @@ class ChatContext {
     required this.habit,
     required this.isZhLocale,
   });
+}
+
+/// 聊天回复结果 — 区分成功、取消、失败。
+///
+/// Service 层保证 DB 一致性（始终有消息保存），
+/// 但通过结果类型让调用方知道实际发生了什么。
+sealed class ChatResult {
+  /// 保存到 DB 的内容（成功时为 AI 回复，失败时为兜底语）。
+  final String content;
+  const ChatResult(this.content);
+}
+
+/// AI 正常回复。
+class ChatSuccess extends ChatResult {
+  const ChatSuccess(super.content);
+}
+
+/// 用户取消后的部分内容。
+class ChatCancelled extends ChatResult {
+  const ChatCancelled(super.content);
+}
+
+/// AI 调用失败 — 兜底语已保存，附带原始错误。
+class ChatError extends ChatResult {
+  final Object error;
+  const ChatError(super.content, this.error);
 }
 
 /// 聊天服务 — prompt 构建 + 流式生成 + 历史管理。
@@ -78,7 +105,10 @@ class ChatService {
   Stream<String> get tokenStream => _tokenController.stream;
 
   /// 发送用户消息并获取猫猫回复。
-  Future<String> sendMessage({
+  ///
+  /// 返回 [ChatResult] 而非 String — 调用方可区分成功、取消、失败。
+  /// 无论结果如何，DB 中始终会保存一条 assistant 消息。
+  Future<ChatResult> sendMessage({
     required String userMessage,
     required ChatContext chatCtx,
   }) async {
@@ -104,13 +134,15 @@ class ChatService {
 
     // 3. 流式生成回复
     try {
-      final response = await _streamGenerate(messages);
-      final cleaned = response.isEmpty
+      final result = await _streamGenerate(messages);
+      final cleaned = result.content.isEmpty
           ? _fallbackResponse(chatCtx.isZhLocale)
-          : response;
+          : result.content;
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, cleaned);
       debugPrint('[ChatService] success (length=${cleaned.length})');
-      return cleaned;
+      return result.wasCancelled
+          ? ChatCancelled(cleaned)
+          : ChatSuccess(cleaned);
     } catch (e, stack) {
       debugPrint('[ChatService] error=$e');
       ErrorHandler.recordOperation(
@@ -121,7 +153,7 @@ class ChatService {
       );
       final fallback = _fallbackResponse(chatCtx.isZhLocale);
       await _saveMessage(chatCtx.cat.id, ChatRole.assistant, fallback);
-      return fallback;
+      return ChatError(fallback, e);
     }
   }
 
@@ -130,14 +162,26 @@ class ChatService {
 
   // ─── Private Helpers ───
 
-  Future<String> _streamGenerate(List<AiMessage> messages) async {
+  /// 流式生成 — 取消时返回已接收的部分内容而非 rethrow。
+  ///
+  /// buffer 保持局部变量：取消是合法退出路径，不需要实例状态。
+  Future<({String content, bool wasCancelled})> _streamGenerate(
+    List<AiMessage> messages,
+  ) async {
     final buffer = StringBuffer();
-    final stream = _aiService.generateStream(messages, AiRequestConfig.chat);
-    await for (final token in stream) {
-      buffer.write(token);
-      _tokenController.add(token);
+    try {
+      final stream = _aiService.generateStream(messages, AiRequestConfig.chat);
+      await for (final token in stream) {
+        buffer.write(token);
+        _tokenController.add(token);
+      }
+      return (content: buffer.toString(), wasCancelled: false);
+    } on AiException catch (e) {
+      if (e.type == AiErrorType.cancelled && buffer.isNotEmpty) {
+        return (content: buffer.toString(), wasCancelled: true);
+      }
+      rethrow;
     }
-    return buffer.toString();
   }
 
   Future<void> _saveMessage(String catId, ChatRole role, String content) async {
