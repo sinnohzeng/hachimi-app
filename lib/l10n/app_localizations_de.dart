@@ -2456,4 +2456,26 @@ class SDe extends S {
   @override
   String get errorCreateHabit =>
       'Gewohnheit konnte nicht erstellt werden. Versuche es erneut';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get loginSendResetEmail => 'Send reset email';
+
+  @override
+  String get loginResetEmailSent =>
+      'Password reset email sent. Check your inbox';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get authErrorRequiresRecentLogin => 'Please log in again to continue';
 }

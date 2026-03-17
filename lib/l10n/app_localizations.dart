@@ -4513,6 +4513,48 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Failed to create habit. Try again'**
   String get errorCreateHabit;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get loginForgotPassword;
+
+  /// No description provided for @loginForgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get loginForgotPasswordTitle;
+
+  /// No description provided for @loginSendResetEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset email'**
+  String get loginSendResetEmail;
+
+  /// No description provided for @loginResetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent. Check your inbox'**
+  String get loginResetEmailSent;
+
+  /// No description provided for @authErrorUserDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled'**
+  String get authErrorUserDisabled;
+
+  /// No description provided for @authErrorInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get authErrorInvalidEmail;
+
+  /// No description provided for @authErrorRequiresRecentLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in again to continue'**
+  String get authErrorRequiresRecentLogin;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

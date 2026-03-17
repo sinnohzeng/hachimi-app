@@ -2396,4 +2396,25 @@ class SJa extends S {
 
   @override
   String get errorCreateHabit => '習慣の作成に失敗しました。もう一度お試しください';
+
+  @override
+  String get loginForgotPassword => 'パスワードを忘れた場合';
+
+  @override
+  String get loginForgotPasswordTitle => 'パスワードをリセット';
+
+  @override
+  String get loginSendResetEmail => 'リセットメールを送信';
+
+  @override
+  String get loginResetEmailSent => 'パスワードリセットメールを送信しました';
+
+  @override
+  String get authErrorUserDisabled => 'このアカウントは無効化されています';
+
+  @override
+  String get authErrorInvalidEmail => '有効なメールアドレスを入力してください';
+
+  @override
+  String get authErrorRequiresRecentLogin => '続行するには再度ログインしてください';
 }

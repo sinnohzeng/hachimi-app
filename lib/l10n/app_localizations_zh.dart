@@ -2391,6 +2391,27 @@ class SZh extends S {
 
   @override
   String get errorCreateHabit => '创建习惯失败，请重试';
+
+  @override
+  String get loginForgotPassword => '忘记密码？';
+
+  @override
+  String get loginForgotPasswordTitle => '重置密码';
+
+  @override
+  String get loginSendResetEmail => '发送重置邮件';
+
+  @override
+  String get loginResetEmailSent => '密码重置邮件已发送，请查收';
+
+  @override
+  String get authErrorUserDisabled => '此账号已被停用';
+
+  @override
+  String get authErrorInvalidEmail => '请输入有效的邮箱地址';
+
+  @override
+  String get authErrorRequiresRecentLogin => '请重新登录后继续';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4780,4 +4801,25 @@ class SZhHant extends SZh {
 
   @override
   String get errorCreateHabit => '建立習慣失敗，請重試';
+
+  @override
+  String get loginForgotPassword => '忘記密碼？';
+
+  @override
+  String get loginForgotPasswordTitle => '重置密碼';
+
+  @override
+  String get loginSendResetEmail => '發送重置郵件';
+
+  @override
+  String get loginResetEmailSent => '密碼重置郵件已發送，請查收';
+
+  @override
+  String get authErrorUserDisabled => '此帳號已被停用';
+
+  @override
+  String get authErrorInvalidEmail => '請輸入有效的電子郵件地址';
+
+  @override
+  String get authErrorRequiresRecentLogin => '請重新登錄後繼續';
 }

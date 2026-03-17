@@ -2400,4 +2400,25 @@ class SKo extends S {
 
   @override
   String get errorCreateHabit => '습관 만들기에 실패했어요. 다시 시도해 주세요';
+
+  @override
+  String get loginForgotPassword => '비밀번호를 잊으셨나요?';
+
+  @override
+  String get loginForgotPasswordTitle => '비밀번호 재설정';
+
+  @override
+  String get loginSendResetEmail => '재설정 이메일 보내기';
+
+  @override
+  String get loginResetEmailSent => '비밀번호 재설정 이메일이 전송되었습니다';
+
+  @override
+  String get authErrorUserDisabled => '이 계정은 비활성화되었습니다';
+
+  @override
+  String get authErrorInvalidEmail => '유효한 이메일 주소를 입력하세요';
+
+  @override
+  String get authErrorRequiresRecentLogin => '계속하려면 다시 로그인하세요';
 }
