@@ -13,6 +13,14 @@ import 'package:google_fonts/google_fonts.dart';
 /// - 状态色（pixelSuccess, pixelWarning）
 /// - 像素字体样式（Silkscreen 系列）
 class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
+  // --- 复古色板 SSOT — 工厂构造函数和外部预览组件共用 ---
+  static const Color lightBackground = Color(0xFFFFF8E7);
+  static const Color lightSurface = Color(0xFFFEF3D0);
+  static const Color darkBackground = Color(0xFF1A1A2E);
+  static const Color darkSurface = Color(0xFF252547);
+  static const Color lightBorder = Color(0xFF5C3A1E);
+  static const Color darkBorder = Color(0xFFA08B6D);
+
   const PixelThemeExtension({
     required this.isRetro,
     required this.retroBackground,
@@ -84,9 +92,9 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   factory PixelThemeExtension.light(ColorScheme scheme) {
     return PixelThemeExtension(
       isRetro: true,
-      retroBackground: const Color(0xFFFFF8E7),
-      retroSurface: const Color(0xFFFEF3D0),
-      pixelBorder: const Color(0xFF5C3A1E),
+      retroBackground: lightBackground,
+      retroSurface: lightSurface,
+      pixelBorder: lightBorder,
       xpBarFill: const Color(0xFFFFD700),
       xpBarTrack: const Color(0xFFD4C5A0),
       pixelAccentWarm: const Color(0xFFE8A87C),
@@ -105,9 +113,9 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   factory PixelThemeExtension.dark(ColorScheme scheme) {
     return PixelThemeExtension(
       isRetro: true,
-      retroBackground: const Color(0xFF1A1A2E),
-      retroSurface: const Color(0xFF252547),
-      pixelBorder: const Color(0xFFA08B6D),
+      retroBackground: darkBackground,
+      retroSurface: darkSurface,
+      pixelBorder: darkBorder,
       xpBarFill: const Color(0xFFFFD700),
       xpBarTrack: const Color(0xFF3A3A5C),
       pixelAccentWarm: const Color(0xFFE8A87C),
@@ -126,20 +134,20 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   factory PixelThemeExtension.fallback() {
     return PixelThemeExtension(
       isRetro: false,
-      retroBackground: const Color(0xFFFFF8E7),
-      retroSurface: const Color(0xFFFEF3D0),
-      pixelBorder: const Color(0xFF5C3A1E),
+      retroBackground: lightBackground,
+      retroSurface: lightSurface,
+      pixelBorder: lightBorder,
       xpBarFill: const Color(0xFFFFD700),
       xpBarTrack: const Color(0xFFD4C5A0),
       pixelAccentWarm: const Color(0xFFE8A87C),
       pixelAccentCool: const Color(0xFF7EC8E3),
       pixelSuccess: const Color(0xFF2E8B57),
       pixelWarning: const Color(0xFFDAA520),
-      pixelTitle: _pixelFont(16, FontWeight.bold, Colors.black),
-      pixelHeading: _pixelFont(14, FontWeight.normal, Colors.black),
-      pixelBody: _pixelFont(14, FontWeight.normal, Colors.black),
-      pixelLabel: _pixelFont(14, FontWeight.normal, Colors.grey),
-      pixelName: _pixelFont(20, FontWeight.bold, Colors.black),
+      pixelTitle: _pixelFont(16, FontWeight.bold, const Color(0xFF1C1B1F)),
+      pixelHeading: _pixelFont(14, FontWeight.normal, const Color(0xFF1C1B1F)),
+      pixelBody: _pixelFont(14, FontWeight.normal, const Color(0xFF1C1B1F)),
+      pixelLabel: _pixelFont(14, FontWeight.normal, const Color(0xFF49454F)),
+      pixelName: _pixelFont(20, FontWeight.bold, const Color(0xFF1C1B1F)),
     );
   }
 
@@ -191,6 +199,7 @@ class PixelThemeExtension extends ThemeExtension<PixelThemeExtension> {
   @override
   PixelThemeExtension lerp(covariant PixelThemeExtension? other, double t) {
     if (other == null) return this;
+    // 所有字段均为 non-nullable，Color.lerp / TextStyle.lerp 在双参非空时保证返回非空
     return PixelThemeExtension(
       isRetro: t < 0.5 ? isRetro : other.isRetro,
       retroBackground: Color.lerp(retroBackground, other.retroBackground, t)!,

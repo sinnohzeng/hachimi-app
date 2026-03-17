@@ -93,8 +93,8 @@ class AppTheme {
     TextTheme baseText,
     ThemeSkin skin,
   ) {
-    // Retro 模式不应使用动态色，但以防万一仍走正常路径
-    final colorScheme = skin is RetroPixelSkin
+    // Retro 模式忽略动态色方案，从种子色重建复古色板
+    final colorScheme = skin.isRetro
         ? skin.buildColorScheme(scheme.primary, scheme.brightness)
         : scheme;
     return _assemble(colorScheme, baseText, skin);

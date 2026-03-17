@@ -106,11 +106,17 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
 
   void _persist() {
     final prefs = ref.read(sharedPreferencesProvider);
-    prefs.setInt(_keyThemeMode, state.mode.index);
-    prefs.setInt(_keySeedColor, state.seedColor.toARGB32());
-    prefs.setBool(_keyDynamicColor, state.useDynamicColor);
-    prefs.setBool(_keyBgAnimation, state.enableBackgroundAnimation);
-    prefs.setInt(_keyUiStyle, state.uiStyle.index);
+    Future.wait([
+      prefs.setInt(_keyThemeMode, state.mode.index),
+      prefs.setInt(_keySeedColor, state.seedColor.toARGB32()),
+      prefs.setBool(_keyDynamicColor, state.useDynamicColor),
+      prefs.setBool(_keyBgAnimation, state.enableBackgroundAnimation),
+      prefs.setInt(_keyUiStyle, state.uiStyle.index),
+    ]).then((results) {
+      if (results.any((ok) => !ok)) {
+        debugPrint('[ThemeNotifier] SharedPreferences write partially failed');
+      }
+    });
   }
 }
 

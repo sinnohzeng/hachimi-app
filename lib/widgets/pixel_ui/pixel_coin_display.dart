@@ -20,7 +20,11 @@ class PixelCoinDisplay extends StatelessWidget {
         // 像素金币图标
         CustomPaint(
           size: const Size(16, 16),
-          painter: _CoinPainter(color: pixel.xpBarFill),
+          painter: _CoinPainter(
+            color: pixel.xpBarFill,
+            // 金币 "C" 字色：深棕在金色 (#FFD700) 上对比度 7.5:1（亮/暗色通用）
+            letterColor: const Color(0xFF3E2723),
+          ),
         ),
         const SizedBox(width: 4),
         AnimatedSwitcher(
@@ -50,9 +54,10 @@ class PixelCoinDisplay extends StatelessWidget {
 
 /// 绘制 16×16 像素金币 — 圆形底色 + "C" 标记。
 class _CoinPainter extends CustomPainter {
-  _CoinPainter({required this.color});
+  _CoinPainter({required this.color, required this.letterColor});
 
   final Color color;
+  final Color letterColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -85,7 +90,7 @@ class _CoinPainter extends CustomPainter {
         style: TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.w900,
-          color: Colors.brown.shade900,
+          color: letterColor,
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -100,5 +105,6 @@ class _CoinPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_CoinPainter oldDelegate) => color != oldDelegate.color;
+  bool shouldRepaint(_CoinPainter oldDelegate) =>
+      color != oldDelegate.color || letterColor != oldDelegate.letterColor;
 }

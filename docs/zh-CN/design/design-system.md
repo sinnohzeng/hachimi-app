@@ -33,6 +33,12 @@ DynamicColorBuilder(
 
 **设置入口（v2.8.2+）：** 动态取色和预设色已统一为一个 **设置 > 主题颜色** 对话框（`ThemeColorDialog`）。对话框顶部显示「动态」选项（渐变圆圈 + 壁纸图标），下方为 8 个预设色。选择「动态」调用 `setDynamicColor(true)`；选择预设色调用 `setDynamicColor(false)` + `setSeedColor(color)`。之前独立的 Material You `SwitchListTile` 开关已移除。
 
+### 色彩对比度（无障碍访问）
+
+Retro Pixel 主题中所有硬编码色彩对已通过 WCAG 2.1 AA 标准审计。Material 3 `ColorScheme.fromSeed()` 为标准语义色对提供自动 AA 合规保证。
+
+详见 **[色彩对比度验证](color-contrast-verification.md)** 获取完整的审计矩阵、对比度数值和验证方法。
+
 ### 色彩角色
 
 **不得硬编码颜色**。始终通过 `Theme.of(context).colorScheme` 访问：
