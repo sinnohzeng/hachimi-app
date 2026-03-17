@@ -113,6 +113,53 @@ lib/
 - Install debug APK: `scripts/adb-debug.sh install`
 - Device screenshot: `scripts/adb-debug.sh screenshot`
 
+## Track-Based Development Workflow
+
+Multi-track feature development follows this standard paradigm, established during V3 awareness (4 tracks, 51 review fixes, 15,000+ lines).
+
+### Per-Track Lifecycle
+
+```
+1. Read plan spec → Create feature branch
+2. Develop (parallel agents for independent tasks)
+3. dart analyze + flutter test (zero new warnings)
+4. Multi-dimensional review (3 skills in parallel):
+   - pr-review-toolkit:code-reviewer     → architecture, l10n, theme, code quality
+   - pr-review-toolkit:silent-failure-hunter → silent failures, fire-and-forget, error swallowing
+   - pr-review-toolkit:type-design-analyzer → type safety, encapsulation, API design
+5. Compile findings → Prioritize (🔴 Critical → 🟡 Medium → 🟢 Minor)
+6. Fix all 🔴 + 🟡 → Re-verify (analyze + test)
+7. DDD: Sync SSOT docs (EN + zh-CN mirrors)
+8. dart format → git add → commit → push → PR → squash merge → cleanup branch
+```
+
+### Anti-Patterns (Proven by 51 Review Fixes)
+
+These anti-patterns were discovered repeatedly across 4 development tracks. **Treat as hard rules.**
+
+| Anti-Pattern | Why It's Dangerous | Correct Pattern |
+|---|---|---|
+| `error: (_, _) => SizedBox.shrink()` | Error becomes invisible — user sees nothing, devs get no logs | Show error text + `debugPrint` logging |
+| Fire-and-forget async writes | UI shows success but data silently lost on failure | Always `await` + `try-catch` + user feedback on error |
+| `on Exception { }` without binding | Zero diagnostic trail — impossible to debug in production | `on Exception catch (e) { debugPrint(...); }` |
+| `TextEditingController` in `StatelessWidget.build()` | Memory leak + cursor jumps on every rebuild | Convert to `StatefulWidget`, hold controller in state, dispose |
+| `showDialog()` then immediate `Navigator.pop()` | Dialog dismissed before user sees it | `await showDialog()` then pop after dismiss |
+| `int.parse()` on DB/user data | Crashes on malformed input | `int.tryParse()` with fallback |
+| Hardcoded Chinese strings in widgets | Breaks l10n for non-Chinese users | All text via `context.l10n` — no exceptions |
+| `Map<int, String>` when enum exists | Type safety leak — callers pass raw int, bypassing enum | `Map<Mood, String>` — propagate enum through the full stack |
+| Read outside transaction, write inside | Race condition — isNew check invalidated between read and write | Use `DatabaseExecutor` parameter, pass `txn` not `db` |
+| `doc.data()!` in Firestore factory | NPE on metadata-only documents | `doc.data() as Map? ?? {}` |
+
+### DDD Sync Checklist (Per Track)
+
+After every track, update these SSOT docs:
+
+- [ ] `docs/architecture/data-model.md` — new tables, collections, schema changes
+- [ ] `docs/architecture/state-management.md` — new providers, ActionType values
+- [ ] `docs/architecture/folder-structure.md` — new directories, files
+- [ ] `docs/design/screens.md` — new screen specs, route changes
+- [ ] All corresponding `docs/zh-CN/` mirrors
+
 ## Key Gotchas
 
 - `google_fonts` 6.x breaks with Flutter 3.41 (FontWeight const) → use 8.x+
