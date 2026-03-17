@@ -818,5 +818,164 @@
   "a11yFocusMeditation": "Meditação focada",
   "a11yUnlocked": "Desbloqueado",
   "a11ySelected": "Selecionado",
-  "a11yDynamicWallpaperColor": "Cor dinâmica do papel de parede"
+  "a11yDynamicWallpaperColor": "Cor dinâmica do papel de parede",
+  "achievementLight100Desc": "Record daily light for 100 days (cumulative)",
+  "achievementLight100Name": "Century of Light",
+  "achievementLight30Desc": "Record daily light for 30 days (cumulative)",
+  "achievementLight30Name": "Month of Light",
+  "achievementLight7Desc": "Record daily light for 7 days (cumulative)",
+  "achievementLight7Name": "Week of Light",
+  "achievementLightFirstDesc": "Record your first daily light",
+  "achievementLightFirstName": "First Light",
+  "achievementReview4Desc": "Complete 4 weekly reviews (cumulative)",
+  "achievementReview4Name": "Monthly Reviewer",
+  "achievementReviewFirstDesc": "Complete your first weekly review",
+  "achievementReviewFirstName": "First Review",
+  "achievementWorryResolved10Desc": "Resolve or release 10 worries (cumulative)",
+  "achievementWorryResolved10Name": "Worry Whisperer",
+  "achievementWorryResolved1Desc": "Resolve or release your first worry",
+  "achievementWorryResolved1Name": "First Release",
+  "awarenessBridgePrompt": "What made you smile today? ✨",
+  "awarenessBridgeRecord": "Record",
+  "awarenessBridgeSkip": "Skip",
+  "awarenessEmptyHistorySubtitle": "Your history will appear here",
+  "awarenessEmptyHistoryTitle": "Every light matters",
+  "awarenessEmptyLightAction": "Record",
+  "awarenessEmptyLightSubtitle": "Whenever you're ready ✨",
+  "awarenessEmptyLightTitle": "No light recorded yet",
+  "awarenessEmptyReviewAction": "Start Review",
+  "awarenessEmptyReviewSubtitle": "Review when you feel like it 🐱",
+  "awarenessEmptyReviewTitle": "Take your time",
+  "awarenessEmptyWorriesSubtitle": "That's wonderful",
+  "awarenessEmptyWorriesTitle": "No worries? Great! 🎉",
+  "awarenessHabitsEmpty": "No habits yet. Adopt a cat to start!",
+  "awarenessHabitsSection": "Today's Habits",
+  "awarenessLightEdit": "Edit",
+  "awarenessLightPlaceholder": "What made you smile today?",
+  "awarenessLightSaved": "Light recorded ✨",
+  "awarenessLoadFailed": "Failed to load, please go back and retry",
+  "awarenessLoginRequired": "Please log in first",
+  "awarenessMoodRequired": "Please select today's mood",
+  "awarenessReviewComingSoon": "Coming soon",
+  "awarenessSaveFailed": "Save failed, please try again",
+  "awarenessSaved": "Saved",
+  "awarenessStatsLightDays": "Light Days",
+  "awarenessStatsMonthlyChallenge": "Monthly Challenge",
+  "awarenessStatsMoodDistribution": "Mood Distribution",
+  "awarenessStatsResolutionRate": "Resolution Rate",
+  "awarenessStatsStartRecording": "Start recording your first light",
+  "awarenessStatsTitle": "Awareness Stats",
+  "awarenessStatsTopTags": "Top Tags",
+  "awarenessStatsWeeklyReviews": "Reviews",
+  "awarenessTabReview": "Review",
+  "awarenessTabThisWeek": "This Week",
+  "awarenessTabToday": "Today",
+  "awarenessTitle": "Awareness",
+  "calendarFri": "Fri",
+  "calendarMon": "Mon",
+  "calendarSat": "Sat",
+  "calendarSun": "Sun",
+  "calendarThu": "Thu",
+  "calendarTue": "Tue",
+  "calendarWed": "Wed",
+  "catReactCalm": "A calm day is a good day 🍃",
+  "catReactDown": "I'm here with you 💛",
+  "catReactHappy": "Another light recorded ✨",
+  "catReactVeryDown": "Not going anywhere 🫂",
+  "catReactVeryHappy": "So happy today! Meow~ 🎉",
+  "dailyDetailEdit": "Edit Record",
+  "dailyDetailGoRecord": "Go Record",
+  "dailyDetailLight": "Today's Light",
+  "dailyDetailNoRecord": "No record for this day",
+  "dailyDetailTimeline": "Today's Timeline",
+  "dailyDetailTitle": "Daily Detail",
+  "historyHappyMoments": "{count} happy moments",
+  "@historyHappyMoments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyWeekRange": "{startDate} - {endDate}",
+  "@historyWeekRange": {
+    "placeholders": {
+      "startDate": {
+        "type": "String"
+      },
+      "endDate": {
+        "type": "String"
+      }
+    }
+  },
+  "historyWeeklyReviews": "Weekly Reviews",
+  "homeTabAwareness": "Awareness",
+  "homeTabHabits": "Habits",
+  "monthlyRitualAchieved": "Goal achieved! 🎉",
+  "monthlyRitualDialogTitle": "Monthly ritual",
+  "monthlyRitualEncouragement": "Every day counts",
+  "monthlyRitualHabitLabel": "Focus habit",
+  "monthlyRitualProgress": "{completed}/{target} days done ✨",
+  "@monthlyRitualProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyRitualRewardHint": "Reward myself with...",
+  "monthlyRitualRewardLabel": "Reward",
+  "monthlyRitualSetupButton": "Set up",
+  "monthlyRitualSetupDesc": "Choose your focus habit, set a flexible goal, and promise yourself a reward.",
+  "monthlyRitualSetupTitle": "A new month — pick a habit to focus on",
+  "monthlyRitualTargetLabel": "Target days",
+  "monthlyRitualTargetValue": "{count} days",
+  "@monthlyRitualTargetValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moodCalm": "Calm",
+  "moodDown": "Down",
+  "moodVeryDown": "Very Down",
+  "moodVeryHappy": "Very Happy",
+  "notifBedtimeLight": "How was your day? Take a moment to notice something good ✨",
+  "notifGentleReengagement": "No pressure — come back whenever you're ready 🌿",
+  "notifMonthlyRitual": "A new month begins! Pick a habit to focus on this month 🌙",
+  "notifWeeklyReview": "Sunday evening — a good time to look back at your week 📖",
+  "tagCustom": "+Custom",
+  "timelineEventHint": "What happened?",
+  "weeklyReviewGratitude": "Gratitude",
+  "weeklyReviewGratitudeHint": "Who or what are you grateful for?",
+  "weeklyReviewHappyMoment": "Happy Moment #{number}",
+  "@weeklyReviewHappyMoment": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyReviewHappyMomentHint": "What made you happy this week?",
+  "weeklyReviewLearning": "Learning",
+  "weeklyReviewLearningHint": "What did you learn this week?",
+  "weeklyReviewSave": "Save Review",
+  "weeklyReviewSaved": "Review saved ✨",
+  "weeklyReviewTitle": "Weekly Review",
+  "worryAdd": "Add Worry",
+  "worryDescriptionHint": "What's bothering you?",
+  "worryDescriptionRequired": "Please describe your worry",
+  "worryLoadFailed": "Failed to load worry",
+  "worryManageAll": "Manage all worries",
+  "worryProcessorTitle": "Worry Processor",
+  "worryResolvedSection": "Resolved & Gone",
+  "worrySave": "Save",
+  "worrySolutionHint": "What could you do about it?",
+  "worryStatusDisappeared": "Gone",
+  "worryStatusOngoing": "Ongoing",
+  "worryStatusResolved": "Resolved"
 }
