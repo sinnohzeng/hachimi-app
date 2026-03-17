@@ -864,5 +864,9 @@
   "loginResetEmailSent": "密碼重置郵件已發送，請查收",
   "authErrorUserDisabled": "此帳號已被停用",
   "authErrorInvalidEmail": "請輸入有效的電子郵件地址",
-  "authErrorRequiresRecentLogin": "請重新登錄後繼續"
+  "authErrorRequiresRecentLogin": "請重新登錄後繼續",
+  "chatSend": "傳送",
+  "chatStop": "停止",
+  "chatErrorMessage": "傳送失敗，點擊重試",
+  "chatRetry": "重試"
 }
