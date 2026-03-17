@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 /// 周回顾记录 — 每周复盘的三个快乐时刻 + 感恩 + 学习。
 ///
@@ -205,8 +206,13 @@ class WeeklyReview {
 
   static List<String> _decodeStringList(dynamic raw) {
     if (raw is String) {
-      final decoded = jsonDecode(raw);
-      if (decoded is List) return decoded.whereType<String>().toList();
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is List) return decoded.whereType<String>().toList();
+      } on FormatException {
+        // 损坏数据静默降级为空列表
+        debugPrint('[WeeklyReview] corrupted JSON in _decodeStringList: $raw');
+      }
     }
     return [];
   }

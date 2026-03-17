@@ -23,15 +23,13 @@ class PixelBadge extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
 
-  /// 是否播放入场动画（复古模式：弹跳缩放；MD3 模式：AnimatedScale）
+  /// 是否播放入场弹跳动画（仅复古模式生效）
   final bool animate;
 
   @override
   Widget build(BuildContext context) {
-    final pixel = context.pixel;
-
-    if (pixel.isRetro) {
-      return _RetroPixelBadge(
+    if (!context.pixel.isRetro) {
+      return _Md3Badge(
         text: text,
         icon: icon,
         backgroundColor: backgroundColor,
@@ -40,7 +38,7 @@ class PixelBadge extends StatelessWidget {
       );
     }
 
-    return _Md3Badge(
+    return _RetroPixelBadge(
       text: text,
       icon: icon,
       backgroundColor: backgroundColor,
@@ -51,7 +49,7 @@ class PixelBadge extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// MD3 模式 — 圆角容器 + AnimatedScale 入场动画
+// MD3 模式 — 圆角容器
 // ---------------------------------------------------------------------------
 
 class _Md3Badge extends StatelessWidget {
@@ -94,10 +92,13 @@ class _Md3Badge extends StatelessWidget {
 
     if (!animate) return badge;
 
-    return AnimatedScale(
-      scale: 1.0,
+    // 入场缩放动画 — 无需 AnimationController
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.8, end: 1.0),
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
+      builder: (context, value, child) =>
+          Transform.scale(scale: value, child: child),
       child: badge,
     );
   }

@@ -38,53 +38,23 @@ class PixelChatBubble extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   Widget _buildMaterial(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     final bgColor = isUser
         ? scheme.primaryContainer
         : scheme.surfaceContainerHigh;
     final fgColor = isUser ? scheme.onPrimaryContainer : scheme.onSurface;
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.75,
+    return _wrapAligned(
+      context,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: AppShape.borderLarge,
+          color: bgColor,
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: AppShape.borderLarge,
-            color: bgColor,
-          ),
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isUser) ...[
-                const ExcludeSemantics(
-                  child: Text('🐾 ', style: TextStyle(fontSize: 12)),
-                ),
-              ],
-              Flexible(
-                child: Text.rich(
-                  TextSpan(
-                    text: text,
-                    children: [
-                      if (isStreaming)
-                        WidgetSpan(child: _BlinkingCursor(color: fgColor)),
-                    ],
-                  ),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: fgColor,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        child: _contentRow(fgColor, theme),
       ),
     );
   }
@@ -94,80 +64,97 @@ class PixelChatBubble extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   Widget _buildRetro(BuildContext context, PixelThemeExtension pixel) {
-    final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     final bgColor = isUser ? scheme.primary : pixel.retroSurface;
     final fgColor = isUser ? scheme.onPrimary : scheme.onSurface;
     final borderColor = pixel.pixelBorder;
 
+    return _wrapAligned(
+      context,
+      child: Column(
+        crossAxisAlignment: isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          CustomPaint(
+            painter: _BubblePainter(
+              fillColor: bgColor,
+              borderColor: borderColor,
+              isUser: isUser,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: _contentRow(fgColor, theme),
+            ),
+          ),
+          // 像素三角尾巴
+          Padding(
+            padding: EdgeInsets.only(
+              left: isUser ? 0 : 16,
+              right: isUser ? 16 : 0,
+            ),
+            child: CustomPaint(
+              size: const Size(10, 6),
+              painter: _TailPainter(
+                fillColor: bgColor,
+                borderColor: borderColor,
+                isUser: isUser,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 共用：对齐 + 最大宽度约束
+  // ---------------------------------------------------------------------------
+
+  Widget _wrapAligned(BuildContext context, {required Widget child}) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.75,
         ),
-        child: Column(
-          crossAxisAlignment: isUser
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
-          children: [
-            CustomPaint(
-              painter: _BubblePainter(
-                fillColor: bgColor,
-                borderColor: borderColor,
-                isUser: isUser,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!isUser) ...[
-                      const ExcludeSemantics(
-                        child: Text('🐾 ', style: TextStyle(fontSize: 12)),
-                      ),
-                    ],
-                    Flexible(
-                      child: Text.rich(
-                        TextSpan(
-                          text: text,
-                          children: [
-                            if (isStreaming)
-                              WidgetSpan(
-                                child: _BlinkingCursor(color: fgColor),
-                              ),
-                          ],
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: fgColor,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // 像素三角尾巴
-            Padding(
-              padding: EdgeInsets.only(
-                left: isUser ? 0 : 16,
-                right: isUser ? 16 : 0,
-              ),
-              child: CustomPaint(
-                size: const Size(10, 6),
-                painter: _TailPainter(
-                  fillColor: bgColor,
-                  borderColor: borderColor,
-                  isUser: isUser,
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: child,
       ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 共用：猫爪前缀 + 文本 + 流式光标
+  // ---------------------------------------------------------------------------
+
+  Widget _contentRow(Color fgColor, ThemeData theme) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!isUser) ...[
+          const ExcludeSemantics(
+            child: Text('🐾 ', style: TextStyle(fontSize: 12)),
+          ),
+        ],
+        Flexible(
+          child: Text.rich(
+            TextSpan(
+              text: text,
+              children: [
+                if (isStreaming)
+                  WidgetSpan(child: _BlinkingCursor(color: fgColor)),
+              ],
+            ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: fgColor,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

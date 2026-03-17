@@ -95,6 +95,8 @@ Architecture:
 - Retro colors map onto `ColorScheme` slots (e.g., `surface` → retro background, `outline` → pixel border) so all existing Material widgets auto-adapt with zero code changes.
 - `AppScaffold` wraps `Scaffold` and conditionally overlays `RetroTiledBackground` in retro mode — single integration point for 23+ screens.
 - `PixelThemeExtension` carries pixel-only tokens (XP bar, success/warning colors, Silkscreen text styles).
+- **Adaptive pixel widgets**: All `lib/widgets/pixel_ui/Pixel*` components check `context.pixel.isRetro` and render standard M3 components (`Container`, `FilledButton.tonal`, `Card`, `LinearProgressIndicator`, `Divider`) in Material mode, or pixel CustomPaint in Retro mode. StatefulWidget components (PixelButton, PixelBadge, PixelCard) use an outer StatelessWidget shell to avoid creating AnimationControllers in MD3 mode.
+- Shared MD3 helpers in `lib/widgets/pixel_ui/_md3_helpers.dart` reduce duplication across adaptive widgets.
 
 ## SSOT Snapshot
 | Concern | SSOT |

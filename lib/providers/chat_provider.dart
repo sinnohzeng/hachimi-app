@@ -93,6 +93,9 @@ class ChatNotifier extends Notifier<ChatState> {
     if (state.status == ChatStatus.generating) return;
     if (text.trim().isEmpty) return;
 
+    // 防止 autoDispose 在生成期间回收 provider
+    final link = ref.keepAlive();
+
     // 乐观更新：先把用户消息加到列表
     final userMsg = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -162,6 +165,7 @@ class ChatNotifier extends Notifier<ChatState> {
     } finally {
       _tokenSub?.cancel();
       _tokenSub = null;
+      link.close();
     }
   }
 

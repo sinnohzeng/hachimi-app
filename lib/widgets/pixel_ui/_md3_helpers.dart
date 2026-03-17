@@ -30,3 +30,20 @@ Widget md3Container({
 Widget md3Divider({Color? color, double? indent}) {
   return Divider(height: 1, thickness: 0.5, color: color, indent: indent);
 }
+
+/// 里程表式数字切换动画 — MD3 / Retro 金币计数共用。
+Widget md3AnimatedCounter({required int amount, required TextStyle? style}) {
+  return AnimatedSwitcher(
+    duration: const Duration(milliseconds: 200),
+    transitionBuilder: (child, animation) {
+      return SlideTransition(
+        position: Tween(
+          begin: const Offset(0, 0.5),
+          end: Offset.zero,
+        ).animate(animation),
+        child: FadeTransition(opacity: animation, child: child),
+      );
+    },
+    child: Text('$amount', key: ValueKey(amount), style: style),
+  );
+}
