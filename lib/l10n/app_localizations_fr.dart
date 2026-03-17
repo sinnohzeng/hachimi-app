@@ -225,6 +225,9 @@ class SFr extends S {
   String get focusCompleteDiaryWritten => 'Journal écrit !';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diary skipped';
+
+  @override
   String get focusCompleteNotifTitle => 'Quête terminée !';
 
   @override

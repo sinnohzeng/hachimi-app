@@ -1,5 +1,5 @@
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:hachimi_app/providers/timer_persistence.dart';
 import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:path/path.dart' as p;
@@ -29,12 +29,15 @@ class AccountDeletionSummary {
 class AccountDeletionService {
   final LocalDatabaseService _localDb;
   final NotificationService _notifications;
+  final TimerPersistence _timerPersistence;
 
   AccountDeletionService({
     required LocalDatabaseService localDb,
     required NotificationService notifications,
+    required TimerPersistence timerPersistence,
   }) : _localDb = localDb,
-       _notifications = notifications;
+       _notifications = notifications,
+       _timerPersistence = timerPersistence;
 
   Future<AccountDeletionSummary> getUserDataSummary(String uid) async {
     final db = await _localDb.database;
@@ -147,7 +150,7 @@ class AccountDeletionService {
 
   Future<void> _cleanTimerState() async {
     try {
-      await FocusTimerNotifier.clearSavedState();
+      await _timerPersistence.clearSavedState();
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,

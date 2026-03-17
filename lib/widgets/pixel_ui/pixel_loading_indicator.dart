@@ -8,6 +8,10 @@ import '../../core/theme/pixel_theme_extension.dart';
 ///
 /// 使用 4 帧阶梯旋转（0°、90°、180°、270°）代替平滑旋转，
 /// 模拟 8-bit 游戏中的加载动画效果。
+///
+/// CustomPaint 作为 AnimatedBuilder.child 提取，仅构建一次；
+/// builder 回调只包装 Transform.rotate（GPU 加速矩阵变换）。
+/// RepaintBoundary 隔离旋转重绘区域。
 class PixelLoadingIndicator extends StatefulWidget {
   const PixelLoadingIndicator({
     super.key,
@@ -48,60 +52,67 @@ class _PixelLoadingIndicatorState extends State<PixelLoadingIndicator>
     final pixel = context.pixel;
     final color = widget.color ?? pixel.pixelBorder;
 
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        // 4 帧阶梯旋转：将连续动画离散化为 4 步
-        final frame = (_controller.value * 4).floor() % 4;
-        final angle = frame * math.pi / 2;
-
-        return Transform.rotate(
-          angle: angle,
-          child: CustomPaint(
-            size: Size.square(widget.size),
-            painter: _PixelSpinnerPainter(
-              color: color,
-              strokeWidth: widget.strokeWidth,
-            ),
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          // 4 帧阶梯旋转：将连续动画离散化为 4 步
+          final frame = (_controller.value * 4).floor() % 4;
+          final angle = frame * math.pi / 2;
+          return Transform.rotate(angle: angle, child: child);
+        },
+        child: CustomPaint(
+          size: Size.square(widget.size),
+          painter: _PixelSpinnerPainter(
+            color: color,
+            strokeWidth: widget.strokeWidth,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
 
 class _PixelSpinnerPainter extends CustomPainter {
-  const _PixelSpinnerPainter({required this.color, required this.strokeWidth});
+  _PixelSpinnerPainter({required this.color, required this.strokeWidth})
+    : _brightPaint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..isAntiAlias = false,
+      _fadePaint = Paint()
+        ..color = color.withValues(alpha: 0.25)
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..isAntiAlias = false;
 
   final Color color;
   final double strokeWidth;
+  final Paint _brightPaint;
+  final Paint _fadePaint;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = false;
-
-    final fadePaint = Paint()
-      ..color = color.withValues(alpha: 0.25)
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = false;
-
     final cx = size.width / 2;
     final cy = size.height / 2;
     final r = (size.width - strokeWidth) / 2;
 
     // 上边（亮）
-    canvas.drawLine(Offset(cx - r, cy - r), Offset(cx + r, cy - r), paint);
+    canvas.drawLine(
+      Offset(cx - r, cy - r),
+      Offset(cx + r, cy - r),
+      _brightPaint,
+    );
     // 右边（亮）
-    canvas.drawLine(Offset(cx + r, cy - r), Offset(cx + r, cy + r), paint);
+    canvas.drawLine(
+      Offset(cx + r, cy - r),
+      Offset(cx + r, cy + r),
+      _brightPaint,
+    );
     // 下边（暗）
-    canvas.drawLine(Offset(cx + r, cy + r), Offset(cx - r, cy + r), fadePaint);
+    canvas.drawLine(Offset(cx + r, cy + r), Offset(cx - r, cy + r), _fadePaint);
     // 左边（暗）
-    canvas.drawLine(Offset(cx - r, cy + r), Offset(cx - r, cy - r), fadePaint);
+    canvas.drawLine(Offset(cx - r, cy + r), Offset(cx - r, cy - r), _fadePaint);
   }
 
   @override

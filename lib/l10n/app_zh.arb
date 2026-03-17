@@ -163,6 +163,7 @@
   "focusCompleteYourCat": "你的猫猫",
   "focusCompleteDiaryWriting": "正在写日记...",
   "focusCompleteDiaryWritten": "日记已写好！",
+  "focusCompleteDiarySkipped": "日记已跳过",
   "focusCompleteNotifTitle": "任务完成！",
   "focusCompleteNotifBody": "{catName} 通过 {minutes} 分钟专注获得了 +{xp} XP",
   "@focusCompleteNotifBody": {

@@ -12,9 +12,7 @@ import 'package:timezone/data/latest_10y.dart' as tzdata;
 import 'package:hachimi_app/services/notification_scheduling.dart';
 
 void main() {
-  setUpAll(() {
-    tzdata.initializeTimeZones();
-  });
+  setUpAll(tzdata.initializeTimeZones);
 
   // ─── nextInstanceOfTime ───
 

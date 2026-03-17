@@ -223,6 +223,9 @@ class SKo extends S {
   String get focusCompleteDiaryWritten => '일기 작성 완료!';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diary skipped';
+
+  @override
   String get focusCompleteNotifTitle => '퀘스트 완료!';
 
   @override

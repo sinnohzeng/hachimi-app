@@ -40,51 +40,46 @@ class PixelBorder extends StatelessWidget {
     final effectiveBorder = borderColor ?? pixel.pixelBorder;
     final effectiveFill = fillColor ?? pixel.retroSurface;
 
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: _PixelBorderPainter(
-          borderColor: effectiveBorder,
-          fillColor: effectiveFill,
-          borderWidth: borderWidth,
-        ),
-        child: Padding(
-          padding: padding ?? const EdgeInsets.all(12),
-          child: child,
-        ),
+    return CustomPaint(
+      painter: _PixelBorderPainter(
+        borderColor: effectiveBorder,
+        fillColor: effectiveFill,
+        borderWidth: borderWidth,
+      ),
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(12),
+        child: child,
       ),
     );
   }
 }
 
 /// 绘制阶梯角矩形 — 四角各裁掉一个 step×step 的小方块。
+///
+/// Paint 对象在构造时缓存，避免 paint() 中分配，降低 GC 压力。
 class _PixelBorderPainter extends CustomPainter {
   _PixelBorderPainter({
     required this.borderColor,
     required this.fillColor,
     required this.borderWidth,
-  });
+  }) : _fillPaint = Paint()..color = fillColor,
+       _strokePaint = Paint()
+         ..color = borderColor
+         ..style = PaintingStyle.stroke
+         ..strokeWidth = borderWidth
+         ..isAntiAlias = false;
 
   final Color borderColor;
   final Color fillColor;
   final double borderWidth;
+  final Paint _fillPaint;
+  final Paint _strokePaint;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final step = borderWidth * 2;
-    final path = _steppedPath(size, step);
-
-    // 填充
-    canvas.drawPath(path, Paint()..color = fillColor);
-
-    // 边框
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = borderWidth
-        ..isAntiAlias = false,
-    );
+    final path = _steppedPath(size, borderWidth * 2);
+    canvas.drawPath(path, _fillPaint);
+    canvas.drawPath(path, _strokePaint);
   }
 
   /// 生成阶梯角路径 — 每个角切掉 step×step 像素。

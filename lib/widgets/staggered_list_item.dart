@@ -39,6 +39,8 @@ class StaggeredListItem extends StatefulWidget {
 class _StaggeredListItemState extends State<StaggeredListItem>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  late final CurvedAnimation _opacityCurve;
+  late final CurvedAnimation _slideCurve;
   late final Animation<double> _opacity;
   late final Animation<Offset> _slide;
   Timer? _delayTimer;
@@ -54,17 +56,19 @@ class _StaggeredListItemState extends State<StaggeredListItem>
       vsync: this,
       duration: AppMotion.durationShort4,
     );
-    _opacity = CurvedAnimation(
+    _opacityCurve = CurvedAnimation(
       parent: _controller,
       curve: AppMotion.standardDecelerate,
     );
-    _slide = Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _controller,
-            curve: AppMotion.standardDecelerate,
-          ),
-        );
+    _opacity = _opacityCurve;
+    _slideCurve = CurvedAnimation(
+      parent: _controller,
+      curve: AppMotion.standardDecelerate,
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.05),
+      end: Offset.zero,
+    ).animate(_slideCurve);
 
     if (!widget.waitForRoute) {
       _startDelayedAnimation();
@@ -109,6 +113,8 @@ class _StaggeredListItemState extends State<StaggeredListItem>
   void dispose() {
     _delayTimer?.cancel();
     _routeAnimation?.removeStatusListener(_onRouteAnimationStatus);
+    _opacityCurve.dispose();
+    _slideCurve.dispose();
     _controller.dispose();
     super.dispose();
   }

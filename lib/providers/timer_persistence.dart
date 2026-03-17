@@ -174,7 +174,7 @@ class TimerPersistence {
   Future<void> clearSavedState() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await Future.wait(_allKeys.map((k) => prefs.remove(k)));
+      await Future.wait(_allKeys.map(prefs.remove));
     } catch (e) {
       debugPrint('[TimerPersistence] clear error: $e');
     }

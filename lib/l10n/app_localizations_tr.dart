@@ -225,6 +225,9 @@ class STr extends S {
   String get focusCompleteDiaryWritten => 'Günlük yazıldı!';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diary skipped';
+
+  @override
   String get focusCompleteNotifTitle => 'Görev tamamlandı!';
 
   @override

@@ -224,6 +224,9 @@ class SDe extends S {
   String get focusCompleteDiaryWritten => 'Tagebuch geschrieben!';
 
   @override
+  String get focusCompleteDiarySkipped => 'Diary skipped';
+
+  @override
   String get focusCompleteNotifTitle => 'Quest abgeschlossen!';
 
   @override

@@ -69,6 +69,13 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
   late final CurvedAnimation _exitContentScaleCurve;
   late final CurvedAnimation _exitContentFadeCurve;
 
+  // Tween 驱动动画 — 在 _initAnimations 中创建，避免 build() 中分配
+  late final Animation<double> _exitBgFade;
+  late final Animation<double> _exitContentScale;
+  late final Animation<double> _exitContentFade;
+  late final Animation<double> _iconScale;
+  late final Animation<Offset> _textSlide;
+
   @override
   void initState() {
     super.initState();
@@ -171,6 +178,25 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
       parent: _exitContentController,
       curve: AppMotion.standardAccelerate,
     );
+
+    // Tween 驱动动画 — 在此创建避免 build()/buildContent() 中每帧分配
+    _exitBgFade = Tween<double>(begin: 1.0, end: 0.0).animate(_exitBgFadeCurve);
+    _exitContentScale = Tween<double>(
+      begin: 1.0,
+      end: 0.9,
+    ).animate(_exitContentScaleCurve);
+    _exitContentFade = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(_exitContentFadeCurve);
+    _iconScale = Tween<double>(
+      begin: _config.iconScaleFrom,
+      end: 1.0,
+    ).animate(_iconScaleCurve);
+    _textSlide = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(_textSlideCurve);
   }
 
   void _startEntrance() {
@@ -325,23 +351,10 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
 
     final confettiColors = BrandColors.confetti(colorScheme);
 
-    final exitBgFade = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(_exitBgFadeCurve);
-    final exitContentScale = Tween<double>(
-      begin: 1.0,
-      end: 0.9,
-    ).animate(_exitContentScaleCurve);
-    final exitContentFade = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(_exitContentFadeCurve);
-
     return Material(
       type: MaterialType.transparency,
       child: FadeTransition(
-        opacity: exitBgFade,
+        opacity: _exitBgFade,
         child: Stack(
           children: [
             // 全屏渐变背景 — 100% 不透明
@@ -370,9 +383,9 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
             // 内容
             SafeArea(
               child: FadeTransition(
-                opacity: exitContentFade,
+                opacity: _exitContentFade,
                 child: ScaleTransition(
-                  scale: exitContentScale,
+                  scale: _exitContentScale,
                   child: _buildContent(
                     colorScheme,
                     textTheme,
@@ -432,15 +445,6 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
     bool hasTitle,
     String? titleName,
   ) {
-    final iconScale = Tween<double>(
-      begin: _config.iconScaleFrom,
-      end: 1.0,
-    ).animate(_iconScaleCurve);
-    final textSlide = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(_textSlideCurve);
-
     final headline = _resolveHeadline(l10n);
 
     return Column(
@@ -469,7 +473,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         FadeTransition(
           opacity: _iconFade,
           child: ScaleTransition(
-            scale: iconScale,
+            scale: _iconScale,
             child: CelebrationGlowIcon(
               icon: def.icon,
               tier: _tier,
@@ -481,7 +485,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
 
         // 成就名称
         SlideTransition(
-          position: textSlide,
+          position: _textSlide,
           child: FadeTransition(
             opacity: _textFade,
             child: Padding(
@@ -500,7 +504,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         if (desc.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.md),
           SlideTransition(
-            position: textSlide,
+            position: _textSlide,
             child: FadeTransition(
               opacity: _textFade,
               child: Padding(

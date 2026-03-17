@@ -10,8 +10,9 @@ enum PatternType { dots, diagonal, crosshatch, grid }
 /// 极低透明度（0.03~0.06），增添质感但不喧宾夺主。
 /// 可选滚动偏移实现 1-2px 视差效果。
 ///
-/// 内部使用 [PictureRecorder] 将图案缓存为 [ui.Image]，
-/// 避免每帧绘制数千个基础图元。仅在尺寸或图案参数变化时重新生成缓存。
+/// 内部使用 [PictureRecorder] 将图案异步缓存为 [ui.Image]，
+/// 避免每帧绘制数千个基础图元，且不阻塞页面转场动画。
+/// 仅在尺寸或图案参数变化时重新生成缓存。
 /// 缓存与 State 生命周期绑定，widget 销毁时自动释放 GPU 纹理。
 class RetroTiledBackground extends StatefulWidget {
   const RetroTiledBackground({
@@ -45,6 +46,7 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
   Color? _cachedColor;
   double? _cachedOffset;
   Size? _cachedSize;
+  bool _isGenerating = false;
 
   @override
   void dispose() {
@@ -53,14 +55,17 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
     super.dispose();
   }
 
-  /// 检查缓存是否需要重新生成，返回当前位图。
-  ui.Image? _ensureCache(
+  /// 异步检查并更新缓存 — 将 GPU 纹理分配移出关键帧路径。
+  ///
+  /// 首帧：背景透明（图案仅 3-5% 透明度，不可感知）。
+  /// 异步完成后 setState 触发重绘，图案无缝出现。
+  void _ensureCacheAsync(
     Size size,
     PatternType pattern,
     Color color,
     double offset,
   ) {
-    if (size.isEmpty) return null;
+    if (size.isEmpty) return;
 
     final needsRegen =
         _cachedImage == null ||
@@ -69,16 +74,24 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
         _cachedColor != color ||
         _cachedOffset != offset;
 
-    if (needsRegen) {
-      _cachedImage?.dispose();
-      _cachedImage = _renderToImage(size, pattern, color, offset);
-      _cachedPattern = pattern;
-      _cachedColor = color;
-      _cachedOffset = offset;
-      _cachedSize = size;
-    }
+    if (!needsRegen || _isGenerating) return;
 
-    return _cachedImage;
+    _isGenerating = true;
+    _renderToImageAsync(size, pattern, color, offset).then((image) {
+      if (!mounted) {
+        image?.dispose();
+        return;
+      }
+      setState(() {
+        _cachedImage?.dispose();
+        _cachedImage = image;
+        _cachedPattern = pattern;
+        _cachedColor = color;
+        _cachedOffset = offset;
+        _cachedSize = size;
+        _isGenerating = false;
+      });
+    });
   }
 
   @override
@@ -90,36 +103,46 @@ class _RetroTiledBackgroundState extends State<RetroTiledBackground> {
     final effectiveColor = patternColor.withValues(alpha: patternOpacity);
     final effectiveOffset = widget.scrollOffset % 16;
 
+    // 触发异步缓存生成（不阻塞当前帧）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final renderBox = context.findRenderObject() as RenderBox?;
+      if (renderBox != null && renderBox.hasSize) {
+        _ensureCacheAsync(
+          renderBox.size,
+          widget.pattern,
+          effectiveColor,
+          effectiveOffset,
+        );
+      }
+    });
+
     return Stack(
       children: [
-        Positioned.fill(
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: _CachedPatternPainter(
-                pattern: widget.pattern,
-                color: effectiveColor,
-                offset: effectiveOffset,
-                ensureCache: _ensureCache,
+        if (_cachedImage != null)
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: _CachedPatternPainter(image: _cachedImage!),
               ),
             ),
           ),
-        ),
         widget.child,
       ],
     );
   }
 }
 
-/// 将图案绘制到离屏画布，返回位图。
+/// 异步将图案绘制到离屏画布，返回位图。
 ///
-/// 对 GPU 纹理分配做防御性保护：尺寸超限或分配失败时返回 null，
-/// 画笔层退化为无背景（而非红屏崩溃）。
-ui.Image? _renderToImage(
+/// 使用 [Picture.toImage]（异步版本）代替 toImageSync，
+/// 避免在页面转场首帧同步阻塞 GPU 线程。
+Future<ui.Image?> _renderToImageAsync(
   Size size,
   PatternType pattern,
   Color color,
   double offset,
-) {
+) async {
   // 防御超大画布导致 GPU OOM
   if (size.width > 4096 || size.height > 4096) return null;
 
@@ -143,11 +166,11 @@ ui.Image? _renderToImage(
     }
 
     final picture = recorder.endRecording();
-    final image = picture.toImageSync(size.width.ceil(), size.height.ceil());
+    final image = await picture.toImage(size.width.ceil(), size.height.ceil());
     picture.dispose();
     return image;
   } catch (e) {
-    debugPrint('[RetroTiledBackground] toImageSync failed: $e');
+    debugPrint('[RetroTiledBackground] toImage failed: $e');
     return null;
   }
 }
@@ -208,35 +231,21 @@ void _paintGrid(Canvas canvas, Size size, Paint paint, double offset) {
   }
 }
 
-/// 缓存图案到 [ui.Image] 的画笔。
-///
-/// 缓存管理委托给 [_RetroTiledBackgroundState]，
-/// 确保 GPU 纹理与 widget 生命周期绑定。
+/// 仅负责绘制已缓存的 [ui.Image] — 零逻辑、零分配。
 class _CachedPatternPainter extends CustomPainter {
-  _CachedPatternPainter({
-    required this.pattern,
-    required this.color,
-    required this.offset,
-    required this.ensureCache,
-  });
+  const _CachedPatternPainter({required this.image});
 
-  final PatternType pattern;
-  final Color color;
-  final double offset;
-  final ui.Image? Function(Size, PatternType, Color, double) ensureCache;
+  final ui.Image image;
+
+  static final Paint _drawPaint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final image = ensureCache(size, pattern, color, offset);
-    if (image != null) {
-      canvas.drawImage(image, Offset.zero, Paint());
-    }
+    canvas.drawImage(image, Offset.zero, _drawPaint);
   }
 
   @override
   bool shouldRepaint(_CachedPatternPainter oldDelegate) {
-    return pattern != oldDelegate.pattern ||
-        color != oldDelegate.color ||
-        offset != oldDelegate.offset;
+    return !identical(image, oldDelegate.image);
   }
 }

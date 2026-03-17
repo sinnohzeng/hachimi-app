@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// 每个角切掉 `step × step`（step = borderWidth × 2）像素，
 /// 形成 12 段折线的阶梯矩形路径。
 class PixelBorderShape extends OutlinedBorder {
-  const PixelBorderShape({
+  PixelBorderShape({
     this.borderWidth = 2.0,
     this.borderColor = const Color(0xFF5C3A1E),
     super.side = BorderSide.none,
@@ -38,17 +38,17 @@ class PixelBorderShape extends OutlinedBorder {
     return steppedPath(rect.deflate(borderWidth), _step);
   }
 
+  /// Paint 对象缓存 — PixelBorderShape 是 immutable 的，
+  /// late final 确保仅在首次访问时分配一次。
+  late final Paint _strokePaint = Paint()
+    ..color = borderColor
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = borderWidth
+    ..isAntiAlias = false;
+
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    final path = getOuterPath(rect);
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = borderWidth
-        ..isAntiAlias = false,
-    );
+    canvas.drawPath(getOuterPath(rect), _strokePaint);
   }
 
   /// 生成阶梯角路径 — 每个角切掉 step×step 像素，形成 12 段折线。

@@ -18,6 +18,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart'; // re-exports service_providers
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
+import 'package:hachimi_app/providers/timer_persistence.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -320,13 +321,24 @@ class _PendingDeletionScreen extends ConsumerWidget {
               const CircularProgressIndicator(),
               const SizedBox(height: AppSpacing.lg),
               Text(l10n.deleteAccountPending, textAlign: TextAlign.center),
-              if (showEscape) ...[
-                const SizedBox(height: AppSpacing.xl),
-                TextButton(
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                '$retryCount / ${SyncConstants.deletionEscapeRetryThreshold}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              if (showEscape)
+                FilledButton.tonal(
+                  onPressed: onAbandon,
+                  child: Text(l10n.deleteAccountAbandon),
+                )
+              else
+                OutlinedButton(
                   onPressed: onAbandon,
                   child: Text(l10n.deleteAccountAbandon),
                 ),
-              ],
             ],
           ),
         ),
@@ -469,10 +481,12 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   }
 
   Future<void> _checkInterruptedSession() async {
-    final hasSession = await FocusTimerNotifier.hasInterruptedSession();
+    final hasSession = await ref
+        .read(timerPersistenceProvider)
+        .hasInterruptedSession();
     if (!mounted || !hasSession) return;
 
-    final info = await FocusTimerNotifier.getSavedSessionInfo();
+    final info = await ref.read(timerPersistenceProvider).getSavedSessionInfo();
     if (!mounted || info == null) return;
 
     final habitName = info['habitName'] as String;
@@ -523,7 +537,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
         Navigator.of(context).pushNamed(AppRouter.timer, arguments: habitId);
       }
     } else {
-      await FocusTimerNotifier.clearSavedState();
+      await ref.read(timerPersistenceProvider).clearSavedState();
     }
   }
 
