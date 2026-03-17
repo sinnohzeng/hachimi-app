@@ -196,7 +196,7 @@ class AdoptionStep2CatPreview extends StatelessWidget {
       right: -6,
       child: Semantics(
         button: true,
-        label: 'Regenerate ${cat.name}',
+        label: context.l10n.a11yRegenerateCat(cat.name),
         child: GestureDetector(
           onTap: () => onRegenerateCat(index),
           child: Container(

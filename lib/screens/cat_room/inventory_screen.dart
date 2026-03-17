@@ -157,7 +157,7 @@ class InventoryScreen extends ConsumerWidget {
                     final cat = cats[index];
                     return Semantics(
                       button: true,
-                      label: 'Equip to ${cat.name}',
+                      label: context.l10n.a11yEquipToCat(cat.name),
                       child: GestureDetector(
                         onTap: () {
                           Navigator.of(ctx).pop();

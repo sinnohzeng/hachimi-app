@@ -198,8 +198,8 @@ class SettingsScreen extends ConsumerWidget {
                     .watch(appInfoProvider)
                     .when(
                       data: (info) => Text(info.version),
-                      loading: () => const Text('...'),
-                      error: (_, _) => const Text('?'),
+                      loading: () => Text(l10n.commonLoading),
+                      error: (_, _) => Text(l10n.commonError),
                     ),
               ),
             ),

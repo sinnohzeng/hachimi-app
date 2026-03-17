@@ -414,9 +414,9 @@ class _DrawerFooter extends StatelessWidget {
                   icon: const Icon(Icons.copy, size: 14),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: uid!));
-                    AppFeedback.info(context, 'ID copied');
+                    AppFeedback.info(context, context.l10n.commonIdCopied);
                   },
-                  tooltip: 'Copy ID',
+                  tooltip: context.l10n.commonCopyId,
                   visualDensity: VisualDensity.compact,
                 ),
               ],

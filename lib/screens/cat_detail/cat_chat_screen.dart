@@ -143,7 +143,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('💬', style: TextStyle(fontSize: AppIconSize.emoji)),
+            ExcludeSemantics(
+              child: Text('💬', style: TextStyle(fontSize: AppIconSize.emoji)),
+            ),
             const SizedBox(height: AppSpacing.base),
             Text(
               context.l10n.chatEmptyTitle(catName),
@@ -270,7 +272,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
               // 发送/停止按钮
               if (isGenerating)
                 PixelButton(
-                  label: 'Stop',
+                  label: context.l10n.commonStop,
                   icon: Icons.stop,
                   backgroundColor: colorScheme.errorContainer,
                   foregroundColor: colorScheme.onErrorContainer,
@@ -282,7 +284,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                 )
               else
                 PixelButton(
-                  label: 'Send',
+                  label: context.l10n.commonSend,
                   icon: Icons.send,
                   onPressed: canSend ? () => _send(cat, habit) : null,
                 ),

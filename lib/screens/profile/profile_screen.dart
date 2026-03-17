@@ -218,7 +218,7 @@ class _ProfileHeader extends StatelessWidget {
     final avatar = avatarId != null ? AvatarConstants.byId(avatarId!) : null;
     return Semantics(
       button: true,
-      label: 'Change avatar',
+      label: context.l10n.profileChooseAvatar,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -279,7 +279,7 @@ class _ProfileHeader extends StatelessWidget {
   Widget _buildNameRow() {
     return Semantics(
       button: true,
-      label: 'Edit display name: $displayName',
+      label: context.l10n.a11yEditDisplayName(displayName),
       child: InkWell(
         borderRadius: AppShape.borderSmall,
         onTap: onEditName,

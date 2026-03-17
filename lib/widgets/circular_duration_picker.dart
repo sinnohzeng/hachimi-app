@@ -113,10 +113,22 @@ class _CircularDurationPickerState extends State<CircularDurationPicker> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final l10n = context.l10n;
+
     return Semantics(
-      label: 'Duration picker, ${widget.value} minutes',
-      value: '${widget.value} minutes',
+      label: l10n.pickerDurationLabel,
+      value: l10n.pickerMinutesValue(widget.value),
       slider: true,
+      onIncrease: widget.value < _maxMinutes
+          ? () => widget.onChanged(
+                (widget.value + _stepMinutes).clamp(_minMinutes, _maxMinutes),
+              )
+          : null,
+      onDecrease: widget.value > _minMinutes
+          ? () => widget.onChanged(
+                (widget.value - _stepMinutes).clamp(_minMinutes, _maxMinutes),
+              )
+          : null,
       child: GestureDetector(
         onPanStart: (details) => _handlePanStart(details.localPosition),
         onPanUpdate: (details) => _handlePan(details.localPosition),

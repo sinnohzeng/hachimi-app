@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:hachimi_app/core/constants/achievement_strings.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
@@ -78,6 +79,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _startEntrance();
+      _announceForAccessibility();
     });
   }
 
@@ -201,6 +203,16 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         _rewardController.forward();
       });
     });
+  }
+
+  void _announceForAccessibility() {
+    final locale = Localizations.localeOf(context).toString();
+    final name = AchievementStrings.name(widget.def.id, locale);
+    final l10n = context.l10n;
+    SemanticsService.announce(
+      l10n.a11yAchievementUnlocked(name),
+      Directionality.of(context),
+    );
   }
 
   bool get _shouldReduceMotion {

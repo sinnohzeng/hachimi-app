@@ -1,12 +1,10 @@
 {
   "@@locale": "de",
   "appTitle": "Hachimi",
-
   "homeTabToday": "Heute",
   "homeTabCatHouse": "Katzenhaus",
   "homeTabStats": "Statistik",
   "homeTabProfile": "Profil",
-
   "adoptionStepDefineHabit": "Gewohnheit festlegen",
   "adoptionStepAdoptCat": "Katze adoptieren",
   "adoptionStepNameCat": "Katze benennen",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "Katzenname",
   "adoptionCatNameHint": "z.B. Mochi",
   "adoptionRandomNameTooltip": "Zufälliger Name",
-
   "catHouseTitle": "Katzenhaus",
   "catHouseEmpty": "Noch keine Katzen! Erstelle eine Gewohnheit, um deine erste Katze zu adoptieren.",
   "catHouseGrowth": "{minutes} / {target} Min.",
-
   "catDetailGrowthProgress": "Wachstumsfortschritt",
   "catDetailTotalMinutes": "{minutes} Min. fokussiert",
   "catDetailTargetMinutes": "Ziel: {minutes} Min.",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "Fokus starten",
   "catDetailBoundHabit": "Verknüpfte Gewohnheit",
   "catDetailStage": "Stufe: {stage}",
-
   "coinBalance": "{amount} Münzen",
   "coinCheckInReward": "+{amount} Münzen!",
   "coinCheckInTitle": "Täglicher Check-in",
   "coinInsufficientBalance": "Nicht genug Münzen",
-
   "shopTitle": "Accessoire-Shop",
   "shopPrice": "{price} Münzen",
   "shopPurchase": "Kaufen",
   "shopEquipped": "Ausgerüstet",
-
   "focusCompleteMinutes": "+{minutes} Min.",
   "focusCompleteStageUp": "Stufenaufstieg!",
   "focusCompleteGreatJob": "Toll gemacht!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "Tagebuch geschrieben!",
   "focusCompleteNotifTitle": "Quest abgeschlossen!",
   "focusCompleteNotifBody": "{catName} hat +{xp} XP durch {minutes} Min. Fokus verdient",
-
   "stageKitten": "Kätzchen",
   "stageAdolescent": "Jungtier",
   "stageAdult": "Erwachsen",
   "stageSenior": "Senior",
-
   "migrationTitle": "Datenaktualisierung erforderlich",
   "migrationMessage": "Hachimi wurde mit einem neuen Pixel-Katzensystem aktualisiert! Deine alten Katzendaten sind nicht mehr kompatibel. Bitte setze zurück, um mit der neuen Version frisch zu starten.",
   "migrationResetButton": "Zurücksetzen & neu starten",
-
   "sessionResumeTitle": "Sitzung fortsetzen?",
   "sessionResumeMessage": "Du hattest eine aktive Fokus-Sitzung ({habitName}, {elapsed}). Fortsetzen?",
   "sessionResumeButton": "Fortsetzen",
   "sessionDiscard": "Verwerfen",
-
   "todaySummaryMinutes": "Heute",
   "todaySummaryTotal": "Gesamt",
   "todaySummaryCats": "Katzen",
@@ -104,7 +93,6 @@
   "todayNoHabits": "Erstelle deine erste Gewohnheit, um loszulegen!",
   "todayNewQuest": "Neue Quest",
   "todayStartFocus": "Fokus starten",
-
   "timerStart": "Start",
   "timerPause": "Pause",
   "timerResume": "Fortsetzen",
@@ -122,7 +110,6 @@
   "giveUpMessage": "Wenn du mindestens 5 Minuten fokussiert hast, zählt die Zeit trotzdem zum Wachstum deiner Katze. Deine Katze versteht das!",
   "giveUpKeepGoing": "Weitermachen",
   "giveUpConfirm": "Aufgeben",
-
   "settingsTitle": "Einstellungen",
   "settingsGeneral": "Allgemein",
   "settingsAppearance": "Erscheinungsbild",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "Konto löschen?",
   "deleteAccountMessage": "Dadurch werden dein Konto und alle Daten dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
   "deleteAccountWarning": "Diese Aktion kann nicht rückgängig gemacht werden",
-
   "profileTitle": "Profil",
   "profileYourJourney": "Deine Reise",
   "profileTotalFocus": "Gesamtfokus",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "Avatar wählen",
   "profileSaved": "Profil gespeichert",
   "profileSettings": "Einstellungen",
-
   "habitDetailStreak": "Serie",
   "habitDetailBestStreak": "Bestleistung",
   "habitDetailTotalMinutes": "Gesamt",
-
   "commonCancel": "Abbrechen",
   "commonConfirm": "Bestätigen",
   "commonSave": "Speichern",
@@ -182,11 +166,9 @@
   "commonLogOut": "Abmelden",
   "commonDeleteAccount": "Konto löschen",
   "commonYes": "Ja",
-
   "chatDailyRemaining": "Noch {count} Nachrichten heute",
   "chatDailyLimitReached": "Tägliches Nachrichtenlimit erreicht",
   "aiTemporarilyUnavailable": "KI-Funktionen sind vorübergehend nicht verfügbar",
-
   "catDetailNotFound": "Katze nicht gefunden",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Umbenennen",
@@ -254,7 +236,6 @@
   "catDetailTortiePattern": "Schildpatt-Muster",
   "catDetailTortieColor": "Schildpatt-Farbe",
   "catDetailSkin": "Haut",
-
   "offlineMessage": "Du bist offline — Änderungen werden synchronisiert, sobald du wieder verbunden bist",
   "offlineModeLabel": "Offline-Modus",
   "habitTodayMinutes": "Heute: {count} Min.",
@@ -267,35 +248,29 @@
   "accessoryEquipped": "Ausgerüstet",
   "accessoryOwned": "Im Besitz",
   "pickerMinUnit": "Min.",
-
   "settingsBackgroundAnimation": "Animierte Hintergründe",
   "settingsBackgroundAnimationSubtitle": "Mesh-Gradient und schwebende Partikel",
-
   "settingsUiStyle": "UI-Stil",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "Retro Pixel",
   "settingsUiStyleMaterialSubtitle": "Modernes, abgerundetes Material Design",
   "settingsUiStyleRetroPixelSubtitle": "Warme Pixel-Art-Ästhetik",
-
   "personalityLazy": "Faul",
   "personalityCurious": "Neugierig",
   "personalityPlayful": "Verspielt",
   "personalityShy": "Schüchtern",
   "personalityBrave": "Mutig",
   "personalityClingy": "Anhänglich",
-
   "personalityFlavorLazy": "Schläft 23 Stunden am Tag. Die andere Stunde? Auch schlafen.",
   "personalityFlavorCurious": "Beschnuppert schon alles in Sichtweite!",
   "personalityFlavorPlayful": "Kann nicht aufhören, Schmetterlinge zu jagen!",
   "personalityFlavorShy": "Hat 3 Minuten gebraucht, um aus der Box zu lugen...",
   "personalityFlavorBrave": "Aus der Box gesprungen, bevor sie überhaupt offen war!",
   "personalityFlavorClingy": "Hat sofort angefangen zu schnurren und lässt nicht los.",
-
   "moodHappy": "Glücklich",
   "moodNeutral": "Neutral",
   "moodLonely": "Einsam",
   "moodMissing": "Vermisst dich",
-
   "moodMsgLazyHappy": "Nya~! Zeit für ein wohlverdientes Nickerchen...",
   "moodMsgCuriousHappy": "Was erkunden wir heute?",
   "moodMsgPlayfulHappy": "Nya~! Bereit loszulegen!",
@@ -313,14 +288,13 @@
   "moodMsgPlayfulLonely": "Die Spielsachen machen ohne dich keinen Spaß...",
   "moodMsgShyLonely": "*rollt sich leise zusammen*",
   "moodMsgBraveLonely": "Ich warte weiter. Ich bin mutig.",
-  "moodMsgClingyLonely": "Wo bist du hin... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "Wo bist du hin... 🥺",
   "moodMsgLazyMissing": "*öffnet hoffnungsvoll ein Auge*",
   "moodMsgCuriousMissing": "Ist etwas passiert...?",
   "moodMsgPlayfulMissing": "Ich habe dein Lieblingsspielzeug aufgehoben...",
   "moodMsgShyMissing": "*versteckt sich, aber beobachtet die Tür*",
   "moodMsgBraveMissing": "Ich weiß, du kommst zurück. Ich glaube daran.",
   "moodMsgClingyMissing": "Ich vermisse dich so sehr... bitte komm zurück.",
-
   "peltTypeTabby": "Klassische Tabby-Streifen",
   "peltTypeTicked": "Ticked-Agouti-Muster",
   "peltTypeMackerel": "Makrelen-Tabby",
@@ -336,7 +310,6 @@
   "peltTypeBengal": "Bengal-Muster",
   "peltTypeMarbled": "Marmormuster",
   "peltTypeMasked": "Maskiertes Gesicht",
-
   "peltColorWhite": "Weiß",
   "peltColorPaleGrey": "Hellgrau",
   "peltColorSilver": "Silber",
@@ -356,7 +329,6 @@
   "peltColorGoldenBrown": "Goldbraun",
   "peltColorDarkBrown": "Dunkelbraun",
   "peltColorChocolate": "Schokolade",
-
   "eyeColorYellow": "Gelb",
   "eyeColorAmber": "Bernstein",
   "eyeColorHazel": "Haselnuss",
@@ -378,10 +350,8 @@
   "eyeColorBronze": "Bronze",
   "eyeColorSilver": "Silber",
   "eyeColorPaleYellow": "Hellgelb",
-
   "eyeDescNormal": "{color} Augen",
   "eyeDescHeterochromia": "Heterochromie ({primary} / {secondary})",
-
   "skinColorPink": "Rosa",
   "skinColorRed": "Rot",
   "skinColorBlack": "Schwarz",
@@ -394,38 +364,30 @@
   "skinColorDarkSalmon": "Dunkler Lachs",
   "skinColorSalmon": "Lachs",
   "skinColorPeach": "Pfirsich",
-
   "furLengthLonghair": "Langhaar",
   "furLengthShorthair": "Kurzhaar",
-
   "whiteTintOffwhite": "Cremeweiß-Tönung",
   "whiteTintCream": "Cremetönung",
   "whiteTintDarkCream": "Dunkle Cremetönung",
   "whiteTintGray": "Grautönung",
   "whiteTintPink": "Rosatönung",
-
   "notifReminderTitle": "{catName} vermisst dich!",
   "notifReminderBody": "Zeit für {habitName} — deine Katze wartet!",
   "notifStreakTitle": "{catName} macht sich Sorgen!",
   "notifStreakBody": "Deine {streak}-Tage-Serie ist in Gefahr. Eine kurze Sitzung rettet sie!",
   "notifEvolutionTitle": "{catName} hat sich entwickelt!",
   "notifEvolutionBody": "{catName} ist zu einem {stageName} herangewachsen!",
-
   "durationHoursMinutes": "{hours}h {minutes}m",
-
   "diaryScreenTitle": "{name}s Tagebuch",
   "diaryFailedToLoad": "Tagebuch konnte nicht geladen werden",
   "diaryEmptyTitle": "Noch keine Tagebucheinträge",
   "diaryEmptyHint": "Schließe eine Fokus-Sitzung ab und deine Katze schreibt ihren ersten Tagebucheintrag!",
-
   "focusSetupCountdown": "Countdown",
   "focusSetupStopwatch": "Stoppuhr",
   "focusSetupStartFocus": "Fokus starten",
   "focusSetupQuestNotFound": "Quest nicht gefunden",
-
   "checkInButtonLogMore": "Weitere Zeit eintragen",
   "checkInButtonStart": "Timer starten",
-
   "adoptionTitleFirst": "Adoptiere deine erste Katze!",
   "adoptionTitleNew": "Neue Quest",
   "adoptionStepDefineQuest": "Quest festlegen",
@@ -462,7 +424,6 @@
   "adoptionValidQuestName": "Bitte gib einen Questnamen ein",
   "adoptionValidCatName": "Bitte gib deiner Katze einen Namen",
   "adoptionError": "Fehler: {message}",
-
   "adoptionBasicInfo": "Grundinfos",
   "adoptionGoals": "Ziele",
   "adoptionUnlimitedMode": "Unbegrenzter Modus",
@@ -475,7 +436,6 @@
   "adoptionMotivationLabel": "Notiz",
   "adoptionMotivationHint": "Schreibe eine Notiz...",
   "adoptionMotivationSwap": "Zufällig ausfüllen",
-
   "loginAppName": "Hachimi",
   "loginTagline": "Ziehe Katzen auf. Erledige Quests.",
   "loginContinueGoogle": "Weiter mit Google",
@@ -495,7 +455,6 @@
   "loginCreateAccountButton": "Konto erstellen",
   "loginNoAccount": "Noch kein Konto? ",
   "loginRegister": "Registrieren",
-
   "checkInTitle": "Monatlicher Check-in",
   "checkInDays": "Tage",
   "checkInCoinsEarned": "Verdiente Münzen",
@@ -508,7 +467,6 @@
   "checkInWeekdayReward": "{coins} Münzen/Tag",
   "checkInWeekend": "Wochenende (Sa–So)",
   "checkInNDays": "{count} Tage",
-
   "onboardTitle1": "Triff deinen Begleiter",
   "onboardSubtitle1": "Jede Quest beginnt mit einem Kätzchen",
   "onboardBody1": "Setze dir ein Ziel und adoptiere ein Kätzchen.\nFokussiere dich darauf und sieh zu, wie deine Katze wächst!",
@@ -521,7 +479,6 @@
   "onboardSkip": "Überspringen",
   "onboardLetsGo": "Los geht's!",
   "onboardNext": "Weiter",
-
   "catRoomTitle": "Katzenhaus",
   "catRoomInventory": "Inventar",
   "catRoomShop": "Accessoire-Shop",
@@ -544,7 +501,6 @@
   "catRoomArchivedLabel": "Archiviert",
   "catRoomArchiveSuccess": "\"{name}\" archiviert",
   "catRoomReactivateSuccess": "\"{name}\" reaktiviert",
-
   "addHabitTitle": "Neue Quest",
   "addHabitQuestName": "Questname",
   "addHabitQuestHint": "z.B. LeetCode-Übung",
@@ -555,7 +511,6 @@
   "addHabitValidNumber": "Bitte gib eine gültige Zahl ein",
   "addHabitCreate": "Quest erstellen",
   "addHabitHoursSuffix": "Stunden",
-
   "shopTabPlants": "Pflanzen ({count})",
   "shopTabWild": "Wild ({count})",
   "shopTabCollars": "Halsbänder ({count})",
@@ -565,7 +520,6 @@
   "shopNotEnoughCoinsButton": "Nicht genug Münzen",
   "shopPurchaseSuccess": "Gekauft! {name} zum Inventar hinzugefügt",
   "shopPurchaseFailed": "Nicht genug Münzen (benötigt: {price})",
-
   "inventoryTitle": "Inventar",
   "inventoryInBox": "In der Box ({count})",
   "inventoryEmpty": "Dein Inventar ist leer.\nBesuche den Shop, um Accessoires zu bekommen!",
@@ -576,7 +530,6 @@
   "inventoryEquipTo": "{name} ausrüsten bei:",
   "inventoryEquipSuccess": "{name} ausgerüstet",
   "inventoryUnequipSuccess": "Von {catName} abgelegt",
-
   "chatCatNotFound": "Katze nicht gefunden",
   "chatTitle": "Chat mit {name}",
   "chatClearHistory": "Verlauf löschen",
@@ -587,13 +540,11 @@
   "chatClearConfirmTitle": "Chatverlauf löschen?",
   "chatClearConfirmMessage": "Dadurch werden alle Nachrichten gelöscht. Dies kann nicht rückgängig gemacht werden.",
   "chatClearButton": "Löschen",
-
   "diaryTitle": "{name}s Tagebuch",
   "diaryLoadFailed": "Tagebuch konnte nicht geladen werden",
   "diaryRetry": "Erneut versuchen",
   "diaryEmptyTitle2": "Noch keine Tagebucheinträge",
   "diaryEmptySubtitle": "Schließe eine Fokus-Sitzung ab und deine Katze schreibt ihren ersten Tagebucheintrag!",
-
   "statsTitle": "Statistik",
   "statsTotalHours": "Gesamtstunden",
   "statsTimeValue": "{hours}h {minutes}m",
@@ -606,7 +557,6 @@
   "statsNoQuestData": "Noch keine Quest-Daten",
   "statsNoQuestHint": "Starte eine Quest, um deinen Fortschritt hier zu sehen!",
   "statsLast30Days": "Letzte 30 Tage",
-
   "habitDetailQuestNotFound": "Quest nicht gefunden",
   "habitDetailComplete": "abgeschlossen",
   "habitDetailTotalTime": "Gesamtzeit",
@@ -614,14 +564,12 @@
   "habitDetailTarget": "Ziel",
   "habitDetailDaysUnit": "{count} Tage",
   "habitDetailHoursUnit": "{count} Stunden",
-
   "checkInBannerSuccess": "+{coins} Münzen! Täglicher Check-in abgeschlossen",
   "checkInBannerBonus": " + {bonus} Meilensteinbonus!",
   "checkInBannerSemantics": "Täglicher Check-in",
   "checkInBannerLoading": "Check-in-Status wird geladen...",
   "checkInBannerPrompt": "Check-in für +{coins} Münzen",
   "checkInBannerSummary": "{count}/{total} Tage  ·  +{coins} heute",
-
   "commonErrorWithDetail": "Fehler: {error}",
   "profileFallbackUser": "Benutzer",
   "fallbackCatName": "Katze",
@@ -638,10 +586,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "fokussiert...",
   "notifInProgress": "Fokus-Sitzung läuft",
-
   "unitMinShort": "Min.",
   "unitHourShort": "h",
   "weekdayMon": "Mo",
@@ -675,7 +621,6 @@
   "historySelectMonth": "Monat wählen",
   "historyAllMonths": "Alle Monate",
   "historyAllHabits": "Alle",
-
   "homeTabAchievements": "Erfolge",
   "achievementTitle": "Erfolge",
   "achievementTabOverview": "Übersicht",
@@ -693,14 +638,12 @@
   "achievementHiddenDesc": "Dies ist ein versteckter Erfolg",
   "achievementPersistDesc": "Sammle {days} Check-in-Tage bei einer Quest",
   "achievementTitleCount": "{count} Titel freigeschaltet",
-
   "growthPathTitle": "Wachstumspfad",
   "growthPathKitten": "Starte eine neue Reise",
   "growthPathAdolescent": "Baue das Fundament auf",
   "growthPathAdult": "Fähigkeiten festigen sich",
   "growthPathSenior": "Tiefe Meisterschaft",
   "growthPathTip": "Studien zeigen, dass 20 Stunden konzentriertes Üben ausreichen, um das Fundament einer neuen Fähigkeit aufzubauen — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} Münzen",
   "achievementCelebrationTitle": "Titel verdient: {title}",
   "achievementCelebrationDismiss": "Großartig!",
@@ -709,7 +652,6 @@
   "achievementUnlockedAt": "Freigeschaltet am {date}",
   "achievementLocked": "Noch nicht freigeschaltet",
   "achievementRewardCoins": "+{count} Münzen",
-
   "reminderModeDaily": "Jeden Tag",
   "reminderModeWeekdays": "Werktage",
   "reminderModeMonday": "Montag",
@@ -727,7 +669,6 @@
   "reminderConfirm": "Bestätigen",
   "reminderNotificationTitle": "{catName} vermisst dich!",
   "reminderNotificationBody": "Zeit für {habitName} — deine Katze wartet!",
-
   "deleteAccountDataWarning": "Alle folgenden Daten werden dauerhaft gelöscht:",
   "deleteAccountQuests": "Quests",
   "deleteAccountCats": "Katzen",
@@ -740,7 +681,6 @@
   "deleteAccountAuthFailed": "Authentifizierung fehlgeschlagen: {error}",
   "deleteAccountProgress": "Konto wird gelöscht...",
   "deleteAccountSuccess": "Konto gelöscht",
-
   "drawerGuestLoginSubtitle": "Daten synchronisieren und KI-Funktionen freischalten",
   "drawerGuestSignIn": "Anmelden",
   "drawerMilestones": "Meilensteine",
@@ -754,18 +694,14 @@
   "settingsResetData": "Alle Daten zurücksetzen",
   "settingsResetDataTitle": "Alle Daten zurücksetzen?",
   "settingsResetDataMessage": "Dadurch werden alle lokalen Daten gelöscht und du kehrst zum Willkommensbildschirm zurück. Dies kann nicht rückgängig gemacht werden.",
-
   "guestUpgradeTitle": "Schütze deine Daten",
   "guestUpgradeMessage": "Verknüpfe ein Konto, um deinen Fortschritt zu sichern, KI-Tagebuch und Chat freizuschalten und geräteübergreifend zu synchronisieren.",
   "guestUpgradeLinkButton": "Konto verknüpfen",
   "guestUpgradeLater": "Vielleicht später",
-
   "loginLinkTagline": "Verknüpfe ein Konto, um deine Daten zu schützen",
-
   "aiTeaserTitle": "Katzentagebuch",
   "aiTeaserPreview": "Heute habe ich wieder mit meinem Menschen gelernt... {catName} fühlt sich jeden Tag schlauer~",
   "aiTeaserCta": "Verknüpfe ein Konto, um zu sehen, was {catName} sagen möchte",
-
   "authErrorEmailInUse": "Diese E-Mail-Adresse ist bereits registriert",
   "authErrorWrongPassword": "Falsche E-Mail oder falsches Passwort",
   "authErrorUserNotFound": "Kein Konto mit dieser E-Mail gefunden",
@@ -774,7 +710,6 @@
   "authErrorAdminRestricted": "Die Anmeldung ist vorübergehend eingeschränkt",
   "authErrorWeakPassword": "Passwort zu schwach. Verwende mindestens 6 Zeichen",
   "authErrorGeneric": "Etwas ist schiefgelaufen. Versuche es erneut",
-
   "deleteAccountReauthEmail": "Gib dein Passwort ein, um fortzufahren",
   "deleteAccountReauthPasswordHint": "Passwort",
   "deleteAccountError": "Etwas ist schiefgelaufen. Versuche es später erneut.",
@@ -793,9 +728,79 @@
   "archiveConflictCloud": "Cloud-Archiv",
   "archiveConflictKeepCloud": "Cloud behalten",
   "archiveConflictKeepLocal": "Lokal behalten",
-
   "loginShowPassword": "Passwort anzeigen",
   "loginHidePassword": "Passwort verbergen",
   "errorGeneric": "Etwas ist schiefgelaufen. Versuche es später erneut",
-  "errorCreateHabit": "Gewohnheit konnte nicht erstellt werden. Versuche es erneut"
+  "errorCreateHabit": "Gewohnheit konnte nicht erstellt werden. Versuche es erneut",
+  "commonCopyId": "ID kopieren",
+  "adoptionClearDeadline": "Frist löschen",
+  "commonIdCopied": "ID kopiert",
+  "pickerDurationLabel": "Dauerauswahl",
+  "pickerMinutesValue": "{count} Minuten",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "Katze {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, tippen zum Interagieren",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% abgeschlossen",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} aktive Tage",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "Offline-Modus",
+  "a11yAchievementUnlocked": "Erfolg freigeschaltet: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "eingecheckt",
+  "calendarToday": "heute",
+  "a11yEquipToCat": "Ausrüsten für {name}",
+  "a11yRegenerateCat": "{name} neu generieren",
+  "a11yTimerDisplay": "Timer: {time}",
+  "a11yOnboardingPage": "Seite {current} von {total}",
+  "a11yEditDisplayName": "Anzeigename bearbeiten: {name}",
+  "commonStop": "Stopp",
+  "commonSend": "Senden",
+  "routeNotFound": "Seite nicht gefunden",
+  "routeGoHome": "Zur Startseite",
+  "a11yError": "Fehler",
+  "a11yDeadline": "Frist",
+  "a11yReminder": "Erinnerung",
+  "a11yFocusMeditation": "Fokus-Meditation",
+  "a11yUnlocked": "Freigeschaltet",
+  "a11ySelected": "Ausgewählt",
+  "a11yDynamicWallpaperColor": "Dynamische Hintergrundfarbe"
 }

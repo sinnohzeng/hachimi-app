@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// ProgressRing — 带弧线过渡动画的环形进度指示器。
 ///
@@ -24,7 +25,7 @@ class ProgressRing extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Semantics(
-      label: '${(progress * 100).round()}% progress',
+      label: context.l10n.a11yProgressPercent((progress * 100).round()),
       value: '${(progress * 100).round()}%',
       child: SizedBox(
         width: size,

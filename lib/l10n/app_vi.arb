@@ -1,12 +1,10 @@
 {
   "@@locale": "vi",
   "appTitle": "Hachimi",
-
   "homeTabToday": "Hôm nay",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "Thống kê",
   "homeTabProfile": "Hồ sơ",
-
   "adoptionStepDefineHabit": "Tạo thói quen",
   "adoptionStepAdoptCat": "Nhận mèo",
   "adoptionStepNameCat": "Đặt tên",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "Tên mèo",
   "adoptionCatNameHint": "VD: Mochi",
   "adoptionRandomNameTooltip": "Tên ngẫu nhiên",
-
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "Chưa có mèo nào! Tạo thói quen để nhận mèo đầu tiên.",
   "catHouseGrowth": "{minutes} / {target} phút",
-
   "catDetailGrowthProgress": "Tiến trình tăng trưởng",
   "catDetailTotalMinutes": "Đã tập trung {minutes} phút",
   "catDetailTargetMinutes": "Mục tiêu: {minutes} phút",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "Bắt đầu tập trung",
   "catDetailBoundHabit": "Thói quen liên kết",
   "catDetailStage": "Giai đoạn: {stage}",
-
   "coinBalance": "{amount} xu",
   "coinCheckInReward": "+{amount} xu!",
   "coinCheckInTitle": "Điểm danh hàng ngày",
   "coinInsufficientBalance": "Không đủ xu",
-
   "shopTitle": "Cửa hàng phụ kiện",
   "shopPrice": "{price} xu",
   "shopPurchase": "Mua",
   "shopEquipped": "Đang đeo",
-
   "focusCompleteMinutes": "+{minutes} phút",
   "focusCompleteStageUp": "Lên cấp!",
   "focusCompleteGreatJob": "Tuyệt vời!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "Đã viết nhật ký!",
   "focusCompleteNotifTitle": "Hoàn thành nhiệm vụ!",
   "focusCompleteNotifBody": "{catName} nhận +{xp} XP từ {minutes} phút tập trung",
-
   "stageKitten": "Mèo con",
   "stageAdolescent": "Mèo thiếu niên",
   "stageAdult": "Mèo trưởng thành",
   "stageSenior": "Mèo lão làng",
-
   "migrationTitle": "Cần cập nhật dữ liệu",
   "migrationMessage": "Hachimi đã được cập nhật hệ thống mèo pixel mới! Dữ liệu mèo cũ không còn tương thích. Hãy đặt lại để bắt đầu trải nghiệm mới.",
   "migrationResetButton": "Đặt lại & Bắt đầu mới",
-
   "sessionResumeTitle": "Tiếp tục phiên?",
   "sessionResumeMessage": "Bạn có phiên tập trung đang dở ({habitName}, {elapsed}). Tiếp tục?",
   "sessionResumeButton": "Tiếp tục",
   "sessionDiscard": "Bỏ qua",
-
   "todaySummaryMinutes": "Hôm nay",
   "todaySummaryTotal": "Tổng",
   "todaySummaryCats": "Mèo",
@@ -104,7 +93,6 @@
   "todayNoHabits": "Tạo thói quen đầu tiên để bắt đầu!",
   "todayNewQuest": "Nhiệm vụ mới",
   "todayStartFocus": "Bắt đầu tập trung",
-
   "timerStart": "Bắt đầu",
   "timerPause": "Tạm dừng",
   "timerResume": "Tiếp tục",
@@ -122,7 +110,6 @@
   "giveUpMessage": "Nếu bạn đã tập trung ít nhất 5 phút, thời gian vẫn được tính vào sự phát triển của mèo. Mèo sẽ hiểu!",
   "giveUpKeepGoing": "Tiếp tục",
   "giveUpConfirm": "Bỏ cuộc",
-
   "settingsTitle": "Cài đặt",
   "settingsGeneral": "Chung",
   "settingsAppearance": "Giao diện",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "Xóa tài khoản?",
   "deleteAccountMessage": "Thao tác này sẽ xóa vĩnh viễn tài khoản và toàn bộ dữ liệu. Không thể hoàn tác.",
   "deleteAccountWarning": "Không thể hoàn tác thao tác này",
-
   "profileTitle": "Hồ sơ",
   "profileYourJourney": "Hành trình của bạn",
   "profileTotalFocus": "Tổng tập trung",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "Chọn avatar",
   "profileSaved": "Đã lưu hồ sơ",
   "profileSettings": "Cài đặt",
-
   "habitDetailStreak": "Chuỗi ngày",
   "habitDetailBestStreak": "Tốt nhất",
   "habitDetailTotalMinutes": "Tổng",
-
   "commonCancel": "Hủy",
   "commonConfirm": "Xác nhận",
   "commonSave": "Lưu",
@@ -182,11 +166,9 @@
   "commonLogOut": "Đăng xuất",
   "commonDeleteAccount": "Xóa tài khoản",
   "commonYes": "Có",
-
   "chatDailyRemaining": "Còn {count} tin nhắn hôm nay",
   "chatDailyLimitReached": "Đã hết giới hạn tin nhắn hôm nay",
   "aiTemporarilyUnavailable": "Tính năng AI tạm thời không khả dụng",
-
   "catDetailNotFound": "Không tìm thấy mèo",
   "catDetailChatTooltip": "Trò chuyện",
   "catDetailRenameTooltip": "Đổi tên",
@@ -254,7 +236,6 @@
   "catDetailTortiePattern": "Hoa văn tortie",
   "catDetailTortieColor": "Màu tortie",
   "catDetailSkin": "Da",
-
   "offlineMessage": "Bạn đang ngoại tuyến — thay đổi sẽ đồng bộ khi kết nối lại",
   "offlineModeLabel": "Chế độ ngoại tuyến",
   "habitTodayMinutes": "Hôm nay: {count} phút",
@@ -267,35 +248,29 @@
   "accessoryEquipped": "Đang đeo",
   "accessoryOwned": "Đã mua",
   "pickerMinUnit": "phút",
-
   "settingsBackgroundAnimation": "Hình nền động",
   "settingsBackgroundAnimationSubtitle": "Gradient lưới và hạt trôi nổi",
-
   "settingsUiStyle": "Kiểu giao diện",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "Retro Pixel",
   "settingsUiStyleMaterialSubtitle": "Thiết kế Material hiện đại, bo tròn",
   "settingsUiStyleRetroPixelSubtitle": "Phong cách pixel art ấm áp",
-
   "personalityLazy": "Lười biếng",
   "personalityCurious": "Tò mò",
   "personalityPlayful": "Tinh nghịch",
   "personalityShy": "Nhút nhát",
   "personalityBrave": "Dũng cảm",
   "personalityClingy": "Bám dính",
-
   "personalityFlavorLazy": "Sẽ ngủ 23 tiếng mỗi ngày. Giờ còn lại? Cũng ngủ nốt.",
   "personalityFlavorCurious": "Đã bắt đầu ngửi mọi thứ rồi!",
   "personalityFlavorPlayful": "Không ngừng đuổi bướm!",
   "personalityFlavorShy": "Mất 3 phút mới dám ló ra khỏi hộp...",
   "personalityFlavorBrave": "Nhảy ra khỏi hộp trước khi nó được mở!",
   "personalityFlavorClingy": "Bắt đầu kêu gừ gừ ngay và không chịu buông.",
-
   "moodHappy": "Vui vẻ",
   "moodNeutral": "Bình thường",
   "moodLonely": "Cô đơn",
   "moodMissing": "Nhớ bạn",
-
   "moodMsgLazyHappy": "Nya~! Đến giờ ngủ trưa xứng đáng rồi...",
   "moodMsgCuriousHappy": "Hôm nay mình khám phá gì nhỉ?",
   "moodMsgPlayfulHappy": "Nya~! Sẵn sàng làm việc!",
@@ -313,14 +288,13 @@
   "moodMsgPlayfulLonely": "Đồ chơi không vui nếu thiếu bạn...",
   "moodMsgShyLonely": "*cuộn tròn im lặng*",
   "moodMsgBraveLonely": "Tớ sẽ tiếp tục chờ. Tớ dũng cảm mà.",
-  "moodMsgClingyLonely": "Bạn đi đâu rồi... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "Bạn đi đâu rồi... 🥺",
   "moodMsgLazyMissing": "*mở một mắt đầy hy vọng*",
   "moodMsgCuriousMissing": "Có chuyện gì xảy ra không...?",
   "moodMsgPlayfulMissing": "Tớ giữ đồ chơi yêu thích của bạn rồi...",
   "moodMsgShyMissing": "*trốn nhưng vẫn nhìn ra cửa*",
   "moodMsgBraveMissing": "Tớ biết bạn sẽ quay lại. Tớ tin.",
   "moodMsgClingyMissing": "Tớ nhớ bạn lắm... quay lại đi mà.",
-
   "peltTypeTabby": "Vằn tabby cổ điển",
   "peltTypeTicked": "Vằn ticked agouti",
   "peltTypeMackerel": "Vằn mackerel tabby",
@@ -336,7 +310,6 @@
   "peltTypeBengal": "Vằn Bengal",
   "peltTypeMarbled": "Vân đá cẩm thạch",
   "peltTypeMasked": "Mặt nạ",
-
   "peltColorWhite": "Trắng",
   "peltColorPaleGrey": "Xám nhạt",
   "peltColorSilver": "Bạc",
@@ -356,7 +329,6 @@
   "peltColorGoldenBrown": "Nâu vàng",
   "peltColorDarkBrown": "Nâu đậm",
   "peltColorChocolate": "Sô cô la",
-
   "eyeColorYellow": "Vàng",
   "eyeColorAmber": "Hổ phách",
   "eyeColorHazel": "Nâu hạt dẻ",
@@ -378,10 +350,8 @@
   "eyeColorBronze": "Đồng thau",
   "eyeColorSilver": "Bạc",
   "eyeColorPaleYellow": "Vàng nhạt",
-
   "eyeDescNormal": "Mắt {color}",
   "eyeDescHeterochromia": "Dị sắc tố ({primary} / {secondary})",
-
   "skinColorPink": "Hồng",
   "skinColorRed": "Đỏ",
   "skinColorBlack": "Đen",
@@ -394,38 +364,30 @@
   "skinColorDarkSalmon": "Cá hồi đậm",
   "skinColorSalmon": "Cá hồi",
   "skinColorPeach": "Đào",
-
   "furLengthLonghair": "Lông dài",
   "furLengthShorthair": "Lông ngắn",
-
   "whiteTintOffwhite": "Sắc trắng ngà",
   "whiteTintCream": "Sắc kem",
   "whiteTintDarkCream": "Sắc kem đậm",
   "whiteTintGray": "Sắc xám",
   "whiteTintPink": "Sắc hồng",
-
   "notifReminderTitle": "{catName} nhớ bạn!",
   "notifReminderBody": "Đến giờ {habitName} rồi — mèo đang đợi bạn!",
   "notifStreakTitle": "{catName} lo lắng!",
   "notifStreakBody": "Chuỗi {streak} ngày của bạn sắp mất. Một phiên ngắn sẽ cứu được!",
   "notifEvolutionTitle": "{catName} đã tiến hóa!",
   "notifEvolutionBody": "{catName} đã lớn thành {stageName}! Tiếp tục phát huy nhé!",
-
   "durationHoursMinutes": "{hours}g {minutes}p",
-
   "diaryScreenTitle": "Nhật ký {name}",
   "diaryFailedToLoad": "Không tải được nhật ký",
   "diaryEmptyTitle": "Chưa có mục nhật ký",
   "diaryEmptyHint": "Hoàn thành phiên tập trung để mèo viết nhật ký đầu tiên!",
-
   "focusSetupCountdown": "Đếm ngược",
   "focusSetupStopwatch": "Bấm giờ",
   "focusSetupStartFocus": "Bắt đầu tập trung",
   "focusSetupQuestNotFound": "Không tìm thấy nhiệm vụ",
-
   "checkInButtonLogMore": "Ghi thêm thời gian",
   "checkInButtonStart": "Bắt đầu hẹn giờ",
-
   "adoptionTitleFirst": "Nhận mèo đầu tiên!",
   "adoptionTitleNew": "Nhiệm vụ mới",
   "adoptionStepDefineQuest": "Tạo nhiệm vụ",
@@ -462,7 +424,6 @@
   "adoptionValidQuestName": "Vui lòng nhập tên nhiệm vụ",
   "adoptionValidCatName": "Vui lòng đặt tên cho mèo",
   "adoptionError": "Lỗi: {message}",
-
   "adoptionBasicInfo": "Thông tin cơ bản",
   "adoptionGoals": "Mục tiêu",
   "adoptionUnlimitedMode": "Chế độ không giới hạn",
@@ -475,7 +436,6 @@
   "adoptionMotivationLabel": "Ghi chú",
   "adoptionMotivationHint": "Viết ghi chú...",
   "adoptionMotivationSwap": "Điền ngẫu nhiên",
-
   "loginAppName": "Hachimi",
   "loginTagline": "Nuôi mèo. Hoàn thành nhiệm vụ.",
   "loginContinueGoogle": "Tiếp tục với Google",
@@ -495,7 +455,6 @@
   "loginCreateAccountButton": "Tạo tài khoản",
   "loginNoAccount": "Chưa có tài khoản? ",
   "loginRegister": "Đăng ký",
-
   "checkInTitle": "Điểm danh hàng tháng",
   "checkInDays": "Ngày",
   "checkInCoinsEarned": "Xu đã nhận",
@@ -508,7 +467,6 @@
   "checkInWeekdayReward": "{coins} xu/ngày",
   "checkInWeekend": "Cuối tuần (T7–CN)",
   "checkInNDays": "{count} ngày",
-
   "onboardTitle1": "Gặp người bạn đồng hành",
   "onboardSubtitle1": "Mọi nhiệm vụ đều bắt đầu từ mèo con",
   "onboardBody1": "Đặt mục tiêu và nhận nuôi mèo con.\nTập trung và xem mèo lớn lên!",
@@ -521,7 +479,6 @@
   "onboardSkip": "Bỏ qua",
   "onboardLetsGo": "Bắt đầu thôi!",
   "onboardNext": "Tiếp",
-
   "catRoomTitle": "CatHouse",
   "catRoomInventory": "Kho đồ",
   "catRoomShop": "Cửa hàng phụ kiện",
@@ -544,7 +501,6 @@
   "catRoomArchivedLabel": "Đã lưu trữ",
   "catRoomArchiveSuccess": "Đã lưu trữ \"{name}\"",
   "catRoomReactivateSuccess": "Đã kích hoạt lại \"{name}\"",
-
   "addHabitTitle": "Nhiệm vụ mới",
   "addHabitQuestName": "Tên nhiệm vụ",
   "addHabitQuestHint": "VD: Luyện LeetCode",
@@ -555,7 +511,6 @@
   "addHabitValidNumber": "Vui lòng nhập số hợp lệ",
   "addHabitCreate": "Tạo nhiệm vụ",
   "addHabitHoursSuffix": "giờ",
-
   "shopTabPlants": "Cây ({count})",
   "shopTabWild": "Hoang dã ({count})",
   "shopTabCollars": "Vòng cổ ({count})",
@@ -565,7 +520,6 @@
   "shopNotEnoughCoinsButton": "Không đủ xu",
   "shopPurchaseSuccess": "Đã mua! {name} đã thêm vào kho đồ",
   "shopPurchaseFailed": "Không đủ xu (cần {price})",
-
   "inventoryTitle": "Kho đồ",
   "inventoryInBox": "Trong hộp ({count})",
   "inventoryEmpty": "Kho đồ trống.\nGhé cửa hàng để mua phụ kiện!",
@@ -576,7 +530,6 @@
   "inventoryEquipTo": "Đeo {name} cho:",
   "inventoryEquipSuccess": "Đã đeo {name}",
   "inventoryUnequipSuccess": "Đã tháo khỏi {catName}",
-
   "chatCatNotFound": "Không tìm thấy mèo",
   "chatTitle": "Trò chuyện với {name}",
   "chatClearHistory": "Xóa lịch sử",
@@ -587,13 +540,11 @@
   "chatClearConfirmTitle": "Xóa lịch sử trò chuyện?",
   "chatClearConfirmMessage": "Thao tác này sẽ xóa tất cả tin nhắn. Không thể hoàn tác.",
   "chatClearButton": "Xóa",
-
   "diaryTitle": "Nhật ký {name}",
   "diaryLoadFailed": "Không tải được nhật ký",
   "diaryRetry": "Thử lại",
   "diaryEmptyTitle2": "Chưa có mục nhật ký",
   "diaryEmptySubtitle": "Hoàn thành phiên tập trung để mèo viết nhật ký đầu tiên!",
-
   "statsTitle": "Thống kê",
   "statsTotalHours": "Tổng giờ",
   "statsTimeValue": "{hours}g {minutes}p",
@@ -606,7 +557,6 @@
   "statsNoQuestData": "Chưa có dữ liệu nhiệm vụ",
   "statsNoQuestHint": "Bắt đầu nhiệm vụ để xem tiến trình!",
   "statsLast30Days": "30 ngày qua",
-
   "habitDetailQuestNotFound": "Không tìm thấy nhiệm vụ",
   "habitDetailComplete": "hoàn thành",
   "habitDetailTotalTime": "Tổng thời gian",
@@ -614,14 +564,12 @@
   "habitDetailTarget": "Mục tiêu",
   "habitDetailDaysUnit": "{count} ngày",
   "habitDetailHoursUnit": "{count} giờ",
-
   "checkInBannerSuccess": "+{coins} xu! Điểm danh hàng ngày hoàn tất",
   "checkInBannerBonus": " + {bonus} thưởng mốc!",
   "checkInBannerSemantics": "Điểm danh hàng ngày",
   "checkInBannerLoading": "Đang tải trạng thái điểm danh...",
   "checkInBannerPrompt": "Điểm danh nhận +{coins} xu",
   "checkInBannerSummary": "{count}/{total} ngày  ·  hôm nay +{coins}",
-
   "commonErrorWithDetail": "Lỗi: {error}",
   "profileFallbackUser": "Người dùng",
   "fallbackCatName": "Mèo",
@@ -638,10 +586,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "đang tập trung...",
   "notifInProgress": "Phiên tập trung đang diễn ra",
-
   "unitMinShort": "p",
   "unitHourShort": "g",
   "weekdayMon": "T2",
@@ -675,7 +621,6 @@
   "historySelectMonth": "Chọn tháng",
   "historyAllMonths": "Tất cả tháng",
   "historyAllHabits": "Tất cả",
-
   "homeTabAchievements": "Thành tựu",
   "achievementTitle": "Thành tựu",
   "achievementTabOverview": "Tổng quan",
@@ -693,14 +638,12 @@
   "achievementHiddenDesc": "Đây là thành tựu ẩn",
   "achievementPersistDesc": "Tích lũy {days} ngày điểm danh trên bất kỳ nhiệm vụ nào",
   "achievementTitleCount": "Đã mở khóa {count} danh hiệu",
-
   "growthPathTitle": "Lộ trình phát triển",
   "growthPathKitten": "Bắt đầu hành trình mới",
   "growthPathAdolescent": "Xây nền tảng ban đầu",
   "growthPathAdult": "Kỹ năng vững chắc",
   "growthPathSenior": "Chuyên sâu thành thạo",
   "growthPathTip": "Nghiên cứu cho thấy 20 giờ luyện tập tập trung đủ để xây nền tảng một kỹ năng mới — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} xu",
   "achievementCelebrationTitle": "Đạt danh hiệu: {title}",
   "achievementCelebrationDismiss": "Tuyệt!",
@@ -709,7 +652,6 @@
   "achievementUnlockedAt": "Mở khóa ngày {date}",
   "achievementLocked": "Chưa mở khóa",
   "achievementRewardCoins": "+{count} xu",
-
   "reminderModeDaily": "Mỗi ngày",
   "reminderModeWeekdays": "Ngày thường",
   "reminderModeMonday": "Thứ Hai",
@@ -727,7 +669,6 @@
   "reminderConfirm": "Xác nhận",
   "reminderNotificationTitle": "{catName} nhớ bạn!",
   "reminderNotificationBody": "Đến giờ {habitName} rồi — mèo đang đợi bạn!",
-
   "deleteAccountDataWarning": "Toàn bộ dữ liệu sau sẽ bị xóa vĩnh viễn:",
   "deleteAccountQuests": "Nhiệm vụ",
   "deleteAccountCats": "Mèo",
@@ -740,7 +681,6 @@
   "deleteAccountAuthFailed": "Xác thực thất bại: {error}",
   "deleteAccountProgress": "Đang xóa tài khoản...",
   "deleteAccountSuccess": "Đã xóa tài khoản",
-
   "drawerGuestLoginSubtitle": "Đồng bộ dữ liệu và mở khóa tính năng AI",
   "drawerGuestSignIn": "Đăng nhập",
   "drawerMilestones": "Mốc thưởng",
@@ -754,18 +694,14 @@
   "settingsResetData": "Đặt lại toàn bộ dữ liệu",
   "settingsResetDataTitle": "Đặt lại toàn bộ dữ liệu?",
   "settingsResetDataMessage": "Thao tác này sẽ xóa toàn bộ dữ liệu cục bộ và quay về màn hình chào mừng. Không thể hoàn tác.",
-
   "guestUpgradeTitle": "Bảo vệ dữ liệu của bạn",
   "guestUpgradeMessage": "Liên kết tài khoản để sao lưu tiến trình, mở khóa nhật ký AI và trò chuyện, đồng bộ giữa các thiết bị.",
   "guestUpgradeLinkButton": "Liên kết tài khoản",
   "guestUpgradeLater": "Để sau",
-
   "loginLinkTagline": "Liên kết tài khoản để bảo vệ dữ liệu",
-
   "aiTeaserTitle": "Nhật ký mèo",
   "aiTeaserPreview": "Hôm nay tớ lại học cùng chủ nhân... {catName} cảm thấy thông minh hơn mỗi ngày~",
   "aiTeaserCta": "Liên kết tài khoản để xem {catName} muốn nói gì",
-
   "authErrorEmailInUse": "Email này đã được đăng ký",
   "authErrorWrongPassword": "Email hoặc mật khẩu không đúng",
   "authErrorUserNotFound": "Không tìm thấy tài khoản với email này",
@@ -774,7 +710,6 @@
   "authErrorAdminRestricted": "Đăng nhập tạm thời bị hạn chế",
   "authErrorWeakPassword": "Mật khẩu quá yếu. Dùng ít nhất 6 ký tự",
   "authErrorGeneric": "Đã xảy ra lỗi. Thử lại nhé",
-
   "deleteAccountReauthEmail": "Nhập mật khẩu để tiếp tục",
   "deleteAccountReauthPasswordHint": "Mật khẩu",
   "deleteAccountError": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
@@ -793,9 +728,79 @@
   "archiveConflictCloud": "Lưu trữ đám mây",
   "archiveConflictKeepCloud": "Giữ đám mây",
   "archiveConflictKeepLocal": "Giữ cục bộ",
-
   "loginShowPassword": "Hiện mật khẩu",
   "loginHidePassword": "Ẩn mật khẩu",
   "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại sau",
-  "errorCreateHabit": "Không tạo được thói quen. Thử lại nhé"
+  "errorCreateHabit": "Không tạo được thói quen. Thử lại nhé",
+  "commonCopyId": "Sao chép ID",
+  "adoptionClearDeadline": "Xóa hạn chót",
+  "commonIdCopied": "Đã sao chép ID",
+  "pickerDurationLabel": "Chọn thời lượng",
+  "pickerMinutesValue": "{count} phút",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "Mèo {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, chạm để tương tác",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "Hoàn thành {percent}%",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} ngày hoạt động",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "Chế độ ngoại tuyến",
+  "a11yAchievementUnlocked": "Mở khóa thành tựu: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "đã điểm danh",
+  "calendarToday": "hôm nay",
+  "a11yEquipToCat": "Trang bị cho {name}",
+  "a11yRegenerateCat": "Tạo lại {name}",
+  "a11yTimerDisplay": "Hẹn giờ: {time}",
+  "a11yOnboardingPage": "Trang {current} / {total}",
+  "a11yEditDisplayName": "Sửa tên hiển thị: {name}",
+  "commonStop": "Dừng",
+  "commonSend": "Gửi",
+  "routeNotFound": "Không tìm thấy trang",
+  "routeGoHome": "Về trang chủ",
+  "a11yError": "Lỗi",
+  "a11yDeadline": "Hạn chót",
+  "a11yReminder": "Nhắc nhở",
+  "a11yFocusMeditation": "Thiền tập trung",
+  "a11yUnlocked": "Đã mở khóa",
+  "a11ySelected": "Đã chọn",
+  "a11yDynamicWallpaperColor": "Màu hình nền động"
 }

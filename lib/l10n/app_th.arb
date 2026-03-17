@@ -1,12 +1,10 @@
 {
   "@@locale": "th",
   "appTitle": "Hachimi",
-
   "homeTabToday": "วันนี้",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "สถิติ",
   "homeTabProfile": "โปรไฟล์",
-
   "adoptionStepDefineHabit": "กำหนดนิสัย",
   "adoptionStepAdoptCat": "รับเลี้ยงแมว",
   "adoptionStepNameCat": "ตั้งชื่อแมว",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "ชื่อแมว",
   "adoptionCatNameHint": "เช่น โมจิ",
   "adoptionRandomNameTooltip": "ชื่อสุ่ม",
-
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "ยังไม่มีแมว! สร้างนิสัยเพื่อรับเลี้ยงแมวตัวแรก",
   "catHouseGrowth": "{minutes} / {target} นาที",
-
   "catDetailGrowthProgress": "ความก้าวหน้าการเติบโต",
   "catDetailTotalMinutes": "โฟกัส {minutes} นาที",
   "catDetailTargetMinutes": "เป้าหมาย: {minutes} นาที",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "เริ่มโฟกัส",
   "catDetailBoundHabit": "นิสัยที่ผูกไว้",
   "catDetailStage": "ระดับ: {stage}",
-
   "coinBalance": "{amount} เหรียญ",
   "coinCheckInReward": "+{amount} เหรียญ!",
   "coinCheckInTitle": "เช็คอินรายวัน",
   "coinInsufficientBalance": "เหรียญไม่เพียงพอ",
-
   "shopTitle": "ร้านเครื่องประดับ",
   "shopPrice": "{price} เหรียญ",
   "shopPurchase": "ซื้อ",
   "shopEquipped": "สวมใส่อยู่",
-
   "focusCompleteMinutes": "+{minutes} นาที",
   "focusCompleteStageUp": "เลื่อนระดับ!",
   "focusCompleteGreatJob": "เก่งมาก!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "เขียนไดอารี่แล้ว!",
   "focusCompleteNotifTitle": "เควสต์สำเร็จ!",
   "focusCompleteNotifBody": "{catName} ได้ +{xp} XP จากการโฟกัส {minutes} นาที",
-
   "stageKitten": "ลูกแมว",
   "stageAdolescent": "แมววัยรุ่น",
   "stageAdult": "แมวโตเต็มวัย",
   "stageSenior": "แมวอาวุโส",
-
   "migrationTitle": "ต้องอัปเดตข้อมูล",
   "migrationMessage": "Hachimi ได้อัปเดตระบบแมวพิกเซลใหม่แล้ว! ข้อมูลแมวเก่าไม่สามารถใช้งานร่วมกันได้ กรุณารีเซ็ตเพื่อเริ่มต้นใหม่",
   "migrationResetButton": "รีเซ็ตและเริ่มใหม่",
-
   "sessionResumeTitle": "ทำต่อไหม?",
   "sessionResumeMessage": "คุณมีเซสชันโฟกัสค้างอยู่ ({habitName}, {elapsed}) ทำต่อไหม?",
   "sessionResumeButton": "ทำต่อ",
   "sessionDiscard": "ยกเลิก",
-
   "todaySummaryMinutes": "วันนี้",
   "todaySummaryTotal": "ทั้งหมด",
   "todaySummaryCats": "แมว",
@@ -104,7 +93,6 @@
   "todayNoHabits": "สร้างนิสัยแรกเพื่อเริ่มต้น!",
   "todayNewQuest": "เควสต์ใหม่",
   "todayStartFocus": "เริ่มโฟกัส",
-
   "timerStart": "เริ่ม",
   "timerPause": "หยุดชั่วคราว",
   "timerResume": "ทำต่อ",
@@ -122,7 +110,6 @@
   "giveUpMessage": "หากคุณโฟกัสได้อย่างน้อย 5 นาที เวลาจะยังนับเข้าการเติบโตของแมว แมวของคุณจะเข้าใจ!",
   "giveUpKeepGoing": "ทำต่อ",
   "giveUpConfirm": "ยอมแพ้",
-
   "settingsTitle": "การตั้งค่า",
   "settingsGeneral": "ทั่วไป",
   "settingsAppearance": "การแสดงผล",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "ลบบัญชี?",
   "deleteAccountMessage": "การดำเนินการนี้จะลบบัญชีและข้อมูลทั้งหมดของคุณอย่างถาวร ไม่สามารถยกเลิกได้",
   "deleteAccountWarning": "ไม่สามารถยกเลิกการดำเนินการนี้ได้",
-
   "profileTitle": "โปรไฟล์",
   "profileYourJourney": "เส้นทางของคุณ",
   "profileTotalFocus": "โฟกัสทั้งหมด",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "เลือกอวาตาร์",
   "profileSaved": "บันทึกโปรไฟล์แล้ว",
   "profileSettings": "การตั้งค่า",
-
   "habitDetailStreak": "สตรีค",
   "habitDetailBestStreak": "ดีที่สุด",
   "habitDetailTotalMinutes": "ทั้งหมด",
-
   "commonCancel": "ยกเลิก",
   "commonConfirm": "ยืนยัน",
   "commonSave": "บันทึก",
@@ -182,11 +166,9 @@
   "commonLogOut": "ออกจากระบบ",
   "commonDeleteAccount": "ลบบัญชี",
   "commonYes": "ใช่",
-
   "chatDailyRemaining": "เหลือ {count} ข้อความวันนี้",
   "chatDailyLimitReached": "ถึงลิมิตข้อความรายวันแล้ว",
   "aiTemporarilyUnavailable": "ฟีเจอร์ AI ไม่พร้อมใช้งานชั่วคราว",
-
   "catDetailNotFound": "ไม่พบแมว",
   "catDetailChatTooltip": "แชท",
   "catDetailRenameTooltip": "เปลี่ยนชื่อ",
@@ -254,7 +236,6 @@
   "catDetailTortiePattern": "ลายทอร์ตี้",
   "catDetailTortieColor": "สีทอร์ตี้",
   "catDetailSkin": "ผิว",
-
   "offlineMessage": "คุณออฟไลน์อยู่ — การเปลี่ยนแปลงจะซิงค์เมื่อเชื่อมต่อ",
   "offlineModeLabel": "โหมดออฟไลน์",
   "habitTodayMinutes": "วันนี้: {count} นาที",
@@ -267,35 +248,29 @@
   "accessoryEquipped": "สวมใส่อยู่",
   "accessoryOwned": "เป็นเจ้าของ",
   "pickerMinUnit": "นาที",
-
   "settingsBackgroundAnimation": "พื้นหลังเคลื่อนไหว",
   "settingsBackgroundAnimationSubtitle": "เมชเกรเดียนท์และอนุภาคลอย",
-
   "settingsUiStyle": "สไตล์ UI",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "เรโทรพิกเซล",
   "settingsUiStyleMaterialSubtitle": "ดีไซน์ Material ทันสมัย โค้งมน",
   "settingsUiStyleRetroPixelSubtitle": "สุนทรียะพิกเซลอาร์ตอบอุ่น",
-
   "personalityLazy": "ขี้เกียจ",
   "personalityCurious": "ช่างสงสัย",
   "personalityPlayful": "ขี้เล่น",
   "personalityShy": "ขี้อาย",
   "personalityBrave": "กล้าหาญ",
   "personalityClingy": "ขี้ติด",
-
   "personalityFlavorLazy": "จะนอนวันละ 23 ชั่วโมง อีก 1 ชั่วโมง? ก็นอนเหมือนกัน",
   "personalityFlavorCurious": "เริ่มสูดดมทุกอย่างแล้ว!",
   "personalityFlavorPlayful": "หยุดไล่ผีเสื้อไม่ได้เลย!",
   "personalityFlavorShy": "ใช้เวลา 3 นาทีถึงจะโผล่จากกล่อง...",
   "personalityFlavorBrave": "กระโดดออกจากกล่องก่อนจะเปิดเสียอีก!",
   "personalityFlavorClingy": "เริ่มคลอเคลียทันทีและไม่ยอมปล่อย",
-
   "moodHappy": "มีความสุข",
   "moodNeutral": "ปกติ",
   "moodLonely": "เหงา",
   "moodMissing": "คิดถึง",
-
   "moodMsgLazyHappy": "เนี้ย~! ถึงเวลานอนพักผ่อนแล้ว...",
   "moodMsgCuriousHappy": "วันนี้จะสำรวจอะไรกัน?",
   "moodMsgPlayfulHappy": "เนี้ย~! พร้อมทำงาน!",
@@ -313,14 +288,13 @@
   "moodMsgPlayfulLonely": "ของเล่นไม่สนุกถ้าไม่มีคุณ...",
   "moodMsgShyLonely": "*นอนขดตัวเงียบๆ*",
   "moodMsgBraveLonely": "ฉันจะรอต่อไป ฉันกล้าหาญ",
-  "moodMsgClingyLonely": "คุณไปไหน... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "คุณไปไหน... 🥺",
   "moodMsgLazyMissing": "*ลืมตาข้างเดียวด้วยความหวัง*",
   "moodMsgCuriousMissing": "มีอะไรเกิดขึ้นหรือเปล่า...?",
   "moodMsgPlayfulMissing": "ฉันเก็บของเล่นที่คุณชอบไว้ให้...",
   "moodMsgShyMissing": "*ซ่อนอยู่ แต่จ้องมองประตู*",
   "moodMsgBraveMissing": "ฉันรู้ว่าคุณจะกลับมา ฉันเชื่อ",
   "moodMsgClingyMissing": "คิดถึงคุณมาก... กลับมานะ",
-
   "peltTypeTabby": "ลายแท็บบี้คลาสสิก",
   "peltTypeTicked": "ลายทิคอะกูตี",
   "peltTypeMackerel": "ลายแท็บบี้แมคเคอเรล",
@@ -336,7 +310,6 @@
   "peltTypeBengal": "ลายเบงกอล",
   "peltTypeMarbled": "ลายหินอ่อน",
   "peltTypeMasked": "หน้ากาก",
-
   "peltColorWhite": "ขาว",
   "peltColorPaleGrey": "เทาอ่อน",
   "peltColorSilver": "เงิน",
@@ -356,7 +329,6 @@
   "peltColorGoldenBrown": "น้ำตาลทอง",
   "peltColorDarkBrown": "น้ำตาลเข้ม",
   "peltColorChocolate": "ช็อกโกแลต",
-
   "eyeColorYellow": "เหลือง",
   "eyeColorAmber": "อำพัน",
   "eyeColorHazel": "เฮเซล",
@@ -378,10 +350,8 @@
   "eyeColorBronze": "บรอนซ์",
   "eyeColorSilver": "เงิน",
   "eyeColorPaleYellow": "เหลืองอ่อน",
-
   "eyeDescNormal": "ตาสี{color}",
   "eyeDescHeterochromia": "ตาสองสี ({primary} / {secondary})",
-
   "skinColorPink": "ชมพู",
   "skinColorRed": "แดง",
   "skinColorBlack": "ดำ",
@@ -394,38 +364,30 @@
   "skinColorDarkSalmon": "แซลมอนเข้ม",
   "skinColorSalmon": "แซลมอน",
   "skinColorPeach": "พีช",
-
   "furLengthLonghair": "ขนยาว",
   "furLengthShorthair": "ขนสั้น",
-
   "whiteTintOffwhite": "โทนออฟไวท์",
   "whiteTintCream": "โทนครีม",
   "whiteTintDarkCream": "โทนครีมเข้ม",
   "whiteTintGray": "โทนเทา",
   "whiteTintPink": "โทนชมพู",
-
   "notifReminderTitle": "{catName} คิดถึงคุณ!",
   "notifReminderBody": "ถึงเวลา {habitName} แล้ว",
   "notifStreakTitle": "{catName} เป็นห่วง!",
   "notifStreakBody": "สตรีค {streak} วันของคุณกำลังจะหาย เซสชันสั้นๆ จะช่วยรักษาได้!",
   "notifEvolutionTitle": "{catName} วิวัฒนาการแล้ว!",
   "notifEvolutionBody": "{catName} เติบโตเป็น {stageName} แล้ว!",
-
   "durationHoursMinutes": "{hours} ชม. {minutes} น.",
-
   "diaryScreenTitle": "ไดอารี่ {name}",
   "diaryFailedToLoad": "โหลดไดอารี่ไม่สำเร็จ",
   "diaryEmptyTitle": "ยังไม่มีไดอารี่",
   "diaryEmptyHint": "ทำเซสชันโฟกัสให้สำเร็จ แล้วแมวจะเขียนไดอารี่เรื่องแรก!",
-
   "focusSetupCountdown": "นับถอยหลัง",
   "focusSetupStopwatch": "นาฬิกาจับเวลา",
   "focusSetupStartFocus": "เริ่มโฟกัส",
   "focusSetupQuestNotFound": "ไม่พบเควสต์",
-
   "checkInButtonLogMore": "บันทึกเวลาเพิ่ม",
   "checkInButtonStart": "เริ่มตัวจับเวลา",
-
   "adoptionTitleFirst": "รับเลี้ยงแมวตัวแรก!",
   "adoptionTitleNew": "เควสต์ใหม่",
   "adoptionStepDefineQuest": "กำหนดเควสต์",
@@ -462,7 +424,6 @@
   "adoptionValidQuestName": "กรุณากรอกชื่อเควสต์",
   "adoptionValidCatName": "กรุณาตั้งชื่อให้แมว",
   "adoptionError": "ข้อผิดพลาด: {message}",
-
   "adoptionBasicInfo": "ข้อมูลเบื้องต้น",
   "adoptionGoals": "เป้าหมาย",
   "adoptionUnlimitedMode": "โหมดไม่จำกัด",
@@ -475,7 +436,6 @@
   "adoptionMotivationLabel": "โน้ต",
   "adoptionMotivationHint": "เขียนโน้ต...",
   "adoptionMotivationSwap": "สุ่มเติม",
-
   "loginAppName": "Hachimi",
   "loginTagline": "เลี้ยงแมว ทำเควสต์",
   "loginContinueGoogle": "ดำเนินการต่อด้วย Google",
@@ -495,7 +455,6 @@
   "loginCreateAccountButton": "สร้างบัญชี",
   "loginNoAccount": "ยังไม่มีบัญชี? ",
   "loginRegister": "ลงทะเบียน",
-
   "checkInTitle": "เช็คอินรายเดือน",
   "checkInDays": "วัน",
   "checkInCoinsEarned": "เหรียญที่ได้",
@@ -508,7 +467,6 @@
   "checkInWeekdayReward": "{coins} เหรียญ/วัน",
   "checkInWeekend": "วันหยุด (ส.–อา.)",
   "checkInNDays": "{count} วัน",
-
   "onboardTitle1": "พบกับเพื่อนของคุณ",
   "onboardSubtitle1": "ทุกเควสต์เริ่มจากลูกแมว",
   "onboardBody1": "ตั้งเป้าหมายและรับเลี้ยงลูกแมว\nโฟกัส แล้วดูแมวเติบโต!",
@@ -521,7 +479,6 @@
   "onboardSkip": "ข้าม",
   "onboardLetsGo": "เริ่มกันเลย!",
   "onboardNext": "ถัดไป",
-
   "catRoomTitle": "CatHouse",
   "catRoomInventory": "คลัง",
   "catRoomShop": "ร้านเครื่องประดับ",
@@ -544,7 +501,6 @@
   "catRoomArchivedLabel": "เก็บในอัลบั้ม",
   "catRoomArchiveSuccess": "เก็บ \"{name}\" เข้าอัลบั้มแล้ว",
   "catRoomReactivateSuccess": "เปิดใช้ \"{name}\" อีกครั้งแล้ว",
-
   "addHabitTitle": "เควสต์ใหม่",
   "addHabitQuestName": "ชื่อเควสต์",
   "addHabitQuestHint": "เช่น ฝึก LeetCode",
@@ -555,7 +511,6 @@
   "addHabitValidNumber": "กรุณากรอกตัวเลขที่ถูกต้อง",
   "addHabitCreate": "สร้างเควสต์",
   "addHabitHoursSuffix": "ชั่วโมง",
-
   "shopTabPlants": "ต้นไม้ ({count})",
   "shopTabWild": "ป่า ({count})",
   "shopTabCollars": "ปลอกคอ ({count})",
@@ -565,7 +520,6 @@
   "shopNotEnoughCoinsButton": "เหรียญไม่พอ",
   "shopPurchaseSuccess": "ซื้อแล้ว! เพิ่ม {name} ลงคลังแล้ว",
   "shopPurchaseFailed": "เหรียญไม่พอ (ต้องการ {price})",
-
   "inventoryTitle": "คลัง",
   "inventoryInBox": "ในกล่อง ({count})",
   "inventoryEmpty": "คลังว่างเปล่า\nไปร้านค้าเพื่อรับเครื่องประดับ!",
@@ -576,7 +530,6 @@
   "inventoryEquipTo": "สวม {name} ให้:",
   "inventoryEquipSuccess": "สวม {name} แล้ว",
   "inventoryUnequipSuccess": "ถอดจาก {catName} แล้ว",
-
   "chatCatNotFound": "ไม่พบแมว",
   "chatTitle": "แชทกับ {name}",
   "chatClearHistory": "ล้างประวัติ",
@@ -587,13 +540,11 @@
   "chatClearConfirmTitle": "ล้างประวัติแชท?",
   "chatClearConfirmMessage": "จะลบข้อความทั้งหมด ไม่สามารถยกเลิกได้",
   "chatClearButton": "ล้าง",
-
   "diaryTitle": "ไดอารี่ {name}",
   "diaryLoadFailed": "โหลดไดอารี่ไม่สำเร็จ",
   "diaryRetry": "ลองอีกครั้ง",
   "diaryEmptyTitle2": "ยังไม่มีไดอารี่",
   "diaryEmptySubtitle": "ทำเซสชันโฟกัสให้สำเร็จ แล้วแมวจะเขียนไดอารี่เรื่องแรก!",
-
   "statsTitle": "สถิติ",
   "statsTotalHours": "ชั่วโมงรวม",
   "statsTimeValue": "{hours} ชม. {minutes} น.",
@@ -606,7 +557,6 @@
   "statsNoQuestData": "ยังไม่มีข้อมูลเควสต์",
   "statsNoQuestHint": "เริ่มเควสต์เพื่อดูความก้าวหน้า!",
   "statsLast30Days": "30 วันล่าสุด",
-
   "habitDetailQuestNotFound": "ไม่พบเควสต์",
   "habitDetailComplete": "สำเร็จ",
   "habitDetailTotalTime": "เวลาทั้งหมด",
@@ -614,14 +564,12 @@
   "habitDetailTarget": "เป้าหมาย",
   "habitDetailDaysUnit": "{count} วัน",
   "habitDetailHoursUnit": "{count} ชั่วโมง",
-
   "checkInBannerSuccess": "+{coins} เหรียญ! เช็คอินรายวันสำเร็จ",
   "checkInBannerBonus": " + {bonus} โบนัสไมล์สโตน!",
   "checkInBannerSemantics": "เช็คอินรายวัน",
   "checkInBannerLoading": "กำลังโหลดสถานะเช็คอิน...",
   "checkInBannerPrompt": "เช็คอินรับ +{coins} เหรียญ",
   "checkInBannerSummary": "{count}/{total} วัน  ·  วันนี้ +{coins}",
-
   "commonErrorWithDetail": "ข้อผิดพลาด: {error}",
   "profileFallbackUser": "ผู้ใช้",
   "fallbackCatName": "แมว",
@@ -638,10 +586,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "กำลังโฟกัส...",
   "notifInProgress": "เซสชันโฟกัสกำลังดำเนินอยู่",
-
   "unitMinShort": "น.",
   "unitHourShort": "ชม.",
   "weekdayMon": "จ",
@@ -675,7 +621,6 @@
   "historySelectMonth": "เลือกเดือน",
   "historyAllMonths": "ทุกเดือน",
   "historyAllHabits": "ทั้งหมด",
-
   "homeTabAchievements": "ความสำเร็จ",
   "achievementTitle": "ความสำเร็จ",
   "achievementTabOverview": "ภาพรวม",
@@ -693,14 +638,12 @@
   "achievementHiddenDesc": "นี่คือความสำเร็จที่ซ่อนอยู่",
   "achievementPersistDesc": "สะสมวันเช็คอิน {days} วันบนเควสต์ใดก็ได้",
   "achievementTitleCount": "ปลดล็อก {count} ตำแหน่ง",
-
   "growthPathTitle": "เส้นทางเติบโต",
   "growthPathKitten": "เริ่มต้นเส้นทางใหม่",
   "growthPathAdolescent": "สร้างพื้นฐานเบื้องต้น",
   "growthPathAdult": "ทักษะแข็งแกร่งขึ้น",
   "growthPathSenior": "เชี่ยวชาญเชิงลึก",
   "growthPathTip": "งานวิจัยบอกว่าการฝึกฝนอย่างตั้งใจ 20 ชั่วโมงเพียงพอที่จะสร้างพื้นฐานทักษะใหม่ — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} เหรียญ",
   "achievementCelebrationTitle": "ได้ตำแหน่ง: {title}",
   "achievementCelebrationDismiss": "เยี่ยม!",
@@ -709,7 +652,6 @@
   "achievementUnlockedAt": "ปลดล็อกเมื่อ {date}",
   "achievementLocked": "ยังไม่ปลดล็อก",
   "achievementRewardCoins": "+{count} เหรียญ",
-
   "reminderModeDaily": "ทุกวัน",
   "reminderModeWeekdays": "วันธรรมดา",
   "reminderModeMonday": "วันจันทร์",
@@ -727,7 +669,6 @@
   "reminderConfirm": "ยืนยัน",
   "reminderNotificationTitle": "{catName} คิดถึงคุณ!",
   "reminderNotificationBody": "ถึงเวลา {habitName} แล้ว — แมวกำลังรอคุณอยู่!",
-
   "deleteAccountDataWarning": "ข้อมูลต่อไปนี้ทั้งหมดจะถูกลบอย่างถาวร:",
   "deleteAccountQuests": "เควสต์",
   "deleteAccountCats": "แมว",
@@ -740,7 +681,6 @@
   "deleteAccountAuthFailed": "การยืนยันตัวตนล้มเหลว: {error}",
   "deleteAccountProgress": "กำลังลบบัญชี...",
   "deleteAccountSuccess": "ลบบัญชีแล้ว",
-
   "drawerGuestLoginSubtitle": "ซิงค์ข้อมูลและปลดล็อกฟีเจอร์ AI",
   "drawerGuestSignIn": "เข้าสู่ระบบ",
   "drawerMilestones": "ไมล์สโตน",
@@ -754,18 +694,14 @@
   "settingsResetData": "รีเซ็ตข้อมูลทั้งหมด",
   "settingsResetDataTitle": "รีเซ็ตข้อมูลทั้งหมด?",
   "settingsResetDataMessage": "จะลบข้อมูลในเครื่องทั้งหมดและกลับไปหน้าต้อนรับ ไม่สามารถยกเลิกได้",
-
   "guestUpgradeTitle": "ปกป้องข้อมูลของคุณ",
   "guestUpgradeMessage": "เชื่อมต่อบัญชีเพื่อสำรองความก้าวหน้า ปลดล็อกไดอารี่และแชท AI และซิงค์ข้ามอุปกรณ์",
   "guestUpgradeLinkButton": "เชื่อมต่อบัญชี",
   "guestUpgradeLater": "ไว้ทีหลัง",
-
   "loginLinkTagline": "เชื่อมต่อบัญชีเพื่อปกป้องข้อมูลของคุณ",
-
   "aiTeaserTitle": "ไดอารี่แมว",
   "aiTeaserPreview": "วันนี้ฉันเรียนกับมนุษย์อีกแล้ว... {catName} รู้สึกฉลาดขึ้นทุกวัน~",
   "aiTeaserCta": "เชื่อมต่อบัญชีเพื่อดูว่า {catName} อยากบอกอะไร",
-
   "authErrorEmailInUse": "อีเมลนี้ถูกลงทะเบียนแล้ว",
   "authErrorWrongPassword": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
   "authErrorUserNotFound": "ไม่พบบัญชีที่ใช้อีเมลนี้",
@@ -774,7 +710,6 @@
   "authErrorAdminRestricted": "การเข้าสู่ระบบถูกจำกัดชั่วคราว",
   "authErrorWeakPassword": "รหัสผ่านอ่อนแอเกินไป ใช้อย่างน้อย 6 ตัวอักษร",
   "authErrorGeneric": "เกิดข้อผิดพลาด ลองอีกครั้ง",
-
   "deleteAccountReauthEmail": "กรอกรหัสผ่านเพื่อดำเนินการต่อ",
   "deleteAccountReauthPasswordHint": "รหัสผ่าน",
   "deleteAccountError": "เกิดข้อผิดพลาด ลองอีกครั้งในภายหลัง",
@@ -793,9 +728,79 @@
   "archiveConflictCloud": "อัลบั้มคลาวด์",
   "archiveConflictKeepCloud": "เก็บคลาวด์",
   "archiveConflictKeepLocal": "เก็บในเครื่อง",
-
   "loginShowPassword": "แสดงรหัสผ่าน",
   "loginHidePassword": "ซ่อนรหัสผ่าน",
   "errorGeneric": "เกิดข้อผิดพลาด ลองอีกครั้งในภายหลัง",
-  "errorCreateHabit": "สร้างนิสัยไม่สำเร็จ ลองอีกครั้ง"
+  "errorCreateHabit": "สร้างนิสัยไม่สำเร็จ ลองอีกครั้ง",
+  "commonCopyId": "คัดลอก ID",
+  "adoptionClearDeadline": "ล้างกำหนดเวลา",
+  "commonIdCopied": "คัดลอก ID แล้ว",
+  "pickerDurationLabel": "ตัวเลือกเวลา",
+  "pickerMinutesValue": "{count} นาที",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "แมว {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name} แตะเพื่อโต้ตอบ",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "เสร็จ {percent}%",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} วันที่ใช้งาน",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "โหมดออฟไลน์",
+  "a11yAchievementUnlocked": "ปลดล็อกความสำเร็จ: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "เช็คอินแล้ว",
+  "calendarToday": "วันนี้",
+  "a11yEquipToCat": "สวมให้ {name}",
+  "a11yRegenerateCat": "สร้าง {name} ใหม่",
+  "a11yTimerDisplay": "ตั้งเวลา: {time}",
+  "a11yOnboardingPage": "หน้า {current} จาก {total}",
+  "a11yEditDisplayName": "แก้ไขชื่อ: {name}",
+  "commonStop": "หยุด",
+  "commonSend": "ส่ง",
+  "routeNotFound": "ไม่พบหน้า",
+  "routeGoHome": "กลับหน้าหลัก",
+  "a11yError": "ข้อผิดพลาด",
+  "a11yDeadline": "กำหนดเวลา",
+  "a11yReminder": "การเตือน",
+  "a11yFocusMeditation": "สมาธิ",
+  "a11yUnlocked": "ปลดล็อกแล้ว",
+  "a11ySelected": "เลือกแล้ว",
+  "a11yDynamicWallpaperColor": "สีวอลเปเปอร์แบบไดนามิก"
 }

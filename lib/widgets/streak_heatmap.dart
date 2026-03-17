@@ -41,7 +41,9 @@ class StreakHeatmap extends StatelessWidget {
       }
     }
 
-    return Column(
+    return Semantics(
+      label: context.l10n.a11yStreakActiveDays(totalDays),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Heatmap grid
@@ -75,7 +77,8 @@ class StreakHeatmap extends StatelessWidget {
                         : 0.0;
 
                     return Semantics(
-                      label: '${date.month}/${date.day}, $minutes minutes',
+                      label:
+                          '${date.month}/${date.day}, ${context.l10n.pickerMinutesValue(minutes)}',
                       child: Container(
                         width: 14,
                         height: 14,
@@ -161,6 +164,7 @@ class StreakHeatmap extends StatelessWidget {
           ],
         ),
       ],
+    ),
     );
   }
 }

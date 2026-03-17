@@ -62,7 +62,7 @@ class ThemeColorDialog extends ConsumerWidget {
                           Icons.check,
                           color: colorScheme.onPrimary,
                           size: 24,
-                          semanticLabel: 'Selected',
+                          semanticLabel: l10n.a11ySelected,
                         )
                       : null,
                 ),
@@ -121,13 +121,13 @@ class _DynamicColorOption extends StatelessWidget {
                       Icons.check,
                       color: colorScheme.onPrimary,
                       size: 24,
-                      semanticLabel: 'Selected',
+                      semanticLabel: l10n.a11ySelected,
                     )
                   : Icon(
                       Icons.wallpaper_outlined,
                       color: colorScheme.onPrimary.withValues(alpha: 0.9),
                       size: 22,
-                      semanticLabel: 'Dynamic wallpaper color',
+                      semanticLabel: l10n.a11yDynamicWallpaperColor,
                     ),
             ),
             const SizedBox(height: 4),

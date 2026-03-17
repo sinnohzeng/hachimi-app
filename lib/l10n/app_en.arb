@@ -1,12 +1,10 @@
 {
   "@@locale": "en",
   "appTitle": "Hachimi",
-
   "homeTabToday": "Today",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "Stats",
   "homeTabProfile": "Profile",
-
   "adoptionStepDefineHabit": "Define Habit",
   "adoptionStepAdoptCat": "Adopt Cat",
   "adoptionStepNameCat": "Name Cat",
@@ -17,12 +15,20 @@
   "adoptionTargetHoursHint": "Total hours to complete this habit",
   "adoptionMinutes": "{count} min",
   "@adoptionMinutes": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "adoptionRefreshCat": "Try another",
   "adoptionPersonality": "Personality: {name}",
   "@adoptionPersonality": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "adoptionNameYourCat": "Name your cat",
   "adoptionRandomName": "Random",
@@ -32,25 +38,35 @@
   "adoptionCatNameLabel": "Cat name",
   "adoptionCatNameHint": "e.g. Mochi",
   "adoptionRandomNameTooltip": "Random name",
-
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "No cats yet! Create a habit to adopt your first cat.",
   "catHouseGrowth": "{minutes} / {target} min",
   "@catHouseGrowth": {
     "placeholders": {
-      "minutes": { "type": "int" },
-      "target": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
     }
   },
-
   "catDetailGrowthProgress": "Growth Progress",
   "catDetailTotalMinutes": "{minutes} min focused",
   "@catDetailTotalMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "catDetailTargetMinutes": "Target: {minutes} min",
   "@catDetailTargetMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "catDetailRename": "Rename",
   "catDetailAccessories": "Accessories",
@@ -58,31 +74,48 @@
   "catDetailBoundHabit": "Bound Habit",
   "catDetailStage": "Stage: {stage}",
   "@catDetailStage": {
-    "placeholders": { "stage": { "type": "String" } }
+    "placeholders": {
+      "stage": {
+        "type": "String"
+      }
+    }
   },
-
   "coinBalance": "{amount} coins",
   "@coinBalance": {
-    "placeholders": { "amount": { "type": "int" } }
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
   },
   "coinCheckInReward": "+{amount} coins!",
   "@coinCheckInReward": {
-    "placeholders": { "amount": { "type": "int" } }
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
   },
   "coinCheckInTitle": "Daily Check-in",
   "coinInsufficientBalance": "Not enough coins",
-
   "shopTitle": "Accessory Shop",
   "shopPrice": "{price} coins",
   "@shopPrice": {
-    "placeholders": { "price": { "type": "int" } }
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
   },
   "shopPurchase": "Buy",
   "shopEquipped": "Equipped",
-
   "focusCompleteMinutes": "+{minutes} min",
   "@focusCompleteMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "focusCompleteStageUp": "Stage Up!",
   "focusCompleteGreatJob": "Great job!",
@@ -90,15 +123,27 @@
   "focusCompleteItsOkay": "It's okay!",
   "focusCompleteEvolved": "{catName} evolved!",
   "@focusCompleteEvolved": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "focusCompleteFocusedFor": "You focused for {minutes} minutes",
   "@focusCompleteFocusedFor": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "focusCompleteAbandonedMessage": "{catName} says: \"We'll try again!\"",
   "@focusCompleteAbandonedMessage": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "focusCompleteFocusTime": "Focus time",
   "focusCompleteCoinsEarned": "Coins earned",
@@ -109,7 +154,11 @@
   "focusCompleteTotal": "Total",
   "focusCompleteEvolvedTo": "Evolved to {stage}!",
   "@focusCompleteEvolvedTo": {
-    "placeholders": { "stage": { "type": "String" } }
+    "placeholders": {
+      "stage": {
+        "type": "String"
+      }
+    }
   },
   "focusCompleteYourCat": "Your cat",
   "focusCompleteDiaryWriting": "Writing diary...",
@@ -118,32 +167,38 @@
   "focusCompleteNotifBody": "{catName} earned +{xp} XP from {minutes}min of focus",
   "@focusCompleteNotifBody": {
     "placeholders": {
-      "catName": { "type": "String" },
-      "xp": { "type": "int" },
-      "minutes": { "type": "int" }
+      "catName": {
+        "type": "String"
+      },
+      "xp": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
-
   "stageKitten": "Kitten",
   "stageAdolescent": "Adolescent",
   "stageAdult": "Adult",
   "stageSenior": "Senior",
-
   "migrationTitle": "Data Update Required",
   "migrationMessage": "Hachimi has been updated with a new pixel cat system! Your old cat data is no longer compatible. Please reset to start fresh with the new experience.",
   "migrationResetButton": "Reset & Start Fresh",
-
   "sessionResumeTitle": "Resume session?",
   "sessionResumeMessage": "You had an active focus session ({habitName}, {elapsed}). Resume?",
   "@sessionResumeMessage": {
     "placeholders": {
-      "habitName": { "type": "String" },
-      "elapsed": { "type": "String" }
+      "habitName": {
+        "type": "String"
+      },
+      "elapsed": {
+        "type": "String"
+      }
     }
   },
   "sessionResumeButton": "Resume",
   "sessionDiscard": "Discard",
-
   "todaySummaryMinutes": "Today",
   "todaySummaryTotal": "Total",
   "todaySummaryCats": "Cats",
@@ -154,27 +209,42 @@
   "todayDeleteQuestTitle": "Delete quest?",
   "todayDeleteQuestMessage": "Are you sure you want to delete \"{name}\"? The cat will be graduated to your album.",
   "@todayDeleteQuestMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "todayQuestCompleted": "{name} completed",
   "@todayQuestCompleted": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "todayFailedToLoad": "Failed to load quests",
   "todayMinToday": "{count}min today",
   "@todayMinToday": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "todayGoalMinPerDay": "Goal: {count}min/day",
   "@todayGoalMinPerDay": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "todayFeaturedCat": "Featured Cat",
   "todayAddHabit": "Add Habit",
   "todayNoHabits": "Create your first habit to get started!",
   "todayNewQuest": "New quest",
   "todayStartFocus": "Start focus",
-
   "timerStart": "Start",
   "timerPause": "Pause",
   "timerResume": "Resume",
@@ -189,13 +259,16 @@
   "timerNotificationEnable": "Enable",
   "timerGraceBack": "Back ({seconds}s)",
   "@timerGraceBack": {
-    "placeholders": { "seconds": { "type": "int" } }
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "giveUpTitle": "Give up?",
   "giveUpMessage": "If you focused for at least 5 minutes, the time still counts towards your cat's growth. Your cat will understand!",
   "giveUpKeepGoing": "Keep Going",
   "giveUpConfirm": "Give Up",
-
   "settingsTitle": "Settings",
   "settingsGeneral": "General",
   "settingsAppearance": "Appearance",
@@ -223,7 +296,6 @@
   "deleteAccountTitle": "Delete account?",
   "deleteAccountMessage": "This will permanently delete your account and all your data. This action cannot be undone.",
   "deleteAccountWarning": "This action cannot be undone",
-
   "profileTitle": "Profile",
   "profileYourJourney": "Your Journey",
   "profileTotalFocus": "Total Focus",
@@ -234,11 +306,9 @@
   "profileChooseAvatar": "Choose avatar",
   "profileSaved": "Profile saved",
   "profileSettings": "Settings",
-
   "habitDetailStreak": "Streak",
   "habitDetailBestStreak": "Best",
   "habitDetailTotalMinutes": "Total",
-
   "commonCancel": "Cancel",
   "commonConfirm": "Confirm",
   "commonSave": "Save",
@@ -255,21 +325,27 @@
   "commonLogOut": "Log Out",
   "commonDeleteAccount": "Delete Account",
   "commonYes": "Yes",
-
   "chatDailyRemaining": "{count} messages left today",
   "@chatDailyRemaining": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "chatDailyLimitReached": "Daily message limit reached",
   "aiTemporarilyUnavailable": "AI features are temporarily unavailable",
-
   "catDetailNotFound": "Cat not found",
   "catDetailChatTooltip": "Chat",
   "catDetailRenameTooltip": "Rename",
   "catDetailGrowthTitle": "Growth Progress",
   "catDetailTarget": "Target: {hours}h",
   "@catDetailTarget": {
-    "placeholders": { "hours": { "type": "int" } }
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
   },
   "catDetailRenameTitle": "Rename Cat",
   "catDetailNewName": "New name",
@@ -295,7 +371,11 @@
   "catDetailDailyReminder": "Daily Reminder",
   "catDetailEveryDay": "{time} every day",
   "@catDetailEveryDay": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "catDetailNoReminder": "No reminder set",
   "catDetailChange": "Change",
@@ -303,7 +383,11 @@
   "catDetailSet": "Set",
   "catDetailReminderSet": "Reminder set for {time}",
   "@catDetailReminderSet": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "catDetailReminderRemoved": "Reminder removed",
   "catDetailDiaryTitle": "Hachimi Diary",
@@ -312,7 +396,11 @@
   "catDetailDiaryEmpty": "No diary entry today yet. Complete a focus session!",
   "catDetailChatWith": "Chat with {name}",
   "@catDetailChatWith": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catDetailChatSubtitle": "Have a conversation with your cat",
   "catDetailActivity": "Activity",
@@ -323,17 +411,29 @@
   "catDetailUnequip": "Unequip",
   "catDetailFromInventory": "From Inventory ({count})",
   "@catDetailFromInventory": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catDetailNoAccessories": "No accessories yet. Visit the shop!",
   "catDetailEquippedItem": "Equipped {name}",
   "@catDetailEquippedItem": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catDetailUnequipped": "Unequipped",
   "catDetailAbout": "About {name}",
   "@catDetailAbout": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catDetailAppearanceDetails": "Appearance details",
   "catDetailStatus": "Status",
@@ -351,12 +451,15 @@
   "catDetailTortiePattern": "Tortie pattern",
   "catDetailTortieColor": "Tortie color",
   "catDetailSkin": "Skin",
-
   "offlineMessage": "You're offline — changes will sync when reconnected",
   "offlineModeLabel": "Offline mode",
   "habitTodayMinutes": "Today: {count}min",
   "@habitTodayMinutes": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "habitDeleteTooltip": "Delete habit",
   "heatmapActiveDays": "Active days",
@@ -367,35 +470,29 @@
   "accessoryEquipped": "Equipped",
   "accessoryOwned": "Owned",
   "pickerMinUnit": "min",
-
   "settingsBackgroundAnimation": "Animated backgrounds",
   "settingsBackgroundAnimationSubtitle": "Mesh gradient and floating particles",
-
   "settingsUiStyle": "UI style",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "Retro Pixel",
   "settingsUiStyleMaterialSubtitle": "Modern, rounded Material Design",
   "settingsUiStyleRetroPixelSubtitle": "Warm pixel-art aesthetic",
-
   "personalityLazy": "Lazy",
   "personalityCurious": "Curious",
   "personalityPlayful": "Playful",
   "personalityShy": "Shy",
   "personalityBrave": "Brave",
   "personalityClingy": "Clingy",
-
   "personalityFlavorLazy": "Will nap 23 hours a day. The other hour? Also napping.",
   "personalityFlavorCurious": "Already sniffing everything in sight!",
   "personalityFlavorPlayful": "Can't stop chasing butterflies!",
   "personalityFlavorShy": "Took 3 minutes to peek out of the box...",
   "personalityFlavorBrave": "Jumped out of the box before it was even opened!",
   "personalityFlavorClingy": "Immediately started purring and won't let go.",
-
   "moodHappy": "Happy",
   "moodNeutral": "Neutral",
   "moodLonely": "Lonely",
   "moodMissing": "Missing You",
-
   "moodMsgLazyHappy": "Nya~! Time for a well-deserved nap...",
   "moodMsgCuriousHappy": "What are we exploring today?",
   "moodMsgPlayfulHappy": "Nya~! Ready to work!",
@@ -413,14 +510,13 @@
   "moodMsgPlayfulLonely": "The toys aren't fun without you...",
   "moodMsgShyLonely": "*curls up quietly*",
   "moodMsgBraveLonely": "I'll keep waiting. I'm brave.",
-  "moodMsgClingyLonely": "Where did you go... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "Where did you go... 🥺",
   "moodMsgLazyMissing": "*opens one eye hopefully*",
   "moodMsgCuriousMissing": "Did something happen...?",
   "moodMsgPlayfulMissing": "I saved your favorite toy...",
   "moodMsgShyMissing": "*hiding, but watching the door*",
   "moodMsgBraveMissing": "I know you'll come back. I believe.",
   "moodMsgClingyMissing": "I miss you so much... please come back.",
-
   "peltTypeTabby": "Classic tabby stripes",
   "peltTypeTicked": "Ticked agouti pattern",
   "peltTypeMackerel": "Mackerel tabby",
@@ -436,7 +532,6 @@
   "peltTypeBengal": "Bengal pattern",
   "peltTypeMarbled": "Marbled pattern",
   "peltTypeMasked": "Masked face",
-
   "peltColorWhite": "White",
   "peltColorPaleGrey": "Pale grey",
   "peltColorSilver": "Silver",
@@ -456,7 +551,6 @@
   "peltColorGoldenBrown": "Golden brown",
   "peltColorDarkBrown": "Dark brown",
   "peltColorChocolate": "Chocolate",
-
   "eyeColorYellow": "Yellow",
   "eyeColorAmber": "Amber",
   "eyeColorHazel": "Hazel",
@@ -478,19 +572,25 @@
   "eyeColorBronze": "Bronze",
   "eyeColorSilver": "Silver",
   "eyeColorPaleYellow": "Pale yellow",
-
   "eyeDescNormal": "{color} eyes",
   "@eyeDescNormal": {
-    "placeholders": { "color": { "type": "String" } }
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
   },
   "eyeDescHeterochromia": "Heterochromia ({primary} / {secondary})",
   "@eyeDescHeterochromia": {
     "placeholders": {
-      "primary": { "type": "String" },
-      "secondary": { "type": "String" }
+      "primary": {
+        "type": "String"
+      },
+      "secondary": {
+        "type": "String"
+      }
     }
   },
-
   "skinColorPink": "Pink",
   "skinColorRed": "Red",
   "skinColorBlack": "Black",
@@ -503,68 +603,92 @@
   "skinColorDarkSalmon": "Dark salmon",
   "skinColorSalmon": "Salmon",
   "skinColorPeach": "Peach",
-
   "furLengthLonghair": "Longhair",
   "furLengthShorthair": "Shorthair",
-
   "whiteTintOffwhite": "Off-white tint",
   "whiteTintCream": "Cream tint",
   "whiteTintDarkCream": "Dark cream tint",
   "whiteTintGray": "Grey tint",
   "whiteTintPink": "Pink tint",
-
   "notifReminderTitle": "{catName} misses you!",
   "@notifReminderTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "notifReminderBody": "Time for {habitName} — your cat is waiting!",
   "@notifReminderBody": {
-    "placeholders": { "habitName": { "type": "String" } }
+    "placeholders": {
+      "habitName": {
+        "type": "String"
+      }
+    }
   },
   "notifStreakTitle": "{catName} is worried!",
   "@notifStreakTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "notifStreakBody": "Your {streak}-day streak is at risk. A quick session will save it!",
   "@notifStreakBody": {
-    "placeholders": { "streak": { "type": "int" } }
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
   },
   "notifEvolutionTitle": "{catName} evolved!",
   "@notifEvolutionTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "notifEvolutionBody": "{catName} grew into a {stageName}! Keep up the great work!",
   "@notifEvolutionBody": {
     "placeholders": {
-      "catName": { "type": "String" },
-      "stageName": { "type": "String" }
+      "catName": {
+        "type": "String"
+      },
+      "stageName": {
+        "type": "String"
+      }
     }
   },
-
   "durationHoursMinutes": "{hours}h {minutes}m",
   "@durationHoursMinutes": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
-
   "diaryScreenTitle": "{name} Diary",
   "@diaryScreenTitle": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "diaryFailedToLoad": "Failed to load diary",
   "diaryEmptyTitle": "No diary entries yet",
   "diaryEmptyHint": "Complete a focus session and your cat will write their first diary entry!",
-
   "focusSetupCountdown": "Countdown",
   "focusSetupStopwatch": "Stopwatch",
   "focusSetupStartFocus": "Start Focus",
   "focusSetupQuestNotFound": "Quest not found",
-
   "checkInButtonLogMore": "Log more time",
   "checkInButtonStart": "Start timer",
-
   "adoptionTitleFirst": "Adopt Your First Cat!",
   "adoptionTitleNew": "New Quest",
   "adoptionStepDefineQuest": "Define Quest",
@@ -593,7 +717,11 @@
   "adoptionChooseKitten": "Choose your kitten!",
   "adoptionCompanionFor": "Your companion for \"{quest}\"",
   "@adoptionCompanionFor": {
-    "placeholders": { "quest": { "type": "String" } }
+    "placeholders": {
+      "quest": {
+        "type": "String"
+      }
+    }
   },
   "adoptionRerollAll": "Reroll All",
   "adoptionNameYourCat2": "Name your cat",
@@ -603,17 +731,24 @@
   "adoptionGrowthTarget": "Your cat will grow as you focus on \"{quest}\"! Target: {hours}h total.",
   "@adoptionGrowthTarget": {
     "placeholders": {
-      "quest": { "type": "String" },
-      "hours": { "type": "int" }
+      "quest": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "adoptionValidQuestName": "Please enter a quest name",
   "adoptionValidCatName": "Please name your cat",
   "adoptionError": "Error: {message}",
   "@adoptionError": {
-    "placeholders": { "message": { "type": "String" } }
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
   },
-
   "adoptionBasicInfo": "Basic info",
   "adoptionGoals": "Goals",
   "adoptionUnlimitedMode": "Unlimited mode",
@@ -626,7 +761,6 @@
   "adoptionMotivationLabel": "Note",
   "adoptionMotivationHint": "Write a note...",
   "adoptionMotivationSwap": "Random fill",
-
   "loginAppName": "Hachimi",
   "loginTagline": "Raise cats. Complete quests.",
   "loginContinueGoogle": "Continue with Google",
@@ -646,7 +780,6 @@
   "loginCreateAccountButton": "Create Account",
   "loginNoAccount": "Don't have an account? ",
   "loginRegister": "Register",
-
   "checkInTitle": "Monthly Check-In",
   "checkInDays": "Days",
   "checkInCoinsEarned": "Coins earned",
@@ -654,8 +787,12 @@
   "checkInMilestoneProgress": "{remaining} more days → +{bonus} coins",
   "@checkInMilestoneProgress": {
     "placeholders": {
-      "remaining": { "type": "int" },
-      "bonus": { "type": "int" }
+      "remaining": {
+        "type": "int"
+      },
+      "bonus": {
+        "type": "int"
+      }
     }
   },
   "checkInMilestones": "Milestones",
@@ -664,14 +801,21 @@
   "checkInWeekday": "Weekday (Mon–Fri)",
   "checkInWeekdayReward": "{coins} coins/day",
   "@checkInWeekdayReward": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "checkInWeekend": "Weekend (Sat–Sun)",
   "checkInNDays": "{count} days",
   "@checkInNDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "onboardTitle1": "Meet Your Companion",
   "onboardSubtitle1": "Every quest begins with a kitten",
   "onboardBody1": "Set a goal and adopt a kitten.\nFocus on it, and watch your cat grow!",
@@ -684,7 +828,6 @@
   "onboardSkip": "Skip",
   "onboardLetsGo": "Let's Go!",
   "onboardNext": "Next",
-
   "catRoomTitle": "CatHouse",
   "catRoomInventory": "Inventory",
   "catRoomShop": "Accessory Shop",
@@ -699,30 +842,49 @@
   "catRoomArchiveTitle": "Archive cat?",
   "catRoomArchiveMessage": "This will archive \"{name}\" and delete its bound quest. The cat will still appear in your album.",
   "@catRoomArchiveMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomArchive": "Archive",
   "catRoomAlbumSection": "Album ({count})",
   "@catRoomAlbumSection": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catRoomReactivateCat": "Reactivate Cat",
   "catRoomReactivateTitle": "Reactivate cat?",
   "catRoomReactivateMessage": "This will restore \"{name}\" and its bound quest to the CatHouse.",
   "@catRoomReactivateMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivate": "Reactivate",
   "catRoomArchivedLabel": "Archived",
   "catRoomArchiveSuccess": "\"{name}\" archived",
   "@catRoomArchiveSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivateSuccess": "\"{name}\" reactivated",
   "@catRoomReactivateSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
-
   "addHabitTitle": "New Quest",
   "addHabitQuestName": "Quest name",
   "addHabitQuestHint": "e.g. LeetCode Practice",
@@ -733,70 +895,119 @@
   "addHabitValidNumber": "Please enter a valid number",
   "addHabitCreate": "Create Quest",
   "addHabitHoursSuffix": "hours",
-
   "shopTabPlants": "Plants ({count})",
   "@shopTabPlants": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "shopTabWild": "Wild ({count})",
   "@shopTabWild": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "shopTabCollars": "Collars ({count})",
   "@shopTabCollars": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "shopNoAccessories": "No accessories available",
   "shopBuyConfirm": "Buy {name}?",
   "@shopBuyConfirm": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "shopPurchaseButton": "Purchase",
   "shopNotEnoughCoinsButton": "Not enough coins",
   "shopPurchaseSuccess": "Purchased! {name} added to inventory",
   "@shopPurchaseSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "shopPurchaseFailed": "Not enough coins (need {price})",
   "@shopPurchaseFailed": {
-    "placeholders": { "price": { "type": "int" } }
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
   },
-
   "inventoryTitle": "Inventory",
   "inventoryInBox": "In Box ({count})",
   "@inventoryInBox": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "inventoryEmpty": "Your inventory is empty.\nVisit the shop to get accessories!",
   "inventoryEquippedOnCats": "Equipped on Cats ({count})",
   "@inventoryEquippedOnCats": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "inventoryNoEquipped": "No accessories equipped on any cat.",
   "inventoryUnequip": "Unequip",
   "inventoryNoActiveCats": "No active cats",
   "inventoryEquipTo": "Equip {name} to:",
   "@inventoryEquipTo": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "inventoryEquipSuccess": "Equipped {name}",
   "@inventoryEquipSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "inventoryUnequipSuccess": "Unequipped from {catName}",
   "@inventoryUnequipSuccess": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
-
   "chatCatNotFound": "Cat not found",
   "chatTitle": "Chat with {name}",
   "@chatTitle": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "chatClearHistory": "Clear history",
   "chatEmptyTitle": "Say hi to {name}!",
   "@chatEmptyTitle": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "chatEmptySubtitle": "Start a conversation with your cat. They will reply based on their personality!",
   "chatGenerating": "Generating...",
@@ -804,41 +1015,54 @@
   "chatClearConfirmTitle": "Clear chat history?",
   "chatClearConfirmMessage": "This will delete all messages. This cannot be undone.",
   "chatClearButton": "Clear",
-
   "diaryTitle": "{name} Diary",
   "@diaryTitle": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "diaryLoadFailed": "Failed to load diary",
   "diaryRetry": "Retry",
   "diaryEmptyTitle2": "No diary entries yet",
   "diaryEmptySubtitle": "Complete a focus session and your cat will write their first diary entry!",
-
   "statsTitle": "Statistics",
   "statsTotalHours": "Total Hours",
   "statsTimeValue": "{hours}h {minutes}m",
   "@statsTimeValue": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "statsBestStreak": "Best Streak",
   "statsStreakDays": "{count} days",
   "@statsStreakDays": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "statsOverallProgress": "Overall Progress",
   "statsPercentOfGoals": "{percent}% of all goals",
   "@statsPercentOfGoals": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "statsPerQuestProgress": "Per-Quest Progress",
   "statsQuestLoadError": "Failed to load quest stats",
   "statsNoQuestData": "No quest data yet",
   "statsNoQuestHint": "Start a quest to see your progress here!",
   "statsLast30Days": "Last 30 Days",
-
   "habitDetailQuestNotFound": "Quest not found",
   "habitDetailComplete": "complete",
   "habitDetailTotalTime": "Total Time",
@@ -846,39 +1070,67 @@
   "habitDetailTarget": "Target",
   "habitDetailDaysUnit": "{count} days",
   "@habitDetailDaysUnit": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "habitDetailHoursUnit": "{count} hours",
   "@habitDetailHoursUnit": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "checkInBannerSuccess": "+{coins} coins! Daily check-in complete",
   "@checkInBannerSuccess": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "checkInBannerBonus": " + {bonus} milestone bonus!",
   "@checkInBannerBonus": {
-    "placeholders": { "bonus": { "type": "int" } }
+    "placeholders": {
+      "bonus": {
+        "type": "int"
+      }
+    }
   },
   "checkInBannerSemantics": "Daily check-in",
   "checkInBannerLoading": "Loading check-in status...",
   "checkInBannerPrompt": "Check in for +{coins} coins",
   "@checkInBannerPrompt": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "checkInBannerSummary": "{count}/{total} days  ·  +{coins} today",
   "@checkInBannerSummary": {
     "placeholders": {
-      "count": { "type": "int" },
-      "total": { "type": "int" },
-      "coins": { "type": "int" }
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "coins": {
+        "type": "int"
+      }
     }
   },
-
   "commonErrorWithDetail": "Error: {error}",
   "@commonErrorWithDetail": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "profileFallbackUser": "User",
   "fallbackCatName": "Cat",
@@ -895,10 +1147,8 @@
   "settingsLanguageVietnamese": "Vietnamese",
   "settingsLanguageIndonesian": "Indonesian",
   "settingsLanguageTurkish": "Turkish",
-
   "notifFocusing": "focusing...",
   "notifInProgress": "Focus session in progress",
-
   "unitMinShort": "min",
   "unitHourShort": "h",
   "weekdayMon": "M",
@@ -918,11 +1168,19 @@
   "historyFilterAll": "All",
   "historySessionCount": "{count} sessions",
   "@historySessionCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "historyTotalMinutes": "{minutes} min",
   "@historyTotalMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "historyNoSessions": "No focus records yet",
   "historyNoSessionsHint": "Complete a focus session to see it here",
@@ -938,7 +1196,6 @@
   "historySelectMonth": "Select month",
   "historyAllMonths": "All months",
   "historyAllHabits": "All",
-
   "homeTabAchievements": "Achievements",
   "achievementTitle": "Achievements",
   "achievementTabOverview": "Overview",
@@ -949,11 +1206,19 @@
   "achievementSummaryTitle": "Achievement Progress",
   "achievementUnlockedCount": "{count} unlocked",
   "@achievementUnlockedCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "achievementTotalCoins": "{coins} coins earned",
   "@achievementTotalCoins": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "achievementUnlocked": "Achievement unlocked!",
   "achievementAwesome": "Awesome!",
@@ -962,13 +1227,20 @@
   "achievementHiddenDesc": "This is a hidden achievement",
   "achievementPersistDesc": "Accumulate {days} check-in days on any quest",
   "@achievementPersistDesc": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "achievementTitleCount": "{count} titles unlocked",
   "@achievementTitleCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "growthPathTitle": "Growth Path",
   "@growthPathTitle": {
     "description": "Title for the growth path card"
@@ -993,16 +1265,23 @@
   "@growthPathTip": {
     "description": "Research tip about the 20-hour rule"
   },
-
   "achievementCelebrationCoins": "+{count} coins",
   "@achievementCelebrationCoins": {
     "description": "Shows coins earned from achievement",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "achievementCelebrationTitle": "Title earned: {title}",
   "@achievementCelebrationTitle": {
     "description": "Shows title earned from achievement",
-    "placeholders": { "title": { "type": "String" } }
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
   },
   "achievementCelebrationDismiss": "Awesome!",
   "@achievementCelebrationDismiss": {
@@ -1016,20 +1295,31 @@
   "@achievementCelebrationCounter": {
     "description": "Shows queue progress for celebrations",
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "achievementUnlockedAt": "Unlocked on {date}",
   "@achievementUnlockedAt": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "achievementLocked": "Not yet unlocked",
   "achievementRewardCoins": "+{count} coins",
   "@achievementRewardCoins": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "reminderModeDaily": "Every day",
   "reminderModeWeekdays": "Weekdays",
   "reminderModeMonday": "Monday",
@@ -1047,13 +1337,20 @@
   "reminderConfirm": "Confirm",
   "reminderNotificationTitle": "{catName} misses you!",
   "@reminderNotificationTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "reminderNotificationBody": "Time for {habitName} — your cat is waiting!",
   "@reminderNotificationBody": {
-    "placeholders": { "habitName": { "type": "String" } }
+    "placeholders": {
+      "habitName": {
+        "type": "String"
+      }
+    }
   },
-
   "deleteAccountDataWarning": "All the following data will be permanently deleted:",
   "deleteAccountQuests": "Quests",
   "deleteAccountCats": "Cats",
@@ -1065,28 +1362,43 @@
   "deleteAccountAuthCancelled": "Authentication cancelled",
   "deleteAccountAuthFailed": "Authentication failed: {error}",
   "@deleteAccountAuthFailed": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "deleteAccountProgress": "Deleting account...",
   "deleteAccountSuccess": "Account deleted",
-
   "drawerGuestLoginSubtitle": "Sync data and unlock AI features",
   "drawerGuestSignIn": "Sign in",
   "drawerMilestones": "Milestones",
   "drawerMilestoneFocus": "Total focus: {hours}h {minutes}m",
   "@drawerMilestoneFocus": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "drawerMilestoneCats": "Cat family: {count}",
   "@drawerMilestoneCats": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMilestoneQuests": "Active quests: {count}",
   "@drawerMilestoneQuests": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMySection": "My",
   "drawerSessionHistory": "Focus history",
@@ -1095,24 +1407,28 @@
   "settingsResetData": "Reset all data",
   "settingsResetDataTitle": "Reset all data?",
   "settingsResetDataMessage": "This will delete all local data and return to the welcome screen. This cannot be undone.",
-
   "guestUpgradeTitle": "Protect your data",
   "guestUpgradeMessage": "Link an account to back up your progress, unlock AI diary and chat features, and sync across devices.",
   "guestUpgradeLinkButton": "Link account",
   "guestUpgradeLater": "Maybe later",
-
   "loginLinkTagline": "Link an account to protect your data",
-
   "aiTeaserTitle": "Cat diary",
   "aiTeaserPreview": "Today I studied with my human again... {catName} feels smarter every day~",
   "@aiTeaserPreview": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "aiTeaserCta": "Link an account to see what {catName} wants to say",
   "@aiTeaserCta": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
-
   "authErrorEmailInUse": "This email is already registered",
   "authErrorWrongPassword": "Incorrect email or password",
   "authErrorUserNotFound": "No account found with this email",
@@ -1121,7 +1437,6 @@
   "authErrorAdminRestricted": "Sign-in is temporarily restricted",
   "authErrorWeakPassword": "Password is too weak. Use at least 6 characters",
   "authErrorGeneric": "Something went wrong. Try again",
-
   "deleteAccountReauthEmail": "Enter your password to continue",
   "deleteAccountReauthPasswordHint": "Password",
   "deleteAccountError": "Something went wrong. Try again later.",
@@ -1140,9 +1455,105 @@
   "archiveConflictCloud": "Cloud archive",
   "archiveConflictKeepCloud": "Keep cloud",
   "archiveConflictKeepLocal": "Keep local",
-
   "loginShowPassword": "Show password",
   "loginHidePassword": "Hide password",
   "errorGeneric": "Something went wrong. Try again later",
-  "errorCreateHabit": "Failed to create habit. Try again"
+  "errorCreateHabit": "Failed to create habit. Try again",
+  "commonCopyId": "Copy ID",
+  "adoptionClearDeadline": "Clear deadline",
+  "commonIdCopied": "ID copied",
+  "pickerDurationLabel": "Duration picker",
+  "pickerMinutesValue": "{count} minutes",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "{name} cat",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, tap to interact",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% complete",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} active days",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "Offline mode",
+  "a11yAchievementUnlocked": "Achievement unlocked: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "checked in",
+  "calendarToday": "today",
+  "a11yEquipToCat": "Equip to {name}",
+  "a11yRegenerateCat": "Regenerate {name}",
+  "a11yTimerDisplay": "Timer: {time}",
+  "a11yOnboardingPage": "Page {current} of {total}",
+  "a11yEditDisplayName": "Edit display name: {name}",
+  "commonStop": "Stop",
+  "commonSend": "Send",
+  "@a11yEquipToCat": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@a11yRegenerateCat": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@a11yTimerDisplay": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "@a11yOnboardingPage": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "@a11yEditDisplayName": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routeNotFound": "Page not found",
+  "routeGoHome": "Go home",
+  "a11yError": "Error",
+  "a11yDeadline": "Deadline",
+  "a11yReminder": "Reminder",
+  "a11yFocusMeditation": "Focus meditation",
+  "a11yUnlocked": "Unlocked",
+  "a11ySelected": "Selected",
+  "a11yDynamicWallpaperColor": "Dynamic wallpaper color"
 }
