@@ -4783,6 +4783,360 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Dynamic wallpaper color'**
   String get a11yDynamicWallpaperColor;
+
+  /// No description provided for @awarenessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awareness'**
+  String get awarenessTitle;
+
+  /// No description provided for @awarenessTabToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get awarenessTabToday;
+
+  /// No description provided for @awarenessTabThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get awarenessTabThisWeek;
+
+  /// No description provided for @awarenessTabReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get awarenessTabReview;
+
+  /// No description provided for @moodVeryHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Happy'**
+  String get moodVeryHappy;
+
+  /// No description provided for @moodCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get moodCalm;
+
+  /// No description provided for @moodDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Down'**
+  String get moodDown;
+
+  /// No description provided for @moodVeryDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Very Down'**
+  String get moodVeryDown;
+
+  /// No description provided for @awarenessLightPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'What made you smile today?'**
+  String get awarenessLightPlaceholder;
+
+  /// No description provided for @awarenessLightSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Light recorded ✨'**
+  String get awarenessLightSaved;
+
+  /// No description provided for @awarenessLightEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get awarenessLightEdit;
+
+  /// No description provided for @weeklyReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Review'**
+  String get weeklyReviewTitle;
+
+  /// No description provided for @weeklyReviewHappyMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Moment #{number}'**
+  String weeklyReviewHappyMoment(int number);
+
+  /// No description provided for @weeklyReviewHappyMomentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What made you happy this week?'**
+  String get weeklyReviewHappyMomentHint;
+
+  /// No description provided for @weeklyReviewGratitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude'**
+  String get weeklyReviewGratitude;
+
+  /// No description provided for @weeklyReviewGratitudeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Who or what are you grateful for?'**
+  String get weeklyReviewGratitudeHint;
+
+  /// No description provided for @weeklyReviewLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get weeklyReviewLearning;
+
+  /// No description provided for @weeklyReviewLearningHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What did you learn this week?'**
+  String get weeklyReviewLearningHint;
+
+  /// No description provided for @weeklyReviewSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Review'**
+  String get weeklyReviewSave;
+
+  /// No description provided for @weeklyReviewSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Review saved ✨'**
+  String get weeklyReviewSaved;
+
+  /// No description provided for @worryProcessorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worry Processor'**
+  String get worryProcessorTitle;
+
+  /// No description provided for @worryDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s bothering you?'**
+  String get worryDescriptionHint;
+
+  /// No description provided for @worrySolutionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What could you do about it?'**
+  String get worrySolutionHint;
+
+  /// No description provided for @worryStatusOngoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get worryStatusOngoing;
+
+  /// No description provided for @worryStatusResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get worryStatusResolved;
+
+  /// No description provided for @worryStatusDisappeared.
+  ///
+  /// In en, this message translates to:
+  /// **'Gone'**
+  String get worryStatusDisappeared;
+
+  /// No description provided for @worryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Worry'**
+  String get worryAdd;
+
+  /// No description provided for @worrySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get worrySave;
+
+  /// No description provided for @worryResolvedSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved & Gone'**
+  String get worryResolvedSection;
+
+  /// No description provided for @worryManageAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage all worries'**
+  String get worryManageAll;
+
+  /// No description provided for @awarenessEmptyLightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No light recorded yet'**
+  String get awarenessEmptyLightTitle;
+
+  /// No description provided for @awarenessEmptyLightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Whenever you\'re ready ✨'**
+  String get awarenessEmptyLightSubtitle;
+
+  /// No description provided for @awarenessEmptyLightAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get awarenessEmptyLightAction;
+
+  /// No description provided for @awarenessEmptyReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take your time'**
+  String get awarenessEmptyReviewTitle;
+
+  /// No description provided for @awarenessEmptyReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review when you feel like it 🐱'**
+  String get awarenessEmptyReviewSubtitle;
+
+  /// No description provided for @awarenessEmptyReviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Review'**
+  String get awarenessEmptyReviewAction;
+
+  /// No description provided for @awarenessEmptyHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every light matters'**
+  String get awarenessEmptyHistoryTitle;
+
+  /// No description provided for @awarenessEmptyHistorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your history will appear here'**
+  String get awarenessEmptyHistorySubtitle;
+
+  /// No description provided for @awarenessEmptyWorriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No worries? Great! 🎉'**
+  String get awarenessEmptyWorriesTitle;
+
+  /// No description provided for @awarenessEmptyWorriesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s wonderful'**
+  String get awarenessEmptyWorriesSubtitle;
+
+  /// No description provided for @catReactVeryHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'So happy today! Meow~ 🎉'**
+  String get catReactVeryHappy;
+
+  /// No description provided for @catReactHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Another light recorded ✨'**
+  String get catReactHappy;
+
+  /// No description provided for @catReactCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'A calm day is a good day 🍃'**
+  String get catReactCalm;
+
+  /// No description provided for @catReactDown.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m here with you 💛'**
+  String get catReactDown;
+
+  /// No description provided for @catReactVeryDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Not going anywhere 🫂'**
+  String get catReactVeryDown;
+
+  /// No description provided for @awarenessBridgePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What made you smile today? ✨'**
+  String get awarenessBridgePrompt;
+
+  /// No description provided for @awarenessBridgeRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get awarenessBridgeRecord;
+
+  /// No description provided for @awarenessBridgeSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get awarenessBridgeSkip;
+
+  /// No description provided for @awarenessHabitsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Habits'**
+  String get awarenessHabitsSection;
+
+  /// No description provided for @awarenessHabitsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No habits yet. Adopt a cat to start!'**
+  String get awarenessHabitsEmpty;
+
+  /// No description provided for @awarenessReviewComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get awarenessReviewComingSoon;
+
+  /// No description provided for @awarenessMoodRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select today\'s mood'**
+  String get awarenessMoodRequired;
+
+  /// No description provided for @awarenessSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed, please try again'**
+  String get awarenessSaveFailed;
+
+  /// No description provided for @awarenessLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load, please go back and retry'**
+  String get awarenessLoadFailed;
+
+  /// No description provided for @awarenessSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get awarenessSaved;
+
+  /// No description provided for @worryDescriptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe your worry'**
+  String get worryDescriptionRequired;
+
+  /// No description provided for @worryLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load worry'**
+  String get worryLoadFailed;
+
+  /// No description provided for @awarenessLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in first'**
+  String get awarenessLoginRequired;
+
+  /// No description provided for @tagCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'+Custom'**
+  String get tagCustom;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

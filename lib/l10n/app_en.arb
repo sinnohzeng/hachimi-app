@@ -1571,5 +1571,82 @@
   "a11yFocusMeditation": "Focus meditation",
   "a11yUnlocked": "Unlocked",
   "a11ySelected": "Selected",
-  "a11yDynamicWallpaperColor": "Dynamic wallpaper color"
+  "a11yDynamicWallpaperColor": "Dynamic wallpaper color",
+
+  "awarenessTitle": "Awareness",
+  "awarenessTabToday": "Today",
+  "awarenessTabThisWeek": "This Week",
+  "awarenessTabReview": "Review",
+
+  "moodVeryHappy": "Very Happy",
+  "moodCalm": "Calm",
+  "moodDown": "Down",
+  "moodVeryDown": "Very Down",
+
+  "awarenessLightPlaceholder": "What made you smile today?",
+  "awarenessLightSaved": "Light recorded ✨",
+  "awarenessLightEdit": "Edit",
+
+  "weeklyReviewTitle": "Weekly Review",
+  "weeklyReviewHappyMoment": "Happy Moment #{number}",
+  "@weeklyReviewHappyMoment": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyReviewHappyMomentHint": "What made you happy this week?",
+  "weeklyReviewGratitude": "Gratitude",
+  "weeklyReviewGratitudeHint": "Who or what are you grateful for?",
+  "weeklyReviewLearning": "Learning",
+  "weeklyReviewLearningHint": "What did you learn this week?",
+  "weeklyReviewSave": "Save Review",
+  "weeklyReviewSaved": "Review saved ✨",
+
+  "worryProcessorTitle": "Worry Processor",
+  "worryDescriptionHint": "What's bothering you?",
+  "worrySolutionHint": "What could you do about it?",
+  "worryStatusOngoing": "Ongoing",
+  "worryStatusResolved": "Resolved",
+  "worryStatusDisappeared": "Gone",
+  "worryAdd": "Add Worry",
+  "worrySave": "Save",
+  "worryResolvedSection": "Resolved & Gone",
+  "worryManageAll": "Manage all worries",
+
+  "awarenessEmptyLightTitle": "No light recorded yet",
+  "awarenessEmptyLightSubtitle": "Whenever you're ready ✨",
+  "awarenessEmptyLightAction": "Record",
+  "awarenessEmptyReviewTitle": "Take your time",
+  "awarenessEmptyReviewSubtitle": "Review when you feel like it 🐱",
+  "awarenessEmptyReviewAction": "Start Review",
+  "awarenessEmptyHistoryTitle": "Every light matters",
+  "awarenessEmptyHistorySubtitle": "Your history will appear here",
+  "awarenessEmptyWorriesTitle": "No worries? Great! 🎉",
+  "awarenessEmptyWorriesSubtitle": "That's wonderful",
+
+  "catReactVeryHappy": "So happy today! Meow~ 🎉",
+  "catReactHappy": "Another light recorded ✨",
+  "catReactCalm": "A calm day is a good day 🍃",
+  "catReactDown": "I'm here with you 💛",
+  "catReactVeryDown": "Not going anywhere 🫂",
+
+  "awarenessBridgePrompt": "What made you smile today? ✨",
+  "awarenessBridgeRecord": "Record",
+  "awarenessBridgeSkip": "Skip",
+
+  "awarenessHabitsSection": "Today's Habits",
+  "awarenessHabitsEmpty": "No habits yet. Adopt a cat to start!",
+
+  "awarenessReviewComingSoon": "Coming soon",
+
+  "awarenessMoodRequired": "Please select today's mood",
+  "awarenessSaveFailed": "Save failed, please try again",
+  "awarenessLoadFailed": "Failed to load, please go back and retry",
+  "awarenessSaved": "Saved",
+  "worryDescriptionRequired": "Please describe your worry",
+  "worryLoadFailed": "Failed to load worry",
+  "awarenessLoginRequired": "Please log in first",
+  "tagCustom": "+Custom"
 }

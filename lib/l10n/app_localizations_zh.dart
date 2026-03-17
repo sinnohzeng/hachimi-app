@@ -2548,6 +2548,185 @@ class SZh extends S {
 
   @override
   String get a11yDynamicWallpaperColor => '动态壁纸颜色';
+
+  @override
+  String get awarenessTitle => '觉知';
+
+  @override
+  String get awarenessTabToday => '今天';
+
+  @override
+  String get awarenessTabThisWeek => '本周';
+
+  @override
+  String get awarenessTabReview => '回顾';
+
+  @override
+  String get moodVeryHappy => '很开心';
+
+  @override
+  String get moodCalm => '平静';
+
+  @override
+  String get moodDown => '低落';
+
+  @override
+  String get moodVeryDown => '很低落';
+
+  @override
+  String get awarenessLightPlaceholder => '今天有什么让你微笑的事？';
+
+  @override
+  String get awarenessLightSaved => '已记录今天的光 ✨';
+
+  @override
+  String get awarenessLightEdit => '编辑';
+
+  @override
+  String get weeklyReviewTitle => '周回顾';
+
+  @override
+  String weeklyReviewHappyMoment(int number) {
+    return '幸福时刻 #$number';
+  }
+
+  @override
+  String get weeklyReviewHappyMomentHint => '这周有什么让你开心的？';
+
+  @override
+  String get weeklyReviewGratitude => '感恩';
+
+  @override
+  String get weeklyReviewGratitudeHint => '这周想感谢谁或什么？';
+
+  @override
+  String get weeklyReviewLearning => '学到了什么';
+
+  @override
+  String get weeklyReviewLearningHint => '这周学到了什么？';
+
+  @override
+  String get weeklyReviewSave => '保存回顾';
+
+  @override
+  String get weeklyReviewSaved => '回顾已保存 ✨';
+
+  @override
+  String get worryProcessorTitle => '烦恼处理器';
+
+  @override
+  String get worryDescriptionHint => '什么在烦你？';
+
+  @override
+  String get worrySolutionHint => '你打算怎么应对？';
+
+  @override
+  String get worryStatusOngoing => '还在';
+
+  @override
+  String get worryStatusResolved => '搞定了';
+
+  @override
+  String get worryStatusDisappeared => '消失了';
+
+  @override
+  String get worryAdd => '添加烦恼';
+
+  @override
+  String get worrySave => '保存';
+
+  @override
+  String get worryResolvedSection => '已解决';
+
+  @override
+  String get worryManageAll => '管理全部烦恼';
+
+  @override
+  String get awarenessEmptyLightTitle => '今天还没有记录光哦';
+
+  @override
+  String get awarenessEmptyLightSubtitle => '什么时候都可以来 ✨';
+
+  @override
+  String get awarenessEmptyLightAction => '记录';
+
+  @override
+  String get awarenessEmptyReviewTitle => '慢慢来';
+
+  @override
+  String get awarenessEmptyReviewSubtitle => '等你准备好了再回顾 🐱';
+
+  @override
+  String get awarenessEmptyReviewAction => '开始回顾';
+
+  @override
+  String get awarenessEmptyHistoryTitle => '每一天的光都值得被记住';
+
+  @override
+  String get awarenessEmptyHistorySubtitle => '你的历史记录会出现在这里';
+
+  @override
+  String get awarenessEmptyWorriesTitle => '没有烦恼？太好了！🎉';
+
+  @override
+  String get awarenessEmptyWorriesSubtitle => '这真是太棒了';
+
+  @override
+  String get catReactVeryHappy => '铲屎官今天好开心，本猫也开心！🎉';
+
+  @override
+  String get catReactHappy => '记录了今天的光，真棒 ✨';
+
+  @override
+  String get catReactCalm => '平静的一天也很好呢 🍃';
+
+  @override
+  String get catReactDown => '不开心的日子，本猫陪着你 💛';
+
+  @override
+  String get catReactVeryDown => '没事的，本猫哪都不去 🫂';
+
+  @override
+  String get awarenessBridgePrompt => '今天有什么让你微笑的事？✨';
+
+  @override
+  String get awarenessBridgeRecord => '记录';
+
+  @override
+  String get awarenessBridgeSkip => '跳过';
+
+  @override
+  String get awarenessHabitsSection => '今日习惯';
+
+  @override
+  String get awarenessHabitsEmpty => '还没有习惯，去领养一只猫吧';
+
+  @override
+  String get awarenessReviewComingSoon => '即将推出';
+
+  @override
+  String get awarenessMoodRequired => '请先选择今天的心情';
+
+  @override
+  String get awarenessSaveFailed => '保存失败，请重试';
+
+  @override
+  String get awarenessLoadFailed => '加载失败，请返回重试';
+
+  @override
+  String get awarenessSaved => '已保存';
+
+  @override
+  String get worryDescriptionRequired => '请描述你的烦恼';
+
+  @override
+  String get worryLoadFailed => '加载烦恼失败';
+
+  @override
+  String get awarenessLoginRequired => '请先登录';
+
+  @override
+  String get tagCustom => '+自定义';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

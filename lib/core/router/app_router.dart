@@ -19,6 +19,11 @@ import 'package:hachimi_app/screens/cat_room/accessory_shop_screen.dart';
 import 'package:hachimi_app/screens/cat_room/inventory_screen.dart';
 import 'package:hachimi_app/screens/check_in/check_in_screen.dart';
 import 'package:hachimi_app/screens/stats/session_history_screen.dart';
+import 'package:hachimi_app/screens/awareness/awareness_screen.dart';
+import 'package:hachimi_app/screens/awareness/daily_light_screen.dart';
+import 'package:hachimi_app/screens/awareness/weekly_review_screen.dart';
+import 'package:hachimi_app/screens/awareness/worry_processor_screen.dart';
+import 'package:hachimi_app/screens/awareness/worry_edit_screen.dart';
 import 'package:hachimi_app/models/xp_result.dart';
 
 class AppRouter {
@@ -42,6 +47,11 @@ class AppRouter {
   static const String catChat = '/cat-chat';
   static const String emailAuth = '/email-auth';
   static const String sessionHistory = '/session-history';
+  static const String awareness = '/awareness';
+  static const String dailyLight = '/daily-light';
+  static const String weeklyReview = '/weekly-review';
+  static const String worryProcessor = '/worry-processor';
+  static const String worryEdit = '/worry-edit';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -111,6 +121,23 @@ class AppRouter {
             startAsLogin: args['startAsLogin'] as bool? ?? false,
             linkMode: args['linkMode'] as bool? ?? false,
           ),
+        );
+      case awareness:
+        return MaterialPageRoute(builder: (_) => const AwarenessScreen());
+      case dailyLight:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        return MaterialPageRoute(
+          builder: (_) =>
+              DailyLightScreen(quickMode: args['quickMode'] as bool? ?? false),
+        );
+      case weeklyReview:
+        return MaterialPageRoute(builder: (_) => const WeeklyReviewScreen());
+      case worryProcessor:
+        return MaterialPageRoute(builder: (_) => const WorryProcessorScreen());
+      case worryEdit:
+        final worryId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => WorryEditScreen(worryId: worryId),
         );
       // Settings sub-pages use Shared Axis transition (horizontal)
       case sessionHistory:

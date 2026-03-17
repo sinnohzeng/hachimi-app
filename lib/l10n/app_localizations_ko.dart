@@ -2557,4 +2557,183 @@ class SKo extends S {
 
   @override
   String get a11yDynamicWallpaperColor => '동적 배경화면 색상';
+
+  @override
+  String get awarenessTitle => 'Awareness';
+
+  @override
+  String get awarenessTabToday => 'Today';
+
+  @override
+  String get awarenessTabThisWeek => 'This Week';
+
+  @override
+  String get awarenessTabReview => 'Review';
+
+  @override
+  String get moodVeryHappy => 'Very Happy';
+
+  @override
+  String get moodCalm => 'Calm';
+
+  @override
+  String get moodDown => 'Down';
+
+  @override
+  String get moodVeryDown => 'Very Down';
+
+  @override
+  String get awarenessLightPlaceholder => 'What made you smile today?';
+
+  @override
+  String get awarenessLightSaved => 'Light recorded ✨';
+
+  @override
+  String get awarenessLightEdit => 'Edit';
+
+  @override
+  String get weeklyReviewTitle => 'Weekly Review';
+
+  @override
+  String weeklyReviewHappyMoment(int number) {
+    return 'Happy Moment #$number';
+  }
+
+  @override
+  String get weeklyReviewHappyMomentHint => 'What made you happy this week?';
+
+  @override
+  String get weeklyReviewGratitude => 'Gratitude';
+
+  @override
+  String get weeklyReviewGratitudeHint => 'Who or what are you grateful for?';
+
+  @override
+  String get weeklyReviewLearning => 'Learning';
+
+  @override
+  String get weeklyReviewLearningHint => 'What did you learn this week?';
+
+  @override
+  String get weeklyReviewSave => 'Save Review';
+
+  @override
+  String get weeklyReviewSaved => 'Review saved ✨';
+
+  @override
+  String get worryProcessorTitle => 'Worry Processor';
+
+  @override
+  String get worryDescriptionHint => 'What\'s bothering you?';
+
+  @override
+  String get worrySolutionHint => 'What could you do about it?';
+
+  @override
+  String get worryStatusOngoing => 'Ongoing';
+
+  @override
+  String get worryStatusResolved => 'Resolved';
+
+  @override
+  String get worryStatusDisappeared => 'Gone';
+
+  @override
+  String get worryAdd => 'Add Worry';
+
+  @override
+  String get worrySave => 'Save';
+
+  @override
+  String get worryResolvedSection => 'Resolved & Gone';
+
+  @override
+  String get worryManageAll => 'Manage all worries';
+
+  @override
+  String get awarenessEmptyLightTitle => 'No light recorded yet';
+
+  @override
+  String get awarenessEmptyLightSubtitle => 'Whenever you\'re ready ✨';
+
+  @override
+  String get awarenessEmptyLightAction => 'Record';
+
+  @override
+  String get awarenessEmptyReviewTitle => 'Take your time';
+
+  @override
+  String get awarenessEmptyReviewSubtitle => 'Review when you feel like it 🐱';
+
+  @override
+  String get awarenessEmptyReviewAction => 'Start Review';
+
+  @override
+  String get awarenessEmptyHistoryTitle => 'Every light matters';
+
+  @override
+  String get awarenessEmptyHistorySubtitle => 'Your history will appear here';
+
+  @override
+  String get awarenessEmptyWorriesTitle => 'No worries? Great! 🎉';
+
+  @override
+  String get awarenessEmptyWorriesSubtitle => 'That\'s wonderful';
+
+  @override
+  String get catReactVeryHappy => 'So happy today! Meow~ 🎉';
+
+  @override
+  String get catReactHappy => 'Another light recorded ✨';
+
+  @override
+  String get catReactCalm => 'A calm day is a good day 🍃';
+
+  @override
+  String get catReactDown => 'I\'m here with you 💛';
+
+  @override
+  String get catReactVeryDown => 'Not going anywhere 🫂';
+
+  @override
+  String get awarenessBridgePrompt => 'What made you smile today? ✨';
+
+  @override
+  String get awarenessBridgeRecord => 'Record';
+
+  @override
+  String get awarenessBridgeSkip => 'Skip';
+
+  @override
+  String get awarenessHabitsSection => 'Today\'s Habits';
+
+  @override
+  String get awarenessHabitsEmpty => 'No habits yet. Adopt a cat to start!';
+
+  @override
+  String get awarenessReviewComingSoon => 'Coming soon';
+
+  @override
+  String get awarenessMoodRequired => 'Please select today\'s mood';
+
+  @override
+  String get awarenessSaveFailed => 'Save failed, please try again';
+
+  @override
+  String get awarenessLoadFailed => 'Failed to load, please go back and retry';
+
+  @override
+  String get awarenessSaved => 'Saved';
+
+  @override
+  String get worryDescriptionRequired => 'Please describe your worry';
+
+  @override
+  String get worryLoadFailed => 'Failed to load worry';
+
+  @override
+  String get awarenessLoginRequired => 'Please log in first';
+
+  @override
+  String get tagCustom => '+Custom';
 }
