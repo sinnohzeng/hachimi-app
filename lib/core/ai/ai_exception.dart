@@ -20,6 +20,10 @@ enum AiErrorType {
 
   /// 未配置 AI 提供商。
   unconfigured,
+
+  /// 本地并发冲突（另一个请求正在进行中）。
+  /// 不计入断路器失败计数。
+  busy,
 }
 
 /// AI API 异常。

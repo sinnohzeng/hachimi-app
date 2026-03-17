@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/ai/ai_exception.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/chat_message.dart';
 import 'package:hachimi_app/models/habit.dart';
@@ -124,21 +125,35 @@ class ChatNotifier extends Notifier<ChatState> {
         isZhLocale: isZhLocale,
       );
 
-      await _chatService.sendMessage(
+      final result = await _chatService.sendMessage(
         userMessage: text.trim(),
         chatCtx: chatCtx,
       );
 
-      // 生成完毕，从数据库重新加载消息（确保与 SQLite 一致）
+      // 从数据库重新加载消息（确保与 SQLite 一致）
       final messages = await _chatService.getRecentMessages(_catId);
       final remaining = await _chatService.getRemainingMessages(_catId);
-      state = state.copyWith(
-        messages: messages,
-        status: ChatStatus.idle,
-        partialResponse: '',
-        remainingMessages: remaining,
-      );
+
+      switch (result) {
+        case ChatSuccess():
+        case ChatCancelled():
+          state = state.copyWith(
+            messages: messages,
+            status: ChatStatus.idle,
+            partialResponse: '',
+            remainingMessages: remaining,
+          );
+        case ChatError(:final error):
+          state = state.copyWith(
+            messages: messages,
+            status: ChatStatus.error,
+            partialResponse: '',
+            error: _userFacingError(error),
+            remainingMessages: remaining,
+          );
+      }
     } catch (e) {
+      // 仅捕获 sendMessage 之外的异常（如 daily limit）
       state = state.copyWith(
         status: ChatStatus.error,
         partialResponse: '',
@@ -151,24 +166,39 @@ class ChatNotifier extends Notifier<ChatState> {
   }
 
   /// 停止当前生成。
+  ///
+  /// 不在此处 reload DB — sendMessage 仍在运行中（保存取消后的部分内容），
+  /// 它完成后会自然走到 ChatCancelled 分支并 reload。
+  /// 此处只需停止 token 流显示。
   Future<void> stopGeneration() async {
     await _chatService.stopGeneration();
     _tokenSub?.cancel();
     _tokenSub = null;
+    state = state.copyWith(partialResponse: '');
+  }
 
-    // 重新加载消息
-    final messages = await _chatService.getRecentMessages(_catId);
-    state = state.copyWith(
-      messages: messages,
-      status: ChatStatus.idle,
-      partialResponse: '',
-    );
+  /// 重置错误状态，允许用户重新发送。
+  void retryLastMessage() {
+    state = state.copyWith(status: ChatStatus.idle);
   }
 
   /// 清除聊天历史。
   Future<void> clearHistory() async {
     await _chatService.clearHistory(_catId);
     state = const ChatState(status: ChatStatus.idle);
+  }
+
+  /// 将内部错误映射为用户可见的简洁文案。
+  String _userFacingError(Object error) {
+    if (error is AiException) {
+      return switch (error.type) {
+        AiErrorType.networkError => 'Network error',
+        AiErrorType.rateLimited => 'Too many requests',
+        AiErrorType.authFailure => 'AI service unavailable',
+        _ => 'Something went wrong',
+      };
+    }
+    return 'Something went wrong';
   }
 }
 

@@ -1783,6 +1783,18 @@ class SEn extends S {
   String get chatClearButton => 'Clear';
 
   @override
+  String get chatSend => 'Send';
+
+  @override
+  String get chatStop => 'Stop';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
   String diaryTitle(String name) {
     return '$name Diary';
   }

@@ -168,15 +168,18 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
   Widget _buildMessageList(ChatState chatState) {
     final messages = chatState.messages;
     final isGenerating = chatState.status == ChatStatus.generating;
+    final isError = chatState.status == ChatStatus.error;
     final partial = chatState.partialResponse;
+    final extraItems = (isGenerating && partial.isNotEmpty ? 1 : 0) +
+        (isError ? 1 : 0);
 
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: messages.length + (isGenerating && partial.isNotEmpty ? 1 : 0),
+      itemCount: messages.length + extraItems,
       itemBuilder: (context, index) {
         // 流式部分回复
-        if (index == messages.length) {
+        if (isGenerating && partial.isNotEmpty && index == messages.length) {
           return Padding(
             padding: AppSpacing.paddingVXs,
             child: PixelChatBubble(
@@ -185,6 +188,11 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
               isStreaming: true,
             ),
           );
+        }
+
+        // 错误提示气泡
+        if (isError && index == messages.length) {
+          return _buildErrorBubble(chatState);
         }
 
         final msg = messages[index];
@@ -196,6 +204,44 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildErrorBubble(ChatState chatState) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: AppSpacing.paddingVXs,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 18,
+              color: colorScheme.onErrorContainer,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                context.l10n.chatErrorMessage,
+                style: TextStyle(color: colorScheme.onErrorContainer),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                ref
+                    .read(chatNotifierProvider(widget.catId).notifier)
+                    .retryLastMessage();
+              },
+              child: Text(context.l10n.chatRetry),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -270,7 +316,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
               // 发送/停止按钮
               if (isGenerating)
                 PixelButton(
-                  label: 'Stop',
+                  label: context.l10n.chatStop,
                   icon: Icons.stop,
                   backgroundColor: colorScheme.errorContainer,
                   foregroundColor: colorScheme.onErrorContainer,
@@ -282,7 +328,7 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
                 )
               else
                 PixelButton(
-                  label: 'Send',
+                  label: context.l10n.chatSend,
                   icon: Icons.send,
                   onPressed: canSend ? () => _send(cat, habit) : null,
                 ),

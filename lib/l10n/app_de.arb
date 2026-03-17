@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Chatverlauf löschen?",
   "chatClearConfirmMessage": "Dadurch werden alle Nachrichten gelöscht. Dies kann nicht rückgängig gemacht werden.",
   "chatClearButton": "Löschen",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name}s Tagebuch",
   "diaryLoadFailed": "Tagebuch konnte nicht geladen werden",

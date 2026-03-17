@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Effacer l'historique du chat ?",
   "chatClearConfirmMessage": "Cela supprimera tous les messages. Cette action est irréversible.",
   "chatClearButton": "Effacer",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "Journal de {name}",
   "diaryLoadFailed": "Échec du chargement du journal",

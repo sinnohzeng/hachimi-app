@@ -601,6 +601,10 @@
   "chatClearConfirmTitle": "チャット履歴を削除しますか？",
   "chatClearConfirmMessage": "すべてのメッセージが削除されます。この操作は取り消せません。",
   "chatClearButton": "削除",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "{name}の日記",
   "diaryLoadFailed": "日記の読み込みに失敗しました",

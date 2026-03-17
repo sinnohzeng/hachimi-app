@@ -587,6 +587,10 @@
   "chatClearConfirmTitle": "Limpar histórico do chat?",
   "chatClearConfirmMessage": "Isso vai excluir todas as mensagens. Não pode ser desfeito.",
   "chatClearButton": "Limpar",
+  "chatSend": "Send",
+  "chatStop": "Stop",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
 
   "diaryTitle": "Diário de {name}",
   "diaryLoadFailed": "Falha ao carregar o diário",

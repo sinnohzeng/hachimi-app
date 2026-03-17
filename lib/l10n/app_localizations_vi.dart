@@ -1780,6 +1780,18 @@ class SVi extends S {
   String get chatClearButton => 'Xóa';
 
   @override
+  String get chatSend => 'Send';
+
+  @override
+  String get chatStop => 'Stop';
+
+  @override
+  String get chatErrorMessage => 'Failed to send message. Tap to retry.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
   String diaryTitle(String name) {
     return 'Nhật ký $name';
   }
