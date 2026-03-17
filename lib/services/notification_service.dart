@@ -352,10 +352,12 @@ class NotificationService {
   );
 
   /// Schedule a streak-at-risk notification for 20:00 today.
+  ///
+  /// [title] and [body] are pre-localized strings from the caller.
   Future<void> scheduleStreakAtRisk({
     required String habitId,
-    required String catName,
-    required int streak,
+    required String title,
+    required String body,
   }) async {
     final id = (habitId.hashCode.abs() % 100000) + 100000;
 
@@ -383,8 +385,8 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      title: '$catName is worried!',
-      body: 'Your $streak-day streak is at risk. A quick session will save it!',
+      title: title,
+      body: body,
       payload: 'streak:$habitId',
     );
   }
@@ -449,14 +451,16 @@ class NotificationService {
   }
 
   /// Show a celebration notification after level-up.
+  ///
+  /// [title] and [body] are pre-localized strings from the caller.
   Future<void> showCelebration({
-    required String catName,
-    required String newStageName,
+    required String title,
+    required String body,
   }) async {
     await _localNotifications.show(
       id: DateTime.now().millisecondsSinceEpoch % 100000 + 200000,
-      title: '$catName evolved!',
-      body: '$catName grew into a $newStageName! Keep up the great work!',
+      title: title,
+      body: body,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,

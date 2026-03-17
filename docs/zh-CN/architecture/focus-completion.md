@@ -3,7 +3,7 @@
 > 专注完成后的庆祝流程规格说明：通知、触觉反馈、撒花特效和 L10N。
 
 **状态：** 活跃
-**证据来源：** `lib/screens/timer/focus_complete_screen.dart`、`lib/screens/timer/timer_screen.dart`、`lib/services/notification_service.dart`
+**证据来源：** `lib/screens/timer/focus_complete_screen.dart`、`lib/screens/timer/timer_screen.dart`、`lib/services/notification_service.dart`、`lib/services/session_completion_service.dart`、`lib/providers/timer_persistence.dart`
 **相关文档：** [state-management.md](./state-management.md)、[cat-system.md](./cat-system.md)
 
 ---
@@ -22,23 +22,32 @@
 ## 完成流程
 
 ```
-FocusTimerNotifier._onTick() [倒计时归零]
+FocusTimerNotifier._handleCountdownComplete() [倒计时归零]
   ├── AtomicIslandService.cancel()
-  ├── FocusTimerService.stop()          // 在通知之前停止前台服务
-  ├── NotificationService.cancelTimerBackup()  // 取消备用闹钟
-  └── NotificationService.showFocusComplete()  // 即时完成通知
+  ├── FocusTimerService.stop()          // 停止前台服务
+  ├── TimerPersistence.clearSavedState()  // 清除崩溃恢复数据
+  └── 取消备用闹钟
+      （此处不发通知 —— 通知唯一来源在 TimerScreen）
 
-TimerScreen._saveSession()
-  ├── FocusTimerService.stop()          // 幂等（上面已停止）
-  ├── 计算 XP、金币、阶段跃迁
-  ├── 保存 FocusSession 到 Firestore
-  ├── NotificationService.showFocusComplete()  // 本地化通知（覆盖上面的）
+TimerScreen._navigateToResult()
+  ├── SessionCompletionService.completeSession()
+  │     ├── 计算 XP、金币、阶段跃迁
+  │     ├── 构建 FocusSession 记录
+  │     ├── 持久化到本地数据库（带 ErrorHandler）
+  │     └── 上报分析事件
+  ├── NotificationService.showFocusComplete()  // 唯一通知来源
   └── Navigator → FocusCompleteScreen
         ├── ConfettiController.play()   // 2 秒爆发（非放弃时）
         ├── Vibration.vibrate(pattern)  // 强震动模式（放弃时轻震）
         ├── 交错动画                     // emoji → 内容 → 数据卡片
         └── DiaryService.generateTodayDiary()  // 异步 AI 日记生成
 ```
+
+### 关键架构决策
+
+- **单一通知来源**：`showFocusComplete()` 仅从 `TimerScreen._navigateToResult()` 调用，消除了之前 `_handleCountdownComplete()` 中的重复调用
+- **SessionCompletionService**：会话完成业务逻辑（奖励、持久化、分析）从 TimerScreen 提取到专用服务，使用显式依赖注入
+- **TimerPersistence**：SharedPreferences 崩溃恢复逻辑从 FocusTimerNotifier 提取，注入可控 Clock 以实现可测试性
 
 ---
 
@@ -139,3 +148,4 @@ TimerScreen._saveSession()
 | 2026-02-19 | 初始规格 —— 通知、震动、撒花、L10N |
 | 2026-02-21 | 渠道 ID 从 `hachimi_focus`（与前台服务共用）改为 `hachimi_focus_complete`（专用）。后台完成通知现在在倒计时归零时从 `_onTick()` 触发。 |
 | 2026-02-22 | 修复通知重叠：`FocusTimerService.stop()` 现在在 `_onTick()`、`complete()` 和 `abandon()` 中于完成通知之前调用。新增通过 `zonedSchedule()` 的备用闹钟以应对前台服务被系统杀死的情况。通知文本重新排序：时间优先于任务名显示，任务名超 20 字符截断。 |
+| 2026-03-17 | 架构重构：（1）移除 provider 中重复的 `showFocusComplete()` —— 通知现在仅从 TimerScreen 触发（单一来源）。（2）提取 `TimerPersistence`，注入可控 Clock 实现可测试的崩溃恢复。（3）提取 `SessionCompletionService`，使用显式依赖注入编排会话完成业务逻辑。（4）`scheduleStreakAtRisk` 和 `showCelebration` L10N 参数化（接受 title/body 而非硬编码英文）。 |

@@ -3,7 +3,7 @@
 > Specification for the post-focus celebration flow: notification, haptic feedback, confetti, and L10N.
 
 **Status:** Active
-**Evidence:** `lib/screens/timer/focus_complete_screen.dart`, `lib/screens/timer/timer_screen.dart`, `lib/services/notification_service.dart`
+**Evidence:** `lib/screens/timer/focus_complete_screen.dart`, `lib/screens/timer/timer_screen.dart`, `lib/services/notification_service.dart`, `lib/services/session_completion_service.dart`, `lib/providers/timer_persistence.dart`
 **Related:** [state-management.md](./state-management.md), [cat-system.md](./cat-system.md)
 
 ---
@@ -22,23 +22,32 @@ When a focus session ends (countdown completes or stopwatch "Done" pressed), the
 ## Completion Flow
 
 ```
-FocusTimerNotifier._onTick() [countdown reaches zero]
+FocusTimerNotifier._handleCountdownComplete() [countdown reaches zero]
   ├── AtomicIslandService.cancel()
-  ├── FocusTimerService.stop()          // Stop foreground service BEFORE notification
-  ├── NotificationService.cancelTimerBackup()  // Cancel backup alarm
-  └── NotificationService.showFocusComplete()  // Immediate completion notification
+  ├── FocusTimerService.stop()          // Stop foreground service
+  ├── TimerPersistence.clearSavedState()  // Clear crash recovery data
+  └── Cancel backup alarm
+      (NO notification here — single source in TimerScreen)
 
-TimerScreen._saveSession()
-  ├── FocusTimerService.stop()          // Idempotent (already stopped above)
-  ├── Calculate XP, coins, stage-up
-  ├── Save FocusSession to Firestore
-  ├── NotificationService.showFocusComplete()  // Localized notification (overwrites above)
+TimerScreen._navigateToResult()
+  ├── SessionCompletionService.completeSession()
+  │     ├── Calculate XP, coins, stage-up
+  │     ├── Build FocusSession record
+  │     ├── Persist to local DB (with ErrorHandler)
+  │     └── Log analytics
+  ├── NotificationService.showFocusComplete()  // Single notification source
   └── Navigator → FocusCompleteScreen
         ├── ConfettiController.play()   // 2s blast (if not abandoned)
         ├── Vibration.vibrate(pattern)  // Strong pattern (or light for abandon)
         ├── Staggered animations        // emoji → content → stats card
         └── DiaryService.generateTodayDiary()  // Fire-and-forget AI diary
 ```
+
+### Key Architecture Decisions
+
+- **Single notification source**: `showFocusComplete()` is called only from `TimerScreen._navigateToResult()`, eliminating the previous duplicate call from `_handleCountdownComplete()`
+- **SessionCompletionService**: Business logic (rewards, persistence, analytics) extracted from TimerScreen into a dedicated service with explicit DI
+- **TimerPersistence**: SharedPreferences crash recovery logic extracted from FocusTimerNotifier with injectable Clock for testability
 
 ---
 
@@ -139,3 +148,4 @@ Stopwatch mode does not schedule a backup (no known end time).
 | 2026-02-19 | Initial spec — notification, vibration, confetti, L10N |
 | 2026-02-21 | Channel ID changed from `hachimi_focus` (shared with foreground service) to `hachimi_focus_complete` (dedicated). Background completion notification now fires from `_onTick()` when countdown reaches zero. |
 | 2026-02-22 | Fix notification overlap: `FocusTimerService.stop()` now called before completion notification in `_onTick()`, `complete()`, and `abandon()`. Added backup alarm via `zonedSchedule()` for OS-killed foreground service. Notification text reordered: time displayed before habit name, with truncation at 20 chars. |
+| 2026-03-17 | Architecture refactor: (1) Removed duplicate `showFocusComplete()` from provider — notification now only fired from TimerScreen (single source). (2) Extracted `TimerPersistence` with injectable Clock for testable crash recovery. (3) Extracted `SessionCompletionService` with explicit DI for session completion business logic. (4) `scheduleStreakAtRisk` and `showCelebration` L10N parameterized (accept title/body instead of hardcoded English). |
