@@ -59,7 +59,7 @@ void main() {
       await tester.pumpWidget(await _buildTestApp(onComplete: () {}));
       await _pumpSettled(tester);
 
-      expect(find.text('Meet Your Companion'), findsOneWidget);
+      expect(find.text('Meet Hachimi'), findsOneWidget);
     });
 
     testWidgets('navigates to page 2 on Next tap', (tester) async {
@@ -69,7 +69,7 @@ void main() {
       await tester.tap(find.text('Next'));
       await _pumpSettled(tester);
 
-      expect(find.text('Focus, Grow, Evolve'), findsOneWidget);
+      expect(find.text('5 Minutes a Day'), findsOneWidget);
     });
 
     testWidgets('skip button triggers onComplete', (tester) async {
@@ -114,15 +114,15 @@ void main() {
       await _pumpSettled(tester);
 
       // Page 1: title visible
-      expect(find.text('Meet Your Companion'), findsOneWidget);
-      expect(find.text('Focus, Grow, Evolve'), findsNothing);
+      expect(find.text('Meet Hachimi'), findsOneWidget);
+      expect(find.text('5 Minutes a Day'), findsNothing);
 
       await tester.tap(find.text('Next'));
       await _pumpSettled(tester);
 
       // Page 2: new title visible, old one gone
-      expect(find.text('Focus, Grow, Evolve'), findsOneWidget);
-      expect(find.text('Meet Your Companion'), findsNothing);
+      expect(find.text('5 Minutes a Day'), findsOneWidget);
+      expect(find.text('Meet Hachimi'), findsNothing);
     });
 
     testWidgets('back button navigates to previous page', (tester) async {
@@ -133,13 +133,13 @@ void main() {
       await tester.tap(find.text('Next'));
       await _pumpSettled(tester);
 
-      expect(find.text('Focus, Grow, Evolve'), findsOneWidget);
+      expect(find.text('5 Minutes a Day'), findsOneWidget);
 
       // Back to page 1
       await tester.tap(find.byIcon(Icons.arrow_back));
       await _pumpSettled(tester);
 
-      expect(find.text('Meet Your Companion'), findsOneWidget);
+      expect(find.text('Meet Hachimi'), findsOneWidget);
     });
   });
 }

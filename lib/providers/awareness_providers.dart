@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/models/weekly_review.dart';
@@ -6,35 +7,6 @@ import 'package:hachimi_app/models/worry.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
-
-// ─── 私有辅助 ───
-
-/// 获取今日日期字符串（'YYYY-MM-DD'）。
-String _todayDateString() {
-  final now = DateTime.now();
-  return '${now.year}-'
-      '${now.month.toString().padLeft(2, '0')}-'
-      '${now.day.toString().padLeft(2, '0')}';
-}
-
-/// 获取当前 ISO 周 ID（'YYYY-WNN'）。
-///
-/// ISO 8601 算法：
-/// 1. 找到本周四 → 确定 ISO 年
-/// 2. 找到该 ISO 年第 1 周的周一（包含 1 月 4 日的那一周）
-/// 3. 周数 = (本周四 - 第 1 周周一) / 7 + 1
-String _currentWeekId() {
-  final now = DateTime.now();
-  // 本周四确定 ISO 年
-  final thursday = now.add(Duration(days: DateTime.thursday - now.weekday));
-  final isoYear = thursday.year;
-  // 1 月 4 日始终在 ISO 第 1 周内
-  final jan4 = DateTime(isoYear, 1, 4);
-  // 第 1 周的周一
-  final week1Monday = jan4.subtract(Duration(days: jan4.weekday - 1));
-  final weekNumber = (thursday.difference(week1Monday).inDays ~/ 7) + 1;
-  return '$isoYear-W${weekNumber.toString().padLeft(2, '0')}';
-}
 
 // ─── 每日一光 ───
 
@@ -53,7 +25,7 @@ final todayLightProvider = StreamProvider<DailyLight?>((ref) {
         c.isGlobalRefresh ||
         c.type == 'light_recorded' ||
         c.type == 'light_deleted',
-    read: () => awarenessRepo.getTodayLight(uid, _todayDateString()),
+    read: () => awarenessRepo.getTodayLight(uid, AppDateUtils.todayString()),
   );
 });
 
@@ -100,7 +72,8 @@ final currentWeekReviewProvider = StreamProvider<WeeklyReview?>((ref) {
         c.isGlobalRefresh ||
         c.type == 'weekly_review_completed' ||
         c.type == 'weekly_review_saved',
-    read: () => awarenessRepo.getCurrentWeekReview(uid, _currentWeekId()),
+    read: () =>
+        awarenessRepo.getCurrentWeekReview(uid, AppDateUtils.currentWeekId()),
   );
 });
 
@@ -168,8 +141,8 @@ final weeklyReviewsForMonthProvider =
       final firstDay = DateTime(year, month, 1);
       final lastDay = DateTime(year, month + 1, 0);
 
-      final startWeekId = _isoWeekId(firstDay);
-      final endWeekId = _isoWeekId(lastDay);
+      final startWeekId = AppDateUtils.isoWeekId(firstDay);
+      final endWeekId = AppDateUtils.isoWeekId(lastDay);
 
       return awarenessRepo.getReviewsInRange(uid, startWeekId, endWeekId);
     });
@@ -187,10 +160,7 @@ final moodDistributionProvider = FutureProvider<Map<Mood, int>>((ref) async {
 
   // 查全量数据：从 2020 年到当前月末
   final now = DateTime.now();
-  final lastDay = DateTime(now.year, now.month + 1, 0).day;
-  final endDate =
-      '${now.year}-${now.month.toString().padLeft(2, '0')}-'
-      '${lastDay.toString().padLeft(2, '0')}';
+  final endDate = AppDateUtils.formatDay(DateTime(now.year, now.month + 1, 0));
   final lights = await awarenessRepo.getLightsInRange(
     uid,
     '2020-01-01',
@@ -203,16 +173,6 @@ final moodDistributionProvider = FutureProvider<Map<Mood, int>>((ref) async {
   }
   return distribution;
 });
-
-/// ISO 8601 周 ID 计算。
-String _isoWeekId(DateTime date) {
-  final thursday = date.add(Duration(days: DateTime.thursday - date.weekday));
-  final isoYear = thursday.year;
-  final jan4 = DateTime(isoYear, 1, 4);
-  final week1Monday = jan4.subtract(Duration(days: jan4.weekday - 1));
-  final weekNumber = (thursday.difference(week1Monday).inDays ~/ 7) + 1;
-  return '$isoYear-W${weekNumber.toString().padLeft(2, '0')}';
-}
 
 // ─── 统计 ───
 

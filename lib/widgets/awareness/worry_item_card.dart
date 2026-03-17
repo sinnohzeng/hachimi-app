@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/worry.dart';
 
 /// WorryItemCard — 烦恼记录卡片。
@@ -79,7 +80,7 @@ class WorryItemCard extends StatelessWidget {
       segments: [
         ButtonSegment(
           value: WorryStatus.ongoing,
-          label: const Text('进行中'),
+          label: Text(context.l10n.worryStatusOngoing),
           icon: Icon(
             Icons.pending_outlined,
             color: colorScheme.tertiary,
@@ -88,7 +89,7 @@ class WorryItemCard extends StatelessWidget {
         ),
         ButtonSegment(
           value: WorryStatus.resolved,
-          label: const Text('已解决'),
+          label: Text(context.l10n.worryStatusResolved),
           icon: Icon(
             Icons.check_circle_outline,
             color: colorScheme.primary,
@@ -97,7 +98,7 @@ class WorryItemCard extends StatelessWidget {
         ),
         ButtonSegment(
           value: WorryStatus.disappeared,
-          label: const Text('消失了'),
+          label: Text(context.l10n.worryStatusDisappeared),
           icon: Icon(
             Icons.auto_awesome_outlined,
             color: colorScheme.outline,

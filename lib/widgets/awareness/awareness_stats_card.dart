@@ -262,7 +262,7 @@ class _MoodBar extends StatelessWidget {
                     height: 16,
                     width: constraints.maxWidth * barFraction,
                     decoration: BoxDecoration(
-                      color: _moodColor(mood.value, colorScheme),
+                      color: mood.themeColor(colorScheme),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -283,18 +283,6 @@ class _MoodBar extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// 心情颜色 — 复用 MoodSelector 的配色逻辑。
-  Color _moodColor(int mood, ColorScheme cs) {
-    return switch (mood) {
-      0 => cs.tertiary,
-      1 => cs.primary.withValues(alpha: 0.8),
-      2 => cs.primary,
-      3 => cs.error.withValues(alpha: 0.7),
-      4 => cs.error,
-      _ => cs.outline,
-    };
   }
 }
 

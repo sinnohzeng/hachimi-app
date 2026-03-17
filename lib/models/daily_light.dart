@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 import 'package:hachimi_app/models/mood.dart';
 
 /// 每日一光记录 — 用户每天睡前记下的一段微小光亮。
@@ -63,12 +64,12 @@ class DailyLight {
       date: map['date'] as String,
       mood: Mood.fromValue(map['mood'] as int),
       lightText: map['light_text'] as String?,
-      tags: _decodeStringList(map['tags']),
+      tags: decodeJsonStringList(map['tags']),
       timelineEvents: map['timeline_events'] != null
-          ? _decodeStringList(map['timeline_events'])
+          ? decodeJsonStringList(map['timeline_events'])
           : null,
       habitCompletions: map['habit_completions'] != null
-          ? _decodeBoolMap(map['habit_completions'])
+          ? decodeJsonBoolMap(map['habit_completions'])
           : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
@@ -133,33 +134,5 @@ class DailyLight {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  // ─── 私有辅助 ───
-
-  static List<String> _decodeStringList(dynamic raw) {
-    if (raw is String) {
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) return decoded.whereType<String>().toList();
-      } on FormatException {
-        // 损坏数据静默降级为空列表
-      }
-    }
-    return [];
-  }
-
-  static Map<String, bool> _decodeBoolMap(dynamic raw) {
-    if (raw is String) {
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is Map<String, dynamic>) {
-          return decoded.map((k, v) => MapEntry(k, v as bool? ?? false));
-        }
-      } on FormatException {
-        // 损坏数据静默降级为空 Map
-      }
-    }
-    return {};
   }
 }

@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/awareness_constants.dart';
 import 'package:hachimi_app/core/constants/cat_response_templates.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
-import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/awareness/light_input_card.dart';
 import 'package:hachimi_app/widgets/awareness/mood_selector.dart';
@@ -55,10 +56,7 @@ class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
       }
 
       final now = DateTime.now();
-      final date =
-          '${now.year}-'
-          '${now.month.toString().padLeft(2, '0')}-'
-          '${now.day.toString().padLeft(2, '0')}';
+      final date = AppDateUtils.formatDay(now);
 
       final light = DailyLight(
         id: const Uuid().v4(),

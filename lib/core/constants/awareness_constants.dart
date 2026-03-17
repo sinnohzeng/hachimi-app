@@ -5,6 +5,10 @@ class AwarenessConstants {
   AwarenessConstants._();
 
   /// 预设情绪标签。
+  ///
+  /// 注意：标签值直接存储在 SQLite 中作为数据标识符，
+  /// 因此不能通过 l10n 翻译（否则会导致已存储数据不匹配）。
+  /// 未来国际化需要 tag ID → display name 映射层。
   static const List<String> presetTags = ['家人', '朋友', '学习', '户外', '工作'];
 
   /// 猫咪睡前反应种子文案（按 Mood 枚举索引）。

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 
 /// 周回顾记录 — 每周复盘的三个快乐时刻 + 感恩 + 学习。
 ///
@@ -99,16 +99,20 @@ class WeeklyReview {
       weekStartDate: map['week_start_date'] as String,
       weekEndDate: map['week_end_date'] as String,
       happyMoment1: map['happy_moment_1'] as String?,
-      happyMoment1Tags: _decodeStringList(map['happy_moment_1_tags']),
+      happyMoment1Tags: decodeJsonStringList(map['happy_moment_1_tags']),
       happyMoment2: map['happy_moment_2'] as String?,
-      happyMoment2Tags: _decodeStringList(map['happy_moment_2_tags']),
+      happyMoment2Tags: decodeJsonStringList(map['happy_moment_2_tags']),
       happyMoment3: map['happy_moment_3'] as String?,
-      happyMoment3Tags: _decodeStringList(map['happy_moment_3_tags']),
+      happyMoment3Tags: decodeJsonStringList(map['happy_moment_3_tags']),
       gratitude: map['gratitude'] as String?,
       learning: map['learning'] as String?,
       catWeeklySummary: map['cat_weekly_summary'] as String?,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        (map['created_at'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        (map['updated_at'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
+      ),
     );
   }
 
@@ -203,19 +207,6 @@ class WeeklyReview {
   }
 
   // ─── 私有辅助 ───
-
-  static List<String> _decodeStringList(dynamic raw) {
-    if (raw is String) {
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) return decoded.whereType<String>().toList();
-      } on FormatException {
-        // 损坏数据静默降级为空列表
-        debugPrint('[WeeklyReview] corrupted JSON in _decodeStringList: $raw');
-      }
-    }
-    return [];
-  }
 
   static List<String> _decodeFirestoreList(dynamic raw) {
     if (raw is List<dynamic>) return raw.whereType<String>().toList();

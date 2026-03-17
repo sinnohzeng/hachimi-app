@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 /// 猫咪反应场景枚举。
 enum CatResponseScene {
   lightVeryHappy, // 一点光保存后 — 很开心
@@ -27,7 +29,13 @@ String getRandomCatResponse(
   String locale = 'zh',
   Map<String, String> params = const {},
 }) {
-  final pool = locale == 'en' ? _templatesEn[scene]! : _templatesZh[scene]!;
+  final pool = (locale == 'en' ? _templatesEn[scene] : _templatesZh[scene]);
+  if (pool == null || pool.isEmpty) {
+    debugPrint(
+      '[CatResponse] Missing templates for scene=$scene locale=$locale',
+    );
+    return '';
+  }
   final template = pool[Random().nextInt(pool.length)];
   return _replacePlaceholders(template, params);
 }
@@ -75,6 +83,12 @@ String _replacePlaceholders(String template, Map<String, String> params) {
   var result = template;
   for (final entry in params.entries) {
     result = result.replaceAll('{${entry.key}}', entry.value);
+  }
+  // 检测并清除未替换的占位符（避免用户看到 {key} 原文）
+  final leftover = RegExp(r'\{\w+\}').hasMatch(result);
+  if (leftover) {
+    debugPrint('[CatResponse] Unreplaced placeholders in: $template');
+    result = result.replaceAll(RegExp(r'\s*\{\w+\}'), '');
   }
   return result;
 }

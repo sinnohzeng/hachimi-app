@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/awareness_constants.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/models/weekly_review.dart';
@@ -44,34 +45,18 @@ class _WeeklyReviewScreenState extends ConsumerState<WeeklyReviewScreen> {
     super.dispose();
   }
 
-  // ─── 周 ID 计算 ───
-
-  String _currentWeekId() {
-    final now = DateTime.now();
-    final thursday = now.add(Duration(days: DateTime.thursday - now.weekday));
-    final isoYear = thursday.year;
-    final jan4 = DateTime(isoYear, 1, 4);
-    final week1Monday = jan4.subtract(Duration(days: jan4.weekday - 1));
-    final weekNumber = (thursday.difference(week1Monday).inDays ~/ 7) + 1;
-    return '$isoYear-W${weekNumber.toString().padLeft(2, '0')}';
-  }
+  // ─── 周日期计算 ───
 
   String _weekStartDate() {
     final now = DateTime.now();
     final monday = now.subtract(Duration(days: now.weekday - 1));
-    return _formatDate(monday);
+    return AppDateUtils.formatDay(monday);
   }
 
   String _weekEndDate() {
     final now = DateTime.now();
     final sunday = now.add(Duration(days: 7 - now.weekday));
-    return _formatDate(sunday);
-  }
-
-  String _formatDate(DateTime d) {
-    return '${d.year}-'
-        '${d.month.toString().padLeft(2, '0')}-'
-        '${d.day.toString().padLeft(2, '0')}';
+    return AppDateUtils.formatDay(sunday);
   }
 
   // ─── 保存 ───
@@ -89,7 +74,7 @@ class _WeeklyReviewScreenState extends ConsumerState<WeeklyReviewScreen> {
       }
 
       final now = DateTime.now();
-      final weekId = _currentWeekId();
+      final weekId = AppDateUtils.currentWeekId();
 
       final review = WeeklyReview(
         id: const Uuid().v4(),
@@ -284,7 +269,7 @@ class _WeeklyReviewScreenState extends ConsumerState<WeeklyReviewScreen> {
           error: (e, _) => Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              context.l10n.awarenessSaveFailed,
+              context.l10n.awarenessLoadFailed,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.error,
               ),
@@ -297,7 +282,10 @@ class _WeeklyReviewScreenState extends ConsumerState<WeeklyReviewScreen> {
 
   Future<void> _resolveWorry(String worryId, WorryStatus status) async {
     final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
+    if (uid == null) {
+      debugPrint('[Awareness] resolveWorry called with null uid');
+      return;
+    }
     try {
       await ref.read(worryRepositoryProvider).resolve(uid, worryId, status);
     } on Exception catch (e) {

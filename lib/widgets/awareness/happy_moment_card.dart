@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/constants/awareness_constants.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/widgets/awareness/tag_selector.dart';
 
 /// HappyMomentCard — 幸福时刻输入卡片。
@@ -94,7 +95,7 @@ class _HappyMomentCardState extends State<HappyMomentCard> {
 
   Widget _buildHeader(TextTheme textTheme, ColorScheme colorScheme) {
     return Text(
-      '幸福时刻 #${widget.momentNumber}',
+      context.l10n.weeklyReviewHappyMoment(widget.momentNumber),
       style: textTheme.titleSmall?.copyWith(color: colorScheme.primary),
     );
   }
@@ -105,7 +106,7 @@ class _HappyMomentCardState extends State<HappyMomentCard> {
       minLines: 2,
       maxLines: 4,
       decoration: InputDecoration(
-        hintText: '记录这个幸福瞬间...',
+        hintText: context.l10n.weeklyReviewHappyMomentHint,
         hintStyle: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),

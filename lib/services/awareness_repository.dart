@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:hachimi_app/models/daily_light.dart';
@@ -264,13 +265,17 @@ class AwarenessRepository {
     for (final row in rows) {
       final raw = row['tags'] as String?;
       if (raw == null) continue;
-      final decoded = jsonDecode(raw);
-      if (decoded is List) {
-        for (final tag in decoded) {
-          if (tag is String && tag.isNotEmpty) {
-            frequency[tag] = (frequency[tag] ?? 0) + 1;
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is List) {
+          for (final tag in decoded) {
+            if (tag is String && tag.isNotEmpty) {
+              frequency[tag] = (frequency[tag] ?? 0) + 1;
+            }
           }
         }
+      } on FormatException catch (e) {
+        debugPrint('[AwarenessRepo] Corrupted tags JSON: $e');
       }
     }
 

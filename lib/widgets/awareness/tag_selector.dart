@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// TagSelector — 多选标签 + 可选自定义输入。
 ///
@@ -134,7 +135,9 @@ class _TagSelectorState extends State<TagSelector> {
         ),
       );
     }
-    // TODO(l10n): 将 '+自定义' 替换为 l10n key（待添加 tagAddCustom）。
-    return ActionChip(label: const Text('+自定义'), onPressed: _openCustomInput);
+    return ActionChip(
+      label: Text(context.l10n.tagCustom),
+      onPressed: _openCustomInput,
+    );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
@@ -65,7 +66,7 @@ final _monthlyRitualProvider = FutureProvider.family<_MonthlyRitual?, String>((
   uid,
 ) async {
   final ledger = ref.watch(ledgerServiceProvider);
-  final currentMonth = _currentMonthString();
+  final currentMonth = AppDateUtils.currentMonth();
 
   final ritualMonth = await ledger.getMaterialized(uid, 'monthly_ritual_month');
   if (ritualMonth != currentMonth) return null;
@@ -107,11 +108,6 @@ final _monthlyRitualProvider = FutureProvider.family<_MonthlyRitual?, String>((
     completedDays: completedDays,
   );
 });
-
-String _currentMonthString() {
-  final now = DateTime.now();
-  return '${now.year}-${now.month.toString().padLeft(2, '0')}';
-}
 
 // ─── 设定提示卡 ───
 
@@ -169,7 +165,7 @@ class _SetupPromptCard extends ConsumerWidget {
 
     try {
       final ledger = ref.read(ledgerServiceProvider);
-      final month = _currentMonthString();
+      final month = AppDateUtils.currentMonth();
       await ledger.setMaterialized(
         uid,
         'monthly_ritual_habit_id',
@@ -190,7 +186,7 @@ class _SetupPromptCard extends ConsumerWidget {
       if (!context.mounted) return;
       // 刷新 Provider
       ref.invalidate(_monthlyRitualProvider(uid));
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('[MonthlyRitual] Save failed: $e');
       if (context.mounted) {
         AppFeedback.error(context, context.l10n.awarenessSaveFailed);
@@ -358,10 +354,9 @@ class _ProgressCard extends StatelessWidget {
               crossAxisSpacing: 4,
               children: List.generate(daysInMonth, (index) {
                 final day = index + 1;
-                final dateStr =
-                    '${now.year}-'
-                    '${now.month.toString().padLeft(2, '0')}-'
-                    '${day.toString().padLeft(2, '0')}';
+                final dateStr = AppDateUtils.formatDay(
+                  DateTime(now.year, now.month, day),
+                );
                 final isCompleted = ritual.completedDays.contains(dateStr);
                 final isToday = day == now.day;
                 final isFuture = day > now.day;

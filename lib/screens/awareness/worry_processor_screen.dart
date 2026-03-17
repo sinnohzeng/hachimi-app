@@ -53,7 +53,7 @@ class WorryProcessorScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  context.l10n.awarenessSaveFailed,
+                  context.l10n.awarenessLoadFailed,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.error,
                   ),
@@ -176,7 +176,10 @@ class WorryProcessorScreen extends ConsumerWidget {
     WorryStatus status,
   ) async {
     final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
+    if (uid == null) {
+      debugPrint('[Awareness] resolveWorry called with null uid');
+      return;
+    }
     try {
       await ref.read(worryRepositoryProvider).resolve(uid, worryId, status);
     } on Exception catch (e) {

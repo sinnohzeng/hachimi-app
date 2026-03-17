@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// 心情等级 — 5 级量表。
 ///
 /// 存储在 SQLite 中使用 [value]（整型），UI 层使用 [emoji] 展示。
@@ -23,5 +25,16 @@ enum Mood {
       (e) => e.value == value,
       orElse: () => throw ArgumentError('Unknown Mood value: $value'),
     );
+  }
+
+  /// 获取心情对应的主题色 — 统一配色，避免各组件重复定义。
+  Color themeColor(ColorScheme cs) {
+    return switch (this) {
+      Mood.veryHappy => cs.tertiary,
+      Mood.happy => cs.primary.withValues(alpha: 0.8),
+      Mood.calm => cs.primary,
+      Mood.down => cs.error.withValues(alpha: 0.7),
+      Mood.veryDown => cs.error,
+    };
   }
 }

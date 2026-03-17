@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/weekly_review.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
@@ -40,10 +41,7 @@ class _AwarenessHistoryScreenState
   }
 
   void _handleDayTap(DateTime date) {
-    final dateStr =
-        '${date.year}-'
-        '${date.month.toString().padLeft(2, '0')}-'
-        '${date.day.toString().padLeft(2, '0')}';
+    final dateStr = AppDateUtils.formatDay(date);
     Navigator.of(context).pushNamed(AppRouter.dailyDetail, arguments: dateStr);
   }
 

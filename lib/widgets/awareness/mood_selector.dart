@@ -48,7 +48,7 @@ class MoodSelector extends StatelessWidget {
     final size = compact ? 40.0 : 56.0;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final ringColor = _moodColor(mood.value, colorScheme);
+    final ringColor = mood.themeColor(colorScheme);
 
     return GestureDetector(
       onTap: () => onMoodSelected(mood.value),
@@ -89,17 +89,5 @@ class MoodSelector extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// 根据心情等级返回主题色。
-  Color _moodColor(int mood, ColorScheme cs) {
-    return switch (mood) {
-      0 => cs.tertiary,
-      1 => cs.primary.withValues(alpha: 0.8),
-      2 => cs.primary,
-      3 => cs.error.withValues(alpha: 0.7),
-      4 => cs.error,
-      _ => cs.outline,
-    };
   }
 }

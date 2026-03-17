@@ -292,7 +292,10 @@ class _ThisWeekSubTab extends ConsumerWidget {
     WorryStatus status,
   ) async {
     final uid = ref.read(currentUidProvider);
-    if (uid == null) return;
+    if (uid == null) {
+      debugPrint('[Awareness] resolveWorry called with null uid');
+      return;
+    }
     try {
       await ref.read(worryRepositoryProvider).resolve(uid, worryId, status);
     } on Exception catch (e) {
