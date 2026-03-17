@@ -173,7 +173,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
   /// 监听计时器终态（完成/放弃），触发会话保存。
   void _onTimerTerminated(FocusTimerState? prev, FocusTimerState next) {
     if (_sessionSaved) return;
-    final isTerminal = next.status == TimerStatus.completed ||
+    final isTerminal =
+        next.status == TimerStatus.completed ||
         next.status == TimerStatus.abandoned;
     if (!isTerminal) return;
     _sessionSaved = true;
@@ -281,13 +282,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
       );
     }
 
-    final bgColor =
-        cat != null ? stageColor(cat.displayStage) : colorScheme.primary;
+    final bgColor = cat != null
+        ? stageColor(cat.displayStage)
+        : colorScheme.primary;
     final meshColors = timerMeshColors(bgColor, colorScheme);
-    final isRunningOrPaused = timerState.status == TimerStatus.running ||
+    final isRunningOrPaused =
+        timerState.status == TimerStatus.running ||
         timerState.status == TimerStatus.paused;
-    final inGracePeriod =
-        isRunningOrPaused && timerState.elapsedSeconds <= 10;
+    final inGracePeriod = isRunningOrPaused && timerState.elapsedSeconds <= 10;
 
     return PopScope(
       canPop: !isRunningOrPaused || inGracePeriod,
@@ -382,8 +384,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
         children: [
           Text(
             habit.name,
-            style:
-                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           if (habit.totalCheckInDays > 0) ...[
             const SizedBox(width: AppSpacing.md),
@@ -496,7 +497,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     bool inGracePeriod,
     ThemeData theme,
   ) {
-    final isActive = _hasStarted &&
+    final isActive =
+        _hasStarted &&
         timerState.status != TimerStatus.completed &&
         timerState.status != TimerStatus.abandoned;
     if (!isActive) return const SizedBox.shrink();

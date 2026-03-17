@@ -61,8 +61,9 @@ final inventoryServiceProvider = Provider<InventoryService>((ref) {
 
 final xpServiceProvider = Provider<XpService>((ref) => XpService());
 
-final sessionCompletionServiceProvider =
-    Provider<SessionCompletionService>((ref) {
+final sessionCompletionServiceProvider = Provider<SessionCompletionService>((
+  ref,
+) {
   return SessionCompletionService(
     sessions: ref.watch(localSessionRepositoryProvider),
     habits: ref.watch(localHabitRepositoryProvider),

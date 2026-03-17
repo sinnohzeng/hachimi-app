@@ -83,10 +83,13 @@ class TimerPersistence {
     final startedAt = DateTime.tryParse(startedAtStr);
     if (startedAt == null) return null;
 
-    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
+    final totalPausedSeconds =
+        (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
         computePendingPauseDelta(prefs.getString(_keyPausedAt));
-    final effectiveElapsed =
-        computeWallClockElapsed(startedAt, totalPausedSeconds);
+    final effectiveElapsed = computeWallClockElapsed(
+      startedAt,
+      totalPausedSeconds,
+    );
 
     return {
       'habitId': prefs.getString(_keyHabitId) ?? '',
@@ -115,15 +118,16 @@ class TimerPersistence {
     final modeIndex = prefs.getInt(_keyMode) ?? 0;
     final mode = TimerMode.values[modeIndex];
 
-    final totalPausedSeconds = (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
+    final totalPausedSeconds =
+        (prefs.getInt(_keyTotalPausedSeconds) ?? 0) +
         computePendingPauseDelta(prefs.getString(_keyPausedAt));
     final elapsed = computeWallClockElapsed(startedAt, totalPausedSeconds);
 
     // 倒计时模式：检查是否已自然完成
     final terminalStatus =
         (mode == TimerMode.countdown && elapsed >= totalSeconds)
-            ? TimerStatus.completed
-            : TimerStatus.paused;
+        ? TimerStatus.completed
+        : TimerStatus.paused;
 
     return FocusTimerState(
       habitId: habitId,
@@ -131,8 +135,9 @@ class TimerPersistence {
       catName: catName,
       habitName: habitName,
       totalSeconds: totalSeconds,
-      elapsedSeconds:
-          terminalStatus == TimerStatus.completed ? totalSeconds : elapsed,
+      elapsedSeconds: terminalStatus == TimerStatus.completed
+          ? totalSeconds
+          : elapsed,
       totalPausedSeconds: totalPausedSeconds,
       status: terminalStatus,
       mode: mode,

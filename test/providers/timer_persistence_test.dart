@@ -56,8 +56,9 @@ void main() {
 
     test('returns seconds since pausedAt', () {
       final pausedAt = fixedNow.subtract(const Duration(minutes: 3));
-      final delta =
-          persistence.computePendingPauseDelta(pausedAt.toIso8601String());
+      final delta = persistence.computePendingPauseDelta(
+        pausedAt.toIso8601String(),
+      );
       expect(delta, equals(180));
     });
   });

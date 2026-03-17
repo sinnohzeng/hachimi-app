@@ -64,11 +64,7 @@ class FakeLocalCatRepository implements LocalCatRepository {
     required int addMinutes,
     required DateTime sessionAt,
   }) async {
-    updates.add({
-      'uid': uid,
-      'catId': catId,
-      'addMinutes': addMinutes,
-    });
+    updates.add({'uid': uid, 'catId': catId, 'addMinutes': addMinutes});
   }
 
   @override
@@ -115,7 +111,10 @@ class FakeAnalyticsService implements AnalyticsService {
   }
 
   @override
-  Future<void> logCoinsEarned({required int amount, required String source}) async {
+  Future<void> logCoinsEarned({
+    required int amount,
+    required String source,
+  }) async {
     events.add('coins:$amount:$source');
   }
 
@@ -126,30 +125,29 @@ class FakeAnalyticsService implements AnalyticsService {
 // ─── Test Helpers ───
 
 Habit _makeHabit({String id = 'h1', String? catId = 'c1'}) => Habit(
-      id: id,
-      name: 'Reading',
-      catId: catId,
-      goalMinutes: 25,
-      createdAt: DateTime(2026, 1, 1),
-    );
+  id: id,
+  name: 'Reading',
+  catId: catId,
+  goalMinutes: 25,
+  createdAt: DateTime(2026, 1, 1),
+);
 
 FocusTimerState _makeTimerState({
   int totalSeconds = 1500,
   int elapsedSeconds = 1500,
   TimerStatus status = TimerStatus.completed,
   TimerMode mode = TimerMode.countdown,
-}) =>
-    FocusTimerState(
-      habitId: 'h1',
-      catId: 'c1',
-      catName: 'Mochi',
-      habitName: 'Reading',
-      totalSeconds: totalSeconds,
-      elapsedSeconds: elapsedSeconds,
-      status: status,
-      mode: mode,
-      startedAt: DateTime(2026, 3, 17, 10, 0, 0),
-    );
+}) => FocusTimerState(
+  habitId: 'h1',
+  catId: 'c1',
+  catName: 'Mochi',
+  habitName: 'Reading',
+  totalSeconds: totalSeconds,
+  elapsedSeconds: elapsedSeconds,
+  status: status,
+  mode: mode,
+  startedAt: DateTime(2026, 3, 17, 10, 0, 0),
+);
 
 // ─── Tests ───
 
@@ -230,9 +228,9 @@ void main() {
         activeHabits: [],
       );
 
-      // 25 min × focusRewardCoinsPerMinute (= 2) = 50 coins
-      expect(result.rewards!.coins, equals(50));
-      expect(fakeCoins.totalCoinsEarned, equals(50));
+      // 25 min × focusRewardCoinsPerMinute (= 10) = 250 coins
+      expect(result.rewards!.coins, equals(250));
+      expect(fakeCoins.totalCoinsEarned, equals(250));
     });
 
     test('persists session to local repository', () async {
@@ -303,14 +301,8 @@ void main() {
         activeHabits: [],
       );
 
-      expect(
-        fakeAnalytics.events,
-        contains(startsWith('completed:h1:')),
-      );
-      expect(
-        fakeAnalytics.events,
-        contains(startsWith('coins:')),
-      );
+      expect(fakeAnalytics.events, contains(startsWith('completed:h1:')));
+      expect(fakeAnalytics.events, contains(startsWith('coins:')));
     });
 
     test('logs analytics for abandoned session', () async {
@@ -327,10 +319,7 @@ void main() {
         activeHabits: [],
       );
 
-      expect(
-        fakeAnalytics.events,
-        contains(startsWith('abandoned:h1:')),
-      );
+      expect(fakeAnalytics.events, contains(startsWith('abandoned:h1:')));
     });
 
     test('skips cat update when habit has no catId', () async {
@@ -349,10 +338,7 @@ void main() {
     });
 
     test('XP includes full-house bonus when all habits done', () async {
-      final habits = [
-        _makeHabit(id: 'h1'),
-        _makeHabit(id: 'h2'),
-      ];
+      final habits = [_makeHabit(id: 'h1'), _makeHabit(id: 'h2')];
 
       final result = await service.completeSession(
         uid: 'u1',

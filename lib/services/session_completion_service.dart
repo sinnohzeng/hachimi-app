@@ -59,12 +59,12 @@ class SessionCompletionService {
     required CoinService coins,
     required AnalyticsService analytics,
     required XpService xp,
-  })  : _sessions = sessions,
-        _habits = habits,
-        _cats = cats,
-        _coins = coins,
-        _analytics = analytics,
-        _xp = xp;
+  }) : _sessions = sessions,
+       _habits = habits,
+       _cats = cats,
+       _coins = coins,
+       _analytics = analytics,
+       _xp = xp;
 
   /// 完成会话：计算奖励 → 持久化 → 上报分析。
   ///
@@ -126,11 +126,7 @@ class SessionCompletionService {
       completionRatio: completionRatio,
     );
 
-    return SessionResult(
-      session: session,
-      rewards: rewards,
-      minutes: minutes,
-    );
+    return SessionResult(session: session, rewards: rewards, minutes: minutes);
   }
 
   // ─── 内部方法 ───
@@ -144,9 +140,11 @@ class SessionCompletionService {
   }) {
     final coins = minutes * focusRewardCoinsPerMinute;
 
-    final allDone = activeHabits.isNotEmpty &&
-        activeHabits
-            .every((h) => (todayMinutesPerHabit[h.id] ?? 0) >= h.goalMinutes);
+    final allDone =
+        activeHabits.isNotEmpty &&
+        activeHabits.every(
+          (h) => (todayMinutesPerHabit[h.id] ?? 0) >= h.goalMinutes,
+        );
     final xp = _xp.calculateXp(minutes: minutes, allHabitsDone: allDone);
 
     final stageUp = cat != null
@@ -163,9 +161,7 @@ class SessionCompletionService {
     final targetMinutes = timerState.mode == TimerMode.countdown
         ? timerState.totalSeconds ~/ 60
         : 0;
-    return targetMinutes > 0
-        ? (minutes / targetMinutes).clamp(0.0, 1.0)
-        : 1.0;
+    return targetMinutes > 0 ? (minutes / targetMinutes).clamp(0.0, 1.0) : 1.0;
   }
 
   FocusSession _buildSession({
@@ -180,8 +176,9 @@ class SessionCompletionService {
     final targetMinutes = timerState.mode == TimerMode.countdown
         ? timerState.totalSeconds ~/ 60
         : 0;
-    final modeStr =
-        timerState.mode == TimerMode.countdown ? 'countdown' : 'stopwatch';
+    final modeStr = timerState.mode == TimerMode.countdown
+        ? 'countdown'
+        : 'stopwatch';
     final startedAt = timerState.startedAt ?? DateTime.now();
 
     return FocusSession(
@@ -288,7 +285,9 @@ class SessionCompletionService {
 
       if (rewards.coins > 0) {
         _analytics.logCoinsEarned(
-            amount: rewards.coins, source: 'focus_session');
+          amount: rewards.coins,
+          source: 'focus_session',
+        );
       }
     } catch (e) {
       debugPrint('[SessionCompletion] analytics error: $e');

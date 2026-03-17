@@ -41,9 +41,7 @@ void main() {
 
     persistence = TimerPersistence(clock: () => testNow);
     container = ProviderContainer(
-      overrides: [
-        timerPersistenceProvider.overrideWithValue(persistence),
-      ],
+      overrides: [timerPersistenceProvider.overrideWithValue(persistence)],
     );
     notifier = container.read(focusTimerProvider.notifier);
   });
@@ -90,19 +88,22 @@ void main() {
       expect(s.status, equals(TimerStatus.running));
     });
 
-    test('countdown auto-completes when elapsed reaches totalSeconds', () async {
-      configureAndStart(durationSeconds: 60);
-      await Future<void>.delayed(Duration.zero);
+    test(
+      'countdown auto-completes when elapsed reaches totalSeconds',
+      () async {
+        configureAndStart(durationSeconds: 60);
+        await Future<void>.delayed(Duration.zero);
 
-      // 推进时钟超过 60 秒
-      testNow = testNow.add(const Duration(seconds: 65));
+        // 推进时钟超过 60 秒
+        testNow = testNow.add(const Duration(seconds: 65));
 
-      await Future<void>.delayed(const Duration(seconds: 1));
+        await Future<void>.delayed(const Duration(seconds: 1));
 
-      final s = container.read(focusTimerProvider);
-      expect(s.status, equals(TimerStatus.completed));
-      expect(s.elapsedSeconds, equals(60));
-    });
+        final s = container.read(focusTimerProvider);
+        expect(s.status, equals(TimerStatus.completed));
+        expect(s.elapsedSeconds, equals(60));
+      },
+    );
 
     test('stopwatch mode does NOT auto-complete', () async {
       configureAndStart(durationSeconds: 60, mode: TimerMode.stopwatch);
@@ -242,25 +243,27 @@ void main() {
       expect(s.status, equals(TimerStatus.completed));
     });
 
-    test('auto-completes when countdown expired during short background',
-        () async {
-      // 10 秒倒计时
-      configureAndStart(durationSeconds: 10);
-      await Future<void>.delayed(Duration.zero);
+    test(
+      'auto-completes when countdown expired during short background',
+      () async {
+        // 10 秒倒计时
+        configureAndStart(durationSeconds: 10);
+        await Future<void>.delayed(Duration.zero);
 
-      notifier.onAppBackgrounded();
-      await Future<void>.delayed(Duration.zero);
+        notifier.onAppBackgrounded();
+        await Future<void>.delayed(Duration.zero);
 
-      // 推进 15 秒（< 30 分钟，但倒计时已过期）
-      testNow = testNow.add(const Duration(seconds: 15));
+        // 推进 15 秒（< 30 分钟，但倒计时已过期）
+        testNow = testNow.add(const Duration(seconds: 15));
 
-      await notifier.onAppResumed();
-      await Future<void>.delayed(Duration.zero);
+        await notifier.onAppResumed();
+        await Future<void>.delayed(Duration.zero);
 
-      final s = container.read(focusTimerProvider);
-      expect(s.status, equals(TimerStatus.completed));
-      expect(s.elapsedSeconds, equals(10)); // 封顶到 totalSeconds
-    });
+        final s = container.read(focusTimerProvider);
+        expect(s.status, equals(TimerStatus.completed));
+        expect(s.elapsedSeconds, equals(10)); // 封顶到 totalSeconds
+      },
+    );
   });
 
   // ─── _shouldAutoComplete 边界 ───

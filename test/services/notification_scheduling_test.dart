@@ -86,12 +86,7 @@ void main() {
     test('target weekday is later this week', () {
       // 现在周二 10:00，目标周五 09:00 → 本周五 (3/20)
       final now = tz.TZDateTime(tz.local, 2026, 3, 17, 10, 0);
-      final result = nextInstanceOfWeekdayTime(
-        DateTime.friday,
-        9,
-        0,
-        now: now,
-      );
+      final result = nextInstanceOfWeekdayTime(DateTime.friday, 9, 0, now: now);
 
       expect(result.weekday, equals(DateTime.friday));
       expect(result.day, equals(20));
@@ -129,12 +124,7 @@ void main() {
     test('target weekday has already passed this week → next week', () {
       // 现在周二，目标周一 → 下周一 (3/23)
       final now = tz.TZDateTime(tz.local, 2026, 3, 17, 10, 0);
-      final result = nextInstanceOfWeekdayTime(
-        DateTime.monday,
-        9,
-        0,
-        now: now,
-      );
+      final result = nextInstanceOfWeekdayTime(DateTime.monday, 9, 0, now: now);
 
       expect(result.day, equals(23));
       expect(result.weekday, equals(DateTime.monday));
@@ -201,8 +191,7 @@ void main() {
       for (int r = 0; r < 5; r++) {
         for (int d = 0; d < 5; d++) {
           final id = computeReminderNotificationId(habitId, r, d);
-          expect(ids.contains(id), isFalse,
-              reason: 'collision at r=$r, d=$d');
+          expect(ids.contains(id), isFalse, reason: 'collision at r=$r, d=$d');
           ids.add(id);
         }
       }

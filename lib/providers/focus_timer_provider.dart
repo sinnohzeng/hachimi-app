@@ -66,8 +66,9 @@ class FocusTimerState {
 
   /// Display time string (MM:SS or HH:MM:SS).
   String get displayTime {
-    final seconds =
-        mode == TimerMode.countdown ? remainingSeconds : elapsedSeconds;
+    final seconds = mode == TimerMode.countdown
+        ? remainingSeconds
+        : elapsedSeconds;
     final hours = seconds ~/ 3600;
     final mins = (seconds % 3600) ~/ 60;
     final secs = seconds % 60;
@@ -155,8 +156,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
       TimerPersistence().getSavedSessionInfo();
 
   /// Clear saved session data (called when user discards recovery).
-  static Future<void> clearSavedState() =>
-      TimerPersistence().clearSavedState();
+  static Future<void> clearSavedState() => TimerPersistence().clearSavedState();
 
   // ─── 配置 & 恢复 ───
 
@@ -233,8 +233,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
     );
 
     // 倒计时归零
-    if (state.mode == TimerMode.countdown &&
-        newElapsed >= state.totalSeconds) {
+    if (state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds) {
       _handleCountdownComplete();
       return;
     }
@@ -277,16 +276,17 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   /// Resume from pause — accumulate pause duration into totalPausedSeconds.
   void resume() {
     if (state.pausedAt != null) {
-      final pauseDuration =
-          _persistence.now().difference(state.pausedAt!).inSeconds;
+      final pauseDuration = _persistence
+          .now()
+          .difference(state.pausedAt!)
+          .inSeconds;
       state = state.copyWith(
         totalPausedSeconds: state.totalPausedSeconds + pauseDuration,
         status: TimerStatus.running,
         clearPausedAt: true,
       );
     } else {
-      state =
-          state.copyWith(status: TimerStatus.running, clearPausedAt: true);
+      state = state.copyWith(status: TimerStatus.running, clearPausedAt: true);
     }
     _ticker?.cancel();
     _ticksSinceSave = 0;
@@ -312,8 +312,7 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
     // Analytics: non-critical — failure must not break core flow
     try {
-      final defaultRatio =
-          terminalStatus == TimerStatus.completed ? 1.0 : 0.0;
+      final defaultRatio = terminalStatus == TimerStatus.completed ? 1.0 : 0.0;
       final completionRatio = state.totalSeconds > 0
           ? (state.elapsedSeconds / state.totalSeconds).clamp(0.0, 1.0)
           : defaultRatio;
@@ -400,11 +399,9 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
 
   /// 解析通知显示标签，使用 configure() 传入的 L10N 标签，英文兜底。
   ({String catName, String focusingLabel, String label})
-      _resolveDisplayLabels() {
+  _resolveDisplayLabels() {
     final label = state.mode == TimerMode.countdown
-        ? (state.labelRemaining.isNotEmpty
-            ? state.labelRemaining
-            : 'remaining')
+        ? (state.labelRemaining.isNotEmpty ? state.labelRemaining : 'remaining')
         : (state.labelElapsed.isNotEmpty ? state.labelElapsed : 'elapsed');
     final focusingLabel = state.labelFocusing.isNotEmpty
         ? state.labelFocusing
@@ -489,10 +486,12 @@ class FocusTimerNotifier extends Notifier<FocusTimerState> {
   // ─── 内部辅助 ───
 
   bool _shouldAutoComplete(int newElapsed) {
-    final awayMinutes =
-        _persistence.now().difference(state.pausedAt!).inMinutes;
-    final countdownDone = state.mode == TimerMode.countdown &&
-        newElapsed >= state.totalSeconds;
+    final awayMinutes = _persistence
+        .now()
+        .difference(state.pausedAt!)
+        .inMinutes;
+    final countdownDone =
+        state.mode == TimerMode.countdown && newElapsed >= state.totalSeconds;
     return awayMinutes > _autoCompleteThresholdMinutes || countdownDone;
   }
 

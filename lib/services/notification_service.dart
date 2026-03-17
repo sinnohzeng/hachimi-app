@@ -474,5 +474,4 @@ class NotificationService {
   Future<String?> getToken() async {
     return await _messaging.getToken();
   }
-
 }
