@@ -20,8 +20,7 @@ class OnboardingCatCluster extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Semantics(
-      label: 'Three unique cats with different appearances',
+    return ExcludeSemantics(
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Row(

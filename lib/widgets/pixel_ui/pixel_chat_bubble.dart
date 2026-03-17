@@ -54,7 +54,9 @@ class PixelChatBubble extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (!isUser) ...[
-                      const Text('🐾 ', style: TextStyle(fontSize: 12)),
+                      const ExcludeSemantics(
+                        child: Text('🐾 ', style: TextStyle(fontSize: 12)),
+                      ),
                     ],
                     Flexible(
                       child: Text.rich(

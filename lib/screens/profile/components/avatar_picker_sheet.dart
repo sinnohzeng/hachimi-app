@@ -111,12 +111,17 @@ class _AvatarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: AnimatedContainer(
+    final l10n = context.l10n;
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '${avatar.id}${isSelected ? ', ${l10n.a11ySelected}' : ''}',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: AnimatedContainer(
           duration: AppMotion.durationShort4,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -156,6 +161,7 @@ class _AvatarTile extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

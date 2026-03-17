@@ -2471,4 +2471,107 @@ class STh extends S {
 
   @override
   String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'คัดลอก ID';
+
+  @override
+  String get adoptionClearDeadline => 'ล้างกำหนดเวลา';
+
+  @override
+  String get commonIdCopied => 'คัดลอก ID แล้ว';
+
+  @override
+  String get pickerDurationLabel => 'ตัวเลือกเวลา';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count นาที';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'แมว $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name แตะเพื่อโต้ตอบ';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return 'เสร็จ $percent%';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count วันที่ใช้งาน';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'โหมดออฟไลน์';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'ปลดล็อกความสำเร็จ: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'เช็คอินแล้ว';
+
+  @override
+  String get calendarToday => 'วันนี้';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'สวมให้ $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'สร้าง $name ใหม่';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'ตั้งเวลา: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'หน้า $current จาก $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'แก้ไขชื่อ: $name';
+  }
+
+  @override
+  String get routeNotFound => 'ไม่พบหน้า';
+
+  @override
+  String get routeGoHome => 'กลับหน้าหลัก';
+
+  @override
+  String get a11yError => 'ข้อผิดพลาด';
+
+  @override
+  String get a11yDeadline => 'กำหนดเวลา';
+
+  @override
+  String get a11yReminder => 'การเตือน';
+
+  @override
+  String get a11yFocusMeditation => 'สมาธิ';
+
+  @override
+  String get a11yUnlocked => 'ปลดล็อกแล้ว';
+
+  @override
+  String get a11ySelected => 'เลือกแล้ว';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'สีวอลเปเปอร์แบบไดนามิก';
 }

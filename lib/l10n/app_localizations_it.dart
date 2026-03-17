@@ -2502,4 +2502,107 @@ class SIt extends S {
 
   @override
   String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'Copia ID';
+
+  @override
+  String get adoptionClearDeadline => 'Cancella scadenza';
+
+  @override
+  String get commonIdCopied => 'ID copiato';
+
+  @override
+  String get pickerDurationLabel => 'Selettore durata';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count minuti';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Gatto $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, tocca per interagire';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% completato';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count giorni attivi';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Modalità offline';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Traguardo sbloccato: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'registrato';
+
+  @override
+  String get calendarToday => 'oggi';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Equipaggia a $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'Rigenera $name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Timer: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Pagina $current di $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Modifica nome: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Pagina non trovata';
+
+  @override
+  String get routeGoHome => 'Vai alla home';
+
+  @override
+  String get a11yError => 'Errore';
+
+  @override
+  String get a11yDeadline => 'Scadenza';
+
+  @override
+  String get a11yReminder => 'Promemoria';
+
+  @override
+  String get a11yFocusMeditation => 'Meditazione di concentrazione';
+
+  @override
+  String get a11yUnlocked => 'Sbloccato';
+
+  @override
+  String get a11ySelected => 'Selezionato';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Colore dinamico dello sfondo';
 }

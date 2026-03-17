@@ -1,12 +1,10 @@
 {
   "@@locale": "ko",
   "appTitle": "하치미",
-
   "homeTabToday": "오늘",
   "homeTabCatHouse": "고양이 집",
   "homeTabStats": "통계",
   "homeTabProfile": "프로필",
-
   "adoptionStepDefineHabit": "습관 설정",
   "adoptionStepAdoptCat": "고양이 입양",
   "adoptionStepNameCat": "이름 짓기",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "고양이 이름",
   "adoptionCatNameHint": "예: 모찌",
   "adoptionRandomNameTooltip": "랜덤 이름",
-
   "catHouseTitle": "고양이 집",
   "catHouseEmpty": "아직 고양이가 없어요! 습관을 만들어 첫 고양이를 입양해 보세요.",
   "catHouseGrowth": "{minutes} / {target}분",
-
   "catDetailGrowthProgress": "성장 진행도",
   "catDetailTotalMinutes": "{minutes}분 집중함",
   "catDetailTargetMinutes": "목표: {minutes}분",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "집중 시작",
   "catDetailBoundHabit": "연결된 습관",
   "catDetailStage": "단계: {stage}",
-
   "coinBalance": "{amount} 코인",
   "coinCheckInReward": "+{amount} 코인!",
   "coinCheckInTitle": "일일 출석",
   "coinInsufficientBalance": "코인이 부족해요",
-
   "shopTitle": "액세서리 상점",
   "shopPrice": "{price} 코인",
   "shopPurchase": "구매",
   "shopEquipped": "장착 중",
-
   "focusCompleteMinutes": "+{minutes}분",
   "focusCompleteStageUp": "단계 업!",
   "focusCompleteGreatJob": "잘했어요!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "일기 작성 완료!",
   "focusCompleteNotifTitle": "퀘스트 완료!",
   "focusCompleteNotifBody": "{catName}이(가) {minutes}분 집중으로 +{xp} XP를 획득했어요",
-
   "stageKitten": "아기 고양이",
   "stageAdolescent": "청소년",
   "stageAdult": "성인",
   "stageSenior": "노년",
-
   "migrationTitle": "데이터 업데이트 필요",
   "migrationMessage": "하치미가 새로운 픽셀 고양이 시스템으로 업데이트되었어요! 기존 고양이 데이터는 더 이상 호환되지 않아요. 초기화하여 새로운 경험을 시작해 주세요.",
   "migrationResetButton": "초기화 & 새로 시작",
-
   "sessionResumeTitle": "세션을 이어할까요?",
   "sessionResumeMessage": "진행 중인 집중 세션이 있어요 ({habitName}, {elapsed}). 이어할까요?",
   "sessionResumeButton": "이어하기",
   "sessionDiscard": "취소",
-
   "todaySummaryMinutes": "오늘",
   "todaySummaryTotal": "전체",
   "todaySummaryCats": "고양이",
@@ -104,7 +93,6 @@
   "todayNoHabits": "첫 번째 습관을 만들어 시작해 보세요!",
   "todayNewQuest": "새 퀘스트",
   "todayStartFocus": "집중 시작",
-
   "timerStart": "시작",
   "timerPause": "일시정지",
   "timerResume": "이어하기",
@@ -122,7 +110,6 @@
   "giveUpMessage": "5분 이상 집중했다면, 그 시간은 고양이 성장에 반영돼요. 고양이가 이해할 거예요!",
   "giveUpKeepGoing": "계속하기",
   "giveUpConfirm": "포기",
-
   "settingsTitle": "설정",
   "settingsGeneral": "일반",
   "settingsAppearance": "외관",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "계정을 삭제할까요?",
   "deleteAccountMessage": "계정과 모든 데이터가 영구적으로 삭제돼요. 이 작업은 되돌릴 수 없어요.",
   "deleteAccountWarning": "이 작업은 되돌릴 수 없어요",
-
   "profileTitle": "프로필",
   "profileYourJourney": "나의 여정",
   "profileTotalFocus": "총 집중 시간",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "아바타 선택",
   "profileSaved": "저장되었습니다",
   "profileSettings": "설정",
-
   "habitDetailStreak": "연속",
   "habitDetailBestStreak": "최고",
   "habitDetailTotalMinutes": "전체",
-
   "commonCancel": "취소",
   "commonConfirm": "확인",
   "commonSave": "저장",
@@ -182,14 +166,16 @@
   "commonLogOut": "로그아웃",
   "commonDeleteAccount": "계정 삭제",
   "commonYes": "네",
-
   "chatDailyRemaining": "오늘 {count}개의 메시지를 더 보낼 수 있어요",
   "@chatDailyRemaining": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "chatDailyLimitReached": "오늘의 메시지 한도에 도달했어요",
   "aiTemporarilyUnavailable": "AI 기능을 일시적으로 사용할 수 없어요",
-
   "catDetailNotFound": "고양이를 찾을 수 없어요",
   "catDetailLoadError": "고양이 데이터를 불러오지 못했어요",
   "catDetailChatTooltip": "채팅",
@@ -258,7 +244,6 @@
   "catDetailTortiePattern": "삼색 무늬",
   "catDetailTortieColor": "삼색 색상",
   "catDetailSkin": "피부",
-
   "offlineMessage": "오프라인 상태예요 — 다시 연결되면 변경 사항이 동기화돼요",
   "offlineModeLabel": "오프라인 모드",
   "habitTodayMinutes": "오늘: {count}분",
@@ -271,35 +256,29 @@
   "accessoryEquipped": "장착 중",
   "accessoryOwned": "보유 중",
   "pickerMinUnit": "분",
-
   "settingsBackgroundAnimation": "배경 애니메이션",
   "settingsBackgroundAnimationSubtitle": "메시 그라디언트와 떠다니는 파티클",
-
   "settingsUiStyle": "UI 스타일",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "레트로 픽셀",
   "settingsUiStyleMaterialSubtitle": "모던한 라운드 Material 디자인",
   "settingsUiStyleRetroPixelSubtitle": "따뜻한 픽셀 아트 스타일",
-
   "personalityLazy": "게으른",
   "personalityCurious": "호기심 많은",
   "personalityPlayful": "장난스러운",
   "personalityShy": "수줍은",
   "personalityBrave": "용감한",
   "personalityClingy": "집착하는",
-
   "personalityFlavorLazy": "하루 23시간을 낮잠으로 보낼 거예요. 나머지 1시간? 그것도 낮잠이에요.",
   "personalityFlavorCurious": "이미 눈에 보이는 모든 걸 킁킁거리고 있어요!",
   "personalityFlavorPlayful": "나비 쫓기를 멈출 수가 없어요!",
   "personalityFlavorShy": "상자 밖을 살짝 내다보는 데 3분이 걸렸어요...",
   "personalityFlavorBrave": "상자가 열리기도 전에 뛰어나왔어요!",
   "personalityFlavorClingy": "바로 골골거리기 시작했고 절대 놓아주지 않아요.",
-
   "moodHappy": "행복",
   "moodNeutral": "보통",
   "moodLonely": "외로움",
   "moodMissing": "보고 싶음",
-
   "moodMsgLazyHappy": "냐~! 잘 잔 낮잠 시간이다...",
   "moodMsgCuriousHappy": "오늘은 뭘 탐험할까?",
   "moodMsgPlayfulHappy": "냐~! 일할 준비 됐다!",
@@ -317,14 +296,13 @@
   "moodMsgPlayfulLonely": "너 없으면 장난감도 재미없어...",
   "moodMsgShyLonely": "*조용히 웅크림*",
   "moodMsgBraveLonely": "계속 기다릴게. 나는 용감하니까.",
-  "moodMsgClingyLonely": "어디 간 거야... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "어디 간 거야... 🥺",
   "moodMsgLazyMissing": "*한쪽 눈을 기대하며 뜸*",
   "moodMsgCuriousMissing": "무슨 일이 있었던 거야...?",
   "moodMsgPlayfulMissing": "네가 좋아하는 장난감 남겨뒀어...",
   "moodMsgShyMissing": "*숨어 있지만, 문을 지켜보고 있어*",
   "moodMsgBraveMissing": "꼭 돌아올 거라고 믿어.",
   "moodMsgClingyMissing": "너무 보고 싶어... 제발 돌아와.",
-
   "peltTypeTabby": "클래식 태비 줄무늬",
   "peltTypeTicked": "틱트 아구티 패턴",
   "peltTypeMackerel": "고등어 태비",
@@ -340,7 +318,6 @@
   "peltTypeBengal": "벵갈 패턴",
   "peltTypeMarbled": "마블 패턴",
   "peltTypeMasked": "마스크 얼굴",
-
   "peltColorWhite": "흰색",
   "peltColorPaleGrey": "연한 회색",
   "peltColorSilver": "실버",
@@ -360,7 +337,6 @@
   "peltColorGoldenBrown": "골든 브라운",
   "peltColorDarkBrown": "진한 갈색",
   "peltColorChocolate": "초콜릿",
-
   "eyeColorYellow": "노랑",
   "eyeColorAmber": "앰버",
   "eyeColorHazel": "헤이즐",
@@ -382,10 +358,8 @@
   "eyeColorBronze": "브론즈",
   "eyeColorSilver": "실버",
   "eyeColorPaleYellow": "연한 노랑",
-
   "eyeDescNormal": "{color} 눈",
   "eyeDescHeterochromia": "오드아이 ({primary} / {secondary})",
-
   "skinColorPink": "분홍",
   "skinColorRed": "빨강",
   "skinColorBlack": "검정",
@@ -398,38 +372,30 @@
   "skinColorDarkSalmon": "진한 살몬",
   "skinColorSalmon": "살몬",
   "skinColorPeach": "피치",
-
   "furLengthLonghair": "장모",
   "furLengthShorthair": "단모",
-
   "whiteTintOffwhite": "오프화이트 색조",
   "whiteTintCream": "크림 색조",
   "whiteTintDarkCream": "진한 크림 색조",
   "whiteTintGray": "회색 색조",
   "whiteTintPink": "핑크 색조",
-
   "notifReminderTitle": "{catName}이(가) 보고 싶어해요!",
   "notifReminderBody": "{habitName} 시간이에요 — 고양이가 기다리고 있어요!",
   "notifStreakTitle": "{catName}이(가) 걱정하고 있어요!",
   "notifStreakBody": "{streak}일 연속 기록이 위험해요. 짧은 세션이면 지킬 수 있어요!",
   "notifEvolutionTitle": "{catName}이(가) 진화했어요!",
   "notifEvolutionBody": "{catName}이(가) {stageName}(으)로 성장했어요! 계속 파이팅!",
-
   "durationHoursMinutes": "{hours}시간 {minutes}분",
-
   "diaryScreenTitle": "{name}의 일기",
   "diaryFailedToLoad": "일기를 불러오지 못했어요",
   "diaryEmptyTitle": "아직 일기가 없어요",
   "diaryEmptyHint": "집중 세션을 완료하면 고양이가 첫 일기를 써요!",
-
   "focusSetupCountdown": "카운트다운",
   "focusSetupStopwatch": "스톱워치",
   "focusSetupStartFocus": "집중 시작",
   "focusSetupQuestNotFound": "퀘스트를 찾을 수 없어요",
-
   "checkInButtonLogMore": "시간 추가 기록",
   "checkInButtonStart": "타이머 시작",
-
   "adoptionTitleFirst": "첫 고양이를 입양하세요!",
   "adoptionTitleNew": "새 퀘스트",
   "adoptionStepDefineQuest": "퀘스트 설정",
@@ -478,7 +444,6 @@
   "adoptionMotivationLabel": "메모",
   "adoptionMotivationHint": "메모를 적어보세요...",
   "adoptionMotivationSwap": "랜덤 입력",
-
   "loginAppName": "하치미",
   "loginTagline": "고양이를 키우고, 퀘스트를 완료하세요.",
   "loginContinueGoogle": "Google로 계속하기",
@@ -498,7 +463,6 @@
   "loginCreateAccountButton": "계정 만들기",
   "loginNoAccount": "계정이 없으신가요? ",
   "loginRegister": "등록",
-
   "checkInTitle": "월간 출석",
   "checkInDays": "일",
   "checkInCoinsEarned": "획득한 코인",
@@ -511,7 +475,6 @@
   "checkInWeekdayReward": "{coins} 코인/일",
   "checkInWeekend": "주말 (토~일)",
   "checkInNDays": "{count}일",
-
   "onboardTitle1": "동반자를 만나보세요",
   "onboardSubtitle1": "모든 여정은 아기 고양이에서 시작돼요",
   "onboardBody1": "목표를 정하고 아기 고양이를 입양하세요.\n집중하면 고양이가 함께 성장해요!",
@@ -524,7 +487,6 @@
   "onboardSkip": "건너뛰기",
   "onboardLetsGo": "시작하기!",
   "onboardNext": "다음",
-
   "catRoomTitle": "고양이 집",
   "catRoomInventory": "보관함",
   "catRoomShop": "액세서리 상점",
@@ -541,29 +503,44 @@
   "catRoomArchive": "보관",
   "catRoomAlbumSection": "앨범 ({count})",
   "@catRoomAlbumSection": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catRoomReactivateCat": "고양이 다시 활성화",
   "catRoomReactivateTitle": "고양이를 다시 활성화할까요?",
   "catRoomReactivateMessage": "\"{name}\"과(와) 연결된 퀘스트를 고양이 집에 복원해요.",
   "@catRoomReactivateMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivate": "활성화",
   "catRoomArchivedLabel": "보관됨",
   "catRoomArchiveSuccess": "\"{name}\"을(를) 보관했어요",
   "@catRoomArchiveSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivateSuccess": "\"{name}\"을(를) 다시 활성화했어요",
   "@catRoomReactivateSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomArchiveError": "고양이 보관에 실패했어요",
   "catRoomReactivateError": "고양이 복구에 실패했어요",
   "catRoomArchiveLoadError": "보관된 고양이를 불러오지 못했어요",
   "catRoomRenameError": "고양이 이름 변경에 실패했어요",
-
   "addHabitTitle": "새 퀘스트",
   "addHabitQuestName": "퀘스트 이름",
   "addHabitQuestHint": "예: 릿코드 연습",
@@ -574,7 +551,6 @@
   "addHabitValidNumber": "올바른 숫자를 입력해 주세요",
   "addHabitCreate": "퀘스트 만들기",
   "addHabitHoursSuffix": "시간",
-
   "shopTabPlants": "식물 ({count})",
   "shopTabWild": "야생 ({count})",
   "shopTabCollars": "목걸이 ({count})",
@@ -584,7 +560,6 @@
   "shopNotEnoughCoinsButton": "코인 부족",
   "shopPurchaseSuccess": "구매 완료! {name}이(가) 보관함에 추가되었어요",
   "shopPurchaseFailed": "코인이 부족해요 ({price} 코인 필요)",
-
   "inventoryTitle": "보관함",
   "inventoryInBox": "보관 중 ({count})",
   "inventoryEmpty": "보관함이 비어있어요.\n상점에서 액세서리를 구매해 보세요!",
@@ -595,7 +570,6 @@
   "inventoryEquipTo": "{name}을(를) 장착할 고양이:",
   "inventoryEquipSuccess": "{name} 장착 완료",
   "inventoryUnequipSuccess": "{catName}에게서 해제됨",
-
   "chatCatNotFound": "고양이를 찾을 수 없어요",
   "chatTitle": "{name}와(과) 채팅",
   "chatClearHistory": "기록 삭제",
@@ -606,20 +580,16 @@
   "chatClearConfirmTitle": "채팅 기록을 삭제할까요?",
   "chatClearConfirmMessage": "모든 메시지가 삭제돼요. 이 작업은 되돌릴 수 없어요.",
   "chatClearButton": "삭제",
-  "chatSend": "Send",
-  "chatStop": "Stop",
-  "chatErrorMessage": "Failed to send message. Tap to retry.",
-  "chatRetry": "Retry",
   "chatSend": "보내기",
   "chatStop": "중지",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
   "chatErrorGeneric": "문제가 발생했어요. 다시 시도해 주세요",
-
   "diaryTitle": "{name}의 일기",
   "diaryLoadFailed": "일기를 불러오지 못했어요",
   "diaryRetry": "다시 시도",
   "diaryEmptyTitle2": "아직 일기가 없어요",
   "diaryEmptySubtitle": "집중 세션을 완료하면 고양이가 첫 일기를 써요!",
-
   "statsTitle": "통계",
   "statsTotalHours": "총 시간",
   "statsTimeValue": "{hours}시간 {minutes}분",
@@ -632,7 +602,6 @@
   "statsNoQuestData": "아직 퀘스트 데이터가 없어요",
   "statsNoQuestHint": "퀘스트를 시작하면 여기에서 진행 상황을 볼 수 있어요!",
   "statsLast30Days": "최근 30일",
-
   "habitDetailQuestNotFound": "퀘스트를 찾을 수 없어요",
   "habitDetailComplete": "완료",
   "habitDetailTotalTime": "총 시간",
@@ -640,14 +609,12 @@
   "habitDetailTarget": "목표",
   "habitDetailDaysUnit": "{count}일",
   "habitDetailHoursUnit": "{count}시간",
-
   "checkInBannerSuccess": "+{coins} 코인! 일일 출석 완료",
   "checkInBannerBonus": " + {bonus} 마일스톤 보너스!",
   "checkInBannerSemantics": "일일 출석",
   "checkInBannerLoading": "출석 상태 확인 중...",
   "checkInBannerPrompt": "출석하면 +{coins} 코인",
   "checkInBannerSummary": "{count}/{total}일  ·  오늘 +{coins}",
-
   "commonErrorWithDetail": "오류: {error}",
   "profileFallbackUser": "사용자",
   "fallbackCatName": "고양이",
@@ -664,10 +631,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "집중 중...",
   "notifInProgress": "집중 세션 진행 중",
-
   "unitMinShort": "분",
   "unitHourShort": "시간",
   "weekdayMon": "월",
@@ -687,11 +652,19 @@
   "historyFilterAll": "전체",
   "historySessionCount": "{count}회 집중",
   "@historySessionCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "historyTotalMinutes": "{minutes}분",
   "@historyTotalMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "historyNoSessions": "집중 기록이 없습니다",
   "historyNoSessionsHint": "집중 세션을 완료하면 여기에 표시됩니다",
@@ -707,7 +680,6 @@
   "historySelectMonth": "월 선택",
   "historyAllMonths": "전체 월",
   "historyAllHabits": "전체",
-
   "homeTabAchievements": "업적",
   "achievementTitle": "업적",
   "achievementTabOverview": "개요",
@@ -718,11 +690,19 @@
   "achievementSummaryTitle": "업적 현황",
   "achievementUnlockedCount": "{count}개 달성",
   "@achievementUnlockedCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "achievementTotalCoins": "{coins} 코인 획득",
   "@achievementTotalCoins": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "achievementUnlocked": "업적 달성!",
   "achievementAwesome": "대단해!",
@@ -731,20 +711,26 @@
   "achievementHiddenDesc": "숨겨진 업적입니다",
   "achievementPersistDesc": "아무 퀘스트에서 {days}일 체크인 달성",
   "@achievementPersistDesc": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "achievementTitleCount": "{count}개 칭호 달성",
   "@achievementTitleCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "growthPathTitle": "성장의 길",
   "growthPathKitten": "새로운 여정의 시작",
   "growthPathAdolescent": "기초를 다지다",
   "growthPathAdult": "스킬 정착",
   "growthPathSenior": "깊은 숙련",
   "growthPathTip": "연구에 따르면 20시간의 집중 연습만으로도 새로운 기술의 기초를 쌓을 수 있습니다 — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} 코인",
   "achievementCelebrationTitle": "칭호 획득: {title}",
   "achievementCelebrationDismiss": "대단해!",
@@ -753,7 +739,6 @@
   "achievementUnlockedAt": "{date}에 달성",
   "achievementLocked": "아직 달성하지 못했습니다",
   "achievementRewardCoins": "+{count} 코인",
-
   "reminderModeDaily": "매일",
   "reminderModeWeekdays": "평일",
   "reminderModeMonday": "월요일",
@@ -771,13 +756,20 @@
   "reminderConfirm": "확인",
   "reminderNotificationTitle": "{catName}이(가) 보고 싶어해요!",
   "@reminderNotificationTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "reminderNotificationBody": "{habitName} 시간이에요. 고양이가 기다리고 있어요!",
   "@reminderNotificationBody": {
-    "placeholders": { "habitName": { "type": "String" } }
+    "placeholders": {
+      "habitName": {
+        "type": "String"
+      }
+    }
   },
-
   "deleteAccountDataWarning": "다음 모든 데이터가 영구적으로 삭제됩니다:",
   "deleteAccountQuests": "퀘스트",
   "deleteAccountCats": "고양이",
@@ -789,28 +781,43 @@
   "deleteAccountAuthCancelled": "인증이 취소되었습니다",
   "deleteAccountAuthFailed": "인증 실패: {error}",
   "@deleteAccountAuthFailed": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "deleteAccountProgress": "계정 삭제 중...",
   "deleteAccountSuccess": "계정이 삭제되었습니다",
-
   "drawerGuestLoginSubtitle": "데이터 동기화, AI 기능 잠금 해제",
   "drawerGuestSignIn": "로그인",
   "drawerMilestones": "마일스톤",
   "drawerMilestoneFocus": "총 집중: {hours}h {minutes}m",
   "@drawerMilestoneFocus": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "drawerMilestoneCats": "고양이 가족: {count}마리",
   "@drawerMilestoneCats": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMilestoneQuests": "진행 중 퀘스트: {count}개",
   "@drawerMilestoneQuests": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMySection": "나의",
   "drawerSessionHistory": "집중 기록",
@@ -819,24 +826,28 @@
   "settingsResetData": "모든 데이터 초기화",
   "settingsResetDataTitle": "모든 데이터를 초기화하시겠습니까?",
   "settingsResetDataMessage": "모든 로컬 데이터가 삭제되고 환영 화면으로 돌아갑니다. 이 작업은 되돌릴 수 없습니다.",
-
   "guestUpgradeTitle": "데이터 보호",
   "guestUpgradeMessage": "계정 연결로 진행 상황을 백업하고, AI 일기 및 채팅 기능을 잠금 해제하고, 기기 간 동기화할 수 있습니다.",
   "guestUpgradeLinkButton": "계정 연결",
   "guestUpgradeLater": "나중에",
-
   "loginLinkTagline": "계정을 연결하여 데이터를 보호하세요",
-
   "aiTeaserTitle": "고양이 일기",
   "aiTeaserPreview": "오늘도 주인과 함께 공부했어... {catName}은(는) 또 똑똑해진 것 같다냥~",
   "@aiTeaserPreview": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "aiTeaserCta": "계정을 연결하여 {catName}이(가) 무슨 말을 하고 싶은지 확인하세요",
   "@aiTeaserCta": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
-
   "authErrorEmailInUse": "이미 등록된 이메일입니다",
   "authErrorWrongPassword": "이메일 또는 비밀번호가 올바르지 않습니다",
   "authErrorUserNotFound": "해당 이메일로 등록된 계정이 없습니다",
@@ -845,7 +856,6 @@
   "authErrorAdminRestricted": "로그인이 일시적으로 제한되었습니다",
   "authErrorWeakPassword": "비밀번호가 너무 약합니다. 6자 이상으로 설정해 주세요",
   "authErrorGeneric": "문제가 발생했습니다. 다시 시도해 주세요",
-
   "deleteAccountReauthEmail": "계속하려면 비밀번호를 입력하세요",
   "deleteAccountReauthPasswordHint": "비밀번호",
   "deleteAccountError": "문제가 발생했습니다. 나중에 다시 시도해 주세요.",
@@ -864,17 +874,84 @@
   "archiveConflictCloud": "클라우드 아카이브",
   "archiveConflictKeepCloud": "클라우드 유지",
   "archiveConflictKeepLocal": "로컬 유지",
-
   "loginShowPassword": "비밀번호 표시",
   "loginHidePassword": "비밀번호 숨기기",
   "errorGeneric": "문제가 발생했어요. 나중에 다시 시도해 주세요",
   "errorCreateHabit": "습관 만들기에 실패했어요. 다시 시도해 주세요",
-
   "loginForgotPassword": "비밀번호를 잊으셨나요?",
   "loginForgotPasswordTitle": "비밀번호 재설정",
   "loginSendResetEmail": "재설정 이메일 보내기",
   "loginResetEmailSent": "비밀번호 재설정 이메일이 전송되었습니다",
   "authErrorUserDisabled": "이 계정은 비활성화되었습니다",
   "authErrorInvalidEmail": "유효한 이메일 주소를 입력하세요",
-  "authErrorRequiresRecentLogin": "계속하려면 다시 로그인하세요"
+  "authErrorRequiresRecentLogin": "계속하려면 다시 로그인하세요",
+  "commonCopyId": "ID 복사",
+  "adoptionClearDeadline": "기한 지우기",
+  "commonIdCopied": "ID 복사됨",
+  "pickerDurationLabel": "시간 선택기",
+  "pickerMinutesValue": "{count}분",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "고양이 {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, 탭하여 상호작용",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% 완료",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "활동 {count}일",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "오프라인 모드",
+  "a11yAchievementUnlocked": "업적 달성: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "체크인 완료",
+  "calendarToday": "오늘",
+  "a11yEquipToCat": "{name}에게 장착",
+  "a11yRegenerateCat": "{name} 재생성",
+  "a11yTimerDisplay": "타이머: {time}",
+  "a11yOnboardingPage": "{total}페이지 중 {current}페이지",
+  "a11yEditDisplayName": "표시 이름 편집: {name}",
+  "routeNotFound": "페이지를 찾을 수 없습니다",
+  "routeGoHome": "홈으로",
+  "a11yError": "오류",
+  "a11yDeadline": "마감일",
+  "a11yReminder": "알림",
+  "a11yFocusMeditation": "집중 명상",
+  "a11yUnlocked": "잠금 해제됨",
+  "a11ySelected": "선택됨",
+  "a11yDynamicWallpaperColor": "동적 배경화면 색상"
 }

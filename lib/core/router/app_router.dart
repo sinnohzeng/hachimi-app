@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_motion.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/screens/auth/components/email_auth_screen.dart';
 import 'package:hachimi_app/screens/auth/login_screen.dart';
 import 'package:hachimi_app/screens/home/home_screen.dart';
@@ -155,7 +156,7 @@ class _NotFoundScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Page not found',
+              context.l10n.routeNotFound,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 24),
@@ -163,7 +164,7 @@ class _NotFoundScreen extends StatelessWidget {
               onPressed: () => Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false),
-              child: const Text('Go home'),
+              child: Text(context.l10n.routeGoHome),
             ),
           ],
         ),

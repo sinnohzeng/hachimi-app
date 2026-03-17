@@ -32,7 +32,7 @@ class ErrorState extends StatelessWidget {
               Icons.error_outline,
               size: 48,
               color: colorScheme.error,
-              semanticLabel: 'Error',
+              semanticLabel: context.l10n.a11yError,
             ),
             const SizedBox(height: AppSpacing.base),
             Text(

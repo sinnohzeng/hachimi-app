@@ -44,9 +44,7 @@ class PixelDiaryEntry extends StatelessWidget {
     final pixel = context.pixel;
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: PixelBorder(
+    final entry = PixelBorder(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +94,13 @@ class PixelDiaryEntry extends StatelessWidget {
             ),
           ],
         ),
-      ),
+    );
+
+    if (onTap == null) return entry;
+
+    return Semantics(
+      button: true,
+      child: GestureDetector(onTap: onTap, child: entry),
     );
   }
 }

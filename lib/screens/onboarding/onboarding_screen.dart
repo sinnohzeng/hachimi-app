@@ -115,7 +115,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Widget _buildPageIndicator(Color activeColor, Color inactiveColor) {
     return Semantics(
-      label: 'Page ${_currentPage + 1} of $_pageCount',
+      label: context.l10n.a11yOnboardingPage(_currentPage + 1, _pageCount),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(
@@ -140,7 +140,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Page ${_currentPage + 1} of $_pageCount',
+      label: context.l10n.a11yOnboardingPage(_currentPage + 1, _pageCount),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isTablet =

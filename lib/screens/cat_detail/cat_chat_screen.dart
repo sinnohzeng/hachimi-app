@@ -175,7 +175,9 @@ class _CatChatScreenState extends ConsumerState<CatChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('💬', style: TextStyle(fontSize: AppIconSize.emoji)),
+            const ExcludeSemantics(
+              child: Text('💬', style: TextStyle(fontSize: AppIconSize.emoji)),
+            ),
             const SizedBox(height: AppSpacing.base),
             Text(
               context.l10n.chatEmptyTitle(catName),

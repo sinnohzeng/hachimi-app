@@ -150,7 +150,7 @@ class AdoptionStep2CatPreview extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             _buildCatCardBody(theme, cat, isSelected),
-            _buildRefreshButton(colorScheme, cat, index),
+            _buildRefreshButton(context, colorScheme, cat, index),
           ],
         ),
       ),
@@ -190,13 +190,14 @@ class AdoptionStep2CatPreview extends StatelessWidget {
     );
   }
 
-  Widget _buildRefreshButton(ColorScheme colorScheme, Cat cat, int index) {
+  Widget _buildRefreshButton(
+      BuildContext context, ColorScheme colorScheme, Cat cat, int index) {
     return Positioned(
       top: -6,
       right: -6,
       child: Semantics(
         button: true,
-        label: 'Regenerate ${cat.name}',
+        label: context.l10n.a11yRegenerateCat(cat.name),
         child: GestureDetector(
           onTap: () => onRegenerateCat(index),
           child: Container(

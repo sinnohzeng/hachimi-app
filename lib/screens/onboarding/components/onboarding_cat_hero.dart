@@ -75,8 +75,7 @@ class _OnboardingCatHeroState extends ConsumerState<OnboardingCatHero>
         ? sprite
         : ScaleTransition(scale: _breathScale, child: sprite);
 
-    return Semantics(
-      label: 'A pixel cat kitten',
+    return ExcludeSemantics(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

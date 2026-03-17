@@ -2493,4 +2493,107 @@ class SHi extends S {
 
   @override
   String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'ID कॉपी करें';
+
+  @override
+  String get adoptionClearDeadline => 'समय सीमा हटाएं';
+
+  @override
+  String get commonIdCopied => 'ID कॉपी हो गई';
+
+  @override
+  String get pickerDurationLabel => 'अवधि चयनकर्ता';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count मिनट';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'बिल्ली $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, बातचीत के लिए टैप करें';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '$percent% पूर्ण';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count सक्रिय दिन';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'ऑफ़लाइन मोड';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'उपलब्धि अनलॉक: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'चेक इन किया';
+
+  @override
+  String get calendarToday => 'आज';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '$name को लगाएँ';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$name पुनः बनाएँ';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'टाइमर: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '$total में से $current पेज';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'प्रदर्शन नाम संपादित करें: $name';
+  }
+
+  @override
+  String get routeNotFound => 'पेज नहीं मिला';
+
+  @override
+  String get routeGoHome => 'होम पर जाएँ';
+
+  @override
+  String get a11yError => 'त्रुटि';
+
+  @override
+  String get a11yDeadline => 'समय सीमा';
+
+  @override
+  String get a11yReminder => 'रिमाइंडर';
+
+  @override
+  String get a11yFocusMeditation => 'ध्यान';
+
+  @override
+  String get a11yUnlocked => 'अनलॉक किया गया';
+
+  @override
+  String get a11ySelected => 'चयनित';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'डायनामिक वॉलपेपर रंग';
 }

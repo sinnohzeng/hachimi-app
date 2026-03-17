@@ -168,7 +168,7 @@ class AchievementCard extends StatelessWidget {
                         Icons.check_circle,
                         color: colorScheme.primary,
                         size: 14,
-                        semanticLabel: 'Unlocked',
+                        semanticLabel: context.l10n.a11yUnlocked,
                       ),
                       const SizedBox(width: 3),
                       Text(

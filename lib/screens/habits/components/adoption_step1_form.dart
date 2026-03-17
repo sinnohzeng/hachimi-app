@@ -244,7 +244,7 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
           Icons.event,
           size: 20,
           color: colorScheme.onSurfaceVariant,
-          semanticLabel: 'Deadline',
+          semanticLabel: context.l10n.a11yDeadline,
         ),
         const SizedBox(width: AppSpacing.sm),
         Text(l10n.adoptionDeadlineLabel, style: textTheme.labelLarge),
@@ -260,7 +260,7 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
           IconButton(
             icon: const Icon(Icons.close, size: 18),
             onPressed: () => setState(() => deadlineDate = null),
-            tooltip: 'Clear deadline',
+            tooltip: l10n.adoptionClearDeadline,
             visualDensity: VisualDensity.compact,
           ),
         ] else
@@ -328,7 +328,7 @@ class AdoptionStep1FormState extends State<AdoptionStep1Form>
             Icons.notifications_active,
             size: 20,
             color: colorScheme.primary,
-            semanticLabel: 'Reminder',
+            semanticLabel: context.l10n.a11yReminder,
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(

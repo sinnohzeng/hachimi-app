@@ -1,12 +1,10 @@
 {
   "@@locale": "zh_Hant",
   "appTitle": "Hachimi",
-
   "homeTabToday": "今日",
   "homeTabCatHouse": "貓屋",
   "homeTabStats": "統計",
   "homeTabProfile": "我的",
-
   "adoptionStepDefineHabit": "設定習慣",
   "adoptionStepAdoptCat": "領養貓咪",
   "adoptionStepNameCat": "改個名字",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "貓咪名字",
   "adoptionCatNameHint": "例如：麻糬",
   "adoptionRandomNameTooltip": "隨機名字",
-
   "catHouseTitle": "貓屋",
   "catHouseEmpty": "仲未有貓咪！建立一個習慣嚟領養你第一隻貓。",
   "catHouseGrowth": "{minutes} / {target} 分鐘",
-
   "catDetailGrowthProgress": "成長進度",
   "catDetailTotalMinutes": "已專注 {minutes} 分鐘",
   "catDetailTargetMinutes": "目標：{minutes} 分鐘",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "開始專注",
   "catDetailBoundHabit": "綁定習慣",
   "catDetailStage": "階段：{stage}",
-
   "coinBalance": "{amount} 金幣",
   "coinCheckInReward": "+{amount} 金幣！",
   "coinCheckInTitle": "每日簽到",
   "coinInsufficientBalance": "金幣不足",
-
   "shopTitle": "飾品商店",
   "shopPrice": "{price} 金幣",
   "shopPurchase": "購買",
   "shopEquipped": "已裝備",
-
   "focusCompleteMinutes": "+{minutes} 分鐘",
   "focusCompleteStageUp": "階段提升！",
   "focusCompleteGreatJob": "做得好！",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "日記寫好喇！",
   "focusCompleteNotifTitle": "任務完成！",
   "focusCompleteNotifBody": "{catName} 透過 {minutes} 分鐘專注獲得咗 +{xp} XP",
-
   "stageKitten": "幼貓",
   "stageAdolescent": "少年貓",
   "stageAdult": "成年貓",
   "stageSenior": "長老貓",
-
   "migrationTitle": "資料更新",
   "migrationMessage": "Hachimi 已升級為全新嘅像素貓系統！舊嘅貓咪資料唔再兼容，請重置以體驗全新版本。",
   "migrationResetButton": "重置並開始",
-
   "sessionResumeTitle": "恢復工作階段？",
   "sessionResumeMessage": "你有一個未完成嘅專注工作階段（{habitName}，{elapsed}）。係咪恢復？",
   "sessionResumeButton": "恢復",
   "sessionDiscard": "捨棄",
-
   "todaySummaryMinutes": "今日",
   "todaySummaryTotal": "總計",
   "todaySummaryCats": "貓咪",
@@ -104,7 +93,6 @@
   "todayNoHabits": "建立你第一個習慣嚟開始啦！",
   "todayNewQuest": "新任務",
   "todayStartFocus": "開始專注",
-
   "timerStart": "開始",
   "timerPause": "暫停",
   "timerResume": "繼續",
@@ -122,7 +110,6 @@
   "giveUpMessage": "如果你已專注超過 5 分鐘，時間仍會計入貓咪嘅成長。貓咪會明白㗎！",
   "giveUpKeepGoing": "繼續努力",
   "giveUpConfirm": "放棄",
-
   "settingsTitle": "設定",
   "settingsGeneral": "一般",
   "settingsAppearance": "外觀",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "刪除帳號？",
   "deleteAccountMessage": "呢個操作會永久刪除你嘅帳號同所有資料，無法復原。",
   "deleteAccountWarning": "呢個操作無法復原",
-
   "profileTitle": "我的",
   "profileYourJourney": "你嘅旅程",
   "profileTotalFocus": "總專注",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "選擇頭像",
   "profileSaved": "資料已儲存",
   "profileSettings": "設定",
-
   "habitDetailStreak": "連續",
   "habitDetailBestStreak": "最佳",
   "habitDetailTotalMinutes": "總計",
-
   "commonCancel": "取消",
   "commonConfirm": "確認",
   "commonSave": "儲存",
@@ -182,14 +166,16 @@
   "commonLogOut": "登出",
   "commonDeleteAccount": "刪除帳號",
   "commonYes": "係",
-
   "chatDailyRemaining": "今天還可以傳送 {count} 條訊息",
   "@chatDailyRemaining": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "chatDailyLimitReached": "今日訊息額度已用完",
   "aiTemporarilyUnavailable": "AI 功能暫時無法使用",
-
   "catDetailNotFound": "搵唔到貓咪",
   "catDetailLoadError": "載入貓咪資料失敗",
   "catDetailChatTooltip": "聊天",
@@ -258,7 +244,6 @@
   "catDetailTortiePattern": "玳瑁花紋",
   "catDetailTortieColor": "玳瑁顏色",
   "catDetailSkin": "膚色",
-
   "offlineMessage": "你已離線——重新連線時會自動同步",
   "offlineModeLabel": "離線模式",
   "habitTodayMinutes": "今日：{count}分鐘",
@@ -271,35 +256,29 @@
   "accessoryEquipped": "已裝備",
   "accessoryOwned": "已擁有",
   "pickerMinUnit": "分鐘",
-
   "settingsBackgroundAnimation": "動態背景",
   "settingsBackgroundAnimationSubtitle": "流體漸層同浮動粒子效果",
-
   "settingsUiStyle": "介面風格",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "復古像素",
   "settingsUiStyleMaterialSubtitle": "現代圓角 Material 設計",
   "settingsUiStyleRetroPixelSubtitle": "溫暖的像素藝術風格",
-
   "personalityLazy": "慵懶",
   "personalityCurious": "好奇",
   "personalityPlayful": "活潑",
   "personalityShy": "怕醜",
   "personalityBrave": "勇敢",
   "personalityClingy": "痴纏",
-
   "personalityFlavorLazy": "一日要瞓 23 個鐘。剩低嗰個鐘？都係瞓。",
   "personalityFlavorCurious": "已經周圍聞嚟聞去喇！",
   "personalityFlavorPlayful": "停唔到咁追蝴蝶！",
   "personalityFlavorShy": "用咗 3 分鐘先至肯從箱入面探個頭出嚟⋯",
   "personalityFlavorBrave": "箱都未打開就跳咗出嚟！",
   "personalityFlavorClingy": "即刻開始咕嚕咕嚕，點都唔肯放手。",
-
   "moodHappy": "開心",
   "moodNeutral": "平靜",
   "moodLonely": "孤單",
   "moodMissing": "掛住你",
-
   "moodMsgLazyHappy": "喵~！係時候瞓個靚覺喇⋯",
   "moodMsgCuriousHappy": "今日我哋去探索啲咩？",
   "moodMsgPlayfulHappy": "喵~！準備好做嘢喇！",
@@ -317,14 +296,13 @@
   "moodMsgPlayfulLonely": "冇咗你，啲玩具都唔好玩⋯",
   "moodMsgShyLonely": "*靜靜咁捲埋自己*",
   "moodMsgBraveLonely": "我會繼續等。我好勇敢㗎。",
-  "moodMsgClingyLonely": "你去咗邊⋯ \uD83E\uDD7A",
+  "moodMsgClingyLonely": "你去咗邊⋯ 🥺",
   "moodMsgLazyMissing": "*滿懷期待咁擘開一隻眼*",
   "moodMsgCuriousMissing": "係咪發生咗啲咩事⋯？",
   "moodMsgPlayfulMissing": "我幫你留住咗你最鍾意嘅玩具⋯",
   "moodMsgShyMissing": "*收埋咗，但係一直望住度門*",
   "moodMsgBraveMissing": "我知你會返嚟。我相信。",
   "moodMsgClingyMissing": "好掛住你⋯ 快啲返嚟啦。",
-
   "peltTypeTabby": "經典虎斑紋",
   "peltTypeTicked": "刺鼠紋",
   "peltTypeMackerel": "鯖魚紋",
@@ -340,7 +318,6 @@
   "peltTypeBengal": "豹紋",
   "peltTypeMarbled": "大理石紋",
   "peltTypeMasked": "面罩臉",
-
   "peltColorWhite": "白色",
   "peltColorPaleGrey": "淺灰色",
   "peltColorSilver": "銀色",
@@ -360,7 +337,6 @@
   "peltColorGoldenBrown": "金棕色",
   "peltColorDarkBrown": "深棕色",
   "peltColorChocolate": "朱古力色",
-
   "eyeColorYellow": "黃色",
   "eyeColorAmber": "琥珀色",
   "eyeColorHazel": "榛色",
@@ -382,10 +358,8 @@
   "eyeColorBronze": "青銅色",
   "eyeColorSilver": "銀色",
   "eyeColorPaleYellow": "淺黃色",
-
   "eyeDescNormal": "{color}眼睛",
   "eyeDescHeterochromia": "異色瞳（{primary} / {secondary}）",
-
   "skinColorPink": "粉紅色",
   "skinColorRed": "紅色",
   "skinColorBlack": "黑色",
@@ -398,38 +372,30 @@
   "skinColorDarkSalmon": "深三文魚色",
   "skinColorSalmon": "三文魚色",
   "skinColorPeach": "桃色",
-
   "furLengthLonghair": "長毛",
   "furLengthShorthair": "短毛",
-
   "whiteTintOffwhite": "米白色調",
   "whiteTintCream": "忌廉色調",
   "whiteTintDarkCream": "深忌廉色調",
   "whiteTintGray": "灰色調",
   "whiteTintPink": "粉紅色調",
-
   "notifReminderTitle": "{catName} 掛住你！",
   "notifReminderBody": "{habitName} 嘅時間到喇——貓咪喺度等你！",
   "notifStreakTitle": "{catName} 好擔心！",
   "notifStreakBody": "你嘅 {streak} 日連續紀錄有危險。快啲嚟一次專注啦！",
   "notifEvolutionTitle": "{catName} 進化咗！",
   "notifEvolutionBody": "{catName} 成長為咗 {stageName}！繼續努力！",
-
   "durationHoursMinutes": "{hours}時{minutes}分",
-
   "diaryScreenTitle": "{name} 嘅日記",
   "diaryFailedToLoad": "載入日記失敗",
   "diaryEmptyTitle": "仲未有日記",
   "diaryEmptyHint": "完成一次專注，貓咪就會寫低第一篇日記！",
-
   "focusSetupCountdown": "倒數計時",
   "focusSetupStopwatch": "正計時",
   "focusSetupStartFocus": "開始專注",
   "focusSetupQuestNotFound": "搵唔到任務",
-
   "checkInButtonLogMore": "繼續記錄",
   "checkInButtonStart": "開始計時",
-
   "adoptionTitleFirst": "領養你第一隻貓！",
   "adoptionTitleNew": "新任務",
   "adoptionStepDefineQuest": "設定任務",
@@ -478,7 +444,6 @@
   "adoptionMotivationLabel": "備忘",
   "adoptionMotivationHint": "寫點什麼備忘...",
   "adoptionMotivationSwap": "隨機填充",
-
   "loginAppName": "Hachimi",
   "loginTagline": "養貓咪，完成任務。",
   "loginContinueGoogle": "以 Google 繼續",
@@ -498,7 +463,6 @@
   "loginCreateAccountButton": "建立帳號",
   "loginNoAccount": "仲未有帳號？",
   "loginRegister": "註冊",
-
   "checkInTitle": "每月簽到",
   "checkInDays": "日數",
   "checkInCoinsEarned": "獲得金幣",
@@ -511,7 +475,6 @@
   "checkInWeekdayReward": "{coins} 金幣/日",
   "checkInWeekend": "週末（週六、週日）",
   "checkInNDays": "{count} 日",
-
   "onboardTitle1": "認識你嘅伙伴",
   "onboardSubtitle1": "每段旅程由一隻小貓開始",
   "onboardBody1": "設定目標，領養一隻小貓。\n專注目標，睇住你嘅貓咪成長！",
@@ -524,7 +487,6 @@
   "onboardSkip": "跳過",
   "onboardLetsGo": "出發！",
   "onboardNext": "下一步",
-
   "catRoomTitle": "貓咪小屋",
   "catRoomInventory": "背包",
   "catRoomShop": "飾品商店",
@@ -541,29 +503,44 @@
   "catRoomArchive": "封存",
   "catRoomAlbumSection": "相簿（{count}）",
   "@catRoomAlbumSection": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "catRoomReactivateCat": "重新啟用",
   "catRoomReactivateTitle": "重新啟用貓咪？",
   "catRoomReactivateMessage": "將「{name}」同其綁定嘅任務恢復返貓咪小屋。",
   "@catRoomReactivateMessage": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivate": "啟用",
   "catRoomArchivedLabel": "已封存",
   "catRoomArchiveSuccess": "已封存「{name}」",
   "@catRoomArchiveSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomReactivateSuccess": "已重新啟用「{name}」",
   "@catRoomReactivateSuccess": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "catRoomArchiveError": "歸檔貓咪失敗",
   "catRoomReactivateError": "恢復貓咪失敗",
   "catRoomArchiveLoadError": "載入歸檔貓咪失敗",
   "catRoomRenameError": "重新命名貓咪失敗",
-
   "addHabitTitle": "新任務",
   "addHabitQuestName": "任務名稱",
   "addHabitQuestHint": "例如 LeetCode 練習",
@@ -574,7 +551,6 @@
   "addHabitValidNumber": "請輸入有效數字",
   "addHabitCreate": "建立任務",
   "addHabitHoursSuffix": "小時",
-
   "shopTabPlants": "植物（{count}）",
   "shopTabWild": "野生（{count}）",
   "shopTabCollars": "頸圈（{count}）",
@@ -584,7 +560,6 @@
   "shopNotEnoughCoinsButton": "金幣不足",
   "shopPurchaseSuccess": "購買成功！{name} 已加入背包",
   "shopPurchaseFailed": "金幣不足（需要 {price}）",
-
   "inventoryTitle": "背包",
   "inventoryInBox": "箱中（{count}）",
   "inventoryEmpty": "背包空空如也。\n去商店購買飾品啦！",
@@ -595,7 +570,6 @@
   "inventoryEquipTo": "將 {name} 裝備畀：",
   "inventoryEquipSuccess": "已裝備 {name}",
   "inventoryUnequipSuccess": "已從 {catName} 卸下",
-
   "chatCatNotFound": "搵唔到貓咪",
   "chatTitle": "同 {name} 傾偈",
   "chatClearHistory": "清除紀錄",
@@ -609,13 +583,11 @@
   "chatSend": "傳送",
   "chatStop": "停止",
   "chatErrorGeneric": "出了點問題，請重試",
-
   "diaryTitle": "{name} 嘅日記",
   "diaryLoadFailed": "載入日記失敗",
   "diaryRetry": "重試",
   "diaryEmptyTitle2": "仲未有日記",
   "diaryEmptySubtitle": "完成一次專注，貓咪就會寫低第一篇日記！",
-
   "statsTitle": "統計",
   "statsTotalHours": "總時數",
   "statsTimeValue": "{hours}時{minutes}分",
@@ -628,7 +600,6 @@
   "statsNoQuestData": "仲未有任務資料",
   "statsNoQuestHint": "開始一個任務嚟查看進度啦！",
   "statsLast30Days": "最近 30 日",
-
   "habitDetailQuestNotFound": "搵唔到任務",
   "habitDetailComplete": "完成",
   "habitDetailTotalTime": "總時數",
@@ -636,14 +607,12 @@
   "habitDetailTarget": "目標",
   "habitDetailDaysUnit": "{count} 日",
   "habitDetailHoursUnit": "{count} 小時",
-
   "checkInBannerSuccess": "+{coins} 金幣！每日簽到完成",
   "checkInBannerBonus": " + {bonus} 里程碑獎勵！",
   "checkInBannerSemantics": "每日簽到",
   "checkInBannerLoading": "載入簽到狀態⋯",
   "checkInBannerPrompt": "簽到領 +{coins} 金幣",
   "checkInBannerSummary": "{count}/{total} 日  ·  今日 +{coins}",
-
   "commonErrorWithDetail": "錯誤：{error}",
   "profileFallbackUser": "用戶",
   "fallbackCatName": "貓咪",
@@ -660,10 +629,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "專注中…",
   "notifInProgress": "正在專注",
-
   "unitMinShort": "分鐘",
   "unitHourShort": "小時",
   "weekdayMon": "一",
@@ -683,11 +650,19 @@
   "historyFilterAll": "全部",
   "historySessionCount": "{count} 次專注",
   "@historySessionCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "historyTotalMinutes": "{minutes} 分鐘",
   "@historyTotalMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "historyNoSessions": "還沒有專注紀錄",
   "historyNoSessionsHint": "完成一次專注就能在這裡看到紀錄",
@@ -703,7 +678,6 @@
   "historySelectMonth": "選擇月份",
   "historyAllMonths": "全部月份",
   "historyAllHabits": "全部",
-
   "homeTabAchievements": "成就",
   "achievementTitle": "成就",
   "achievementTabOverview": "概覽",
@@ -714,11 +688,19 @@
   "achievementSummaryTitle": "成就進度",
   "achievementUnlockedCount": "已解鎖 {count} 個",
   "@achievementUnlockedCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "achievementTotalCoins": "共獲 {coins} 金幣",
   "@achievementTotalCoins": {
-    "placeholders": { "coins": { "type": "int" } }
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
   },
   "achievementUnlocked": "成就解鎖！",
   "achievementAwesome": "太棒了！",
@@ -727,20 +709,26 @@
   "achievementHiddenDesc": "這是一個隱藏成就",
   "achievementPersistDesc": "累計打卡 {days} 天",
   "@achievementPersistDesc": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "achievementTitleCount": "已解鎖 {count} 個稱號",
   "@achievementTitleCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "growthPathTitle": "成長之路",
   "growthPathKitten": "開始新的旅程",
   "growthPathAdolescent": "初步入門，建立基礎",
   "growthPathAdult": "技能鞏固，完成一個項目",
   "growthPathSenior": "深度投入，持續精進",
   "growthPathTip": "研究表明，20 小時的專注練習足以建立一項新技能的基礎 —— Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} 金幣",
   "achievementCelebrationTitle": "獲得稱號：{title}",
   "achievementCelebrationDismiss": "太棒了！",
@@ -749,7 +737,6 @@
   "achievementUnlockedAt": "解鎖於 {date}",
   "achievementLocked": "尚未解鎖",
   "achievementRewardCoins": "+{count} 金幣",
-
   "reminderModeDaily": "每天",
   "reminderModeWeekdays": "工作日",
   "reminderModeMonday": "週一",
@@ -767,13 +754,20 @@
   "reminderConfirm": "確認",
   "reminderNotificationTitle": "{catName}想你了！",
   "@reminderNotificationTitle": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "reminderNotificationBody": "{habitName}的時間到了，你的貓咪在等你！",
   "@reminderNotificationBody": {
-    "placeholders": { "habitName": { "type": "String" } }
+    "placeholders": {
+      "habitName": {
+        "type": "String"
+      }
+    }
   },
-
   "deleteAccountDataWarning": "以下所有資料將被永久刪除：",
   "deleteAccountQuests": "任務",
   "deleteAccountCats": "貓咪",
@@ -785,28 +779,43 @@
   "deleteAccountAuthCancelled": "認證已取消",
   "deleteAccountAuthFailed": "認證失敗：{error}",
   "@deleteAccountAuthFailed": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "deleteAccountProgress": "正在刪除帳號...",
   "deleteAccountSuccess": "帳號已刪除",
-
   "drawerGuestLoginSubtitle": "同步資料，解鎖 AI 功能",
   "drawerGuestSignIn": "登入",
   "drawerMilestones": "里程碑",
   "drawerMilestoneFocus": "累計專注：{hours}h {minutes}m",
   "@drawerMilestoneFocus": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "drawerMilestoneCats": "貓咪家族：{count} 隻",
   "@drawerMilestoneCats": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMilestoneQuests": "進行中任務：{count} 個",
   "@drawerMilestoneQuests": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "drawerMySection": "我的",
   "drawerSessionHistory": "專注歷史",
@@ -815,24 +824,28 @@
   "settingsResetData": "清除所有資料",
   "settingsResetDataTitle": "清除所有資料？",
   "settingsResetDataMessage": "此操作將刪除所有本地資料並返回歡迎頁面，且無法撤銷。",
-
   "guestUpgradeTitle": "保護你的資料",
   "guestUpgradeMessage": "關聯帳號可備份進度、解鎖 AI 日記和聊天功能，並在多裝置間同步。",
   "guestUpgradeLinkButton": "關聯帳號",
   "guestUpgradeLater": "以後再說",
-
   "loginLinkTagline": "關聯帳號以保護你的資料",
-
   "aiTeaserTitle": "貓貓日記",
   "aiTeaserPreview": "今天和主人一起學習了…{catName}覺得自己又變聰明了喵~",
   "@aiTeaserPreview": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
   "aiTeaserCta": "關聯帳號，看看{catName}想說什麼",
   "@aiTeaserCta": {
-    "placeholders": { "catName": { "type": "String" } }
+    "placeholders": {
+      "catName": {
+        "type": "String"
+      }
+    }
   },
-
   "authErrorEmailInUse": "該電郵已被註冊",
   "authErrorWrongPassword": "電郵或密碼不正確",
   "authErrorUserNotFound": "未找到該電郵對應的帳號",
@@ -841,7 +854,6 @@
   "authErrorAdminRestricted": "登入暫時受限",
   "authErrorWeakPassword": "密碼強度不足，至少需要 6 個字元",
   "authErrorGeneric": "出了點問題，請重試",
-
   "deleteAccountReauthEmail": "輸入密碼以繼續",
   "deleteAccountReauthPasswordHint": "密碼",
   "deleteAccountError": "出了點問題，稍後再試",
@@ -860,12 +872,10 @@
   "archiveConflictCloud": "雲端存檔",
   "archiveConflictKeepCloud": "保留雲端",
   "archiveConflictKeepLocal": "保留本機",
-
   "loginShowPassword": "顯示密碼",
   "loginHidePassword": "隱藏密碼",
   "errorGeneric": "出了點問題，稍後再試",
   "errorCreateHabit": "建立習慣失敗，請重試",
-
   "loginForgotPassword": "忘記密碼？",
   "loginForgotPasswordTitle": "重置密碼",
   "loginSendResetEmail": "發送重置郵件",
@@ -873,8 +883,75 @@
   "authErrorUserDisabled": "此帳號已被停用",
   "authErrorInvalidEmail": "請輸入有效的電子郵件地址",
   "authErrorRequiresRecentLogin": "請重新登錄後繼續",
-  "chatSend": "傳送",
-  "chatStop": "停止",
   "chatErrorMessage": "傳送失敗，點擊重試",
-  "chatRetry": "重試"
+  "chatRetry": "重試",
+  "commonCopyId": "複製 ID",
+  "adoptionClearDeadline": "清除截止日期",
+  "commonIdCopied": "ID 已複製",
+  "pickerDurationLabel": "時長選擇器",
+  "pickerMinutesValue": "{count} 分鐘",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "貓咪 {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}，點擊互動",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "已完成 {percent}%",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} 個活躍日",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "離線模式",
+  "a11yAchievementUnlocked": "成就解鎖：{name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "已簽到",
+  "calendarToday": "今天",
+  "a11yEquipToCat": "裝備給{name}",
+  "a11yRegenerateCat": "重新生成{name}",
+  "a11yTimerDisplay": "計時器：{time}",
+  "a11yOnboardingPage": "第 {current} 頁，共 {total} 頁",
+  "a11yEditDisplayName": "編輯顯示名：{name}",
+  "routeNotFound": "頁面未找到",
+  "routeGoHome": "返回首頁",
+  "a11yError": "錯誤",
+  "a11yDeadline": "截止日期",
+  "a11yReminder": "提醒",
+  "a11yFocusMeditation": "專注冥想",
+  "a11yUnlocked": "已解鎖",
+  "a11ySelected": "已選中",
+  "a11yDynamicWallpaperColor": "動態桌布顏色"
 }

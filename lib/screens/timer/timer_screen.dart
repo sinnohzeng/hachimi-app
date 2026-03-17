@@ -470,6 +470,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
               ),
             ),
             SafeArea(
+              child: FocusTraversalGroup(
               child: Column(
                 children: [
                   if (_showPermissionBanner) _buildPermissionBanner(),
@@ -489,6 +490,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   ),
                   _buildGraceOrGiveUp(timerState, inGracePeriod, theme),
                 ],
+              ),
               ),
             ),
           ],
@@ -549,7 +551,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
                   const Icon(Icons.calendar_today, size: 14),
                   const SizedBox(width: 2),
                   Text(
-                    '${habit.totalCheckInDays}d',
+                    context.l10n.habitDetailDaysUnit(habit.totalCheckInDays),
                     style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -587,7 +589,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
               Icons.self_improvement,
               size: 64,
               color: colorScheme.onSurfaceVariant,
-              semanticLabel: 'Focus meditation',
+              semanticLabel: context.l10n.a11yFocusMeditation,
             ),
         ],
       ),
@@ -601,7 +603,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen>
     return Column(
       children: [
         Semantics(
-          label: 'Timer: ${timerState.displayTime}',
+          label: context.l10n.a11yTimerDisplay(timerState.displayTime),
           liveRegion: true,
           child: Text(
             timerState.displayTime,

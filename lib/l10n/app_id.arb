@@ -1,12 +1,10 @@
 {
   "@@locale": "id",
   "appTitle": "Hachimi",
-
   "homeTabToday": "Hari Ini",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "Statistik",
   "homeTabProfile": "Profil",
-
   "adoptionStepDefineHabit": "Tentukan Kebiasaan",
   "adoptionStepAdoptCat": "Adopsi Kucing",
   "adoptionStepNameCat": "Beri Nama Kucing",
@@ -26,11 +24,9 @@
   "adoptionCatNameLabel": "Nama kucing",
   "adoptionCatNameHint": "mis. Mochi",
   "adoptionRandomNameTooltip": "Nama acak",
-
   "catHouseTitle": "CatHouse",
   "catHouseEmpty": "Belum ada kucing! Buat kebiasaan untuk mengadopsi kucing pertamamu.",
   "catHouseGrowth": "{minutes} / {target} mnt",
-
   "catDetailGrowthProgress": "Progres Pertumbuhan",
   "catDetailTotalMinutes": "{minutes} mnt fokus",
   "catDetailTargetMinutes": "Target: {minutes} mnt",
@@ -39,17 +35,14 @@
   "catDetailStartFocus": "Mulai Fokus",
   "catDetailBoundHabit": "Kebiasaan Terkait",
   "catDetailStage": "Tahap: {stage}",
-
   "coinBalance": "{amount} koin",
   "coinCheckInReward": "+{amount} koin!",
   "coinCheckInTitle": "Absen Harian",
   "coinInsufficientBalance": "Koin tidak cukup",
-
   "shopTitle": "Toko Aksesori",
   "shopPrice": "{price} koin",
   "shopPurchase": "Beli",
   "shopEquipped": "Dipakai",
-
   "focusCompleteMinutes": "+{minutes} mnt",
   "focusCompleteStageUp": "Naik Tahap!",
   "focusCompleteGreatJob": "Kerja bagus!",
@@ -71,21 +64,17 @@
   "focusCompleteDiaryWritten": "Diari sudah ditulis!",
   "focusCompleteNotifTitle": "Misi selesai!",
   "focusCompleteNotifBody": "{catName} mendapat +{xp} XP dari {minutes} mnt fokus",
-
   "stageKitten": "Anak Kucing",
   "stageAdolescent": "Remaja",
   "stageAdult": "Dewasa",
   "stageSenior": "Senior",
-
   "migrationTitle": "Pembaruan Data Diperlukan",
   "migrationMessage": "Hachimi telah diperbarui dengan sistem kucing piksel baru! Data kucing lama kamu tidak lagi kompatibel. Silakan reset untuk memulai pengalaman baru.",
   "migrationResetButton": "Reset & Mulai Baru",
-
   "sessionResumeTitle": "Lanjutkan sesi?",
   "sessionResumeMessage": "Kamu punya sesi fokus aktif ({habitName}, {elapsed}). Lanjutkan?",
   "sessionResumeButton": "Lanjutkan",
   "sessionDiscard": "Buang",
-
   "todaySummaryMinutes": "Hari Ini",
   "todaySummaryTotal": "Total",
   "todaySummaryCats": "Kucing",
@@ -104,7 +93,6 @@
   "todayNoHabits": "Buat kebiasaan pertamamu untuk memulai!",
   "todayNewQuest": "Misi baru",
   "todayStartFocus": "Mulai fokus",
-
   "timerStart": "Mulai",
   "timerPause": "Jeda",
   "timerResume": "Lanjut",
@@ -122,7 +110,6 @@
   "giveUpMessage": "Jika kamu sudah fokus setidaknya 5 menit, waktu tersebut tetap dihitung untuk pertumbuhan kucingmu. Kucingmu pasti mengerti!",
   "giveUpKeepGoing": "Lanjutkan",
   "giveUpConfirm": "Menyerah",
-
   "settingsTitle": "Pengaturan",
   "settingsGeneral": "Umum",
   "settingsAppearance": "Tampilan",
@@ -150,7 +137,6 @@
   "deleteAccountTitle": "Hapus akun?",
   "deleteAccountMessage": "Ini akan menghapus akun dan semua datamu secara permanen. Tindakan ini tidak bisa dibatalkan.",
   "deleteAccountWarning": "Tindakan ini tidak bisa dibatalkan",
-
   "profileTitle": "Profil",
   "profileYourJourney": "Perjalananmu",
   "profileTotalFocus": "Total Fokus",
@@ -161,11 +147,9 @@
   "profileChooseAvatar": "Pilih avatar",
   "profileSaved": "Profil disimpan",
   "profileSettings": "Pengaturan",
-
   "habitDetailStreak": "Beruntun",
   "habitDetailBestStreak": "Terbaik",
   "habitDetailTotalMinutes": "Total",
-
   "commonCancel": "Batal",
   "commonConfirm": "Konfirmasi",
   "commonSave": "Simpan",
@@ -182,11 +166,9 @@
   "commonLogOut": "Keluar",
   "commonDeleteAccount": "Hapus Akun",
   "commonYes": "Ya",
-
   "chatDailyRemaining": "{count} pesan tersisa hari ini",
   "chatDailyLimitReached": "Batas pesan harian tercapai",
   "aiTemporarilyUnavailable": "Fitur AI sementara tidak tersedia",
-
   "catDetailNotFound": "Kucing tidak ditemukan",
   "catDetailLoadError": "Gagal memuat data kucing",
   "catDetailChatTooltip": "Obrolan",
@@ -255,7 +237,6 @@
   "catDetailTortiePattern": "Pola tortie",
   "catDetailTortieColor": "Warna tortie",
   "catDetailSkin": "Kulit",
-
   "offlineMessage": "Kamu sedang offline — perubahan akan disinkronkan saat terhubung kembali",
   "offlineModeLabel": "Mode offline",
   "habitTodayMinutes": "Hari ini: {count} mnt",
@@ -268,35 +249,29 @@
   "accessoryEquipped": "Dipakai",
   "accessoryOwned": "Dimiliki",
   "pickerMinUnit": "mnt",
-
   "settingsBackgroundAnimation": "Animasi latar belakang",
   "settingsBackgroundAnimationSubtitle": "Gradien mesh dan partikel melayang",
-
   "settingsUiStyle": "Gaya UI",
   "settingsUiStyleMaterial": "Material 3",
   "settingsUiStyleRetroPixel": "Retro Piksel",
   "settingsUiStyleMaterialSubtitle": "Desain Material modern dan bulat",
   "settingsUiStyleRetroPixelSubtitle": "Estetika pixel art yang hangat",
-
   "personalityLazy": "Pemalas",
   "personalityCurious": "Penasaran",
   "personalityPlayful": "Suka Bermain",
   "personalityShy": "Pemalu",
   "personalityBrave": "Pemberani",
   "personalityClingy": "Manja",
-
   "personalityFlavorLazy": "Akan tidur 23 jam sehari. Jam sisanya? Juga tidur.",
   "personalityFlavorCurious": "Sudah mengendus-endus segala sesuatu!",
   "personalityFlavorPlayful": "Tidak bisa berhenti mengejar kupu-kupu!",
   "personalityFlavorShy": "Butuh 3 menit untuk mengintip dari dalam kotak...",
   "personalityFlavorBrave": "Lompat keluar dari kotak sebelum dibuka!",
   "personalityFlavorClingy": "Langsung mendengkur dan tidak mau lepas.",
-
   "moodHappy": "Senang",
   "moodNeutral": "Netral",
   "moodLonely": "Kesepian",
   "moodMissing": "Merindukanmu",
-
   "moodMsgLazyHappy": "Nya~! Saatnya tidur siang yang layak...",
   "moodMsgCuriousHappy": "Hari ini kita jelajahi apa?",
   "moodMsgPlayfulHappy": "Nya~! Siap bekerja!",
@@ -314,14 +289,13 @@
   "moodMsgPlayfulLonely": "Mainan tidak seru tanpamu...",
   "moodMsgShyLonely": "*meringkuk diam-diam*",
   "moodMsgBraveLonely": "Aku akan terus menunggu. Aku pemberani.",
-  "moodMsgClingyLonely": "Kamu ke mana... \uD83E\uDD7A",
+  "moodMsgClingyLonely": "Kamu ke mana... 🥺",
   "moodMsgLazyMissing": "*membuka satu mata dengan harap*",
   "moodMsgCuriousMissing": "Ada sesuatu yang terjadi...?",
   "moodMsgPlayfulMissing": "Aku simpan mainan favoritmu...",
   "moodMsgShyMissing": "*bersembunyi, tapi mengawasi pintu*",
   "moodMsgBraveMissing": "Aku tahu kamu akan kembali. Aku percaya.",
   "moodMsgClingyMissing": "Aku sangat merindukanmu... tolong kembali.",
-
   "peltTypeTabby": "Garis tabby klasik",
   "peltTypeTicked": "Pola agouti ticked",
   "peltTypeMackerel": "Tabby mackerel",
@@ -337,7 +311,6 @@
   "peltTypeBengal": "Pola bengal",
   "peltTypeMarbled": "Pola marmer",
   "peltTypeMasked": "Wajah bertopeng",
-
   "peltColorWhite": "Putih",
   "peltColorPaleGrey": "Abu-abu pucat",
   "peltColorSilver": "Perak",
@@ -357,7 +330,6 @@
   "peltColorGoldenBrown": "Cokelat emas",
   "peltColorDarkBrown": "Cokelat gelap",
   "peltColorChocolate": "Cokelat tua",
-
   "eyeColorYellow": "Kuning",
   "eyeColorAmber": "Amber",
   "eyeColorHazel": "Hazel",
@@ -379,10 +351,8 @@
   "eyeColorBronze": "Perunggu",
   "eyeColorSilver": "Perak",
   "eyeColorPaleYellow": "Kuning pucat",
-
   "eyeDescNormal": "Mata {color}",
   "eyeDescHeterochromia": "Heterokromia ({primary} / {secondary})",
-
   "skinColorPink": "Merah muda",
   "skinColorRed": "Merah",
   "skinColorBlack": "Hitam",
@@ -395,38 +365,30 @@
   "skinColorDarkSalmon": "Salmon gelap",
   "skinColorSalmon": "Salmon",
   "skinColorPeach": "Peach",
-
   "furLengthLonghair": "Bulu panjang",
   "furLengthShorthair": "Bulu pendek",
-
   "whiteTintOffwhite": "Warna off-white",
   "whiteTintCream": "Warna krem",
   "whiteTintDarkCream": "Warna krem gelap",
   "whiteTintGray": "Warna abu-abu",
   "whiteTintPink": "Warna merah muda",
-
   "notifReminderTitle": "{catName} merindukanmu!",
   "notifReminderBody": "Waktunya {habitName} — kucingmu menunggu!",
   "notifStreakTitle": "{catName} khawatir!",
   "notifStreakBody": "Rekor beruntun {streak} harimu terancam. Sesi singkat bisa menyelamatkannya!",
   "notifEvolutionTitle": "{catName} berevolusi!",
   "notifEvolutionBody": "{catName} tumbuh menjadi {stageName}! Terus pertahankan!",
-
   "durationHoursMinutes": "{hours}j {minutes}m",
-
   "diaryScreenTitle": "Diari {name}",
   "diaryFailedToLoad": "Gagal memuat diari",
   "diaryEmptyTitle": "Belum ada catatan diari",
   "diaryEmptyHint": "Selesaikan sesi fokus dan kucingmu akan menulis catatan diari pertamanya!",
-
   "focusSetupCountdown": "Hitung Mundur",
   "focusSetupStopwatch": "Stopwatch",
   "focusSetupStartFocus": "Mulai Fokus",
   "focusSetupQuestNotFound": "Misi tidak ditemukan",
-
   "checkInButtonLogMore": "Catat lebih banyak waktu",
   "checkInButtonStart": "Mulai timer",
-
   "adoptionTitleFirst": "Adopsi Kucing Pertamamu!",
   "adoptionTitleNew": "Misi Baru",
   "adoptionStepDefineQuest": "Tentukan Misi",
@@ -463,7 +425,6 @@
   "adoptionValidQuestName": "Masukkan nama misi",
   "adoptionValidCatName": "Beri nama kucingmu",
   "adoptionError": "Error: {message}",
-
   "adoptionBasicInfo": "Info dasar",
   "adoptionGoals": "Target",
   "adoptionUnlimitedMode": "Mode tanpa batas",
@@ -476,7 +437,6 @@
   "adoptionMotivationLabel": "Catatan",
   "adoptionMotivationHint": "Tulis catatan...",
   "adoptionMotivationSwap": "Isi acak",
-
   "loginAppName": "Hachimi",
   "loginTagline": "Pelihara kucing. Selesaikan misi.",
   "loginContinueGoogle": "Lanjutkan dengan Google",
@@ -496,7 +456,6 @@
   "loginCreateAccountButton": "Buat Akun",
   "loginNoAccount": "Belum punya akun? ",
   "loginRegister": "Daftar",
-
   "checkInTitle": "Absen Bulanan",
   "checkInDays": "Hari",
   "checkInCoinsEarned": "Koin diperoleh",
@@ -509,7 +468,6 @@
   "checkInWeekdayReward": "{coins} koin/hari",
   "checkInWeekend": "Akhir pekan (Sab–Min)",
   "checkInNDays": "{count} hari",
-
   "onboardTitle1": "Temui Pendampingmu",
   "onboardSubtitle1": "Setiap misi dimulai dengan anak kucing",
   "onboardBody1": "Tetapkan tujuan dan adopsi anak kucing.\nFokus padanya, dan saksikan kucingmu tumbuh!",
@@ -522,7 +480,6 @@
   "onboardSkip": "Lewati",
   "onboardLetsGo": "Ayo Mulai!",
   "onboardNext": "Lanjut",
-
   "catRoomTitle": "CatHouse",
   "catRoomInventory": "Inventaris",
   "catRoomShop": "Toko Aksesori",
@@ -549,7 +506,6 @@
   "catRoomReactivateError": "Gagal mengaktifkan kembali kucing",
   "catRoomArchiveLoadError": "Gagal memuat kucing yang diarsipkan",
   "catRoomRenameError": "Gagal mengganti nama kucing",
-
   "addHabitTitle": "Misi Baru",
   "addHabitQuestName": "Nama misi",
   "addHabitQuestHint": "mis. Latihan LeetCode",
@@ -560,7 +516,6 @@
   "addHabitValidNumber": "Masukkan angka yang valid",
   "addHabitCreate": "Buat Misi",
   "addHabitHoursSuffix": "jam",
-
   "shopTabPlants": "Tanaman ({count})",
   "shopTabWild": "Liar ({count})",
   "shopTabCollars": "Kalung ({count})",
@@ -570,7 +525,6 @@
   "shopNotEnoughCoinsButton": "Koin tidak cukup",
   "shopPurchaseSuccess": "Berhasil dibeli! {name} ditambahkan ke inventaris",
   "shopPurchaseFailed": "Koin tidak cukup (butuh {price})",
-
   "inventoryTitle": "Inventaris",
   "inventoryInBox": "Di Kotak ({count})",
   "inventoryEmpty": "Inventarismu kosong.\nKunjungi toko untuk mendapatkan aksesori!",
@@ -581,7 +535,6 @@
   "inventoryEquipTo": "Pasang {name} ke:",
   "inventoryEquipSuccess": "{name} dipasang",
   "inventoryUnequipSuccess": "Dilepas dari {catName}",
-
   "chatCatNotFound": "Kucing tidak ditemukan",
   "chatTitle": "Obrolan dengan {name}",
   "chatClearHistory": "Hapus riwayat",
@@ -592,20 +545,16 @@
   "chatClearConfirmTitle": "Hapus riwayat obrolan?",
   "chatClearConfirmMessage": "Ini akan menghapus semua pesan. Tindakan ini tidak bisa dibatalkan.",
   "chatClearButton": "Hapus",
-  "chatSend": "Send",
-  "chatStop": "Stop",
-  "chatErrorMessage": "Failed to send message. Tap to retry.",
-  "chatRetry": "Retry",
   "chatSend": "Kirim",
   "chatStop": "Berhenti",
+  "chatErrorMessage": "Failed to send message. Tap to retry.",
+  "chatRetry": "Retry",
   "chatErrorGeneric": "Terjadi kesalahan. Coba lagi.",
-
   "diaryTitle": "Diari {name}",
   "diaryLoadFailed": "Gagal memuat diari",
   "diaryRetry": "Coba Lagi",
   "diaryEmptyTitle2": "Belum ada catatan diari",
   "diaryEmptySubtitle": "Selesaikan sesi fokus dan kucingmu akan menulis catatan diari pertamanya!",
-
   "statsTitle": "Statistik",
   "statsTotalHours": "Total Jam",
   "statsTimeValue": "{hours}j {minutes}m",
@@ -618,7 +567,6 @@
   "statsNoQuestData": "Belum ada data misi",
   "statsNoQuestHint": "Mulai misi untuk melihat progresmu di sini!",
   "statsLast30Days": "30 Hari Terakhir",
-
   "habitDetailQuestNotFound": "Misi tidak ditemukan",
   "habitDetailComplete": "selesai",
   "habitDetailTotalTime": "Total Waktu",
@@ -626,14 +574,12 @@
   "habitDetailTarget": "Target",
   "habitDetailDaysUnit": "{count} hari",
   "habitDetailHoursUnit": "{count} jam",
-
   "checkInBannerSuccess": "+{coins} koin! Absen harian selesai",
   "checkInBannerBonus": " + {bonus} bonus pencapaian!",
   "checkInBannerSemantics": "Absen harian",
   "checkInBannerLoading": "Memuat status absen...",
   "checkInBannerPrompt": "Absen untuk +{coins} koin",
   "checkInBannerSummary": "{count}/{total} hari  ·  +{coins} hari ini",
-
   "commonErrorWithDetail": "Error: {error}",
   "profileFallbackUser": "Pengguna",
   "fallbackCatName": "Kucing",
@@ -650,10 +596,8 @@
   "settingsLanguageVietnamese": "Tiếng Việt",
   "settingsLanguageIndonesian": "Bahasa Indonesia",
   "settingsLanguageTurkish": "Türkçe",
-
   "notifFocusing": "sedang fokus...",
   "notifInProgress": "Sesi fokus sedang berlangsung",
-
   "unitMinShort": "mnt",
   "unitHourShort": "j",
   "weekdayMon": "Sen",
@@ -687,7 +631,6 @@
   "historySelectMonth": "Pilih bulan",
   "historyAllMonths": "Semua bulan",
   "historyAllHabits": "Semua",
-
   "homeTabAchievements": "Pencapaian",
   "achievementTitle": "Pencapaian",
   "achievementTabOverview": "Ringkasan",
@@ -705,14 +648,12 @@
   "achievementHiddenDesc": "Ini adalah pencapaian tersembunyi",
   "achievementPersistDesc": "Kumpulkan {days} hari absen di misi mana pun",
   "achievementTitleCount": "{count} gelar terbuka",
-
   "growthPathTitle": "Jalur Pertumbuhan",
   "growthPathKitten": "Mulai perjalanan baru",
   "growthPathAdolescent": "Bangun fondasi awal",
   "growthPathAdult": "Keterampilan menguat",
   "growthPathSenior": "Penguasaan mendalam",
   "growthPathTip": "Riset menunjukkan bahwa 20 jam latihan terfokus cukup untuk membangun fondasi keterampilan baru — Josh Kaufman",
-
   "achievementCelebrationCoins": "+{count} koin",
   "achievementCelebrationTitle": "Gelar diperoleh: {title}",
   "achievementCelebrationDismiss": "Keren!",
@@ -721,7 +662,6 @@
   "achievementUnlockedAt": "Terbuka pada {date}",
   "achievementLocked": "Belum terbuka",
   "achievementRewardCoins": "+{count} koin",
-
   "reminderModeDaily": "Setiap hari",
   "reminderModeWeekdays": "Hari kerja",
   "reminderModeMonday": "Senin",
@@ -739,7 +679,6 @@
   "reminderConfirm": "Konfirmasi",
   "reminderNotificationTitle": "{catName} merindukanmu!",
   "reminderNotificationBody": "Waktunya {habitName} — kucingmu menunggu!",
-
   "deleteAccountDataWarning": "Semua data berikut akan dihapus secara permanen:",
   "deleteAccountQuests": "Misi",
   "deleteAccountCats": "Kucing",
@@ -752,7 +691,6 @@
   "deleteAccountAuthFailed": "Autentikasi gagal: {error}",
   "deleteAccountProgress": "Menghapus akun...",
   "deleteAccountSuccess": "Akun dihapus",
-
   "drawerGuestLoginSubtitle": "Sinkronkan data dan buka fitur AI",
   "drawerGuestSignIn": "Masuk",
   "drawerMilestones": "Pencapaian",
@@ -766,18 +704,14 @@
   "settingsResetData": "Reset semua data",
   "settingsResetDataTitle": "Reset semua data?",
   "settingsResetDataMessage": "Ini akan menghapus semua data lokal dan kembali ke layar selamat datang. Tindakan ini tidak bisa dibatalkan.",
-
   "guestUpgradeTitle": "Lindungi datamu",
   "guestUpgradeMessage": "Tautkan akun untuk mencadangkan progresmu, membuka fitur diari dan obrolan AI, serta sinkronisasi antar perangkat.",
   "guestUpgradeLinkButton": "Tautkan akun",
   "guestUpgradeLater": "Nanti saja",
-
   "loginLinkTagline": "Tautkan akun untuk melindungi datamu",
-
   "aiTeaserTitle": "Diari kucing",
   "aiTeaserPreview": "Hari ini aku belajar lagi dengan manusiaku... {catName} merasa makin pintar setiap hari~",
   "aiTeaserCta": "Tautkan akun untuk melihat apa yang ingin {catName} katakan",
-
   "authErrorEmailInUse": "Email ini sudah terdaftar",
   "authErrorWrongPassword": "Email atau kata sandi salah",
   "authErrorUserNotFound": "Tidak ada akun dengan email ini",
@@ -786,7 +720,6 @@
   "authErrorAdminRestricted": "Login sementara dibatasi",
   "authErrorWeakPassword": "Kata sandi terlalu lemah. Gunakan minimal 6 karakter",
   "authErrorGeneric": "Terjadi kesalahan. Coba lagi",
-
   "deleteAccountReauthEmail": "Masukkan kata sandi untuk melanjutkan",
   "deleteAccountReauthPasswordHint": "Kata sandi",
   "deleteAccountError": "Terjadi kesalahan. Coba lagi nanti.",
@@ -805,17 +738,84 @@
   "archiveConflictCloud": "Arsip cloud",
   "archiveConflictKeepCloud": "Simpan cloud",
   "archiveConflictKeepLocal": "Simpan lokal",
-
   "loginShowPassword": "Tampilkan kata sandi",
   "loginHidePassword": "Sembunyikan kata sandi",
   "errorGeneric": "Terjadi kesalahan. Coba lagi nanti",
   "errorCreateHabit": "Gagal membuat kebiasaan. Coba lagi",
-
   "loginForgotPassword": "Forgot password?",
   "loginForgotPasswordTitle": "Reset password",
   "loginSendResetEmail": "Send reset email",
   "loginResetEmailSent": "Password reset email sent. Check your inbox",
   "authErrorUserDisabled": "This account has been disabled",
   "authErrorInvalidEmail": "Please enter a valid email address",
-  "authErrorRequiresRecentLogin": "Please log in again to continue"
+  "authErrorRequiresRecentLogin": "Please log in again to continue",
+  "commonCopyId": "Salin ID",
+  "adoptionClearDeadline": "Hapus tenggat",
+  "commonIdCopied": "ID disalin",
+  "pickerDurationLabel": "Pemilih durasi",
+  "pickerMinutesValue": "{count} menit",
+  "@pickerMinutesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yCatImage": "Kucing {name}",
+  "@a11yCatImage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yCatTapToInteract": "{name}, ketuk untuk berinteraksi",
+  "@a11yCatTapToInteract": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yProgressPercent": "{percent}% selesai",
+  "@a11yProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yStreakActiveDays": "{count} hari aktif",
+  "@a11yStreakActiveDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "a11yOfflineStatus": "Mode offline",
+  "a11yAchievementUnlocked": "Pencapaian terbuka: {name}",
+  "@a11yAchievementUnlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarCheckedIn": "sudah absen",
+  "calendarToday": "hari ini",
+  "a11yEquipToCat": "Pasang ke {name}",
+  "a11yRegenerateCat": "Buat ulang {name}",
+  "a11yTimerDisplay": "Timer: {time}",
+  "a11yOnboardingPage": "Halaman {current} dari {total}",
+  "a11yEditDisplayName": "Edit nama tampilan: {name}",
+  "routeNotFound": "Halaman tidak ditemukan",
+  "routeGoHome": "Ke beranda",
+  "a11yError": "Error",
+  "a11yDeadline": "Tenggat",
+  "a11yReminder": "Pengingat",
+  "a11yFocusMeditation": "Meditasi fokus",
+  "a11yUnlocked": "Terbuka",
+  "a11ySelected": "Dipilih",
+  "a11yDynamicWallpaperColor": "Warna wallpaper dinamis"
 }

@@ -1,5 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/core/constants/cat_constants.dart';
@@ -126,6 +127,17 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
     Future.delayed(AppMotion.durationMedium1, () {
       if (mounted) _statsController.forward();
     });
+
+    // 无障碍播报完成摘要
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final l10n = context.l10n;
+      final message = widget.isAbandoned
+          ? l10n.focusCompleteItsOkay
+          : l10n.focusCompleteFocusedFor(widget.minutes);
+      SemanticsService.sendAnnouncement(
+          View.of(context), message, Directionality.of(context));
+    });
   }
 
   /// Trigger vibration pattern + confetti based on completion status.
@@ -226,11 +238,13 @@ class _FocusCompleteScreenState extends ConsumerState<FocusCompleteScreen>
                     const Spacer(),
 
                     // Status emoji with scale-up animation
-                    ScaleTransition(
-                      scale: _emojiScale,
-                      child: Text(
-                        widget.isAbandoned ? '🤗' : (didStageUp ? '🎉' : '✨'),
-                        style: const TextStyle(fontSize: AppIconSize.emoji),
+                    ExcludeSemantics(
+                      child: ScaleTransition(
+                        scale: _emojiScale,
+                        child: Text(
+                          widget.isAbandoned ? '🤗' : (didStageUp ? '🎉' : '✨'),
+                          style: const TextStyle(fontSize: AppIconSize.emoji),
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.base),

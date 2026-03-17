@@ -363,7 +363,8 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   size: 16,
                   color: colorScheme.onTertiaryContainer,
                 ),
-                label: Text('${habit.totalCheckInDays}d'),
+                label: Text(
+                    context.l10n.habitDetailDaysUnit(habit.totalCheckInDays)),
                 backgroundColor: colorScheme.tertiaryContainer,
                 side: BorderSide.none,
               ),

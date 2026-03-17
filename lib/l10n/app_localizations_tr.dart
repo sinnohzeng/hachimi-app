@@ -2490,4 +2490,107 @@ class STr extends S {
 
   @override
   String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'ID\'yi kopyala';
+
+  @override
+  String get adoptionClearDeadline => 'Son tarihi temizle';
+
+  @override
+  String get commonIdCopied => 'ID kopyalandı';
+
+  @override
+  String get pickerDurationLabel => 'Süre seçici';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count dakika';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Kedi $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, etkileşim için dokun';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return '%$percent tamamlandı';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count aktif gün';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Çevrimdışı mod';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Başarım açıldı: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'giriş yapıldı';
+
+  @override
+  String get calendarToday => 'bugün';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return '$name için giydirin';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return '$name yeniden oluştur';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Zamanlayıcı: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return '$total sayfadan $current. sayfa';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Görünen adı düzenle: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Sayfa bulunamadı';
+
+  @override
+  String get routeGoHome => 'Ana sayfaya git';
+
+  @override
+  String get a11yError => 'Hata';
+
+  @override
+  String get a11yDeadline => 'Son tarih';
+
+  @override
+  String get a11yReminder => 'Hatırlatma';
+
+  @override
+  String get a11yFocusMeditation => 'Odaklanma meditasyonu';
+
+  @override
+  String get a11yUnlocked => 'Kilidi açıldı';
+
+  @override
+  String get a11ySelected => 'Seçildi';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Dinamik duvar kağıdı rengi';
 }

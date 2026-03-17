@@ -1,18 +1,49 @@
+import 'package:hachimi_app/core/constants/achievement_strings_ext.dart';
+
 /// 成就名称与描述的多语言字符串表。
 /// 游戏内容的本地化独立于 ARB 系统管理，便于维护 163 条成就数据。
+/// en / zh 存放于本文件，ja / ko / zh-Hant 存放于 [AchievementStringsExt]。
 class AchievementStrings {
   AchievementStrings._();
 
+  /// 判断 locale 是否为繁体中文。
+  static bool _isHant(String locale) =>
+      locale.contains('Hant') || locale == 'zh_TW' || locale == 'zh_HK';
+
   /// 根据 locale 获取成就名称。
   static String name(String id, String locale) {
-    final map = locale.startsWith('zh') ? _namesZh : _namesEn;
-    return map[id] ?? id;
+    final map = switch (locale) {
+      _ when locale.startsWith('ja') => AchievementStringsExt.namesJa,
+      _ when locale.startsWith('ko') => AchievementStringsExt.namesKo,
+      _ when _isHant(locale) => AchievementStringsExt.namesZhHant,
+      _ when locale.startsWith('zh') => _namesZh,
+      _ => _namesEn,
+    };
+    return map[id] ?? _namesEn[id] ?? id;
   }
 
   /// 根据 locale 获取成就描述（仅 quest/cat/hours 类使用，persist 类使用参数化 l10n）。
   static String desc(String id, String locale) {
-    final map = locale.startsWith('zh') ? _descsZh : _descsEn;
-    return map[id] ?? '';
+    final map = switch (locale) {
+      _ when locale.startsWith('ja') => AchievementStringsExt.descsJa,
+      _ when locale.startsWith('ko') => AchievementStringsExt.descsKo,
+      _ when _isHant(locale) => AchievementStringsExt.descsZhHant,
+      _ when locale.startsWith('zh') => _descsZh,
+      _ => _descsEn,
+    };
+    return map[id] ?? _descsEn[id] ?? '';
+  }
+
+  /// 获取称号显示名称。
+  static String titleName(String titleId, String locale) {
+    final map = switch (locale) {
+      _ when locale.startsWith('ja') => AchievementStringsExt.titleNamesJa,
+      _ when locale.startsWith('ko') => AchievementStringsExt.titleNamesKo,
+      _ when _isHant(locale) => AchievementStringsExt.titleNamesZhHant,
+      _ when locale.startsWith('zh') => _titleNamesZh,
+      _ => _titleNamesEn,
+    };
+    return map[titleId] ?? _titleNamesEn[titleId] ?? titleId;
   }
 
   // ─── 英文名称 ───
@@ -185,7 +216,7 @@ class AchievementStrings {
     'persist_2997': 'Speed of Light',
   };
 
-  // ─── 中文名称 ───
+  // ─── 中文名称（简体）───
 
   static const Map<String, String> _namesZh = {
     // Quest (8)
@@ -386,7 +417,7 @@ class AchievementStrings {
     'cat_all_happy': 'All active cats are happy at the same time',
   };
 
-  // ─── 中文描述 ───
+  // ─── 中文描述（简体）───
 
   static const Map<String, String> _descsZh = {
     // Quest
@@ -417,6 +448,7 @@ class AchievementStrings {
     'cat_all_happy': '所有活跃猫同时开心',
   };
 
+
   // ─── 称号名称 ───
 
   static const Map<String, String> _titleNamesEn = {
@@ -444,10 +476,4 @@ class AchievementStrings {
     'title_thousand_hours': '千时传奇',
     'title_ahead_of_time': '时光先行者',
   };
-
-  /// 获取称号显示名称。
-  static String titleName(String titleId, String locale) {
-    final map = locale.startsWith('zh') ? _titleNamesZh : _titleNamesEn;
-    return map[titleId] ?? titleId;
-  }
 }

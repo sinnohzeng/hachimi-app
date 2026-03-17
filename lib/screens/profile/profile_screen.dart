@@ -199,9 +199,9 @@ class _ProfileHeader extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildAvatar(),
+        _buildAvatar(context),
         const SizedBox(height: AppSpacing.md),
-        _buildNameRow(),
+        _buildNameRow(context),
         const SizedBox(height: AppSpacing.xs),
         if (email != null)
           Text(
@@ -214,11 +214,11 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(BuildContext context) {
     final avatar = avatarId != null ? AvatarConstants.byId(avatarId!) : null;
     return Semantics(
       button: true,
-      label: 'Change avatar',
+      label: context.l10n.profileChooseAvatar,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -276,10 +276,10 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildNameRow() {
+  Widget _buildNameRow(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Edit display name: $displayName',
+      label: context.l10n.a11yEditDisplayName(displayName),
       child: InkWell(
         borderRadius: AppShape.borderSmall,
         onTap: onEditName,

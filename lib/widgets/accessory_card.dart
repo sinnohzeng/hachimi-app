@@ -16,13 +16,15 @@ class AccessoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final l10n = context.l10n;
+    final status = info.isEquipped
+        ? l10n.accessoryEquipped
+        : info.isOwned
+            ? l10n.accessoryOwned
+            : l10n.coinBalance(info.price);
+
     return Semantics(
-      label:
-          '${info.displayName} accessory, ${info.isEquipped
-              ? "equipped"
-              : info.isOwned
-              ? "owned"
-              : "${info.price} coins"}',
+      label: '${info.displayName}, $status',
       button: onTap != null,
       child: Card(
         clipBehavior: Clip.antiAlias,

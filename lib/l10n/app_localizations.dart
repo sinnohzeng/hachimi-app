@@ -4615,6 +4615,168 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Please log in again to continue'**
   String get authErrorRequiresRecentLogin;
+
+  /// No description provided for @commonCopyId.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get commonCopyId;
+
+  /// No description provided for @adoptionClearDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear deadline'**
+  String get adoptionClearDeadline;
+
+  /// No description provided for @commonIdCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'ID copied'**
+  String get commonIdCopied;
+
+  /// No description provided for @pickerDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration picker'**
+  String get pickerDurationLabel;
+
+  /// No description provided for @pickerMinutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes'**
+  String pickerMinutesValue(int count);
+
+  /// No description provided for @a11yCatImage.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} cat'**
+  String a11yCatImage(String name);
+
+  /// No description provided for @a11yCatTapToInteract.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, tap to interact'**
+  String a11yCatTapToInteract(String name);
+
+  /// No description provided for @a11yProgressPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% complete'**
+  String a11yProgressPercent(int percent);
+
+  /// No description provided for @a11yStreakActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active days'**
+  String a11yStreakActiveDays(int count);
+
+  /// No description provided for @a11yOfflineStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline mode'**
+  String get a11yOfflineStatus;
+
+  /// No description provided for @a11yAchievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement unlocked: {name}'**
+  String a11yAchievementUnlocked(String name);
+
+  /// No description provided for @calendarCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'checked in'**
+  String get calendarCheckedIn;
+
+  /// No description provided for @calendarToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get calendarToday;
+
+  /// No description provided for @a11yEquipToCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip to {name}'**
+  String a11yEquipToCat(Object name);
+
+  /// No description provided for @a11yRegenerateCat.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate {name}'**
+  String a11yRegenerateCat(Object name);
+
+  /// No description provided for @a11yTimerDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Timer: {time}'**
+  String a11yTimerDisplay(Object time);
+
+  /// No description provided for @a11yOnboardingPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String a11yOnboardingPage(Object current, Object total);
+
+  /// No description provided for @a11yEditDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit display name: {name}'**
+  String a11yEditDisplayName(Object name);
+
+  /// No description provided for @routeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get routeNotFound;
+
+  /// No description provided for @routeGoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Go home'**
+  String get routeGoHome;
+
+  /// No description provided for @a11yError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get a11yError;
+
+  /// No description provided for @a11yDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get a11yDeadline;
+
+  /// No description provided for @a11yReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get a11yReminder;
+
+  /// No description provided for @a11yFocusMeditation.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus meditation'**
+  String get a11yFocusMeditation;
+
+  /// No description provided for @a11yUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get a11yUnlocked;
+
+  /// No description provided for @a11ySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get a11ySelected;
+
+  /// No description provided for @a11yDynamicWallpaperColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic wallpaper color'**
+  String get a11yDynamicWallpaperColor;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

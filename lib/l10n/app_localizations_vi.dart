@@ -2481,4 +2481,107 @@ class SVi extends S {
 
   @override
   String get authErrorRequiresRecentLogin => 'Please log in again to continue';
+
+  @override
+  String get commonCopyId => 'Sao chép ID';
+
+  @override
+  String get adoptionClearDeadline => 'Xóa hạn chót';
+
+  @override
+  String get commonIdCopied => 'Đã sao chép ID';
+
+  @override
+  String get pickerDurationLabel => 'Chọn thời lượng';
+
+  @override
+  String pickerMinutesValue(int count) {
+    return '$count phút';
+  }
+
+  @override
+  String a11yCatImage(String name) {
+    return 'Mèo $name';
+  }
+
+  @override
+  String a11yCatTapToInteract(String name) {
+    return '$name, chạm để tương tác';
+  }
+
+  @override
+  String a11yProgressPercent(int percent) {
+    return 'Hoàn thành $percent%';
+  }
+
+  @override
+  String a11yStreakActiveDays(int count) {
+    return '$count ngày hoạt động';
+  }
+
+  @override
+  String get a11yOfflineStatus => 'Chế độ ngoại tuyến';
+
+  @override
+  String a11yAchievementUnlocked(String name) {
+    return 'Mở khóa thành tựu: $name';
+  }
+
+  @override
+  String get calendarCheckedIn => 'đã điểm danh';
+
+  @override
+  String get calendarToday => 'hôm nay';
+
+  @override
+  String a11yEquipToCat(Object name) {
+    return 'Trang bị cho $name';
+  }
+
+  @override
+  String a11yRegenerateCat(Object name) {
+    return 'Tạo lại $name';
+  }
+
+  @override
+  String a11yTimerDisplay(Object time) {
+    return 'Hẹn giờ: $time';
+  }
+
+  @override
+  String a11yOnboardingPage(Object current, Object total) {
+    return 'Trang $current / $total';
+  }
+
+  @override
+  String a11yEditDisplayName(Object name) {
+    return 'Sửa tên hiển thị: $name';
+  }
+
+  @override
+  String get routeNotFound => 'Không tìm thấy trang';
+
+  @override
+  String get routeGoHome => 'Về trang chủ';
+
+  @override
+  String get a11yError => 'Lỗi';
+
+  @override
+  String get a11yDeadline => 'Hạn chót';
+
+  @override
+  String get a11yReminder => 'Nhắc nhở';
+
+  @override
+  String get a11yFocusMeditation => 'Thiền tập trung';
+
+  @override
+  String get a11yUnlocked => 'Đã mở khóa';
+
+  @override
+  String get a11ySelected => 'Đã chọn';
+
+  @override
+  String get a11yDynamicWallpaperColor => 'Màu hình nền động';
 }

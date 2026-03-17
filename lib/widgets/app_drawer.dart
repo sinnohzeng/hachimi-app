@@ -173,10 +173,13 @@ class _GuestLoginHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Card(
         color: colorScheme.primaryContainer,
-        child: InkWell(
-          borderRadius: AppShape.borderMedium,
-          onTap: onSignIn,
-          child: Padding(
+        child: Semantics(
+          button: true,
+          label: l10n.guestUpgradeTitle,
+          child: InkWell(
+            borderRadius: AppShape.borderMedium,
+            onTap: onSignIn,
+            child: Padding(
             padding: AppSpacing.paddingBase,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,6 +228,7 @@ class _GuestLoginHeader extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -256,24 +260,36 @@ class _DrawerHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: onEditAvatar,
-            child: _buildAvatar(avatar, colorScheme, textTheme),
+          Semantics(
+            button: true,
+            label: context.l10n.profileChooseAvatar,
+            child: GestureDetector(
+              onTap: onEditAvatar,
+              child: ExcludeSemantics(
+                child: _buildAvatar(avatar, colorScheme, textTheme),
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: onEditName,
-                  child: Text(
-                    displayName,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                Semantics(
+                  button: true,
+                  label: context.l10n.a11yEditDisplayName(displayName),
+                  child: GestureDetector(
+                    onTap: onEditName,
+                    child: ExcludeSemantics(
+                      child: Text(
+                        displayName,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 if (email != null)
@@ -414,9 +430,9 @@ class _DrawerFooter extends StatelessWidget {
                   icon: const Icon(Icons.copy, size: 14),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: uid!));
-                    AppFeedback.info(context, 'ID copied');
+                    AppFeedback.info(context, context.l10n.commonIdCopied);
                   },
-                  tooltip: 'Copy ID',
+                  tooltip: context.l10n.commonCopyId,
                   visualDensity: VisualDensity.compact,
                 ),
               ],
