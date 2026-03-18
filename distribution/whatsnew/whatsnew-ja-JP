@@ -1,5 +1,7 @@
-v2.35.1
+v2.38.0
 
-- ピクセルテーマのページ遷移カクツキを修正
-- ネイティブプラットフォーム遷移でスムーズなナビゲーション
-- 背景パターンのレンダリングを最適化
+- Improved code quality and stability across the app
+- Fixed silent errors that could cause data loss during sync
+- Fixed memory leak in cat sprite rendering
+- Better error messages when things go wrong
+- 125 new automated tests for reliability

@@ -740,8 +740,7 @@ enum CatStage {
   }
 
   /// 比较两个阶段，返回较高的。
-  static CatStage higher(CatStage a, CatStage b) =>
-      a.order >= b.order ? a : b;
+  static CatStage higher(CatStage a, CatStage b) => a.order >= b.order ? a : b;
 }
 
 /// 根据进度百分比计算成长阶段（委托到 [CatStage]）。

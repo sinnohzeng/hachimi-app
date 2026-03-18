@@ -11,6 +11,7 @@ import 'package:hachimi_app/core/constants/cat_constants.dart' show CatState;
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
     show CatStage;
 import 'package:hachimi_app/models/achievement.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 
@@ -177,7 +178,8 @@ class AchievementEvaluator {
       totalCatCount: catData.totalCount,
       graduatedCatCount: catData.graduatedCount,
       accessoryCount:
-          _decodeInventory(invRaw).length + catData.equippedAccessories.length,
+          decodeJsonStringList(invRaw).length +
+          catData.equippedAccessories.length,
       equippedAccessories: catData.equippedAccessories,
       allCatsHappy: catData.allHappy,
       allHabitsDoneToday: allDoneToday,
@@ -443,17 +445,6 @@ class AchievementEvaluator {
   static String _higherStage(String? a, String b) {
     if (a == null) return b;
     return CatStage.higher(CatStage.fromValue(a), CatStage.fromValue(b)).value;
-  }
-
-  static List<String> _decodeInventory(String? raw) {
-    if (raw == null) return [];
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is List) return decoded.whereType<String>().toList();
-      return [];
-    } on FormatException {
-      return [];
-    }
   }
 }
 

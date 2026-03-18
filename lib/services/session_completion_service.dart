@@ -3,9 +3,13 @@ import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/session_checksum.dart';
+import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/models/habit.dart';
-import 'package:hachimi_app/providers/focus_timer_provider.dart';
+// Architecture: type-only import — FocusTimerState/TimerStatus/TimerMode are
+// pure data classes co-located in the provider file. No provider calls here.
+import 'package:hachimi_app/providers/focus_timer_provider.dart'
+    show FocusTimerState, TimerMode, TimerStatus;
 import 'package:hachimi_app/services/analytics_service.dart';
 import 'package:hachimi_app/services/coin_service.dart';
 import 'package:hachimi_app/services/local_cat_repository.dart';
@@ -77,7 +81,7 @@ class SessionCompletionService {
     required String clientVersion,
     required Map<String, int> todayMinutesPerHabit,
     required List<Habit> activeHabits,
-    dynamic cat,
+    Cat? cat,
   }) async {
     final minutes = timerState.focusedMinutes;
     final isAbandoned = timerState.status == TimerStatus.abandoned;
@@ -134,7 +138,7 @@ class SessionCompletionService {
   SessionRewards _calculateRewards({
     required int minutes,
     required Habit habit,
-    required dynamic cat,
+    required Cat? cat,
     required Map<String, int> todayMinutesPerHabit,
     required List<Habit> activeHabits,
   }) {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/backend/sync_backend.dart';
+import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/habit.dart';
 
@@ -68,9 +69,15 @@ class FirebaseSyncBackend implements SyncBackend {
         cats: cats,
         userProfile: userProfile,
       );
-    } catch (e) {
-      debugPrint('FirebaseSyncBackend: hydration failed: $e');
-      return const HydrationData();
+    } catch (e, stack) {
+      debugPrint('[FirebaseSyncBackend] hydration failed: $e');
+      ErrorHandler.recordOperation(
+        e,
+        stackTrace: stack,
+        feature: 'SyncBackend',
+        operation: 'hydrate',
+      );
+      rethrow;
     }
   }
 

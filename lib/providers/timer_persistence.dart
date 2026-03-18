@@ -96,7 +96,11 @@ class TimerPersistence {
       'habitName': prefs.getString(_keyHabitName) ?? 'Focus',
       'wallClockElapsed': effectiveElapsed,
       'totalSeconds': prefs.getInt(_keyTotalSeconds) ?? 0,
-      'mode': TimerMode.values[prefs.getInt(_keyMode) ?? 0],
+      'mode':
+          TimerMode.values[(prefs.getInt(_keyMode) ?? 0).clamp(
+            0,
+            TimerMode.values.length - 1,
+          )],
     };
   }
 
@@ -115,7 +119,10 @@ class TimerPersistence {
     final habitName = prefs.getString(_keyHabitName) ?? '';
     final totalSeconds =
         prefs.getInt(_keyTotalSeconds) ?? _defaultDurationSeconds;
-    final modeIndex = prefs.getInt(_keyMode) ?? 0;
+    final modeIndex = (prefs.getInt(_keyMode) ?? 0).clamp(
+      0,
+      TimerMode.values.length - 1,
+    );
     final mode = TimerMode.values[modeIndex];
 
     final totalPausedSeconds =

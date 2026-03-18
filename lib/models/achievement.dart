@@ -43,7 +43,7 @@ class UnlockedAchievement {
   });
 
   factory UnlockedAchievement.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return UnlockedAchievement(
       id: doc.id,
       unlockedAt:

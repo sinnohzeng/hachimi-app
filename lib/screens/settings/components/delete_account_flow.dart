@@ -145,7 +145,7 @@ class DeleteAccountFlow {
           );
         },
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   static Future<void> _executeDelete(

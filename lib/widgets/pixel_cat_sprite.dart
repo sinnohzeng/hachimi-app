@@ -69,11 +69,14 @@ class PixelCatSprite extends ConsumerWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            error: (e, _) => Center(
-              child: ExcludeSemantics(
-                child: Text('🐱', style: TextStyle(fontSize: size * 0.5)),
-              ),
-            ),
+            error: (e, _) {
+              debugPrint('[PixelCatSprite] Load error: $e');
+              return Center(
+                child: ExcludeSemantics(
+                  child: Text('🐱', style: TextStyle(fontSize: size * 0.5)),
+                ),
+              );
+            },
           ),
         ),
       ),

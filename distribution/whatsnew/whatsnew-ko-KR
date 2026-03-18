@@ -1,5 +1,7 @@
-v2.35.1
+v2.38.0
 
-- 픽셀 테마 페이지 전환 프레임 드롭 수정
-- 네이티브 플랫폼 전환으로 부드러운 내비게이션
-- 배경 패턴 렌더링 최적화
+- Improved code quality and stability across the app
+- Fixed silent errors that could cause data loss during sync
+- Fixed memory leak in cat sprite rendering
+- Better error messages when things go wrong
+- 125 new automated tests for reliability

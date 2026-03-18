@@ -73,9 +73,7 @@ class LedgerService {
         result: result,
       );
     });
-    _changeController.add(
-      LedgerChange(type: type, affectedIds: affectedIds),
-    );
+    _changeController.add(LedgerChange(type: type, affectedIds: affectedIds));
   }
 
   /// 广播变更事件（供 Repository 在事务完成后调用）。

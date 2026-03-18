@@ -51,8 +51,10 @@ class TodayTab extends ConsumerWidget {
             // Featured cat card（首屏核心情感焦点）
             catsAsync.when(
               loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              error: (_, _) =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+              error: (e, _) {
+                debugPrint('[TodayTab] Load error: $e');
+                return const SliverToBoxAdapter(child: SizedBox.shrink());
+              },
               data: (cats) {
                 if (cats.isEmpty) {
                   return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -224,16 +226,27 @@ class TodayTab extends ConsumerWidget {
               final uid = ref.read(currentUidProvider);
               if (uid != null) {
                 HapticFeedback.mediumImpact();
-                await ref
-                    .read(localHabitRepositoryProvider)
-                    .delete(uid, habitId);
-                await ref
-                    .read(analyticsServiceProvider)
-                    .logHabitDeleted(habitName: habitName);
-              }
-              if (ctx.mounted) {
-                Navigator.of(ctx).pop();
-                AppFeedback.success(ctx, l10n.todayQuestCompleted(habitName));
+                try {
+                  await ref
+                      .read(localHabitRepositoryProvider)
+                      .delete(uid, habitId);
+                  await ref
+                      .read(analyticsServiceProvider)
+                      .logHabitDeleted(habitName: habitName);
+                  if (ctx.mounted) {
+                    Navigator.of(ctx).pop();
+                    AppFeedback.success(
+                      ctx,
+                      l10n.todayQuestCompleted(habitName),
+                    );
+                  }
+                } catch (e) {
+                  debugPrint('[TodayTab] delete habit failed: $e');
+                  if (ctx.mounted) {
+                    Navigator.of(ctx).pop();
+                    AppFeedback.error(ctx, l10n.commonError);
+                  }
+                }
               }
             },
             child: Text(l10n.commonDelete),

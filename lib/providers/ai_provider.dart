@@ -3,17 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
+import 'package:hachimi_app/providers/service_providers.dart';
 import 'package:hachimi_app/services/ai/firebase_ai_provider.dart';
 import 'package:hachimi_app/services/ai_service.dart';
 import 'package:hachimi_app/services/chat_service.dart';
 import 'package:hachimi_app/services/diary_service.dart';
-import 'package:hachimi_app/services/local_database_service.dart';
 
 // ─── Service Providers ───
-
-final localDatabaseProvider = Provider<LocalDatabaseService>(
-  (ref) => LocalDatabaseService(),
-);
 
 /// AI 门面服务 — 根据用户选择的提供商动态实例化。
 /// 断路器回调在此处注入，AiService 统一管理成功/失败通知。
@@ -33,14 +29,14 @@ final aiServiceProvider = Provider<AiService>((ref) {
 final diaryServiceProvider = Provider<DiaryService>((ref) {
   return DiaryService(
     aiService: ref.watch(aiServiceProvider),
-    dbService: ref.watch(localDatabaseProvider),
+    dbService: ref.watch(localDatabaseServiceProvider),
   );
 });
 
 final chatServiceProvider = Provider<ChatService>((ref) {
   final service = ChatService(
     aiService: ref.watch(aiServiceProvider),
-    dbService: ref.watch(localDatabaseProvider),
+    dbService: ref.watch(localDatabaseServiceProvider),
   );
   ref.onDispose(service.dispose);
   return service;

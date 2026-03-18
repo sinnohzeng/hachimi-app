@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 /// 行为台账 — 行为类型枚举。
 /// 每个用户操作都映射到一个 ActionType，写入 action_ledger 表。
 /// 同时用于 [LedgerChange] 的变更通知（包含仅通知用途的值）。
@@ -134,7 +136,8 @@ class LedgerAction {
   static LedgerAction? fromSqliteSafe(Map<String, dynamic> map) {
     try {
       return LedgerAction.fromSqlite(map);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[LedgerAction] fromSqliteSafe failed: $e');
       return null;
     }
   }

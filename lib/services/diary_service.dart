@@ -9,7 +9,7 @@ import 'package:hachimi_app/core/constants/ai_constants.dart';
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/core/utils/performance_traces.dart';
+import 'package:hachimi_app/services/performance_traces.dart';
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/diary_entry.dart';
 import 'package:hachimi_app/models/diary_generation_context.dart';
@@ -84,9 +84,15 @@ class DiaryService {
   Future<void> savePendingRetry(DiaryGenerationContext ctx) async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
-    final list = raw != null
-        ? (jsonDecode(raw) as List).cast<Map<String, dynamic>>()
-        : <Map<String, dynamic>>[];
+    List<Map<String, dynamic>> list;
+    try {
+      list = raw != null
+          ? (jsonDecode(raw) as List).cast<Map<String, dynamic>>()
+          : <Map<String, dynamic>>[];
+    } on FormatException {
+      debugPrint('[DiaryService] Corrupted retry JSON, resetting');
+      list = <Map<String, dynamic>>[];
+    }
 
     // 移除同一 catId 已有的条目（覆盖）
     list.removeWhere((e) => e['catId'] == ctx.cat.id);
@@ -126,7 +132,14 @@ class DiaryService {
     final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
     if (raw == null) return null;
 
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    final List<Map<String, dynamic>> list;
+    try {
+      list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    } on FormatException {
+      debugPrint('[DiaryService] Corrupted retry JSON, clearing');
+      await prefs.remove(AppPrefsKeys.diaryPendingRetries);
+      return null;
+    }
     final idx = list.indexWhere((e) => e['catId'] == catId);
     if (idx == -1) return null;
 
@@ -182,7 +195,14 @@ class DiaryService {
     final raw = prefs.getString(AppPrefsKeys.diaryPendingRetries);
     if (raw == null) return;
 
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    final List<Map<String, dynamic>> list;
+    try {
+      list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    } on FormatException {
+      debugPrint('[DiaryService] Corrupted retry JSON, clearing');
+      await prefs.remove(AppPrefsKeys.diaryPendingRetries);
+      return;
+    }
     list.removeWhere((e) => e['catId'] == catId);
     await prefs.setString(AppPrefsKeys.diaryPendingRetries, jsonEncode(list));
   }

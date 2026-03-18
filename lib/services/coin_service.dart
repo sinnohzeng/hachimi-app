@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Transaction;
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
@@ -27,7 +28,7 @@ class CoinService {
 
     try {
       final db = await _ledger.database;
-      return await db.transaction((txn) async {
+      final result = await db.transaction((txn) async {
         final existing = await _loadMonthlyCheckIn(txn, uid, today, month);
         if (existing == null) return null; // 今日已签到
 
@@ -35,6 +36,10 @@ class CoinService {
         await _persistCheckIn(txn, uid, now, today, month, existing, rewards);
         return rewards.toResult();
       });
+      if (result != null) {
+        _ledger.notifyChange(const LedgerChange(type: ActionType.checkIn));
+      }
+      return result;
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,
@@ -43,8 +48,6 @@ class CoinService {
         operation: 'checkIn',
       );
       rethrow;
-    } finally {
-      _ledger.notifyChange(const LedgerChange(type: ActionType.checkIn));
     }
   }
 
@@ -226,7 +229,7 @@ class CoinService {
     if (balance < price) return false;
 
     final invRaw = await _ledger.getMaterializedInTxn(txn, uid, 'inventory');
-    final inventory = _decodeInventory(invRaw);
+    final inventory = decodeJsonStringList(invRaw);
     if (inventory.contains(accessoryId)) return false;
 
     await _ledger.setMaterializedInTxn(
@@ -274,6 +277,7 @@ class CoinService {
           (balance + amount).toString(),
         );
       });
+      _ledger.notifyChange(const LedgerChange(type: ActionType.coinsEarned));
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,
@@ -282,16 +286,7 @@ class CoinService {
         operation: 'earnCoins',
       );
       rethrow;
-    } finally {
-      _ledger.notifyChange(const LedgerChange(type: ActionType.coinsEarned));
     }
-  }
-
-  List<String> _decodeInventory(String? raw) {
-    if (raw == null) return [];
-    final decoded = jsonDecode(raw);
-    if (decoded is List) return decoded.whereType<String>().toList();
-    return [];
   }
 }
 

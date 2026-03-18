@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
@@ -27,8 +26,5 @@ final inventoryProvider = StreamProvider<List<String>>((ref) {
 
 Future<List<String>> _readInventory(LedgerService ledger, String uid) async {
   final raw = await ledger.getMaterialized(uid, 'inventory');
-  if (raw == null) return const [];
-  final decoded = jsonDecode(raw);
-  if (decoded is List) return decoded.whereType<String>().toList();
-  return const [];
+  return decodeJsonStringList(raw);
 }

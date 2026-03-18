@@ -63,7 +63,7 @@ class FocusSession {
   bool get isAbandoned => status == SessionStatus.abandoned.value;
 
   factory FocusSession.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return FocusSession(
       id: doc.id,
       habitId: data['habitId'] as String? ?? '',

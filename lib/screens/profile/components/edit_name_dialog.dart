@@ -20,7 +20,7 @@ Future<void> showEditNameDialog(BuildContext context, WidgetRef ref) {
   return showDialog(
     context: context,
     builder: (ctx) => _buildEditNameDialog(ctx, ref, controller, l10n),
-  );
+  ).whenComplete(controller.dispose);
 }
 
 AlertDialog _buildEditNameDialog(
@@ -74,7 +74,8 @@ Future<void> _saveName(
       Navigator.of(ctx).pop();
       AppFeedback.success(ctx, l10n.profileSaved);
     }
-  } catch (_) {
+  } catch (e) {
+    debugPrint('[EditNameDialog] Save failed: $e');
     if (ctx.mounted) {
       AppFeedback.error(ctx, l10n.commonError);
     }

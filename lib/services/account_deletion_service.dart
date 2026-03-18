@@ -1,5 +1,8 @@
 import 'package:hachimi_app/core/utils/error_handler.dart';
-import 'package:hachimi_app/providers/timer_persistence.dart';
+// Architecture: type-only import — TimerPersistence is a pure persistence
+// utility co-located with its provider. No provider calls here.
+import 'package:hachimi_app/providers/timer_persistence.dart'
+    show TimerPersistence;
 import 'package:hachimi_app/services/local_database_service.dart';
 import 'package:hachimi_app/services/notification_service.dart';
 import 'package:path/path.dart' as p;

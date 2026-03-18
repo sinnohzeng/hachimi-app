@@ -15,8 +15,10 @@ import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/cat_provider.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/focus_timer_provider.dart';
+// Architecture: static platform service for foreground task — no provider wrapper needed
 import 'package:hachimi_app/services/focus_timer_service.dart';
-import 'package:hachimi_app/services/session_completion_service.dart';
+import 'package:hachimi_app/services/session_completion_service.dart'
+    show SessionResult;
 import 'package:hachimi_app/screens/timer/components/timer_controls.dart';
 import 'package:hachimi_app/widgets/tappable_cat_sprite.dart';
 import 'package:hachimi_app/widgets/progress_ring.dart';

@@ -77,6 +77,12 @@ hachimi-app/
 - `lib/core/observability/error_context.dart`
 - `lib/core/observability/operation_context.dart`
 
+## B5 File Moves
+Files moved from `core/utils/` to `services/` (they contain business logic, not pure utilities):
+- `core/utils/deferred_init.dart` → `services/deferred_init.dart`
+- `core/utils/performance_traces.dart` → `services/performance_traces.dart`
+- `core/utils/auth_error_mapper.dart` → `services/auth_error_mapper.dart`
+
 ## Removed Legacy Files
 - `lib/services/migration_service.dart`
 - `lib/services/remote_config_service.dart`

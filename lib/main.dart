@@ -13,6 +13,8 @@ import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/observability/observability_runtime.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/providers/service_providers.dart';
+import 'package:hachimi_app/services/firebase/firebase_analytics_backend.dart';
+import 'package:hachimi_app/services/firebase/firebase_crash_backend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
@@ -59,6 +61,10 @@ Future<SharedPreferences> _initializeCriticalServices() async {
   );
 
   await _configureCrashlytics();
+
+  // 注入后端到 ErrorHandler — 此后 record/breadcrumb 才会上报到 Firebase
+  ErrorHandler.init(FirebaseCrashBackend(), FirebaseAnalyticsBackend());
+
   return prefs;
 }
 

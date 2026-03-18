@@ -26,16 +26,18 @@ class DiaryEntry {
 
   factory DiaryEntry.fromMap(Map<String, dynamic> map) {
     return DiaryEntry(
-      id: map['id'] as String,
-      catId: map['cat_id'] as String,
-      habitId: map['habit_id'] as String,
-      content: map['content'] as String,
-      date: map['date'] as String,
-      personality: map['personality'] as String,
-      mood: map['mood'] as String,
-      stage: map['stage'] as String,
-      totalMinutes: map['total_minutes'] as int,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      id: map['id'] as String? ?? '',
+      catId: map['cat_id'] as String? ?? '',
+      habitId: map['habit_id'] as String? ?? '',
+      content: map['content'] as String? ?? '',
+      date: map['date'] as String? ?? '',
+      personality: map['personality'] as String? ?? '',
+      mood: map['mood'] as String? ?? '',
+      stage: map['stage'] as String? ?? '',
+      totalMinutes: map['total_minutes'] as int? ?? 0,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        map['created_at'] as int? ?? 0,
+      ),
     );
   }
 

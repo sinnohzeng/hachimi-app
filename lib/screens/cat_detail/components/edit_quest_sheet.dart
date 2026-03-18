@@ -448,20 +448,29 @@ class _EditQuestSheetState extends ConsumerState<EditQuestSheet> {
 
     HapticFeedback.mediumImpact();
 
-    final updatedHabit = _buildUpdatedHabit(name);
-    await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
+    try {
+      final updatedHabit = _buildUpdatedHabit(name);
+      await ref.read(localHabitRepositoryProvider).update(uid, updatedHabit);
 
-    final remindersChanged = !_remindersEqual(
-      widget.habit.reminders,
-      _reminders,
-    );
-    if (remindersChanged && mounted) {
-      await _rescheduleReminders(name);
-    }
+      final remindersChanged = !_remindersEqual(
+        widget.habit.reminders,
+        _reminders,
+      );
+      if (remindersChanged && mounted) {
+        await _rescheduleReminders(name);
+      }
 
-    if (mounted) {
-      Navigator.of(context).pop();
-      AppFeedback.success(context, context.l10n.catDetailQuestUpdated);
+      if (mounted) {
+        Navigator.of(context).pop();
+        AppFeedback.success(context, context.l10n.catDetailQuestUpdated);
+      }
+    } catch (e) {
+      debugPrint('[EditQuestSheet] save failed: $e');
+      if (mounted) {
+        AppFeedback.error(context, context.l10n.commonError);
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 

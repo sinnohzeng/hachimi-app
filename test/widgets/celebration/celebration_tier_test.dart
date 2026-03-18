@@ -63,21 +63,30 @@ void main() {
       final config = CelebrationConfig.fromDef(makeDef(coinReward: 10));
       expect(config.particleCount, 20);
       expect(config.hasBurstOrigin, false);
-      expect(config.celebrationHeadlineKey, CelebrationHeadline.achievementUnlocked);
+      expect(
+        config.celebrationHeadlineKey,
+        CelebrationHeadline.achievementUnlocked,
+      );
     });
 
     test('notable config for mid-coin achievement', () {
       final config = CelebrationConfig.fromDef(makeDef(coinReward: 150));
       expect(config.particleCount, 40);
       expect(config.hasBurstOrigin, true);
-      expect(config.celebrationHeadlineKey, CelebrationHeadline.achievementAwesome);
+      expect(
+        config.celebrationHeadlineKey,
+        CelebrationHeadline.achievementAwesome,
+      );
     });
 
     test('epic config for high-coin achievement', () {
       final config = CelebrationConfig.fromDef(makeDef(coinReward: 500));
       expect(config.particleCount, 60);
       expect(config.hasBurstOrigin, true);
-      expect(config.celebrationHeadlineKey, CelebrationHeadline.achievementIncredible);
+      expect(
+        config.celebrationHeadlineKey,
+        CelebrationHeadline.achievementIncredible,
+      );
     });
   });
 }

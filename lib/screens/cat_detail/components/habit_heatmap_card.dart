@@ -46,7 +46,8 @@ class _HabitHeatmapCardState extends ConsumerState<HabitHeatmapCard> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[HabitHeatmap] Load failed: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;

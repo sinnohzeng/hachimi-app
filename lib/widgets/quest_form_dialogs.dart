@@ -45,7 +45,7 @@ void showCustomGoalDialog(
         ),
       ],
     ),
-  );
+  ).whenComplete(controller.dispose);
 }
 
 /// 自定义总目标对话框（共用于创建和编辑 Quest）。
@@ -91,5 +91,5 @@ void showCustomTargetDialog(
         ),
       ],
     ),
-  );
+  ).whenComplete(controller.dispose);
 }

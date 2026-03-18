@@ -13,7 +13,7 @@ class StreakIndicator extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Semantics(
-      label: '$streak day streak',
+      label: '$streak',
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(

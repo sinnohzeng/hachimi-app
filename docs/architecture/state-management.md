@@ -203,6 +203,11 @@ These values are used in `LedgerChange` domain-specific filters for the awarenes
 
 Affected LedgerChange refresh: awareness providers respond to `isGlobalRefresh` plus the above domain-specific action types.
 
+## B5 Quality Batch Changes
+
+- `localDatabaseProvider` removed from `core/ai/ai_provider.dart` — AI providers no longer hold a direct DB reference; they access data through service providers.
+- `LedgerChange.type` changed from `String` to `ActionType` enum (`lib/models/ledger_action.dart`). All consumers now pattern-match on `ActionType` values instead of raw string comparison.
+
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Navigation side-effects must be handled by listeners/effects, not inside `build()`.

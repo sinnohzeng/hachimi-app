@@ -93,9 +93,12 @@ class UserProfileNotifier extends Notifier<void> {
       // Step 3: 创建新访客身份 + 触发导航重置
       debugPrint('[Auth] 登出 Step 3: 创建新访客身份');
       final prefs = ref.read(sharedPreferencesProvider);
-      prefs.setString(AppPrefsKeys.localGuestUid, 'guest_${const Uuid().v4()}');
-      prefs.remove(AppPrefsKeys.dataHydrated);
-      prefs.remove(AppPrefsKeys.onboardingComplete);
+      await prefs.setString(
+        AppPrefsKeys.localGuestUid,
+        'guest_${const Uuid().v4()}',
+      );
+      await prefs.remove(AppPrefsKeys.dataHydrated);
+      await prefs.remove(AppPrefsKeys.onboardingComplete);
 
       ObservabilityRuntime.clearUidHash();
       ref.read(onboardingCompleteProvider.notifier).reset();

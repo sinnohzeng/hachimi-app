@@ -80,7 +80,8 @@ class ReminderConfig {
   };
 
   factory ReminderConfig.fromMap(Map<String, dynamic> map) => ReminderConfig(
-    mode: ReminderMode.tryFromValue(map['mode'] as String) ?? ReminderMode.daily,
+    mode:
+        ReminderMode.tryFromValue(map['mode'] as String) ?? ReminderMode.daily,
     hour: map['hour'] as int,
     minute: map['minute'] as int,
   );

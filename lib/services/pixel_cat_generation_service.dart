@@ -22,51 +22,89 @@ class PixelCatGenerationService {
 
   /// 生成随机外观
   CatAppearance generateRandomAppearance() {
-    // 选择皮毛类型（按类别加权）
-    final categoryWeights = [
-      0.35,
-      0.15,
-      0.35,
-      0.15,
-    ]; // tabby, spotted, plain, exotic
+    final pelt = _randomPeltType();
+    final eyes = _randomEyeColors();
+    final white = _randomWhitePatches();
+    final tint = _randomTint();
+    final skinColor = _choice(skinColors);
+
+    // Points ~10%（仅无白斑时）
+    String? points;
+    if (white.patches == null && _random.nextDouble() < 0.10) {
+      points = _choice(pointMarkings);
+    }
+
+    // Vitiligo ~5%
+    String? vitiligo;
+    if (_random.nextDouble() < 0.05) {
+      vitiligo = _choice(vitiligoPatterns);
+    }
+
+    final tortie = _randomTortieParams(pelt.isTortie, pelt.peltColor);
+
+    return CatAppearance(
+      peltType: pelt.isTortie
+          ? (pelt.peltType == 'Calico' ? 'Calico' : 'Tortie')
+          : pelt.peltType,
+      peltColor: pelt.peltColor,
+      tint: tint,
+      eyeColor: eyes.primary,
+      eyeColor2: eyes.secondary,
+      whitePatches: white.patches,
+      whitePatchesTint: white.tint,
+      skinColor: skinColor,
+      points: points,
+      vitiligo: vitiligo,
+      isTortie: pelt.isTortie,
+      tortiePattern: tortie.pattern,
+      tortieBase: tortie.base,
+      tortieColor: tortie.color,
+      isLonghair: _random.nextDouble() < 0.20,
+      reverse: _random.nextBool(),
+      spriteVariant: _random.nextInt(3),
+    );
+  }
+
+  /// 皮毛类型 + 玳瑁判定。
+  ({String peltType, String peltColor, bool isTortie}) _randomPeltType() {
+    final categoryWeights = [0.35, 0.15, 0.35, 0.15];
     final categories = [tabbies, spotted, plain, exotic];
     final category = _weightedChoice(categories, categoryWeights);
     var peltType = _choice(category);
-
-    // 玳瑁 ~15%
     final isTortie = _random.nextDouble() < 0.15;
     if (isTortie) {
       peltType = _random.nextBool() ? 'Tortie' : 'Calico';
     }
-
-    // 皮毛颜色
     final peltColor = _choice(peltColors);
+    return (peltType: peltType, peltColor: peltColor, isTortie: isTortie);
+  }
 
-    // 眼色
-    final eyeColor = _choice(eyeColors);
-
-    // 异色瞳 ~10%
-    String? eyeColor2;
+  /// 眼色 + 异色瞳（~10%）。
+  ({String primary, String? secondary}) _randomEyeColors() {
+    final primary = _choice(eyeColors);
+    String? secondary;
     if (_random.nextDouble() < 0.10) {
-      eyeColor2 = _choice(eyeColors.where((e) => e != eyeColor).toList());
+      secondary = _choice(eyeColors.where((e) => e != primary).toList());
     }
+    return (primary: primary, secondary: secondary);
+  }
 
-    // 白色斑块 ~60%
-    String? whitePatches;
+  /// 白色斑块（~60%）+ 白斑色调。
+  ({String? patches, String tint}) _randomWhitePatches() {
+    String? patches;
     if (_random.nextDouble() < 0.60) {
       final wpGroups = [littleWhite, midWhite, highWhite, mostlyWhite];
       final wpWeights = [0.35, 0.30, 0.25, 0.10];
       final group = _weightedChoice(wpGroups, wpWeights);
-      whitePatches = _choice(group);
+      patches = _choice(group);
     }
+    return (patches: patches, tint: _choice(whitePatchesTints));
+  }
 
-    // 白斑色调
-    final whitePatchesTint = _choice(whitePatchesTints);
-
-    // 色调 ~30%
-    String tint = 'none';
+  /// 色调（~30%）。
+  String _randomTint() {
     if (_random.nextDouble() < 0.30) {
-      tint = _choice([
+      return _choice([
         'pink',
         'gray',
         'red',
@@ -80,69 +118,26 @@ class PixelCatGenerationService {
         'cooldilute',
       ]);
     }
+    return 'none';
+  }
 
-    // 皮肤色
-    final skinColor = _choice(skinColors);
-
-    // Points ~10%
-    String? points;
-    if (whitePatches == null && _random.nextDouble() < 0.10) {
-      points = _choice(pointMarkings);
+  /// 玳瑁参数（仅 isTortie 时生成）。
+  ({String? pattern, String? base, String? color}) _randomTortieParams(
+    bool isTortie,
+    String peltColor,
+  ) {
+    if (!isTortie) return (pattern: null, base: null, color: null);
+    final pattern = _choice(tortiePatterns);
+    final base = _choice(tortieBases);
+    String color;
+    if (gingerColors.contains(peltColor)) {
+      color = _choice(blackColors);
+    } else if (blackColors.contains(peltColor)) {
+      color = _choice(gingerColors);
+    } else {
+      color = _choice([...gingerColors, ...blackColors]);
     }
-
-    // Vitiligo ~5%
-    String? vitiligo;
-    if (_random.nextDouble() < 0.05) {
-      vitiligo = _choice(vitiligoPatterns);
-    }
-
-    // 玳瑁参数
-    String? tortiePattern;
-    String? tortieBase;
-    String? tortieColor;
-    if (isTortie) {
-      tortiePattern = _choice(tortiePatterns);
-      tortieBase = _choice(tortieBases);
-      // 互补色选择
-      if (gingerColors.contains(peltColor)) {
-        tortieColor = _choice(blackColors);
-      } else if (blackColors.contains(peltColor)) {
-        tortieColor = _choice(gingerColors);
-      } else {
-        tortieColor = _choice([...gingerColors, ...blackColors]);
-      }
-    }
-
-    // 长毛 ~20%
-    final isLonghair = _random.nextDouble() < 0.20;
-
-    // 朝向翻转 50%
-    final reverse = _random.nextBool();
-
-    // sprite 变体 (0, 1, 2)
-    final spriteVariant = _random.nextInt(3);
-
-    return CatAppearance(
-      peltType: isTortie
-          ? (peltType == 'Calico' ? 'Calico' : 'Tortie')
-          : peltType,
-      peltColor: peltColor,
-      tint: tint,
-      eyeColor: eyeColor,
-      eyeColor2: eyeColor2,
-      whitePatches: whitePatches,
-      whitePatchesTint: whitePatchesTint,
-      skinColor: skinColor,
-      points: points,
-      vitiligo: vitiligo,
-      isTortie: isTortie,
-      tortiePattern: tortiePattern,
-      tortieBase: tortieBase,
-      tortieColor: tortieColor,
-      isLonghair: isLonghair,
-      reverse: reverse,
-      spriteVariant: spriteVariant,
-    );
+    return (pattern: pattern, base: base, color: color);
   }
 
   /// 生成完整的 Cat 对象

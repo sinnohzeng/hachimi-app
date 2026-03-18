@@ -321,22 +321,51 @@ class AwarenessRepository {
     return rows.isEmpty;
   }
 
+  /// 通用觉知统计自增（供 Repository 内部使用）。
+  /// [column] 必须是 total_light_days / total_weekly_reviews / total_worries_resolved 之一。
+  static Future<void> incrementStatInTxn(
+    DatabaseExecutor txn,
+    String uid,
+    String column, {
+    Map<String, Object?>? extraColumns,
+  }) async {
+    final extraCols = extraColumns ?? {};
+    final setClauses = [
+      '$column = $column + 1',
+      'updated_at = excluded.updated_at',
+      ...extraCols.keys.map((k) => '$k = excluded.$k'),
+    ].join(', ');
+    final insertCols = [
+      'uid',
+      column,
+      'updated_at',
+      ...extraCols.keys,
+    ].join(', ');
+    final placeholders = [
+      '?', // uid
+      '1', // column default value
+      '?', // updated_at
+      ...extraCols.keys.map((_) => '?'),
+    ].join(', ');
+    await txn.rawInsert(
+      'INSERT INTO local_awareness_stats ($insertCols) '
+      'VALUES ($placeholders) '
+      'ON CONFLICT(uid) DO UPDATE SET $setClauses',
+      [uid, DateTime.now().millisecondsSinceEpoch, ...extraCols.values],
+    );
+  }
+
   /// 增加每日一光天数统计（事务内）。
   Future<void> _incrementLightDaysInTxn(
     Transaction txn,
     String uid,
     String date,
   ) async {
-    await txn.rawInsert(
-      'INSERT INTO local_awareness_stats '
-      '(uid, total_light_days, total_weekly_reviews, total_worries_resolved, '
-      'last_light_date, updated_at) '
-      'VALUES (?, 1, 0, 0, ?, ?) '
-      'ON CONFLICT(uid) DO UPDATE SET '
-      'total_light_days = total_light_days + 1, '
-      'last_light_date = excluded.last_light_date, '
-      'updated_at = excluded.updated_at',
-      [uid, date, DateTime.now().millisecondsSinceEpoch],
+    await incrementStatInTxn(
+      txn,
+      uid,
+      'total_light_days',
+      extraColumns: {'last_light_date': date},
     );
   }
 
@@ -353,24 +382,6 @@ class AwarenessRepository {
 
   /// 增加周回顾次数统计（事务内）。
   Future<void> _incrementWeeklyReviewsInTxn(Transaction txn, String uid) async {
-    await _ensureStatsRow(txn, uid);
-    await txn.rawUpdate(
-      'UPDATE local_awareness_stats SET '
-      'total_weekly_reviews = total_weekly_reviews + 1, '
-      'updated_at = ? '
-      'WHERE uid = ?',
-      [DateTime.now().millisecondsSinceEpoch, uid],
-    );
-  }
-
-  /// 确保统计行存在（事务内）。
-  Future<void> _ensureStatsRow(Transaction txn, String uid) async {
-    await txn.rawInsert(
-      'INSERT OR IGNORE INTO local_awareness_stats '
-      '(uid, total_light_days, total_weekly_reviews, '
-      'total_worries_resolved, updated_at) '
-      'VALUES (?, 0, 0, 0, ?)',
-      [uid, DateTime.now().millisecondsSinceEpoch],
-    );
+    await incrementStatInTxn(txn, uid, 'total_weekly_reviews');
   }
 }

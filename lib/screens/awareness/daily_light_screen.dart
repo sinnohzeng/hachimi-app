@@ -31,7 +31,7 @@ class DailyLightScreen extends ConsumerStatefulWidget {
 }
 
 class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
-  int? _selectedMood;
+  Mood? _selectedMood;
   String _lightText = '';
   Set<String> _selectedTags = {};
   bool _isSaving = false;
@@ -61,7 +61,7 @@ class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
       final light = DailyLight(
         id: const Uuid().v4(),
         date: date,
-        mood: Mood.fromValue(_selectedMood!),
+        mood: _selectedMood!,
         lightText: _lightText.trim().isEmpty ? null : _lightText.trim(),
         tags: _selectedTags.toList(),
         createdAt: now,
@@ -102,7 +102,7 @@ class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
     final cats = ref.read(catsProvider).value ?? [];
     final catName = cats.isNotEmpty ? cats.first.name : 'Hachimi';
     final locale = Localizations.localeOf(context).languageCode;
-    final scene = switch (Mood.fromValue(_selectedMood!)) {
+    final scene = switch (_selectedMood!) {
       Mood.veryHappy => CatResponseScene.lightVeryHappy,
       Mood.happy => CatResponseScene.lightHappy,
       Mood.calm => CatResponseScene.lightCalm,

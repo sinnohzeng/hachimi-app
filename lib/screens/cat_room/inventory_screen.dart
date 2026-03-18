@@ -198,36 +198,54 @@ class InventoryScreen extends ConsumerWidget {
     );
   }
 
-  void _equip(
+  Future<void> _equip(
     BuildContext context,
     WidgetRef ref,
     String catId,
     String accessoryId,
-  ) {
+  ) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    ref
-        .read(inventoryServiceProvider)
-        .equipAccessory(uid: uid, catId: catId, accessoryId: accessoryId);
-    ref
-        .read(analyticsServiceProvider)
-        .logAccessoryEquipped(catId: catId, accessoryId: accessoryId);
-    AppFeedback.success(
-      context,
-      context.l10n.inventoryEquipSuccess(accessoryDisplayName(accessoryId)),
-    );
+    try {
+      await ref
+          .read(inventoryServiceProvider)
+          .equipAccessory(uid: uid, catId: catId, accessoryId: accessoryId);
+      ref
+          .read(analyticsServiceProvider)
+          .logAccessoryEquipped(catId: catId, accessoryId: accessoryId);
+      if (context.mounted) {
+        AppFeedback.success(
+          context,
+          context.l10n.inventoryEquipSuccess(accessoryDisplayName(accessoryId)),
+        );
+      }
+    } catch (e) {
+      debugPrint('[InventoryScreen] equip failed: $e');
+      if (context.mounted) {
+        AppFeedback.error(context, context.l10n.commonError);
+      }
+    }
   }
 
-  void _unequip(BuildContext context, WidgetRef ref, Cat cat) {
+  Future<void> _unequip(BuildContext context, WidgetRef ref, Cat cat) async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    ref
-        .read(inventoryServiceProvider)
-        .unequipAccessory(uid: uid, catId: cat.id);
-    AppFeedback.success(
-      context,
-      context.l10n.inventoryUnequipSuccess(cat.name),
-    );
+    try {
+      await ref
+          .read(inventoryServiceProvider)
+          .unequipAccessory(uid: uid, catId: cat.id);
+      if (context.mounted) {
+        AppFeedback.success(
+          context,
+          context.l10n.inventoryUnequipSuccess(cat.name),
+        );
+      }
+    } catch (e) {
+      debugPrint('[InventoryScreen] unequip failed: $e');
+      if (context.mounted) {
+        AppFeedback.error(context, context.l10n.commonError);
+      }
+    }
   }
 }
 

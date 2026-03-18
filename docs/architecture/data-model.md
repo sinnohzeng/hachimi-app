@@ -82,6 +82,20 @@ Compatibility aliases (`deleteAccountV1` / `wipeUserDataV1`) remain available du
 - Cloud/Auth deletion is immediate when online or queued when offline.
 - Pending deletion is retried automatically on app startup and periodic retry loop.
 
+## Domain Enums
+
+Strongly-typed enums introduced in the B1 quality batch to replace raw `String` / `int` constants.
+
+| Enum | File | Values | Used By |
+|------|------|--------|---------|
+| `CatState` | `core/constants/cat_constants.dart` | `active`, `graduated`, `dormant` | `Cat.state` field |
+| `CatStage` | `core/constants/pixel_cat_constants.dart` | `kitten`, `adolescent`, `adult`, `senior` | Pixel cat sprite stage |
+| `SessionStatus` | `core/constants/session_constants.dart` | `completed`, `abandoned`, `interrupted` | `FocusSession.status` field |
+| `SessionMode` | `models/focus_session.dart` | `countdown`, `stopwatch` | `FocusSession.mode` field |
+| `AccessoryCategory` | `providers/accessory_provider.dart` | `plant`, `wild`, `collar` | Accessory filtering |
+| `ReminderMode` | `models/reminder_config.dart` | `daily`, `weekdays`, `monday`–`sunday` | `ReminderConfig.mode` field |
+| `CelebrationHeadline` | `widgets/celebration/celebration_tier.dart` | `achievementUnlocked`, `achievementAwesome`, `achievementIncredible` | `CelebrationConfig.headline` |
+
 ## V3 Awareness Data Layer
 
 ### Local SQLite — Awareness Tables (DB v4)

@@ -31,7 +31,10 @@ class OverviewRecentSessions extends ConsumerWidget {
               height: 80,
               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
-            error: (_, _) => const SizedBox(height: 80),
+            error: (e, _) {
+              debugPrint('[RecentSessions] Load error: $e');
+              return const SizedBox(height: 80);
+            },
             data: (sessions) {
               if (sessions.isEmpty) {
                 return Padding(

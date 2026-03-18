@@ -1,6 +1,6 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hachimi_app/core/backend/analytics_backend.dart';
+import 'package:hachimi_app/core/backend/crash_backend.dart';
 import 'package:hachimi_app/core/constants/analytics_events.dart';
 import 'package:hachimi_app/core/observability/error_context.dart';
 import 'package:hachimi_app/core/observability/network_state_resolver.dart';
@@ -10,10 +10,23 @@ import 'package:hachimi_app/core/observability/observability_tags.dart';
 ///
 /// Sends errors to:
 /// 1. `debugPrint` (always, for local dev)
-/// 2. `FirebaseCrashlytics.recordError` (release builds only)
-/// 3. GA4 `app_error` event (for analytics dashboards)
+/// 2. [CrashBackend.recordError] (release builds only)
+/// 3. [AnalyticsBackend.logEvent] `app_error` event (for analytics dashboards)
+///
+/// Call [init] once at startup to inject backend implementations.
 class ErrorHandler {
   ErrorHandler._();
+
+  static CrashBackend? _crash;
+  static AnalyticsBackend? _analytics;
+  static bool _initialized = false;
+
+  /// 注入后端实现。在 main() 初始化 Firebase 后调用一次。
+  static void init(CrashBackend crash, AnalyticsBackend analytics) {
+    _crash = crash;
+    _analytics = analytics;
+    _initialized = true;
+  }
 
   /// Record a caught error with structured metadata.
   static Future<void> record(
@@ -28,25 +41,28 @@ class ErrorHandler {
       '[${effectiveContext.feature}] ${effectiveContext.operation} failed: $error',
     );
 
+    if (!_initialized) return;
+
     try {
-      final crashlytics = FirebaseCrashlytics.instance;
+      final crash = _crash!;
       final tags = _sanitizeTags(effectiveContext.toTags());
       for (final entry in tags.entries) {
-        await crashlytics.setCustomKey(entry.key, entry.value);
+        await crash.setCustomKey(entry.key, entry.value);
       }
-      await crashlytics.recordError(
+      await crash.recordError(
         error,
         trace,
         reason: '${effectiveContext.feature}.${effectiveContext.operation}',
         fatal: fatal,
       );
-    } catch (_) {
-      // Crashlytics itself failed — swallow to avoid cascading errors.
+    } catch (e) {
+      // Crash backend itself failed — swallow to avoid cascading errors.
+      debugPrint('[ErrorHandler] secondary error (Crash): $e');
     }
 
-    // Log to GA4 for analytics dashboards
+    // Log to analytics for dashboards
     try {
-      await FirebaseAnalytics.instance.logEvent(
+      await _analytics!.logEvent(
         name: AnalyticsEvents.appError,
         parameters: {
           AnalyticsEvents.paramErrorType: error.runtimeType.toString(),
@@ -57,7 +73,9 @@ class ErrorHandler {
           'error_code': effectiveContext.errorCode,
         },
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[ErrorHandler] secondary error (Analytics): $e');
+    }
   }
 
   static Future<void> recordOperation(
@@ -88,11 +106,14 @@ class ErrorHandler {
     );
   }
 
-  /// Append a breadcrumb log to Crashlytics for debugging context.
+  /// Append a breadcrumb log for debugging context.
   static void breadcrumb(String message) {
+    if (!_initialized) return;
     try {
-      FirebaseCrashlytics.instance.log(message);
-    } catch (_) {}
+      _crash!.log(message);
+    } catch (e) {
+      debugPrint('[ErrorHandler] secondary error (breadcrumb): $e');
+    }
   }
 
   static Future<ErrorContext> _enrichContext(ErrorContext context) async {

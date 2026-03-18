@@ -8,11 +8,11 @@ import 'package:hachimi_app/models/mood.dart';
 ///
 /// [compact] 为 true 时使用 40x40 尺寸且不显示文字标签。
 class MoodSelector extends StatelessWidget {
-  /// 当前选中的心情等级（0-4），null 表示未选择。
-  final int? selectedMood;
+  /// 当前选中的心情，null 表示未选择。
+  final Mood? selectedMood;
 
   /// 心情选中回调。
-  final ValueChanged<int> onMoodSelected;
+  final ValueChanged<Mood> onMoodSelected;
 
   /// 紧凑模式（隐藏标签，缩小尺寸）。
   final bool compact;
@@ -44,14 +44,14 @@ class MoodSelector extends StatelessWidget {
   }
 
   Widget _buildMoodButton(BuildContext context, Mood mood) {
-    final isSelected = selectedMood == mood.value;
+    final isSelected = mood == selectedMood;
     final size = compact ? 40.0 : 56.0;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final ringColor = mood.themeColor(colorScheme);
 
     return GestureDetector(
-      onTap: () => onMoodSelected(mood.value),
+      onTap: () => onMoodSelected(mood),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

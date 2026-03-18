@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/worry.dart';
+import 'package:hachimi_app/services/awareness_repository.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 
 /// 烦恼仓库 — local_worries 表 CRUD + 台账写入。
@@ -176,15 +177,10 @@ class WorryRepository {
     Transaction txn,
     String uid,
   ) async {
-    await txn.rawInsert(
-      'INSERT INTO local_awareness_stats '
-      '(uid, total_light_days, total_weekly_reviews, '
-      'total_worries_resolved, updated_at) '
-      'VALUES (?, 0, 0, 1, ?) '
-      'ON CONFLICT(uid) DO UPDATE SET '
-      'total_worries_resolved = total_worries_resolved + 1, '
-      'updated_at = excluded.updated_at',
-      [uid, DateTime.now().millisecondsSinceEpoch],
+    await AwarenessRepository.incrementStatInTxn(
+      txn,
+      uid,
+      'total_worries_resolved',
     );
   }
 }

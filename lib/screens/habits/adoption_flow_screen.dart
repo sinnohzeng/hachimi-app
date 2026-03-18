@@ -149,7 +149,8 @@ class _AdoptionFlowScreenState extends ConsumerState<AdoptionFlowScreen> {
       await _scheduleReminders(result.habitId, result.reminders);
 
       if (mounted) Navigator.of(context).pop(true);
-    } on Exception {
+    } on Exception catch (e) {
+      debugPrint('[AdoptionFlow] Submit failed: $e');
       if (mounted) {
         AppFeedback.error(context, context.l10n.errorGeneric);
       }

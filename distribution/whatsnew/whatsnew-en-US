@@ -1,5 +1,7 @@
-v2.35.1
+v2.38.0
 
-- Fixed page transition jank in pixel theme
-- Now uses native platform transitions for smoother navigation
-- Background pattern rendering optimized
+- Improved code quality and stability across the app
+- Fixed silent errors that could cause data loss during sync
+- Fixed memory leak in cat sprite rendering
+- Better error messages when things go wrong
+- 125 new automated tests for reliability

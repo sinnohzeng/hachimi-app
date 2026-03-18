@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.38.0] - 2026-03-18
+
+### Added
+
+- **7 个领域枚举**：CatState、CatStage、SessionStatus、SessionMode、AccessoryCategory、ReminderMode、CelebrationHeadline — 消除 30+ 处字符串常量
+- **ActionType 扩展**：新增 6 个 notification-only 值（hydrate、catUpdate 等）+ `isHabitAction` / `isWorryAction` 分组方法
+- **125 个新单元测试**：ActionType 全值 roundtrip、json_helpers 降级、isoWeekId 年界、SessionChecksum 确定性、ChatNotifier 错误映射、GuestUpgrade 决策矩阵、quest_form 输入验证
+- **3 个测试基础设施文件**：共享 Firebase mock、FakeLedgerService、FakeAnalyticsService
+
+### Fixed
+
+- **类型安全**：LedgerChange.type 从 String 改为 ActionType，消除 50+ 处字符串比较；Firestore doc.data() null guard 5 处；反序列化硬转换防御 2 个模型；TimerMode.values 越界保护；MoodSelector / CatBedtimeAnimation int→Mood 类型传播；dynamic cat→Cat? 参数类型
+- **静默错误消除**：7 处 SizedBox.shrink 反模式加 debugPrint；12 处 bare catch 绑定异常并记录；sync_engine 10 处 null-guard early return 加日志
+- **数据完整性**：fire-and-forget SharedPreferences 写入加 await；inventory equip/unequip 加 try-catch；hydration 失败从静默返回空数据改为 rethrow；5 处 jsonDecode FormatException 保护
+- **架构修正**：ErrorHandler 从直接 Firebase SDK 改为注入 CrashBackend/AnalyticsBackend；3 个 core/utils 文件迁移至 services/；LocalDatabaseService 双实例合并；ObservabilityTags PII 过滤逻辑 bug 修复（allowedExtras 优先于 PII hints）
+- **内存泄漏**：pixel_cat_renderer LRU 缓存驱逐时调用 ui.Image.dispose()；4 处 dialog TextEditingController 泄漏加 whenComplete dispose
+- **代码简化**：_decodeInventory 3 份重复合并为 json_helpers；awareness stats upsert 3 份合并为共享方法；4 个超长函数拆分（generateRandomAppearance 123→30 行等）；coin_service finally 块移到成功路径
+- **l10n**：daily_detail_screen 硬编码中文星期名改为 DateFormat；mood_calendar 硬编码英文月份改为 DateFormat；streak_indicator 硬编码英文 Semantics 改为数字；chip_selector_row 'Custom' 默认值改为 required 参数
+
+### Changed
+
+- **SSOT 文档同步**：data-model.md 新增 7 枚举文档；state-management.md 更新 provider 变更；folder-structure.md 更新文件迁移
+
 ## [2.36.0] - 2026-03-18
 
 ### Added

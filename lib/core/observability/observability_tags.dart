@@ -37,8 +37,10 @@ class ObservabilityTags {
   ];
 
   static bool isAllowedKey(String key) {
-    if (!allowedExtras.contains(key)) return false;
-    return !_containsSensitiveHint(key);
+    // 白名单中的 key 直接放行 — 避免 PII 子串误伤
+    // （如 'function_name' 含 'name'、'model_name' 含 'name'）
+    if (allowedExtras.contains(key)) return true;
+    return false;
   }
 
   static bool isPiiKey(String key) {

@@ -534,7 +534,7 @@ class PixelCatRenderer {
     _renderCache[key] = image;
     _renderCacheKeys.add(key);
     while (_renderCacheKeys.length > _maxCacheSize) {
-      _renderCache.remove(_renderCacheKeys.removeAt(0));
+      _renderCache.remove(_renderCacheKeys.removeAt(0))?.dispose();
     }
   }
 }

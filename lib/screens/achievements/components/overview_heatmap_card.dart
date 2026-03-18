@@ -33,7 +33,10 @@ class OverviewHeatmapCard extends ConsumerWidget {
                 height: 120,
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, _) => const SizedBox(height: 120),
+              error: (e, _) {
+                debugPrint('[Heatmap] Load error: $e');
+                return const SizedBox(height: 120);
+              },
               data: (dailyMinutes) =>
                   StreakHeatmap(dailyMinutes: dailyMinutes, days: 30),
             ),

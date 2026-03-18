@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/theme/app_theme.dart';
 import 'package:hachimi_app/core/theme/color_utils.dart';
@@ -435,10 +436,18 @@ class SettingsScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref
-                  .read(userProfileNotifierProvider.notifier)
-                  .resetGuestData();
+              try {
+                await ref
+                    .read(userProfileNotifierProvider.notifier)
+                    .resetGuestData();
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              } catch (e) {
+                debugPrint('[SettingsScreen] resetGuestData failed: $e');
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop();
+                  AppFeedback.error(ctx, l10n.commonError);
+                }
+              }
             },
             child: Text(
               l10n.settingsResetData,

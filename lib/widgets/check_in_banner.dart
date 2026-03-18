@@ -56,7 +56,8 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
 
         AppFeedback.success(context, message);
       }
-    } on Exception {
+    } on Exception catch (e) {
+      debugPrint('[CheckInBanner] Check-in failed: $e');
       if (mounted) {
         AppFeedback.error(context, context.l10n.errorGeneric);
       }
@@ -76,7 +77,10 @@ class _CheckInBannerState extends ConsumerState<CheckInBanner> {
       label: context.l10n.checkInBannerSemantics,
       child: checkedInAsync.when(
         loading: () => _buildLoadingCard(colorScheme),
-        error: (_, _) => const SizedBox.shrink(),
+        error: (e, _) {
+          debugPrint('[CheckInBanner] Load error: $e');
+          return const SizedBox.shrink();
+        },
         data: (hasCheckedIn) {
           final monthly = monthlyAsync.value;
           if (hasCheckedIn) {

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
-import 'package:hachimi_app/core/utils/auth_error_mapper.dart';
+import 'package:hachimi_app/services/auth_error_mapper.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';

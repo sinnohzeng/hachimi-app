@@ -81,7 +81,7 @@ class Cat {
   CatPersonality? get personalityData => personalityMap[personality];
 
   factory Cat.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     final appearanceMap = data['appearance'] as Map<String, dynamic>?;
 
     return Cat(

@@ -10,6 +10,7 @@ import 'package:hachimi_app/providers/awareness_providers.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/error_state.dart';
+import 'package:intl/intl.dart';
 
 /// 每日详情页 — 只读展示单日的心情、光文本、标签、时间轴。
 class DailyDetailScreen extends ConsumerWidget {
@@ -154,41 +155,12 @@ class _DetailContent extends StatelessWidget {
   /// 格式化日期显示。
   String _formatDate(String date, BuildContext context) {
     if (date.length < 10) return date;
-    final year = date.substring(0, 4);
+    final year = int.tryParse(date.substring(0, 4)) ?? 2026;
     final month = int.tryParse(date.substring(5, 7)) ?? 1;
     final day = int.tryParse(date.substring(8, 10)) ?? 1;
-    final dt = DateTime(int.tryParse(year) ?? 2026, month, day);
-    final locale = Localizations.localeOf(context);
-    if (locale.languageCode == 'zh') {
-      final weekdays = ['一', '二', '三', '四', '五', '六', '日'];
-      return '$year\u5E74$month\u6708$day\u65E5 '
-          '\u661F\u671F${weekdays[dt.weekday - 1]}';
-    }
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    return '${weekdays[dt.weekday - 1]}, '
-        '${months[month - 1]} $day, $year';
+    final dt = DateTime(year, month, day);
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMMEEEEd(locale).format(dt);
   }
 
   /// 心情标签。

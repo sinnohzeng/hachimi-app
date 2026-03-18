@@ -36,7 +36,10 @@ class OverviewWeeklyTrend extends ConsumerWidget {
                 height: 150,
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, _) => const SizedBox(height: 150),
+              error: (e, _) {
+                debugPrint('[WeeklyTrend] Load error: $e');
+                return const SizedBox(height: 150);
+              },
               data: (dailyMinutes) =>
                   _buildChart(dailyMinutes, colorScheme, textTheme),
             ),

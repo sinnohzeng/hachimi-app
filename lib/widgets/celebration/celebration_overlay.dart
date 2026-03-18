@@ -266,8 +266,9 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
         pattern: [0, 80, 120, 120, 100, 200],
         intensities: [0, 128, 0, 180, 0, 255],
       );
-    } catch (_) {
+    } catch (e) {
       // 设备不支持自定义振动
+      debugPrint('[CelebrationOverlay] Haptic failed: $e');
     }
   }
 

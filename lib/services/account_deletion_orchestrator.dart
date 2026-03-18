@@ -86,7 +86,8 @@ class AccountDeletionOrchestrator {
       final correlationId = data['correlation_id'] as String?;
       await _attemptRemoteDeletion(uid, correlationId: correlationId);
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[AccountDeletion] Resume pending failed: $e');
       await _clearPending();
       return false;
     }

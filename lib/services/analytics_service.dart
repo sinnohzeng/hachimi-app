@@ -405,61 +405,24 @@ class AnalyticsService {
     int? daysActive,
     int? daysSinceSignup,
   }) async {
-    if (totalHabits != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propTotalHabits,
-          value: totalHabits.toString(),
-        ),
-      );
-    }
-    if (catCount != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propCatCount,
-          value: catCount.toString(),
-        ),
-      );
-    }
-    if (maxCatLevel != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propMaxCatLevel,
-          value: maxCatLevel.toString(),
-        ),
-      );
-    }
-    if (totalFocusMinutes != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propTotalFocusMinutes,
-          value: totalFocusMinutes.toString(),
-        ),
-      );
-    }
-    if (totalHoursLogged != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propTotalHoursLogged,
-          value: totalHoursLogged.toString(),
-        ),
-      );
-    }
-    if (daysActive != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propDaysActive,
-          value: daysActive.toString(),
-        ),
-      );
-    }
-    if (daysSinceSignup != null) {
-      await _safeLog(
-        () => _analytics.setUserProperty(
-          name: AnalyticsEvents.propDaysSinceSignup,
-          value: daysSinceSignup.toString(),
-        ),
-      );
+    final props = <String, int?>{
+      AnalyticsEvents.propTotalHabits: totalHabits,
+      AnalyticsEvents.propCatCount: catCount,
+      AnalyticsEvents.propMaxCatLevel: maxCatLevel,
+      AnalyticsEvents.propTotalFocusMinutes: totalFocusMinutes,
+      AnalyticsEvents.propTotalHoursLogged: totalHoursLogged,
+      AnalyticsEvents.propDaysActive: daysActive,
+      AnalyticsEvents.propDaysSinceSignup: daysSinceSignup,
+    };
+    for (final entry in props.entries) {
+      if (entry.value != null) {
+        await _safeLog(
+          () => _analytics.setUserProperty(
+            name: entry.key,
+            value: entry.value.toString(),
+          ),
+        );
+      }
     }
   }
 }

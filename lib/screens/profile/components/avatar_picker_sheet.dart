@@ -88,7 +88,8 @@ class _AvatarPickerContent extends StatelessWidget {
           .updateAvatar(avatarId);
 
       if (context.mounted) Navigator.of(context).pop();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[AvatarPicker] Save failed: $e');
       if (context.mounted) {
         AppFeedback.error(context, context.l10n.commonError);
       }

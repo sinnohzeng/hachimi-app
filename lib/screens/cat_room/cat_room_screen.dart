@@ -379,6 +379,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
         context.l10n.catRoomArchiveSuccess(cat.name),
       );
     } catch (e) {
+      debugPrint('[CatRoom] Archive failed: $e');
       if (!mounted) return;
       AppFeedback.error(context, context.l10n.catRoomArchiveError);
     }
@@ -420,6 +421,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
         context.l10n.catRoomReactivateSuccess(cat.name),
       );
     } catch (e) {
+      debugPrint('[CatRoom] Reactivate failed: $e');
       if (!mounted) return;
       AppFeedback.error(context, context.l10n.catRoomReactivateError);
     }

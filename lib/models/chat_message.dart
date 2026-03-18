@@ -42,11 +42,13 @@ class ChatMessage {
 
   factory ChatMessage.fromMap(Map<String, dynamic> map) {
     return ChatMessage(
-      id: map['id'] as String,
-      catId: map['cat_id'] as String,
-      role: ChatRole.fromString(map['role'] as String),
-      content: map['content'] as String,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      id: map['id'] as String? ?? '',
+      catId: map['cat_id'] as String? ?? '',
+      role: ChatRole.fromString(map['role'] as String? ?? 'assistant'),
+      content: map['content'] as String? ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        map['created_at'] as int? ?? 0,
+      ),
     );
   }
 

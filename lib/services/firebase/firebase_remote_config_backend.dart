@@ -1,4 +1,5 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hachimi_app/core/backend/remote_config_backend.dart';
 
 /// Firebase Remote Config 后端实现。
@@ -20,8 +21,8 @@ class FirebaseRemoteConfigBackend implements RemoteConfigBackend {
 
     try {
       await _config.fetchAndActivate();
-    } catch (_) {
-      // 使用默认值
+    } catch (e) {
+      debugPrint('[RemoteConfig] Fetch failed, using defaults: $e');
     }
   }
 

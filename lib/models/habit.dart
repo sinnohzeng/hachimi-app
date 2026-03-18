@@ -83,7 +83,7 @@ class Habit {
   }
 
   factory Habit.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
 
     // 防御性解析 reminders 数组（跳过畸形数据）
     final rawReminders = data['reminders'] as List<dynamic>?;

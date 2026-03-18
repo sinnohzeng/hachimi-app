@@ -73,7 +73,12 @@ class _TappableCatSpriteState extends ConsumerState<TappableCatSprite>
     _bounceController.forward(from: 0);
 
     // 持久化到 SQLite
-    ref.read(localCatRepositoryProvider).updateDisplayPose(cat.id, newPose);
+    ref
+        .read(localCatRepositoryProvider)
+        .updateDisplayPose(cat.id, newPose)
+        .catchError(
+          (e) => debugPrint('[TappableCatSprite] Pose update failed: $e'),
+        );
   }
 
   @override

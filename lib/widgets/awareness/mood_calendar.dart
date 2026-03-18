@@ -5,6 +5,7 @@ import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
+import 'package:intl/intl.dart';
 
 /// MoodCalendar — 月历心情日历，显示每日心情 emoji。
 class MoodCalendar extends ConsumerWidget {
@@ -138,25 +139,8 @@ class _MonthNavHeader extends StatelessWidget {
   }
 
   String _formatMonthTitle(BuildContext context) {
-    final locale = Localizations.localeOf(context);
-    if (locale.languageCode == 'zh') {
-      return '$year\u5E74$month\u6708';
-    }
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return '${months[month - 1]} $year';
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMM(locale).format(DateTime(year, month));
   }
 }
 

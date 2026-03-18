@@ -16,8 +16,8 @@ import 'package:hachimi_app/widgets/pixel_cat_sprite.dart';
 /// 文字在动画开始 300ms 后淡入，3 秒后自动消失，
 /// 也可点击提前关闭。
 class CatBedtimeAnimation extends ConsumerStatefulWidget {
-  /// 当前心情等级（0-4）。
-  final int mood;
+  /// 当前心情。
+  final Mood mood;
 
   const CatBedtimeAnimation({super.key, required this.mood});
 
@@ -78,7 +78,7 @@ class _CatBedtimeAnimationState extends ConsumerState<CatBedtimeAnimation>
     final cat = cats.isNotEmpty ? cats.first : null;
     final catName = cat?.name ?? 'Hachimi';
     final locale = Localizations.localeOf(context).languageCode;
-    final scene = switch (Mood.fromValue(widget.mood)) {
+    final scene = switch (widget.mood) {
       Mood.veryHappy => CatResponseScene.lightVeryHappy,
       Mood.happy => CatResponseScene.lightHappy,
       Mood.calm => CatResponseScene.lightCalm,
@@ -155,11 +155,11 @@ class _CatBedtimeAnimationState extends ConsumerState<CatBedtimeAnimation>
   /// 根据心情等级构建 sprite 动画曲线。
   Animation<double> _buildMoodAnimation() {
     final curve = switch (widget.mood) {
-      0 => Curves.bounceOut,
-      1 => Curves.easeOutBack,
-      2 => Curves.easeInOut,
-      3 => Curves.easeInOutSine,
-      _ => Curves.easeInCubic,
+      Mood.veryHappy => Curves.bounceOut,
+      Mood.happy => Curves.easeOutBack,
+      Mood.calm => Curves.easeInOut,
+      Mood.down => Curves.easeInOutSine,
+      Mood.veryDown => Curves.easeInCubic,
     };
     return CurvedAnimation(parent: _spriteController, curve: curve);
   }
@@ -167,20 +167,20 @@ class _CatBedtimeAnimationState extends ConsumerState<CatBedtimeAnimation>
   /// 根据心情等级计算位移偏移。
   Offset _moodOffset(double t) {
     return switch (widget.mood) {
-      0 => Offset(0, -20 * (1 - t)), // 弹跳（bounce）
-      1 => Offset(8 * (1 - t), 0), // 轻推（nudge）
-      2 => Offset.zero, // 呼吸（breathe，仅缩放）
-      3 => Offset(-6 * (1 - t), 4 * t), // 靠近（lean-in）
-      _ => Offset(0, 8 * t), // 蜷缩（curl-up）
+      Mood.veryHappy => Offset(0, -20 * (1 - t)), // 弹跳（bounce）
+      Mood.happy => Offset(8 * (1 - t), 0), // 轻推（nudge）
+      Mood.calm => Offset.zero, // 呼吸（breathe，仅缩放）
+      Mood.down => Offset(-6 * (1 - t), 4 * t), // 靠近（lean-in）
+      Mood.veryDown => Offset(0, 8 * t), // 蜷缩（curl-up）
     };
   }
 
   /// 根据心情等级计算缩放比例。
   double _moodScale(double t) {
     return switch (widget.mood) {
-      0 => 1.0 + 0.1 * t, // 弹跳略放大
-      2 => 1.0 + 0.05 * (1 - (2 * t - 1).abs()), // 呼吸效果
-      4 => 1.0 - 0.05 * t, // 蜷缩略缩小
+      Mood.veryHappy => 1.0 + 0.1 * t, // 弹跳略放大
+      Mood.calm => 1.0 + 0.05 * (1 - (2 * t - 1).abs()), // 呼吸效果
+      Mood.veryDown => 1.0 - 0.05 * t, // 蜷缩略缩小
       _ => 1.0,
     };
   }

@@ -52,4 +52,55 @@ void main() {
       expect(today.substring(0, 7), equals(month));
     });
   });
+
+  group('AppDateUtils.isoWeekId', () {
+    test('normal date returns correct ISO week', () {
+      // 2026-03-17 是周二，ISO 第 12 周
+      expect(AppDateUtils.isoWeekId(DateTime(2026, 3, 17)), equals('2026-W12'));
+    });
+
+    test('week number is zero-padded', () {
+      // 2026-01-05 是周一，ISO 第 2 周
+      expect(AppDateUtils.isoWeekId(DateTime(2026, 1, 5)), equals('2026-W02'));
+    });
+
+    test('first day of year may belong to previous year week', () {
+      // 2026-01-01 是周四，属于 2026-W01
+      expect(AppDateUtils.isoWeekId(DateTime(2026, 1, 1)), equals('2026-W01'));
+    });
+
+    test('year boundary: 2025-12-29 belongs to ISO 2026-W01', () {
+      // 2025-12-29 是周一，ISO 8601 中它属于 2026 年第 1 周
+      // （因为该周的周四 2026-01-01 在 2026 年）
+      expect(
+        AppDateUtils.isoWeekId(DateTime(2025, 12, 29)),
+        equals('2026-W01'),
+      );
+    });
+
+    test('year boundary: 2024-12-30 belongs to ISO 2025-W01', () {
+      // 2024-12-30 是周一，该周四是 2025-01-02 → 2025-W01
+      expect(
+        AppDateUtils.isoWeekId(DateTime(2024, 12, 30)),
+        equals('2025-W01'),
+      );
+    });
+
+    test('last week of year: 2025-12-28 is 2025-W52', () {
+      // 2025-12-28 是周日，该周四是 2025-12-25 → 2025-W52
+      expect(
+        AppDateUtils.isoWeekId(DateTime(2025, 12, 28)),
+        equals('2025-W52'),
+      );
+    });
+
+    test('matches yyyy-Wnn format', () {
+      final result = AppDateUtils.isoWeekId(DateTime(2026, 6, 15));
+      expect(
+        RegExp(r'^\d{4}-W\d{2}$').hasMatch(result),
+        isTrue,
+        reason: 'isoWeekId should match yyyy-Wnn, got: $result',
+      );
+    });
+  });
 }

@@ -163,7 +163,9 @@ class LocalCatRepository {
         },
       );
     });
-    _ledger.notifyChange(LedgerChange(type: ActionType.equip, affectedIds: [catId]));
+    _ledger.notifyChange(
+      LedgerChange(type: ActionType.equip, affectedIds: [catId]),
+    );
   }
 
   /// 卸下配饰。
@@ -190,7 +192,9 @@ class LocalCatRepository {
         payload: {'catId': catId, 'accessoryId': accessoryId},
       );
     });
-    _ledger.notifyChange(LedgerChange(type: ActionType.unequip, affectedIds: [catId]));
+    _ledger.notifyChange(
+      LedgerChange(type: ActionType.unequip, affectedIds: [catId]),
+    );
   }
 
   /// 更新猫的姿势偏好（纯本地，不写台账）。
@@ -278,7 +282,10 @@ class LocalCatRepository {
     });
 
     _ledger.notifyChange(
-      LedgerChange(type: ActionType.habitRestore, affectedIds: [habitId, catId]),
+      LedgerChange(
+        type: ActionType.habitRestore,
+        affectedIds: [habitId, catId],
+      ),
     );
   }
 

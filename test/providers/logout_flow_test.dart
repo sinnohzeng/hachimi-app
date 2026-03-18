@@ -50,7 +50,7 @@ void main() {
 
       expect(container.read(onboardingCompleteProvider), isFalse);
 
-      container.read(onboardingCompleteProvider.notifier).complete();
+      await container.read(onboardingCompleteProvider.notifier).complete();
 
       expect(container.read(onboardingCompleteProvider), isTrue);
       expect(prefs.getBool(AppPrefsKeys.onboardingComplete), isTrue);
@@ -90,7 +90,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      container.read(onboardingCompleteProvider.notifier).complete();
+      await container.read(onboardingCompleteProvider.notifier).complete();
 
       expect(prefs.getBool(AppPrefsKeys.hasOnboardedBefore), isTrue);
     });

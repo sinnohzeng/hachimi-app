@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 
@@ -155,8 +156,9 @@ class FirebaseAuthBackend implements AuthBackend {
   Future<void> signOut() async {
     try {
       await _googleSignIn.signOut().timeout(const Duration(seconds: 3));
-    } catch (_) {
+    } catch (e) {
       // Google 未初始化、已退出、或网络超时 — 不阻止 Firebase signOut
+      debugPrint('[AuthBackend] Google signOut failed (non-blocking): $e');
     }
     await _auth.signOut();
   }

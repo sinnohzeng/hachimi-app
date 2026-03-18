@@ -38,7 +38,7 @@ class ChipSelectorRow extends StatelessWidget {
     required this.labelBuilder,
     required this.onSelected,
     this.onCustom,
-    this.customLabel = 'Custom',
+    required this.customLabel,
   });
 
   @override

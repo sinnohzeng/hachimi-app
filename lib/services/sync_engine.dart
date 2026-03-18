@@ -134,7 +134,7 @@ class SyncEngine {
     final userDoc = await userRef.get();
     if (!userDoc.exists) return;
 
-    final data = userDoc.data()! as Map<String, dynamic>;
+    final data = userDoc.data() as Map<String, dynamic>? ?? {};
 
     // 简单字段映射：Firestore 字段名 → 物化键
     const fieldMap = {
@@ -362,7 +362,10 @@ class SyncEngine {
     final coins = action.result['coins'] as int? ?? 0;
     final milestone = action.result['milestone'] as int? ?? 0;
 
-    if (month == null || day == null) return;
+    if (month == null || day == null) {
+      debugPrint('[SyncEngine] checkIn: missing required field, skipping');
+      return;
+    }
 
     final userRef = _db.collection('users').doc(uid);
     final monthRef = userRef.collection('monthlyCheckIns').doc(month);
@@ -387,7 +390,10 @@ class SyncEngine {
     final coins = action.result['coins'] as int? ?? 0;
     final xp = action.result['xp'] as int? ?? 0;
 
-    if (habitId == null || catId == null) return;
+    if (habitId == null || catId == null) {
+      debugPrint('[SyncEngine] session: missing required field, skipping');
+      return;
+    }
 
     final sessionRef = _db
         .collection('users')
@@ -444,7 +450,10 @@ class SyncEngine {
     final accessoryId = action.payload['accessoryId'] as String?;
     final price = action.payload['price'] as int? ?? 0;
 
-    if (accessoryId == null) return;
+    if (accessoryId == null) {
+      debugPrint('[SyncEngine] purchase: missing required field, skipping');
+      return;
+    }
 
     final userRef = _db.collection('users').doc(uid);
     batch.update(userRef, {
@@ -457,7 +466,10 @@ class SyncEngine {
     final catId = action.payload['catId'] as String?;
     final accessoryId = action.payload['accessoryId'] as String?;
 
-    if (catId == null) return;
+    if (catId == null) {
+      debugPrint('[SyncEngine] equip: missing required field, skipping');
+      return;
+    }
 
     final userRef = _db.collection('users').doc(uid);
     final catRef = userRef.collection('cats').doc(catId);
@@ -487,7 +499,10 @@ class SyncEngine {
     LedgerAction action,
   ) async {
     final habitId = action.payload['habitId'] as String?;
-    if (habitId == null) return;
+    if (habitId == null) {
+      debugPrint('[SyncEngine] habit: missing required field, skipping');
+      return;
+    }
 
     final userRef = _db.collection('users').doc(uid);
     final habitRef = userRef.collection('habits').doc(habitId);
@@ -564,7 +579,12 @@ class SyncEngine {
   void _syncProfileUpdate(WriteBatch batch, String uid, LedgerAction action) {
     final field = action.payload['field'] as String?;
     final value = action.payload['value'] as String?;
-    if (field == null) return;
+    if (field == null) {
+      debugPrint(
+        '[SyncEngine] profileUpdate: missing required field, skipping',
+      );
+      return;
+    }
 
     final userRef = _db.collection('users').doc(uid);
     batch.update(userRef, {field: value});
@@ -577,7 +597,10 @@ class SyncEngine {
     LedgerAction action,
   ) async {
     final date = action.payload['date'] as String?;
-    if (date == null) return;
+    if (date == null) {
+      debugPrint('[SyncEngine] dailyLight: missing required field, skipping');
+      return;
+    }
 
     final db = await _ledger.database;
     final rows = await db.query(
@@ -604,7 +627,10 @@ class SyncEngine {
     LedgerAction action,
   ) async {
     final weekId = action.payload['weekId'] as String?;
-    if (weekId == null) return;
+    if (weekId == null) {
+      debugPrint('[SyncEngine] weeklyReview: missing required field, skipping');
+      return;
+    }
 
     final db = await _ledger.database;
     final rows = await db.query(
@@ -631,7 +657,10 @@ class SyncEngine {
     LedgerAction action,
   ) async {
     final worryId = action.payload['worryId'] as String?;
-    if (worryId == null) return;
+    if (worryId == null) {
+      debugPrint('[SyncEngine] worry: missing required field, skipping');
+      return;
+    }
 
     final db = await _ledger.database;
     final rows = await db.query(
@@ -653,7 +682,10 @@ class SyncEngine {
 
   void _syncAchievement(WriteBatch batch, String uid, LedgerAction action) {
     final achievementId = action.payload['achievementId'] as String?;
-    if (achievementId == null) return;
+    if (achievementId == null) {
+      debugPrint('[SyncEngine] achievement: missing required field, skipping');
+      return;
+    }
 
     final coins = action.result['coins'] as int? ?? 0;
 
