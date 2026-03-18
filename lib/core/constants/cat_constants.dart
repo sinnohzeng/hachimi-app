@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 
 // ─── Cat State（生命周期状态）───
 
-/// 猫的生命周期状态常量 — Firestore 中 state 字段的合法值。
-class CatState {
-  CatState._();
-  static const String active = 'active';
-  static const String graduated = 'graduated';
-  static const String dormant = 'dormant';
+/// 猫的生命周期状态 — Firestore / SQLite 中 state 字段的合法值。
+enum CatState {
+  active('active'),
+  graduated('graduated'),
+  dormant('dormant');
 
-  static const List<String> values = [active, graduated, dormant];
+  const CatState(this.value);
+  final String value;
+
+  static CatState fromValue(String value) {
+    return CatState.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw ArgumentError('Unknown CatState: $value'),
+    );
+  }
 }
 
 // ─── Personalities ───

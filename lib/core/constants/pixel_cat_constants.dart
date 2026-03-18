@@ -712,19 +712,48 @@ const Map<String, double> stageThresholds = {
 /// 阶段列表（有序）
 const List<String> stageList = ['kitten', 'adolescent', 'adult', 'senior'];
 
-/// 根据进度百分比计算成长阶段
-String stageForProgress(double progress) {
-  if (progress >= 1.0) return 'senior';
-  if (progress >= 0.50) return 'adult';
-  if (progress >= 0.10) return 'adolescent';
-  return 'kitten';
+/// 猫的成长阶段枚举。
+enum CatStage {
+  kitten('kitten', 0),
+  adolescent('adolescent', 1),
+  adult('adult', 2),
+  senior('senior', 3);
+
+  const CatStage(this.value, this.order);
+  final String value;
+  final int order;
+
+  static CatStage fromValue(String value) {
+    return CatStage.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => CatStage.kitten, // 兼容历史数据的安全回退
+    );
+  }
+
+  /// 根据总分钟数计算成长阶段。
+  static CatStage computeFromMinutes(int totalMinutes) {
+    final progress = totalMinutes / 12000.0; // 200h = 12000min
+    if (progress >= 1.0) return senior;
+    if (progress >= 0.50) return adult;
+    if (progress >= 0.10) return adolescent;
+    return kitten;
+  }
+
+  /// 比较两个阶段，返回较高的。
+  static CatStage higher(CatStage a, CatStage b) =>
+      a.order >= b.order ? a : b;
 }
 
-/// 阶段顺序索引（用于比较）
-int stageOrder(String stage) {
-  final idx = stageList.indexOf(stage);
-  return idx >= 0 ? idx : 0;
+/// 根据进度百分比计算成长阶段（委托到 [CatStage]）。
+String stageForProgress(double progress) {
+  if (progress >= 1.0) return CatStage.senior.value;
+  if (progress >= 0.50) return CatStage.adult.value;
+  if (progress >= 0.10) return CatStage.adolescent.value;
+  return CatStage.kitten.value;
 }
+
+/// 阶段顺序索引（委托到 [CatStage]）。
+int stageOrder(String stage) => CatStage.fromValue(stage).order;
 
 /// 计算当前阶段内的进度（0.0-1.0）
 double stageProgressInRange(double progress) {

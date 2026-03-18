@@ -468,7 +468,7 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
       await ledger.migrateUid(guestUid, currentUid);
       await prefs.remove(AppPrefsKeys.localGuestUid);
       await prefs.setBool(AppPrefsKeys.dataHydrated, true);
-      ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+      ledger.notifyChange(const LedgerChange(type: ActionType.hydrate));
       debugPrint('[RECOVERY] migrated orphaned guest data');
     } on Exception catch (e) {
       ErrorHandler.recordOperation(

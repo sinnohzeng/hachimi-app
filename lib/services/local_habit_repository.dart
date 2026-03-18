@@ -69,7 +69,7 @@ class LocalHabitRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'habit_create', affectedIds: [habit.id]),
+      LedgerChange(type: ActionType.habitCreate, affectedIds: [habit.id]),
     );
   }
 
@@ -93,7 +93,7 @@ class LocalHabitRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'habit_update', affectedIds: [habit.id]),
+      LedgerChange(type: ActionType.habitUpdate, affectedIds: [habit.id]),
     );
   }
 
@@ -117,7 +117,7 @@ class LocalHabitRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'habit_delete', affectedIds: [habitId]),
+      LedgerChange(type: ActionType.habitDelete, affectedIds: [habitId]),
     );
   }
 

@@ -101,7 +101,7 @@ class AwarenessRepository {
       }
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'light_recorded', affectedIds: [light.id]),
+      LedgerChange(type: ActionType.lightRecorded, affectedIds: [light.id]),
     );
   }
 
@@ -119,7 +119,7 @@ class AwarenessRepository {
       }
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'light_deleted', affectedIds: [date]),
+      LedgerChange(type: ActionType.lightDeleted, affectedIds: [date]),
     );
   }
 
@@ -202,8 +202,8 @@ class AwarenessRepository {
     });
     // 完成的回顾发 'weekly_review_completed'，草稿发 'weekly_review_saved'
     final changeType = review.isComplete
-        ? 'weekly_review_completed'
-        : 'weekly_review_saved';
+        ? ActionType.weeklyReviewCompleted
+        : ActionType.weeklyReviewSaved;
     _ledger.notifyChange(
       LedgerChange(type: changeType, affectedIds: [review.id]),
     );

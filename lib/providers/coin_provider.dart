@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/monthly_check_in.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
@@ -17,10 +18,10 @@ final coinBalanceProvider = StreamProvider<int>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'check_in' ||
-        c.type == 'focus_complete' ||
-        c.type == 'purchase' ||
-        c.type == 'achievement_unlocked',
+        c.type == ActionType.checkIn ||
+        c.type == ActionType.focusComplete ||
+        c.type == ActionType.purchase ||
+        c.type == ActionType.achievementUnlocked,
     read: () async => await ledger.getMaterializedInt(uid, 'coins') ?? 0,
   );
 });
@@ -36,7 +37,7 @@ final hasCheckedInTodayProvider = StreamProvider<bool>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type == 'check_in',
+    filter: (c) => c.isGlobalRefresh || c.type == ActionType.checkIn,
     read: () async {
       final lastDate = await ledger.getMaterialized(uid, 'last_check_in_date');
       return lastDate == today;
@@ -55,7 +56,7 @@ final monthlyCheckInProvider = StreamProvider<MonthlyCheckIn?>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type == 'check_in',
+    filter: (c) => c.isGlobalRefresh || c.type == ActionType.checkIn,
     read: () => _readMonthlyCheckIn(ledger, uid, month),
   );
 });

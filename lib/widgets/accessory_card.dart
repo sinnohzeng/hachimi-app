@@ -118,18 +118,11 @@ class AccessoryCard extends StatelessWidget {
     );
   }
 
-  String _categoryEmoji(String category) {
-    switch (category) {
-      case 'plant':
-        return '🌿';
-      case 'wild':
-        return '🪶';
-      case 'collar':
-        return '📿';
-      default:
-        return '✨';
-    }
-  }
+  String _categoryEmoji(AccessoryCategory category) => switch (category) {
+    AccessoryCategory.plant => '🌿',
+    AccessoryCategory.wild => '🪶',
+    AccessoryCategory.collar => '📿',
+  };
 
   Color _priceColor(int price, ColorScheme colorScheme) {
     if (price >= 350) {

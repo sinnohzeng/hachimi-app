@@ -1,5 +1,6 @@
+import 'package:hachimi_app/core/constants/cat_constants.dart' show CatState;
 import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
-    show stageHourThresholds, stageList;
+    show CatStage;
 import 'package:hachimi_app/models/cat.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
@@ -17,8 +18,8 @@ class LocalCatRepository {
     final db = await _ledger.database;
     final rows = await db.query(
       'local_cats',
-      where: "uid = ? AND state = 'active'",
-      whereArgs: [uid],
+      where: 'uid = ? AND state = ?',
+      whereArgs: [uid, CatState.active.value],
       orderBy: 'created_at ASC',
     );
     return rows.map(Cat.fromSqlite).toList();
@@ -162,7 +163,7 @@ class LocalCatRepository {
         },
       );
     });
-    _ledger.notifyChange(LedgerChange(type: 'equip', affectedIds: [catId]));
+    _ledger.notifyChange(LedgerChange(type: ActionType.equip, affectedIds: [catId]));
   }
 
   /// 卸下配饰。
@@ -189,7 +190,7 @@ class LocalCatRepository {
         payload: {'catId': catId, 'accessoryId': accessoryId},
       );
     });
-    _ledger.notifyChange(LedgerChange(type: 'unequip', affectedIds: [catId]));
+    _ledger.notifyChange(LedgerChange(type: ActionType.unequip, affectedIds: [catId]));
   }
 
   /// 更新猫的姿势偏好（纯本地，不写台账）。
@@ -202,7 +203,7 @@ class LocalCatRepository {
       whereArgs: [catId],
     );
     _ledger.notifyChange(
-      LedgerChange(type: 'cat_update', affectedIds: [catId]),
+      LedgerChange(type: ActionType.catUpdate, affectedIds: [catId]),
     );
   }
 
@@ -218,7 +219,7 @@ class LocalCatRepository {
     await db.transaction((txn) async {
       await txn.update(
         'local_cats',
-        {'state': 'graduated'},
+        {'state': CatState.graduated.value},
         where: 'id = ?',
         whereArgs: [catId],
       );
@@ -240,7 +241,7 @@ class LocalCatRepository {
     });
 
     _ledger.notifyChange(
-      LedgerChange(type: 'habit_delete', affectedIds: [habitId, catId]),
+      LedgerChange(type: ActionType.habitDelete, affectedIds: [habitId, catId]),
     );
   }
 
@@ -255,7 +256,7 @@ class LocalCatRepository {
     await db.transaction((txn) async {
       await txn.update(
         'local_cats',
-        {'state': 'active'},
+        {'state': CatState.active.value},
         where: 'id = ?',
         whereArgs: [catId],
       );
@@ -277,30 +278,18 @@ class LocalCatRepository {
     });
 
     _ledger.notifyChange(
-      LedgerChange(type: 'habit_restore', affectedIds: [habitId, catId]),
+      LedgerChange(type: ActionType.habitRestore, affectedIds: [habitId, catId]),
     );
   }
 
   // ─── 内部工具 ───
 
-  /// 阶段计算 — 使用 pixel_cat_constants.dart 中的 SSOT 阈值。
-  static String _computeStage(int totalMinutes) {
-    final hours = totalMinutes / 60.0;
-    for (final stage in stageList.reversed) {
-      if (hours >= stageHourThresholds[stage]!) return stage;
-    }
-    return 'kitten';
-  }
-
-  static const _stageOrder = {
-    'kitten': 0,
-    'adolescent': 1,
-    'adult': 2,
-    'senior': 3,
-  };
+  /// 阶段计算 — 委托到 [CatStage] 枚举。
+  static String _computeStage(int totalMinutes) =>
+      CatStage.computeFromMinutes(totalMinutes).value;
 
   static String _higherStage(String? a, String b) {
     if (a == null) return b;
-    return (_stageOrder[a] ?? 0) >= (_stageOrder[b] ?? 0) ? a : b;
+    return CatStage.higher(CatStage.fromValue(a), CatStage.fromValue(b)).value;
   }
 }

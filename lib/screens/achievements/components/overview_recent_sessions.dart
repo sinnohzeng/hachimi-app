@@ -87,7 +87,7 @@ class _SessionTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    final modeLabel = session.mode == 'countdown'
+    final modeLabel = session.mode == SessionMode.countdown
         ? l10n.sessionCountdown
         : l10n.sessionStopwatch;
     final statusIcon = session.isCompleted

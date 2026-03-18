@@ -7,6 +7,16 @@ enum CelebrationTier { standard, notable, epic }
 /// 纸屑形状类型。
 enum ConfettiShape { rectangle, circle, star, diamond, streamer }
 
+/// 庆祝标题类型。
+enum CelebrationHeadline {
+  achievementUnlocked('achievementUnlocked'),
+  achievementAwesome('achievementAwesome'),
+  achievementIncredible('achievementIncredible');
+
+  const CelebrationHeadline(this.value);
+  final String value;
+}
+
 /// 庆祝动画配置 — 每个层级对应一组 const 预设。
 class CelebrationConfig {
   final Duration bgFadeDuration;
@@ -18,7 +28,7 @@ class CelebrationConfig {
   final int particleCount;
   final bool hasBurstOrigin;
   final List<ConfettiShape> shapes;
-  final String celebrationHeadlineKey;
+  final CelebrationHeadline celebrationHeadlineKey;
 
   const CelebrationConfig({
     required this.bgFadeDuration,
@@ -44,7 +54,7 @@ class CelebrationConfig {
     particleCount: 20,
     hasBurstOrigin: false,
     shapes: [ConfettiShape.rectangle, ConfettiShape.circle],
-    celebrationHeadlineKey: 'achievementUnlocked',
+    celebrationHeadlineKey: CelebrationHeadline.achievementUnlocked,
   );
 
   /// Notable: 中等仪式感，单次 mediumImpact。
@@ -58,7 +68,7 @@ class CelebrationConfig {
     particleCount: 40,
     hasBurstOrigin: true,
     shapes: [ConfettiShape.rectangle, ConfettiShape.circle, ConfettiShape.star],
-    celebrationHeadlineKey: 'achievementAwesome',
+    celebrationHeadlineKey: CelebrationHeadline.achievementAwesome,
   );
 
   /// Epic: 三阶段仪式，全编排触觉 + 聚光灯。
@@ -72,7 +82,7 @@ class CelebrationConfig {
     particleCount: 60,
     hasBurstOrigin: true,
     shapes: ConfettiShape.values,
-    celebrationHeadlineKey: 'achievementIncredible',
+    celebrationHeadlineKey: CelebrationHeadline.achievementIncredible,
   );
 
   /// 根据成就定义自动选择层级。

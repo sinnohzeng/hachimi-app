@@ -36,7 +36,7 @@ class UserProfileNotifier extends Notifier<void> {
     if (displayName != null) {
       await ledger.setMaterialized(uid, 'display_name', displayName);
     }
-    ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+    ledger.notifyChange(const LedgerChange(type: ActionType.hydrate));
   }
 
   /// 更新显示名称（本地优先 → Auth + Firestore fire-and-forget）。

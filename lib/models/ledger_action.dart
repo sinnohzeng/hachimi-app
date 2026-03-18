@@ -2,6 +2,7 @@ import 'dart:convert';
 
 /// 行为台账 — 行为类型枚举。
 /// 每个用户操作都映射到一个 ActionType，写入 action_ledger 表。
+/// 同时用于 [LedgerChange] 的变更通知（包含仅通知用途的值）。
 enum ActionType {
   checkIn('check_in'),
   focusComplete('focus_complete'),
@@ -25,7 +26,15 @@ enum ActionType {
   worryCreated('worry_created'),
   worryUpdated('worry_updated'),
   worryResolved('worry_resolved'),
-  monthlyRitualSet('monthly_ritual_set');
+  monthlyRitualSet('monthly_ritual_set'),
+
+  // 仅通知用途 — 不写入 action_ledger，仅用于 LedgerChange 广播
+  hydrate('hydrate'),
+  catUpdate('cat_update'),
+  lightDeleted('light_deleted'),
+  coinsEarned('coins_earned'),
+  worryDeleted('worry_deleted'),
+  weeklyReviewSaved('weekly_review_saved');
 
   const ActionType(this.value);
   final String value;
@@ -36,6 +45,20 @@ enum ActionType {
       orElse: () => throw ArgumentError('Unknown ActionType: $value'),
     );
   }
+
+  /// 是否为习惯相关操作。
+  bool get isHabitAction =>
+      this == habitCreate ||
+      this == habitUpdate ||
+      this == habitDelete ||
+      this == habitRestore;
+
+  /// 是否为烦恼相关操作。
+  bool get isWorryAction =>
+      this == worryCreated ||
+      this == worryUpdated ||
+      this == worryResolved ||
+      this == worryDeleted;
 }
 
 /// 行为台账记录 — 不可变事件日志。
@@ -127,12 +150,12 @@ class LedgerAction {
 
 /// 台账变更事件 — LedgerService 广播用。
 class LedgerChange {
-  final String type;
+  final ActionType type;
   final List<String> affectedIds;
 
   const LedgerChange({required this.type, this.affectedIds = const []});
 
   /// 全局刷新 — 底层数据源发生批量变更（水化、UID 迁移等），
   /// 所有依赖本地数据的 Provider 都应重新读取。
-  bool get isGlobalRefresh => type == 'hydrate';
+  bool get isGlobalRefresh => type == ActionType.hydrate;
 }

@@ -44,7 +44,7 @@ class CoinService {
       );
       rethrow;
     } finally {
-      _ledger.notifyChange(const LedgerChange(type: 'check_in'));
+      _ledger.notifyChange(const LedgerChange(type: ActionType.checkIn));
     }
   }
 
@@ -200,7 +200,7 @@ class CoinService {
         (txn) => _executePurchaseTxn(txn, uid, accessoryId, price),
       );
       if (result) {
-        _ledger.notifyChange(const LedgerChange(type: 'purchase'));
+        _ledger.notifyChange(const LedgerChange(type: ActionType.purchase));
       }
       return result;
     } catch (e, stack) {
@@ -283,7 +283,7 @@ class CoinService {
       );
       rethrow;
     } finally {
-      _ledger.notifyChange(const LedgerChange(type: 'coins_earned'));
+      _ledger.notifyChange(const LedgerChange(type: ActionType.coinsEarned));
     }
   }
 

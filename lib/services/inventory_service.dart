@@ -83,7 +83,7 @@ class InventoryService {
         );
       });
 
-      _ledger.notifyChange(LedgerChange(type: 'equip', affectedIds: [catId]));
+      _ledger.notifyChange(LedgerChange(type: ActionType.equip, affectedIds: [catId]));
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,
@@ -153,7 +153,7 @@ class InventoryService {
         );
       });
 
-      _ledger.notifyChange(LedgerChange(type: 'unequip', affectedIds: [catId]));
+      _ledger.notifyChange(LedgerChange(type: ActionType.unequip, affectedIds: [catId]));
     } catch (e, stack) {
       ErrorHandler.recordOperation(
         e,

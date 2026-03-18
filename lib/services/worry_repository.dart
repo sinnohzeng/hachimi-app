@@ -93,7 +93,7 @@ class WorryRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_created', affectedIds: [worry.id]),
+      LedgerChange(type: ActionType.worryCreated, affectedIds: [worry.id]),
     );
   }
 
@@ -117,7 +117,7 @@ class WorryRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_updated', affectedIds: [worry.id]),
+      LedgerChange(type: ActionType.worryUpdated, affectedIds: [worry.id]),
     );
   }
 
@@ -150,7 +150,7 @@ class WorryRepository {
       await _incrementWorriesResolvedInTxn(txn, uid);
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_resolved', affectedIds: [worryId]),
+      LedgerChange(type: ActionType.worryResolved, affectedIds: [worryId]),
     );
   }
 
@@ -165,7 +165,7 @@ class WorryRepository {
       );
     });
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_deleted', affectedIds: [worryId]),
+      LedgerChange(type: ActionType.worryDeleted, affectedIds: [worryId]),
     );
   }
 

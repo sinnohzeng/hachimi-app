@@ -176,9 +176,9 @@ class SessionCompletionService {
     final targetMinutes = timerState.mode == TimerMode.countdown
         ? timerState.totalSeconds ~/ 60
         : 0;
-    final modeStr = timerState.mode == TimerMode.countdown
-        ? 'countdown'
-        : 'stopwatch';
+    final sessionMode = timerState.mode == TimerMode.countdown
+        ? SessionMode.countdown
+        : SessionMode.stopwatch;
     final startedAt = timerState.startedAt ?? DateTime.now();
 
     return FocusSession(
@@ -196,7 +196,7 @@ class SessionCompletionService {
       completionRatio: completionRatio,
       xpEarned: rewards.xp.totalXp,
       coinsEarned: rewards.coins,
-      mode: modeStr,
+      mode: sessionMode,
       checksum: SessionChecksum.compute(
         habitId: habitId,
         durationMinutes: minutes,

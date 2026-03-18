@@ -41,7 +41,7 @@ class AccessoryShopScreen extends ConsumerWidget {
             id: id,
             displayName: accessoryDisplayName(id),
             price: prices[id] ?? 150,
-            category: 'plant',
+            category: AccessoryCategory.plant,
             isOwned: ownedSet.contains(id),
           ),
         )
@@ -53,7 +53,7 @@ class AccessoryShopScreen extends ConsumerWidget {
             id: id,
             displayName: accessoryDisplayName(id),
             price: prices[id] ?? 250,
-            category: 'wild',
+            category: AccessoryCategory.wild,
             isOwned: ownedSet.contains(id),
           ),
         )
@@ -68,7 +68,7 @@ class AccessoryShopScreen extends ConsumerWidget {
             id: id,
             displayName: accessoryDisplayName(id),
             price: prices[id] ?? 100,
-            category: 'collar',
+            category: AccessoryCategory.collar,
             isOwned: ownedSet.contains(id),
           ),
         );

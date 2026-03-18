@@ -1,6 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hachimi_app/core/constants/session_constants.dart';
 
+/// 专注会话计时模式。
+enum SessionMode {
+  countdown('countdown'),
+  stopwatch('stopwatch');
+
+  const SessionMode(this.value);
+  final String value;
+
+  static SessionMode fromValue(String value) {
+    return SessionMode.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => SessionMode.countdown, // 安全回退
+    );
+  }
+}
+
 /// Focus session model — maps to Firestore `users/{uid}/habits/{habitId}/sessions/{sessionId}`.
 /// Records each focus session with duration, rewards, and completion status.
 ///
@@ -18,7 +34,7 @@ class FocusSession {
   final double completionRatio; // actual / target（正计时为 1.0）
   final int xpEarned;
   final int coinsEarned; // durationMinutes × 10
-  final String mode; // 'countdown' / 'stopwatch'
+  final SessionMode mode;
   final String? checksum; // HMAC-SHA256 签名
   final String clientVersion; // 客户端版本号
 
@@ -41,10 +57,10 @@ class FocusSession {
   });
 
   /// 会话是否正常完成。
-  bool get isCompleted => status == SessionStatus.completed;
+  bool get isCompleted => status == SessionStatus.completed.value;
 
   /// 会话是否被放弃。
-  bool get isAbandoned => status == SessionStatus.abandoned;
+  bool get isAbandoned => status == SessionStatus.abandoned.value;
 
   factory FocusSession.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -57,11 +73,11 @@ class FocusSession {
       durationMinutes: data['durationMinutes'] as int? ?? 0,
       targetDurationMinutes: data['targetDurationMinutes'] as int? ?? 0,
       pausedSeconds: data['pausedSeconds'] as int? ?? 0,
-      status: data['status'] as String? ?? SessionStatus.completed,
+      status: data['status'] as String? ?? SessionStatus.completed.value,
       completionRatio: (data['completionRatio'] as num?)?.toDouble() ?? 1.0,
       xpEarned: data['xpEarned'] as int? ?? 0,
       coinsEarned: data['coinsEarned'] as int? ?? 0,
-      mode: data['mode'] as String? ?? 'countdown',
+      mode: SessionMode.fromValue(data['mode'] as String? ?? 'countdown'),
       checksum: data['checksum'] as String?,
       clientVersion: data['clientVersion'] as String? ?? '',
     );
@@ -83,7 +99,7 @@ class FocusSession {
       'completion_ratio': completionRatio,
       'xp_earned': xpEarned,
       'coins_earned': coinsEarned,
-      'mode': mode,
+      'mode': mode.value,
       'checksum': checksum,
       'client_version': clientVersion,
     };
@@ -100,11 +116,11 @@ class FocusSession {
       durationMinutes: map['duration_minutes'] as int? ?? 0,
       targetDurationMinutes: map['target_duration_minutes'] as int? ?? 0,
       pausedSeconds: map['paused_seconds'] as int? ?? 0,
-      status: map['status'] as String? ?? SessionStatus.completed,
+      status: map['status'] as String? ?? SessionStatus.completed.value,
       completionRatio: (map['completion_ratio'] as num?)?.toDouble() ?? 1.0,
       xpEarned: map['xp_earned'] as int? ?? 0,
       coinsEarned: map['coins_earned'] as int? ?? 0,
-      mode: map['mode'] as String? ?? 'countdown',
+      mode: SessionMode.fromValue(map['mode'] as String? ?? 'countdown'),
       checksum: map['checksum'] as String?,
       clientVersion: map['client_version'] as String? ?? '',
     );
@@ -123,7 +139,7 @@ class FocusSession {
       'completionRatio': completionRatio,
       'xpEarned': xpEarned,
       'coinsEarned': coinsEarned,
-      'mode': mode,
+      'mode': mode.value,
       if (checksum != null) 'checksum': checksum,
       'clientVersion': clientVersion,
     };

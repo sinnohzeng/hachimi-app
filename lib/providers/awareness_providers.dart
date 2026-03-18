@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
 import 'package:hachimi_app/models/daily_light.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/models/weekly_review.dart';
 import 'package:hachimi_app/models/worry.dart';
@@ -23,8 +24,8 @@ final todayLightProvider = StreamProvider<DailyLight?>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'light_recorded' ||
-        c.type == 'light_deleted',
+        c.type == ActionType.lightRecorded ||
+        c.type == ActionType.lightDeleted,
     read: () => awarenessRepo.getTodayLight(uid, AppDateUtils.todayString()),
   );
 });
@@ -70,8 +71,8 @@ final currentWeekReviewProvider = StreamProvider<WeeklyReview?>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'weekly_review_completed' ||
-        c.type == 'weekly_review_saved',
+        c.type == ActionType.weeklyReviewCompleted ||
+        c.type == ActionType.weeklyReviewSaved,
     read: () =>
         awarenessRepo.getCurrentWeekReview(uid, AppDateUtils.currentWeekId()),
   );
@@ -90,7 +91,7 @@ final activeWorriesProvider = StreamProvider<List<Worry>>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type.startsWith('worry_'),
+    filter: (c) => c.isGlobalRefresh || c.type.isWorryAction,
     read: () => worryRepo.getActiveWorries(uid),
   );
 });
@@ -106,7 +107,7 @@ final resolvedWorriesProvider = StreamProvider<List<Worry>>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type.startsWith('worry_'),
+    filter: (c) => c.isGlobalRefresh || c.type.isWorryAction,
     read: () => worryRepo.getResolvedWorries(uid),
   );
 });
@@ -195,10 +196,10 @@ final awarenessStatsProvider = StreamProvider<Map<String, int>>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'light_recorded' ||
-        c.type == 'light_deleted' ||
-        c.type == 'weekly_review_completed' ||
-        c.type.startsWith('worry_'),
+        c.type == ActionType.lightRecorded ||
+        c.type == ActionType.lightDeleted ||
+        c.type == ActionType.weeklyReviewCompleted ||
+        c.type.isWorryAction,
     read: () => awarenessRepo.getAwarenessStats(uid),
   );
 });

@@ -76,7 +76,7 @@ class AccountMergeService {
 
     // 4. 恢复同步 + 通知 UI
     _syncEngine.start(newUid);
-    _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+    _ledger.notifyChange(const LedgerChange(type: ActionType.hydrate));
 
     // 5. Best-effort: 清理旧账号云端孤立数据
     _wipeCloudBestEffort();

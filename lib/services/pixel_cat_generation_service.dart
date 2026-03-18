@@ -158,7 +158,7 @@ class PixelCatGenerationService {
       appearance: appearance,
       totalMinutes: 0,
       boundHabitId: boundHabitId,
-      state: 'active',
+      state: CatState.active.value,
       createdAt: DateTime.now(),
     );
   }

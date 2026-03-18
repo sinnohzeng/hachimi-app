@@ -7,26 +7,28 @@ import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart' show CatState;
+import 'package:hachimi_app/core/constants/pixel_cat_constants.dart'
+    show CatStage;
 import 'package:hachimi_app/models/achievement.dart';
 import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
 
 const _uuid = Uuid();
 
-/// 台账 action.type → 成就触发器映射。
+/// 台账 ActionType → 成就触发器映射。
 const _triggerMap = {
-  'focus_complete': AchievementTrigger.sessionCompleted,
-  'habit_create': AchievementTrigger.habitCreated,
-  'habit_delete': AchievementTrigger.habitCreated,
-  'habit_restore': AchievementTrigger.habitCreated,
-  'check_in': AchievementTrigger.checkInCompleted,
-  'equip': AchievementTrigger.accessoryEquipped,
-  'purchase': AchievementTrigger.accessoryEquipped,
+  ActionType.focusComplete: AchievementTrigger.sessionCompleted,
+  ActionType.habitCreate: AchievementTrigger.habitCreated,
+  ActionType.habitDelete: AchievementTrigger.habitCreated,
+  ActionType.habitRestore: AchievementTrigger.habitCreated,
+  ActionType.checkIn: AchievementTrigger.checkInCompleted,
+  ActionType.equip: AchievementTrigger.accessoryEquipped,
+  ActionType.purchase: AchievementTrigger.accessoryEquipped,
   // V3 觉知
-  'light_recorded': AchievementTrigger.lightRecorded,
-  'weekly_review_completed': AchievementTrigger.weeklyReviewCompleted,
-  'worry_resolved': AchievementTrigger.worryResolved,
-  'worry_vanished': AchievementTrigger.worryResolved,
+  ActionType.lightRecorded: AchievementTrigger.lightRecorded,
+  ActionType.weeklyReviewCompleted: AchievementTrigger.weeklyReviewCompleted,
+  ActionType.worryResolved: AchievementTrigger.worryResolved,
 };
 
 /// 事件驱动成就评估器 — 监听台账变更自动检查成就。
@@ -81,7 +83,7 @@ class AchievementEvaluator {
       if (newlyUnlocked.isNotEmpty) {
         _ledger.notifyChange(
           LedgerChange(
-            type: 'achievement_unlocked',
+            type: ActionType.achievementUnlocked,
             affectedIds: newlyUnlocked,
           ),
         );
@@ -262,13 +264,13 @@ class AchievementEvaluator {
       );
       final eq = row['equipped_accessory'] as String?;
       if (eq != null && eq.isNotEmpty) equipped.add(eq);
-      if (row['state'] == 'graduated') {
+      if (row['state'] == CatState.graduated.value) {
         // 仅 senior 阶段的猫计入"毕业日"成就
         final highestStage = _higherStage(
           row['highest_stage'] as String?,
           _computeStage(totalMin),
         );
-        if (highestStage == 'senior') graduated++;
+        if (highestStage == CatStage.senior.value) graduated++;
       }
       final lastAt = row['last_session_at'] as int?;
       if (lastAt == null) {
@@ -434,24 +436,13 @@ class AchievementEvaluator {
     return {'affectedIds': change.affectedIds};
   }
 
-  static String _computeStage(int totalMinutes) {
-    final hours = totalMinutes / 60.0;
-    if (hours >= 200) return 'senior';
-    if (hours >= 100) return 'adult';
-    if (hours >= 20) return 'adolescent';
-    return 'kitten';
-  }
-
-  static const _stageOrder = {
-    'kitten': 0,
-    'adolescent': 1,
-    'adult': 2,
-    'senior': 3,
-  };
+  /// 阶段计算 — 委托到 [CatStage] 枚举。
+  static String _computeStage(int totalMinutes) =>
+      CatStage.computeFromMinutes(totalMinutes).value;
 
   static String _higherStage(String? a, String b) {
     if (a == null) return b;
-    return (_stageOrder[a] ?? 0) >= (_stageOrder[b] ?? 0) ? a : b;
+    return CatStage.higher(CatStage.fromValue(a), CatStage.fromValue(b)).value;
   }
 
   static List<String> _decodeInventory(String? raw) {

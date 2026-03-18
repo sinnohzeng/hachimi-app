@@ -578,14 +578,9 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
     );
   }
 
-  String _resolveHeadline(S l10n) {
-    switch (_config.celebrationHeadlineKey) {
-      case 'achievementAwesome':
-        return l10n.achievementAwesome;
-      case 'achievementIncredible':
-        return l10n.achievementIncredible;
-      default:
-        return l10n.achievementUnlocked;
-    }
-  }
+  String _resolveHeadline(S l10n) => switch (_config.celebrationHeadlineKey) {
+    CelebrationHeadline.achievementAwesome => l10n.achievementAwesome,
+    CelebrationHeadline.achievementIncredible => l10n.achievementIncredible,
+    CelebrationHeadline.achievementUnlocked => l10n.achievementUnlocked,
+  };
 }

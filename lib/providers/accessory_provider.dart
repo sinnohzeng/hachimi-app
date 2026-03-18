@@ -1,9 +1,26 @@
+/// 饰品分类。
+enum AccessoryCategory {
+  plant('plant'),
+  wild('wild'),
+  collar('collar');
+
+  const AccessoryCategory(this.value);
+  final String value;
+
+  static AccessoryCategory fromValue(String value) {
+    return AccessoryCategory.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => AccessoryCategory.plant, // 安全回退
+    );
+  }
+}
+
 /// 饰品信息数据类 — 用于商店展示和装备管理。
 class AccessoryInfo {
   final String id;
   final String displayName;
   final int price;
-  final String category; // 'plant' / 'wild' / 'collar'
+  final AccessoryCategory category;
   final bool isOwned;
   final bool isEquipped;
 

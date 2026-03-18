@@ -80,7 +80,7 @@ class _CatRoomScreenState extends ConsumerState<CatRoomScreen> {
     final hasError = allCatsAsync is AsyncError;
     final allCats = allCatsAsync.value ?? [];
     final archived = allCats
-        .where((c) => c.state == CatState.graduated)
+        .where((c) => c.state == CatState.graduated.value)
         .toList();
     return (archived, hasError);
   }

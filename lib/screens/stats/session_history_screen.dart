@@ -428,7 +428,7 @@ class _SessionItem extends StatelessWidget {
     final statusColor = session.isCompleted
         ? colorScheme.primary
         : colorScheme.error;
-    final modeLabel = session.mode == 'countdown'
+    final modeLabel = session.mode == SessionMode.countdown
         ? l10n.sessionCountdown
         : l10n.sessionStopwatch;
     final timeStr = DateFormat.Hm().format(session.endedAt);

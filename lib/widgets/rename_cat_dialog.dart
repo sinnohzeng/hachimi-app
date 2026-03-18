@@ -60,7 +60,7 @@ Future<void> _performRename(
     await ref.read(localCatRepositoryProvider).update(uid, renamedCat);
     ref
         .read(ledgerServiceProvider)
-        .notifyChange(const LedgerChange(type: 'cat_update'));
+        .notifyChange(const LedgerChange(type: ActionType.catUpdate));
   } catch (e) {
     if (dialogCtx.mounted) {
       AppFeedback.error(dialogCtx, dialogCtx.l10n.catRoomRenameError);

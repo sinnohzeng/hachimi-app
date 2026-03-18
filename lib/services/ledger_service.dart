@@ -74,7 +74,7 @@ class LedgerService {
       );
     });
     _changeController.add(
-      LedgerChange(type: type.value, affectedIds: affectedIds),
+      LedgerChange(type: type, affectedIds: affectedIds),
     );
   }
 

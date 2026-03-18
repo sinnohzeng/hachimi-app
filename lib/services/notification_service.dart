@@ -268,9 +268,9 @@ class NotificationService {
     required String body,
   }) async {
     switch (reminder.mode) {
-      case 'daily':
+      case ReminderMode.daily:
         await _scheduleDaily(reminder, index, habitId, title, body);
-      case 'weekdays':
+      case ReminderMode.weekdays:
         await _scheduleWeekdays(reminder, index, habitId, title, body);
       default:
         await _scheduleSpecificDay(reminder, index, habitId, title, body);

@@ -209,7 +209,7 @@ class LocalSessionRepository {
 
     _ledger.notifyChange(
       LedgerChange(
-        type: actionType.value,
+        type: actionType,
         affectedIds: [session.habitId, session.catId],
       ),
     );

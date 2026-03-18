@@ -42,7 +42,7 @@ class _ReminderPickerSheetState extends State<_ReminderPickerSheet> {
     super.initState();
     final initial = widget.initial;
     _selectedModeIndex = initial != null
-        ? ReminderConfig.validModes.indexOf(initial.mode).clamp(0, 8)
+        ? ReminderMode.values.indexOf(initial.mode).clamp(0, 8)
         : 0;
     _selectedHour = initial?.hour ?? 8;
     _selectedMinute = initial?.minute ?? 0;
@@ -65,8 +65,7 @@ class _ReminderPickerSheetState extends State<_ReminderPickerSheet> {
   }
 
   /// 获取模式的本地化名称。
-  String _modeName(String mode) =>
-      ReminderConfig.localizedModeName(mode, context.l10n);
+  String _modeName(ReminderMode mode) => mode.localizedName(context.l10n);
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +102,7 @@ class _ReminderPickerSheetState extends State<_ReminderPickerSheet> {
                       onSelectedItemChanged: (index) {
                         _selectedModeIndex = index;
                       },
-                      children: ReminderConfig.validModes.map((mode) {
+                      children: ReminderMode.values.map((mode) {
                         return Center(
                           child: Text(
                             _modeName(mode),
@@ -164,7 +163,7 @@ class _ReminderPickerSheetState extends State<_ReminderPickerSheet> {
               height: 48,
               child: FilledButton(
                 onPressed: () {
-                  final mode = ReminderConfig.validModes[_selectedModeIndex];
+                  final mode = ReminderMode.values[_selectedModeIndex];
                   Navigator.of(context).pop(
                     ReminderConfig(
                       mode: mode,

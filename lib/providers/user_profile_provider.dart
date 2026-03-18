@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
@@ -18,7 +19,7 @@ final avatarIdProvider = StreamProvider<String?>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.type == 'profile_update' || c.isGlobalRefresh,
+    filter: (c) => c.type == ActionType.profileUpdate || c.isGlobalRefresh,
     read: () => ledger.getMaterialized(uid, 'avatar_id'),
   );
 });
@@ -35,7 +36,7 @@ final currentTitleProvider = StreamProvider<String?>((ref) {
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.type == 'profile_update' || c.isGlobalRefresh,
+    filter: (c) => c.type == ActionType.profileUpdate || c.isGlobalRefresh,
     read: () => ledger.getMaterialized(uid, 'current_title'),
   );
 });
@@ -53,9 +54,9 @@ final unlockedTitlesProvider = StreamProvider<List<String>>((ref) {
     ref: ref,
     ledger: ledger,
     filter: (c) =>
-        c.type == 'profile_update' ||
+        c.type == ActionType.profileUpdate ||
         c.isGlobalRefresh ||
-        c.type == 'achievement_unlocked',
+        c.type == ActionType.achievementUnlocked,
     read: () async =>
         _decodeTitles(await ledger.getMaterialized(uid, 'unlocked_titles')),
   );

@@ -12,11 +12,11 @@ final pixelCatGenerationServiceProvider = Provider<PixelCatGenerationService>(
 
 bool _catChangeFilter(LedgerChange c) =>
     c.isGlobalRefresh ||
-    c.type.startsWith('habit_') ||
-    c.type == 'cat_update' ||
-    c.type == 'focus_complete' ||
-    c.type == 'equip' ||
-    c.type == 'unequip';
+    c.type.isHabitAction ||
+    c.type == ActionType.catUpdate ||
+    c.type == ActionType.focusComplete ||
+    c.type == ActionType.equip ||
+    c.type == ActionType.unequip;
 
 /// Active cats — SSOT from local SQLite.
 /// 监听 LedgerService 变更事件自动刷新。

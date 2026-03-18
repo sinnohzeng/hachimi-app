@@ -19,7 +19,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 10, 25),
         durationMinutes: 25,
         xpEarned: 25,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
         coinsEarned: 250,
       );
@@ -55,7 +55,7 @@ void main() {
         targetDurationMinutes: 25,
         pausedSeconds: 30,
         xpEarned: 30,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
         completionRatio: 1.0,
         coinsEarned: 250,
@@ -88,7 +88,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 10, 3),
         durationMinutes: 3,
         xpEarned: 0,
-        mode: 'stopwatch',
+        mode: SessionMode.stopwatch,
         status: 'abandoned',
       );
 
@@ -109,7 +109,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 10),
         durationMinutes: 10,
         xpEarned: 10,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
       );
 
@@ -128,7 +128,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 25),
         durationMinutes: 25,
         xpEarned: 25,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
       );
 
@@ -145,7 +145,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 25),
         durationMinutes: 25,
         xpEarned: 25,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
         checksum: 'abc123',
       );
@@ -165,7 +165,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 45),
         durationMinutes: 45,
         xpEarned: 45,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
       );
 
@@ -181,7 +181,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 25),
         durationMinutes: 25,
         xpEarned: 25,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
       );
 
@@ -199,7 +199,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 25),
         durationMinutes: 25,
         xpEarned: 25,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'completed',
       );
 
@@ -216,7 +216,7 @@ void main() {
         endedAt: DateTime(2026, 2, 19, 0, 5),
         durationMinutes: 5,
         xpEarned: 0,
-        mode: 'countdown',
+        mode: SessionMode.countdown,
         status: 'abandoned',
       );
 

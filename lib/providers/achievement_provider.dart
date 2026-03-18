@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/constants/achievement_constants.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/unlocked_achievement.dart';
 import 'package:hachimi_app/services/achievement_evaluator.dart';
 export 'package:hachimi_app/services/achievement_evaluator.dart'
@@ -25,8 +26,8 @@ final unlockedAchievementsProvider = StreamProvider<List<LocalAchievement>>((
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'achievement_unlocked' ||
-        c.type == 'achievement_claimed',
+        c.type == ActionType.achievementUnlocked ||
+        c.type == ActionType.achievementClaimed,
     read: () => _readUnlockedAchievements(ledger, uid),
   );
 });

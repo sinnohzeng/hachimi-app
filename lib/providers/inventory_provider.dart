@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
 import 'package:hachimi_app/services/ledger_service.dart';
@@ -17,9 +18,9 @@ final inventoryProvider = StreamProvider<List<String>>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type == 'purchase' ||
-        c.type == 'equip' ||
-        c.type == 'unequip',
+        c.type == ActionType.purchase ||
+        c.type == ActionType.equip ||
+        c.type == ActionType.unequip,
     read: () => _readInventory(ledger, uid),
   );
 });

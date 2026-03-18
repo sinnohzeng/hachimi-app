@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/models/habit.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
 import 'package:hachimi_app/models/focus_session.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
@@ -18,8 +19,8 @@ final habitsProvider = StreamProvider<List<Habit>>((ref) {
     ledger: ledger,
     filter: (c) =>
         c.isGlobalRefresh ||
-        c.type.startsWith('habit_') ||
-        c.type == 'focus_complete',
+        c.type.isHabitAction ||
+        c.type == ActionType.focusComplete,
     read: () => habitRepo.getActiveHabits(uid),
   );
 });

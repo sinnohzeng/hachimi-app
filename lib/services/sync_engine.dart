@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart' show ConflictAlgorithm, Database;
 
 import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
+import 'package:hachimi_app/core/constants/cat_constants.dart' show CatState;
 import 'package:hachimi_app/core/constants/session_constants.dart';
 import 'package:hachimi_app/core/constants/sync_constants.dart';
 import 'package:hachimi_app/core/utils/error_handler.dart';
@@ -104,7 +105,7 @@ class SyncEngine {
     await _hydrateUserProfile(userRef, uid);
 
     await prefs.setBool(AppPrefsKeys.dataHydrated, true);
-    _ledger.notifyChange(const LedgerChange(type: 'hydrate'));
+    _ledger.notifyChange(const LedgerChange(type: ActionType.hydrate));
     debugPrint('SyncEngine: hydration complete');
   }
 
@@ -318,6 +319,15 @@ class SyncEngine {
           // 这些类型暂不需要同步
           await _ledger.markSynced(action.id);
           return;
+        case ActionType.hydrate:
+        case ActionType.catUpdate:
+        case ActionType.lightDeleted:
+        case ActionType.coinsEarned:
+        case ActionType.worryDeleted:
+        case ActionType.weeklyReviewSaved:
+          // 仅通知用途，不写入 action_ledger，不会到达此处
+          await _ledger.markSynced(action.id);
+          return;
       }
 
       await batch.commit();
@@ -394,8 +404,8 @@ class SyncEngine {
       'endedAt': Timestamp.fromDate(action.endedAt ?? action.startedAt),
       'durationMinutes': minutes,
       'status': action.type == ActionType.focusComplete
-          ? SessionStatus.completed
-          : SessionStatus.abandoned,
+          ? SessionStatus.completed.value
+          : SessionStatus.abandoned.value,
       'mode': action.payload['mode'] ?? 'countdown',
       'xpEarned': xp,
       'coinsEarned': coins,
@@ -525,10 +535,10 @@ class SyncEngine {
         }
       case ActionType.habitDelete:
         batch.update(habitRef, {'isActive': false});
-        _syncCatStateIfNeeded(batch, uid, action, 'graduated');
+        _syncCatStateIfNeeded(batch, uid, action, CatState.graduated.value);
       case ActionType.habitRestore:
         batch.update(habitRef, {'isActive': true});
-        _syncCatStateIfNeeded(batch, uid, action, 'active');
+        _syncCatStateIfNeeded(batch, uid, action, CatState.active.value);
       default:
         break;
     }
