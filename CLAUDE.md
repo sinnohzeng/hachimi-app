@@ -34,6 +34,7 @@ Every concern in the system has exactly one authoritative source. Never duplicat
 | Website deployment & maintenance | `docs/website/deployment.md` |
 | App release process | `docs/release/process.md` |
 | Google Play CI/CD setup | `docs/release/google-play-setup.md` |
+| Dart coding standards | [Effective Dart](https://dart.dev/effective-dart) |
 | License | `LICENSE` |
 
 **When adding a new provider, service, model, route, or widget:**
@@ -65,13 +66,13 @@ lib/
 │   ├── router/                   # GoRouter route definitions
 │   ├── theme/                    # Material 3 design tokens
 │   └── utils/                    # Shared utilities
-├── models/                       # Data models (13 files)
-├── providers/                    # Riverpod providers (22 files)
-├── services/                     # Business logic & Firebase SDK (29 files)
+├── models/                       # Data models
+├── providers/                    # Riverpod providers
+├── services/                     # Business logic & Firebase SDK
 │   ├── firebase/                 # Firebase backend implementations
 │   └── ai/                       # AI provider implementations
-├── screens/                      # Feature screens (14 modules)
-├── widgets/                      # Reusable components (36 files)
+├── screens/                      # Feature screens
+├── widgets/                      # Reusable components
 └── l10n/                         # ARB localization files
 ```
 
@@ -103,37 +104,9 @@ lib/
 - Build with AI (env file): `flutter run --dart-define-from-file=.env`
 - Build with AI (manual): `flutter build apk --release --dart-define=MINIMAX_API_KEY=xxx --dart-define=GEMINI_API_KEY=xxx`
 - Tag release: `git tag -a v<VERSION> -m "v<VERSION>: <description>" && git push origin main --tags`
-- Check device status: `scripts/adb-debug.sh status`
-- Read device logs: `scripts/adb-debug.sh logs [--lines N] [--level W|E] [--tag TAG]`
-- Read errors only: `scripts/adb-debug.sh errors`
-- Read crash trace: `scripts/adb-debug.sh crash`
-- Clear device logs: `scripts/adb-debug.sh clear`
-- Start log collector: `scripts/adb-debug.sh start-bg`
-- Stop log collector: `scripts/adb-debug.sh stop-bg`
-- Install debug APK: `scripts/adb-debug.sh install`
-- Device screenshot: `scripts/adb-debug.sh screenshot`
+- Device debugging: see `.claude/rules/30-debug-workflow.md` for full `scripts/adb-debug.sh` reference
 
-## Track-Based Development Workflow
-
-Multi-track feature development follows this standard paradigm, established during V3 awareness (4 tracks, 51 review fixes, 15,000+ lines).
-
-### Per-Track Lifecycle
-
-```
-1. Read plan spec → Create feature branch
-2. Develop (parallel agents for independent tasks)
-3. dart analyze + flutter test (zero new warnings)
-4. Multi-dimensional review (3 skills in parallel):
-   - pr-review-toolkit:code-reviewer     → architecture, l10n, theme, code quality
-   - pr-review-toolkit:silent-failure-hunter → silent failures, fire-and-forget, error swallowing
-   - pr-review-toolkit:type-design-analyzer → type safety, encapsulation, API design
-5. Compile findings → Prioritize (🔴 Critical → 🟡 Medium → 🟢 Minor)
-6. Fix all 🔴 + 🟡 → Re-verify (analyze + test)
-7. DDD: Sync SSOT docs (EN + zh-CN mirrors)
-8. dart format → git add → commit → push → PR → squash merge → cleanup branch
-```
-
-### Anti-Patterns (Proven by 51 Review Fixes)
+## Anti-Patterns (Proven by 51 Review Fixes)
 
 These anti-patterns were discovered repeatedly across 4 development tracks. **Treat as hard rules.**
 
@@ -149,16 +122,6 @@ These anti-patterns were discovered repeatedly across 4 development tracks. **Tr
 | `Map<int, String>` when enum exists | Type safety leak — callers pass raw int, bypassing enum | `Map<Mood, String>` — propagate enum through the full stack |
 | Read outside transaction, write inside | Race condition — isNew check invalidated between read and write | Use `DatabaseExecutor` parameter, pass `txn` not `db` |
 | `doc.data()!` in Firestore factory | NPE on metadata-only documents | `doc.data() as Map? ?? {}` |
-
-### DDD Sync Checklist (Per Track)
-
-After every track, update these SSOT docs:
-
-- [ ] `docs/architecture/data-model.md` — new tables, collections, schema changes
-- [ ] `docs/architecture/state-management.md` — new providers, ActionType values
-- [ ] `docs/architecture/folder-structure.md` — new directories, files
-- [ ] `docs/design/screens.md` — new screen specs, route changes
-- [ ] All corresponding `docs/zh-CN/` mirrors
 
 ## Key Gotchas
 
