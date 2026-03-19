@@ -3,126 +3,203 @@ level: 2
 file_id: plan_02
 parent: plan_01
 status: pending
-created: 2026-03-17 23:30
+created: 2026-03-19 22:00
 children: []
-estimated_time: 480分钟
-prerequisites: []
 ---
 
-# 模块：Track 1 — 数据基础层（Data Layer）
+# 模块：Track 1 — 数据基础层（LUMI Pivot）
 
 ## 1. 模块概述
 
 ### 模块目标
 
-Track 1 是 V3 觉知伴侣功能的 **地基工程**。它不包含任何 UI 代码，完全聚焦于数据模型、本地持久化、台账同步和响应式 Provider 的搭建。
+Track 1 是 LUMI 功能的 **地基工程**。完全聚焦于数据模型、本地持久化、台账同步和响应式 Provider 的搭建，不包含任何 UI 代码。
 
-完成 Track 1 后，上层 Track（UI、猫咪反应、成就系统）可以直接 `ref.watch` 拿到结构化数据，无需关心存储细节。
+**LUMI Pivot 关键变更**：
+
+- **无迁移** — 所有用户都是新用户，只建全新 Schema，不需要 v3→v4 升级路径
+- **新增 5 个模型** — YearlyPlan、MonthlyPlan、WeeklyPlan、UserList、HighlightEntry
+- **保留 4 个已实现模型** — DailyLight、WeeklyReview、Worry、Mood（代码已存在）
+- **WeeklyReview 扩展** — 新增 `freeNote` 和 `worrySummary` 两个 TEXT 字段
+- **双持久化** — 所有模型遵循 SQLite（本地 SSOT）+ Firestore（云备份）架构
+- **ledgerDrivenStream** — 所有 Provider 使用台账驱动流模式
 
 ### 在项目中的位置
 
 ```
 Track 1（数据基础）  ← 本文档
    ↑
-Track 2（每日一光 UI）
-Track 3（周回顾 UI）
-Track 4（烦恼处理器 UI）
+Track 2（LUMI 核心 UI）
+Track 3（计划系统 UI）
+Track 4（列表 + 高光 UI）
 Track 5（数据洞察 + 猫咪反应）
 ```
-
-所有上层 Track 都依赖 Track 1 的模型和 Provider。Track 1 自身仅依赖现有的 `LedgerService`、`LocalDatabaseService`、`SyncEngine` 基础设施。
 
 ### 交付物概览
 
 | 类别 | 数量 | 说明 |
 |------|------|------|
-| 新增 Dart 模型 | 4 个 | Mood、DailyLight、WeeklyReview、Worry |
-| 新增 SQLite 表 | 4 张 | local_daily_lights、local_weekly_reviews、local_worries、local_awareness_stats |
-| 新增 Service | 2 个 | AwarenessRepository、WorryRepository |
-| 新增 Provider | 8 个 | 覆盖所有觉知数据的响应式访问 |
-| 新增 ActionType | 6 个 | 台账行为类型扩展 |
-| 修改现有文件 | 8 个 | 数据库迁移、台账、同步、规则等 |
-| 新增单元测试 | 4 个 | 模型序列化往返测试 |
+| 新增 Dart 模型 | 5 个 | YearlyPlan、MonthlyPlan、WeeklyPlan、UserList、HighlightEntry |
+| 已有模型（保留） | 4 个 | DailyLight、WeeklyReview、Worry、Mood |
+| WeeklyReview 扩展 | 2 字段 | `freeNote`（TEXT）、`worrySummary`（TEXT） |
+| 新增 SQLite 表 | 5 张 | 对应 5 个新模型 |
+| WeeklyReview 表变更 | 2 列 | ALTER TABLE 新增 `free_note`、`worry_summary` |
+| 新增 Service | 2 个 | PlanRepository、ListHighlightRepository |
+| 新增 Provider | 10+ 个 | 覆盖所有 LUMI 数据的响应式访问 |
+| 新增 ActionType | 5 个 | 计划、列表、高光相关 |
+| 新增单元测试 | 5 个 | 新模型序列化往返测试 |
 
 ---
 
-## 2. 新增 Dart 模型
+## 2. 已有模型（保留，不修改）
+
+以下 4 个模型已在代码库中实现，LUMI Pivot 直接复用：
 
 ### 2.1 `Mood` 枚举（`lib/models/mood.dart`）
 
-```dart
-/// 心情等级 — 5 级量表。
-/// 存储在 SQLite 中使用 int value，UI 层使用 emoji 展示。
-enum Mood {
-  veryHappy(0, '😄'),
-  happy(1, '🙂'),
-  calm(2, '😌'),
-  down(3, '😔'),
-  veryDown(4, '😢');
-
-  const Mood(this.value, this.emoji);
-  final int value;
-  final String emoji;
-
-  /// 从整型值反序列化。无效值抛出 ArgumentError。
-  static Mood fromValue(int value) {
-    return Mood.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => throw ArgumentError('Unknown Mood value: $value'),
-    );
-  }
-}
-```
-
-**要点**：
-
-- 5 个等级覆盖积极→消极完整光谱
-- `value` 字段用于 SQLite 存储（INT 列）
-- `emoji` 字段用于 UI 展示
-- `fromValue` 使用 `firstWhere` + `orElse`，与项目现有 `ActionType.fromValue` 保持一致
-
----
+- 5 级心情量表：veryHappy(0) → happy(1) → calm(2) → down(3) → veryDown(4)
+- `value` 用于 SQLite 存储，`emoji` 用于 UI 展示
+- 已有 `themeColor(ColorScheme)` 方法
 
 ### 2.2 `DailyLight` 模型（`lib/models/daily_light.dart`）
 
+- 每日一光记录，SQLite 表 `local_daily_lights`
+- Firestore 路径 `users/{uid}/dailyLights/{date}`
+- 字段：id、date、mood、lightText、tags、timelineEvents、habitCompletions、createdAt、updatedAt
+
+### 2.3 `WeeklyReview` 模型（`lib/models/weekly_review.dart`）
+
+- 周回顾记录，SQLite 表 `local_weekly_reviews`
+- Firestore 路径 `users/{uid}/weeklyReviews/{weekId}`
+- 字段：id、weekId、weekStartDate、weekEndDate、happyMoment1~3（含 tags）、gratitude、learning、catWeeklySummary、createdAt、updatedAt
+
+### 2.4 `Worry` 模型（`lib/models/worry.dart`）
+
+- 烦恼记录，SQLite 表 `local_worries`
+- Firestore 路径 `users/{uid}/worries/{worryId}`
+- 三态：ongoing / resolved / disappeared
+
+---
+
+## 3. WeeklyReview 扩展
+
+### 3.1 新增字段
+
+在 `WeeklyReview` 模型中新增 2 个可选 TEXT 字段：
+
+```dart
+class WeeklyReview {
+  // ... 现有字段 ...
+
+  final String? freeNote;       // 自由笔记（用户随手写的周记）
+  final String? worrySummary;   // 本周烦恼摘要（从 Worry 列表自动生成或手动填写）
+
+  // 构造函数新增参数
+  const WeeklyReview({
+    // ... 现有参数 ...
+    this.freeNote,
+    this.worrySummary,
+  });
+}
+```
+
+### 3.2 SQLite 序列化更新
+
+`toSqlite` 新增：
+
+```dart
+'free_note': freeNote,
+'worry_summary': worrySummary,
+```
+
+`fromSqlite` 新增：
+
+```dart
+freeNote: map['free_note'] as String?,
+worrySummary: map['worry_summary'] as String?,
+```
+
+### 3.3 Firestore 序列化更新
+
+`toFirestore` 新增：
+
+```dart
+'freeNote': freeNote,
+'worrySummary': worrySummary,
+```
+
+`fromFirestore` 新增：
+
+```dart
+freeNote: data['freeNote'] as String?,
+worrySummary: data['worrySummary'] as String?,
+```
+
+### 3.4 copyWith 更新
+
+```dart
+WeeklyReview copyWith({
+  // ... 现有参数 ...
+  String? freeNote,
+  bool clearFreeNote = false,
+  String? worrySummary,
+  bool clearWorrySummary = false,
+}) {
+  return WeeklyReview(
+    // ... 现有赋值 ...
+    freeNote: clearFreeNote ? null : (freeNote ?? this.freeNote),
+    worrySummary: clearWorrySummary ? null : (worrySummary ?? this.worrySummary),
+  );
+}
+```
+
+### 3.5 SQLite 表变更
+
+```sql
+ALTER TABLE local_weekly_reviews ADD COLUMN free_note TEXT;
+ALTER TABLE local_weekly_reviews ADD COLUMN worry_summary TEXT;
+```
+
+---
+
+## 4. 新增 Dart 模型
+
+### 4.1 `YearlyPlan` 模型（`lib/models/yearly_plan.dart`）
+
 ```dart
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hachimi_app/models/mood.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 
-/// 每日一光记录 — 用户每天睡前记下的一段微小光亮。
-/// 对应 SQLite 表 `local_daily_lights`，Firestore 路径 `users/{uid}/dailyLights/{date}`。
-class DailyLight {
+/// 年度计划 — 用户设定的年度关键词和大方向。
+///
+/// 对应 SQLite 表 `local_yearly_plans`，
+/// Firestore 路径 `users/{uid}/yearlyPlans/{year}`。
+///
+/// 每用户每年一条记录，year 格式：'YYYY'（如 '2026'）。
+class YearlyPlan {
   final String id;
-  final String date; // 'YYYY-MM-DD' 格式
-  final Mood mood;
-  final String? lightText; // 今日之光文字（可选）
-  final List<String> tags; // 情绪标签（如 ['工作', '运动', '社交']）
-  final List<String>? timelineEvents; // 时间线事件（Track 4 使用，MVP 暂不填充）
-  final Map<String, bool>? habitCompletions; // 习惯完成状态（Track 4 使用，MVP 暂不填充）
+  final String year;          // 'YYYY'
+  final String? keyword;      // 年度关键词（如"成长"、"平衡"）
+  final String? vision;       // 年度愿景描述
+  final List<String> goals;   // 年度目标列表（3-5 条）
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const DailyLight({
+  const YearlyPlan({
     required this.id,
-    required this.date,
-    required this.mood,
-    this.lightText,
-    this.tags = const [],
-    this.timelineEvents,
-    this.habitCompletions,
+    required this.year,
+    this.keyword,
+    this.vision,
+    this.goals = const [],
     required this.createdAt,
     required this.updatedAt,
   });
 
   // ─── 计算属性 ───
 
-  /// 是否有文字记录
-  bool get hasText => lightText != null && lightText!.isNotEmpty;
-
-  /// 是否有标签
-  bool get hasTags => tags.isNotEmpty;
+  bool get hasKeyword => keyword != null && keyword!.isNotEmpty;
+  bool get hasGoals => goals.isNotEmpty;
 
   // ─── SQLite 序列化 ───
 
@@ -130,38 +207,24 @@ class DailyLight {
     return {
       'id': id,
       'uid': uid,
-      'date': date,
-      'mood': mood.value,
-      'light_text': lightText,
-      'tags': jsonEncode(tags),
-      'timeline_events': timelineEvents != null
-          ? jsonEncode(timelineEvents)
-          : null,
-      'habit_completions': habitCompletions != null
-          ? jsonEncode(habitCompletions)
-          : null,
+      'year': year,
+      'keyword': keyword,
+      'vision': vision,
+      'goals': jsonEncode(goals),
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
     };
   }
 
-  factory DailyLight.fromSqlite(Map<String, dynamic> map) {
-    return DailyLight(
+  factory YearlyPlan.fromSqlite(Map<String, dynamic> map) {
+    return YearlyPlan(
       id: map['id'] as String,
-      date: map['date'] as String,
-      mood: Mood.fromValue(map['mood'] as int),
-      lightText: map['light_text'] as String?,
-      tags: _decodeStringList(map['tags']),
-      timelineEvents: map['timeline_events'] != null
-          ? _decodeStringList(map['timeline_events'])
-          : null,
-      habitCompletions: map['habit_completions'] != null
-          ? _decodeBoolMap(map['habit_completions'])
-          : null,
-      createdAt:
-          DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt:
-          DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      year: map['year'] as String,
+      keyword: map['keyword'] as String?,
+      vision: map['vision'] as String?,
+      goals: decodeJsonStringList(map['goals']),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
     );
   }
 
@@ -169,168 +232,217 @@ class DailyLight {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'mood': mood.value,
-      'lightText': lightText,
-      'tags': tags,
-      'timelineEvents': timelineEvents,
-      'habitCompletions': habitCompletions,
+      'keyword': keyword,
+      'vision': vision,
+      'goals': goals,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
-  factory DailyLight.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data()! as Map<String, dynamic>;
-    return DailyLight(
+  factory YearlyPlan.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return YearlyPlan(
       id: doc.id,
-      date: doc.id, // Firestore 文档 ID 即为 date
-      mood: Mood.fromValue(data['mood'] as int? ?? 2),
-      lightText: data['lightText'] as String?,
-      tags: (data['tags'] as List<dynamic>?)
+      year: doc.id,
+      keyword: data['keyword'] as String?,
+      vision: data['vision'] as String?,
+      goals: (data['goals'] as List<dynamic>?)
               ?.whereType<String>()
               .toList() ??
           [],
-      timelineEvents: (data['timelineEvents'] as List<dynamic>?)
-          ?.whereType<String>()
-          .toList(),
-      habitCompletions: (data['habitCompletions'] as Map<String, dynamic>?)
-          ?.map((k, v) => MapEntry(k, v as bool? ?? false)),
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt:
-          (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   // ─── copyWith ───
 
-  DailyLight copyWith({
+  YearlyPlan copyWith({
     String? id,
-    String? date,
-    Mood? mood,
-    String? lightText,
-    bool clearLightText = false,
-    List<String>? tags,
-    List<String>? timelineEvents,
-    Map<String, bool>? habitCompletions,
+    String? year,
+    String? keyword,
+    bool clearKeyword = false,
+    String? vision,
+    bool clearVision = false,
+    List<String>? goals,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return DailyLight(
+    return YearlyPlan(
       id: id ?? this.id,
-      date: date ?? this.date,
-      mood: mood ?? this.mood,
-      lightText: clearLightText ? null : (lightText ?? this.lightText),
-      tags: tags ?? this.tags,
-      timelineEvents: timelineEvents ?? this.timelineEvents,
-      habitCompletions: habitCompletions ?? this.habitCompletions,
+      year: year ?? this.year,
+      keyword: clearKeyword ? null : (keyword ?? this.keyword),
+      vision: clearVision ? null : (vision ?? this.vision),
+      goals: goals ?? this.goals,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
-
-  // ─── 私有辅助 ───
-
-  static List<String> _decodeStringList(dynamic raw) {
-    if (raw is String) {
-      final decoded = jsonDecode(raw);
-      if (decoded is List) {
-        return decoded.whereType<String>().toList();
-      }
-    }
-    return [];
-  }
-
-  static Map<String, bool> _decodeBoolMap(dynamic raw) {
-    if (raw is String) {
-      final decoded = jsonDecode(raw);
-      if (decoded is Map<String, dynamic>) {
-        return decoded.map((k, v) => MapEntry(k, v as bool? ?? false));
-      }
-    }
-    return {};
-  }
 }
 ```
 
-**要点**：
-
-- `tags` 在 SQLite 中以 JSON 字符串存储，Dart 层为 `List<String>`
-- `timelineEvents` 和 `habitCompletions` 预留给 Track 4，MVP 阶段值为 null
-- Firestore 文档 ID 使用 `date` 字符串（`YYYY-MM-DD`），确保每用户每天唯一
-- `copyWith` 支持 `clearLightText` 标志位，用于显式置空可选字段
-
 ---
 
-### 2.3 `WeeklyReview` 模型（`lib/models/weekly_review.dart`）
+### 4.2 `MonthlyPlan` 模型（`lib/models/monthly_plan.dart`）
 
 ```dart
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 
-/// 周回顾记录 — 每周日复盘的三个快乐时刻 + 感恩 + 学习。
-/// 对应 SQLite 表 `local_weekly_reviews`，Firestore 路径 `users/{uid}/weeklyReviews/{weekId}`。
+/// 月度计划 — 从年度目标拆解的月度行动计划。
 ///
-/// 周定义：ISO 8601（周一开始，周日结束）。
-/// weekId 格式：'YYYY-WNN'（如 '2026-W12'）。
-class WeeklyReview {
+/// 对应 SQLite 表 `local_monthly_plans`，
+/// Firestore 路径 `users/{uid}/monthlyPlans/{monthId}`。
+///
+/// monthId 格式：'YYYY-MM'（如 '2026-03'）。
+class MonthlyPlan {
   final String id;
-  final String weekId; // 'YYYY-WNN' ISO 格式
-  final String weekStartDate; // 周一日期 'YYYY-MM-DD'
-  final String weekEndDate; // 周日日期 'YYYY-MM-DD'
-
-  // 三个快乐时刻（独立字段，非 List）
-  final String? happyMoment1;
-  final List<String> happyMoment1Tags;
-  final String? happyMoment2;
-  final List<String> happyMoment2Tags;
-  final String? happyMoment3;
-  final List<String> happyMoment3Tags;
-
-  final String? gratitude; // 本周感恩
-  final String? learning; // 本周学习
-  final String? catWeeklySummary; // 猫咪周总结（模板库生成，非 AI）
-
+  final String monthId;       // 'YYYY-MM'
+  final String? theme;        // 月度主题（如"健康月"、"学习月"）
+  final List<String> tasks;   // 月度任务列表
+  final String? reflection;   // 月末反思
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const WeeklyReview({
+  const MonthlyPlan({
     required this.id,
-    required this.weekId,
-    required this.weekStartDate,
-    required this.weekEndDate,
-    this.happyMoment1,
-    this.happyMoment1Tags = const [],
-    this.happyMoment2,
-    this.happyMoment2Tags = const [],
-    this.happyMoment3,
-    this.happyMoment3Tags = const [],
-    this.gratitude,
-    this.learning,
-    this.catWeeklySummary,
+    required this.monthId,
+    this.theme,
+    this.tasks = const [],
+    this.reflection,
     required this.createdAt,
     required this.updatedAt,
   });
 
   // ─── 计算属性 ───
 
-  /// 已填写的快乐时刻数量（0-3）
-  int get filledMomentCount {
-    int count = 0;
-    if (happyMoment1 != null && happyMoment1!.isNotEmpty) count++;
-    if (happyMoment2 != null && happyMoment2!.isNotEmpty) count++;
-    if (happyMoment3 != null && happyMoment3!.isNotEmpty) count++;
-    return count;
+  bool get hasTheme => theme != null && theme!.isNotEmpty;
+  bool get hasTasks => tasks.isNotEmpty;
+  bool get hasReflection => reflection != null && reflection!.isNotEmpty;
+
+  // ─── SQLite 序列化 ───
+
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'id': id,
+      'uid': uid,
+      'month_id': monthId,
+      'theme': theme,
+      'tasks': jsonEncode(tasks),
+      'reflection': reflection,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
   }
 
-  /// 周回顾是否完成（至少 1 个快乐时刻 + 感恩或学习之一）
-  bool get isComplete {
-    final hasMoment = filledMomentCount >= 1;
-    final hasReflection = (gratitude != null && gratitude!.isNotEmpty) ||
-        (learning != null && learning!.isNotEmpty);
-    return hasMoment && hasReflection;
+  factory MonthlyPlan.fromSqlite(Map<String, dynamic> map) {
+    return MonthlyPlan(
+      id: map['id'] as String,
+      monthId: map['month_id'] as String,
+      theme: map['theme'] as String?,
+      tasks: decodeJsonStringList(map['tasks']),
+      reflection: map['reflection'] as String?,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+    );
   }
+
+  // ─── Firestore 序列化 ───
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'theme': theme,
+      'tasks': tasks,
+      'reflection': reflection,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
+
+  factory MonthlyPlan.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return MonthlyPlan(
+      id: doc.id,
+      monthId: doc.id,
+      theme: data['theme'] as String?,
+      tasks: (data['tasks'] as List<dynamic>?)
+              ?.whereType<String>()
+              .toList() ??
+          [],
+      reflection: data['reflection'] as String?,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  // ─── copyWith ───
+
+  MonthlyPlan copyWith({
+    String? id,
+    String? monthId,
+    String? theme,
+    bool clearTheme = false,
+    List<String>? tasks,
+    String? reflection,
+    bool clearReflection = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return MonthlyPlan(
+      id: id ?? this.id,
+      monthId: monthId ?? this.monthId,
+      theme: clearTheme ? null : (theme ?? this.theme),
+      tasks: tasks ?? this.tasks,
+      reflection: clearReflection ? null : (reflection ?? this.reflection),
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+}
+```
+
+---
+
+### 4.3 `WeeklyPlan` 模型（`lib/models/weekly_plan.dart`）
+
+```dart
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
+
+/// 周计划 — 从月度任务拆解的每周行动项。
+///
+/// 对应 SQLite 表 `local_weekly_plans`，
+/// Firestore 路径 `users/{uid}/weeklyPlans/{weekId}`。
+///
+/// weekId 格式：'YYYY-WNN'（如 '2026-W12'），与 WeeklyReview 使用相同周标识。
+class WeeklyPlan {
+  final String id;
+  final String weekId;        // 'YYYY-WNN' ISO 格式
+  final String weekStartDate; // 周一 'YYYY-MM-DD'
+  final String weekEndDate;   // 周日 'YYYY-MM-DD'
+  final List<String> tasks;   // 本周任务列表
+  final String? focus;        // 本周聚焦重点（一句话）
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const WeeklyPlan({
+    required this.id,
+    required this.weekId,
+    required this.weekStartDate,
+    required this.weekEndDate,
+    this.tasks = const [],
+    this.focus,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  // ─── 计算属性 ───
+
+  bool get hasTasks => tasks.isNotEmpty;
+  bool get hasFocus => focus != null && focus!.isNotEmpty;
 
   // ─── SQLite 序列化 ───
 
@@ -341,39 +453,23 @@ class WeeklyReview {
       'week_id': weekId,
       'week_start_date': weekStartDate,
       'week_end_date': weekEndDate,
-      'happy_moment_1': happyMoment1,
-      'happy_moment_1_tags': jsonEncode(happyMoment1Tags),
-      'happy_moment_2': happyMoment2,
-      'happy_moment_2_tags': jsonEncode(happyMoment2Tags),
-      'happy_moment_3': happyMoment3,
-      'happy_moment_3_tags': jsonEncode(happyMoment3Tags),
-      'gratitude': gratitude,
-      'learning': learning,
-      'cat_weekly_summary': catWeeklySummary,
+      'tasks': jsonEncode(tasks),
+      'focus': focus,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
     };
   }
 
-  factory WeeklyReview.fromSqlite(Map<String, dynamic> map) {
-    return WeeklyReview(
+  factory WeeklyPlan.fromSqlite(Map<String, dynamic> map) {
+    return WeeklyPlan(
       id: map['id'] as String,
       weekId: map['week_id'] as String,
       weekStartDate: map['week_start_date'] as String,
       weekEndDate: map['week_end_date'] as String,
-      happyMoment1: map['happy_moment_1'] as String?,
-      happyMoment1Tags: _decodeStringList(map['happy_moment_1_tags']),
-      happyMoment2: map['happy_moment_2'] as String?,
-      happyMoment2Tags: _decodeStringList(map['happy_moment_2_tags']),
-      happyMoment3: map['happy_moment_3'] as String?,
-      happyMoment3Tags: _decodeStringList(map['happy_moment_3_tags']),
-      gratitude: map['gratitude'] as String?,
-      learning: map['learning'] as String?,
-      catWeeklySummary: map['cat_weekly_summary'] as String?,
-      createdAt:
-          DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt:
-          DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      tasks: decodeJsonStringList(map['tasks']),
+      focus: map['focus'] as String?,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
     );
   }
 
@@ -383,164 +479,114 @@ class WeeklyReview {
     return {
       'weekStartDate': weekStartDate,
       'weekEndDate': weekEndDate,
-      'happyMoment1': happyMoment1,
-      'happyMoment1Tags': happyMoment1Tags,
-      'happyMoment2': happyMoment2,
-      'happyMoment2Tags': happyMoment2Tags,
-      'happyMoment3': happyMoment3,
-      'happyMoment3Tags': happyMoment3Tags,
-      'gratitude': gratitude,
-      'learning': learning,
-      'catWeeklySummary': catWeeklySummary,
+      'tasks': tasks,
+      'focus': focus,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
-  factory WeeklyReview.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data()! as Map<String, dynamic>;
-    return WeeklyReview(
+  factory WeeklyPlan.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return WeeklyPlan(
       id: doc.id,
-      weekId: doc.id, // Firestore 文档 ID 即为 weekId
+      weekId: doc.id,
       weekStartDate: data['weekStartDate'] as String? ?? '',
       weekEndDate: data['weekEndDate'] as String? ?? '',
-      happyMoment1: data['happyMoment1'] as String?,
-      happyMoment1Tags: _decodeFirestoreList(data['happyMoment1Tags']),
-      happyMoment2: data['happyMoment2'] as String?,
-      happyMoment2Tags: _decodeFirestoreList(data['happyMoment2Tags']),
-      happyMoment3: data['happyMoment3'] as String?,
-      happyMoment3Tags: _decodeFirestoreList(data['happyMoment3Tags']),
-      gratitude: data['gratitude'] as String?,
-      learning: data['learning'] as String?,
-      catWeeklySummary: data['catWeeklySummary'] as String?,
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt:
-          (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      tasks: (data['tasks'] as List<dynamic>?)
+              ?.whereType<String>()
+              .toList() ??
+          [],
+      focus: data['focus'] as String?,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   // ─── copyWith ───
 
-  WeeklyReview copyWith({
+  WeeklyPlan copyWith({
     String? id,
     String? weekId,
     String? weekStartDate,
     String? weekEndDate,
-    String? happyMoment1,
-    bool clearHappyMoment1 = false,
-    List<String>? happyMoment1Tags,
-    String? happyMoment2,
-    bool clearHappyMoment2 = false,
-    List<String>? happyMoment2Tags,
-    String? happyMoment3,
-    bool clearHappyMoment3 = false,
-    List<String>? happyMoment3Tags,
-    String? gratitude,
-    bool clearGratitude = false,
-    String? learning,
-    bool clearLearning = false,
-    String? catWeeklySummary,
+    List<String>? tasks,
+    String? focus,
+    bool clearFocus = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return WeeklyReview(
+    return WeeklyPlan(
       id: id ?? this.id,
       weekId: weekId ?? this.weekId,
       weekStartDate: weekStartDate ?? this.weekStartDate,
       weekEndDate: weekEndDate ?? this.weekEndDate,
-      happyMoment1: clearHappyMoment1
-          ? null
-          : (happyMoment1 ?? this.happyMoment1),
-      happyMoment1Tags: happyMoment1Tags ?? this.happyMoment1Tags,
-      happyMoment2: clearHappyMoment2
-          ? null
-          : (happyMoment2 ?? this.happyMoment2),
-      happyMoment2Tags: happyMoment2Tags ?? this.happyMoment2Tags,
-      happyMoment3: clearHappyMoment3
-          ? null
-          : (happyMoment3 ?? this.happyMoment3),
-      happyMoment3Tags: happyMoment3Tags ?? this.happyMoment3Tags,
-      gratitude: clearGratitude ? null : (gratitude ?? this.gratitude),
-      learning: clearLearning ? null : (learning ?? this.learning),
-      catWeeklySummary: catWeeklySummary ?? this.catWeeklySummary,
+      tasks: tasks ?? this.tasks,
+      focus: clearFocus ? null : (focus ?? this.focus),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
-
-  // ─── 私有辅助 ───
-
-  static List<String> _decodeStringList(dynamic raw) {
-    if (raw is String) {
-      final decoded = jsonDecode(raw);
-      if (decoded is List) {
-        return decoded.whereType<String>().toList();
-      }
-    }
-    return [];
-  }
-
-  static List<String> _decodeFirestoreList(dynamic raw) {
-    if (raw is List<dynamic>) {
-      return raw.whereType<String>().toList();
-    }
-    return [];
-  }
 }
 ```
 
-**要点**：
-
-- 使用 3 个独立的 `happyMoment` 字段（非 List），每个配对独立的 tags 字段
-- `weekId` 格式为 ISO 8601 `'YYYY-WNN'`，例如 `'2026-W12'`
-- Firestore 文档 ID 使用 `weekId`
-- `isComplete` 判定：至少 1 个快乐时刻 + 感恩或学习之一
-
 ---
 
-### 2.4 `Worry` 模型（`lib/models/worry.dart`）
+### 4.4 `UserList` 模型（`lib/models/user_list.dart`）
 
 ```dart
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hachimi_app/models/json_helpers.dart';
 
-/// 烦恼状态枚举。
-enum WorryStatus {
-  ongoing('ongoing'),
-  resolved('resolved'),
-  disappeared('disappeared');
+/// 用户列表类型枚举。
+enum ListType {
+  gratitude('gratitude'),   // 感恩清单
+  wish('wish'),             // 心愿清单
+  bucket('bucket'),         // 人生清单
+  custom('custom');         // 自定义清单
 
-  const WorryStatus(this.value);
+  const ListType(this.value);
   final String value;
 
-  static WorryStatus fromValue(String value) {
-    return WorryStatus.values.firstWhere(
+  static ListType fromValue(String value) {
+    return ListType.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => throw ArgumentError('Unknown WorryStatus: $value'),
+      orElse: () => throw ArgumentError('Unknown ListType: $value'),
     );
   }
 }
 
-/// 烦恼记录 — 用户外化的焦虑或烦恼。
-/// 对应 SQLite 表 `local_worries`，Firestore 路径 `users/{uid}/worries/{worryId}`。
-class Worry {
+/// 用户自定义列表 — 感恩清单、心愿清单、人生清单等。
+///
+/// 对应 SQLite 表 `local_user_lists`，
+/// Firestore 路径 `users/{uid}/userLists/{listId}`。
+///
+/// 每个列表包含一个标题和多个条目（items）。
+/// items 以 JSON 数组存储在 SQLite 中。
+class UserList {
   final String id;
-  final String description;
-  final String? solution;
-  final WorryStatus status;
-  final DateTime? resolvedAt;
+  final ListType listType;
+  final String title;         // 列表标题（如"2026 心愿清单"）
+  final List<String> items;   // 列表条目
+  final int sortOrder;        // 排序权重（越小越靠前）
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  const Worry({
+  const UserList({
     required this.id,
-    required this.description,
-    this.solution,
-    this.status = WorryStatus.ongoing,
-    this.resolvedAt,
+    required this.listType,
+    required this.title,
+    this.items = const [],
+    this.sortOrder = 0,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  // ─── 计算属性 ───
+
+  bool get hasItems => items.isNotEmpty;
+  int get itemCount => items.length;
 
   // ─── SQLite 序列化 ───
 
@@ -548,30 +594,24 @@ class Worry {
     return {
       'id': id,
       'uid': uid,
-      'description': description,
-      'solution': solution,
-      'status': status.value,
-      'resolved_at': resolvedAt?.millisecondsSinceEpoch,
+      'list_type': listType.value,
+      'title': title,
+      'items': jsonEncode(items),
+      'sort_order': sortOrder,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
     };
   }
 
-  factory Worry.fromSqlite(Map<String, dynamic> map) {
-    return Worry(
+  factory UserList.fromSqlite(Map<String, dynamic> map) {
+    return UserList(
       id: map['id'] as String,
-      description: map['description'] as String,
-      solution: map['solution'] as String?,
-      status: WorryStatus.fromValue(
-        map['status'] as String? ?? 'ongoing',
-      ),
-      resolvedAt: map['resolved_at'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['resolved_at'] as int)
-          : null,
-      createdAt:
-          DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt:
-          DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      listType: ListType.fromValue(map['list_type'] as String),
+      title: map['title'] as String,
+      items: decodeJsonStringList(map['items']),
+      sortOrder: map['sort_order'] as int? ?? 0,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
     );
   }
 
@@ -579,55 +619,48 @@ class Worry {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'description': description,
-      'solution': solution,
-      'status': status.value,
-      'resolvedAt': resolvedAt != null
-          ? Timestamp.fromDate(resolvedAt!)
-          : null,
+      'listType': listType.value,
+      'title': title,
+      'items': items,
+      'sortOrder': sortOrder,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
-  factory Worry.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data()! as Map<String, dynamic>;
-    return Worry(
+  factory UserList.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return UserList(
       id: doc.id,
-      description: data['description'] as String? ?? '',
-      solution: data['solution'] as String?,
-      status: WorryStatus.fromValue(
-        data['status'] as String? ?? 'ongoing',
-      ),
-      resolvedAt: (data['resolvedAt'] as Timestamp?)?.toDate(),
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt:
-          (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      listType: ListType.fromValue(data['listType'] as String? ?? 'custom'),
+      title: data['title'] as String? ?? '',
+      items: (data['items'] as List<dynamic>?)
+              ?.whereType<String>()
+              .toList() ??
+          [],
+      sortOrder: data['sortOrder'] as int? ?? 0,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   // ─── copyWith ───
 
-  Worry copyWith({
+  UserList copyWith({
     String? id,
-    String? description,
-    String? solution,
-    bool clearSolution = false,
-    WorryStatus? status,
-    DateTime? resolvedAt,
-    bool clearResolvedAt = false,
+    ListType? listType,
+    String? title,
+    List<String>? items,
+    int? sortOrder,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Worry(
+    return UserList(
       id: id ?? this.id,
-      description: description ?? this.description,
-      solution: clearSolution ? null : (solution ?? this.solution),
-      status: status ?? this.status,
-      resolvedAt: clearResolvedAt
-          ? null
-          : (resolvedAt ?? this.resolvedAt),
+      listType: listType ?? this.listType,
+      title: title ?? this.title,
+      items: items ?? this.items,
+      sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -635,32 +668,133 @@ class Worry {
 }
 ```
 
-**要点**：
+---
 
-- `WorryStatus` 三态：进行中 / 已解决 / 自然消失
-- `resolvedAt` 仅在 status 变更为 resolved 或 disappeared 时赋值
-- SQLite 中 `status` 列存储字符串值，默认 `'ongoing'`
+### 4.5 `HighlightEntry` 模型（`lib/models/highlight_entry.dart`）
+
+```dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+/// 高光时刻记录 — 用户主动标记的值得纪念的瞬间。
+///
+/// 对应 SQLite 表 `local_highlights`，
+/// Firestore 路径 `users/{uid}/highlights/{highlightId}`。
+///
+/// 与 DailyLight 的区别：DailyLight 是每日记录（一天一条），
+/// HighlightEntry 是事件驱动的（随时记录，不限数量）。
+class HighlightEntry {
+  final String id;
+  final String date;          // 发生日期 'YYYY-MM-DD'
+  final String title;         // 高光标题（一句话描述）
+  final String? description;  // 详细描述（可选）
+  final String? category;     // 分类标签（如"成就"、"感动"、"突破"）
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const HighlightEntry({
+    required this.id,
+    required this.date,
+    required this.title,
+    this.description,
+    this.category,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  // ─── 计算属性 ───
+
+  bool get hasDescription => description != null && description!.isNotEmpty;
+  bool get hasCategory => category != null && category!.isNotEmpty;
+
+  // ─── SQLite 序列化 ───
+
+  Map<String, dynamic> toSqlite(String uid) {
+    return {
+      'id': id,
+      'uid': uid,
+      'date': date,
+      'title': title,
+      'description': description,
+      'category': category,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
+    };
+  }
+
+  factory HighlightEntry.fromSqlite(Map<String, dynamic> map) {
+    return HighlightEntry(
+      id: map['id'] as String,
+      date: map['date'] as String,
+      title: map['title'] as String,
+      description: map['description'] as String?,
+      category: map['category'] as String?,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+    );
+  }
+
+  // ─── Firestore 序列化 ───
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'date': date,
+      'title': title,
+      'description': description,
+      'category': category,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    };
+  }
+
+  factory HighlightEntry.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return HighlightEntry(
+      id: doc.id,
+      date: data['date'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      description: data['description'] as String?,
+      category: data['category'] as String?,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  // ─── copyWith ───
+
+  HighlightEntry copyWith({
+    String? id,
+    String? date,
+    String? title,
+    String? description,
+    bool clearDescription = false,
+    String? category,
+    bool clearCategory = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return HighlightEntry(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      title: title ?? this.title,
+      description: clearDescription ? null : (description ?? this.description),
+      category: clearCategory ? null : (category ?? this.category),
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+}
+```
 
 ---
 
-## 3. SQLite Migration
+## 5. SQLite Schema（全部表）
 
-### 当前版本
+> **无迁移策略**：所有用户都是新用户，Schema 版本直接升至 v5。无需 v4→v5 升级路径。
+> 仅 WeeklyReview 表需要 ALTER TABLE（因为 v4 已建表，需要加列）。
 
-当前 Schema 版本为 **v3**（`lib/services/local_database_service.dart` 第 18 行）。本次升级到 **v4**。
+### 5.1 已有表（v4 已创建，保留不变）
 
-### 版本升级修改
-
-在 `LocalDatabaseService` 中修改：
-
-```dart
-// 修改：_dbVersion 从 3 改为 4
-static const _dbVersion = 4;
-```
-
-### 新增 4 张表的完整 SQL
-
-#### 3.1 `local_daily_lights` 表
+#### `local_daily_lights`
 
 ```sql
 CREATE TABLE local_daily_lights (
@@ -675,19 +809,14 @@ CREATE TABLE local_daily_lights (
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   UNIQUE(uid, date)
-)
+);
+CREATE INDEX idx_daily_lights_uid_date ON local_daily_lights(uid, date);
 ```
 
-索引：
+#### `local_weekly_reviews`（v5 新增 2 列）
 
 ```sql
-CREATE INDEX idx_daily_lights_uid_date
-  ON local_daily_lights(uid, date)
-```
-
-#### 3.2 `local_weekly_reviews` 表
-
-```sql
+-- v4 原始表结构
 CREATE TABLE local_weekly_reviews (
   id TEXT PRIMARY KEY,
   uid TEXT NOT NULL,
@@ -706,17 +835,15 @@ CREATE TABLE local_weekly_reviews (
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
   UNIQUE(uid, week_id)
-)
+);
+CREATE INDEX idx_weekly_reviews_uid_week ON local_weekly_reviews(uid, week_id);
+
+-- v5 新增列
+ALTER TABLE local_weekly_reviews ADD COLUMN free_note TEXT;
+ALTER TABLE local_weekly_reviews ADD COLUMN worry_summary TEXT;
 ```
 
-索引：
-
-```sql
-CREATE INDEX idx_weekly_reviews_uid_week
-  ON local_weekly_reviews(uid, week_id)
-```
-
-#### 3.3 `local_worries` 表
+#### `local_worries`
 
 ```sql
 CREATE TABLE local_worries (
@@ -728,17 +855,11 @@ CREATE TABLE local_worries (
   resolved_at INTEGER,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL
-)
+);
+CREATE INDEX idx_worries_uid_status ON local_worries(uid, status);
 ```
 
-索引：
-
-```sql
-CREATE INDEX idx_worries_uid_status
-  ON local_worries(uid, status)
-```
-
-#### 3.4 `local_awareness_stats` 表
+#### `local_awareness_stats`
 
 ```sql
 CREATE TABLE local_awareness_stats (
@@ -748,91 +869,201 @@ CREATE TABLE local_awareness_stats (
   total_worries_resolved INTEGER NOT NULL DEFAULT 0,
   last_light_date TEXT,
   updated_at INTEGER NOT NULL
-)
+);
 ```
 
-> **说明**：`local_awareness_stats` 是聚合统计表，主键为 `uid`（单用户单行），不需要额外索引。用于快速查询成就评估所需的计数器，避免每次 `COUNT(*)` 全表扫描。
+### 5.2 新增表（v5）
 
-### 迁移方法实现
+#### `local_yearly_plans`
 
-在 `lib/services/local_database_service.dart` 中新增：
+```sql
+CREATE TABLE local_yearly_plans (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  year TEXT NOT NULL,
+  keyword TEXT,
+  vision TEXT,
+  goals TEXT NOT NULL DEFAULT '[]',
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  UNIQUE(uid, year)
+);
+CREATE INDEX idx_yearly_plans_uid_year ON local_yearly_plans(uid, year);
+```
+
+#### `local_monthly_plans`
+
+```sql
+CREATE TABLE local_monthly_plans (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  month_id TEXT NOT NULL,
+  theme TEXT,
+  tasks TEXT NOT NULL DEFAULT '[]',
+  reflection TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  UNIQUE(uid, month_id)
+);
+CREATE INDEX idx_monthly_plans_uid_month ON local_monthly_plans(uid, month_id);
+```
+
+#### `local_weekly_plans`
+
+```sql
+CREATE TABLE local_weekly_plans (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  week_id TEXT NOT NULL,
+  week_start_date TEXT NOT NULL,
+  week_end_date TEXT NOT NULL,
+  tasks TEXT NOT NULL DEFAULT '[]',
+  focus TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  UNIQUE(uid, week_id)
+);
+CREATE INDEX idx_weekly_plans_uid_week ON local_weekly_plans(uid, week_id);
+```
+
+#### `local_user_lists`
+
+```sql
+CREATE TABLE local_user_lists (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  list_type TEXT NOT NULL DEFAULT 'custom',
+  title TEXT NOT NULL,
+  items TEXT NOT NULL DEFAULT '[]',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+CREATE INDEX idx_user_lists_uid_type ON local_user_lists(uid, list_type);
+```
+
+#### `local_highlights`
+
+```sql
+CREATE TABLE local_highlights (
+  id TEXT PRIMARY KEY,
+  uid TEXT NOT NULL,
+  date TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+CREATE INDEX idx_highlights_uid_date ON local_highlights(uid, date);
+```
+
+### 5.3 数据库版本升级
+
+在 `LocalDatabaseService` 中：
 
 ```dart
-/// v4 表：觉知记录（每日一光 + 周回顾 + 烦恼 + 聚合统计）。
-Future<void> _createV4Tables(Database db) async {
+// _dbVersion 从 4 改为 5
+static const _dbVersion = 5;
+```
+
+新增 `_createV5Tables` 方法：
+
+```dart
+/// v5 表：LUMI Pivot — 计划系统 + 列表 + 高光 + WeeklyReview 扩展。
+Future<void> _createV5Tables(Database db) async {
+  // WeeklyReview 新增列
+  await db.execute('ALTER TABLE local_weekly_reviews ADD COLUMN free_note TEXT');
+  await db.execute('ALTER TABLE local_weekly_reviews ADD COLUMN worry_summary TEXT');
+
+  // 年度计划
   await db.execute('''
-    CREATE TABLE local_daily_lights (
+    CREATE TABLE local_yearly_plans (
       id TEXT PRIMARY KEY,
       uid TEXT NOT NULL,
-      date TEXT NOT NULL,
-      mood INTEGER NOT NULL DEFAULT 2,
-      light_text TEXT,
-      tags TEXT NOT NULL DEFAULT '[]',
-      timeline_events TEXT,
-      habit_completions TEXT,
+      year TEXT NOT NULL,
+      keyword TEXT,
+      vision TEXT,
+      goals TEXT NOT NULL DEFAULT '[]',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      UNIQUE(uid, date)
+      UNIQUE(uid, year)
     )
   ''');
   await db.execute(
-    'CREATE INDEX idx_daily_lights_uid_date '
-    'ON local_daily_lights(uid, date)',
+    'CREATE INDEX idx_yearly_plans_uid_year ON local_yearly_plans(uid, year)',
   );
 
+  // 月度计划
   await db.execute('''
-    CREATE TABLE local_weekly_reviews (
+    CREATE TABLE local_monthly_plans (
+      id TEXT PRIMARY KEY,
+      uid TEXT NOT NULL,
+      month_id TEXT NOT NULL,
+      theme TEXT,
+      tasks TEXT NOT NULL DEFAULT '[]',
+      reflection TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      UNIQUE(uid, month_id)
+    )
+  ''');
+  await db.execute(
+    'CREATE INDEX idx_monthly_plans_uid_month ON local_monthly_plans(uid, month_id)',
+  );
+
+  // 周计划
+  await db.execute('''
+    CREATE TABLE local_weekly_plans (
       id TEXT PRIMARY KEY,
       uid TEXT NOT NULL,
       week_id TEXT NOT NULL,
       week_start_date TEXT NOT NULL,
       week_end_date TEXT NOT NULL,
-      happy_moment_1 TEXT,
-      happy_moment_1_tags TEXT NOT NULL DEFAULT '[]',
-      happy_moment_2 TEXT,
-      happy_moment_2_tags TEXT NOT NULL DEFAULT '[]',
-      happy_moment_3 TEXT,
-      happy_moment_3_tags TEXT NOT NULL DEFAULT '[]',
-      gratitude TEXT,
-      learning TEXT,
-      cat_weekly_summary TEXT,
+      tasks TEXT NOT NULL DEFAULT '[]',
+      focus TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       UNIQUE(uid, week_id)
     )
   ''');
   await db.execute(
-    'CREATE INDEX idx_weekly_reviews_uid_week '
-    'ON local_weekly_reviews(uid, week_id)',
+    'CREATE INDEX idx_weekly_plans_uid_week ON local_weekly_plans(uid, week_id)',
   );
 
+  // 用户列表
   await db.execute('''
-    CREATE TABLE local_worries (
+    CREATE TABLE local_user_lists (
       id TEXT PRIMARY KEY,
       uid TEXT NOT NULL,
-      description TEXT NOT NULL,
-      solution TEXT,
-      status TEXT NOT NULL DEFAULT 'ongoing',
-      resolved_at INTEGER,
+      list_type TEXT NOT NULL DEFAULT 'custom',
+      title TEXT NOT NULL,
+      items TEXT NOT NULL DEFAULT '[]',
+      sort_order INTEGER NOT NULL DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )
   ''');
   await db.execute(
-    'CREATE INDEX idx_worries_uid_status '
-    'ON local_worries(uid, status)',
+    'CREATE INDEX idx_user_lists_uid_type ON local_user_lists(uid, list_type)',
   );
 
+  // 高光时刻
   await db.execute('''
-    CREATE TABLE local_awareness_stats (
-      uid TEXT PRIMARY KEY,
-      total_light_days INTEGER NOT NULL DEFAULT 0,
-      total_weekly_reviews INTEGER NOT NULL DEFAULT 0,
-      total_worries_resolved INTEGER NOT NULL DEFAULT 0,
-      last_light_date TEXT,
+    CREATE TABLE local_highlights (
+      id TEXT PRIMARY KEY,
+      uid TEXT NOT NULL,
+      date TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      category TEXT,
+      created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )
   ''');
+  await db.execute(
+    'CREATE INDEX idx_highlights_uid_date ON local_highlights(uid, date)',
+  );
 }
 ```
 
@@ -841,15 +1072,10 @@ Future<void> _createV4Tables(Database db) async {
 ```dart
 Future<void> _onCreate(Database db, int version) async {
   await _createV1Tables(db);
-  if (version >= 2) {
-    await _createV2Tables(db);
-  }
-  if (version >= 3) {
-    await _createV3Columns(db);
-  }
-  if (version >= 4) {
-    await _createV4Tables(db);
-  }
+  if (version >= 2) await _createV2Tables(db);
+  if (version >= 3) await _createV3Columns(db);
+  if (version >= 4) await _createV4Tables(db);
+  if (version >= 5) await _createV5Tables(db);
 }
 ```
 
@@ -857,1288 +1083,1121 @@ Future<void> _onCreate(Database db, int version) async {
 
 ```dart
 Future<void> _onUpgrade(Database db, int oldV, int newV) async {
-  if (oldV < 2) {
-    await _createV2Tables(db);
-  }
-  if (oldV < 3) {
-    await _createV3Columns(db);
-  }
-  if (oldV < 4) {
-    await _createV4Tables(db);
-  }
+  if (oldV < 2) await _createV2Tables(db);
+  if (oldV < 3) await _createV3Columns(db);
+  if (oldV < 4) await _createV4Tables(db);
+  if (oldV < 5) await _createV5Tables(db);
 }
 ```
 
 ---
 
-## 4. 新增 ActionType 枚举值
+## 6. Firestore 集合结构
 
-在 `lib/models/ledger_action.dart` 的 `ActionType` 枚举中新增 6 个值：
+```
+users/{uid}/
+  ├── dailyLights/{date}           ← 已有（DailyLight）
+  ├── weeklyReviews/{weekId}       ← 已有（WeeklyReview，新增 freeNote/worrySummary 字段）
+  ├── worries/{worryId}            ← 已有（Worry）
+  ├── yearlyPlans/{year}           ← 新增（YearlyPlan）
+  ├── monthlyPlans/{monthId}       ← 新增（MonthlyPlan）
+  ├── weeklyPlans/{weekId}         ← 新增（WeeklyPlan）
+  ├── userLists/{listId}           ← 新增（UserList）
+  └── highlights/{highlightId}     ← 新增（HighlightEntry）
+```
+
+**文档 ID 策略**：
+
+| 集合 | 文档 ID | 唯一性保证 |
+|------|---------|-----------|
+| yearlyPlans | `year`（如 `2026`） | 每用户每年一条 |
+| monthlyPlans | `monthId`（如 `2026-03`） | 每用户每月一条 |
+| weeklyPlans | `weekId`（如 `2026-W12`） | 每用户每周一条 |
+| userLists | UUID | 多列表允许 |
+| highlights | UUID | 多条目允许 |
+
+---
+
+## 7. 新增 ActionType 枚举值
+
+在 `lib/models/ledger_action.dart` 的 `ActionType` 枚举中新增 5 个值：
 
 ```dart
 enum ActionType {
-  // ... 现有值 ...
-  profileUpdate('profile_update'),
+  // ... 现有 V3 觉知模块值 ...
+  monthlyRitualSet('monthly_ritual_set'),
 
-  // ─── V3 觉知功能 ───
-  lightRecorded('light_recorded'),
-  weeklyReviewCompleted('weekly_review_completed'),
-  worryCreated('worry_created'),
-  worryUpdated('worry_updated'),
-  worryResolved('worry_resolved'),
-  monthlyRitualSet('monthly_ritual_set');
+  // LUMI Pivot — 计划系统 + 列表 + 高光
+  yearlyPlanSaved('yearly_plan_saved'),
+  monthlyPlanSaved('monthly_plan_saved'),
+  weeklyPlanSaved('weekly_plan_saved'),
+  listUpdated('list_updated'),
+  highlightRecorded('highlight_recorded'),
 
-  // ... 构造函数和 fromValue 不变 ...
+  // 仅通知用途 ...
+  hydrate('hydrate'),
+  // ...
 }
 ```
 
-**插入位置**：在 `profileUpdate` 之后，分号之前。加注释分隔。
+**插入位置**：在 `monthlyRitualSet` 之后、`hydrate`（仅通知用途分隔线）之前。
+
+同时新增分组 getter：
+
+```dart
+/// 是否为计划相关操作。
+bool get isPlanAction =>
+    this == yearlyPlanSaved ||
+    this == monthlyPlanSaved ||
+    this == weeklyPlanSaved;
+```
 
 ---
 
-## 5. Service API 契约
+## 8. Repository 层
 
-### 5.1 `AwarenessRepository`（`lib/services/awareness_repository.dart`）
+### 8.1 `PlanRepository`（`lib/services/plan_repository.dart`）
+
+遵循现有 `AwarenessRepository` 模式：所有写操作在 SQLite 事务中同时更新领域表和行为台账。
 
 ```dart
-import 'package:hachimi_app/models/daily_light.dart';
-import 'package:hachimi_app/models/weekly_review.dart';
-import 'package:hachimi_app/models/ledger_action.dart';
-import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:uuid/uuid.dart';
 
-const _uuid = Uuid();
+import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/models/yearly_plan.dart';
+import 'package:hachimi_app/models/monthly_plan.dart';
+import 'package:hachimi_app/models/weekly_plan.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
 
-/// 觉知数据仓库 — DailyLight + WeeklyReview + 聚合统计 CRUD。
-/// 所有写操作在 SQLite 事务中同时更新领域表、聚合统计表和行为台账。
-class AwarenessRepository {
+/// 计划仓库 — YearlyPlan + MonthlyPlan + WeeklyPlan CRUD + 台账写入。
+class PlanRepository {
   final LedgerService _ledger;
 
-  AwarenessRepository({required LedgerService ledger}) : _ledger = ledger;
+  PlanRepository({required LedgerService ledger}) : _ledger = ledger;
 
-  // ─── DailyLight 查询 ───
+  // ─── YearlyPlan ───
 
-  /// 获取今日之光记录。
-  Future<DailyLight?> getTodayLight(String uid, String todayDate) async {
-    // todayDate: 'YYYY-MM-DD' 格式
+  Future<YearlyPlan?> getYearlyPlan(String uid, String year) async {
     final db = await _ledger.database;
     final rows = await db.query(
-      'local_daily_lights',
-      where: 'uid = ? AND date = ?',
-      whereArgs: [uid, todayDate],
+      'local_yearly_plans',
+      where: 'uid = ? AND year = ?',
+      whereArgs: [uid, year],
       limit: 1,
     );
     if (rows.isEmpty) return null;
-    return DailyLight.fromSqlite(rows.first);
+    return YearlyPlan.fromSqlite(rows.first);
   }
 
-  /// 按日期获取记录。
-  Future<DailyLight?> getLightByDate(String uid, String date) async {
-    return getTodayLight(uid, date);
-  }
-
-  /// 获取指定月份的所有记录（月历视图用）。
-  /// month 格式：'YYYY-MM'
-  Future<List<DailyLight>> getLightsForMonth(
-    String uid,
-    String month,
-  ) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_daily_lights',
-      where: "uid = ? AND date LIKE ?",
-      whereArgs: [uid, '$month%'],
-      orderBy: 'date ASC',
-    );
-    return rows.map(DailyLight.fromSqlite).toList();
-  }
-
-  /// 获取日期范围内的记录。
-  Future<List<DailyLight>> getLightsInRange(
-    String uid,
-    String startDate,
-    String endDate,
-  ) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_daily_lights',
-      where: 'uid = ? AND date >= ? AND date <= ?',
-      whereArgs: [uid, startDate, endDate],
-      orderBy: 'date ASC',
-    );
-    return rows.map(DailyLight.fromSqlite).toList();
-  }
-
-  /// 获取总记录天数（从聚合统计表读取）。
-  Future<int> getTotalLightDays(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_awareness_stats',
-      columns: ['total_light_days'],
-      where: 'uid = ?',
-      whereArgs: [uid],
-      limit: 1,
-    );
-    if (rows.isEmpty) return 0;
-    return rows.first['total_light_days'] as int? ?? 0;
-  }
-
-  // ─── DailyLight 写入 ───
-
-  /// 保存每日一光（新建或更新）。
-  /// 写入模式：db.transaction → insert/update → appendInTxn → stats 更新 → notifyChange
-  Future<void> saveDailyLight(String uid, DailyLight light) async {
+  Future<void> saveYearlyPlan(String uid, YearlyPlan plan) async {
     final db = await _ledger.database;
     final now = DateTime.now();
-    final isNew = await _isNewDailyLight(db, uid, light.date);
-
     await db.transaction((txn) async {
-      // 1. 写入领域表（REPLACE 语义，基于 UNIQUE(uid, date)）
       await txn.insert(
-        'local_daily_lights',
-        light.toSqlite(uid),
+        'local_yearly_plans',
+        plan.toSqlite(uid),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-
-      // 2. 写入行为台账
       await _ledger.appendInTxn(
         txn,
-        type: ActionType.lightRecorded,
+        type: ActionType.yearlyPlanSaved,
         uid: uid,
         startedAt: now,
-        payload: {
-          'date': light.date,
-          'mood': light.mood.value,
-          'hasText': light.hasText,
-          'tagCount': light.tags.length,
-        },
+        payload: {'year': plan.year, 'hasKeyword': plan.hasKeyword},
       );
-
-      // 3. 更新聚合统计（仅新记录时递增）
-      if (isNew) {
-        await _incrementLightDaysInTxn(txn, uid, light.date);
-      }
     });
-
     _ledger.notifyChange(
-      LedgerChange(type: 'light_recorded', affectedIds: [light.id]),
+      LedgerChange(type: ActionType.yearlyPlanSaved, affectedIds: [plan.id]),
     );
   }
 
-  /// 删除每日一光记录。
-  Future<void> deleteDailyLight(String uid, String date) async {
+  // ─── MonthlyPlan ───
+
+  Future<MonthlyPlan?> getMonthlyPlan(String uid, String monthId) async {
     final db = await _ledger.database;
-    await db.transaction((txn) async {
-      final deleted = await txn.delete(
-        'local_daily_lights',
-        where: 'uid = ? AND date = ?',
-        whereArgs: [uid, date],
-      );
-      if (deleted > 0) {
-        await _decrementLightDaysInTxn(txn, uid);
-      }
-    });
-    _ledger.notifyChange(const LedgerChange(type: 'light_recorded'));
+    final rows = await db.query(
+      'local_monthly_plans',
+      where: 'uid = ? AND month_id = ?',
+      whereArgs: [uid, monthId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return MonthlyPlan.fromSqlite(rows.first);
   }
 
-  // ─── WeeklyReview 查询 ───
-
-  /// 获取当前周的回顾。
-  Future<WeeklyReview?> getCurrentWeekReview(
+  Future<List<MonthlyPlan>> getMonthlyPlansForYear(
     String uid,
-    String currentWeekId,
-  ) async {
-    return getReviewByWeekId(uid, currentWeekId);
-  }
-
-  /// 按 weekId 获取回顾。
-  Future<WeeklyReview?> getReviewByWeekId(
-    String uid,
-    String weekId,
+    String year,
   ) async {
     final db = await _ledger.database;
     final rows = await db.query(
-      'local_weekly_reviews',
+      'local_monthly_plans',
+      where: 'uid = ? AND month_id LIKE ?',
+      whereArgs: [uid, '$year%'],
+      orderBy: 'month_id ASC',
+    );
+    return rows.map(MonthlyPlan.fromSqlite).toList();
+  }
+
+  Future<void> saveMonthlyPlan(String uid, MonthlyPlan plan) async {
+    final db = await _ledger.database;
+    final now = DateTime.now();
+    await db.transaction((txn) async {
+      await txn.insert(
+        'local_monthly_plans',
+        plan.toSqlite(uid),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      await _ledger.appendInTxn(
+        txn,
+        type: ActionType.monthlyPlanSaved,
+        uid: uid,
+        startedAt: now,
+        payload: {'monthId': plan.monthId, 'taskCount': plan.tasks.length},
+      );
+    });
+    _ledger.notifyChange(
+      LedgerChange(type: ActionType.monthlyPlanSaved, affectedIds: [plan.id]),
+    );
+  }
+
+  // ─── WeeklyPlan ───
+
+  Future<WeeklyPlan?> getWeeklyPlan(String uid, String weekId) async {
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_weekly_plans',
       where: 'uid = ? AND week_id = ?',
       whereArgs: [uid, weekId],
       limit: 1,
     );
     if (rows.isEmpty) return null;
-    return WeeklyReview.fromSqlite(rows.first);
+    return WeeklyPlan.fromSqlite(rows.first);
   }
 
-  /// 获取日期范围内的周回顾。
-  Future<List<WeeklyReview>> getReviewsInRange(
-    String uid,
-    String startWeekId,
-    String endWeekId,
-  ) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_weekly_reviews',
-      where: 'uid = ? AND week_id >= ? AND week_id <= ?',
-      whereArgs: [uid, startWeekId, endWeekId],
-      orderBy: 'week_id ASC',
-    );
-    return rows.map(WeeklyReview.fromSqlite).toList();
-  }
-
-  /// 获取总周回顾数。
-  Future<int> getTotalReviewCount(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_awareness_stats',
-      columns: ['total_weekly_reviews'],
-      where: 'uid = ?',
-      whereArgs: [uid],
-      limit: 1,
-    );
-    if (rows.isEmpty) return 0;
-    return rows.first['total_weekly_reviews'] as int? ?? 0;
-  }
-
-  // ─── WeeklyReview 写入 ───
-
-  /// 保存周回顾（新建或更新）。
-  Future<void> saveWeeklyReview(String uid, WeeklyReview review) async {
+  Future<void> saveWeeklyPlan(String uid, WeeklyPlan plan) async {
     final db = await _ledger.database;
     final now = DateTime.now();
-    final isNew = await _isNewWeeklyReview(db, uid, review.weekId);
-
     await db.transaction((txn) async {
       await txn.insert(
-        'local_weekly_reviews',
-        review.toSqlite(uid),
+        'local_weekly_plans',
+        plan.toSqlite(uid),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-
-      // 仅在回顾完成状态时写台账（避免草稿状态频繁写入）
-      if (review.isComplete) {
-        await _ledger.appendInTxn(
-          txn,
-          type: ActionType.weeklyReviewCompleted,
-          uid: uid,
-          startedAt: now,
-          payload: {
-            'weekId': review.weekId,
-            'momentCount': review.filledMomentCount,
-          },
-        );
-      }
-
-      if (isNew && review.isComplete) {
-        await _incrementWeeklyReviewsInTxn(txn, uid);
-      }
+      await _ledger.appendInTxn(
+        txn,
+        type: ActionType.weeklyPlanSaved,
+        uid: uid,
+        startedAt: now,
+        payload: {'weekId': plan.weekId, 'taskCount': plan.tasks.length},
+      );
     });
-
     _ledger.notifyChange(
-      LedgerChange(
-        type: 'weekly_review_completed',
-        affectedIds: [review.id],
-      ),
+      LedgerChange(type: ActionType.weeklyPlanSaved, affectedIds: [plan.id]),
     );
-  }
-
-  // ─── 聚合统计 ───
-
-  /// 获取觉知聚合统计。
-  Future<Map<String, int>> getAwarenessStats(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_awareness_stats',
-      where: 'uid = ?',
-      whereArgs: [uid],
-      limit: 1,
-    );
-    if (rows.isEmpty) {
-      return {
-        'totalLightDays': 0,
-        'totalWeeklyReviews': 0,
-        'totalWorriesResolved': 0,
-      };
-    }
-    final row = rows.first;
-    return {
-      'totalLightDays': row['total_light_days'] as int? ?? 0,
-      'totalWeeklyReviews': row['total_weekly_reviews'] as int? ?? 0,
-      'totalWorriesResolved': row['total_worries_resolved'] as int? ?? 0,
-    };
-  }
-
-  // ─── 标签分析（Track 5 使用）───
-
-  /// 获取标签频率统计。
-  /// 返回 Map<标签名, 出现次数>，按频率降序。
-  Future<Map<String, int>> getTagFrequency(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_daily_lights',
-      columns: ['tags'],
-      where: 'uid = ?',
-      whereArgs: [uid],
-    );
-    final freq = <String, int>{};
-    for (final row in rows) {
-      final tagsJson = row['tags'] as String? ?? '[]';
-      final tags = DailyLight.fromSqlite({
-        ...row,
-        'id': '',
-        'date': '',
-        'mood': 2,
-        'created_at': 0,
-        'updated_at': 0,
-      }).tags;
-      // 注意：上面的 hack 不优雅，改用直接解析
-      // 实际实现时直接解析 JSON 即可
-    }
-    // 实际实现：
-    // for (final row in rows) {
-    //   final decoded = jsonDecode(row['tags'] as String? ?? '[]');
-    //   if (decoded is List) {
-    //     for (final tag in decoded.whereType<String>()) {
-    //       freq[tag] = (freq[tag] ?? 0) + 1;
-    //     }
-    //   }
-    // }
-    // 按频率降序排列
-    // final sorted = freq.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-    // return Map.fromEntries(sorted);
-    return freq;
-  }
-
-  // ─── 私有辅助方法 ───
-
-  Future<bool> _isNewDailyLight(Database db, String uid, String date) async {
-    final rows = await db.query(
-      'local_daily_lights',
-      columns: ['id'],
-      where: 'uid = ? AND date = ?',
-      whereArgs: [uid, date],
-      limit: 1,
-    );
-    return rows.isEmpty;
-  }
-
-  Future<bool> _isNewWeeklyReview(
-    Database db,
-    String uid,
-    String weekId,
-  ) async {
-    final rows = await db.query(
-      'local_weekly_reviews',
-      columns: ['id'],
-      where: 'uid = ? AND week_id = ?',
-      whereArgs: [uid, weekId],
-      limit: 1,
-    );
-    return rows.isEmpty;
-  }
-
-  Future<void> _incrementLightDaysInTxn(
-    Transaction txn,
-    String uid,
-    String date,
-  ) async {
-    await txn.rawInsert('''
-      INSERT INTO local_awareness_stats (uid, total_light_days, total_weekly_reviews, total_worries_resolved, last_light_date, updated_at)
-      VALUES (?, 1, 0, 0, ?, ?)
-      ON CONFLICT(uid) DO UPDATE SET
-        total_light_days = total_light_days + 1,
-        last_light_date = excluded.last_light_date,
-        updated_at = excluded.updated_at
-    ''', [uid, date, DateTime.now().millisecondsSinceEpoch]);
-  }
-
-  Future<void> _decrementLightDaysInTxn(Transaction txn, String uid) async {
-    await txn.rawUpdate('''
-      UPDATE local_awareness_stats
-      SET total_light_days = MAX(total_light_days - 1, 0),
-          updated_at = ?
-      WHERE uid = ?
-    ''', [DateTime.now().millisecondsSinceEpoch, uid]);
-  }
-
-  Future<void> _incrementWeeklyReviewsInTxn(
-    Transaction txn,
-    String uid,
-  ) async {
-    await txn.rawInsert('''
-      INSERT INTO local_awareness_stats (uid, total_light_days, total_weekly_reviews, total_worries_resolved, last_light_date, updated_at)
-      VALUES (?, 0, 1, 0, NULL, ?)
-      ON CONFLICT(uid) DO UPDATE SET
-        total_weekly_reviews = total_weekly_reviews + 1,
-        updated_at = excluded.updated_at
-    ''', [uid, DateTime.now().millisecondsSinceEpoch]);
   }
 }
 ```
 
-**实现说明**：
-
-- `getTagFrequency` 的伪代码注释中给出了实际实现逻辑，直接 `jsonDecode` tags 列并累加频率
-- 聚合统计使用 `INSERT ... ON CONFLICT DO UPDATE`（SQLite UPSERT），保证原子性
-- 所有写入方法遵循固定模式：`db.transaction → insert/update → appendInTxn → stats → notifyChange`
-
 ---
 
-### 5.2 `WorryRepository`（`lib/services/worry_repository.dart`）
+### 8.2 `ListHighlightRepository`（`lib/services/list_highlight_repository.dart`）
 
 ```dart
-import 'package:hachimi_app/models/ledger_action.dart';
-import 'package:hachimi_app/models/worry.dart';
-import 'package:hachimi_app/services/ledger_service.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/models/user_list.dart';
+import 'package:hachimi_app/models/highlight_entry.dart';
+import 'package:hachimi_app/services/ledger_service.dart';
+
 const _uuid = Uuid();
 
-/// 烦恼仓库 — local_worries 表 CRUD + 台账写入。
-class WorryRepository {
+/// 列表 + 高光仓库 — UserList + HighlightEntry CRUD + 台账写入。
+class ListHighlightRepository {
   final LedgerService _ledger;
 
-  WorryRepository({required LedgerService ledger}) : _ledger = ledger;
+  ListHighlightRepository({required LedgerService ledger}) : _ledger = ledger;
 
-  // ─── 查询 ───
+  // ─── UserList 查询 ───
 
-  /// 获取所有进行中的烦恼（按创建时间倒序）。
-  Future<List<Worry>> getActiveWorries(String uid) async {
+  /// 获取用户的所有列表（按 sort_order + created_at 排序）。
+  Future<List<UserList>> getAllLists(String uid) async {
     final db = await _ledger.database;
     final rows = await db.query(
-      'local_worries',
-      where: "uid = ? AND status = 'ongoing'",
-      whereArgs: [uid],
-      orderBy: 'created_at DESC',
-    );
-    return rows.map(Worry.fromSqlite).toList();
-  }
-
-  /// 获取已解决/已消失的烦恼（按解决时间倒序）。
-  Future<List<Worry>> getResolvedWorries(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_worries',
-      where: "uid = ? AND status IN ('resolved', 'disappeared')",
-      whereArgs: [uid],
-      orderBy: 'resolved_at DESC',
-    );
-    return rows.map(Worry.fromSqlite).toList();
-  }
-
-  /// 获取所有烦恼（含已解决，按创建时间倒序）。
-  Future<List<Worry>> getAllWorries(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_worries',
+      'local_user_lists',
       where: 'uid = ?',
       whereArgs: [uid],
-      orderBy: 'created_at DESC',
+      orderBy: 'sort_order ASC, created_at ASC',
     );
-    return rows.map(Worry.fromSqlite).toList();
+    return rows.map(UserList.fromSqlite).toList();
   }
 
-  /// 按 ID 获取烦恼。
-  Future<Worry?> getWorry(String worryId) async {
+  /// 按类型获取列表。
+  Future<List<UserList>> getListsByType(String uid, ListType type) async {
     final db = await _ledger.database;
     final rows = await db.query(
-      'local_worries',
+      'local_user_lists',
+      where: 'uid = ? AND list_type = ?',
+      whereArgs: [uid, type.value],
+      orderBy: 'sort_order ASC, created_at ASC',
+    );
+    return rows.map(UserList.fromSqlite).toList();
+  }
+
+  /// 按 ID 获取列表。
+  Future<UserList?> getList(String listId) async {
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_user_lists',
       where: 'id = ?',
-      whereArgs: [worryId],
+      whereArgs: [listId],
       limit: 1,
     );
     if (rows.isEmpty) return null;
-    return Worry.fromSqlite(rows.first);
+    return UserList.fromSqlite(rows.first);
   }
 
-  /// 获取已解决烦恼总数（从聚合统计表读取）。
-  Future<int> getResolvedCount(String uid) async {
-    final db = await _ledger.database;
-    final rows = await db.query(
-      'local_awareness_stats',
-      columns: ['total_worries_resolved'],
-      where: 'uid = ?',
-      whereArgs: [uid],
-      limit: 1,
-    );
-    if (rows.isEmpty) return 0;
-    return rows.first['total_worries_resolved'] as int? ?? 0;
-  }
+  // ─── UserList 写入 ───
 
-  // ─── 写入 ───
-
-  /// 创建新烦恼。
-  Future<Worry> create(String uid, String description) async {
+  /// 创建新列表。
+  Future<UserList> createList(
+    String uid, {
+    required ListType listType,
+    required String title,
+    List<String> items = const [],
+  }) async {
     final db = await _ledger.database;
     final now = DateTime.now();
-    final worry = Worry(
+    final list = UserList(
       id: _uuid.v4(),
-      description: description,
+      listType: listType,
+      title: title,
+      items: items,
       createdAt: now,
       updatedAt: now,
     );
-
     await db.transaction((txn) async {
-      await txn.insert('local_worries', worry.toSqlite(uid));
+      await txn.insert('local_user_lists', list.toSqlite(uid));
       await _ledger.appendInTxn(
         txn,
-        type: ActionType.worryCreated,
+        type: ActionType.listUpdated,
         uid: uid,
         startedAt: now,
-        payload: {'worryId': worry.id},
+        payload: {'listId': list.id, 'action': 'created', 'listType': listType.value},
       );
     });
-
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_created', affectedIds: [worry.id]),
+      LedgerChange(type: ActionType.listUpdated, affectedIds: [list.id]),
     );
-    return worry;
+    return list;
   }
 
-  /// 更新烦恼描述或解决方案。
-  Future<void> update(String uid, Worry worry) async {
+  /// 更新列表。
+  Future<void> updateList(String uid, UserList list) async {
     final db = await _ledger.database;
     final now = DateTime.now();
-    final updated = worry.copyWith(updatedAt: now);
-
+    final updated = list.copyWith(updatedAt: now);
     await db.transaction((txn) async {
       await txn.update(
-        'local_worries',
+        'local_user_lists',
         updated.toSqlite(uid),
         where: 'id = ?',
         whereArgs: [updated.id],
       );
       await _ledger.appendInTxn(
         txn,
-        type: ActionType.worryUpdated,
+        type: ActionType.listUpdated,
         uid: uid,
         startedAt: now,
-        payload: {'worryId': updated.id},
+        payload: {'listId': updated.id, 'action': 'updated', 'itemCount': updated.items.length},
       );
     });
-
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_updated', affectedIds: [updated.id]),
+      LedgerChange(type: ActionType.listUpdated, affectedIds: [updated.id]),
     );
   }
 
-  /// 标记烦恼为已解决 / 已消失。
-  Future<void> resolve(
-    String uid,
-    String worryId,
-    WorryStatus resolvedStatus,
-  ) async {
-    assert(
-      resolvedStatus == WorryStatus.resolved ||
-          resolvedStatus == WorryStatus.disappeared,
+  /// 删除列表。
+  Future<void> deleteList(String uid, String listId) async {
+    final db = await _ledger.database;
+    await db.delete(
+      'local_user_lists',
+      where: 'id = ? AND uid = ?',
+      whereArgs: [listId, uid],
     );
+    _ledger.notifyChange(
+      LedgerChange(type: ActionType.listUpdated, affectedIds: [listId]),
+    );
+  }
+
+  // ─── HighlightEntry 查询 ───
+
+  /// 获取所有高光时刻（按日期倒序）。
+  Future<List<HighlightEntry>> getAllHighlights(String uid) async {
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_highlights',
+      where: 'uid = ?',
+      whereArgs: [uid],
+      orderBy: 'date DESC, created_at DESC',
+    );
+    return rows.map(HighlightEntry.fromSqlite).toList();
+  }
+
+  /// 按日期范围获取高光时刻。
+  Future<List<HighlightEntry>> getHighlightsInRange(
+    String uid,
+    String startDate,
+    String endDate,
+  ) async {
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_highlights',
+      where: 'uid = ? AND date >= ? AND date <= ?',
+      whereArgs: [uid, startDate, endDate],
+      orderBy: 'date DESC, created_at DESC',
+    );
+    return rows.map(HighlightEntry.fromSqlite).toList();
+  }
+
+  /// 按 ID 获取高光时刻。
+  Future<HighlightEntry?> getHighlight(String highlightId) async {
+    final db = await _ledger.database;
+    final rows = await db.query(
+      'local_highlights',
+      where: 'id = ?',
+      whereArgs: [highlightId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return HighlightEntry.fromSqlite(rows.first);
+  }
+
+  // ─── HighlightEntry 写入 ───
+
+  /// 创建高光时刻。
+  Future<HighlightEntry> createHighlight(
+    String uid, {
+    required String date,
+    required String title,
+    String? description,
+    String? category,
+  }) async {
     final db = await _ledger.database;
     final now = DateTime.now();
+    final entry = HighlightEntry(
+      id: _uuid.v4(),
+      date: date,
+      title: title,
+      description: description,
+      category: category,
+      createdAt: now,
+      updatedAt: now,
+    );
+    await db.transaction((txn) async {
+      await txn.insert('local_highlights', entry.toSqlite(uid));
+      await _ledger.appendInTxn(
+        txn,
+        type: ActionType.highlightRecorded,
+        uid: uid,
+        startedAt: now,
+        payload: {'highlightId': entry.id, 'date': date, 'hasCategory': entry.hasCategory},
+      );
+    });
+    _ledger.notifyChange(
+      LedgerChange(type: ActionType.highlightRecorded, affectedIds: [entry.id]),
+    );
+    return entry;
+  }
 
+  /// 更新高光时刻。
+  Future<void> updateHighlight(String uid, HighlightEntry entry) async {
+    final db = await _ledger.database;
+    final now = DateTime.now();
+    final updated = entry.copyWith(updatedAt: now);
     await db.transaction((txn) async {
       await txn.update(
-        'local_worries',
-        {
-          'status': resolvedStatus.value,
-          'resolved_at': now.millisecondsSinceEpoch,
-          'updated_at': now.millisecondsSinceEpoch,
-        },
+        'local_highlights',
+        updated.toSqlite(uid),
         where: 'id = ?',
-        whereArgs: [worryId],
+        whereArgs: [updated.id],
       );
       await _ledger.appendInTxn(
         txn,
-        type: ActionType.worryResolved,
+        type: ActionType.highlightRecorded,
         uid: uid,
         startedAt: now,
-        payload: {
-          'worryId': worryId,
-          'resolvedStatus': resolvedStatus.value,
-        },
+        payload: {'highlightId': updated.id, 'action': 'updated'},
       );
-      // 更新聚合统计
-      await _incrementWorriesResolvedInTxn(txn, uid);
     });
-
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_resolved', affectedIds: [worryId]),
+      LedgerChange(type: ActionType.highlightRecorded, affectedIds: [updated.id]),
     );
   }
 
-  /// 删除烦恼（硬删除）。
-  Future<void> delete(String uid, String worryId) async {
+  /// 删除高光时刻。
+  Future<void> deleteHighlight(String uid, String highlightId) async {
     final db = await _ledger.database;
     await db.delete(
-      'local_worries',
+      'local_highlights',
       where: 'id = ? AND uid = ?',
-      whereArgs: [worryId, uid],
+      whereArgs: [highlightId, uid],
     );
     _ledger.notifyChange(
-      LedgerChange(type: 'worry_updated', affectedIds: [worryId]),
+      LedgerChange(type: ActionType.highlightRecorded, affectedIds: [highlightId]),
     );
-  }
-
-  // ─── 私有辅助 ───
-
-  Future<void> _incrementWorriesResolvedInTxn(
-    Transaction txn,
-    String uid,
-  ) async {
-    await txn.rawInsert('''
-      INSERT INTO local_awareness_stats (uid, total_light_days, total_weekly_reviews, total_worries_resolved, last_light_date, updated_at)
-      VALUES (?, 0, 0, 1, NULL, ?)
-      ON CONFLICT(uid) DO UPDATE SET
-        total_worries_resolved = total_worries_resolved + 1,
-        updated_at = excluded.updated_at
-    ''', [uid, DateTime.now().millisecondsSinceEpoch]);
   }
 }
 ```
 
 ---
 
-## 6. Riverpod Provider 定义
+## 9. Riverpod Provider 定义
 
-### 文件：`lib/providers/awareness_providers.dart`
+### 文件：`lib/providers/plan_providers.dart`
 
 ```dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
-import 'package:hachimi_app/models/daily_light.dart';
-import 'package:hachimi_app/models/weekly_review.dart';
-import 'package:hachimi_app/models/worry.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/models/yearly_plan.dart';
+import 'package:hachimi_app/models/monthly_plan.dart';
+import 'package:hachimi_app/models/weekly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/habits_provider.dart';
 import 'package:hachimi_app/providers/ledger_stream.dart';
 
-// ─── 今日之光 ───
+// ─── 年度计划 ───
 
-/// 今日之光记录 — SSOT from local SQLite。
-final todayLightProvider = StreamProvider<DailyLight?>((ref) {
+/// 当前年度计划。
+final currentYearlyPlanProvider = StreamProvider<YearlyPlan?>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(null);
 
-  final repo = ref.watch(awarenessRepositoryProvider);
+  final repo = ref.watch(planRepositoryProvider);
   final ledger = ref.watch(ledgerServiceProvider);
-  final today = AppDateUtils.todayString();
+  final year = DateTime.now().year.toString();
 
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type == 'light_recorded',
-    read: () => repo.getTodayLight(uid, today),
+    filter: (c) =>
+        c.isGlobalRefresh || c.type == ActionType.yearlyPlanSaved,
+    read: () => repo.getYearlyPlan(uid, year),
   );
 });
 
-/// 今天是否已记录 — 派生 provider。
-final hasRecordedTodayLightProvider = Provider<bool>((ref) {
-  return ref.watch(todayLightProvider).value != null;
+// ─── 月度计划 ───
+
+/// 当前月度计划。
+final currentMonthlyPlanProvider = StreamProvider<MonthlyPlan?>((ref) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(null);
+
+  final repo = ref.watch(planRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+  final monthId = AppDateUtils.currentMonthId();
+
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh || c.type == ActionType.monthlyPlanSaved,
+    read: () => repo.getMonthlyPlan(uid, monthId),
+  );
 });
 
-/// 指定月份的每日一光列表 — family provider。
-/// 参数：'YYYY-MM' 格式月份字符串。
-final monthlyLightsProvider = FutureProvider.family<List<DailyLight>, String>((
-  ref,
-  month,
-) async {
+/// 指定年份的所有月度计划。
+final monthlyPlansForYearProvider =
+    FutureProvider.family<List<MonthlyPlan>, String>((ref, year) async {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return [];
 
-  final repo = ref.watch(awarenessRepositoryProvider);
-  return repo.getLightsForMonth(uid, month);
+  final repo = ref.watch(planRepositoryProvider);
+  ref.listen(ledgerChangesProvider, (_, _) {});
+
+  return repo.getMonthlyPlansForYear(uid, year);
 });
 
-// ─── 周回顾 ───
+// ─── 周计划 ───
 
-/// 当前周回顾 — SSOT from local SQLite。
-final currentWeekReviewProvider = StreamProvider<WeeklyReview?>((ref) {
+/// 当前周计划。
+final currentWeeklyPlanProvider = StreamProvider<WeeklyPlan?>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(null);
 
-  final repo = ref.watch(awarenessRepositoryProvider);
+  final repo = ref.watch(planRepositoryProvider);
   final ledger = ref.watch(ledgerServiceProvider);
-  final weekId = AppDateUtils.currentIsoWeekId();
+  final weekId = AppDateUtils.currentWeekId();
 
   return ledgerDrivenStream(
     ref: ref,
     ledger: ledger,
     filter: (c) =>
-        c.isGlobalRefresh || c.type == 'weekly_review_completed',
-    read: () => repo.getCurrentWeekReview(uid, weekId),
-  );
-});
-
-// ─── 烦恼 ───
-
-/// 进行中的烦恼列表 — SSOT from local SQLite。
-final activeWorriesProvider = StreamProvider<List<Worry>>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-
-  final repo = ref.watch(worryRepositoryProvider);
-  final ledger = ref.watch(ledgerServiceProvider);
-
-  return ledgerDrivenStream(
-    ref: ref,
-    ledger: ledger,
-    filter: (c) =>
-        c.isGlobalRefresh ||
-        c.type.startsWith('worry_'),
-    read: () => repo.getActiveWorries(uid),
-  );
-});
-
-/// 已解决/已消失的烦恼列表。
-final resolvedWorriesProvider = StreamProvider<List<Worry>>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-  final repo = ref.watch(worryRepositoryProvider);
-  final ledger = ref.watch(ledgerServiceProvider);
-  return ledgerDrivenStream(
-    ref: ref,
-    ledger: ledger,
-    filter: (c) => c.isGlobalRefresh || c.type.startsWith('worry_'),
-    read: () => repo.getResolvedWorries(uid),
-  );
-});
-
-// ─── 聚合统计 ───
-
-/// 觉知聚合统计 — 成就评估和数据面板使用。
-final awarenessStatsProvider = StreamProvider<Map<String, int>>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value({});
-
-  final repo = ref.watch(awarenessRepositoryProvider);
-  final ledger = ref.watch(ledgerServiceProvider);
-
-  return ledgerDrivenStream(
-    ref: ref,
-    ledger: ledger,
-    filter: (c) =>
-        c.isGlobalRefresh ||
-        c.type == 'light_recorded' ||
-        c.type == 'weekly_review_completed' ||
-        c.type == 'worry_resolved',
-    read: () => repo.getAwarenessStats(uid),
+        c.isGlobalRefresh || c.type == ActionType.weeklyPlanSaved,
+    read: () => repo.getWeeklyPlan(uid, weekId),
   );
 });
 ```
 
-> **说明**：`awarenessRepositoryProvider` 和 `worryRepositoryProvider` 定义在 `service_providers.dart` 中（见第 11 节修改清单）。`AppDateUtils.currentIsoWeekId()` 需在现有 `date_utils.dart` 中新增。
+### 文件：`lib/providers/list_highlight_providers.dart`
+
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hachimi_app/models/ledger_action.dart';
+import 'package:hachimi_app/models/user_list.dart';
+import 'package:hachimi_app/models/highlight_entry.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/habits_provider.dart';
+import 'package:hachimi_app/providers/ledger_stream.dart';
+
+// ─── 用户列表 ───
+
+/// 所有用户列表。
+final allUserListsProvider = StreamProvider<List<UserList>>((ref) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(<UserList>[]);
+
+  final repo = ref.watch(listHighlightRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh || c.type == ActionType.listUpdated,
+    read: () => repo.getAllLists(uid),
+  );
+});
+
+/// 按类型获取列表 — family provider。
+final userListsByTypeProvider =
+    StreamProvider.family<List<UserList>, ListType>((ref, type) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(<UserList>[]);
+
+  final repo = ref.watch(listHighlightRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh || c.type == ActionType.listUpdated,
+    read: () => repo.getListsByType(uid, type),
+  );
+});
+
+// ─── 高光时刻 ───
+
+/// 所有高光时刻（按日期倒序）。
+final allHighlightsProvider = StreamProvider<List<HighlightEntry>>((ref) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(<HighlightEntry>[]);
+
+  final repo = ref.watch(listHighlightRepositoryProvider);
+  final ledger = ref.watch(ledgerServiceProvider);
+
+  return ledgerDrivenStream(
+    ref: ref,
+    ledger: ledger,
+    filter: (c) =>
+        c.isGlobalRefresh || c.type == ActionType.highlightRecorded,
+    read: () => repo.getAllHighlights(uid),
+  );
+});
+
+/// 日期范围内的高光时刻 — family provider（参数：(startDate, endDate)）。
+final highlightsInRangeProvider =
+    FutureProvider.family<List<HighlightEntry>, (String, String)>((
+  ref,
+  params,
+) async {
+  final (startDate, endDate) = params;
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return [];
+
+  final repo = ref.watch(listHighlightRepositoryProvider);
+  ref.listen(ledgerChangesProvider, (_, _) {});
+
+  return repo.getHighlightsInRange(uid, startDate, endDate);
+});
+```
 
 ### 在 `lib/providers/service_providers.dart` 中新增
 
 ```dart
-import 'package:hachimi_app/services/awareness_repository.dart';
-import 'package:hachimi_app/services/worry_repository.dart';
+import 'package:hachimi_app/services/plan_repository.dart';
+import 'package:hachimi_app/services/list_highlight_repository.dart';
 
-final awarenessRepositoryProvider = Provider<AwarenessRepository>((ref) {
-  return AwarenessRepository(ledger: ref.watch(ledgerServiceProvider));
+final planRepositoryProvider = Provider<PlanRepository>((ref) {
+  return PlanRepository(ledger: ref.watch(ledgerServiceProvider));
 });
 
-final worryRepositoryProvider = Provider<WorryRepository>((ref) {
-  return WorryRepository(ledger: ref.watch(ledgerServiceProvider));
+final listHighlightRepositoryProvider = Provider<ListHighlightRepository>((ref) {
+  return ListHighlightRepository(ledger: ref.watch(ledgerServiceProvider));
 });
-```
-
-### `AppDateUtils` 新增方法
-
-在 `lib/core/utils/date_utils.dart` 中新增：
-
-```dart
-/// 获取当前 ISO 8601 周标识（如 '2026-W12'）。
-/// 周一为一周的第一天。
-static String currentIsoWeekId() {
-  return isoWeekIdForDate(DateTime.now());
-}
-
-/// 获取指定日期的 ISO 8601 周标识。
-static String isoWeekIdForDate(DateTime date) {
-  // ISO 8601 周计算：以周四所在年为准
-  final thursday = date.add(Duration(days: DateTime.thursday - date.weekday));
-  final yearOfWeek = thursday.year;
-  final jan1 = DateTime(yearOfWeek, 1, 1);
-  final jan1Weekday = jan1.weekday;
-  final firstThursday = jan1.add(Duration(days: (DateTime.thursday - jan1Weekday + 7) % 7));
-  final weekNumber = ((thursday.difference(firstThursday).inDays) ~/ 7) + 1;
-  return '$yearOfWeek-W${weekNumber.toString().padLeft(2, '0')}';
-}
-
-/// 获取 ISO 周的周一日期（'YYYY-MM-DD' 格式）。
-static String isoWeekStartDate(DateTime date) {
-  final monday = date.subtract(Duration(days: date.weekday - DateTime.monday));
-  return '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
-}
-
-/// 获取 ISO 周的周日日期（'YYYY-MM-DD' 格式）。
-static String isoWeekEndDate(DateTime date) {
-  final sunday = date.add(Duration(days: DateTime.sunday - date.weekday));
-  return '${sunday.year}-${sunday.month.toString().padLeft(2, '0')}-${sunday.day.toString().padLeft(2, '0')}';
-}
 ```
 
 ---
 
-## 7. SyncEngine 更新
+## 10. SyncEngine 更新
 
-### 文件：`lib/services/sync_engine.dart`
-
-### 7.1 `_syncAction` switch 新增 case
-
-在现有的 `_syncAction` 方法的 switch 语句中，`accountCreated` / `accountLinked` / `achievementClaimed` 分支前新增：
+### 10.1 `_syncAction` switch 新增 case
 
 ```dart
-case ActionType.lightRecorded:
-  await _syncDailyLight(batch, uid, action);
-case ActionType.weeklyReviewCompleted:
-  await _syncWeeklyReview(batch, uid, action);
-case ActionType.worryCreated:
-case ActionType.worryUpdated:
-case ActionType.worryResolved:
-  await _syncWorry(batch, uid, action);
-case ActionType.monthlyRitualSet:
-  // 暂不需要 Firestore 同步（纯本地提醒配置）
-  await _ledger.markSynced(action.id);
-  return;
+case ActionType.yearlyPlanSaved:
+  await _syncYearlyPlan(batch, uid, action);
+case ActionType.monthlyPlanSaved:
+  await _syncMonthlyPlan(batch, uid, action);
+case ActionType.weeklyPlanSaved:
+  await _syncWeeklyPlan(batch, uid, action);
+case ActionType.listUpdated:
+  await _syncUserList(batch, uid, action);
+case ActionType.highlightRecorded:
+  await _syncHighlight(batch, uid, action);
 ```
 
-### 7.2 新增同步方法
+### 10.2 新增同步方法
 
 ```dart
-Future<void> _syncDailyLight(
-  WriteBatch batch,
-  String uid,
-  LedgerAction action,
-) async {
-  final date = action.payload['date'] as String?;
-  if (date == null) return;
-
+Future<void> _syncYearlyPlan(WriteBatch batch, String uid, LedgerAction action) async {
+  final year = action.payload['year'] as String?;
+  if (year == null) return;
   final db = await _ledger.database;
   final rows = await db.query(
-    'local_daily_lights',
-    where: 'uid = ? AND date = ?',
-    whereArgs: [uid, date],
+    'local_yearly_plans',
+    where: 'uid = ? AND year = ?',
+    whereArgs: [uid, year],
     limit: 1,
   );
   if (rows.isEmpty) return;
-
-  final light = DailyLight.fromSqlite(rows.first);
-  final ref = _db
-      .collection('users')
-      .doc(uid)
-      .collection('dailyLights')
-      .doc(date);
-  batch.set(ref, light.toFirestore(), SetOptions(merge: true));
+  final plan = YearlyPlan.fromSqlite(rows.first);
+  final ref = _db.collection('users').doc(uid).collection('yearlyPlans').doc(year);
+  batch.set(ref, plan.toFirestore(), SetOptions(merge: true));
 }
 
-Future<void> _syncWeeklyReview(
-  WriteBatch batch,
-  String uid,
-  LedgerAction action,
-) async {
-  final weekId = action.payload['weekId'] as String?;
-  if (weekId == null) return;
-
+Future<void> _syncMonthlyPlan(WriteBatch batch, String uid, LedgerAction action) async {
+  final monthId = action.payload['monthId'] as String?;
+  if (monthId == null) return;
   final db = await _ledger.database;
   final rows = await db.query(
-    'local_weekly_reviews',
+    'local_monthly_plans',
+    where: 'uid = ? AND month_id = ?',
+    whereArgs: [uid, monthId],
+    limit: 1,
+  );
+  if (rows.isEmpty) return;
+  final plan = MonthlyPlan.fromSqlite(rows.first);
+  final ref = _db.collection('users').doc(uid).collection('monthlyPlans').doc(monthId);
+  batch.set(ref, plan.toFirestore(), SetOptions(merge: true));
+}
+
+Future<void> _syncWeeklyPlan(WriteBatch batch, String uid, LedgerAction action) async {
+  final weekId = action.payload['weekId'] as String?;
+  if (weekId == null) return;
+  final db = await _ledger.database;
+  final rows = await db.query(
+    'local_weekly_plans',
     where: 'uid = ? AND week_id = ?',
     whereArgs: [uid, weekId],
     limit: 1,
   );
   if (rows.isEmpty) return;
-
-  final review = WeeklyReview.fromSqlite(rows.first);
-  final ref = _db
-      .collection('users')
-      .doc(uid)
-      .collection('weeklyReviews')
-      .doc(weekId);
-  batch.set(ref, review.toFirestore(), SetOptions(merge: true));
+  final plan = WeeklyPlan.fromSqlite(rows.first);
+  final ref = _db.collection('users').doc(uid).collection('weeklyPlans').doc(weekId);
+  batch.set(ref, plan.toFirestore(), SetOptions(merge: true));
 }
 
-Future<void> _syncWorry(
-  WriteBatch batch,
-  String uid,
-  LedgerAction action,
-) async {
-  final worryId = action.payload['worryId'] as String?;
-  if (worryId == null) return;
-
+Future<void> _syncUserList(WriteBatch batch, String uid, LedgerAction action) async {
+  final listId = action.payload['listId'] as String?;
+  if (listId == null) return;
   final db = await _ledger.database;
   final rows = await db.query(
-    'local_worries',
+    'local_user_lists',
     where: 'id = ?',
-    whereArgs: [worryId],
+    whereArgs: [listId],
     limit: 1,
   );
   if (rows.isEmpty) return;
+  final list = UserList.fromSqlite(rows.first);
+  final ref = _db.collection('users').doc(uid).collection('userLists').doc(listId);
+  batch.set(ref, list.toFirestore(), SetOptions(merge: true));
+}
 
-  final worry = Worry.fromSqlite(rows.first);
-  final ref = _db
-      .collection('users')
-      .doc(uid)
-      .collection('worries')
-      .doc(worryId);
-  batch.set(ref, worry.toFirestore(), SetOptions(merge: true));
+Future<void> _syncHighlight(WriteBatch batch, String uid, LedgerAction action) async {
+  final highlightId = action.payload['highlightId'] as String?;
+  if (highlightId == null) return;
+  final db = await _ledger.database;
+  final rows = await db.query(
+    'local_highlights',
+    where: 'id = ?',
+    whereArgs: [highlightId],
+    limit: 1,
+  );
+  if (rows.isEmpty) return;
+  final entry = HighlightEntry.fromSqlite(rows.first);
+  final ref = _db.collection('users').doc(uid).collection('highlights').doc(highlightId);
+  batch.set(ref, entry.toFirestore(), SetOptions(merge: true));
 }
 ```
 
-### 7.3 水化更新
+### 10.3 水化更新
 
-在 `_doHydrate` 方法中新增 3 个集合水化：
-
-```dart
-// 在 _hydrateCollection<Cat>(...) 之后添加：
-await _hydrateCollection<DailyLight>(
-  userRef.collection('dailyLights'),
-  'local_daily_lights',
-  db,
-  (doc) => DailyLight.fromFirestore(doc).toSqlite(uid),
-);
-await _hydrateCollection<WeeklyReview>(
-  userRef.collection('weeklyReviews'),
-  'local_weekly_reviews',
-  db,
-  (doc) => WeeklyReview.fromFirestore(doc).toSqlite(uid),
-);
-await _hydrateCollection<Worry>(
-  userRef.collection('worries'),
-  'local_worries',
-  db,
-  (doc) => Worry.fromFirestore(doc).toSqlite(uid),
-);
-```
-
-需新增 import：
+在 `_doHydrate` 方法中新增 5 个集合水化：
 
 ```dart
-import 'package:hachimi_app/models/daily_light.dart';
-import 'package:hachimi_app/models/weekly_review.dart';
-import 'package:hachimi_app/models/worry.dart';
+await _hydrateCollection<YearlyPlan>(
+  userRef.collection('yearlyPlans'),
+  'local_yearly_plans',
+  db,
+  (doc) => YearlyPlan.fromFirestore(doc).toSqlite(uid),
+);
+await _hydrateCollection<MonthlyPlan>(
+  userRef.collection('monthlyPlans'),
+  'local_monthly_plans',
+  db,
+  (doc) => MonthlyPlan.fromFirestore(doc).toSqlite(uid),
+);
+await _hydrateCollection<WeeklyPlan>(
+  userRef.collection('weeklyPlans'),
+  'local_weekly_plans',
+  db,
+  (doc) => WeeklyPlan.fromFirestore(doc).toSqlite(uid),
+);
+await _hydrateCollection<UserList>(
+  userRef.collection('userLists'),
+  'local_user_lists',
+  db,
+  (doc) => UserList.fromFirestore(doc).toSqlite(uid),
+);
+await _hydrateCollection<HighlightEntry>(
+  userRef.collection('highlights'),
+  'local_highlights',
+  db,
+  (doc) => HighlightEntry.fromFirestore(doc).toSqlite(uid),
+);
 ```
 
 ---
 
-## 8. Firestore 规则更新
+## 11. LedgerService 更新
 
-### 文件：`firestore.rules`
+### 11.1 `migrateUid()` 更新
 
-在 `match /users/{userId}` 块内，`achievements` 规则之后、闭合花括号之前新增：
+```dart
+// 单列 PK 表新增：
+'local_user_lists',
+'local_highlights',
+
+// 复合 PK / UNIQUE 约束表新增：
+'local_yearly_plans',  // UNIQUE(uid, year)
+'local_monthly_plans', // UNIQUE(uid, month_id)
+'local_weekly_plans',  // UNIQUE(uid, week_id)
+```
+
+### 11.2 `deleteUidData()` 更新
+
+新增 5 张表到删除列表：
+
+```dart
+'local_yearly_plans',
+'local_monthly_plans',
+'local_weekly_plans',
+'local_user_lists',
+'local_highlights',
+```
+
+---
+
+## 12. Firestore 规则更新
+
+在 `match /users/{userId}` 块内新增：
 
 ```javascript
-// Daily light records
-match /dailyLights/{date} {
+// Yearly plans
+match /yearlyPlans/{year} {
   allow read, write: if isOwner(userId);
 }
 
-// Weekly review records
-match /weeklyReviews/{weekId} {
+// Monthly plans
+match /monthlyPlans/{monthId} {
   allow read, write: if isOwner(userId);
 }
 
-// Worry records
-match /worries/{worryId} {
+// Weekly plans
+match /weeklyPlans/{weekId} {
   allow read, write: if isOwner(userId);
 }
-```
 
-> **说明**：MVP 阶段使用宽松规则（`isOwner` 即可读写），后续可按需添加字段校验（参考 habits 的验证模式）。
-
----
-
-## 9. LedgerService 更新
-
-### 文件：`lib/services/ledger_service.dart`
-
-### 9.1 `migrateUid()` 更新
-
-修改 `migrateUid` 方法，在单列 PK 表列表中新增 `'local_worries'`，在复合 PK / UNIQUE 约束表列表中新增 `'local_daily_lights'` 和 `'local_weekly_reviews'`：
-
-```dart
-Future<void> migrateUid(String oldUid, String newUid) async {
-  final db = await database;
-  await db.transaction((txn) async {
-    // 单列 PK 表 — 直接 UPDATE
-    for (final table in [
-      'action_ledger',
-      'local_habits',
-      'local_cats',
-      'local_sessions',
-      'local_achievements',
-      'local_worries', // V3 新增
-    ]) {
-      await txn.update(
-        table,
-        {'uid': newUid},
-        where: 'uid = ?',
-        whereArgs: [oldUid],
-      );
-    }
-
-    // 复合 PK / UNIQUE 约束表 — 先删 newUid 默认行，再更新 oldUid→newUid
-    for (final table in [
-      'materialized_state',
-      'local_monthly_checkins',
-      'local_daily_lights',    // V3 新增（UNIQUE(uid, date)）
-      'local_weekly_reviews',  // V3 新增（UNIQUE(uid, week_id)）
-      'local_awareness_stats', // V3 新增（uid 为 PK）
-    ]) {
-      await txn.delete(table, where: 'uid = ?', whereArgs: [newUid]);
-      await txn.update(
-        table,
-        {'uid': newUid},
-        where: 'uid = ?',
-        whereArgs: [oldUid],
-      );
-    }
-  });
+// User lists
+match /userLists/{listId} {
+  allow read, write: if isOwner(userId);
 }
-```
 
-### 9.2 `deleteUidData()` 更新
-
-```dart
-Future<void> deleteUidData(String uid) async {
-  final db = await database;
-  await db.transaction((txn) async {
-    for (final table in [
-      'action_ledger',
-      'local_habits',
-      'local_cats',
-      'local_sessions',
-      'local_monthly_checkins',
-      'materialized_state',
-      'local_achievements',
-      'local_daily_lights',    // V3 新增
-      'local_weekly_reviews',  // V3 新增
-      'local_worries',         // V3 新增
-      'local_awareness_stats', // V3 新增
-    ]) {
-      await txn.delete(table, where: 'uid = ?', whereArgs: [uid]);
-    }
-  });
+// Highlight entries
+match /highlights/{highlightId} {
+  allow read, write: if isOwner(userId);
 }
 ```
 
 ---
 
-## 10. 单元测试要求
+## 13. `AppDateUtils` 新增方法
 
-### 10.1 `test/models/mood_test.dart`
+在 `lib/core/utils/date_utils.dart` 中确保存在以下方法（部分可能已实现）：
 
 ```dart
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hachimi_app/models/mood.dart';
-
-void main() {
-  group('Mood', () {
-    test('所有枚举值 fromValue 往返一致', () {
-      for (final mood in Mood.values) {
-        expect(Mood.fromValue(mood.value), equals(mood));
-      }
-    });
-
-    test('fromValue 无效值抛出 ArgumentError', () {
-      expect(() => Mood.fromValue(-1), throwsArgumentError);
-      expect(() => Mood.fromValue(99), throwsArgumentError);
-    });
-
-    test('emoji 字段非空', () {
-      for (final mood in Mood.values) {
-        expect(mood.emoji, isNotEmpty);
-      }
-    });
-  });
+/// 获取当前月份 ID（'YYYY-MM' 格式）。
+static String currentMonthId() {
+  final now = DateTime.now();
+  return '${now.year}-${now.month.toString().padLeft(2, '0')}';
 }
 ```
 
-### 10.2 `test/models/daily_light_test.dart`
+> 注：`currentWeekId()` 和 `isoWeekId()` 在 V3 Track 1 中已实现。
+
+---
+
+## 14. 单元测试
+
+### 14.1 `test/models/yearly_plan_test.dart`
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hachimi_app/models/daily_light.dart';
-import 'package:hachimi_app/models/mood.dart';
+import 'package:hachimi_app/models/yearly_plan.dart';
 
 void main() {
-  final now = DateTime(2026, 3, 17, 22, 0);
-  final sample = DailyLight(
+  final now = DateTime(2026, 3, 19, 22, 0);
+  final sample = YearlyPlan(
     id: 'test-id',
-    date: '2026-03-17',
-    mood: Mood.happy,
-    lightText: '今天和朋友聊了天',
-    tags: ['社交', '开心'],
+    year: '2026',
+    keyword: '成长',
+    vision: '成为更好的自己',
+    goals: ['坚持运动', '读 12 本书', '学一门新技能'],
     createdAt: now,
     updatedAt: now,
   );
 
-  group('DailyLight', () {
+  group('YearlyPlan', () {
     test('toSqlite / fromSqlite 往返一致', () {
       final map = sample.toSqlite('uid-123');
       expect(map['uid'], 'uid-123');
-      expect(map['mood'], 1);
+      expect(map['year'], '2026');
 
-      final restored = DailyLight.fromSqlite(map);
+      final restored = YearlyPlan.fromSqlite(map);
       expect(restored.id, sample.id);
-      expect(restored.date, sample.date);
-      expect(restored.mood, sample.mood);
-      expect(restored.lightText, sample.lightText);
-      expect(restored.tags, sample.tags);
+      expect(restored.year, sample.year);
+      expect(restored.keyword, sample.keyword);
+      expect(restored.goals, sample.goals);
     });
 
-    test('toFirestore / fromFirestore 往返一致', () {
-      // fromFirestore 需要 DocumentSnapshot，
-      // 此处测试 toFirestore 输出的 Map 结构正确性
-      final map = sample.toFirestore();
-      expect(map['mood'], 1);
-      expect(map['lightText'], '今天和朋友聊了天');
-      expect(map['tags'], ['社交', '开心']);
+    test('计算属性 hasKeyword / hasGoals', () {
+      expect(sample.hasKeyword, true);
+      expect(sample.hasGoals, true);
+
+      final empty = sample.copyWith(clearKeyword: true, goals: []);
+      expect(empty.hasKeyword, false);
+      expect(empty.hasGoals, false);
     });
 
-    test('计算属性 hasText / hasTags', () {
-      expect(sample.hasText, true);
-      expect(sample.hasTags, true);
-
-      final empty = sample.copyWith(
-        clearLightText: true,
-        tags: [],
-      );
-      expect(empty.hasText, false);
-      expect(empty.hasTags, false);
-    });
-
-    test('tags 空列表在 SQLite 中存为 []', () {
-      final noTags = sample.copyWith(tags: []);
-      final map = noTags.toSqlite('uid');
-      expect(map['tags'], '[]');
+    test('goals 空列表在 SQLite 中存为 []', () {
+      final noGoals = sample.copyWith(goals: []);
+      final map = noGoals.toSqlite('uid');
+      expect(map['goals'], '[]');
     });
   });
 }
 ```
 
-### 10.3 `test/models/weekly_review_test.dart`
+### 14.2 `test/models/monthly_plan_test.dart`
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hachimi_app/models/weekly_review.dart';
+import 'package:hachimi_app/models/monthly_plan.dart';
 
 void main() {
-  final now = DateTime(2026, 3, 17, 22, 0);
-  final sample = WeeklyReview(
+  final now = DateTime(2026, 3, 19, 22, 0);
+  final sample = MonthlyPlan(
+    id: 'test-id',
+    monthId: '2026-03',
+    theme: '健康月',
+    tasks: ['每周运动 3 次', '每天睡前冥想'],
+    createdAt: now,
+    updatedAt: now,
+  );
+
+  group('MonthlyPlan', () {
+    test('toSqlite / fromSqlite 往返一致', () {
+      final map = sample.toSqlite('uid-123');
+      final restored = MonthlyPlan.fromSqlite(map);
+      expect(restored.monthId, sample.monthId);
+      expect(restored.theme, sample.theme);
+      expect(restored.tasks, sample.tasks);
+    });
+
+    test('计算属性 hasTheme / hasTasks / hasReflection', () {
+      expect(sample.hasTheme, true);
+      expect(sample.hasTasks, true);
+      expect(sample.hasReflection, false);
+
+      final withReflection = sample.copyWith(reflection: '本月收获很大');
+      expect(withReflection.hasReflection, true);
+    });
+  });
+}
+```
+
+### 14.3 `test/models/weekly_plan_test.dart`
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hachimi_app/models/weekly_plan.dart';
+
+void main() {
+  final now = DateTime(2026, 3, 19, 22, 0);
+  final sample = WeeklyPlan(
     id: 'test-id',
     weekId: '2026-W12',
     weekStartDate: '2026-03-16',
     weekEndDate: '2026-03-22',
-    happyMoment1: '完成了跑步目标',
-    happyMoment1Tags: ['运动'],
-    gratitude: '感恩好天气',
+    tasks: ['完成设计稿', '写单元测试'],
+    focus: '专注数据层重构',
     createdAt: now,
     updatedAt: now,
   );
 
-  group('WeeklyReview', () {
+  group('WeeklyPlan', () {
     test('toSqlite / fromSqlite 往返一致', () {
       final map = sample.toSqlite('uid-123');
-      final restored = WeeklyReview.fromSqlite(map);
+      final restored = WeeklyPlan.fromSqlite(map);
       expect(restored.weekId, sample.weekId);
-      expect(restored.happyMoment1, sample.happyMoment1);
-      expect(restored.happyMoment1Tags, ['运动']);
-      expect(restored.gratitude, sample.gratitude);
+      expect(restored.weekStartDate, sample.weekStartDate);
+      expect(restored.tasks, sample.tasks);
+      expect(restored.focus, sample.focus);
     });
 
-    test('filledMomentCount 正确计数', () {
-      expect(sample.filledMomentCount, 1);
+    test('计算属性 hasTasks / hasFocus', () {
+      expect(sample.hasTasks, true);
+      expect(sample.hasFocus, true);
 
-      final two = sample.copyWith(
-        happyMoment2: '读了一本好书',
-      );
-      expect(two.filledMomentCount, 2);
-
-      final three = two.copyWith(
-        happyMoment3: '和家人吃饭',
-      );
-      expect(three.filledMomentCount, 3);
-    });
-
-    test('isComplete 判定逻辑', () {
-      // 有 1 个 moment + gratitude → 完成
-      expect(sample.isComplete, true);
-
-      // 有 moment 但无 gratitude 和 learning → 未完成
-      final incomplete = WeeklyReview(
+      final empty = WeeklyPlan(
         id: 'test',
         weekId: '2026-W12',
         weekStartDate: '2026-03-16',
         weekEndDate: '2026-03-22',
-        happyMoment1: '测试',
         createdAt: now,
         updatedAt: now,
       );
-      expect(incomplete.isComplete, false);
-
-      // 无 moment → 未完成（即使有 gratitude）
-      final noMoment = WeeklyReview(
-        id: 'test',
-        weekId: '2026-W12',
-        weekStartDate: '2026-03-16',
-        weekEndDate: '2026-03-22',
-        gratitude: '感恩',
-        createdAt: now,
-        updatedAt: now,
-      );
-      expect(noMoment.isComplete, false);
+      expect(empty.hasTasks, false);
+      expect(empty.hasFocus, false);
     });
   });
 }
 ```
 
-### 10.4 `test/models/worry_test.dart`
+### 14.4 `test/models/user_list_test.dart`
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hachimi_app/models/worry.dart';
+import 'package:hachimi_app/models/user_list.dart';
 
 void main() {
-  final now = DateTime(2026, 3, 17, 22, 0);
-  final sample = Worry(
+  final now = DateTime(2026, 3, 19, 22, 0);
+  final sample = UserList(
     id: 'test-id',
-    description: '担心面试结果',
-    status: WorryStatus.ongoing,
+    listType: ListType.gratitude,
+    title: '2026 感恩清单',
+    items: ['健康的身体', '支持我的朋友'],
     createdAt: now,
     updatedAt: now,
   );
 
-  group('Worry', () {
+  group('UserList', () {
     test('toSqlite / fromSqlite 往返一致', () {
       final map = sample.toSqlite('uid-123');
-      expect(map['status'], 'ongoing');
+      expect(map['list_type'], 'gratitude');
 
-      final restored = Worry.fromSqlite(map);
+      final restored = UserList.fromSqlite(map);
       expect(restored.id, sample.id);
-      expect(restored.description, sample.description);
-      expect(restored.status, WorryStatus.ongoing);
+      expect(restored.listType, ListType.gratitude);
+      expect(restored.title, sample.title);
+      expect(restored.items, sample.items);
     });
 
-    test('WorryStatus.fromValue 所有值往返一致', () {
-      for (final s in WorryStatus.values) {
-        expect(WorryStatus.fromValue(s.value), equals(s));
+    test('ListType.fromValue 所有值往返一致', () {
+      for (final type in ListType.values) {
+        expect(ListType.fromValue(type.value), equals(type));
       }
     });
 
-    test('WorryStatus.fromValue 无效值抛出 ArgumentError', () {
-      expect(
-        () => WorryStatus.fromValue('invalid'),
-        throwsArgumentError,
-      );
+    test('ListType.fromValue 无效值抛出 ArgumentError', () {
+      expect(() => ListType.fromValue('invalid'), throwsArgumentError);
     });
 
-    test('resolved 状态含 resolvedAt', () {
-      final resolved = sample.copyWith(
-        status: WorryStatus.resolved,
-        resolvedAt: now,
+    test('计算属性 hasItems / itemCount', () {
+      expect(sample.hasItems, true);
+      expect(sample.itemCount, 2);
+
+      final empty = sample.copyWith(items: []);
+      expect(empty.hasItems, false);
+      expect(empty.itemCount, 0);
+    });
+  });
+}
+```
+
+### 14.5 `test/models/highlight_entry_test.dart`
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hachimi_app/models/highlight_entry.dart';
+
+void main() {
+  final now = DateTime(2026, 3, 19, 22, 0);
+  final sample = HighlightEntry(
+    id: 'test-id',
+    date: '2026-03-19',
+    title: '第一次完成 5 公里跑步',
+    description: '在公园跑完了全程，很有成就感',
+    category: '成就',
+    createdAt: now,
+    updatedAt: now,
+  );
+
+  group('HighlightEntry', () {
+    test('toSqlite / fromSqlite 往返一致', () {
+      final map = sample.toSqlite('uid-123');
+      expect(map['uid'], 'uid-123');
+      expect(map['date'], '2026-03-19');
+
+      final restored = HighlightEntry.fromSqlite(map);
+      expect(restored.id, sample.id);
+      expect(restored.title, sample.title);
+      expect(restored.description, sample.description);
+      expect(restored.category, sample.category);
+    });
+
+    test('toFirestore 输出正确', () {
+      final map = sample.toFirestore();
+      expect(map['date'], '2026-03-19');
+      expect(map['title'], '第一次完成 5 公里跑步');
+      expect(map['description'], isNotNull);
+      expect(map['category'], '成就');
+    });
+
+    test('计算属性 hasDescription / hasCategory', () {
+      expect(sample.hasDescription, true);
+      expect(sample.hasCategory, true);
+
+      final minimal = sample.copyWith(
+        clearDescription: true,
+        clearCategory: true,
       );
-      final map = resolved.toSqlite('uid');
-      expect(map['resolved_at'], now.millisecondsSinceEpoch);
-      expect(map['status'], 'resolved');
+      expect(minimal.hasDescription, false);
+      expect(minimal.hasCategory, false);
     });
   });
 }
@@ -2146,53 +2205,58 @@ void main() {
 
 ---
 
-## 11. 文件操作清单
+## 15. 文件操作清单
 
 ### 需要创建的文件
 
 | 文件路径 | 用途 |
 |----------|------|
-| `lib/models/mood.dart` | Mood 枚举（5 级心情量表） |
-| `lib/models/daily_light.dart` | DailyLight 模型（每日一光记录） |
-| `lib/models/weekly_review.dart` | WeeklyReview 模型（周回顾记录） |
-| `lib/models/worry.dart` | Worry 模型 + WorryStatus 枚举 |
-| `lib/services/awareness_repository.dart` | DailyLight + WeeklyReview + 聚合统计 CRUD |
-| `lib/services/worry_repository.dart` | Worry CRUD |
-| `lib/providers/awareness_providers.dart` | 所有觉知相关 Riverpod provider |
-| `test/models/mood_test.dart` | Mood 枚举单元测试 |
-| `test/models/daily_light_test.dart` | DailyLight 模型单元测试 |
-| `test/models/weekly_review_test.dart` | WeeklyReview 模型单元测试 |
-| `test/models/worry_test.dart` | Worry 模型单元测试 |
+| `lib/models/yearly_plan.dart` | YearlyPlan 模型 |
+| `lib/models/monthly_plan.dart` | MonthlyPlan 模型 |
+| `lib/models/weekly_plan.dart` | WeeklyPlan 模型 |
+| `lib/models/user_list.dart` | UserList 模型 + ListType 枚举 |
+| `lib/models/highlight_entry.dart` | HighlightEntry 模型 |
+| `lib/services/plan_repository.dart` | 计划 CRUD |
+| `lib/services/list_highlight_repository.dart` | 列表 + 高光 CRUD |
+| `lib/providers/plan_providers.dart` | 计划相关 Provider |
+| `lib/providers/list_highlight_providers.dart` | 列表 + 高光相关 Provider |
+| `test/models/yearly_plan_test.dart` | YearlyPlan 单元测试 |
+| `test/models/monthly_plan_test.dart` | MonthlyPlan 单元测试 |
+| `test/models/weekly_plan_test.dart` | WeeklyPlan 单元测试 |
+| `test/models/user_list_test.dart` | UserList 单元测试 |
+| `test/models/highlight_entry_test.dart` | HighlightEntry 单元测试 |
 
 ### 需要修改的文件
 
 | 文件路径 | 改动内容 |
 |----------|----------|
-| `lib/services/local_database_service.dart` | `_dbVersion` 升至 4；新增 `_createV4Tables` 方法；修改 `_onCreate` 和 `_onUpgrade` |
-| `lib/models/ledger_action.dart` | 新增 6 个 `ActionType` 枚举值 |
-| `lib/services/ledger_service.dart` | `migrateUid()` 新增 5 张表；`deleteUidData()` 新增 4 张表 |
-| `lib/services/sync_engine.dart` | `_syncAction` 新增 6 个 case；新增 3 个同步方法；`_doHydrate` 新增 3 个集合水化；新增 3 个 import |
-| `lib/providers/service_providers.dart` | 新增 `awarenessRepositoryProvider` 和 `worryRepositoryProvider` |
-| `lib/core/utils/date_utils.dart` | 新增 `currentIsoWeekId`、`isoWeekIdForDate`、`isoWeekStartDate`、`isoWeekEndDate` |
-| `firestore.rules` | 在 `users/{userId}` 下新增 3 个子集合匹配规则 |
-| `docs/architecture/data-model.md` | 补充 4 张新表的 schema 文档 |
-| `docs/architecture/state-management.md` | 补充新 provider 拓扑图 |
+| `lib/models/weekly_review.dart` | 新增 `freeNote`、`worrySummary` 字段 + 序列化 + copyWith |
+| `lib/services/local_database_service.dart` | `_dbVersion` 升至 5；新增 `_createV5Tables`；修改 `_onCreate` 和 `_onUpgrade` |
+| `lib/models/ledger_action.dart` | 新增 5 个 `ActionType` + `isPlanAction` getter |
+| `lib/services/ledger_service.dart` | `migrateUid()` 新增 5 张表；`deleteUidData()` 新增 5 张表 |
+| `lib/services/sync_engine.dart` | `_syncAction` 新增 5 个 case；新增 5 个同步方法；`_doHydrate` 新增 5 个集合水化 |
+| `lib/providers/service_providers.dart` | 新增 `planRepositoryProvider` 和 `listHighlightRepositoryProvider` |
+| `lib/core/utils/date_utils.dart` | 新增 `currentMonthId()`（如不存在） |
+| `firestore.rules` | 新增 5 个子集合匹配规则 |
+| `docs/architecture/data-model.md` | 补充 5 张新表 + WeeklyReview 扩展字段 |
+| `docs/architecture/state-management.md` | 补充新 Provider 拓扑图 |
 
 ---
 
-## 12. 完成标志
+## 16. 完成标志
 
 | 检查项 | 验证命令 / 方法 |
 |--------|----------------|
 | 静态分析零 warning | `dart analyze lib/` |
-| 模型单元测试全绿 | `flutter test test/models/` |
-| 4 张新表在全新安装时正确创建 | 删除 app 重装后检查 SQLite schema |
-| v3→v4 升级迁移正常 | 在已有 v3 数据库的设备上升级验证 |
+| 新模型单元测试全绿 | `flutter test test/models/` |
+| 5 张新表在全新安装时正确创建 | 删除 app 重装后检查 SQLite schema |
+| WeeklyReview 新增列在升级时正确添加 | v4 数据库升级到 v5 验证 |
 | LedgerService.migrateUid() 包含新表 | 代码审查 |
 | LedgerService.deleteUidData() 包含新表 | 代码审查 |
-| SyncEngine 6 个新 ActionType 有对应 case | 代码审查确认 switch 完备 |
+| SyncEngine 5 个新 ActionType 有对应 case | 代码审查确认 switch 完备 |
+| 5 个新 Provider 使用 ledgerDrivenStream | 代码审查确认模式一致 |
 | Firestore 规则部署成功 | `firebase deploy --only firestore:rules --project hachimi-ai` |
-| 架构文档已同步更新 | `docs/architecture/data-model.md` 和 `state-management.md` 已更新 |
+| 架构文档已同步更新 | `data-model.md` 和 `state-management.md` 已更新 |
 
 ---
 
@@ -2200,15 +2264,14 @@ void main() {
 
 ### 前置条件
 
-- 无外部前置条件。Track 1 仅依赖现有基础设施（LedgerService、LocalDatabaseService、SyncEngine）
+- 无外部前置条件。仅依赖现有基础设施（LedgerService、LocalDatabaseService、SyncEngine）+ V3 Track 1 已实现的 4 个模型
 
 ### 后续影响
 
-- Track 2（每日一光 UI）直接依赖 `todayLightProvider`、`monthlyLightsProvider`、`awarenessRepositoryProvider`
-- Track 3（周回顾 UI）直接依赖 `currentWeekReviewProvider`、`awarenessRepositoryProvider`
-- Track 4（烦恼处理器 UI）直接依赖 `activeWorriesProvider`、`worryRepositoryProvider`
-- Track 5（数据洞察）依赖 `awarenessStatsProvider`、`getTagFrequency`
-- 成就系统扩展依赖 `awarenessStatsProvider` 中的累计计数器
+- Track 2（LUMI 核心 UI）依赖所有 awareness Provider
+- Track 3（计划系统 UI）依赖 `currentYearlyPlanProvider`、`currentMonthlyPlanProvider`、`currentWeeklyPlanProvider`、`planRepositoryProvider`
+- Track 4（列表 + 高光 UI）依赖 `allUserListsProvider`、`allHighlightsProvider`、`listHighlightRepositoryProvider`
+- Track 5（数据洞察 + 猫咪反应）依赖 `awarenessStatsProvider` + 各模型的聚合查询
 
 ### 外部依赖
 
@@ -2224,7 +2287,8 @@ void main() {
 
 | 风险点 | 缓解措施 |
 |--------|----------|
-| ISO 8601 周计算边界（跨年周） | `isoWeekIdForDate` 以周四所在年为准，测试 12/31 和 1/1 边界 |
-| SQLite UPSERT 兼容性 | `ON CONFLICT DO UPDATE` 需 SQLite 3.24+，Android 11+ 和 sqflite 均支持 |
-| 水化超时（新增 3 个集合） | `_hydrateTimeout` 为 8 秒，3 个新集合数据量小不会超时 |
-| tags JSON 解析防御性 | `_decodeStringList` 在畸形数据时返回空列表，不抛异常 |
+| WeeklyReview ALTER TABLE 兼容性 | SQLite ALTER TABLE ADD COLUMN 自 3.2.0 起支持，sqflite 全平台兼容 |
+| 水化超时（新增 5 个集合） | 新集合数据量小（计划表每年最多 12+52 条），不会超时 |
+| UserList items JSON 解析 | 复用 `json_helpers.dart` 的 `decodeJsonStringList`，畸形数据返回空列表 |
+| WeeklyPlan 与 WeeklyReview 的 weekId 一致性 | 共用 `AppDateUtils.currentWeekId()` 和 `isoWeekId()` 方法 |
+| 无迁移策略的风险 | 所有用户为新用户，无历史数据，无需迁移。已有 v4 用户通过 `_onUpgrade` 走 v5 升级路径 |

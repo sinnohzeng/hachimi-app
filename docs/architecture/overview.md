@@ -98,6 +98,88 @@ Architecture:
 - **Adaptive pixel widgets**: All `lib/widgets/pixel_ui/Pixel*` components check `context.pixel.isRetro` and render standard M3 components (`Container`, `FilledButton.tonal`, `Card`, `LinearProgressIndicator`, `Divider`) in Material mode, or pixel CustomPaint in Retro mode. StatefulWidget components (PixelButton, PixelBadge, PixelCard) use an outer StatelessWidget shell to avoid creating AnimationControllers in MD3 mode.
 - Shared MD3 helpers in `lib/widgets/pixel_ui/_md3_helpers.dart` reduce duplication across adaptive widgets.
 
+## LUMI 3-Tab 导航架构
+
+### 战略转型
+
+v3 LUMI（Light Up My Innerverse）将 App 从"猫咪养成习惯应用"转型为"韧性成长手册电子化"。核心变化：
+
+- **3 Tab 替代 4 Tab**：减少选择，降低认知负荷
+- **猫咪降级**：从一级 Tab 退到「我的」二级入口
+- **习惯降级**：从独立 Tab 退到月度规划子模块
+
+### 导航结构
+
+```
+旧（v2.x）：觉知 | 习惯 | 猫咪 | 我的（4 Tab）
+新（LUMI）：✦ 今天 | 🗺 旅程 | 👤 我的（3 Tab）
+```
+
+| Tab | 屏幕 | 核心功能 |
+|-----|------|---------|
+| Tab 0: 今天 | `TodayScreen` | QuickLightCard（心情+一句话）+ HabitSnapshot + InspirationCard |
+| Tab 1: 旅程 | `JourneyScreen` | SegmentedButton 切换：本周 / 本月 / 年度 / 探索 |
+| Tab 2: 我的 | `ProfileScreen` | LUMI 统计 + 猫咪伴侣入口（二级）+ 成长回望 + 设置 |
+
+### 完整屏幕层级
+
+```
+App
+├── Tab 0: TodayScreen（今天）
+│   ├── QuickLightCard（inline 心情+一句话，30 秒完成）
+│   ├── HabitSnapshot（今日习惯勾选）
+│   ├── InspirationCard（灵感清单轮换提示）
+│   └── → DailyLightScreen（展开完整记录）
+│
+├── Tab 1: JourneyScreen（旅程）
+│   ├── [本周] WeeklyPlan + WeeklyReview + WorryJar
+│   ├── [本月] MonthlyCalendar + Goals + SmallWin + Habits + MoodTracker + Memory
+│   ├── [年度] YearlyMessages + GrowthPlan + AnnualCalendar + Lists + SmallWin100 + Highlights
+│   └── [探索] 6 主题月度活动（Day 30 解锁）
+│
+└── Tab 2: ProfileScreen（我的）
+    ├── LumiStatsCard
+    ├── CatCompanionCard → CatRoomScreen（二级入口，可选）
+    ├── GrowthReview（Day 90 解锁）
+    └── Settings
+```
+
+## Onboarding 流程
+
+### LUMI Onboarding（4 页）
+
+替换旧猫咪 3 页引导：
+
+| 页 | 内容 | 用户动作 |
+|----|------|---------|
+| Page 1 | 欢迎 — 品牌 slogan + 星星动画 | 继续 |
+| Page 2 | 你是谁 — 名字 + 生日 | 输入 + 下一步 |
+| Page 3 | 开始日期 — 日历选择器 | 选择 + 下一步 |
+| Page 4 | 使用指南 — LUMI 三件小事 | 开始旅程 |
+
+Onboarding 后直接进入 TodayScreen，**不经过** 猫咪领养。
+
+### 猫咪系统位置
+
+- `_FirstHabitGate` 绕过——不再强制猫咪领养
+- 猫咪领养入口在 `ProfileScreen` 的 `CatCompanionCard` 中
+- 完全可选，不影响核心 LUMI 体验
+
+## 渐进解锁机制
+
+`FeatureGateProvider` 根据累计记录天数（`totalLightDays`）决定功能可见性：
+
+| 条件 | 解锁内容 |
+|------|---------|
+| Day 0 | 今天 Tab（每日一点光）|
+| Day 1 | 旅程 Tab · 本周视图 |
+| Day 3 | 旅程 Tab · 本月视图 |
+| Day 14 | 旅程 Tab · 年度视图 |
+| Day 30 | 旅程 Tab · 探索（月度活动 6 主题）|
+| Day 90 | 成长回望 |
+
+未解锁内容使用温暖提示卡片（非灰色锁图标）。
+
 ## SSOT Snapshot
 | Concern | SSOT |
 |---|---|
@@ -105,5 +187,7 @@ Architecture:
 | Write log | `action_ledger` |
 | Cloud persistence | Firestore `users/{uid}` subtree |
 | Auth state | `authStateProvider` |
+| Navigation architecture | 3-Tab (`TodayScreen`, `JourneyScreen`, `ProfileScreen`) |
+| Feature gating | `featureGateProvider` (progressive unlock by `totalLightDays`) |
 | Observability schema | `docs/architecture/observability.md` |
 | Infra state | `infra/terraform/*` |

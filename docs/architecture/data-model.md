@@ -200,3 +200,242 @@ users/{uid}
 - `resolvedAt` (timestamp, nullable)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
+
+## V3 LUMI 数据层
+
+### 新增 Firestore Collections
+
+```
+users/{uid}
+├── ...existing collections...
+├── weeklyPlans/{weekId}
+├── monthlyPlans/{yyyy-MM}
+├── yearlyPlans/{year}
+├── lists/{listId}
+└── highlightEntries/{id}
+```
+
+### 新增模型定义
+
+#### YearlyPlan（年度计划）
+
+**Firestore**: `users/{uid}/yearlyPlans/{year}`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `year` | int | 年份 |
+| `messages` | map | 年度寄语（7 个提问的回答） |
+| `messages.become` | string | 我希望成为…… |
+| `messages.achieve` | string | 我想要达成…… |
+| `messages.breakthrough` | string | 我要突破性地完成…… |
+| `messages.stopDoing` | string | 我不再做…… |
+| `messages.keyword` | string | 我的年度关键词 |
+| `messages.letterToFuture` | string | 给亲爱的未来的我 |
+| `messages.motto` | string | 我的座右铭 |
+| `growthPlan` | array<map> | 8 维度成长计划 |
+| `growthPlan[].dimension` | string | 维度名称 |
+| `growthPlan[].goals` | array<string> | 3 个具体目标 |
+| `growthPlan[].status` | string | completed / inProgress / notStarted |
+| `annualMarkers` | map<string, string> | 年历标记 {MM-dd: note} |
+| `smallWin100` | map | 100 天挑战 |
+| `smallWin100.habitName` | string | 挑战习惯名称 |
+| `smallWin100.completedDays` | array<string> | 已完成日期列表 |
+| `smallWin100.reward` | string | 奖励 |
+| `travelActivities` | array<map> | 旅行与活动（16 条） |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
+#### MonthlyPlan（月度计划）
+
+**Firestore**: `users/{uid}/monthlyPlans/{yyyy-MM}`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `monthKey` | string | 格式 yyyy-MM |
+| `goals` | array<map> | 5 个月目标 |
+| `goals[].text` | string | 目标描述 |
+| `goals[].completed` | bool | 是否完成 |
+| `smallWinChallenge` | map | 小赢挑战 |
+| `smallWinChallenge.habitName` | string | 挑战习惯名称 |
+| `smallWinChallenge.fourLaws` | map | 四法则 {cue, craving, response, reward} |
+| `smallWinChallenge.completedDays` | array<string> | 已完成日期列表 |
+| `smallWinChallenge.reward` | string | 奖励 |
+| `habitTrackers` | array<map> | 4 个小习惯追踪 |
+| `habitTrackers[].habitName` | string | 习惯名称 |
+| `habitTrackers[].completedDays` | array<string> | 已完成日期列表 |
+| `selfCareActivities` | array<string> | 爱自己活动清单 |
+| `memory` | string | 本月记忆 |
+| `achievement` | string | 本月成就 |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
+#### WeeklyPlan（周计划）
+
+**Firestore**: `users/{uid}/weeklyPlans/{weekId}`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `weekId` | string | ISO 周 ID，格式 yyyy-Www |
+| `weekStartDate` | string | 周一日期 |
+| `weekEndDate` | string | 周日日期 |
+| `oneLineWish` | string | 一句话给自己（本周心愿）|
+| `eisenhowerMatrix` | map | 艾森豪威尔四象限 |
+| `eisenhowerMatrix.mustDo` | array<map> | 必须做 [{text, duration}] |
+| `eisenhowerMatrix.shouldDo` | array<map> | 要做 |
+| `eisenhowerMatrix.couldDo` | array<map> | 该做 |
+| `eisenhowerMatrix.wantDo` | array<map> | 想做 |
+| `newWorries` | array<map> | 本周新增烦恼 [{description, solution}] |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
+#### WeeklyReview 扩展字段
+
+在现有 `weeklyReviews/{weekId}` 基础上新增：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `freeNote` | string | 随笔（自由记录区）|
+| `worrySummary` | map | 烦恼状态总结 |
+| `worrySummary.vanished` | array<string> | 自然消失的烦恼 |
+| `worrySummary.resolved` | array<string> | 自己搞定的烦恼 |
+| `worrySummary.remaining` | array<string> | 还在的烦恼 → 烦恼罐 |
+
+#### UserList（用户清单）
+
+**Firestore**: `users/{uid}/lists/{listId}`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `listType` | string | book / movie / custom |
+| `customName` | string, nullable | 自定义清单名称 |
+| `year` | int | 所属年份 |
+| `items` | array<map> | 清单条目（10 条） |
+| `items[].title` | string | 标题 |
+| `items[].creator` | string | 作者/导演 |
+| `items[].genre` | string | 类型 |
+| `items[].rating` | int | 1-5 评分 |
+| `items[].keywords` | string | 关键词 |
+| `items[].feeling` | string | 感受 |
+| `yearPick` | map, nullable | 年度精选 |
+| `yearPick.treasure` | string | 宝藏推荐 |
+| `yearPick.inspiration` | string | 灵感一击 |
+| `yearPick.wall` | array<string> | 精华墙（3 条） |
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
+#### HighlightEntry（幸福/高光时刻）
+
+**Firestore**: `users/{uid}/highlightEntries/{id}`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `entryType` | string | happy / highlight |
+| `year` | int | 所属年份 |
+| `description` | string | 发生了什么 / 幸福的事 |
+| `companion` | string, nullable | 和谁一起（幸福时刻专用）|
+| `myAction` | string, nullable | 我做了什么（高光时刻专用）|
+| `feeling` | string | 感受 |
+| `eventDate` | string | 事件日期 |
+| `rating` | int, nullable | 1-5 评分（幸福仪表盘）|
+| `createdAt` | timestamp | |
+| `updatedAt` | timestamp | |
+
+### 新增 SQLite 表（全新 Schema，无迁移）
+
+**`local_weekly_plans`**
+
+| Column | Type | Constraint |
+|--------|------|------------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `week_id` | TEXT | NOT NULL |
+| `week_start_date` | TEXT | |
+| `week_end_date` | TEXT | |
+| `one_line_wish` | TEXT | |
+| `eisenhower_matrix` | TEXT (JSON) | |
+| `new_worries` | TEXT (JSON) | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+| | | UNIQUE(uid, week_id) |
+
+**`local_monthly_plans`**
+
+| Column | Type | Constraint |
+|--------|------|------------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `month_key` | TEXT | NOT NULL |
+| `goals` | TEXT (JSON) | |
+| `small_win_challenge` | TEXT (JSON) | |
+| `habit_trackers` | TEXT (JSON) | |
+| `self_care_activities` | TEXT (JSON) | |
+| `memory` | TEXT | |
+| `achievement` | TEXT | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+| | | UNIQUE(uid, month_key) |
+
+**`local_yearly_plans`**
+
+| Column | Type | Constraint |
+|--------|------|------------|
+| `id` | INTEGER | PK |
+| `uid` | TEXT | NOT NULL |
+| `year` | INTEGER | NOT NULL |
+| `messages` | TEXT (JSON) | |
+| `growth_plan` | TEXT (JSON) | |
+| `annual_markers` | TEXT (JSON) | |
+| `small_win_100` | TEXT (JSON) | |
+| `travel_activities` | TEXT (JSON) | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+| | | UNIQUE(uid, year) |
+
+**`local_user_lists`**
+
+| Column | Type | Constraint |
+|--------|------|------------|
+| `id` | TEXT | PK |
+| `uid` | TEXT | NOT NULL |
+| `list_type` | TEXT | NOT NULL |
+| `custom_name` | TEXT | |
+| `year` | INTEGER | NOT NULL |
+| `items` | TEXT (JSON) | |
+| `year_pick` | TEXT (JSON) | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+
+**`local_highlight_entries`**
+
+| Column | Type | Constraint |
+|--------|------|------------|
+| `id` | TEXT | PK |
+| `uid` | TEXT | NOT NULL |
+| `entry_type` | TEXT | NOT NULL |
+| `year` | INTEGER | NOT NULL |
+| `description` | TEXT | NOT NULL |
+| `companion` | TEXT | |
+| `my_action` | TEXT | |
+| `feeling` | TEXT | |
+| `event_date` | TEXT | |
+| `rating` | INTEGER | |
+| `created_at` | INTEGER | NOT NULL |
+| `updated_at` | INTEGER | NOT NULL |
+
+**`local_weekly_reviews` 扩展列**
+
+| Column | Type | 说明 |
+|--------|------|------|
+| `free_note` | TEXT | 随笔 |
+| `worry_summary` | TEXT (JSON) | 烦恼状态总结 |
+
+### LUMI Onboarding 数据
+
+存入 `materialized_state`：
+
+| Key | 类型 | 说明 |
+|-----|------|------|
+| `lumi_user_name` | String | 手册主人名字 |
+| `lumi_birthday` | String | 生日（MM-dd）|
+| `lumi_start_date` | String | 旅程开始日期（yyyy-MM-dd）|
+| `lumi_onboarding_version` | int | Onboarding 版本（2）|

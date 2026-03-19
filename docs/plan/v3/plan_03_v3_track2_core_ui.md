@@ -3,652 +3,271 @@ level: 2
 file_id: plan_03
 parent: plan_01
 status: pending
-created: 2026-03-17 23:30
+created: 2026-03-19 22:00
 children: []
-estimated_time: 720分钟
-prerequisites: [plan_02]
 ---
 
-# 轨道二：觉知核心 UI
+# 轨道二：LUMI 核心 UI + 导航重组
 
 ## 1. 模块概述
 
 ### 1.1 交付目标
 
-轨道二是 V3 觉知伴侣的 **UI 实现层**，负责构建用户与觉知功能交互的全部界面。交付完成后，用户可以：
+轨道二是 LUMI 转型的 **UI 实现层 + 导航重组层**，负责将旧 4 Tab 架构完整替换为 LUMI 3-Tab 架构。交付完成后：
 
-- 在觉知 Tab 的「今天」「本周」「回顾」三个子 Tab 间切换
-- 完整完成「每日一点光」记录流程（选心情 → 写文字 → 选标签 → 保存 → 看猫咪反应）
-- 完整完成「周回顾」流程（三个幸福时刻 + 感恩 + 学习 + 烦恼更新 → 保存 → 看猫咪模板周总结）
-- 使用「烦恼处理器」进行烦恼的 CRUD 和状态管理
-- 在快速模式下（从专注完成页触发），30 秒完成一点光记录
+- 导航从 `觉知 | 习惯 | 猫咪 | 我的` 变为 `✦ 今天 | 🗺 旅程 | 👤 我的`
+- 新 Onboarding 4 页温暖提问替换旧猫咪引导
+- `TodayScreen` 完整可用：QuickLightCard + HabitSnapshot + InspirationCard
+- `JourneyScreen` 周视图完整可用（月/年/探索为占位）
+- `ProfileScreen` 重组：LUMI 统计 + 猫咪伴侣降为二级入口
+- `_FirstHabitGate` 强制猫咪领养彻底移除
+- `FeatureGateProvider` 渐进解锁机制生效
 
 ### 1.2 前置依赖
-
-本轨道 **严格依赖轨道一（plan_02）** 提供的以下产物：
 
 | 依赖项 | 来源 | 用途 |
 |--------|------|------|
 | `Mood` 枚举 | `lib/models/mood.dart` | MoodSelector 渲染 5 种心情 |
-| `DailyLight` 模型 | `lib/models/daily_light.dart` | DailyLightScreen 读写 |
-| `WeeklyReview` 模型 | `lib/models/weekly_review.dart` | WeeklyReviewScreen 读写 |
-| `Worry` 模型 + `WorryStatus` 枚举 | `lib/models/worry.dart` | WorryItemCard、WorryEditScreen |
-| `awarenessRepositoryProvider` | `lib/providers/service_providers.dart` | 所有觉知数据操作 |
+| `DailyLight` 模型 | `lib/models/daily_light.dart` | QuickLightCard / DailyLightScreen 读写 |
+| `WeeklyPlan` 模型 | `lib/models/weekly_plan.dart` | WeeklyPlanCard 读写 |
+| `WeeklyReview` 模型 | `lib/models/weekly_review.dart` | WeeklyReviewCard 读写 |
+| `Worry` 模型 + `WorryStatus` 枚举 | `lib/models/worry.dart` | WorryJarCard / WorryEditScreen |
+| `LumiProfile` 模型 | `lib/models/lumi_profile.dart` | Onboarding 数据存储、ProfileScreen 展示 |
+| `awarenessRepositoryProvider` | `lib/providers/service_providers.dart` | 觉知数据操作 |
 | `worryRepositoryProvider` | `lib/providers/service_providers.dart` | 烦恼数据操作 |
 | `todayLightProvider` | `lib/providers/awareness_providers.dart` | 今日一点光状态 |
-| `currentWeekReviewProvider` | `lib/providers/awareness_providers.dart` | 本周回顾状态 |
 | `activeWorriesProvider` | `lib/providers/awareness_providers.dart` | 活跃烦恼列表 |
+| `featureGateProvider` | `lib/providers/feature_gate_provider.dart` | 渐进解锁判断 |
+| `lumiProfileProvider` | `lib/providers/lumi_profile_provider.dart` | LUMI 用户资料 |
 
 ### 1.3 与其他轨道的关系
 
 ```
 轨道一（数据基础）
-    │
+    │  提供模型、Repository、Provider
     ▼
-【轨道二（觉知核心 UI）】  ← 本文档
+【轨道二（核心 UI + 导航重组）】  ← 本文档
     │
-    ├──▶ 轨道三（飞轮桥接 + 导航）
-    │       - HomeScreen Tab 重组时把 AwarenessScreen 接入 Tab 0
-    │       - FocusCompleteScreen 桥接 Banner 调用 DailyLightScreen(quickMode: true)
-    │       - MonthlyRitualCard 嵌入 AwarenessScreen 今日 Tab
+    ├──▶ 轨道三（集成）
+    │       - 通知调度
+    │       - 成就系统扩展
+    │       - 飞轮桥接（FocusComplete → 一点光）
     │
-    └──▶ 轨道四（历史视图 + 统计）
-            - 回顾子 Tab 内容在轨道四实现
+    └──▶ 轨道四（月度/年度 + 历史视图）
+            - JourneyScreen 本月/年度/探索 Segment 填充
+            - 心情热力图、标签统计
 ```
 
 ### 1.4 主题兼容策略
 
 所有新增 Widget 必须在 **Material 3** 和 **Retro Pixel** 两种主题下正确渲染：
 
-- **颜色**：统一使用 `Theme.of(context).colorScheme.*`，**绝对禁止** 硬编码颜色值
-- **形状**：使用 `Theme.of(context).cardTheme.shape` 等主题属性，Retro Pixel 模式通过 `ThemeSkin` 自动注入 `PixelBorderShape`
-- **文字**：使用 `Theme.of(context).textTheme.*`，Retro Pixel 模式自动替换为像素字体
-- **间距**：使用 `AppSpacing` 常量，双主题共用
-- **背景**：Screen 级别使用 `AppScaffold`（自动叠加 `RetroTiledBackground`），Widget 级别不需要处理
+- **颜色**：统一使用 `Theme.of(context).colorScheme.*`，绝对禁止硬编码颜色值
+- **形状**：使用 `Theme.of(context).cardTheme.shape`，Retro Pixel 模式通过 `ThemeSkin` 自动注入 `PixelBorderShape`
+- **文字**：使用 `Theme.of(context).textTheme.*`
+- **间距**：使用 `AppSpacing` 常量
+- **背景**：Screen 级别使用 `AppScaffold`
 
 ---
 
-## 2. Widget 规格
+## 2. 导航重组：4 Tab → 3 Tab
 
-### 2.1 MoodSelector
+### 2.1 当前结构（待替换）
 
-**文件路径**：`lib/widgets/awareness/mood_selector.dart`
+**文件**：`lib/screens/home/home_screen.dart`
 
-**类定义**：
+```
+当前 4 Tab：
+  Tab 0: AwarenessScreen  — 觉知
+  Tab 1: TodayTab          — 习惯
+  Tab 2: CatRoomScreen     — 猫咪
+  Tab 3: ProfileScreen     — 我的
+```
+
+### 2.2 新结构
+
+```
+新 3 Tab：
+  Tab 0: TodayScreen       — ✦ 今天
+  Tab 1: JourneyScreen     — 🗺 旅程
+  Tab 2: ProfileScreen     — 👤 我的（重组后）
+```
+
+### 2.3 `HomeScreen` 改动明细
 
 ```dart
-/// 心情选择器 — 水平排列 5 个心情按钮。
-///
-/// 两种尺寸：
-/// - `compact: false`（默认）：完整页面模式，用于 DailyLightScreen
-/// - `compact: true`：迷你模式，用于飞轮桥接 Banner
-class MoodSelector extends StatelessWidget {
-  /// 当前选中的心情（null = 未选择）。
-  final Mood? selectedMood;
+// 旧
+static const _screens = <Widget>[
+  AwarenessScreen(),
+  TodayTab(),
+  CatRoomScreen(),
+  ProfileScreen(),
+];
 
-  /// 心情选中回调。
-  final ValueChanged<Mood> onMoodSelected;
-
-  /// 迷你模式：缩小尺寸，适配 BottomSheet / Banner。
-  final bool compact;
-
-  const MoodSelector({
-    super.key,
-    required this.selectedMood,
-    required this.onMoodSelected,
-    this.compact = false,
-  });
-}
+// 新
+static const _screens = <Widget>[
+  TodayScreen(),      // Tab 0：今天
+  JourneyScreen(),    // Tab 1：旅程
+  ProfileScreen(),    // Tab 2：我的（重组后）
+];
 ```
 
-**视觉布局**：
+**NavigationBar destinations**：
 
-```
-┌─────────────────────────────────────────────┐
-│  Row(mainAxisAlignment: spaceEvenly)        │
-│                                             │
-│  [😄]   [🙂]   [😌]   [😔]   [😢]        │
-│                                             │
-│  文字    文字    文字    文字    文字         │
-│  (仅非 compact 模式显示)                     │
-└─────────────────────────────────────────────┘
-```
+| 索引 | Tab | icon（未选中）| selectedIcon | label L10n key |
+|------|-----|-------------|-------------|---------------|
+| 0 | 今天 | `Icons.auto_awesome_outlined` | `Icons.auto_awesome` | `homeTabToday` |
+| 1 | 旅程 | `Icons.explore_outlined` | `Icons.explore` | `homeTabJourney` |
+| 2 | 我的 | `Icons.person_outline` | `Icons.person` | `homeTabProfile` |
 
-- **完整模式**（`compact: false`）：每个心情按钮 56x56，下方有 `bodySmall` 文字标签（来自 L10n）
-- **迷你模式**（`compact: true`）：每个心情按钮 40x40，无文字标签
+**FAB 变更**：
 
-**心情按钮构成**：
+- 旧：Tab 1 显示添加习惯 FAB
+- 新：Tab 0 显示 FAB（快速记录一点光），点击展开 `DailyLightScreen`
 
-每个心情按钮为 `InkWell` 包裹的 `AnimatedContainer`：
-- **未选中**：`Container` 背景为 `colorScheme.surfaceContainerHigh`，内部为 `Text`（emoji 文字）
-- **选中**：`Container` 背景为心情对应颜色的 `withValues(alpha: 0.2)`，外围 2px `Border` 使用心情颜色
+### 2.4 `_FirstHabitGate` 移除
 
-**心情颜色映射**（使用 `colorScheme` 语义色）：
-
-| Mood | emoji | 选中环颜色 | 语义 |
-|------|-------|-----------|------|
-| `veryHappy` | 😄 | `colorScheme.tertiary`（gold 色调） | 非常开心 |
-| `happy` | 🙂 | `Color(0xFF4CAF50)` — 但应从 `colorScheme.primary` 派生 | 开心 |
-| `calm` | 😌 | `colorScheme.primary` | 平静 |
-| `down` | 😔 | `colorScheme.error.withValues(alpha: 0.7)` | 低落 |
-| `veryDown` | 😢 | `colorScheme.error` | 很低落 |
-
-> **注意**：为避免硬编码，使用 `colorScheme` 的语义槽配合 `HSLColor` 明度调整。具体实现可提取一个 `_moodColor(Mood mood, ColorScheme scheme)` 私有方法。
-
-**动画**：选中时 `ScaleTransition`，`duration: 100ms`，`curve: Curves.easeOut`，缩放比 `1.0 → 1.15 → 1.0`。使用 `AnimatedScale` 简化实现（无需手动 `AnimationController`）。
-
-**交互行为**：
-
-1. 点击任意心情按钮 → 调用 `onMoodSelected(mood)`
-2. 已选中状态下再次点击同一按钮 → 不做任何操作（心情为必选项，不可取消）
-3. 切换选中项时，旧按钮缩回、新按钮放大
-
-**主题兼容**：
-
-- Material 3：`CircleAvatar` 风格圆形按钮，`colorScheme.primaryContainer` 背景
-- Retro Pixel：容器自动获取 `PixelBorderShape`（来自 `chipTheme`），无需额外代码
+在 `app.dart`（或 `home_screen.dart` 外层）中查找 `_FirstHabitGate` 或类似的"首次必须领养猫咪"逻辑，完全删除。新用户 Onboarding 完成后直接进入 `TodayScreen`，不再强制领养。
 
 ---
 
-### 2.2 LightInputCard
+## 3. Onboarding 重写
 
-**文件路径**：`lib/widgets/awareness/light_input_card.dart`
+### 3.1 概述
 
-**类定义**：
+完全替换 `lib/screens/onboarding/onboarding_screen.dart`（当前 3 页猫咪引导）为 LUMI 4 页温暖提问。
+
+**新文件路径**：`lib/screens/onboarding/lumi_onboarding_screen.dart`
+
+**旧文件处理**：`onboarding_screen.dart` + `components/` 下 3 个组件标记为 deprecated，待清理删除。
+
+### 3.2 四页结构
+
+#### Page 1：欢迎
+
+```
+┌───────────────────────────────────────┐
+│                                       │
+│            ✦  ✧  ✦                    │
+│      （星星缓缓出现动画）               │
+│                                       │
+│             你好                       │
+│          这里是 LUMI                   │
+│                                       │
+│    每写一行，都是在为你的               │
+│    内心宇宙添一颗星                    │
+│                                       │
+│           [继续]                       │
+└───────────────────────────────────────┘
+```
+
+- 星星动画：3 颗四角星 `✦` 依次淡入（`AnimatedOpacity` 级联延迟 300ms）
+- 主标题：`headlineMedium`，品牌核心语
+- 按钮：`FilledButton`（"继续"）
+
+#### Page 2：你是谁
+
+```
+┌───────────────────────────────────────┐
+│                                       │
+│     这本手册的主人是                    │
+│     ┌─────────────────────────┐       │
+│     │ [名字输入框]              │       │
+│     └─────────────────────────┘       │
+│                                       │
+│     你的生日                           │
+│     [月] 月 [日] 日                    │
+│                                       │
+│           [下一步]                     │
+└───────────────────────────────────────┘
+```
+
+- 名字输入：`TextField`，`hintText: "写下你的名字"`
+- 生日：两个 `DropdownButton`（月 1-12、日 1-31）
+- 名字为必填，生日可选
+- 按钮：名字为空时 disabled
+
+#### Page 3：开始日期
+
+```
+┌───────────────────────────────────────┐
+│                                       │
+│     你想从哪天开始这段旅程？            │
+│                                       │
+│     ┌─────────────────────────┐       │
+│     │     [日历选择器]          │       │
+│     │     （默认：今天）         │       │
+│     └─────────────────────────┘       │
+│                                       │
+│     小字：你可以随时修改                │
+│                                       │
+│           [下一步]                     │
+└───────────────────────────────────────┘
+```
+
+- 日历：`showDatePicker` 或内联日历
+- 默认值：`DateTime.now()`
+- 选择范围：今天往前 30 天 ~ 今天
+
+#### Page 4：快速导览
+
+```
+┌───────────────────────────────────────┐
+│                                       │
+│     LUMI 只有三件小事                  │
+│                                       │
+│     ┌─────────────────────────┐       │
+│     │ ✦ 睡前写一句             │       │
+│     │   今天的一点光            │       │
+│     └─────────────────────────┘       │
+│     ┌─────────────────────────┐       │
+│     │ ✦ 周末回顾               │       │
+│     │   三个幸福时刻            │       │
+│     └─────────────────────────┘       │
+│     ┌─────────────────────────┐       │
+│     │ ✦ 写下烦恼               │       │
+│     │   放进烦恼罐              │       │
+│     └─────────────────────────┘       │
+│                                       │
+│     准备好了吗？                       │
+│           [开始旅程]                   │
+└───────────────────────────────────────┘
+```
+
+- 三个卡片：`Card` + `ListTile` 简化布局
+- "开始旅程" 按钮：`FilledButton`，触发数据保存 + 导航到 `HomeScreen`
+
+### 3.3 数据保存
+
+Onboarding 完成时写入 `materialized_state`：
 
 ```dart
-/// 一点光文字输入卡片 — 带字数计数器的 TextField。
-class LightInputCard extends StatefulWidget {
-  /// 初始文字（编辑模式）。
-  final String? initialText;
-
-  /// 文字变更回调。
-  final ValueChanged<String> onTextChanged;
-
-  /// 最大字数限制。
-  final int maxLength;
-
-  const LightInputCard({
-    super.key,
-    this.initialText,
-    required this.onTextChanged,
-    this.maxLength = 500,
-  });
+{
+  'lumi_user_name': String,       // 必填
+  'lumi_birthday': String?,       // 'MM-dd'，可选
+  'lumi_start_date': String,      // 'yyyy-MM-dd'
+  'lumi_onboarding_version': 2,   // 区分新旧 Onboarding
 }
 ```
 
-**状态管理**：`_LightInputCardState` 持有 `TextEditingController`，在 `initState` 中从 `initialText` 初始化，在 `dispose` 中释放。
+### 3.4 Onboarding 后行为
 
-**视觉布局**：
-
-```
-┌─────────────────────────────────────┐
-│  Card                               │
-│  ┌─────────────────────────────────┐│
-│  │ TextField                       ││
-│  │ placeholder: l10n 文案          ││
-│  │ minLines: 3                     ││
-│  │ maxLines: 6                     ││
-│  │ maxLength: 500                  ││
-│  │                                 ││
-│  │                        42/500   ││
-│  └─────────────────────────────────┘│
-│  padding: AppSpacing.paddingMd      │
-└─────────────────────────────────────┘
-```
-
-**TextField 配置**：
-
-```dart
-TextField(
-  controller: _controller,
-  decoration: InputDecoration(
-    hintText: context.l10n.awarenessLightPlaceholder,
-    border: InputBorder.none,
-    counterText: '${_controller.text.length}/$maxLength',
-  ),
-  minLines: 3,
-  maxLines: 6,
-  maxLength: maxLength,
-  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-  onChanged: onTextChanged,
-  textCapitalization: TextCapitalization.sentences,
-)
-```
-
-**注意事项**：
-
-- `counterText` 自定义格式（`42/500`），不使用 Flutter 默认的 `counterText` 样式位置
-- 自行在 `Card` 右下角通过 `Align` 放置计数器文字，使用 `textTheme.labelSmall` + `colorScheme.onSurfaceVariant`
-- `Card` 使用 `Theme.of(context).cardTheme` 样式，自动适配双主题
-
-**主题兼容**：
-
-- Material 3：标准 `Card` + `InputDecoration`，圆角来自 `cardTheme`
-- Retro Pixel：`Card` 自动获取 `PixelBorderShape`，`InputDecoration` 通过 `inputDecorationTheme` 自动适配
+1. 保存数据 → 设置 `onboardingComplete = true`
+2. 导航到 `HomeScreen`（Tab 0: TodayScreen）
+3. **不经过猫咪领养**
+4. 首次打开 TodayScreen 显示引导气泡："写下今天的第一束光 ✦"
 
 ---
 
-### 2.3 TagSelector
+## 4. TodayScreen（Tab 0）
 
-**文件路径**：`lib/widgets/awareness/tag_selector.dart`
+### 4.1 概述
 
-**类定义**：
+**文件路径**：`lib/screens/today/today_screen.dart`
 
-```dart
-/// 标签选择器 — 预设标签 + 可选自定义标签。
-///
-/// 复用 [ChipSelectorRow] 的 Wrap + FilterChip 模式，
-/// 但输入输出为 `List<String>` 而非 `int`。
-class TagSelector extends StatelessWidget {
-  /// 预设标签列表。
-  final List<String> presetTags;
+TodayScreen 是用户每天打开 App 的第一个页面，设计为 **10 秒可完成** 的极简记录面。
 
-  /// 当前选中的标签列表（支持多选）。
-  final List<String> selectedTags;
-
-  /// 标签变更回调。
-  final ValueChanged<List<String>> onTagsChanged;
-
-  /// 是否允许自定义标签。
-  final bool allowCustom;
-
-  const TagSelector({
-    super.key,
-    required this.presetTags,
-    required this.selectedTags,
-    required this.onTagsChanged,
-    this.allowCustom = true,
-  });
-}
-```
-
-**预设标签常量**（定义在 `lib/core/constants/awareness_constants.dart`）：
-
-```dart
-class AwarenessConstants {
-  AwarenessConstants._();
-
-  static const List<String> presetTags = [
-    '家人',  // family
-    '朋友',  // friends
-    '学习',  // study
-    '户外',  // outdoor
-    '工作',  // work
-  ];
-}
-```
-
-> **注意**：预设标签使用中文硬编码。因为标签是用户数据的一部分（保存到数据库），L10n 翻译在此不适用——中文用户写的标签永远是中文。如果未来做国际化，标签改为 L10n key 映射需要数据迁移。MVP 阶段不处理此问题。
-
-**视觉布局**：
-
-```
-┌──────────────────────────────────────────────┐
-│  Wrap(spacing: 8, runSpacing: 4)             │
-│                                              │
-│  [家人] [朋友] [学习] [户外] [工作] [+自定义] │
-│                                              │
-└──────────────────────────────────────────────┘
-```
-
-- 每个预设标签为 `FilterChip`，`selected` 状态由 `selectedTags.contains(tag)` 控制
-- 点击已选中标签 → 从 `selectedTags` 移除；点击未选中标签 → 添加到 `selectedTags`
-- 最后一个元素为 `ActionChip`，图标 `Icons.add`，文案 `+自定义`
-
-**自定义标签行为**：
-
-1. 点击「+自定义」→ `ActionChip` 替换为内联 `TextField`（`SizedBox(width: 120)`）
-2. 用户输入完成（按回车或失焦）→ 非空文本添加到 `selectedTags`，`TextField` 消失
-3. 自定义标签添加后与预设标签外观一致（`FilterChip`，`selected: true`），点击可取消
-4. 空输入自动取消
-
-**主题兼容**：
-
-- `FilterChip` 和 `ActionChip` 通过 `chipTheme` 自动适配双主题
-- Retro Pixel 下 Chip 自动获取像素边框，无需额外代码
-
----
-
-### 2.4 HappyMomentCard
-
-**文件路径**：`lib/widgets/awareness/happy_moment_card.dart`
-
-**类定义**：
-
-```dart
-/// 幸福时刻卡片 — 周回顾中使用，包含编号、文本输入和标签选择。
-class HappyMomentCard extends StatelessWidget {
-  /// 幸福时刻编号（1、2 或 3）。
-  final int momentNumber;
-
-  /// 当前文本内容。
-  final String? text;
-
-  /// 当前选中的标签。
-  final List<String> tags;
-
-  /// 文本变更回调。
-  final ValueChanged<String?> onTextChanged;
-
-  /// 标签变更回调。
-  final ValueChanged<List<String>> onTagsChanged;
-
-  const HappyMomentCard({
-    super.key,
-    required this.momentNumber,
-    this.text,
-    this.tags = const [],
-    required this.onTextChanged,
-    required this.onTagsChanged,
-  });
-}
-```
-
-**视觉布局**：
-
-```
-┌──────────────────────────────────────┐
-│  Card                                │
-│  ┌──────────────────────────────────┐│
-│  │ Row                              ││
-│  │  [✨ emoji]  "幸福时刻 #1"       ││
-│  │               titleSmall          ││
-│  └──────────────────────────────────┘│
-│  ┌──────────────────────────────────┐│
-│  │ TextField                        ││
-│  │ hintText: "这周有什么让你开心的？"││
-│  │ minLines: 2, maxLines: 4         ││
-│  └──────────────────────────────────┘│
-│  ┌──────────────────────────────────┐│
-│  │ TagSelector(compact)             ││
-│  │ presetTags + allowCustom         ││
-│  └──────────────────────────────────┘│
-│  padding: AppSpacing.paddingMd       │
-└──────────────────────────────────────┘
-```
-
-- 卡片头部使用 `textTheme.titleSmall`，带 `✨` emoji 前缀
-- `TextField` 使用 `InputBorder.none`，保持卡片内干净
-- `TagSelector` 复用 2.3 中定义的组件，传入相同的 `presetTags`
-
-**主题兼容**：`Card` + `TextField` + `TagSelector` 均通过 `Theme` 自动适配。
-
----
-
-### 2.5 WorryItemCard
-
-**文件路径**：`lib/widgets/awareness/worry_item_card.dart`
-
-**类定义**：
-
-```dart
-/// 烦恼条目卡片 — 显示烦恼描述、解法预览和状态切换。
-class WorryItemCard extends StatelessWidget {
-  /// 烦恼数据。
-  final Worry worry;
-
-  /// 状态变更回调。
-  final ValueChanged<WorryStatus> onStatusChanged;
-
-  /// 点击卡片回调（进入编辑页）。
-  final VoidCallback onTap;
-
-  const WorryItemCard({
-    super.key,
-    required this.worry,
-    required this.onStatusChanged,
-    required this.onTap,
-  });
-}
-```
-
-**视觉布局**：
-
-```
-┌──────────────────────────────────────────────┐
-│  Card (InkWell onTap)                         │
-│  ┌──────────────────────────────────────────┐│
-│  │ Column                                   ││
-│  │                                          ││
-│  │ Text: worry.description                  ││
-│  │   bodyMedium, maxLines: 2, overflow      ││
-│  │                                          ││
-│  │ if (worry.solution != null)              ││
-│  │   Text: "💡 " + worry.solution           ││
-│  │     bodySmall, onSurfaceVariant          ││
-│  │     maxLines: 1, overflow                ││
-│  │                                          ││
-│  │ SizedBox(height: sm)                     ││
-│  │                                          ││
-│  │ SegmentedButton<WorryStatus>             ││
-│  │   [还在] [搞定了] [消失了]               ││
-│  │                                          ││
-│  └──────────────────────────────────────────┘│
-│  padding: AppSpacing.paddingMd               │
-└──────────────────────────────────────────────┘
-```
-
-**SegmentedButton 样式**：
-
-| WorryStatus | 文案 | 选中时颜色 |
-|-------------|------|-----------|
-| `ongoing` | L10n: `worryStatusOngoing` | `colorScheme.tertiary`（amber 色调） |
-| `resolved` | L10n: `worryStatusResolved` | `Color(0xFF4CAF50)` 派生自 `colorScheme` |
-| `disappeared` | L10n: `worryStatusDisappeared` | `colorScheme.outline`（grey 色调） |
-
-**交互行为**：
-
-1. 点击卡片整体 → `onTap()`（导航到 WorryEditScreen 编辑）
-2. 点击 `SegmentedButton` 某段 → `onStatusChanged(newStatus)`
-3. `SegmentedButton` 的 `onSelectionChanged` 需要 `stopPropagation` 避免触发卡片 `onTap`
-
-**主题兼容**：
-
-- `SegmentedButton` 通过 `Theme` 自动适配
-- `Card` 通过 `cardTheme` 自动适配
-
----
-
-### 2.6 CatBedtimeAnimation
-
-**文件路径**：`lib/widgets/awareness/cat_bedtime_animation.dart`
-
-**类定义**：
-
-```dart
-/// 猫咪睡前反应动画 — 一点光保存后弹出。
-///
-/// 使用现有 [PixelCatSprite] 显示 featured cat，
-/// 根据用户心情播放不同动画 + 显示模板文案。
-class CatBedtimeAnimation extends ConsumerStatefulWidget {
-  /// 用户选择的心情。
-  final Mood mood;
-
-  const CatBedtimeAnimation({
-    super.key,
-    required this.mood,
-  });
-
-  @override
-  ConsumerState<CatBedtimeAnimation> createState() =>
-      _CatBedtimeAnimationState();
-}
-```
-
-> **注意**：此 Widget 需要 `ConsumerStatefulWidget` 而非 `ConsumerWidget`，因为它使用 `AnimationController` 控制动画。
-
-**状态管理**：
-
-`_CatBedtimeAnimationState` 混入 `TickerProviderStateMixin`，持有：
-- `_spriteController`：控制猫咪 sprite 动画（scale/translate）
-- `_textController`：控制文案淡入
-- `_textOpacity`：`CurvedAnimation` 用于文案 `FadeTransition`
-
-**视觉布局**：
-
-```
-┌─────────────────────────────────────┐
-│  Column(mainAxisSize: min)          │
-│                                     │
-│  ┌─────────────────────────────────┐│
-│  │ PixelCatSprite.fromCat(         ││
-│  │   cat: featuredCat,             ││
-│  │   size: 120,                    ││
-│  │ )                               ││
-│  │ 外层包裹 AnimatedBuilder        ││
-│  │ 应用 Transform (scale/translate)││
-│  └─────────────────────────────────┘│
-│                                     │
-│  SizedBox(height: AppSpacing.base)  │
-│                                     │
-│  ┌─────────────────────────────────┐│
-│  │ FadeTransition                  ││
-│  │   Text: 模板文案                ││
-│  │   bodyMedium, textAlign: center ││
-│  │   maxLines: 3                   ││
-│  └─────────────────────────────────┘│
-│                                     │
-│  padding: AppSpacing.paddingLg      │
-└─────────────────────────────────────┘
-```
-
-**心情动画映射**：
-
-| Mood | 动画类型 | Transform 参数 | 时长 | 循环 |
-|------|---------|---------------|------|------|
-| `veryHappy` | bounce | `scale`: `1.0 → 1.2 → 1.0`（`TweenSequence`） | 600ms | 重复 3 次 |
-| `happy` | nudge | `translateX`: `0 → 8 → -8 → 0`（正弦摆动） | 400ms | 重复 2 次 |
-| `calm` | breathe | `scale`: `1.0 → 1.05 → 1.0`（缓慢呼吸） | 2000ms | 重复 1 次 |
-| `down` | lean-in | `translateX`: `0 → -12`（向左轻靠） | 500ms | 不循环，保持终点 |
-| `veryDown` | curl-up | `scale`: `1.0 → 0.92` + `opacity`: `1.0 → 0.85 → 1.0` | 3000ms | 不循环 |
-
-**文案显示时序**：
-
-1. Dialog 打开 → 猫咪动画立即开始
-2. 猫咪动画完成后 300ms → 文案 `FadeTransition` 开始（`duration: 300ms`）
-3. 文案完全显示后 → 整个 Dialog 保持 3 秒 → 自动关闭
-4. 用户随时可点击关闭（`GestureDetector` 包裹整个布局）
-
-**Featured Cat 获取**：
-
-```dart
-final catsAsync = ref.watch(catsProvider);
-// 复用 TodayTab 的 _findFeaturedCat 逻辑
-// 如果没有猫（理论上不会），显示默认 placeholder
-```
-
-> **重构提示**：`_findFeaturedCat` 目前是 `TodayTab` 的私有方法，轨道二实现时应将其提取为 `catsProvider` 上的公共 computed provider（如 `featuredCatProvider`），避免代码重复。
-
-**模板文案来源**：
-
-文案从 `lib/core/constants/cat_response_templates.dart`（轨道五种子数据）获取。轨道二先硬编码 5 条种子文案（每心情 1 条），轨道五扩充为 100-150 条。
-
-种子文案（用于轨道二开发/测试）：
-
-| Mood | 种子文案 |
-|------|---------|
-| `veryHappy` | 「铲屎官今天好开心，本猫也开心！」 |
-| `happy` | 「记录了今天的光，真棒 ✨」 |
-| `calm` | 「平静的一天也很好呢 🍃」 |
-| `down` | 「不开心的日子，本猫陪着你 💛」 |
-| `veryDown` | 「没事的，本猫哪都不去 🫂」 |
-
-**主题兼容**：
-
-- `PixelCatSprite` 在双主题下已经过验证，无需额外处理
-- 文案文字使用 `textTheme.bodyMedium`，颜色使用 `colorScheme.onSurface`
-
----
-
-### 2.7 AwarenessEmptyState
-
-**文件路径**：`lib/widgets/awareness/awareness_empty_state.dart`
-
-**类定义**：
-
-```dart
-/// 觉知模块空状态 — 4 种类型，温暖关怀语气。
-enum AwarenessEmptyType {
-  todayLight,    // 今天还没记录一点光
-  weeklyReview,  // 本周还没写周回顾
-  history,       // 还没有历史记录
-  worries,       // 没有活跃的烦恼
-}
-
-class AwarenessEmptyState extends StatelessWidget {
-  /// 空状态类型。
-  final AwarenessEmptyType type;
-
-  /// 行动按钮回调（null = 不显示按钮）。
-  final VoidCallback? onAction;
-
-  const AwarenessEmptyState({
-    super.key,
-    required this.type,
-    this.onAction,
-  });
-}
-```
-
-**4 种空状态配置**：
-
-| type | 图标 | 标题（L10n key） | 副标题（L10n key） | 按钮文案（L10n key） |
-|------|------|----------------|-------------------|---------------------|
-| `todayLight` | `Icons.wb_sunny_outlined` | `awarenessEmptyLightTitle` | `awarenessEmptyLightSubtitle` | `awarenessEmptyLightAction` |
-| `weeklyReview` | `Icons.auto_stories_outlined` | `awarenessEmptyReviewTitle` | `awarenessEmptyReviewSubtitle` | `awarenessEmptyReviewAction` |
-| `history` | `Icons.history_outlined` | `awarenessEmptyHistoryTitle` | `awarenessEmptyHistorySubtitle` | — |
-| `worries` | `Icons.sentiment_satisfied_outlined` | `awarenessEmptyWorriesTitle` | `awarenessEmptyWorriesSubtitle` | — |
-
-**视觉布局**：
-
-复用现有 `EmptyState` widget 的布局模式（`Center` + `Column` + icon + title + subtitle + optional button），但文案使用温暖关怀语气。
-
-```dart
-@override
-Widget build(BuildContext context) {
-  final config = _configFor(type, context);
-  return EmptyState(
-    icon: config.icon,
-    title: config.title,
-    subtitle: config.subtitle,
-    actionLabel: config.actionLabel,
-    onAction: onAction,
-  );
-}
-```
-
-**主题兼容**：完全继承 `EmptyState` 的主题适配，无需额外处理。
-
----
-
-## 3. Screen 规格
-
-### 3.1 AwarenessScreen
-
-**文件路径**：`lib/screens/awareness/awareness_screen.dart`
-
-**路由**：无独立命名路由 — 作为 `HomeScreen` 的 Tab 0 嵌入 `IndexedStack`。
-
-> **注意**：Tab 重组在轨道三执行。轨道二仅构建 `AwarenessScreen` 本身，不修改 `HomeScreen`。开发期间可临时替换 `TodayTab` 进行测试。
-
-**类定义**：
-
-```dart
-/// 觉知主屏幕 — 三个子 Tab：今天 / 本周 / 回顾。
-class AwarenessScreen extends ConsumerStatefulWidget {
-  const AwarenessScreen({super.key});
-
-  @override
-  ConsumerState<AwarenessScreen> createState() => _AwarenessScreenState();
-}
-```
-
-**状态管理**：
-
-`_AwarenessScreenState` 持有 `TabController`（length: 3），混入 `TickerProviderStateMixin`。
-
-**视觉布局**：
+### 4.2 视觉布局
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -657,1008 +276,724 @@ class AwarenessScreen extends ConsumerStatefulWidget {
 │  │ CustomScrollView                        ││
 │  │                                         ││
 │  │ SliverAppBar(floating: true)            ││
-│  │   title: l10n.awarenessTitle            ││
-│  │   bottom: TabBar                        ││
-│  │     [今天] [本周] [回顾]                ││
+│  │   title: "✦ 今天"                       ││
+│  │   subtitle: "3 月 19 日，星期三"         ││
 │  │                                         ││
-│  │ SliverFillRemaining                     ││
-│  │   TabBarView                            ││
-│  │     [TodaySubTab]                       ││
-│  │     [ThisWeekSubTab]                    ││
-│  │     [ReviewSubTab]                      ││
+│  │ ── 1. QuickLightCard ──                 ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ 已记录状态：                         │ ││
+│  │ │   [😌] "阳光很好" · 14:30           │ ││
+│  │ │   [编辑] 按钮                        │ ││
+│  │ │                                     │ ││
+│  │ │ 未记录状态：                         │ ││
+│  │ │   MoodSelector(compact) 5 emoji     │ ││
+│  │ │   TextField(一句话，inline)           │ ││
+│  │ │   [记录 ✦] 按钮                      │ ││
+│  │ └─────────────────────────────────────┘ ││
+│  │                                         ││
+│  │ ── 2. HabitSnapshot ──                  ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ "今日习惯" section header            │ ││
+│  │ │                                     │ ││
+│  │ │ habitsProvider.when(...)             │ ││
+│  │ │   有习惯: 简化列表 + 勾选状态         │ ││
+│  │ │   无习惯: SizedBox.shrink()          │ ││
+│  │ └─────────────────────────────────────┘ ││
+│  │                                         ││
+│  │ ── 3. InspirationCard ──                ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ Card(surfaceVariant)                 │ ││
+│  │ │   ✦ 灵感轮换文案                     │ ││
+│  │ │   "在厌倦之前就收笔"                  │ ││
+│  │ │   — 张晓萌                           │ ││
+│  │ └─────────────────────────────────────┘ ││
+│  │                                         ││
+│  │ SizedBox(height: 100) // NavBar space   ││
+│  └─────────────────────────────────────────┘│
+└─────────────────────────────────────────────┘
+```
+
+### 4.3 QuickLightCard 规格
+
+**文件路径**：`lib/widgets/today/quick_light_card.dart`
+
+```dart
+/// 快速一点光卡片 — inline 心情 + 一句话，10 秒完成。
+///
+/// 两种状态：
+/// - 未记录：显示 MoodSelector(compact) + TextField + 保存按钮
+/// - 已记录：显示心情 emoji + 文字预览 + 编辑按钮
+class QuickLightCard extends ConsumerStatefulWidget {
+  const QuickLightCard({super.key});
+}
+```
+
+**未记录状态布局**：
+
+```
+┌─────────────────────────────────────────┐
+│  Card                                   │
+│                                         │
+│  "今天有什么让你微笑的事？"              │
+│   bodyLarge, onSurfaceVariant           │
+│                                         │
+│  [😄] [🙂] [😌] [😔] [😢]             │
+│  MoodSelector(compact: true)            │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ TextField                       │    │
+│  │ hintText: "写一句话..."          │    │
+│  │ maxLines: 2                     │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  Align(right):                          │
+│    FilledButton.tonal("记录 ✦")          │
+│    disabled if mood == null              │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**已记录状态布局**：
+
+```
+┌─────────────────────────────────────────┐
+│  Card                                   │
+│                                         │
+│  Row:                                   │
+│    [😌 emoji] + "阳光很好" (bodyMedium)  │
+│    Spacer                               │
+│    Text("14:30") + IconButton(编辑)      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**交互**：
+
+1. 未记录 → 选心情 → 写一句话（可选）→ 点击「记录 ✦」→ 保存 → 卡片变为已记录状态
+2. 已记录 → 点击编辑 → 跳转 `DailyLightScreen`（完整编辑模式）
+3. 保存失败 → `SnackBar` 显示错误信息
+
+### 4.4 HabitSnapshot 规格
+
+**文件路径**：`lib/widgets/today/habit_snapshot.dart`
+
+```dart
+/// 今日习惯快照 — 显示来自月度计划的习惯勾选状态。
+///
+/// 如果用户没有任何习惯，此 Widget 返回 SizedBox.shrink()。
+class HabitSnapshot extends ConsumerWidget {
+  const HabitSnapshot({super.key});
+}
+```
+
+- 复用 `habitsProvider`，以简化列表展示
+- 每个条目：`ListTile`（leading: 勾选图标，title: 习惯名，subtitle: 今日分钟数）
+- 点击条目：导航到 `AppRouter.focusSetup`
+- 无习惯时：不显示（`SizedBox.shrink()`），不显示"去领养猫"之类的引导
+
+### 4.5 InspirationCard 规格
+
+**文件路径**：`lib/widgets/today/inspiration_card.dart`
+
+```dart
+/// 灵感提示卡 — 来自张晓萌语录的每日轮换激励。
+class InspirationCard extends StatelessWidget {
+  const InspirationCard({super.key});
+}
+```
+
+- 内容来源：`lib/core/constants/inspiration_constants.dart`（静态常量列表）
+- 轮换逻辑：`dayOfYear % inspirations.length`
+- 布局：`Card(color: surfaceContainerLow)` + `Text`（引用文案）+ `Text`（来源）
+- 文案风格："在厌倦之前就收笔" — 张晓萌
+
+---
+
+## 5. JourneyScreen（Tab 1）
+
+### 5.1 概述
+
+**文件路径**：`lib/screens/journey/journey_screen.dart`
+
+JourneyScreen 是 LUMI 的 **时间维度旅程**，通过 `SegmentedButton` 在不同时间粒度间切换。
+
+### 5.2 SegmentedButton 切换
+
+```dart
+enum JourneySegment { week, month, year, explore }
+```
+
+| Segment | label | 解锁条件（FeatureGateProvider）|
+|---------|-------|------------------------------|
+| 本周 | `journeySegmentWeek` | Day 1（记录 1 天）|
+| 本月 | `journeySegmentMonth` | Day 3（记录 3 天）|
+| 年度 | `journeySegmentYear` | Day 14（记录 14 天）|
+| 探索 | `journeySegmentExplore` | Day 30（记录 30 天）|
+
+**未解锁 Segment 的呈现**：
+
+不使用灰色锁图标。使用温暖的占位卡片：
+
+```
+┌─────────────────────────────────────────┐
+│  Center                                 │
+│                                         │
+│  ✦                                      │
+│  "再记录 X 天，就可以开始年度规划了"      │
+│  "不急，慢慢来"                          │
+│                                         │
+│  bodyMedium, onSurfaceVariant           │
+└─────────────────────────────────────────┘
+```
+
+### 5.3 视觉布局
+
+```
+┌─────────────────────────────────────────────┐
+│  ContentWidthConstraint                     │
+│  ┌─────────────────────────────────────────┐│
+│  │ NestedScrollView                        ││
+│  │                                         ││
+│  │ SliverAppBar(floating: true)            ││
+│  │   title: "旅程"                         ││
+│  │   bottom: SegmentedButton               ││
+│  │     [本周] [本月] [年度] [探索]          ││
+│  │                                         ││
+│  │ body: AnimatedSwitcher                  ││
+│  │   [_WeekView]                           ││
+│  │   [_MonthView]    (占位)                ││
+│  │   [_YearView]     (占位)                ││
+│  │   [_ExploreView]  (占位)                ││
 │  │                                         ││
 │  └─────────────────────────────────────────┘│
 └─────────────────────────────────────────────┘
 ```
 
-> **实现注意**：`SliverAppBar` + `TabBarView` 嵌套 `CustomScrollView` 在 Flutter 中需要用 `NestedScrollView` 而非 `CustomScrollView` + `SliverFillRemaining`。推荐结构：
-
-```dart
-NestedScrollView(
-  headerSliverBuilder: (context, innerBoxIsScrolled) => [
-    SliverAppBar(
-      floating: true,
-      snap: true,
-      title: Text(context.l10n.awarenessTitle),
-      bottom: TabBar(
-        controller: _tabController,
-        tabs: [
-          Tab(text: context.l10n.awarenessTabToday),
-          Tab(text: context.l10n.awarenessTabThisWeek),
-          Tab(text: context.l10n.awarenessTabReview),
-        ],
-      ),
-    ),
-  ],
-  body: TabBarView(
-    controller: _tabController,
-    children: const [
-      _TodaySubTab(),
-      _ThisWeekSubTab(),
-      _ReviewSubTab(),
-    ],
-  ),
-)
-```
-
-#### 3.1.1 今天子 Tab（`_TodaySubTab`）
-
-**类型**：私有 `ConsumerWidget`，定义在 `awareness_screen.dart` 内部。
-
-**内容（自上而下）**：
-
-```
-┌─────────────────────────────────────────────┐
-│  ListView / SingleChildScrollView           │
-│                                             │
-│  1. 一点光状态卡                             │
-│     ┌─────────────────────────────────────┐ │
-│     │ 已记录：                             │ │
-│     │   [😌] + "今天阳光很好" + [编辑]     │ │
-│     │ 未记录：                             │ │
-│     │   AwarenessEmptyState(todayLight)    │ │
-│     │   onAction: → DailyLightScreen       │ │
-│     └─────────────────────────────────────┘ │
-│                                             │
-│  2. 月度挑战卡（Track 3 提供 placeholder）   │
-│     ┌─────────────────────────────────────┐ │
-│     │ 占位: SizedBox.shrink()              │ │
-│     │ (轨道三 MonthlyRitualCard 接入)      │ │
-│     └─────────────────────────────────────┘ │
-│                                             │
-│  3. 习惯快速勾选                             │
-│     ┌─────────────────────────────────────┐ │
-│     │ Section header: "今日习惯"            │ │
-│     │ habitsProvider.when(...)              │ │
-│     │   loading: SkeletonCard              │ │
-│     │   data: habit list with checkboxes   │ │
-│     │   empty: "还没有习惯，去领养一只猫吧"  │ │
-│     └─────────────────────────────────────┘ │
-│                                             │
-│  Bottom padding: 100 (FAB + NavBar)         │
-└─────────────────────────────────────────────┘
-```
-
-**一点光状态卡实现细节**：
-
-```dart
-final todayLight = ref.watch(todayLightProvider);
-
-// todayLight 为 AsyncValue<DailyLight?>
-todayLight.when(
-  loading: () => const SkeletonCard(),
-  error: (_, _) => const SizedBox.shrink(),
-  data: (light) {
-    if (light == null) {
-      return AwarenessEmptyState(
-        type: AwarenessEmptyType.todayLight,
-        onAction: () => Navigator.of(context).pushNamed(AppRouter.dailyLight),
-      );
-    }
-    return _LightStatusCard(light: light); // 显示已记录状态
-  },
-);
-```
-
-`_LightStatusCard`：`Card` 内包含 `Row`（心情 emoji + 文字预览 1 行）+ 右侧 `IconButton`（`Icons.edit_outlined`），点击跳转 `DailyLightScreen` 编辑模式。
-
-**习惯快速勾选**：
-
-复用 `habitsProvider`，以简化列表形式展示今日习惯。每个条目为 `ListTile`：
-- leading: `Checkbox`（今日是否已完成 30 分钟+）
-- title: 习惯名称
-- subtitle: 今日已完成分钟数
-- onTap: 导航到 `AppRouter.focusSetup`
-
-> **注意**：快速勾选是只读状态展示 + 快捷入口，不是真正的 checkbox 打卡操作。用户需通过专注计时来「完成」习惯。
-
-#### 3.1.2 本周子 Tab（`_ThisWeekSubTab`）
-
-**内容（自上而下）**：
+### 5.4 周视图（`_WeekView`）— 本轨道完整实现
 
 ```
 ┌─────────────────────────────────────────────┐
 │  ListView                                   │
 │                                             │
-│  1. 周回顾状态卡                             │
-│     ┌─────────────────────────────────────┐ │
-│     │ 已完成：                             │ │
-│     │   周回顾摘要（时刻数 + 感恩主题）     │ │
-│     │   [查看详情] → WeeklyReviewScreen    │ │
-│     │ 未完成：                             │ │
-│     │   AwarenessEmptyState(weeklyReview)  │ │
-│     │   onAction: → WeeklyReviewScreen     │ │
-│     └─────────────────────────────────────┘ │
+│  ── 1. WeeklyPlanCard ──                    │
+│  ┌─────────────────────────────────────────┐│
+│  │ "本周计划" section header               ││
+│  │                                         ││
+│  │ 已填写: 一句话预览 + 四象限概要           ││
+│  │ 未填写: "给这周的自己说句话？"            ││
+│  │         [开始规划] 按钮                   ││
+│  │                                         ││
+│  │ onTap → WeeklyPlanScreen               ││
+│  └─────────────────────────────────────────┘│
 │                                             │
-│  2. 烦恼处理器                               │
-│     ┌─────────────────────────────────────┐ │
-│     │ Section header: "烦恼处理器"          │ │
-│     │                                     │ │
-│     │ activeWorriesProvider.when(...)      │ │
-│     │   data:                             │ │
-│     │     empty → AwarenessEmptyState     │ │
-│     │     non-empty → WorryItemCard list  │ │
-│     │                                     │ │
-│     │ TextButton: "管理全部烦恼"            │ │
-│     │   → WorryProcessorScreen            │ │
-│     └─────────────────────────────────────┘ │
+│  ── 2. WeekMoodDots ──                     │
+│  ┌─────────────────────────────────────────┐│
+│  │ Row: 7 天心情圆点（Mon-Sun）             ││
+│  │ 已记录: 对应心情颜色圆点                  ││
+│  │ 未记录: 灰色空心圆点                      ││
+│  └─────────────────────────────────────────┘│
 │                                             │
-│  3. "添加烦恼" OutlinedButton               │
-│     → WorryEditScreen(worryId: null)        │
+│  ── 3. WeeklyReviewCard ──                 │
+│  ┌─────────────────────────────────────────┐│
+│  │ "周回顾" section header                 ││
+│  │                                         ││
+│  │ 已完成: 幸福时刻数 + 感恩主题摘要         ││
+│  │ 未完成: "回忆本周的幸福时刻"              ││
+│  │         [开始回顾] 按钮                   ││
+│  │                                         ││
+│  │ onTap → WeeklyReviewScreen             ││
+│  └─────────────────────────────────────────┘│
 │                                             │
-│  Bottom padding: 100                        │
+│  ── 4. WorryJarCard ──                     │
+│  ┌─────────────────────────────────────────┐│
+│  │ "烦恼处理器" section header             ││
+│  │                                         ││
+│  │ activeWorriesProvider.when(...)          ││
+│  │   empty: "没有烦恼，真好！"              ││
+│  │   data: WorryItemCard list (max 3)      ││
+│  │         + "查看全部" TextButton           ││
+│  │                                         ││
+│  │ OutlinedButton("+ 写下烦恼")             ││
+│  │   → WorryEditScreen(worryId: null)      ││
+│  └─────────────────────────────────────────┘│
+│                                             │
+│  SizedBox(height: 100)                      │
 └─────────────────────────────────────────────┘
 ```
 
-**状态依赖**：
-- `currentWeekReviewProvider`：`AsyncValue<WeeklyReview?>`
-- `activeWorriesProvider`：`AsyncValue<List<Worry>>`
+### 5.5 月/年/探索视图（占位实现）
 
-#### 3.1.3 回顾子 Tab（`_ReviewSubTab`）
-
-**轨道二占位实现**：
+本轨道仅实现占位，轨道四填充完整内容：
 
 ```dart
-class _ReviewSubTab extends StatelessWidget {
-  const _ReviewSubTab();
-
+class _MonthView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final gate = ref.watch(featureGateProvider);
+    if (!gate.monthUnlocked) {
+      return _LockedPlaceholder(
+        daysNeeded: gate.daysUntilMonth,
+        message: context.l10n.journeyLockedMonth,
+      );
+    }
     return Center(
-      child: Text(
-        context.l10n.awarenessReviewComingSoon,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
+      child: Text(context.l10n.journeyComingSoon),
     );
   }
 }
 ```
 
-轨道四（plan_05）替换为完整的历史视图。
-
 ---
 
-### 3.2 DailyLightScreen
+## 6. ProfileScreen 重组
 
-**文件路径**：`lib/screens/awareness/daily_light_screen.dart`
+### 6.1 概述
 
-**路由**：`AppRouter.dailyLight = '/daily-light'`
+**文件路径**：`lib/screens/profile/profile_screen.dart`（原地重构）
 
-**Arguments**：`Map<String, dynamic>` — `{ 'quickMode': bool }`（默认 `false`）
+ProfileScreen 从"用户统计 + 成就"变为"LUMI 统计 + 猫咪伴侣入口 + 设置"。
 
-**类定义**：
-
-```dart
-/// 每日一点光记录页 — 支持完整模式和快速模式。
-class DailyLightScreen extends ConsumerStatefulWidget {
-  /// 快速模式：仅心情 + 一句话，无标签。
-  final bool quickMode;
-
-  const DailyLightScreen({
-    super.key,
-    this.quickMode = false,
-  });
-
-  @override
-  ConsumerState<DailyLightScreen> createState() => _DailyLightScreenState();
-}
-```
-
-**状态管理**：
-
-```dart
-class _DailyLightScreenState extends ConsumerState<DailyLightScreen> {
-  Mood? _selectedMood;
-  String _text = '';
-  List<String> _selectedTags = [];
-  bool _isSaving = false;
-
-  // 编辑模式：加载已有记录
-  @override
-  void initState() {
-    super.initState();
-    // 如果今天已有记录，填充表单
-    // 使用 ref.read(todayLightProvider) 获取
-  }
-}
-```
-
-#### 3.2.1 完整模式布局
+### 6.2 新布局
 
 ```
 ┌─────────────────────────────────────────────┐
 │  AppScaffold                                │
-│  appBar: AppBar(title: "今日一点光")          │
-│                                             │
-│  SingleChildScrollView                      │
-│  padding: AppSpacing.paddingScreenBody       │
-│  ┌─────────────────────────────────────────┐│
-│  │                                         ││
-│  │ Text: "你今天心情如何？"                  ││
-│  │   titleMedium                           ││
-│  │                                         ││
-│  │ SizedBox(height: lg)                    ││
-│  │                                         ││
-│  │ MoodSelector(                           ││
-│  │   selectedMood: _selectedMood,          ││
-│  │   onMoodSelected: (m) => setState(...), ││
-│  │   compact: false,                       ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: xl)                    ││
-│  │                                         ││
-│  │ LightInputCard(                         ││
-│  │   initialText: _text,                   ││
-│  │   onTextChanged: (t) => _text = t,      ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: lg)                    ││
-│  │                                         ││
-│  │ Text: "标签（可选）"                      ││
-│  │   labelLarge                            ││
-│  │                                         ││
-│  │ SizedBox(height: sm)                    ││
-│  │                                         ││
-│  │ TagSelector(                            ││
-│  │   presetTags: AwarenessConstants.tags,  ││
-│  │   selectedTags: _selectedTags,          ││
-│  │   onTagsChanged: (t) => setState(...), ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: 100) // FAB space      ││
-│  └─────────────────────────────────────────┘│
-│                                             │
-│  FAB: FloatingActionButton.extended(        │
-│    label: "保存",                            │
-│    icon: Icons.check,                       │
-│    onPressed: _selectedMood != null         │
-│               ? _save : null,               │
-│  )                                          │
-└─────────────────────────────────────────────┘
-```
-
-#### 3.2.2 快速模式布局
-
-快速模式设计为 `BottomSheet`（从 FocusCompleteScreen 调出），不使用独立页面路由：
-
-```
-┌─────────────────────────────────────────────┐
-│  BottomSheet                                │
-│  padding: AppSpacing.paddingDialog           │
-│  ┌─────────────────────────────────────────┐│
-│  │                                         ││
-│  │ Text: "今天有什么让你微笑的事？"          ││
-│  │   titleSmall                            ││
-│  │                                         ││
-│  │ SizedBox(height: base)                  ││
-│  │                                         ││
-│  │ MoodSelector(                           ││
-│  │   selectedMood: _selectedMood,          ││
-│  │   onMoodSelected: ...,                  ││
-│  │   compact: true,                        ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: base)                  ││
-│  │                                         ││
-│  │ TextField(                              ││
-│  │   maxLines: 2,                          ││
-│  │   hintText: l10n.awarenessLightPlaceholder ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: base)                  ││
-│  │                                         ││
-│  │ Row(mainAxisAlignment: end)             ││
-│  │   TextButton("跳过") + FilledButton("记录")││
-│  │                                         ││
-│  └─────────────────────────────────────────┘│
-└─────────────────────────────────────────────┘
-```
-
-> **设计变更**：快速模式使用 `showModalBottomSheet` 而非页面路由，保持用户停留在 FocusCompleteScreen 上下文中。仅包含 MoodSelector（compact）+ 简短 TextField + 保存/跳过按钮。**无标签选择**。
-
-#### 3.2.3 保存流程
-
-```
-用户点击「保存」
-    ↓
-setState(() => _isSaving = true)
-    ↓
-await ref.read(awarenessRepositoryProvider).saveDailyLight(
-  DailyLight(
-    date: DateTime.now(),
-    mood: _selectedMood!,
-    lightText: _text.isEmpty ? null : _text,
-    tags: _selectedTags,
-  ),
-)
-    ↓
-setState(() => _isSaving = false)
-    ↓
-显示 CatBedtimeAnimation（showDialog）
-    ↓
-动画完成 / 用户点击关闭
-    ↓
-完整模式: Navigator.of(context).pop()
-快速模式: Navigator.of(context).pop() (关闭 BottomSheet)
-    ↓
-Analytics: ref.read(analyticsServiceProvider).logEvent('light_recorded')
-```
-
-**保存按钮状态**：
-- `_selectedMood == null` → 按钮 disabled（灰色，不可点击）
-- `_isSaving == true` → 按钮显示 `CircularProgressIndicator`
-- 其他 → 正常可点击
-
-**CatBedtimeAnimation 弹出方式**：
-
-```dart
-showDialog(
-  context: context,
-  barrierDismissible: true,
-  builder: (_) => Dialog(
-    backgroundColor: Colors.transparent,
-    child: CatBedtimeAnimation(mood: _selectedMood!),
-  ),
-);
-
-// 3 秒后自动关闭
-Future.delayed(const Duration(seconds: 3), () {
-  if (mounted && Navigator.of(context).canPop()) {
-    Navigator.of(context).pop(); // 关闭 dialog
-  }
-});
-```
-
----
-
-### 3.3 WeeklyReviewScreen
-
-**文件路径**：`lib/screens/awareness/weekly_review_screen.dart`
-
-**路由**：`AppRouter.weeklyReview = '/weekly-review'`
-
-**类定义**：
-
-```dart
-/// 周回顾页面 — 填写三个幸福时刻、感恩、学习、更新烦恼。
-class WeeklyReviewScreen extends ConsumerStatefulWidget {
-  const WeeklyReviewScreen({super.key});
-
-  @override
-  ConsumerState<WeeklyReviewScreen> createState() =>
-      _WeeklyReviewScreenState();
-}
-```
-
-**状态管理**：
-
-```dart
-class _WeeklyReviewScreenState extends ConsumerState<WeeklyReviewScreen> {
-  // 三个幸福时刻
-  String? _moment1Text;
-  List<String> _moment1Tags = [];
-  String? _moment2Text;
-  List<String> _moment2Tags = [];
-  String? _moment3Text;
-  List<String> _moment3Tags = [];
-
-  // 感恩 + 学习
-  String _gratitude = '';
-  String _learned = '';
-
-  bool _isSaving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // 加载已有的本周回顾（编辑模式）
-    _loadExistingReview();
-  }
-}
-```
-
-**视觉布局**：
-
-```
-┌─────────────────────────────────────────────┐
-│  AppScaffold                                │
-│  appBar: AppBar(title: "周回顾")              │
-│                                             │
-│  SingleChildScrollView                      │
-│  padding: AppSpacing.paddingScreenBody       │
-│  ┌─────────────────────────────────────────┐│
-│  │                                         ││
-│  │ ── Section 1: 三个幸福时刻 ──            ││
-│  │                                         ││
-│  │ Text: "回忆本周的三个幸福时刻"            ││
-│  │   titleMedium                           ││
-│  │ Text: "大事小事都算数"                    ││
-│  │   bodySmall, onSurfaceVariant           ││
-│  │                                         ││
-│  │ HappyMomentCard(momentNumber: 1, ...)   ││
-│  │ SizedBox(height: md)                    ││
-│  │ HappyMomentCard(momentNumber: 2, ...)   ││
-│  │ SizedBox(height: md)                    ││
-│  │ HappyMomentCard(momentNumber: 3, ...)   ││
-│  │                                         ││
-│  │ ── Divider ──                           ││
-│  │                                         ││
-│  │ ── Section 2: 感恩 ──                    ││
-│  │                                         ││
-│  │ Text: "这周我想感谢..."                   ││
-│  │   titleSmall                            ││
-│  │ TextField(                              ││
-│  │   hintText: "一个人、一件事、或自己"      ││
-│  │   minLines: 2, maxLines: 4              ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ ── Divider ──                           ││
-│  │                                         ││
-│  │ ── Section 3: 学到了什么 ──              ││
-│  │                                         ││
-│  │ Text: "这周我学到了..."                   ││
-│  │   titleSmall                            ││
-│  │ TextField(                              ││
-│  │   hintText: "一个技能、一个道理、一个视角"  ││
-│  │   minLines: 2, maxLines: 4              ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ ── Divider ──                           ││
-│  │                                         ││
-│  │ ── Section 4: 烦恼更新 ──               ││
-│  │                                         ││
-│  │ Text: "更新你的烦恼"                      ││
-│  │   titleSmall                            ││
-│  │ Text: "上周的烦恼，现在怎么样了？"         ││
-│  │   bodySmall, onSurfaceVariant           ││
-│  │                                         ││
-│  │ activeWorriesProvider.when(...)          ││
-│  │   data:                                 ││
-│  │     empty → "没有进行中的烦恼，太好了！"   ││
-│  │     non-empty → WorryItemCard list      ││
-│  │                                         ││
-│  │ OutlinedButton("+ 新增烦恼")              ││
-│  │   onPressed → _addWorryInline()         ││
-│  │                                         ││
-│  │ ── Divider ──                           ││
-│  │                                         ││
-│  │ SizedBox(height: xl)                    ││
-│  │                                         ││
-│  │ FilledButton.icon(                      ││
-│  │   icon: Icons.check,                   ││
-│  │   label: "保存周回顾",                   ││
-│  │   onPressed: _save,                     ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: 100) // safe area      ││
-│  └─────────────────────────────────────────┘│
-└─────────────────────────────────────────────┘
-```
-
-**新增烦恼内联行为**：
-
-点击「+ 新增烦恼」按钮：
-1. 在按钮上方插入一个简化的内联表单（`TextField` for description + `TextField` for solution）
-2. 用户填写后点击 「添加」→ 调用 `worryRepositoryProvider.create(uid, description)`
-3. 内联表单消失，新烦恼出现在 `WorryItemCard` 列表中
-4. 或者：导航到 `WorryEditScreen(worryId: null)` 再返回
-
-> **实现建议**：为简化轨道二，使用导航到 `WorryEditScreen` 方案。内联表单可在后续迭代中优化。
-
-**保存流程**：
-
-```
-用户点击「保存周回顾」
-    ↓
-setState(() => _isSaving = true)
-    ↓
-await ref.read(awarenessRepositoryProvider).saveWeeklyReview(
-  WeeklyReview(
-    weekStart: _currentWeekStart(), // ISO 周一
-    moment1: _moment1Text,
-    moment1Tags: _moment1Tags,
-    moment2: _moment2Text,
-    moment2Tags: _moment2Tags,
-    moment3: _moment3Text,
-    moment3Tags: _moment3Tags,
-    gratitude: _gratitude.isEmpty ? null : _gratitude,
-    learning: _learned.isEmpty ? null : _learned,
-  ),
-)
-    ↓
-setState(() => _isSaving = false)
-    ↓
-Analytics: logEvent('weekly_review_completed')
-    ↓
-显示猫咪模板周总结卡（SnackBar 或 Dialog）
-    ↓
-Navigator.of(context).pop()
-```
-
-**猫咪模板周总结**：
-
-保存成功后显示一个 `Dialog`（非 `SnackBar`，因为内容较多）：
-
-```
-┌─────────────────────────────────────┐
-│  Dialog                             │
-│  ┌─────────────────────────────────┐│
-│  │ PixelCatSprite (size: 80)       ││
-│  │                                 ││
-│  │ Text: 模板周总结文案             ││
-│  │   bodyMedium, textAlign: center ││
-│  │                                 ││
-│  │ FilledButton.tonal("好的！")     ││
-│  └─────────────────────────────────┘│
-└─────────────────────────────────────┘
-```
-
-模板周总结从 `cat_response_templates.dart` 获取，使用占位符替换：
-- `{momentCount}`: 填写了几个幸福时刻（1-3）
-- `{topTag}`: 最常出现的标签（如果有）
-
-种子模板示例：「铲屎官这周记录了 {momentCount} 个幸福时刻呢，本猫都看到了 ✨」
-
----
-
-### 3.4 WorryProcessorScreen
-
-**文件路径**：`lib/screens/awareness/worry_processor_screen.dart`
-
-**路由**：`AppRouter.worryProcessor = '/worry-processor'`
-
-**类定义**：
-
-```dart
-/// 烦恼处理器 — 管理所有烦恼的列表页。
-class WorryProcessorScreen extends ConsumerWidget {
-  const WorryProcessorScreen({super.key});
-}
-```
-
-**视觉布局**：
-
-```
-┌─────────────────────────────────────────────┐
-│  AppScaffold                                │
-│  appBar: AppBar(title: "烦恼处理器")          │
-│                                             │
 │  CustomScrollView                           │
 │  ┌─────────────────────────────────────────┐│
-│  │ SliverAppBar(pinned: false)             ││
+│  │ SliverAppBar                            ││
+│  │   用户头像 + 名字 + 开始日期             ││
 │  │                                         ││
-│  │ ── 活跃烦恼 ──                          ││
+│  │ ── 1. LumiStatsCard ──                  ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ Row:                                │ ││
+│  │ │   ✦ 星星总数    📅 记录天数           │ ││
+│  │ │   🔥 当前连续   💪 最长连续           │ ││
+│  │ └─────────────────────────────────────┘ ││
 │  │                                         ││
-│  │ activeWorriesProvider.when(...)          ││
-│  │   loading: SkeletonCard x 2             ││
-│  │   empty: AwarenessEmptyState(worries)   ││
-│  │   data:                                 ││
-│  │     SliverList of WorryItemCard         ││
+│  │ ── 2. CatCompanionCard ──              ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ Card:                               │ ││
+│  │ │   PixelCatSprite + "你的猫咪伙伴"    │ ││
+│  │ │   subtitle: 猫咪数量                 │ ││
+│  │ │   onTap → CatRoomScreen             │ ││
+│  │ │                                     │ ││
+│  │ │ 无猫咪时:                            │ ││
+│  │ │   "领养一只猫咪伙伴？"               │ ││
+│  │ │   onTap → AdoptionFlowScreen        │ ││
+│  │ └─────────────────────────────────────┘ ││
 │  │                                         ││
-│  │ ── 已解决的烦恼（折叠） ──               ││
+│  │ ── 3. 设置区域 ──                       ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ ListTile: 提醒时间                   │ ││
+│  │ │ ListTile: 语言                      │ ││
+│  │ │ ListTile: 主题                      │ ││
+│  │ │ ListTile: UI 风格                   │ ││
+│  │ │ ListTile: 数据导出                   │ ││
+│  │ │ ListTile: 关于 LUMI                 │ ││
+│  │ └─────────────────────────────────────┘ ││
 │  │                                         ││
-│  │ ExpansionTile("已解决/消失")             ││
-│  │   resolvedWorriesProvider.when(...)      ││
-│  │     data: WorryItemCard list (readonly)  ││
-│  │                                         ││
-│  │ SizedBox(height: 100)                   ││
+│  │ ── 4. 账号区域 ──                       ││
+│  │ ┌─────────────────────────────────────┐ ││
+│  │ │ 登出 / 删除账号                      │ ││
+│  │ └─────────────────────────────────────┘ ││
 │  └─────────────────────────────────────────┘│
-│                                             │
-│  FAB: FloatingActionButton(                 │
-│    child: Icon(Icons.add),                  │
-│    tooltip: "添加烦恼",                      │
-│    onPressed: → WorryEditScreen(null),       │
-│  )                                          │
 └─────────────────────────────────────────────┘
 ```
 
-**状态依赖**：
-- `activeWorriesProvider`：`AsyncValue<List<Worry>>` — 状态为 `ongoing` 的烦恼
-- `resolvedWorriesProvider`：`AsyncValue<List<Worry>>` — 状态为 `resolved` 或 `disappeared` 的烦恼
+### 6.3 关键变更
 
-> **Provider 补充**：`resolvedWorriesProvider` 已在轨道一（plan_02）中定义。参考定义方式：
+| 项目 | 旧 | 新 |
+|------|----|----|
+| 顶部统计 | 专注总时长 + 猫咪数 | LUMI 星星 + 记录天数 + 连续天数 |
+| 猫咪入口 | 无（猫咪是一级 Tab）| `CatCompanionCard`（二级入口）|
+| 成就入口 | 无（成就是独立 Tab 或子页面）| 暂时移除（轨道三恢复）|
+| 习惯入口 | 无（习惯是一级 Tab）| 无（习惯在月度规划中）|
+
+---
+
+## 7. 渐进解锁（FeatureGateProvider）
+
+### 7.1 概述
+
+**文件路径**：`lib/providers/feature_gate_provider.dart`
+
+渐进解锁的核心原则："不用写满、不用做对、不用从头到尾完成。从你想开始的地方开始。"
+
+### 7.2 解锁时间表
+
+| 阶段 | 条件 | 解锁内容 | UI 体现 |
+|------|------|---------|---------|
+| Day 0 | 完成 Onboarding | TodayScreen（每日一点光）| 默认可用 |
+| Day 1 | 记录 1 天 | JourneyScreen · 本周视图 | 本周 Segment 可点击 |
+| Day 3 | 记录 3 天 | JourneyScreen · 本月视图 | 本月 Segment 可点击 |
+| Day 14 | 记录 14 天 | JourneyScreen · 年度视图 | 年度 Segment 可点击 |
+| Day 30 | 记录 30 天 | JourneyScreen · 探索（月度活动）| 探索 Segment 可点击 |
+| Day 90 | 记录 90 天 | ProfileScreen · 成长回望 | 新卡片出现 |
+
+### 7.3 Provider 定义
 
 ```dart
-final resolvedWorriesProvider = StreamProvider<List<Worry>>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value([]);
-  return ref.watch(worryRepositoryProvider).watchResolved(uid);
+/// 记录天数 = 用户有多少天记录了 DailyLight。
+/// 不要求连续，Day 3 只需要累计 3 天有记录。
+final featureGateProvider = Provider<FeatureGate>((ref) {
+  final totalDays = ref.watch(totalLightDaysProvider).value ?? 0;
+  return FeatureGate(totalLightDays: totalDays);
 });
-```
 
-**烦恼状态变更行为**：
+class FeatureGate {
+  final int totalLightDays;
 
-在 `WorryItemCard` 中点击 `SegmentedButton` 切换状态 → 调用 `worryRepositoryProvider.updateStatus(worryId, newStatus)` → Provider 自动刷新列表，烦恼在活跃/已解决区间移动。
+  const FeatureGate({required this.totalLightDays});
 
----
+  bool get weekUnlocked => totalLightDays >= 1;
+  bool get monthUnlocked => totalLightDays >= 3;
+  bool get yearUnlocked => totalLightDays >= 14;
+  bool get exploreUnlocked => totalLightDays >= 30;
+  bool get growthReviewUnlocked => totalLightDays >= 90;
 
-### 3.5 WorryEditScreen
-
-**文件路径**：`lib/screens/awareness/worry_edit_screen.dart`
-
-**路由**：`AppRouter.worryEdit = '/worry-edit'`
-
-**Arguments**：`String?` — `worryId`（`null` = 新建，非空 = 编辑）
-
-**类定义**：
-
-```dart
-/// 烦恼编辑页 — 新建或编辑一条烦恼。
-class WorryEditScreen extends ConsumerStatefulWidget {
-  /// 烦恼 ID（null = 新建）。
-  final String? worryId;
-
-  const WorryEditScreen({
-    super.key,
-    this.worryId,
-  });
-
-  @override
-  ConsumerState<WorryEditScreen> createState() => _WorryEditScreenState();
+  int get daysUntilWeek => (1 - totalLightDays).clamp(0, 1);
+  int get daysUntilMonth => (3 - totalLightDays).clamp(0, 3);
+  int get daysUntilYear => (14 - totalLightDays).clamp(0, 14);
+  int get daysUntilExplore => (30 - totalLightDays).clamp(0, 30);
 }
 ```
 
-**状态管理**：
+### 7.4 未解锁呈现
+
+温暖提示卡片（不使用灰色锁图标）：
 
 ```dart
-class _WorryEditScreenState extends ConsumerState<WorryEditScreen> {
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _solutionController;
-  bool _isSaving = false;
+class LockedSegmentPlaceholder extends StatelessWidget {
+  final int daysRemaining;
+  final String featureName;
 
-  bool get _isEditMode => widget.worryId != null;
-
-  @override
-  void initState() {
-    super.initState();
-    _descriptionController = TextEditingController();
-    _solutionController = TextEditingController();
-    if (_isEditMode) {
-      _loadExistingWorry();
-    }
-  }
+  // 显示：✦ + "再记录 {daysRemaining} 天，就可以开始{featureName}了。不急，慢慢来"
 }
 ```
 
-**视觉布局**：
+---
 
-```
-┌─────────────────────────────────────────────┐
-│  AppScaffold                                │
-│  appBar: AppBar(                            │
-│    title: _isEditMode ? "编辑烦恼" : "新增烦恼"│
-│  )                                          │
-│                                             │
-│  Padding(AppSpacing.paddingScreenBody)       │
-│  ┌─────────────────────────────────────────┐│
-│  │                                         ││
-│  │ Text: "什么事让你烦恼？"                  ││
-│  │   titleSmall                            ││
-│  │                                         ││
-│  │ SizedBox(height: sm)                    ││
-│  │                                         ││
-│  │ TextField(                              ││
-│  │   controller: _descriptionController,   ││
-│  │   hintText: "写下来，把它从脑袋里搬出来"  ││
-│  │   minLines: 3, maxLines: 6              ││
-│  │   maxLength: 500                        ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: lg)                    ││
-│  │                                         ││
-│  │ Text: "你能做些什么？（可选）"             ││
-│  │   titleSmall                            ││
-│  │                                         ││
-│  │ SizedBox(height: sm)                    ││
-│  │                                         ││
-│  │ TextField(                              ││
-│  │   controller: _solutionController,      ││
-│  │   hintText: "哪怕是一小步也好"            ││
-│  │   minLines: 2, maxLines: 4              ││
-│  │   maxLength: 300                        ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ Spacer()                                ││
-│  │                                         ││
-│  │ FilledButton.icon(                      ││
-│  │   icon: Icons.check,                   ││
-│  │   label: _isEditMode ? "更新" : "添加",  ││
-│  │   onPressed: _description.isNotEmpty    ││
-│  │              ? _save : null,             ││
-│  │ )                                       ││
-│  │                                         ││
-│  │ SizedBox(height: base) // safe area     ││
-│  └─────────────────────────────────────────┘│
-└─────────────────────────────────────────────┘
-```
+## 8. Widget 规格
 
-**保存流程**：
+### 8.1 新增 Widget 清单
 
-```
-新建模式:
-  await ref.read(worryRepositoryProvider).create(uid, description)
+| 文件路径 | Widget | 用途 |
+|---------|--------|------|
+| `lib/widgets/today/quick_light_card.dart` | `QuickLightCard` | TodayScreen 内联一点光记录 |
+| `lib/widgets/today/habit_snapshot.dart` | `HabitSnapshot` | TodayScreen 今日习惯快照 |
+| `lib/widgets/today/inspiration_card.dart` | `InspirationCard` | TodayScreen 灵感轮换卡片 |
+| `lib/widgets/journey/weekly_plan_card.dart` | `WeeklyPlanCard` | JourneyScreen 周计划摘要卡 |
+| `lib/widgets/journey/weekly_review_card.dart` | `WeeklyReviewCard` | JourneyScreen 周回顾摘要卡 |
+| `lib/widgets/journey/worry_jar_card.dart` | `WorryJarCard` | JourneyScreen 烦恼处理器摘要卡 |
+| `lib/widgets/journey/week_mood_dots.dart` | `WeekMoodDots` | JourneyScreen 7 天心情圆点概览 |
+| `lib/widgets/journey/locked_segment_placeholder.dart` | `LockedSegmentPlaceholder` | 未解锁 Segment 温暖占位 |
+| `lib/widgets/profile/lumi_stats_card.dart` | `LumiStatsCard` | ProfileScreen LUMI 统计卡 |
+| `lib/widgets/profile/cat_companion_card.dart` | `CatCompanionCard` | ProfileScreen 猫咪伴侣入口 |
 
-编辑模式:
-  await ref.read(worryRepositoryProvider).update(uid, worry)
+### 8.2 复用现有 Widget
 
-→ Navigator.of(context).pop()
-→ Analytics: logEvent('worry_added' / 'worry_updated')
-```
-
-**表单验证**：`description` 为必填。保存按钮在 `description` 为空时 `disabled`。
+| Widget | 来源 | 在本轨道中的用途 |
+|--------|------|----------------|
+| `MoodSelector` | `lib/widgets/awareness/mood_selector.dart` | QuickLightCard 内联心情选择 |
+| `LightInputCard` | `lib/widgets/awareness/light_input_card.dart` | DailyLightScreen 文字输入 |
+| `TagSelector` | `lib/widgets/awareness/tag_selector.dart` | DailyLightScreen 标签选择 |
+| `WorryItemCard` | `lib/widgets/awareness/worry_item_card.dart` | WorryJarCard 烦恼条目 |
+| `HappyMomentCard` | `lib/widgets/awareness/happy_moment_card.dart` | WeeklyReviewScreen 幸福时刻 |
+| `CatBedtimeAnimation` | `lib/widgets/awareness/cat_bedtime_animation.dart` | DailyLightScreen 保存后动画 |
+| `AwarenessEmptyState` | `lib/widgets/awareness/awareness_empty_state.dart` | 各处空状态 |
+| `ContentWidthConstraint` | `lib/widgets/content_width_constraint.dart` | 全部 Screen 宽度约束 |
+| `AppScaffold` | `lib/widgets/app_scaffold.dart` | 全部 Screen 外层 |
+| `PixelCatSprite` | `lib/widgets/pixel_cat_sprite.dart` | CatCompanionCard 猫咪展示 |
 
 ---
 
-## 4. 路由注册
+## 9. Screen 规格
 
-在 `lib/core/router/app_router.dart` 中新增以下路由常量和 `case` 分支：
+### 9.1 新增 Screen 清单
 
-### 4.1 新增路由常量
+| 文件路径 | Screen | 用途 |
+|---------|--------|------|
+| `lib/screens/today/today_screen.dart` | `TodayScreen` | Tab 0：今天 |
+| `lib/screens/journey/journey_screen.dart` | `JourneyScreen` | Tab 1：旅程 |
+| `lib/screens/onboarding/lumi_onboarding_screen.dart` | `LumiOnboardingScreen` | 新 LUMI Onboarding |
+
+### 9.2 保留并修改的 Screen
+
+| 文件路径 | 改动 |
+|---------|------|
+| `lib/screens/home/home_screen.dart` | 4 Tab → 3 Tab，导航目标替换 |
+| `lib/screens/profile/profile_screen.dart` | 重组为 LUMI 统计 + 猫咪二级入口 |
+| `lib/screens/awareness/daily_light_screen.dart` | 保留完整记录页，从 QuickLightCard 编辑入口进入 |
+| `lib/screens/awareness/weekly_review_screen.dart` | 保留，从 JourneyScreen WeeklyReviewCard 进入 |
+| `lib/screens/awareness/worry_processor_screen.dart` | 保留，从 JourneyScreen WorryJarCard "查看全部" 进入 |
+| `lib/screens/awareness/worry_edit_screen.dart` | 保留 |
+
+### 9.3 移除或降级的 Screen
+
+| 文件路径 | 处理 |
+|---------|------|
+| `lib/screens/home/components/today_tab.dart` | 被 `TodayScreen` 替代，标记 deprecated |
+| `lib/screens/awareness/awareness_screen.dart` | 3 子 Tab 结构不再使用，由 JourneyScreen 承担，标记 deprecated |
+| `lib/screens/onboarding/onboarding_screen.dart` | 被 `LumiOnboardingScreen` 替代，标记 deprecated |
+| `lib/screens/cat_room/cat_room_screen.dart` | 从一级 Tab 降为 ProfileScreen 二级入口，代码不变 |
+
+---
+
+## 10. 路由变更
+
+### 10.1 新增路由
+
+在 `lib/core/router/app_router.dart` 中：
 
 ```dart
-// --- Awareness (Track 2) ---
-static const String dailyLight = '/daily-light';
-static const String weeklyReview = '/weekly-review';
-static const String worryProcessor = '/worry-processor';
-static const String worryEdit = '/worry-edit';
-
-// --- Awareness (Track 4 placeholders, 注册但不实现) ---
-// static const String awarenessHistory = '/awareness-history';
-// static const String dailyDetail = '/daily-detail';
-// static const String awarenessStats = '/awareness-stats';
+// --- LUMI Core (Track 2) ---
+static const String today = '/today';           // TodayScreen
+static const String journey = '/journey';       // JourneyScreen
+static const String weeklyPlan = '/weekly-plan'; // WeeklyPlanScreen
 ```
 
-### 4.2 新增 case 分支
+### 10.2 新增 case 分支
 
 ```dart
-case dailyLight:
-  final args = settings.arguments as Map<String, dynamic>? ?? {};
-  final quickMode = args['quickMode'] as bool? ?? false;
-  return MaterialPageRoute(
-    builder: (_) => DailyLightScreen(quickMode: quickMode),
-  );
+case today:
+  return MaterialPageRoute(builder: (_) => const TodayScreen());
 
-case weeklyReview:
-  return MaterialPageRoute(
-    builder: (_) => const WeeklyReviewScreen(),
-  );
+case journey:
+  return MaterialPageRoute(builder: (_) => const JourneyScreen());
 
-case worryProcessor:
-  return MaterialPageRoute(
-    builder: (_) => const WorryProcessorScreen(),
-  );
-
-case worryEdit:
-  final worryId = settings.arguments as String?;
-  return MaterialPageRoute(
-    builder: (_) => WorryEditScreen(worryId: worryId),
-  );
+case weeklyPlan:
+  return MaterialPageRoute(builder: (_) => const WeeklyPlanScreen());
 ```
 
-### 4.3 新增 import
+### 10.3 保留的路由
+
+以下路由不变，继续使用：
+
+```
+/daily-light      → DailyLightScreen
+/weekly-review    → WeeklyReviewScreen
+/worry-processor  → WorryProcessorScreen
+/worry-edit       → WorryEditScreen
+/cat-detail       → CatDetailScreen
+/adoption         → AdoptionFlowScreen
+/settings         → SettingsScreen
+```
+
+### 10.4 新增 import
 
 ```dart
-import 'package:hachimi_app/screens/awareness/daily_light_screen.dart';
-import 'package:hachimi_app/screens/awareness/weekly_review_screen.dart';
-import 'package:hachimi_app/screens/awareness/worry_processor_screen.dart';
-import 'package:hachimi_app/screens/awareness/worry_edit_screen.dart';
+import 'package:hachimi_app/screens/today/today_screen.dart';
+import 'package:hachimi_app/screens/journey/journey_screen.dart';
+import 'package:hachimi_app/screens/onboarding/lumi_onboarding_screen.dart';
 ```
 
 ---
 
-## 5. L10n Key 清单
+## 11. L10n Key 清单
 
-### 5.1 Tab 标签与页面标题
-
-| Key | EN | ZH-CN |
-|-----|-----|-------|
-| `awarenessTitle` | Awareness | 觉知 |
-| `awarenessTabToday` | Today | 今天 |
-| `awarenessTabThisWeek` | This Week | 本周 |
-| `awarenessTabReview` | Review | 回顾 |
-| `awarenessReviewComingSoon` | Coming soon | 即将推出 |
-
-### 5.2 心情标签
+### 11.1 导航
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `moodVeryHappy` | Very Happy | 很开心 |
-| `moodHappy` | Happy | 开心 |
-| `moodCalm` | Calm | 平静 |
-| `moodDown` | Down | 低落 |
-| `moodVeryDown` | Very Down | 很低落 |
+| `homeTabToday` | Today | 今天 |
+| `homeTabJourney` | Journey | 旅程 |
+| `homeTabProfile` | Profile | 我的 |
 
-### 5.3 每日一点光
+### 11.2 TodayScreen
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `dailyLightTitle` | Daily Light | 今日一点光 |
-| `dailyLightMoodPrompt` | How are you feeling today? | 你今天心情如何？ |
-| `awarenessLightPlaceholder` | What made you smile today? | 今天有什么让你微笑的事？ |
-| `dailyLightTagsLabel` | Tags (optional) | 标签（可选） |
-| `dailyLightSave` | Save | 保存 |
-| `dailyLightSaving` | Saving... | 保存中... |
-| `dailyLightQuickPrompt` | What made you smile today? | 今天有什么让你微笑的事？ |
-| `dailyLightQuickSkip` | Skip | 跳过 |
-| `dailyLightQuickRecord` | Record | 记录 |
-| `dailyLightEditButton` | Edit | 编辑 |
+| `todayTitle` | Today | ✦ 今天 |
+| `todayQuickLightPrompt` | What made you smile today? | 今天有什么让你微笑的事？ |
+| `todayQuickLightHint` | Write a line... | 写一句话... |
+| `todayQuickLightRecord` | Record ✦ | 记录 ✦ |
+| `todayQuickLightEdit` | Edit | 编辑 |
+| `todayHabitSection` | Today's habits | 今日习惯 |
+| `todayFirstLightGuide` | Write your first light ✦ | 写下今天的第一束光 ✦ |
 
-### 5.4 猫咪反应文案（种子）
+### 11.3 JourneyScreen
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `catReactVeryHappy` | You're so happy today, I'm happy too! | 铲屎官今天好开心，本猫也开心！ |
-| `catReactHappy` | Another ray of light recorded! | 记录了今天的光，真棒 ✨ |
-| `catReactCalm` | A calm day is a good day. | 平静的一天也很好呢 🍃 |
-| `catReactDown` | On tough days, I'm right here with you. | 不开心的日子，本猫陪着你 💛 |
-| `catReactVeryDown` | It's okay, I'm not going anywhere. | 没事的，本猫哪都不去 🫂 |
+| `journeyTitle` | Journey | 旅程 |
+| `journeySegmentWeek` | This Week | 本周 |
+| `journeySegmentMonth` | This Month | 本月 |
+| `journeySegmentYear` | Year | 年度 |
+| `journeySegmentExplore` | Explore | 探索 |
+| `journeyComingSoon` | Coming soon | 即将推出 |
+| `journeyLockedWeek` | Record 1 day to unlock weekly view. No rush ✦ | 记录 1 天后解锁本周视图。不急，慢慢来 ✦ |
+| `journeyLockedMonth` | Record {days} more days to start monthly planning. No rush ✦ | 再记录 {days} 天，就可以开始月度规划了。不急，慢慢来 ✦ |
+| `journeyLockedYear` | Record {days} more days to start yearly planning. No rush ✦ | 再记录 {days} 天，就可以开始年度规划了。不急，慢慢来 ✦ |
+| `journeyLockedExplore` | Record {days} more days to unlock exploration. No rush ✦ | 再记录 {days} 天，就可以开启探索之旅了。不急，慢慢来 ✦ |
 
-### 5.5 周回顾
-
-| Key | EN | ZH-CN |
-|-----|-----|-------|
-| `weeklyReviewTitle` | Weekly Review | 周回顾 |
-| `weeklyReviewMomentsTitle` | Three Happy Moments | 回忆本周的三个幸福时刻 |
-| `weeklyReviewMomentsSubtitle` | Big or small, they all count | 大事小事都算数 |
-| `weeklyReviewMomentHint` | What made you happy this week? | 这周有什么让你开心的？ |
-| `weeklyReviewMomentNumber` | Happy Moment #{number} | 幸福时刻 #{number} |
-| `weeklyReviewGratitudeTitle` | I'm grateful for... | 这周我想感谢... |
-| `weeklyReviewGratitudeHint` | A person, an event, or yourself | 一个人、一件事、或自己 |
-| `weeklyReviewLearnedTitle` | This week I learned... | 这周我学到了... |
-| `weeklyReviewLearnedHint` | A skill, a lesson, or a new perspective | 一个技能、一个道理、一个视角 |
-| `weeklyReviewWorryUpdateTitle` | Update your worries | 更新你的烦恼 |
-| `weeklyReviewWorryUpdateSubtitle` | How are last week's worries doing? | 上周的烦恼，现在怎么样了？ |
-| `weeklyReviewNoWorries` | No active worries. That's great! | 没有进行中的烦恼，太好了！ |
-| `weeklyReviewAddWorry` | + New worry | + 新增烦恼 |
-| `weeklyReviewSave` | Save weekly review | 保存周回顾 |
-| `weeklyReviewSaved` | Weekly review saved! | 周回顾已保存！ |
-
-### 5.6 猫咪周总结模板（种子）
+### 11.4 周视图
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `catWeeklySummary` | You recorded {momentCount} happy moments this week. I saw them all! | 铲屎官这周记录了 {momentCount} 个幸福时刻呢，本猫都看到了 ✨ |
-| `catWeeklySummaryOk` | Got it! | 好的！ |
+| `weekPlanSection` | Weekly Plan | 本周计划 |
+| `weekPlanEmpty` | Say something to this week? | 给这周的自己说句话？ |
+| `weekPlanStart` | Start planning | 开始规划 |
+| `weekReviewSection` | Weekly Review | 周回顾 |
+| `weekReviewEmpty` | Recall this week's happy moments | 回忆本周的幸福时刻 |
+| `weekReviewStart` | Start review | 开始回顾 |
+| `weekWorrySection` | Worry Processor | 烦恼处理器 |
+| `weekWorryEmpty` | No worries right now. Great! | 没有烦恼，真好！ |
+| `weekWorryAdd` | + Write down a worry | + 写下烦恼 |
+| `weekWorryViewAll` | View all | 查看全部 |
 
-### 5.7 烦恼处理器
-
-| Key | EN | ZH-CN |
-|-----|-----|-------|
-| `worryProcessorTitle` | Worry Processor | 烦恼处理器 |
-| `worryEditTitleNew` | New Worry | 新增烦恼 |
-| `worryEditTitleEdit` | Edit Worry | 编辑烦恼 |
-| `worryDescriptionPrompt` | What's bothering you? | 什么事让你烦恼？ |
-| `worryDescriptionHint` | Write it down, get it out of your head | 写下来，把它从脑袋里搬出来 |
-| `worrySolutionPrompt` | What could you do? (optional) | 你能做些什么？（可选） |
-| `worrySolutionHint` | Even a tiny step counts | 哪怕是一小步也好 |
-| `worrySave` | Add | 添加 |
-| `worryUpdate` | Update | 更新 |
-| `worryStatusOngoing` | Ongoing | 还在 |
-| `worryStatusResolved` | Resolved | 搞定了 |
-| `worryStatusDisappeared` | Gone | 消失了 |
-| `worryResolvedSection` | Resolved / Gone | 已解决/消失 |
-| `worryAddTooltip` | Add worry | 添加烦恼 |
-| `worryManageAll` | Manage all worries | 管理全部烦恼 |
-
-### 5.8 空状态
+### 11.5 Onboarding
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `awarenessEmptyLightTitle` | No light recorded yet | 今天还没记录一点光 |
-| `awarenessEmptyLightSubtitle` | You can come anytime | 什么时候都可以来 ✨ |
-| `awarenessEmptyLightAction` | Record now | 去记录 |
-| `awarenessEmptyReviewTitle` | No weekly review yet | 本周还没写周回顾 |
-| `awarenessEmptyReviewSubtitle` | Take a few minutes to reflect | 花几分钟回顾一下这周吧 |
-| `awarenessEmptyReviewAction` | Start review | 开始回顾 |
-| `awarenessEmptyHistoryTitle` | No records yet | 还没有记录 |
-| `awarenessEmptyHistorySubtitle` | Your journey starts with the first light | 从第一束光开始你的旅程 |
-| `awarenessEmptyWorriesTitle` | No worries right now | 现在没有烦恼 |
-| `awarenessEmptyWorriesSubtitle` | That's wonderful! | 真好！ |
+| `onboardingWelcomeTitle` | Hello | 你好 |
+| `onboardingWelcomeSubtitle` | This is LUMI | 这里是 LUMI |
+| `onboardingWelcomeSlogan` | Every line you write adds a star to your innerverse | 每写一行，都是在为你的内心宇宙添一颗星 |
+| `onboardingContinue` | Continue | 继续 |
+| `onboardingNameTitle` | The owner of this journal is | 这本手册的主人是 |
+| `onboardingNameHint` | Write your name | 写下你的名字 |
+| `onboardingBirthdayTitle` | Your birthday | 你的生日 |
+| `onboardingNext` | Next | 下一步 |
+| `onboardingDateTitle` | When do you want to start this journey? | 你想从哪天开始这段旅程？ |
+| `onboardingDateHint` | You can change it anytime | 你可以随时修改 |
+| `onboardingGuideTitle` | LUMI is just three little things | LUMI 只有三件小事 |
+| `onboardingGuide1` | Write a line before bed — today's light | 睡前写一句 — 今天的一点光 |
+| `onboardingGuide2` | Weekend review — three happy moments | 周末回顾 — 三个幸福时刻 |
+| `onboardingGuide3` | Write down worries — put them in the jar | 写下烦恼 — 放进烦恼罐 |
+| `onboardingReady` | Ready? | 准备好了吗？ |
+| `onboardingStart` | Start the journey | 开始旅程 |
 
-### 5.9 通用
+### 11.6 ProfileScreen 新增
 
 | Key | EN | ZH-CN |
 |-----|-----|-------|
-| `awarenessHabitSectionTitle` | Today's habits | 今日习惯 |
-| `awarenessNoHabits` | No habits yet. Adopt a cat to start! | 还没有习惯，去领养一只猫吧 |
-| `tagCustom` | + Custom | +自定义 |
+| `profileLumiStars` | Stars | 星星 |
+| `profileRecordDays` | Days recorded | 记录天数 |
+| `profileCurrentStreak` | Current streak | 当前连续 |
+| `profileLongestStreak` | Longest streak | 最长连续 |
+| `profileCatCompanion` | Cat companion | 猫咪伙伴 |
+| `profileCatCompanionSubtitle` | {count} cats | {count} 只猫咪 |
+| `profileAdoptCat` | Adopt a cat companion? | 领养一只猫咪伙伴？ |
+| `profileAboutLumi` | About LUMI | 关于 LUMI |
 
-**合计**：约 55 个新 L10n key。
+**合计**：约 50 个新/修改 L10n key。
 
 ---
 
-## 6. 文件操作清单
+## 12. 文件操作清单
 
-### 6.1 新建文件
+### 12.1 新建文件
 
 | 文件路径 | 说明 |
 |---------|------|
-| `lib/widgets/awareness/mood_selector.dart` | 心情选择器 Widget |
-| `lib/widgets/awareness/light_input_card.dart` | 一点光文字输入卡片 |
-| `lib/widgets/awareness/tag_selector.dart` | 标签选择器 Widget |
-| `lib/widgets/awareness/happy_moment_card.dart` | 幸福时刻卡片 |
-| `lib/widgets/awareness/worry_item_card.dart` | 烦恼条目卡片 |
-| `lib/widgets/awareness/cat_bedtime_animation.dart` | 猫咪睡前反应动画 |
-| `lib/widgets/awareness/awareness_empty_state.dart` | 觉知模块空状态 |
-| `lib/screens/awareness/awareness_screen.dart` | 觉知主屏幕（3 子 Tab） |
-| `lib/screens/awareness/daily_light_screen.dart` | 每日一点光记录页 |
-| `lib/screens/awareness/weekly_review_screen.dart` | 周回顾页面 |
-| `lib/screens/awareness/worry_processor_screen.dart` | 烦恼处理器列表页 |
-| `lib/screens/awareness/worry_edit_screen.dart` | 烦恼编辑页 |
-| `lib/core/constants/awareness_constants.dart` | 觉知模块常量（预设标签等） |
+| `lib/screens/today/today_screen.dart` | Tab 0：TodayScreen |
+| `lib/screens/journey/journey_screen.dart` | Tab 1：JourneyScreen |
+| `lib/screens/onboarding/lumi_onboarding_screen.dart` | 新 LUMI Onboarding |
+| `lib/widgets/today/quick_light_card.dart` | 内联一点光卡片 |
+| `lib/widgets/today/habit_snapshot.dart` | 今日习惯快照 |
+| `lib/widgets/today/inspiration_card.dart` | 灵感提示卡 |
+| `lib/widgets/journey/weekly_plan_card.dart` | 周计划摘要卡 |
+| `lib/widgets/journey/weekly_review_card.dart` | 周回顾摘要卡 |
+| `lib/widgets/journey/worry_jar_card.dart` | 烦恼处理器摘要卡 |
+| `lib/widgets/journey/week_mood_dots.dart` | 7 天心情圆点 |
+| `lib/widgets/journey/locked_segment_placeholder.dart` | 未解锁温暖占位 |
+| `lib/widgets/profile/lumi_stats_card.dart` | LUMI 统计卡 |
+| `lib/widgets/profile/cat_companion_card.dart` | 猫咪伴侣入口卡 |
+| `lib/providers/feature_gate_provider.dart` | 渐进解锁 Provider |
+| `lib/core/constants/inspiration_constants.dart` | 灵感清单常量 |
 
-### 6.2 修改文件
-
-| 文件路径 | 改动内容 |
-|---------|---------|
-| `lib/core/router/app_router.dart` | 新增 4 个路由常量 + 4 个 case 分支 + 4 个 import |
-| `lib/l10n/app_en.arb` | 新增约 55 个英文 L10n key |
-| `lib/l10n/app_zh.arb` | 新增约 55 个中文 L10n key |
-| `lib/providers/awareness_providers.dart` | 新增 `resolvedWorriesProvider`（如轨道一未提供） |
-| `lib/core/constants/cat_response_templates.dart` | 新建或追加 5 条种子模板（如轨道五未先创建） |
-
-### 6.3 SSOT 文档更新（编码前必须先完成）
+### 12.2 修改文件
 
 | 文件路径 | 改动内容 |
 |---------|---------|
-| `docs/architecture/folder-structure.md` | 新增 `screens/awareness/`（5 文件）+ `widgets/awareness/`（7 文件） |
+| `lib/screens/home/home_screen.dart` | 4 Tab → 3 Tab，替换 `_screens` 列表、NavigationBar destinations、FAB 逻辑 |
+| `lib/screens/profile/profile_screen.dart` | 重组：LUMI 统计 + CatCompanionCard + 设置 |
+| `lib/core/router/app_router.dart` | 新增 3 个路由常量 + case 分支 + import |
+| `lib/l10n/app_en.arb` | 新增约 50 个英文 L10n key |
+| `lib/l10n/app_zh.arb` | 新增约 50 个中文 L10n key |
+| `lib/l10n/` 其他 ARB | 同步新增 key |
+| `app.dart` 或相关入口文件 | 移除 `_FirstHabitGate`，Onboarding 入口替换 |
+
+### 12.3 标记 deprecated（不立即删除）
+
+| 文件路径 | 原因 |
+|---------|------|
+| `lib/screens/home/components/today_tab.dart` | 被 TodayScreen 替代 |
+| `lib/screens/awareness/awareness_screen.dart` | 3 子 Tab 结构被 JourneyScreen 替代 |
+| `lib/screens/onboarding/onboarding_screen.dart` | 被 LumiOnboardingScreen 替代 |
+| `lib/screens/onboarding/components/*.dart` | 旧 Onboarding 组件 |
+
+### 12.4 SSOT 文档更新（编码前必须先完成）
+
+| 文件路径 | 改动内容 |
+|---------|---------|
+| `docs/architecture/folder-structure.md` | 新增 `screens/today/`、`screens/journey/`、`widgets/today/`、`widgets/journey/`、`widgets/profile/` |
 | `docs/zh-CN/architecture/folder-structure.md` | 同步中文版 |
 
 ---
 
-## 7. 完成标志
+## 13. 完成标志
 
-### 7.1 功能验证
+### 13.1 导航重组
 
-- [ ] `DailyLightScreen` 完整模式：选心情 → 写文字 → 选标签 → 保存 → CatBedtimeAnimation 弹出 → 自动关闭 → 返回
-- [ ] `DailyLightScreen` 快速模式：BottomSheet 弹出 → 选心情 → 写文字 → 保存 → 动画 → 关闭
-- [ ] `WeeklyReviewScreen`：填写 3 个幸福时刻 + 感恩 + 学习 + 烦恼更新 → 保存 → 猫咪周总结 Dialog
-- [ ] `WorryProcessorScreen`：查看活跃/已解决烦恼列表 → FAB 添加 → 状态切换
-- [ ] `WorryEditScreen`：新建烦恼 → 保存；编辑烦恼 → 更新
-- [ ] `AwarenessScreen` 三个子 Tab 切换正常
-- [ ] 今天 Tab：未记录 → 空状态 + 快捷入口；已记录 → 状态卡 + 编辑入口
-- [ ] 本周 Tab：周回顾状态 + 烦恼列表 + 添加入口
-- [ ] 回顾 Tab：显示占位文案
+- [ ] HomeScreen 变为 3 Tab（今天 / 旅程 / 我的）
+- [ ] 旧 4 Tab（觉知 / 习惯 / 猫咪 / 我的）不再出现
+- [ ] `_FirstHabitGate` 完全移除，新用户不经过猫咪领养
+- [ ] NavigationBar 图标和文案与设计一致
 
-### 7.2 主题验证
+### 13.2 Onboarding
+
+- [ ] 4 页 LUMI Onboarding 流程可完整走通（欢迎 → 名字 → 日期 → 导览 → HomeScreen）
+- [ ] 名字必填校验生效
+- [ ] Onboarding 数据正确写入 `materialized_state`
+- [ ] 旧猫咪 Onboarding 不再触发
+
+### 13.3 TodayScreen
+
+- [ ] QuickLightCard 未记录状态：选心情 → 写一句话 → 保存 → 切换为已记录状态
+- [ ] QuickLightCard 已记录状态：显示心情 + 预览 + 编辑按钮
+- [ ] HabitSnapshot：有习惯时显示列表，无习惯时不显示
+- [ ] InspirationCard：显示灵感文案，每天轮换
+
+### 13.4 JourneyScreen
+
+- [ ] SegmentedButton 4 段（本周/本月/年度/探索）切换正常
+- [ ] 本周视图：WeeklyPlanCard + WeekMoodDots + WeeklyReviewCard + WorryJarCard
+- [ ] WeeklyPlanCard 点击进入 WeeklyPlanScreen
+- [ ] WeeklyReviewCard 点击进入 WeeklyReviewScreen
+- [ ] WorryJarCard 显示活跃烦恼，"查看全部"进入 WorryProcessorScreen
+- [ ] 未解锁 Segment 显示温暖占位卡片
+
+### 13.5 ProfileScreen
+
+- [ ] LumiStatsCard 显示星星/记录天数/连续天数
+- [ ] CatCompanionCard 有猫显示猫咪+数量，无猫显示领养入口
+- [ ] 设置区域正常可用
+
+### 13.6 渐进解锁
+
+- [ ] Day 0（新用户）：仅 TodayScreen 可用，JourneyScreen 全部 Segment 锁定
+- [ ] Day 1：本周 Segment 解锁
+- [ ] Day 3：本月 Segment 解锁
+- [ ] Day 14：年度 Segment 解锁
+- [ ] Day 30：探索 Segment 解锁
+
+### 13.7 主题验证
 
 - [ ] Material 3 主题下所有新屏幕正确渲染
-- [ ] Retro Pixel 主题下所有新屏幕正确渲染（像素边框、像素字体、背景图案）
+- [ ] Retro Pixel 主题下所有新屏幕正确渲染
 - [ ] 两种主题切换后无崩溃
 
-### 7.3 代码质量
+### 13.8 代码质量
 
 - [ ] `dart analyze lib/` 零 warning / error
 - [ ] `dart format lib/ test/ --set-exit-if-changed` 零格式问题
-- [ ] 所有新文件 ≤ 800 行
-- [ ] 所有新函数 ≤ 30 行
-- [ ] 所有 Widget 使用 `const` 构造函数
+- [ ] 所有新文件不超过 800 行
+- [ ] 所有新函数不超过 30 行
 - [ ] 无硬编码颜色值
+- [ ] 所有 Widget 使用 `const` 构造函数
 
-### 7.4 L10n 验证
+### 13.9 L10n 验证
 
-- [ ] `app_en.arb` 和 `app_zh.arb` 各新增约 55 个 key
-- [ ] 所有新增 key 在 EN 和 ZH-CN 下均有值
+- [ ] 约 50 个新 key 在 EN 和 ZH-CN 下均有值
 - [ ] `flutter gen-l10n` 无报错
+- [ ] 其他 13 个语言 ARB 文件同步

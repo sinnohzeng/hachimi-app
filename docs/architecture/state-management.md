@@ -208,6 +208,44 @@ Affected LedgerChange refresh: awareness providers respond to `isGlobalRefresh` 
 - `localDatabaseProvider` removed from `core/ai/ai_provider.dart` — AI providers no longer hold a direct DB reference; they access data through service providers.
 - `LedgerChange.type` changed from `String` to `ActionType` enum (`lib/models/ledger_action.dart`). All consumers now pattern-match on `ActionType` values instead of raw string comparison.
 
+## V3 LUMI Journey Providers
+
+### Journey Providers (in `journey_providers.dart`)
+
+| Provider | Type | Description |
+|----------|------|-------------|
+| `yearlyPlanProvider` | `FutureProvider.family<YearlyPlan?, int>` | 年度计划，参数为 year |
+| `monthlyPlanProvider` | `FutureProvider.family<MonthlyPlan?, String>` | 月度计划，参数为 monthKey (yyyy-MM) |
+| `weeklyPlanProvider` | `FutureProvider.family<WeeklyPlan?, String>` | 周计划，参数为 weekId (yyyy-Www) |
+
+数据流：`JourneyScreen` → `ref.watch(xxxProvider(key))` → `JourneyRepository` → SQLite
+
+### Feature Gate Provider (in `feature_gate_provider.dart`)
+
+| Provider | Type | Description |
+|----------|------|-------------|
+| `featureGateProvider` | `FutureProvider<FeatureGate>` | 渐进解锁状态，基于 `totalLightDays` |
+
+`FeatureGate` 数据类字段：
+
+| 字段 | 类型 | 条件 | 说明 |
+|------|------|------|------|
+| `todayTab` | bool | 始终 true | Day 0 可用 |
+| `weeklyView` | bool | totalDays >= 1 | Day 1 解锁 |
+| `monthlyView` | bool | totalDays >= 3 | Day 3 解锁 |
+| `yearlyView` | bool | totalDays >= 14 | Day 14 解锁 |
+| `exploreView` | bool | totalDays >= 30 | Day 30 解锁 |
+| `growthReview` | bool | totalDays >= 90 | Day 90 解锁 |
+
+### Inspiration Provider (in `inspiration_provider.dart`)
+
+| Provider | Type | Description |
+|----------|------|-------------|
+| `dailyInspirationProvider` | `Provider<String>` | 每日灵感轮换（爱自己活动），基于 dayOfYear % list.length |
+| `habitInspirationProvider` | `Provider<HabitTemplate>` | 习惯灵感轮换，基于 day % list.length |
+
+灵感数据源：`LumiConstants.selfCareActivities`（~50 条）和 `LumiConstants.habitTemplates`（9 条），均为编译期静态常量，零运行时开销。
+
 ## Rules
 - Screens must not call Firebase SDK directly.
 - Navigation side-effects must be handled by listeners/effects, not inside `build()`.
