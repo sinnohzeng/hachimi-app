@@ -90,16 +90,21 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final plan = ref.read(currentWeekPlanProvider).value;
+      if (plan != null) _loadFromPlan(plan);
+      if (!_loaded) setState(() => _loaded = true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final planAsync = ref.watch(currentWeekPlanProvider);
+    // 触发 provider 订阅，保持数据刷新
+    ref.watch(currentWeekPlanProvider);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
-    // 加载已有数据
-    planAsync.whenData((plan) {
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) _loaded = true;
-    });
 
     return AppScaffold(
       appBar: AppBar(

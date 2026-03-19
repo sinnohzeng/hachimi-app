@@ -174,7 +174,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => DailyDetailScreen(date: date));
       case onboardingLumi:
         return MaterialPageRoute(
-          builder: (_) => LumiOnboardingScreen(onComplete: () {}),
+          builder: (context) => LumiOnboardingScreen(
+            onComplete: () => Navigator.of(context)
+                .pushNamedAndRemoveUntil(AppRouter.home, (_) => false),
+          ),
         );
       case journey:
         return MaterialPageRoute(builder: (_) => const JourneyScreen());

@@ -58,6 +58,11 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
     for (final key in LumiConstants.growthDimensions.keys) {
       _dimControllers[key] = TextEditingController();
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final plan = ref.read(currentYearPlanProvider).value;
+      if (plan != null) _loadFromPlan(plan);
+      if (!_loaded) setState(() => _loaded = true);
+    });
   }
 
   @override
@@ -141,14 +146,10 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final planAsync = ref.watch(currentYearPlanProvider);
+    // 触发 provider 订阅，保持数据刷新
+    ref.watch(currentYearPlanProvider);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
-    planAsync.whenData((plan) {
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) _loaded = true;
-    });
 
     final dimEntries = LumiConstants.growthDimensions.entries.toList();
 

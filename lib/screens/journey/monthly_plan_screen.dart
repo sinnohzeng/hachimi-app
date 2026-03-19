@@ -123,15 +123,21 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final plan = ref.read(currentMonthPlanProvider).value;
+      if (plan != null) _loadFromPlan(plan);
+      if (!_loaded) setState(() => _loaded = true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final planAsync = ref.watch(currentMonthPlanProvider);
+    // 触发 provider 订阅，保持数据刷新
+    ref.watch(currentMonthPlanProvider);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
-    planAsync.whenData((plan) {
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) _loaded = true;
-    });
 
     return AppScaffold(
       appBar: AppBar(title: const Text('月计划')),

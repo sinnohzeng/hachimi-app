@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_breakpoints.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
-import 'package:hachimi_app/screens/awareness/awareness_screen.dart';
-import 'package:hachimi_app/screens/cat_room/cat_room_screen.dart';
+import 'package:hachimi_app/screens/today/today_screen.dart';
+import 'package:hachimi_app/screens/journey/journey_screen.dart';
 import 'package:hachimi_app/screens/profile/profile_screen.dart';
 import 'package:hachimi_app/widgets/app_drawer.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
-
-import 'components/today_tab.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,10 +20,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
   static const _screens = <Widget>[
-    AwarenessScreen(), // Tab 0: 觉知（默认）
-    TodayTab(), // Tab 1: 习惯
-    CatRoomScreen(), // Tab 2: 猫咪
-    ProfileScreen(), // Tab 3: 我的
+    TodayScreen(), // Tab 0: 今天
+    JourneyScreen(), // Tab 1: 旅程
+    ProfileScreen(), // Tab 2: 我的
   ];
 
   @override
@@ -66,7 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             selectedIndex: _selectedIndex,
             onDestinationSelected: _onDestinationSelected,
             groupAlignment: -0.85,
-            leading: _selectedIndex == 1 ? _buildFab(context) : null,
+            leading: _selectedIndex == 0 ? _buildFab(context) : null,
             destinations: _buildRailDestinations(context),
           ),
           const VerticalDivider(width: 1, thickness: 1),
@@ -83,7 +80,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget? _buildFab(BuildContext context) {
-    if (_selectedIndex != 1) return null;
+    // FAB 仅在「今天」Tab 显示，用于快速新建习惯
+    if (_selectedIndex != 0) return null;
     return FloatingActionButton(
       onPressed: () => Navigator.of(context).pushNamed(AppRouter.adoption),
       tooltip: context.l10n.todayNewQuest,
@@ -99,24 +97,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final l10n = context.l10n;
     return [
       NavigationDestination(
-        icon: const Icon(Icons.auto_awesome_outlined),
-        selectedIcon: const Icon(Icons.auto_awesome),
-        label: l10n.homeTabAwareness,
+        icon: const Icon(Icons.star_outline),
+        selectedIcon: const Icon(Icons.star),
+        label: l10n.homeTabToday,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.today_outlined),
-        selectedIcon: const Icon(Icons.today),
-        label: l10n.homeTabHabits,
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.pets_outlined),
-        selectedIcon: const Icon(Icons.pets),
-        label: l10n.homeTabCatHouse,
+        icon: const Icon(Icons.explore_outlined),
+        selectedIcon: const Icon(Icons.explore),
+        label: l10n.tabJourney,
       ),
       NavigationDestination(
         icon: const Icon(Icons.person_outline),
         selectedIcon: const Icon(Icons.person),
-        label: l10n.homeTabProfile,
+        label: l10n.tabProfile,
       ),
     ];
   }
@@ -125,24 +118,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final l10n = context.l10n;
     return [
       NavigationRailDestination(
-        icon: const Icon(Icons.auto_awesome_outlined),
-        selectedIcon: const Icon(Icons.auto_awesome),
-        label: Text(l10n.homeTabAwareness),
+        icon: const Icon(Icons.star_outline),
+        selectedIcon: const Icon(Icons.star),
+        label: Text(l10n.homeTabToday),
       ),
       NavigationRailDestination(
-        icon: const Icon(Icons.today_outlined),
-        selectedIcon: const Icon(Icons.today),
-        label: Text(l10n.homeTabHabits),
-      ),
-      NavigationRailDestination(
-        icon: const Icon(Icons.pets_outlined),
-        selectedIcon: const Icon(Icons.pets),
-        label: Text(l10n.homeTabCatHouse),
+        icon: const Icon(Icons.explore_outlined),
+        selectedIcon: const Icon(Icons.explore),
+        label: Text(l10n.tabJourney),
       ),
       NavigationRailDestination(
         icon: const Icon(Icons.person_outline),
         selectedIcon: const Icon(Icons.person),
-        label: Text(l10n.homeTabProfile),
+        label: Text(l10n.tabProfile),
       ),
     ];
   }
