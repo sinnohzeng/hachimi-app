@@ -614,17 +614,25 @@ class _FirstHabitGateState extends ConsumerState<_FirstHabitGate> {
   }
 
   /// 习惯数据就绪后判断是否为首次用户，触发领养引导或调度提醒。
+  /// LUMI 引导完成（version >= 2）的用户跳过强制领养流程。
   void _onHabitsLoaded(List<Habit> habits) {
     _checkedFirstHabit = true;
     if (habits.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.of(context).pushNamed(
-            AppRouter.adoption,
-            arguments: true, // isFirstHabit = true
-          );
-        }
-      });
+      final lumiVersion =
+          ref
+              .read(sharedPreferencesProvider)
+              .getInt(AppPrefsKeys.lumiOnboardingVersion) ??
+          0;
+      if (lumiVersion < 2) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            Navigator.of(context).pushNamed(
+              AppRouter.adoption,
+              arguments: true, // isFirstHabit = true
+            );
+          }
+        });
+      }
     } else if (!_remindersScheduled) {
       _remindersScheduled = true;
       _rescheduleReminders(habits);

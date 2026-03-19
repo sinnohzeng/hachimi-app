@@ -36,6 +36,8 @@ export 'package:hachimi_app/services/notification_service.dart'
     show NotificationService;
 import 'package:hachimi_app/services/session_completion_service.dart';
 import 'package:hachimi_app/services/awareness_repository.dart';
+import 'package:hachimi_app/services/list_highlight_repository.dart';
+import 'package:hachimi_app/services/plan_repository.dart';
 import 'package:hachimi_app/services/sync_engine.dart';
 import 'package:hachimi_app/services/user_profile_service.dart';
 import 'package:hachimi_app/services/worry_repository.dart';
@@ -113,6 +115,16 @@ final awarenessRepositoryProvider = Provider<AwarenessRepository>((ref) {
 
 final worryRepositoryProvider = Provider<WorryRepository>((ref) {
   return WorryRepository(ledger: ref.watch(ledgerServiceProvider));
+});
+
+final planRepositoryProvider = Provider<PlanRepository>((ref) {
+  return PlanRepository(ledger: ref.watch(ledgerServiceProvider));
+});
+
+final listHighlightRepositoryProvider = Provider<ListHighlightRepository>((
+  ref,
+) {
+  return ListHighlightRepository(ledger: ref.watch(ledgerServiceProvider));
 });
 
 // ─── 后端抽象 ───

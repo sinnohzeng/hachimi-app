@@ -97,3 +97,5 @@ override.tf.json
 
 # 忽略参考书籍原文（版权内容，不入库）
 docs/plan/reference/book-real-demand-liang-ning/
+docs/plan/reference/lumi/
+docs/plan/reference/lumi-inspiration-list/

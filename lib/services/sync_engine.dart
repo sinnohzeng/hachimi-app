@@ -310,7 +310,12 @@ class SyncEngine {
         case ActionType.worryResolved:
           await _syncWorry(batch, uid, action);
         case ActionType.monthlyRitualSet:
-          // 月度仪式仅本地存储，无需同步
+        case ActionType.weeklyPlanSaved:
+        case ActionType.monthlyPlanSaved:
+        case ActionType.yearlyPlanSaved:
+        case ActionType.listUpdated:
+        case ActionType.highlightRecorded:
+          // LUMI 计划与清单暂仅本地存储，无需同步
           await _ledger.markSynced(action.id);
           return;
         case ActionType.accountCreated:

@@ -25,6 +25,21 @@ import 'package:hachimi_app/screens/awareness/weekly_review_screen.dart';
 import 'package:hachimi_app/screens/awareness/worry_processor_screen.dart';
 import 'package:hachimi_app/screens/awareness/worry_edit_screen.dart';
 import 'package:hachimi_app/screens/awareness/daily_detail_screen.dart';
+import 'package:hachimi_app/screens/journey/journey_screen.dart';
+import 'package:hachimi_app/screens/journey/weekly_plan_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_plan_screen.dart';
+import 'package:hachimi_app/screens/journey/yearly_plan_screen.dart';
+import 'package:hachimi_app/screens/journey/list_detail_screen.dart';
+import 'package:hachimi_app/screens/journey/highlight_moments_screen.dart';
+import 'package:hachimi_app/screens/journey/growth_review_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/habit_pact_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/worry_unload_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/self_praise_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/support_map_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/future_self_screen.dart';
+import 'package:hachimi_app/screens/journey/monthly_activities/ideal_vs_real_screen.dart';
+import 'package:hachimi_app/screens/onboarding/lumi_onboarding_screen.dart';
+import 'package:hachimi_app/models/user_list.dart';
 import 'package:hachimi_app/models/xp_result.dart';
 
 class AppRouter {
@@ -53,6 +68,20 @@ class AppRouter {
   static const String worryProcessor = '/worry-processor';
   static const String worryEdit = '/worry-edit';
   static const String dailyDetail = '/daily-detail';
+  static const String onboardingLumi = '/onboarding-lumi';
+  static const String journey = '/journey';
+  static const String weeklyPlan = '/weekly-plan';
+  static const String monthlyPlan = '/monthly-plan';
+  static const String yearlyPlan = '/yearly-plan';
+  static const String listDetail = '/list-detail';
+  static const String highlightMoments = '/highlight-moments';
+  static const String growthReview = '/growth-review';
+  static const String habitPact = '/habit-pact';
+  static const String worryUnload = '/worry-unload';
+  static const String selfPraise = '/self-praise';
+  static const String supportMap = '/support-map';
+  static const String futureSelf = '/future-self';
+  static const String idealVsReal = '/ideal-vs-real';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -143,6 +172,44 @@ class AppRouter {
           return MaterialPageRoute(builder: (_) => const HomeScreen());
         }
         return MaterialPageRoute(builder: (_) => DailyDetailScreen(date: date));
+      case onboardingLumi:
+        return MaterialPageRoute(
+          builder: (_) => LumiOnboardingScreen(onComplete: () {}),
+        );
+      case journey:
+        return MaterialPageRoute(builder: (_) => const JourneyScreen());
+      case weeklyPlan:
+        return MaterialPageRoute(builder: (_) => const WeeklyPlanScreen());
+      case monthlyPlan:
+        return MaterialPageRoute(builder: (_) => const MonthlyPlanScreen());
+      case yearlyPlan:
+        return MaterialPageRoute(builder: (_) => const YearlyPlanScreen());
+      case listDetail:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        return MaterialPageRoute(
+          builder: (_) => ListDetailScreen(
+            listType: args['type'] as ListType? ?? ListType.custom,
+            listId: args['listId'] as String?,
+          ),
+        );
+      case highlightMoments:
+        return MaterialPageRoute(
+          builder: (_) => const HighlightMomentsScreen(),
+        );
+      case growthReview:
+        return MaterialPageRoute(builder: (_) => const GrowthReviewScreen());
+      case habitPact:
+        return MaterialPageRoute(builder: (_) => const HabitPactScreen());
+      case worryUnload:
+        return MaterialPageRoute(builder: (_) => const WorryUnloadScreen());
+      case selfPraise:
+        return MaterialPageRoute(builder: (_) => const SelfPraiseScreen());
+      case supportMap:
+        return MaterialPageRoute(builder: (_) => const SupportMapScreen());
+      case futureSelf:
+        return MaterialPageRoute(builder: (_) => const FutureSelfScreen());
+      case idealVsReal:
+        return MaterialPageRoute(builder: (_) => const IdealVsRealScreen());
       // Settings sub-pages use Shared Axis transition (horizontal)
       case sessionHistory:
         return _sharedAxisRoute((_) => const SessionHistoryScreen());

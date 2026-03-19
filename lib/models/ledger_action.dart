@@ -30,6 +30,13 @@ enum ActionType {
   worryResolved('worry_resolved'),
   monthlyRitualSet('monthly_ritual_set'),
 
+  // LUMI 计划与清单模块
+  weeklyPlanSaved('weekly_plan_saved'),
+  monthlyPlanSaved('monthly_plan_saved'),
+  yearlyPlanSaved('yearly_plan_saved'),
+  listUpdated('list_updated'),
+  highlightRecorded('highlight_recorded'),
+
   // 仅通知用途 — 不写入 action_ledger，仅用于 LedgerChange 广播
   hydrate('hydrate'),
   catUpdate('cat_update'),

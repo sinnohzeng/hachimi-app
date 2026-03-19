@@ -54,6 +54,14 @@ class AnalyticsEvents {
   static const String worryCreated = 'worry_created';
   static const String worryResolved = 'worry_resolved';
 
+  // LUMI
+  static const String lumiOnboardingComplete = 'lumi_onboarding_complete';
+  static const String dailyLightRecorded = 'daily_light_recorded';
+  static const String weeklyPlanSaved = 'weekly_plan_saved';
+  static const String monthlyPlanSaved = 'monthly_plan_saved';
+  static const String yearlyPlanSaved = 'yearly_plan_saved';
+  static const String featureUnlocked = 'feature_unlocked';
+
   // Session quality
   static const String sessionQuality = 'session_quality';
 

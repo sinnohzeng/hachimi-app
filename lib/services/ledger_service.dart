@@ -220,6 +220,8 @@ class LedgerService {
         'local_sessions',
         'local_achievements',
         'local_worries',
+        'local_user_lists',
+        'local_highlight_entries',
       ]) {
         await txn.update(
           table,
@@ -235,6 +237,9 @@ class LedgerService {
         'local_monthly_checkins',
         'local_daily_lights',
         'local_weekly_reviews',
+        'local_weekly_plans',
+        'local_monthly_plans',
+        'local_yearly_plans',
       ]) {
         await txn.delete(table, where: 'uid = ?', whereArgs: [newUid]);
         await txn.update(
@@ -276,6 +281,11 @@ class LedgerService {
         'local_weekly_reviews',
         'local_worries',
         'local_awareness_stats',
+        'local_weekly_plans',
+        'local_monthly_plans',
+        'local_yearly_plans',
+        'local_user_lists',
+        'local_highlight_entries',
       ]) {
         await txn.delete(table, where: 'uid = ?', whereArgs: [uid]);
       }

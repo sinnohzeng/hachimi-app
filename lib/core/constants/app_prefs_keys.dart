@@ -27,6 +27,12 @@ class AppPrefsKeys {
   // ─── AI 日记重试队列 ───
   static const diaryPendingRetries = 'diary_pending_retries';
 
+  // ─── LUMI 引导 ───
+  static const lumiUserName = 'lumi_user_name';
+  static const lumiBirthday = 'lumi_birthday';
+  static const lumiStartDate = 'lumi_start_date';
+  static const lumiOnboardingVersion = 'lumi_onboarding_version';
+
   // ─── 觉知通知 ───
   static const awarenessReminderHour = 'awareness_reminder_hour';
   static const awarenessReminderMinute = 'awareness_reminder_minute';

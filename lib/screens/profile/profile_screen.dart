@@ -8,7 +8,9 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/cat_l10n.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/models/lumi_feature.dart';
 import 'package:hachimi_app/providers/achievement_provider.dart';
+import 'package:hachimi_app/providers/feature_gate_provider.dart';
 import 'package:hachimi_app/l10n/app_localizations.dart';
 import 'package:hachimi_app/core/backend/auth_backend.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -136,10 +138,24 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           const StaggeredListItem(index: 2, child: AwarenessStatsCard()),
+          if (ref.watch(featureGateProvider)[LumiFeature.growthReview] ??
+              false) ...[
+            const SizedBox(height: AppSpacing.lg),
+            StaggeredListItem(
+              index: 3,
+              child: ListTile(
+                leading: const Icon(Icons.trending_up_outlined),
+                title: const Text('成长回望'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRouter.growthReview),
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           const Divider(),
           StaggeredListItem(
-            index: 3,
+            index: 4,
             child: ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(l10n.profileSettings),
@@ -150,7 +166,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           if (!isGuest)
             StaggeredListItem(
-              index: 4,
+              index: 5,
               child: ListTile(
                 leading: Icon(Icons.logout, color: theme.colorScheme.error),
                 title: Text(

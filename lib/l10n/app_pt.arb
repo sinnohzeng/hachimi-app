@@ -1,6 +1,6 @@
 {
   "@@locale": "pt",
-  "appTitle": "Hachimi",
+  "appTitle": "Hachimi - Light Up My Innerverse",
   "homeTabToday": "Hoje",
   "homeTabCatHouse": "CatHouse",
   "homeTabStats": "Estatísticas",
@@ -977,5 +977,79 @@
   "worrySolutionHint": "What could you do about it?",
   "worryStatusDisappeared": "Gone",
   "worryStatusOngoing": "Ongoing",
-  "worryStatusResolved": "Resolved"
+  "worryStatusResolved": "Resolved",
+  "tabToday": "Today",
+  "tabJourney": "Journey",
+  "tabProfile": "Me",
+  "onboardingWelcome": "Hello",
+  "onboardingLumiIntro": "This is LUMI",
+  "onboardingSlogan": "Every line you write adds a star to your inner universe",
+  "onboardingNamePrompt": "The owner of this journal is",
+  "onboardingNameHint": "Your name",
+  "onboardingBirthdayPrompt": "Your birthday",
+  "onboardingBirthdayMonth": "Month",
+  "onboardingBirthdayDay": "Day",
+  "onboardingStartDatePrompt": "When would you like to start this journey?",
+  "onboardingThreeThings": "LUMI has just three little things",
+  "onboardingDailyLight": "Write one line before bed",
+  "onboardingDailyLightSub": "Today's little light",
+  "onboardingWeeklyReview": "Weekend review",
+  "onboardingWeeklyReviewSub": "Three happy moments",
+  "onboardingWorryJar": "Write down worries",
+  "onboardingWorryJarSub": "Put them in the worry jar",
+  "onboardingStart": "Start the journey",
+  "onboardingContinue": "Continue",
+  "onboardingNext": "Next",
+  "todayGreeting": "Good morning, {name}",
+  "quickLightPlaceholder": "What made you smile today?",
+  "recordLight": "Record",
+  "noHabitsYet": "No habits yet. You can set them in monthly plans.",
+  "segmentWeek": "This Week",
+  "segmentMonth": "This Month",
+  "segmentYear": "Year",
+  "segmentExplore": "Explore",
+  "featureLockedTitle": "Coming Soon",
+  "featureLockedMessage": "Record {days} more days to unlock. No rush.",
+  "weeklyPlanTitle": "Weekly Plan",
+  "oneLineForSelf": "Write a line for yourself this week",
+  "urgentImportant": "Must Do",
+  "importantNotUrgent": "Should Do",
+  "urgentNotImportant": "Need to Do",
+  "wantToDo": "Want to Do",
+  "monthlyGoals": "Monthly Goals",
+  "smallWinChallenge": "Small Win Challenge",
+  "monthlyPassion": "Monthly Passion",
+  "moodTracker": "Mood Tracker",
+  "monthlyMemory": "Monthly Memory",
+  "monthlyAchievement": "Monthly Achievement",
+  "yearlyMessages": "Yearly Messages",
+  "growthPlan": "Growth Plan",
+  "annualCalendar": "Annual Calendar",
+  "lumiStats": "My Stars",
+  "totalStars": "{count} stars",
+  "currentStreak": "Current Streak",
+  "longestStreak": "Longest Streak",
+  "catCompanion": "Cat Companion",
+  "growthReview": "Growth Review",
+  "@todayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@featureLockedMessage": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@totalStars": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

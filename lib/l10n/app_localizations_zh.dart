@@ -9,7 +9,7 @@ class SZh extends S {
   SZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get appTitle => 'Hachimi';
+  String get appTitle => 'Hachimi - 点亮内心宇宙';
 
   @override
   String get homeTabToday => '今天';
@@ -2912,6 +2912,171 @@ class SZh extends S {
 
   @override
   String get timelineEventHint => '发生了什么？';
+
+  @override
+  String get tabToday => '今天';
+
+  @override
+  String get tabJourney => '旅程';
+
+  @override
+  String get tabProfile => '我的';
+
+  @override
+  String get onboardingWelcome => '你好';
+
+  @override
+  String get onboardingLumiIntro => '这里是 LUMI';
+
+  @override
+  String get onboardingSlogan => '每写一行，都是在为你的内心宇宙添一颗星';
+
+  @override
+  String get onboardingNamePrompt => '这本手册的主人是';
+
+  @override
+  String get onboardingNameHint => '你的名字';
+
+  @override
+  String get onboardingBirthdayPrompt => '你的生日';
+
+  @override
+  String get onboardingBirthdayMonth => '月';
+
+  @override
+  String get onboardingBirthdayDay => '日';
+
+  @override
+  String get onboardingStartDatePrompt => '你想从哪天开始这段旅程？';
+
+  @override
+  String get onboardingThreeThings => 'LUMI 只有三件小事';
+
+  @override
+  String get onboardingDailyLight => '睡前写一句';
+
+  @override
+  String get onboardingDailyLightSub => '今天的一点光';
+
+  @override
+  String get onboardingWeeklyReview => '周末回顾';
+
+  @override
+  String get onboardingWeeklyReviewSub => '三个幸福时刻';
+
+  @override
+  String get onboardingWorryJar => '写下烦恼';
+
+  @override
+  String get onboardingWorryJarSub => '放进烦恼罐';
+
+  @override
+  String get onboardingStart => '开始旅程';
+
+  @override
+  String get onboardingContinue => '继续';
+
+  @override
+  String get onboardingNext => '下一步';
+
+  @override
+  String todayGreeting(String name) {
+    return '早上好，$name';
+  }
+
+  @override
+  String get quickLightPlaceholder => '今天有什么让你微笑的事？';
+
+  @override
+  String get recordLight => '记录';
+
+  @override
+  String get noHabitsYet => '你还没有习惯，可以在月度计划里设定';
+
+  @override
+  String get segmentWeek => '本周';
+
+  @override
+  String get segmentMonth => '本月';
+
+  @override
+  String get segmentYear => '年度';
+
+  @override
+  String get segmentExplore => '探索';
+
+  @override
+  String get featureLockedTitle => '即将开放';
+
+  @override
+  String featureLockedMessage(int days) {
+    return '再记录 $days 天就可以解锁了，不急，慢慢来';
+  }
+
+  @override
+  String get weeklyPlanTitle => '本周计划';
+
+  @override
+  String get oneLineForSelf => '写一句话给这周的自己';
+
+  @override
+  String get urgentImportant => '必须做';
+
+  @override
+  String get importantNotUrgent => '要做';
+
+  @override
+  String get urgentNotImportant => '该做';
+
+  @override
+  String get wantToDo => '想做';
+
+  @override
+  String get monthlyGoals => '本月目标';
+
+  @override
+  String get smallWinChallenge => '小赢挑战';
+
+  @override
+  String get monthlyPassion => '本月热爱与坚持';
+
+  @override
+  String get moodTracker => '心情追踪';
+
+  @override
+  String get monthlyMemory => '本月记忆';
+
+  @override
+  String get monthlyAchievement => '本月成就';
+
+  @override
+  String get yearlyMessages => '年度寄语';
+
+  @override
+  String get growthPlan => '年度成长计划';
+
+  @override
+  String get annualCalendar => '我的年历';
+
+  @override
+  String get lumiStats => '我的星星';
+
+  @override
+  String totalStars(int count) {
+    return '$count 颗星';
+  }
+
+  @override
+  String get currentStreak => '当前连续';
+
+  @override
+  String get longestStreak => '最长连续';
+
+  @override
+  String get catCompanion => '猫咪伴侣';
+
+  @override
+  String get growthReview => '成长回望';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2919,7 +3084,7 @@ class SZhHant extends SZh {
   SZhHant() : super('zh_Hant');
 
   @override
-  String get appTitle => 'Hachimi';
+  String get appTitle => 'Hachimi - 點亮內心宇宙';
 
   @override
   String get homeTabToday => '今日';
@@ -5833,4 +5998,171 @@ class SZhHant extends SZh {
 
   @override
   String get timelineEventHint => 'What happened?';
+
+  @override
+  String get tabToday => 'Today';
+
+  @override
+  String get tabJourney => 'Journey';
+
+  @override
+  String get tabProfile => 'Me';
+
+  @override
+  String get onboardingWelcome => 'Hello';
+
+  @override
+  String get onboardingLumiIntro => 'This is LUMI';
+
+  @override
+  String get onboardingSlogan =>
+      'Every line you write adds a star to your inner universe';
+
+  @override
+  String get onboardingNamePrompt => 'The owner of this journal is';
+
+  @override
+  String get onboardingNameHint => 'Your name';
+
+  @override
+  String get onboardingBirthdayPrompt => 'Your birthday';
+
+  @override
+  String get onboardingBirthdayMonth => 'Month';
+
+  @override
+  String get onboardingBirthdayDay => 'Day';
+
+  @override
+  String get onboardingStartDatePrompt =>
+      'When would you like to start this journey?';
+
+  @override
+  String get onboardingThreeThings => 'LUMI has just three little things';
+
+  @override
+  String get onboardingDailyLight => 'Write one line before bed';
+
+  @override
+  String get onboardingDailyLightSub => 'Today\'s little light';
+
+  @override
+  String get onboardingWeeklyReview => 'Weekend review';
+
+  @override
+  String get onboardingWeeklyReviewSub => 'Three happy moments';
+
+  @override
+  String get onboardingWorryJar => 'Write down worries';
+
+  @override
+  String get onboardingWorryJarSub => 'Put them in the worry jar';
+
+  @override
+  String get onboardingStart => 'Start the journey';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String todayGreeting(String name) {
+    return 'Good morning, $name';
+  }
+
+  @override
+  String get quickLightPlaceholder => 'What made you smile today?';
+
+  @override
+  String get recordLight => 'Record';
+
+  @override
+  String get noHabitsYet => 'No habits yet. You can set them in monthly plans.';
+
+  @override
+  String get segmentWeek => 'This Week';
+
+  @override
+  String get segmentMonth => 'This Month';
+
+  @override
+  String get segmentYear => 'Year';
+
+  @override
+  String get segmentExplore => 'Explore';
+
+  @override
+  String get featureLockedTitle => 'Coming Soon';
+
+  @override
+  String featureLockedMessage(int days) {
+    return 'Record $days more days to unlock. No rush.';
+  }
+
+  @override
+  String get weeklyPlanTitle => 'Weekly Plan';
+
+  @override
+  String get oneLineForSelf => 'Write a line for yourself this week';
+
+  @override
+  String get urgentImportant => 'Must Do';
+
+  @override
+  String get importantNotUrgent => 'Should Do';
+
+  @override
+  String get urgentNotImportant => 'Need to Do';
+
+  @override
+  String get wantToDo => 'Want to Do';
+
+  @override
+  String get monthlyGoals => 'Monthly Goals';
+
+  @override
+  String get smallWinChallenge => 'Small Win Challenge';
+
+  @override
+  String get monthlyPassion => 'Monthly Passion';
+
+  @override
+  String get moodTracker => 'Mood Tracker';
+
+  @override
+  String get monthlyMemory => 'Monthly Memory';
+
+  @override
+  String get monthlyAchievement => 'Monthly Achievement';
+
+  @override
+  String get yearlyMessages => 'Yearly Messages';
+
+  @override
+  String get growthPlan => 'Growth Plan';
+
+  @override
+  String get annualCalendar => 'Annual Calendar';
+
+  @override
+  String get lumiStats => 'My Stars';
+
+  @override
+  String totalStars(int count) {
+    return '$count stars';
+  }
+
+  @override
+  String get currentStreak => 'Current Streak';
+
+  @override
+  String get longestStreak => 'Longest Streak';
+
+  @override
+  String get catCompanion => 'Cat Companion';
+
+  @override
+  String get growthReview => 'Growth Review';
 }

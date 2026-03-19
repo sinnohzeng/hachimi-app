@@ -1,6 +1,6 @@
 {
   "@@locale": "zh",
-  "appTitle": "Hachimi",
+  "appTitle": "Hachimi - 点亮内心宇宙",
   "homeTabToday": "今天",
   "homeTabCatHouse": "猫屋",
   "homeTabStats": "统计",
@@ -1659,5 +1659,84 @@
   "awarenessStatsMonthlyChallenge": "本月挑战",
   "awarenessStatsStartRecording": "开始记录你的第一点光",
 
-  "timelineEventHint": "发生了什么？"
+  "timelineEventHint": "发生了什么？",
+
+  "tabToday": "今天",
+  "tabJourney": "旅程",
+  "tabProfile": "我的",
+
+  "onboardingWelcome": "你好",
+  "onboardingLumiIntro": "这里是 LUMI",
+  "onboardingSlogan": "每写一行，都是在为你的内心宇宙添一颗星",
+  "onboardingNamePrompt": "这本手册的主人是",
+  "onboardingNameHint": "你的名字",
+  "onboardingBirthdayPrompt": "你的生日",
+  "onboardingBirthdayMonth": "月",
+  "onboardingBirthdayDay": "日",
+  "onboardingStartDatePrompt": "你想从哪天开始这段旅程？",
+  "onboardingThreeThings": "LUMI 只有三件小事",
+  "onboardingDailyLight": "睡前写一句",
+  "onboardingDailyLightSub": "今天的一点光",
+  "onboardingWeeklyReview": "周末回顾",
+  "onboardingWeeklyReviewSub": "三个幸福时刻",
+  "onboardingWorryJar": "写下烦恼",
+  "onboardingWorryJarSub": "放进烦恼罐",
+  "onboardingStart": "开始旅程",
+  "onboardingContinue": "继续",
+  "onboardingNext": "下一步",
+
+  "todayGreeting": "早上好，{name}",
+  "@todayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quickLightPlaceholder": "今天有什么让你微笑的事？",
+  "recordLight": "记录",
+  "noHabitsYet": "你还没有习惯，可以在月度计划里设定",
+
+  "segmentWeek": "本周",
+  "segmentMonth": "本月",
+  "segmentYear": "年度",
+  "segmentExplore": "探索",
+  "featureLockedTitle": "即将开放",
+  "featureLockedMessage": "再记录 {days} 天就可以解锁了，不急，慢慢来",
+  "@featureLockedMessage": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyPlanTitle": "本周计划",
+  "oneLineForSelf": "写一句话给这周的自己",
+  "urgentImportant": "必须做",
+  "importantNotUrgent": "要做",
+  "urgentNotImportant": "该做",
+  "wantToDo": "想做",
+  "monthlyGoals": "本月目标",
+  "smallWinChallenge": "小赢挑战",
+  "monthlyPassion": "本月热爱与坚持",
+  "moodTracker": "心情追踪",
+  "monthlyMemory": "本月记忆",
+  "monthlyAchievement": "本月成就",
+  "yearlyMessages": "年度寄语",
+  "growthPlan": "年度成长计划",
+  "annualCalendar": "我的年历",
+
+  "lumiStats": "我的星星",
+  "totalStars": "{count} 颗星",
+  "@totalStars": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currentStreak": "当前连续",
+  "longestStreak": "最长连续",
+  "catCompanion": "猫咪伴侣",
+  "growthReview": "成长回望"
 }

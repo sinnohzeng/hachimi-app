@@ -125,7 +125,7 @@ abstract class S {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Hachimi'**
+  /// **'Hachimi - Light Up My Innerverse'**
   String get appTitle;
 
   /// No description provided for @homeTabToday.
@@ -5491,6 +5491,324 @@ abstract class S {
   /// In en, this message translates to:
   /// **'What happened?'**
   String get timelineEventHint;
+
+  /// No description provided for @tabToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tabToday;
+
+  /// No description provided for @tabJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get tabJourney;
+
+  /// No description provided for @tabProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get tabProfile;
+
+  /// No description provided for @onboardingWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello'**
+  String get onboardingWelcome;
+
+  /// No description provided for @onboardingLumiIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This is LUMI'**
+  String get onboardingLumiIntro;
+
+  /// No description provided for @onboardingSlogan.
+  ///
+  /// In en, this message translates to:
+  /// **'Every line you write adds a star to your inner universe'**
+  String get onboardingSlogan;
+
+  /// No description provided for @onboardingNamePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'The owner of this journal is'**
+  String get onboardingNamePrompt;
+
+  /// No description provided for @onboardingNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get onboardingNameHint;
+
+  /// No description provided for @onboardingBirthdayPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Your birthday'**
+  String get onboardingBirthdayPrompt;
+
+  /// No description provided for @onboardingBirthdayMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get onboardingBirthdayMonth;
+
+  /// No description provided for @onboardingBirthdayDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get onboardingBirthdayDay;
+
+  /// No description provided for @onboardingStartDatePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'When would you like to start this journey?'**
+  String get onboardingStartDatePrompt;
+
+  /// No description provided for @onboardingThreeThings.
+  ///
+  /// In en, this message translates to:
+  /// **'LUMI has just three little things'**
+  String get onboardingThreeThings;
+
+  /// No description provided for @onboardingDailyLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Write one line before bed'**
+  String get onboardingDailyLight;
+
+  /// No description provided for @onboardingDailyLightSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s little light'**
+  String get onboardingDailyLightSub;
+
+  /// No description provided for @onboardingWeeklyReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend review'**
+  String get onboardingWeeklyReview;
+
+  /// No description provided for @onboardingWeeklyReviewSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Three happy moments'**
+  String get onboardingWeeklyReviewSub;
+
+  /// No description provided for @onboardingWorryJar.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down worries'**
+  String get onboardingWorryJar;
+
+  /// No description provided for @onboardingWorryJarSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Put them in the worry jar'**
+  String get onboardingWorryJarSub;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the journey'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @todayGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, {name}'**
+  String todayGreeting(String name);
+
+  /// No description provided for @quickLightPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'What made you smile today?'**
+  String get quickLightPlaceholder;
+
+  /// No description provided for @recordLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get recordLight;
+
+  /// No description provided for @noHabitsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No habits yet. You can set them in monthly plans.'**
+  String get noHabitsYet;
+
+  /// No description provided for @segmentWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get segmentWeek;
+
+  /// No description provided for @segmentMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get segmentMonth;
+
+  /// No description provided for @segmentYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get segmentYear;
+
+  /// No description provided for @segmentExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get segmentExplore;
+
+  /// No description provided for @featureLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get featureLockedTitle;
+
+  /// No description provided for @featureLockedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Record {days} more days to unlock. No rush.'**
+  String featureLockedMessage(int days);
+
+  /// No description provided for @weeklyPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Plan'**
+  String get weeklyPlanTitle;
+
+  /// No description provided for @oneLineForSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a line for yourself this week'**
+  String get oneLineForSelf;
+
+  /// No description provided for @urgentImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Must Do'**
+  String get urgentImportant;
+
+  /// No description provided for @importantNotUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Should Do'**
+  String get importantNotUrgent;
+
+  /// No description provided for @urgentNotImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Need to Do'**
+  String get urgentNotImportant;
+
+  /// No description provided for @wantToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Want to Do'**
+  String get wantToDo;
+
+  /// No description provided for @monthlyGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Goals'**
+  String get monthlyGoals;
+
+  /// No description provided for @smallWinChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Small Win Challenge'**
+  String get smallWinChallenge;
+
+  /// No description provided for @monthlyPassion.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Passion'**
+  String get monthlyPassion;
+
+  /// No description provided for @moodTracker.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood Tracker'**
+  String get moodTracker;
+
+  /// No description provided for @monthlyMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Memory'**
+  String get monthlyMemory;
+
+  /// No description provided for @monthlyAchievement.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Achievement'**
+  String get monthlyAchievement;
+
+  /// No description provided for @yearlyMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Messages'**
+  String get yearlyMessages;
+
+  /// No description provided for @growthPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Plan'**
+  String get growthPlan;
+
+  /// No description provided for @annualCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Calendar'**
+  String get annualCalendar;
+
+  /// No description provided for @lumiStats.
+  ///
+  /// In en, this message translates to:
+  /// **'My Stars'**
+  String get lumiStats;
+
+  /// No description provided for @totalStars.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stars'**
+  String totalStars(int count);
+
+  /// No description provided for @currentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get currentStreak;
+
+  /// No description provided for @longestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Streak'**
+  String get longestStreak;
+
+  /// No description provided for @catCompanion.
+  ///
+  /// In en, this message translates to:
+  /// **'Cat Companion'**
+  String get catCompanion;
+
+  /// No description provided for @growthReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Review'**
+  String get growthReview;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

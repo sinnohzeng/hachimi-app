@@ -27,6 +27,8 @@ class WeeklyReview {
   final String? gratitude;
   final String? learning;
   final String? catWeeklySummary; // 模板库生成，非 AI
+  final String? freeNote; // 自由书写区
+  final String? worrySummary; // 烦恼状态小结
 
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -45,6 +47,8 @@ class WeeklyReview {
     this.gratitude,
     this.learning,
     this.catWeeklySummary,
+    this.freeNote,
+    this.worrySummary,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -87,6 +91,8 @@ class WeeklyReview {
       'gratitude': gratitude,
       'learning': learning,
       'cat_weekly_summary': catWeeklySummary,
+      'free_note': freeNote,
+      'worry_summary': worrySummary,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
     };
@@ -107,6 +113,8 @@ class WeeklyReview {
       gratitude: map['gratitude'] as String?,
       learning: map['learning'] as String?,
       catWeeklySummary: map['cat_weekly_summary'] as String?,
+      freeNote: map['free_note'] as String?,
+      worrySummary: map['worry_summary'] as String?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         (map['created_at'] as int?) ?? DateTime.now().millisecondsSinceEpoch,
       ),
@@ -131,6 +139,8 @@ class WeeklyReview {
       'gratitude': gratitude,
       'learning': learning,
       'catWeeklySummary': catWeeklySummary,
+      'freeNote': freeNote,
+      'worrySummary': worrySummary,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
@@ -152,6 +162,8 @@ class WeeklyReview {
       gratitude: data['gratitude'] as String?,
       learning: data['learning'] as String?,
       catWeeklySummary: data['catWeeklySummary'] as String?,
+      freeNote: data['freeNote'] as String?,
+      worrySummary: data['worrySummary'] as String?,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -178,6 +190,10 @@ class WeeklyReview {
     String? learning,
     bool clearLearning = false,
     String? catWeeklySummary,
+    String? freeNote,
+    bool clearFreeNote = false,
+    String? worrySummary,
+    bool clearWorrySummary = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -201,6 +217,10 @@ class WeeklyReview {
       gratitude: clearGratitude ? null : (gratitude ?? this.gratitude),
       learning: clearLearning ? null : (learning ?? this.learning),
       catWeeklySummary: catWeeklySummary ?? this.catWeeklySummary,
+      freeNote: clearFreeNote ? null : (freeNote ?? this.freeNote),
+      worrySummary: clearWorrySummary
+          ? null
+          : (worrySummary ?? this.worrySummary),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

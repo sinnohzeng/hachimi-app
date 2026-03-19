@@ -17,7 +17,10 @@ class LocalDatabaseService {
   /// - v3: local_cats.display_pose 列（纯本地，不同步）
   /// - v4: V3 觉知模块 — local_daily_lights, local_weekly_reviews,
   ///        local_worries, local_awareness_stats
-  static const _dbVersion = 4;
+  /// - v5: LUMI 计划与清单 — local_weekly_plans, local_monthly_plans,
+  ///        local_yearly_plans, local_user_lists, local_highlight_entries,
+  ///        local_weekly_reviews 新增 free_note + worry_summary 列
+  static const _dbVersion = 5;
 
   Database? _db;
 
@@ -89,6 +92,9 @@ class LocalDatabaseService {
     if (version >= 4) {
       await _createV4Tables(db);
     }
+    if (version >= 5) {
+      await _createV5Tables(db);
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldV, int newV) async {
@@ -100,6 +106,10 @@ class LocalDatabaseService {
     }
     if (oldV < 4) {
       await _createV4Tables(db);
+    }
+    if (oldV < 5) {
+      await _createV5Tables(db);
+      await _addV5Columns(db);
     }
   }
 
@@ -350,6 +360,8 @@ class LocalDatabaseService {
         gratitude TEXT,
         learning TEXT,
         cat_weekly_summary TEXT,
+        free_note TEXT,
+        worry_summary TEXT,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         UNIQUE(uid, week_id)
@@ -391,6 +403,142 @@ class LocalDatabaseService {
         updated_at INTEGER NOT NULL
       )
     ''');
+  }
+
+  /// v5: LUMI 计划与清单 — 5 张新表 + WeeklyReview 扩展列。
+  Future<void> _createV5Tables(Database db) async {
+    await _createWeeklyPlansTable(db);
+    await _createMonthlyPlansTable(db);
+    await _createYearlyPlansTable(db);
+    await _createUserListsTable(db);
+    await _createHighlightEntriesTable(db);
+  }
+
+  /// v5 升级专用 — 为已有 local_weekly_reviews 表添加新列。
+  /// onCreate 路径中 v4 建表已包含这些列（见下方条件判断），
+  /// 此方法仅在 onUpgrade 从 v4→v5 时调用。
+  Future<void> _addV5Columns(Database db) async {
+    await db.execute(
+      'ALTER TABLE local_weekly_reviews ADD COLUMN free_note TEXT',
+    );
+    await db.execute(
+      'ALTER TABLE local_weekly_reviews ADD COLUMN worry_summary TEXT',
+    );
+  }
+
+  Future<void> _createWeeklyPlansTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_weekly_plans (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        week_id TEXT NOT NULL,
+        week_start_date TEXT NOT NULL,
+        week_end_date TEXT NOT NULL,
+        one_line_for_self TEXT,
+        urgent_important TEXT NOT NULL DEFAULT '[]',
+        important_not_urgent TEXT NOT NULL DEFAULT '[]',
+        urgent_not_important TEXT NOT NULL DEFAULT '[]',
+        want_to_do TEXT NOT NULL DEFAULT '[]',
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(uid, week_id)
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_weekly_plans_uid '
+      'ON local_weekly_plans(uid, week_id)',
+    );
+  }
+
+  Future<void> _createMonthlyPlansTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_monthly_plans (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        month_id TEXT NOT NULL,
+        goals TEXT NOT NULL DEFAULT '[]',
+        challenge_habit_name TEXT,
+        challenge_reward TEXT,
+        self_care_activities TEXT NOT NULL DEFAULT '[]',
+        memory TEXT,
+        achievement TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(uid, month_id)
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_monthly_plans_uid '
+      'ON local_monthly_plans(uid, month_id)',
+    );
+  }
+
+  Future<void> _createYearlyPlansTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_yearly_plans (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        become_person TEXT,
+        achieve_goals TEXT,
+        breakthrough TEXT,
+        dont_do TEXT,
+        year_keyword TEXT,
+        future_message TEXT,
+        motto TEXT,
+        growth_dimensions TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(uid, year)
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_yearly_plans_uid '
+      'ON local_yearly_plans(uid, year)',
+    );
+  }
+
+  Future<void> _createUserListsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_user_lists (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        custom_title TEXT,
+        items TEXT NOT NULL DEFAULT '[]',
+        year_pick TEXT,
+        year_insight TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_user_lists_uid_year '
+      'ON local_user_lists(uid, year)',
+    );
+  }
+
+  Future<void> _createHighlightEntriesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE local_highlight_entries (
+        id TEXT PRIMARY KEY,
+        uid TEXT NOT NULL,
+        year INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        description TEXT NOT NULL,
+        companion TEXT,
+        feeling TEXT,
+        date TEXT NOT NULL,
+        rating INTEGER NOT NULL DEFAULT 3,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX idx_highlight_entries_uid_year '
+      'ON local_highlight_entries(uid, year, type)',
+    );
   }
 
   // ─── Diary CRUD ───
