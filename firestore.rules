@@ -109,6 +109,31 @@ service cloud.firestore {
         allow delete: if isOwner(userId);
       }
 
+      // Weekly plans subcollection (LUMI 韧性手册 — 周计划)
+      match /weeklyPlans/{planId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Monthly plans subcollection (LUMI 韧性手册 — 月计划)
+      match /monthlyPlans/{planId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Yearly plans subcollection (LUMI 韧性手册 — 年计划)
+      match /yearlyPlans/{planId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Lists subcollection (LUMI 韧性手册 — 书单/影单/自定义清单)
+      match /lists/{listId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Highlight entries subcollection (LUMI 韧性手册 — 高光时刻)
+      match /highlightEntries/{entryId} {
+        allow read, write: if isOwner(userId);
+      }
+
     }
 
     // Deny all other access

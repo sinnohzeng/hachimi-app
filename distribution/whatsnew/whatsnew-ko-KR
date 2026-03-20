@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI: 내 안의 우주를 밝히다
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- 새로운 3탭 레이아웃: 오늘, 여정, 프로필
+- 데일리 라이트: 매일 한 줄로 기분 기록
+- 여정 플래너: 주간, 월간, 연간 목표 설정
+- 자기 성찰과 성장을 위한 월간 활동 6가지
+- 하이라이트 순간과 행복 저널
+- 연속 기록 기반 단계적 잠금 해제
+- 15개 언어 완전 현지화 지원

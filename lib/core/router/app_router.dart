@@ -175,8 +175,9 @@ class AppRouter {
       case onboardingLumi:
         return MaterialPageRoute(
           builder: (context) => LumiOnboardingScreen(
-            onComplete: () => Navigator.of(context)
-                .pushNamedAndRemoveUntil(AppRouter.home, (_) => false),
+            onComplete: () => Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false),
           ),
         );
       case journey:

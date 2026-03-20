@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/constants/lumi_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/yearly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -27,15 +28,20 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
   bool _loaded = false;
   bool _isSaving = false;
 
-  static const _prompts = [
-    '这一年我希望自己成为......',
-    '达成目标',
-    '突破性完成',
-    '不做（说不，也是在为重要的事腾位置）',
-    '年度关键词（例：专注/勇敢/耐心/温柔）',
-    '给亲爱的未来的我',
-    '我的座右铭',
-  ];
+  static const _promptCount = 7;
+
+  List<String> _prompts(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.yearlyMessageBecome,
+      l10n.yearlyMessageGoals,
+      l10n.yearlyMessageBreakthrough,
+      l10n.yearlyMessageDontDo,
+      l10n.yearlyMessageKeyword,
+      l10n.yearlyMessageFutureSelf,
+      l10n.yearlyMessageMotto,
+    ];
+  }
 
   static const _dimIcons = <String, IconData>{
     'health': Icons.favorite_outline,
@@ -52,16 +58,21 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
   void initState() {
     super.initState();
     _messageControllers = List.generate(
-      _prompts.length,
+      _promptCount,
       (_) => TextEditingController(),
     );
     for (final key in LumiConstants.growthDimensions.keys) {
       _dimControllers[key] = TextEditingController();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final plan = ref.read(currentYearPlanProvider).value;
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) setState(() => _loaded = true);
+      ref.listenManual(currentYearPlanProvider, (prev, next) {
+        next.whenData((plan) {
+          if (plan != null && !_loaded) {
+            _loadFromPlan(plan);
+            setState(() {});
+          }
+        });
+      }, fireImmediately: true);
     });
   }
 
@@ -133,12 +144,12 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
       await ref.read(planRepositoryProvider).saveYearlyPlan(uid, plan);
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[YearlyPlanScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -154,7 +165,9 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
     final dimEntries = LumiConstants.growthDimensions.entries.toList();
 
     return AppScaffold(
-      appBar: AppBar(title: Text('${DateTime.now().year} 年度计划')),
+      appBar: AppBar(
+        title: Text(context.l10n.yearlyPlanScreenTitle(DateTime.now().year)),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -164,7 +177,7 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -172,25 +185,30 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 年度寄语
-            _sectionTitle(textTheme, colorScheme, Icons.edit_note, '年度寄语'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.edit_note,
+              context.l10n.yearlyPlanMessagesSection,
+            ),
             const SizedBox(height: AppSpacing.md),
-            ...List.generate(
-              _prompts.length,
-              (i) => Padding(
+            ...List.generate(_promptCount, (i) {
+              final prompts = _prompts(context);
+              return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: TextField(
                   controller: _messageControllers[i],
                   maxLines: i == 5 ? 4 : 2,
                   decoration: InputDecoration(
-                    labelText: _prompts[i],
+                    labelText: prompts[i],
                     border: OutlineInputBorder(
                       borderRadius: AppShape.borderSmall,
                     ),
                     alignLabelWithHint: true,
                   ),
                 ),
-              ),
-            ),
+              );
+            }),
 
             const SizedBox(height: AppSpacing.lg),
 
@@ -199,7 +217,7 @@ class _YearlyPlanScreenState extends ConsumerState<YearlyPlanScreen> {
               textTheme,
               colorScheme,
               Icons.rocket_launch_outlined,
-              '成长计划',
+              context.l10n.yearlyPlanGrowthSection,
             ),
             const SizedBox(height: AppSpacing.md),
             ...dimEntries.map((entry) {

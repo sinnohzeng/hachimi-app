@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -21,19 +22,33 @@ class MonthlyMemoryCard extends ConsumerStatefulWidget {
 class _MonthlyMemoryCardState extends ConsumerState<MonthlyMemoryCard> {
   final _memoryController = TextEditingController();
   final _achievementController = TextEditingController();
+  late final FocusNode _memoryFocus;
+  late final FocusNode _achievementFocus;
   String? _loadedPlanId;
   Timer? _saveTimer;
 
   @override
   void initState() {
     super.initState();
+    _memoryFocus = FocusNode()
+      ..addListener(() {
+        if (!_memoryFocus.hasFocus) _save();
+      });
+    _achievementFocus = FocusNode()
+      ..addListener(() {
+        if (!_achievementFocus.hasFocus) _save();
+      });
     _memoryController.addListener(_scheduleSave);
     _achievementController.addListener(_scheduleSave);
   }
 
   @override
   void dispose() {
+    // 离开页面时立即保存未提交的内容
     _saveTimer?.cancel();
+    _save();
+    _memoryFocus.dispose();
+    _achievementFocus.dispose();
     _memoryController.dispose();
     _achievementController.dispose();
     super.dispose();
@@ -81,7 +96,7 @@ class _MonthlyMemoryCardState extends ConsumerState<MonthlyMemoryCard> {
       await ref.read(planRepositoryProvider).saveMonthlyPlan(uid, plan);
     } on Exception catch (e) {
       debugPrint('[MonthlyMemoryCard] Save error: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     }
   }
 
@@ -109,16 +124,20 @@ class _MonthlyMemoryCardState extends ConsumerState<MonthlyMemoryCard> {
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('本月记忆', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.monthlyMemoryTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _memoryController,
+              focusNode: _memoryFocus,
               maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: '这个月最美好的记忆是...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.monthlyMemoryHint,
+                border: const OutlineInputBorder(),
                 isDense: true,
               ),
             ),
@@ -127,16 +146,20 @@ class _MonthlyMemoryCardState extends ConsumerState<MonthlyMemoryCard> {
               children: [
                 Icon(Icons.star_outline, size: 20, color: colorScheme.tertiary),
                 const SizedBox(width: AppSpacing.sm),
-                Text('本月成就', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.monthlyAchievementTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _achievementController,
+              focusNode: _achievementFocus,
               maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: '这个月我最骄傲的成就是...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.monthlyAchievementHint,
+                border: const OutlineInputBorder(),
                 isDense: true,
               ),
             ),

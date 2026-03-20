@@ -3140,4 +3140,861 @@ class SId extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return 'Sudah malam, $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'Selamat pagi, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'Selamat siang, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'Selamat malam, $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => 'Sudah malam';
+
+  @override
+  String get greetingMorningNoName => 'Selamat pagi';
+
+  @override
+  String get greetingAfternoonNoName => 'Selamat siang';
+
+  @override
+  String get greetingEveningNoName => 'Selamat malam';
+
+  @override
+  String get journeyTitle => 'Perjalanan';
+
+  @override
+  String get journeySegmentWeek => 'Minggu';
+
+  @override
+  String get journeySegmentMonth => 'Bulan';
+
+  @override
+  String get journeySegmentYear => 'Tahun';
+
+  @override
+  String get journeySegmentExplore => 'Jelajahi';
+
+  @override
+  String get journeyMonthlyView => 'Tampilan bulanan';
+
+  @override
+  String get journeyYearlyView => 'Tampilan tahunan';
+
+  @override
+  String get journeyExploreActivities => 'Aktivitas';
+
+  @override
+  String get journeyEditMonthlyPlan => 'Edit rencana bulan';
+
+  @override
+  String get journeyEditYearlyPlan => 'Edit rencana tahun';
+
+  @override
+  String get quickLightTitle => 'Cahaya kecil hari ini';
+
+  @override
+  String get quickLightHint => 'Apa yang kamu rasakan hari ini?';
+
+  @override
+  String get quickLightRecord => 'Catat';
+
+  @override
+  String get quickLightSaveSuccess => 'Tercatat';
+
+  @override
+  String get quickLightSaveError => 'Gagal menyimpan. Coba lagi ya';
+
+  @override
+  String get habitSnapshotTitle => 'Kebiasaan hari ini';
+
+  @override
+  String get habitSnapshotEmpty => 'Belum ada kebiasaan. Atur di perjalananmu';
+
+  @override
+  String get habitSnapshotLoadError => 'Gagal memuat';
+
+  @override
+  String get worryJarTitle => 'Toples kekhawatiran';
+
+  @override
+  String get worryJarLoadError => 'Gagal memuat';
+
+  @override
+  String get weeklyReviewEmpty => 'Catat momen bahagia minggu ini';
+
+  @override
+  String get weeklyReviewHappyMoments => 'Momen bahagia';
+
+  @override
+  String get weeklyReviewLoadError => 'Gagal memuat';
+
+  @override
+  String get weeklyPlanCardTitle => 'Rencana minggu';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count item';
+  }
+
+  @override
+  String get weeklyPlanEmpty => 'Buat rencana mingguan';
+
+  @override
+  String get weekMoodTitle => 'Suasana hati minggu ini';
+
+  @override
+  String get weekMoodLoadError => 'Gagal memuat suasana hati';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return 'Catat $remaining hari lagi untuk membuka';
+  }
+
+  @override
+  String get featureLockedSoon => 'Segera hadir';
+
+  @override
+  String get weeklyPlanScreenTitle => 'Rencana minggu';
+
+  @override
+  String get weeklyPlanSave => 'Simpan';
+
+  @override
+  String get weeklyPlanSaveSuccess => 'Tersimpan';
+
+  @override
+  String get weeklyPlanSaveError => 'Gagal menyimpan';
+
+  @override
+  String get weeklyPlanOneLine => 'Satu kalimat untuk dirimu minggu ini';
+
+  @override
+  String get weeklyPlanOneLineHint => 'Minggu ini aku ingin...';
+
+  @override
+  String get weeklyPlanUrgentImportant => 'Mendesak dan penting';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => 'Penting, tidak mendesak';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => 'Mendesak, tidak penting';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => 'Tidak mendesak, tidak penting';
+
+  @override
+  String get weeklyPlanAddHint => 'Tambah...';
+
+  @override
+  String get weeklyPlanMustDo => 'Harus';
+
+  @override
+  String get weeklyPlanShouldDo => 'Sebaiknya';
+
+  @override
+  String get weeklyPlanNeedToDo => 'Bisa';
+
+  @override
+  String get weeklyPlanWantToDo => 'Ingin';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$month/$year';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => 'Gagal memuat';
+
+  @override
+  String get monthlyGoalsTitle => 'Target bulan';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return 'Target $index';
+  }
+
+  @override
+  String get monthlySaveError => 'Gagal menyimpan';
+
+  @override
+  String get monthlyMemoryTitle => 'Kenangan bulan ini';
+
+  @override
+  String get monthlyMemoryHint => 'Kenangan terindah bulan ini...';
+
+  @override
+  String get monthlyAchievementTitle => 'Pencapaian bulan';
+
+  @override
+  String get monthlyAchievementHint => 'Pencapaian paling membanggakan...';
+
+  @override
+  String get yearlyMessagesTitle => 'Pesan tahunan';
+
+  @override
+  String get yearlyMessageBecome => 'Tahun ini aku ingin menjadi...';
+
+  @override
+  String get yearlyMessageGoals => 'Target yang ingin dicapai';
+
+  @override
+  String get yearlyMessageBreakthrough => 'Terobosan';
+
+  @override
+  String get yearlyMessageDontDo =>
+      'Tidak dilakukan (bilang tidak = beri ruang untuk yang penting)';
+
+  @override
+  String get yearlyMessageKeyword =>
+      'Kata kunci tahun (cth: Fokus/Berani/Sabar/Lembut)';
+
+  @override
+  String get yearlyMessageFutureSelf => 'Untuk diriku di masa depan';
+
+  @override
+  String get yearlyMessageMotto => 'Motto ku';
+
+  @override
+  String get growthPlanTitle => 'Rencana pertumbuhan';
+
+  @override
+  String get growthPlanHint => 'Rencanaku...';
+
+  @override
+  String get growthPlanSaveError => 'Gagal menyimpan';
+
+  @override
+  String get growthDimensionHealth => 'Kesehatan fisik';
+
+  @override
+  String get growthDimensionEmotion => 'Kesehatan emosi';
+
+  @override
+  String get growthDimensionRelationship => 'Hubungan';
+
+  @override
+  String get growthDimensionCareer => 'Karier';
+
+  @override
+  String get growthDimensionFinance => 'Keuangan';
+
+  @override
+  String get growthDimensionLearning => 'Belajar terus';
+
+  @override
+  String get growthDimensionCreativity => 'Kreativitas';
+
+  @override
+  String get growthDimensionSpirituality => 'Pertumbuhan batin';
+
+  @override
+  String get smallWinTitle => 'Tantangan kemenangan kecil';
+
+  @override
+  String smallWinEmpty(int days) {
+    return 'Mulai tantangan $days hari, sedikit tiap hari';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'Hadiah: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => 'Gagal memuat';
+
+  @override
+  String get smallWinLawVisible => 'Terlihat';
+
+  @override
+  String get smallWinLawAttractive => 'Menarik';
+
+  @override
+  String get smallWinLawEasy => 'Mudah';
+
+  @override
+  String get smallWinLawRewarding => 'Ada hadiah';
+
+  @override
+  String get moodTrackerTitle => 'Pelacak suasana hati';
+
+  @override
+  String get moodTrackerLoadError => 'Gagal memuat';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count kali';
+  }
+
+  @override
+  String get habitTrackerTitle => 'Semangat bulanan';
+
+  @override
+  String get habitTrackerComingSoon =>
+      'Fitur pelacak kebiasaan sedang dikembangkan';
+
+  @override
+  String get habitTrackerComingSoonHint =>
+      'Atur kebiasaan di tantangan kemenangan kecil';
+
+  @override
+  String get listsTitle => 'Daftar saya';
+
+  @override
+  String get listBookTitle => 'Buku';
+
+  @override
+  String get listMovieTitle => 'Film';
+
+  @override
+  String get listCustomTitle => 'Daftar kustom';
+
+  @override
+  String listItemCount(int count) {
+    return '$count item';
+  }
+
+  @override
+  String get listDetailBookTitle => 'Buku saya';
+
+  @override
+  String get listDetailMovieTitle => 'Film saya';
+
+  @override
+  String get listDetailCustomTitle => 'Daftar saya';
+
+  @override
+  String get listDetailSave => 'Simpan';
+
+  @override
+  String get listDetailSaveSuccess => 'Tersimpan';
+
+  @override
+  String get listDetailSaveError => 'Gagal';
+
+  @override
+  String get listDetailCustomNameLabel => 'Nama daftar';
+
+  @override
+  String get listDetailCustomNameHint => 'cth: Podcast saya';
+
+  @override
+  String get listDetailItemTitleHint => 'Judul';
+
+  @override
+  String get listDetailItemDateHint => 'Tanggal';
+
+  @override
+  String get listDetailItemGenreHint => 'Genre/Tag';
+
+  @override
+  String get listDetailItemKeywordHint => 'Kata kunci/Kesan';
+
+  @override
+  String get listDetailYearTreasure => 'Harta tahun ini';
+
+  @override
+  String get listDetailYearPick => 'Pilihan tahun';
+
+  @override
+  String get listDetailYearPickHint => 'Yang paling direkomendasikan tahun ini';
+
+  @override
+  String get listDetailInsight => 'Insight';
+
+  @override
+  String get listDetailInsightHint => 'Inspirasi terbesar dari buku/film';
+
+  @override
+  String get exploreMyMoments => 'Momenku';
+
+  @override
+  String get exploreMyMomentsDesc => 'Catat momen bahagia dan istimewa';
+
+  @override
+  String get exploreHabitPact => 'Janji kebiasaan';
+
+  @override
+  String get exploreHabitPactDesc => 'Rancang kebiasaan dengan empat hukum';
+
+  @override
+  String get exploreWorryUnload => 'Hari lepas beban';
+
+  @override
+  String get exploreWorryUnloadDesc =>
+      'Klasifikasi kekhawatiran: lepas, bertindak, atau terima';
+
+  @override
+  String get exploreSelfPraise => 'Kelompok pujian';
+
+  @override
+  String get exploreSelfPraiseDesc => 'Tulis 5 kelebihanmu';
+
+  @override
+  String get exploreSupportMap => 'Orang di sekitarku';
+
+  @override
+  String get exploreSupportMapDesc => 'Catat siapa yang mendukungmu';
+
+  @override
+  String get exploreFutureSelf => 'Aku di masa depan';
+
+  @override
+  String get exploreFutureSelfDesc => 'Bayangkan 3 versi masa depanmu';
+
+  @override
+  String get exploreIdealVsReal => 'Aku ideal vs. Aku nyata';
+
+  @override
+  String get exploreIdealVsRealDesc => 'Temukan titik temu ideal dan nyata';
+
+  @override
+  String get highlightScreenTitle => 'Momenku';
+
+  @override
+  String get highlightTabHappy => 'Momen bahagia';
+
+  @override
+  String get highlightTabHighlight => 'Sorotan';
+
+  @override
+  String get highlightEmptyHappy => 'Belum ada momen bahagia';
+
+  @override
+  String get highlightEmptyHighlight => 'Belum ada sorotan';
+
+  @override
+  String highlightLoadError(String error) {
+    return 'Gagal: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => 'Rencana bulan';
+
+  @override
+  String get monthlyPlanSave => 'Simpan';
+
+  @override
+  String get monthlyPlanSaveSuccess => 'Tersimpan';
+
+  @override
+  String get monthlyPlanSaveError => 'Gagal';
+
+  @override
+  String get monthlyPlanGoalsSection => 'Target bulanan';
+
+  @override
+  String get monthlyPlanChallengeSection => 'Tantangan kemenangan kecil';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'Kebiasaan tantangan';
+
+  @override
+  String get monthlyPlanChallengeNameHint => 'cth: Lari 10 menit/hari';
+
+  @override
+  String get monthlyPlanRewardLabel => 'Hadiah';
+
+  @override
+  String get monthlyPlanRewardHint => 'cth: Beli buku';
+
+  @override
+  String get monthlyPlanSelfCareSection => 'Perawatan diri';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return 'Aktivitas $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => 'Kenangan bulan';
+
+  @override
+  String get monthlyPlanMemoryHint => 'Kenangan terindah...';
+
+  @override
+  String get monthlyPlanAchievementSection => 'Pencapaian bulan';
+
+  @override
+  String get monthlyPlanAchievementHint => 'Pencapaian paling bangga...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return 'Rencana tahun $year';
+  }
+
+  @override
+  String get yearlyPlanSave => 'Simpan';
+
+  @override
+  String get yearlyPlanSaveSuccess => 'Tersimpan';
+
+  @override
+  String get yearlyPlanSaveError => 'Gagal';
+
+  @override
+  String get yearlyPlanMessagesSection => 'Pesan tahunan';
+
+  @override
+  String get yearlyPlanGrowthSection => 'Rencana pertumbuhan';
+
+  @override
+  String get growthReviewScreenTitle => 'Tinjauan pertumbuhan';
+
+  @override
+  String get growthReviewMyMoments => 'Momen istimewaku';
+
+  @override
+  String get growthReviewEmptyMoments => 'Belum ada sorotan';
+
+  @override
+  String get growthReviewMySummary => 'Ringkasanku';
+
+  @override
+  String get growthReviewSummaryPrompt =>
+      'Melihat perjalanan ini, apa yang ingin kamu katakan pada diri sendiri?';
+
+  @override
+  String get growthReviewSmallWins => 'Penghargaan kemenangan kecil';
+
+  @override
+  String get growthReviewConsistentRecord => 'Pencatatan konsisten';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return 'Kamu sudah mencatat $count hari';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => 'Juara tinjauan mingguan';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '$count tinjauan mingguan selesai';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'Penutup yang hangat';
+
+  @override
+  String get growthReviewEveryStar => 'Setiap hari adalah bintang';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return 'Kamu sudah mengumpulkan $count bintang. Terus bersinar!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => 'Aku di masa depan';
+
+  @override
+  String get futureSelfSubtitle => 'Bayangkan 3 versi masa depanmu';
+
+  @override
+  String get futureSelfHint =>
+      'Tidak perlu sempurna, biarkan imajinasi mengalir';
+
+  @override
+  String get futureSelfStable => 'Masa depan stabil';
+
+  @override
+  String get futureSelfStableHint =>
+      'Jika semua berjalan lancar, seperti apa hidupmu?';
+
+  @override
+  String get futureSelfFree => 'Masa depan bebas';
+
+  @override
+  String get futureSelfFreeHint =>
+      'Tanpa batasan, apa yang paling ingin kamu lakukan?';
+
+  @override
+  String get futureSelfPace => 'Masa depan dengan kecepatanmu';
+
+  @override
+  String get futureSelfPaceHint => 'Tidak terburu-buru, ritme idealmu?';
+
+  @override
+  String get futureSelfCoreLabel => 'Apa yang benar-benar penting bagimu?';
+
+  @override
+  String get futureSelfCoreHint =>
+      'Apa kesamaan 3 versi itu? Mungkin itu yang paling penting...';
+
+  @override
+  String get habitPactScreenTitle => 'Janji kebiasaan';
+
+  @override
+  String get habitPactStep1 => 'Kebiasaan apa yang ingin dibangun?';
+
+  @override
+  String get habitPactCategoryLearning => 'Belajar';
+
+  @override
+  String get habitPactCategoryHealth => 'Kesehatan';
+
+  @override
+  String get habitPactCategoryRelationship => 'Hubungan';
+
+  @override
+  String get habitPactCategoryHobby => 'Hobi';
+
+  @override
+  String get habitPactHabitLabel => 'Kebiasaan spesifik';
+
+  @override
+  String get habitPactHabitHint => 'cth: Baca 20 halaman/hari';
+
+  @override
+  String get habitPactStep2 => 'Empat hukum kebiasaan';
+
+  @override
+  String get habitPactLawVisible => 'Buat terlihat';
+
+  @override
+  String get habitPactLawVisibleHint => 'Petunjuk akan di...';
+
+  @override
+  String get habitPactLawAttractive => 'Buat menarik';
+
+  @override
+  String get habitPactLawAttractiveHint => 'Saya padukan dengan...';
+
+  @override
+  String get habitPactLawEasy => 'Buat mudah';
+
+  @override
+  String get habitPactLawEasyHint => 'Versi minimum saya...';
+
+  @override
+  String get habitPactLawRewarding => 'Buat memuaskan';
+
+  @override
+  String get habitPactLawRewardingHint =>
+      'Setelahnya saya hadiahi diri dengan...';
+
+  @override
+  String get habitPactStep3 => 'Deklarasi aksi';
+
+  @override
+  String get habitPactDeclarationEmpty =>
+      'Isi di atas untuk membuat deklarasi...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return 'Saya berkomitmen membangun kebiasaan \"$habit\"';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return 'ketika $cue';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return 'saya akan $response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'lalu $reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => 'Aku ideal vs. Aku nyata';
+
+  @override
+  String get idealVsRealIdeal => 'Aku ideal';
+
+  @override
+  String get idealVsRealIdealHint => 'Orang seperti apa yang ingin saya jadi?';
+
+  @override
+  String get idealVsRealReal => 'Aku nyata';
+
+  @override
+  String get idealVsRealRealHint => 'Orang seperti apa saya sekarang?';
+
+  @override
+  String get idealVsRealSame => 'Apa yang sama?';
+
+  @override
+  String get idealVsRealSameHint => 'Di mana ideal dan nyata sudah bertemu?';
+
+  @override
+  String get idealVsRealDiff => 'Apa yang berbeda?';
+
+  @override
+  String get idealVsRealDiffHint =>
+      'Di mana kesenjangannya? Bagaimana rasanya?';
+
+  @override
+  String get idealVsRealStep => 'Langkah kecil menuju ideal';
+
+  @override
+  String get idealVsRealStepHint => 'Hal kecil yang bisa dilakukan hari ini...';
+
+  @override
+  String get selfPraiseScreenTitle => 'Kelompok pujian';
+
+  @override
+  String get selfPraiseSubtitle => 'Tulis 5 kelebihanmu';
+
+  @override
+  String get selfPraiseHint =>
+      'Semua orang layak dilihat, terutama oleh diri sendiri';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return 'Kelebihan $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'Sifat paling hangat saya...';
+
+  @override
+  String get selfPraisePrompt2 => 'Hal yang saya kuasai...';
+
+  @override
+  String get selfPraisePrompt3 => 'Yang sering dipuji...';
+
+  @override
+  String get selfPraisePrompt4 => 'Yang membuat saya bangga...';
+
+  @override
+  String get selfPraisePrompt5 => 'Yang membuat saya unik...';
+
+  @override
+  String get supportMapScreenTitle => 'Orang di sekitarku';
+
+  @override
+  String get supportMapSubtitle => 'Siapa yang mendukungmu?';
+
+  @override
+  String get supportMapHint => 'Ingatkan diri bahwa kamu tidak sendiri';
+
+  @override
+  String get supportMapNameLabel => 'Nama';
+
+  @override
+  String get supportMapRelationLabel => 'Hubungan';
+
+  @override
+  String get supportMapRelationHint => 'cth: Teman/Keluarga/Rekan';
+
+  @override
+  String get supportMapAdd => 'Tambah';
+
+  @override
+  String get worryUnloadScreenTitle => 'Hari lepas beban';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return 'Gagal: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => 'Tidak ada kekhawatiran aktif';
+
+  @override
+  String get worryUnloadEmptyHint => 'Hebat! Hari yang ringan';
+
+  @override
+  String get worryUnloadIntro => 'Lihat kekhawatiranmu dan klasifikasikan';
+
+  @override
+  String get worryUnloadLetGo => 'Bisa dilepas';
+
+  @override
+  String get worryUnloadTakeAction => 'Bisa ditindak';
+
+  @override
+  String get worryUnloadAccept => 'Terima dulu';
+
+  @override
+  String get worryUnloadResultTitle => 'Hasil';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get worryUnloadEncouragement =>
+      'Setiap klasifikasi adalah langkah maju.';
+
+  @override
+  String get commonSaved => 'Tersimpan';
+
+  @override
+  String get commonSaveError => 'Gagal menyimpan';
+
+  @override
+  String get commonLoadError => 'Gagal memuat';
+
+  @override
+  String get momentEditTitle => 'Edit momen';
+
+  @override
+  String get momentNewHappy => 'Catat momen bahagia';
+
+  @override
+  String get momentNewHighlight => 'Catat momen istimewa';
+
+  @override
+  String get momentDescHappy => 'Hal yang membahagiakan';
+
+  @override
+  String get momentDescHighlight => 'Apa yang terjadi';
+
+  @override
+  String get momentCompanionHappy => 'Bersama siapa';
+
+  @override
+  String get momentCompanionHighlight => 'Apa yang saya lakukan';
+
+  @override
+  String get momentFeeling => 'Perasaan';
+
+  @override
+  String get momentDate => 'Tanggal (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => 'Penilaian';
+
+  @override
+  String get momentDescRequired => 'Mohon tambahkan deskripsi';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return 'Bersama $companion';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'Saya melakukan: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => 'Kalender tahunan';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return 'Bulan $month';
+  }
 }

@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
@@ -55,14 +56,14 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
       await ref.read(awarenessRepositoryProvider).saveDailyLight(uid, light);
 
       if (mounted) {
-        AppFeedback.success(context, '记录成功'); // TODO: l10n
+        AppFeedback.success(context, context.l10n.quickLightSaveSuccess);
         _textController.clear();
         setState(() => _selectedMood = null);
       }
     } on Exception catch (e) {
       debugPrint('[QuickLight] Save failed: $e');
       if (mounted) {
-        AppFeedback.error(context, '保存失败，请重试'); // TODO: l10n
+        AppFeedback.error(context, context.l10n.quickLightSaveError);
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -112,7 +113,7 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '今天的一点光', // TODO: l10n
+                      context.l10n.quickLightTitle,
                       style: textTheme.labelMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -143,6 +144,7 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
   Widget _buildInput(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     return Card(
       child: Padding(
@@ -151,7 +153,7 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '今天的一点光', // TODO: l10n
+              l10n.quickLightTitle,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -169,7 +171,7 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
               maxLines: 3,
               maxLength: 200,
               decoration: InputDecoration(
-                hintText: '写一句今天的心情...', // TODO: l10n
+                hintText: l10n.quickLightHint,
                 hintStyle: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 ),
@@ -188,7 +190,7 @@ class _QuickLightCardState extends ConsumerState<QuickLightCard> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('记录'), // TODO: l10n
+                    : Text(l10n.quickLightRecord),
               ),
             ),
           ],

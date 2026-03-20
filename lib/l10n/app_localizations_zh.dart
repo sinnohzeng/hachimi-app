@@ -3077,6 +3077,848 @@ class SZh extends S {
 
   @override
   String get growthReview => '成长回望';
+
+  @override
+  String greetingLateNight(String name) {
+    return '夜深了，$name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return '早安，$name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return '下午好，$name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return '晚上好，$name';
+  }
+
+  @override
+  String get greetingLateNightNoName => '夜深了';
+
+  @override
+  String get greetingMorningNoName => '早安';
+
+  @override
+  String get greetingAfternoonNoName => '下午好';
+
+  @override
+  String get greetingEveningNoName => '晚上好';
+
+  @override
+  String get journeyTitle => '旅程';
+
+  @override
+  String get journeySegmentWeek => '本周';
+
+  @override
+  String get journeySegmentMonth => '本月';
+
+  @override
+  String get journeySegmentYear => '年度';
+
+  @override
+  String get journeySegmentExplore => '探索';
+
+  @override
+  String get journeyMonthlyView => '月度视图';
+
+  @override
+  String get journeyYearlyView => '年度视图';
+
+  @override
+  String get journeyExploreActivities => '探索活动';
+
+  @override
+  String get journeyEditMonthlyPlan => '编辑月计划';
+
+  @override
+  String get journeyEditYearlyPlan => '编辑年度计划';
+
+  @override
+  String get quickLightTitle => '今天的一点光';
+
+  @override
+  String get quickLightHint => '写一句今天的心情...';
+
+  @override
+  String get quickLightRecord => '记录';
+
+  @override
+  String get quickLightSaveSuccess => '记录成功';
+
+  @override
+  String get quickLightSaveError => '保存失败，请重试';
+
+  @override
+  String get habitSnapshotTitle => '今日习惯';
+
+  @override
+  String get habitSnapshotEmpty => '你还没有习惯，可以在旅程里设定';
+
+  @override
+  String get habitSnapshotLoadError => '加载失败';
+
+  @override
+  String get worryJarTitle => '烦恼罐';
+
+  @override
+  String get worryJarLoadError => '加载失败';
+
+  @override
+  String get weeklyReviewEmpty => '记录本周的幸福时刻';
+
+  @override
+  String get weeklyReviewHappyMoments => '幸福时刻';
+
+  @override
+  String get weeklyReviewLoadError => '加载失败';
+
+  @override
+  String get weeklyPlanCardTitle => '本周计划';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count 项';
+  }
+
+  @override
+  String get weeklyPlanEmpty => '制定本周计划';
+
+  @override
+  String get weekMoodTitle => '本周心情';
+
+  @override
+  String get weekMoodLoadError => '心情加载失败';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return '再记录 $remaining 天后解锁';
+  }
+
+  @override
+  String get featureLockedSoon => '即将解锁';
+
+  @override
+  String get weeklyPlanScreenTitle => '本周计划';
+
+  @override
+  String get weeklyPlanSave => '保存';
+
+  @override
+  String get weeklyPlanSaveSuccess => '已保存';
+
+  @override
+  String get weeklyPlanSaveError => '保存失败';
+
+  @override
+  String get weeklyPlanOneLine => '写一句话给这周的自己';
+
+  @override
+  String get weeklyPlanOneLineHint => '这周我想...';
+
+  @override
+  String get weeklyPlanUrgentImportant => '紧急且重要';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => '重要不紧急';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => '紧急不重要';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => '不紧急不重要';
+
+  @override
+  String get weeklyPlanAddHint => '添加...';
+
+  @override
+  String get weeklyPlanMustDo => '必须做';
+
+  @override
+  String get weeklyPlanShouldDo => '要做';
+
+  @override
+  String get weeklyPlanNeedToDo => '该做';
+
+  @override
+  String get weeklyPlanWantToDo => '想做';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$year 年 $month 月';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => '加载失败';
+
+  @override
+  String get monthlyGoalsTitle => '本月目标';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return '目标 $index';
+  }
+
+  @override
+  String get monthlySaveError => '保存失败';
+
+  @override
+  String get monthlyMemoryTitle => '本月记忆';
+
+  @override
+  String get monthlyMemoryHint => '这个月最美好的记忆是...';
+
+  @override
+  String get monthlyAchievementTitle => '本月成就';
+
+  @override
+  String get monthlyAchievementHint => '这个月我最骄傲的成就是...';
+
+  @override
+  String get yearlyMessagesTitle => '年度寄语';
+
+  @override
+  String get yearlyMessageBecome => '这一年我希望自己成为......';
+
+  @override
+  String get yearlyMessageGoals => '达成目标';
+
+  @override
+  String get yearlyMessageBreakthrough => '突破性完成';
+
+  @override
+  String get yearlyMessageDontDo => '不做（说不，也是在为重要的事腾位置）';
+
+  @override
+  String get yearlyMessageKeyword => '年度关键词（例：专注/勇敢/耐心/温柔）';
+
+  @override
+  String get yearlyMessageFutureSelf => '给亲爱的未来的我';
+
+  @override
+  String get yearlyMessageMotto => '我的座右铭';
+
+  @override
+  String get growthPlanTitle => '年度成长计划';
+
+  @override
+  String get growthPlanHint => '我的计划...';
+
+  @override
+  String get growthPlanSaveError => '保存失败';
+
+  @override
+  String get growthDimensionHealth => '身体健康';
+
+  @override
+  String get growthDimensionEmotion => '情绪管理';
+
+  @override
+  String get growthDimensionRelationship => '人际关系';
+
+  @override
+  String get growthDimensionCareer => '职业发展';
+
+  @override
+  String get growthDimensionFinance => '财务管理';
+
+  @override
+  String get growthDimensionLearning => '持续学习';
+
+  @override
+  String get growthDimensionCreativity => '创造力';
+
+  @override
+  String get growthDimensionSpirituality => '内在成长';
+
+  @override
+  String get smallWinTitle => '小赢挑战';
+
+  @override
+  String smallWinEmpty(int days) {
+    return '设定一个 $days 天小挑战，每天坚持一点点';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return '奖励: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => '加载失败';
+
+  @override
+  String get smallWinLawVisible => '看得见';
+
+  @override
+  String get smallWinLawAttractive => '想去做';
+
+  @override
+  String get smallWinLawEasy => '易上手';
+
+  @override
+  String get smallWinLawRewarding => '有奖励';
+
+  @override
+  String get moodTrackerTitle => '心情追踪';
+
+  @override
+  String get moodTrackerLoadError => '加载失败';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count 次';
+  }
+
+  @override
+  String get habitTrackerTitle => '本月热爱与坚持';
+
+  @override
+  String get habitTrackerComingSoon => '习惯追踪功能正在开发中';
+
+  @override
+  String get habitTrackerComingSoonHint => '在小赢挑战中设定你的习惯';
+
+  @override
+  String get listsTitle => '我的清单';
+
+  @override
+  String get listBookTitle => '书单';
+
+  @override
+  String get listMovieTitle => '影单';
+
+  @override
+  String get listCustomTitle => '自定义清单';
+
+  @override
+  String listItemCount(int count) {
+    return '$count 条';
+  }
+
+  @override
+  String get listDetailBookTitle => '我的书单';
+
+  @override
+  String get listDetailMovieTitle => '我的影单';
+
+  @override
+  String get listDetailCustomTitle => '我的清单';
+
+  @override
+  String get listDetailSave => '保存';
+
+  @override
+  String get listDetailSaveSuccess => '已保存';
+
+  @override
+  String get listDetailSaveError => '保存失败';
+
+  @override
+  String get listDetailCustomNameLabel => '清单名称';
+
+  @override
+  String get listDetailCustomNameHint => '例：我的播客清单';
+
+  @override
+  String get listDetailItemTitleHint => '标题';
+
+  @override
+  String get listDetailItemDateHint => '日期';
+
+  @override
+  String get listDetailItemGenreHint => '类型/标签';
+
+  @override
+  String get listDetailItemKeywordHint => '关键词/感受';
+
+  @override
+  String get listDetailYearTreasure => '年度宝藏';
+
+  @override
+  String get listDetailYearPick => '年度之选';
+
+  @override
+  String get listDetailYearPickHint => '这一年最值得推荐的一部';
+
+  @override
+  String get listDetailInsight => '灵感一击';
+
+  @override
+  String get listDetailInsightHint => '阅读/观影带给你的最大启发';
+
+  @override
+  String get exploreMyMoments => '我的时刻';
+
+  @override
+  String get exploreMyMomentsDesc => '记录幸福与高光时刻';
+
+  @override
+  String get exploreHabitPact => '我与习惯的约定';
+
+  @override
+  String get exploreHabitPactDesc => '基于原子习惯四定律设计你的新习惯';
+
+  @override
+  String get exploreWorryUnload => '烦恼减负日';
+
+  @override
+  String get exploreWorryUnloadDesc => '为你的烦恼分类：放下、行动或接受';
+
+  @override
+  String get exploreSelfPraise => '我的夸夸群';
+
+  @override
+  String get exploreSelfPraiseDesc => '写下自己的 5 个优点';
+
+  @override
+  String get exploreSupportMap => '我身边的人';
+
+  @override
+  String get exploreSupportMapDesc => '记录支持你的人';
+
+  @override
+  String get exploreFutureSelf => '未来照见我';
+
+  @override
+  String get exploreFutureSelfDesc => '想象 3 种未来的自己';
+
+  @override
+  String get exploreIdealVsReal => '理想的我 vs. 现在的我';
+
+  @override
+  String get exploreIdealVsRealDesc => '发现理想与现实的交集';
+
+  @override
+  String get highlightScreenTitle => '我的时刻';
+
+  @override
+  String get highlightTabHappy => '幸福时刻';
+
+  @override
+  String get highlightTabHighlight => '高光时刻';
+
+  @override
+  String get highlightEmptyHappy => '还没有记录幸福时刻';
+
+  @override
+  String get highlightEmptyHighlight => '还没有记录高光时刻';
+
+  @override
+  String highlightLoadError(String error) {
+    return '加载失败: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => '月计划';
+
+  @override
+  String get monthlyPlanSave => '保存';
+
+  @override
+  String get monthlyPlanSaveSuccess => '已保存';
+
+  @override
+  String get monthlyPlanSaveError => '保存失败';
+
+  @override
+  String get monthlyPlanGoalsSection => '月目标';
+
+  @override
+  String get monthlyPlanChallengeSection => '小赢挑战';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => '挑战习惯名称';
+
+  @override
+  String get monthlyPlanChallengeNameHint => '例：每天跑步 10 分钟';
+
+  @override
+  String get monthlyPlanRewardLabel => '完成后的奖励';
+
+  @override
+  String get monthlyPlanRewardHint => '例：买一本想看的书';
+
+  @override
+  String get monthlyPlanSelfCareSection => '爱自己活动';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return '活动 $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => '本月记忆';
+
+  @override
+  String get monthlyPlanMemoryHint => '这个月最美好的记忆是...';
+
+  @override
+  String get monthlyPlanAchievementSection => '本月成就';
+
+  @override
+  String get monthlyPlanAchievementHint => '这个月我最骄傲的成就是...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year 年度计划';
+  }
+
+  @override
+  String get yearlyPlanSave => '保存';
+
+  @override
+  String get yearlyPlanSaveSuccess => '已保存';
+
+  @override
+  String get yearlyPlanSaveError => '保存失败';
+
+  @override
+  String get yearlyPlanMessagesSection => '年度寄语';
+
+  @override
+  String get yearlyPlanGrowthSection => '成长计划';
+
+  @override
+  String get growthReviewScreenTitle => '成长回望';
+
+  @override
+  String get growthReviewMyMoments => '属于我的时刻';
+
+  @override
+  String get growthReviewEmptyMoments => '还没有记录高光时刻';
+
+  @override
+  String get growthReviewMySummary => '我的总结';
+
+  @override
+  String get growthReviewSummaryPrompt => '回顾这段旅程，你有什么想对自己说的？';
+
+  @override
+  String get growthReviewSmallWins => '小赢颁奖';
+
+  @override
+  String get growthReviewConsistentRecord => '坚持记录';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return '你已经记录了 $count 天';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => '周回顾达人';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '完成了 $count 次周回顾';
+  }
+
+  @override
+  String get growthReviewWarmClose => '温暖的收官';
+
+  @override
+  String get growthReviewEveryStar => '每一天的记录都是一颗星星';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return '你已经收集了 $count 颗星星，继续闪耀吧！';
+  }
+
+  @override
+  String get futureSelfScreenTitle => '未来照见我';
+
+  @override
+  String get futureSelfSubtitle => '想象 3 种未来的自己';
+
+  @override
+  String get futureSelfHint => '不需要完美答案，让想象自由流动';
+
+  @override
+  String get futureSelfStable => '稳定的未来';
+
+  @override
+  String get futureSelfStableHint => '如果一切顺利，稳定发展，你的生活会是什么样？';
+
+  @override
+  String get futureSelfFree => '自由的未来';
+
+  @override
+  String get futureSelfFreeHint => '如果没有任何限制，你最想做什么？';
+
+  @override
+  String get futureSelfPace => '按自己节奏发展的未来';
+
+  @override
+  String get futureSelfPaceHint => '不急不缓，你理想中的节奏是什么样的？';
+
+  @override
+  String get futureSelfCoreLabel => '你真正在意的是什么？';
+
+  @override
+  String get futureSelfCoreHint => '看看上面的 3 个版本，它们有什么共同点？那可能就是你内心最在意的...';
+
+  @override
+  String get habitPactScreenTitle => '我与习惯的约定';
+
+  @override
+  String get habitPactStep1 => '我想养成什么习惯？';
+
+  @override
+  String get habitPactCategoryLearning => '学习';
+
+  @override
+  String get habitPactCategoryHealth => '健康';
+
+  @override
+  String get habitPactCategoryRelationship => '关系';
+
+  @override
+  String get habitPactCategoryHobby => '兴趣';
+
+  @override
+  String get habitPactHabitLabel => '具体习惯';
+
+  @override
+  String get habitPactHabitHint => '例：每天读 20 页书';
+
+  @override
+  String get habitPactStep2 => '习惯四定律设计';
+
+  @override
+  String get habitPactLawVisible => '看得见';
+
+  @override
+  String get habitPactLawVisibleHint => '我会把提示放在...';
+
+  @override
+  String get habitPactLawAttractive => '想去做';
+
+  @override
+  String get habitPactLawAttractiveHint => '我会把它和...连在一起';
+
+  @override
+  String get habitPactLawEasy => '易上手';
+
+  @override
+  String get habitPactLawEasyHint => '我设计的最小版本是...';
+
+  @override
+  String get habitPactLawRewarding => '有奖励';
+
+  @override
+  String get habitPactLawRewardingHint => '完成后我会奖励自己...';
+
+  @override
+  String get habitPactStep3 => '行动宣言';
+
+  @override
+  String get habitPactDeclarationEmpty => '填写上方内容，自动生成宣言...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return '我决定养成「$habit」的习惯';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return '当$cue时';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return '我会$response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return '然后$reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => '理想的我 vs. 现在的我';
+
+  @override
+  String get idealVsRealIdeal => '理想的我';
+
+  @override
+  String get idealVsRealIdealHint => '我希望自己是什么样的人？';
+
+  @override
+  String get idealVsRealReal => '现在的我';
+
+  @override
+  String get idealVsRealRealHint => '我现在是什么样的人？';
+
+  @override
+  String get idealVsRealSame => '有哪些相同点？';
+
+  @override
+  String get idealVsRealSameHint => '理想和现实之间，已经有哪些重合的地方？';
+
+  @override
+  String get idealVsRealDiff => '有哪些不同？';
+
+  @override
+  String get idealVsRealDiffHint => '差距在哪里？这些差距让你有什么感受？';
+
+  @override
+  String get idealVsRealStep => '靠近理想，我只需要迈出一小步';
+
+  @override
+  String get idealVsRealStepHint => '今天就可以做的一件小事是...';
+
+  @override
+  String get selfPraiseScreenTitle => '我的夸夸群';
+
+  @override
+  String get selfPraiseSubtitle => '写下你的 5 个优点';
+
+  @override
+  String get selfPraiseHint => '每个人都值得被看见，尤其是自己';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return '优点 $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => '我最温暖的品质是...';
+
+  @override
+  String get selfPraisePrompt2 => '我擅长的一件事是...';
+
+  @override
+  String get selfPraisePrompt3 => '别人常夸我的是...';
+
+  @override
+  String get selfPraisePrompt4 => '我为自己骄傲的地方是...';
+
+  @override
+  String get selfPraisePrompt5 => '我的独特之处是...';
+
+  @override
+  String get supportMapScreenTitle => '我身边的人';
+
+  @override
+  String get supportMapSubtitle => '谁在支持你？';
+
+  @override
+  String get supportMapHint => '记录身边重要的人，提醒自己并不孤单';
+
+  @override
+  String get supportMapNameLabel => '姓名';
+
+  @override
+  String get supportMapRelationLabel => '关系';
+
+  @override
+  String get supportMapRelationHint => '例：朋友/家人/同事';
+
+  @override
+  String get supportMapAdd => '添加';
+
+  @override
+  String get worryUnloadScreenTitle => '烦恼减负日';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return '加载失败: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => '没有进行中的烦恼';
+
+  @override
+  String get worryUnloadEmptyHint => '太棒了！今天是轻松的一天';
+
+  @override
+  String get worryUnloadIntro => '看看你的烦恼，为它们分个类吧';
+
+  @override
+  String get worryUnloadLetGo => '可以放下';
+
+  @override
+  String get worryUnloadTakeAction => '可以行动';
+
+  @override
+  String get worryUnloadAccept => '暂时接受';
+
+  @override
+  String get worryUnloadResultTitle => '减负结果';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count 个';
+  }
+
+  @override
+  String get worryUnloadEncouragement => '每一个分类都是前进的一步。';
+
+  @override
+  String get commonSaved => '已保存';
+
+  @override
+  String get commonSaveError => '保存失败';
+
+  @override
+  String get commonLoadError => '加载失败';
+
+  @override
+  String get momentEditTitle => '编辑时刻';
+
+  @override
+  String get momentNewHappy => '记录幸福时刻';
+
+  @override
+  String get momentNewHighlight => '记录高光时刻';
+
+  @override
+  String get momentDescHappy => '幸福的事';
+
+  @override
+  String get momentDescHighlight => '发生了什么';
+
+  @override
+  String get momentCompanionHappy => '和谁在一起';
+
+  @override
+  String get momentCompanionHighlight => '我做了什么';
+
+  @override
+  String get momentFeeling => '感受';
+
+  @override
+  String get momentDate => '日期 (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => '评分';
+
+  @override
+  String get momentDescRequired => '请填写描述';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return '和$companion一起';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return '我做了：$action';
+  }
+
+  @override
+  String get annualCalendarTitle => '我的年历';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month 月';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6165,4 +7007,846 @@ class SZhHant extends SZh {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return '夜深了，$name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return '早安，$name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return '午安，$name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return '晚安，$name';
+  }
+
+  @override
+  String get greetingLateNightNoName => '夜深了';
+
+  @override
+  String get greetingMorningNoName => '早安';
+
+  @override
+  String get greetingAfternoonNoName => '午安';
+
+  @override
+  String get greetingEveningNoName => '晚安';
+
+  @override
+  String get journeyTitle => '旅程';
+
+  @override
+  String get journeySegmentWeek => '本週';
+
+  @override
+  String get journeySegmentMonth => '本月';
+
+  @override
+  String get journeySegmentYear => '年度';
+
+  @override
+  String get journeySegmentExplore => '探索';
+
+  @override
+  String get journeyMonthlyView => '月度檢視';
+
+  @override
+  String get journeyYearlyView => '年度檢視';
+
+  @override
+  String get journeyExploreActivities => '探索活動';
+
+  @override
+  String get journeyEditMonthlyPlan => '編輯月計畫';
+
+  @override
+  String get journeyEditYearlyPlan => '編輯年度計畫';
+
+  @override
+  String get quickLightTitle => '今天的一點光';
+
+  @override
+  String get quickLightHint => '寫下今天的心情...';
+
+  @override
+  String get quickLightRecord => '記錄';
+
+  @override
+  String get quickLightSaveSuccess => '記錄成功';
+
+  @override
+  String get quickLightSaveError => '儲存失敗，請重試';
+
+  @override
+  String get habitSnapshotTitle => '今日習慣';
+
+  @override
+  String get habitSnapshotEmpty => '還沒有習慣，可以在旅程裡設定';
+
+  @override
+  String get habitSnapshotLoadError => '載入失敗';
+
+  @override
+  String get worryJarTitle => '煩惱罐';
+
+  @override
+  String get worryJarLoadError => '載入失敗';
+
+  @override
+  String get weeklyReviewEmpty => '記錄本週的幸福時刻';
+
+  @override
+  String get weeklyReviewHappyMoments => '幸福時刻';
+
+  @override
+  String get weeklyReviewLoadError => '載入失敗';
+
+  @override
+  String get weeklyPlanCardTitle => '本週計畫';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count 項';
+  }
+
+  @override
+  String get weeklyPlanEmpty => '制定本週計畫';
+
+  @override
+  String get weekMoodTitle => '本週心情';
+
+  @override
+  String get weekMoodLoadError => '心情載入失敗';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return '再記錄 $remaining 天後解鎖';
+  }
+
+  @override
+  String get featureLockedSoon => '即將解鎖';
+
+  @override
+  String get weeklyPlanScreenTitle => '本週計畫';
+
+  @override
+  String get weeklyPlanSave => '儲存';
+
+  @override
+  String get weeklyPlanSaveSuccess => '已儲存';
+
+  @override
+  String get weeklyPlanSaveError => '儲存失敗';
+
+  @override
+  String get weeklyPlanOneLine => '寫一句話給這週的自己';
+
+  @override
+  String get weeklyPlanOneLineHint => '這週我想...';
+
+  @override
+  String get weeklyPlanUrgentImportant => '緊急且重要';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => '重要不緊急';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => '緊急不重要';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => '不緊急不重要';
+
+  @override
+  String get weeklyPlanAddHint => '新增...';
+
+  @override
+  String get weeklyPlanMustDo => '必須做';
+
+  @override
+  String get weeklyPlanShouldDo => '要做';
+
+  @override
+  String get weeklyPlanNeedToDo => '該做';
+
+  @override
+  String get weeklyPlanWantToDo => '想做';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$year 年 $month 月';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => '載入失敗';
+
+  @override
+  String get monthlyGoalsTitle => '本月目標';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return '目標 $index';
+  }
+
+  @override
+  String get monthlySaveError => '儲存失敗';
+
+  @override
+  String get monthlyMemoryTitle => '本月回憶';
+
+  @override
+  String get monthlyMemoryHint => '這個月最美好的回憶是...';
+
+  @override
+  String get monthlyAchievementTitle => '本月成就';
+
+  @override
+  String get monthlyAchievementHint => '這個月最驕傲的成就是...';
+
+  @override
+  String get yearlyMessagesTitle => '年度寄語';
+
+  @override
+  String get yearlyMessageBecome => '這一年我希望自己成為......';
+
+  @override
+  String get yearlyMessageGoals => '達成目標';
+
+  @override
+  String get yearlyMessageBreakthrough => '突破性完成';
+
+  @override
+  String get yearlyMessageDontDo => '不做（說不，也是在為重要的事騰位置）';
+
+  @override
+  String get yearlyMessageKeyword => '年度關鍵詞（例：專注/勇敢/耐心/溫柔）';
+
+  @override
+  String get yearlyMessageFutureSelf => '給親愛的未來的我';
+
+  @override
+  String get yearlyMessageMotto => '我的座右銘';
+
+  @override
+  String get growthPlanTitle => '年度成長計畫';
+
+  @override
+  String get growthPlanHint => '我的計畫...';
+
+  @override
+  String get growthPlanSaveError => '儲存失敗';
+
+  @override
+  String get growthDimensionHealth => '身體健康';
+
+  @override
+  String get growthDimensionEmotion => '情緒管理';
+
+  @override
+  String get growthDimensionRelationship => '人際關係';
+
+  @override
+  String get growthDimensionCareer => '職涯發展';
+
+  @override
+  String get growthDimensionFinance => '財務管理';
+
+  @override
+  String get growthDimensionLearning => '持續學習';
+
+  @override
+  String get growthDimensionCreativity => '創造力';
+
+  @override
+  String get growthDimensionSpirituality => '內在成長';
+
+  @override
+  String get smallWinTitle => '小贏挑戰';
+
+  @override
+  String smallWinEmpty(int days) {
+    return '設定一個 $days 天的小挑戰，每天堅持一點點';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return '獎勵：$reward';
+  }
+
+  @override
+  String get smallWinLoadError => '載入失敗';
+
+  @override
+  String get smallWinLawVisible => '看得見';
+
+  @override
+  String get smallWinLawAttractive => '想去做';
+
+  @override
+  String get smallWinLawEasy => '易上手';
+
+  @override
+  String get smallWinLawRewarding => '有獎勵';
+
+  @override
+  String get moodTrackerTitle => '心情追蹤';
+
+  @override
+  String get moodTrackerLoadError => '載入失敗';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count 次';
+  }
+
+  @override
+  String get habitTrackerTitle => '本月熱愛與堅持';
+
+  @override
+  String get habitTrackerComingSoon => '習慣追蹤功能開發中';
+
+  @override
+  String get habitTrackerComingSoonHint => '在小贏挑戰中設定你的習慣';
+
+  @override
+  String get listsTitle => '我的清單';
+
+  @override
+  String get listBookTitle => '書單';
+
+  @override
+  String get listMovieTitle => '影單';
+
+  @override
+  String get listCustomTitle => '自訂清單';
+
+  @override
+  String listItemCount(int count) {
+    return '$count 條';
+  }
+
+  @override
+  String get listDetailBookTitle => '我的書單';
+
+  @override
+  String get listDetailMovieTitle => '我的影單';
+
+  @override
+  String get listDetailCustomTitle => '我的清單';
+
+  @override
+  String get listDetailSave => '儲存';
+
+  @override
+  String get listDetailSaveSuccess => '已儲存';
+
+  @override
+  String get listDetailSaveError => '儲存失敗';
+
+  @override
+  String get listDetailCustomNameLabel => '清單名稱';
+
+  @override
+  String get listDetailCustomNameHint => '例：我的 Podcast 清單';
+
+  @override
+  String get listDetailItemTitleHint => '標題';
+
+  @override
+  String get listDetailItemDateHint => '日期';
+
+  @override
+  String get listDetailItemGenreHint => '類型/標籤';
+
+  @override
+  String get listDetailItemKeywordHint => '關鍵詞/感受';
+
+  @override
+  String get listDetailYearTreasure => '年度寶藏';
+
+  @override
+  String get listDetailYearPick => '年度之選';
+
+  @override
+  String get listDetailYearPickHint => '這一年最值得推薦的一部';
+
+  @override
+  String get listDetailInsight => '靈感一擊';
+
+  @override
+  String get listDetailInsightHint => '閱讀/觀影帶給你的最大啟發';
+
+  @override
+  String get exploreMyMoments => '我的時刻';
+
+  @override
+  String get exploreMyMomentsDesc => '記錄幸福與高光時刻';
+
+  @override
+  String get exploreHabitPact => '我與習慣的約定';
+
+  @override
+  String get exploreHabitPactDesc => '用原子習慣四定律設計新習慣';
+
+  @override
+  String get exploreWorryUnload => '煩惱減負日';
+
+  @override
+  String get exploreWorryUnloadDesc => '為煩惱分類：放下、行動或接受';
+
+  @override
+  String get exploreSelfPraise => '我的誇誇群';
+
+  @override
+  String get exploreSelfPraiseDesc => '寫下自己的 5 個優點';
+
+  @override
+  String get exploreSupportMap => '我身邊的人';
+
+  @override
+  String get exploreSupportMapDesc => '記錄支持你的人';
+
+  @override
+  String get exploreFutureSelf => '未來照見我';
+
+  @override
+  String get exploreFutureSelfDesc => '想像 3 種未來的自己';
+
+  @override
+  String get exploreIdealVsReal => '理想的我 vs. 現在的我';
+
+  @override
+  String get exploreIdealVsRealDesc => '發現理想與現實的交集';
+
+  @override
+  String get highlightScreenTitle => '我的時刻';
+
+  @override
+  String get highlightTabHappy => '幸福時刻';
+
+  @override
+  String get highlightTabHighlight => '高光時刻';
+
+  @override
+  String get highlightEmptyHappy => '還沒有記錄幸福時刻';
+
+  @override
+  String get highlightEmptyHighlight => '還沒有記錄高光時刻';
+
+  @override
+  String highlightLoadError(String error) {
+    return '載入失敗: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => '月計畫';
+
+  @override
+  String get monthlyPlanSave => '儲存';
+
+  @override
+  String get monthlyPlanSaveSuccess => '已儲存';
+
+  @override
+  String get monthlyPlanSaveError => '儲存失敗';
+
+  @override
+  String get monthlyPlanGoalsSection => '月目標';
+
+  @override
+  String get monthlyPlanChallengeSection => '小贏挑戰';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => '挑戰習慣名稱';
+
+  @override
+  String get monthlyPlanChallengeNameHint => '例：每天跑步 10 分鐘';
+
+  @override
+  String get monthlyPlanRewardLabel => '完成後的獎勵';
+
+  @override
+  String get monthlyPlanRewardHint => '例：買一本想看的書';
+
+  @override
+  String get monthlyPlanSelfCareSection => '愛自己活動';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return '活動 $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => '本月回憶';
+
+  @override
+  String get monthlyPlanMemoryHint => '這個月最美好的回憶是...';
+
+  @override
+  String get monthlyPlanAchievementSection => '本月成就';
+
+  @override
+  String get monthlyPlanAchievementHint => '這個月最驕傲的成就是...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year 年度計畫';
+  }
+
+  @override
+  String get yearlyPlanSave => '儲存';
+
+  @override
+  String get yearlyPlanSaveSuccess => '已儲存';
+
+  @override
+  String get yearlyPlanSaveError => '儲存失敗';
+
+  @override
+  String get yearlyPlanMessagesSection => '年度寄語';
+
+  @override
+  String get yearlyPlanGrowthSection => '成長計畫';
+
+  @override
+  String get growthReviewScreenTitle => '成長回望';
+
+  @override
+  String get growthReviewMyMoments => '屬於我的時刻';
+
+  @override
+  String get growthReviewEmptyMoments => '還沒有記錄高光時刻';
+
+  @override
+  String get growthReviewMySummary => '我的總結';
+
+  @override
+  String get growthReviewSummaryPrompt => '回顧這段旅程，你有什麼想對自己說的？';
+
+  @override
+  String get growthReviewSmallWins => '小贏頒獎';
+
+  @override
+  String get growthReviewConsistentRecord => '堅持記錄';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return '你已經記錄了 $count 天';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => '週回顧達人';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '完成了 $count 次週回顧';
+  }
+
+  @override
+  String get growthReviewWarmClose => '溫暖的收官';
+
+  @override
+  String get growthReviewEveryStar => '每一天的記錄都是一顆星星';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return '你已經收集了 $count 顆星星，繼續閃耀吧！';
+  }
+
+  @override
+  String get futureSelfScreenTitle => '未來照見我';
+
+  @override
+  String get futureSelfSubtitle => '想像 3 種未來的自己';
+
+  @override
+  String get futureSelfHint => '不需要完美答案，讓想像自由流動';
+
+  @override
+  String get futureSelfStable => '穩定的未來';
+
+  @override
+  String get futureSelfStableHint => '如果一切順利，穩定發展，你的生活會是什麼樣？';
+
+  @override
+  String get futureSelfFree => '自由的未來';
+
+  @override
+  String get futureSelfFreeHint => '如果沒有任何限制，你最想做什麼？';
+
+  @override
+  String get futureSelfPace => '按自己節奏發展的未來';
+
+  @override
+  String get futureSelfPaceHint => '不急不緩，你理想中的節奏是什麼樣的？';
+
+  @override
+  String get futureSelfCoreLabel => '你真正在意的是什麼？';
+
+  @override
+  String get futureSelfCoreHint => '看看上面的 3 個版本，它們有什麼共同點？那可能就是你內心最在意的...';
+
+  @override
+  String get habitPactScreenTitle => '我與習慣的約定';
+
+  @override
+  String get habitPactStep1 => '我想養成什麼習慣？';
+
+  @override
+  String get habitPactCategoryLearning => '學習';
+
+  @override
+  String get habitPactCategoryHealth => '健康';
+
+  @override
+  String get habitPactCategoryRelationship => '關係';
+
+  @override
+  String get habitPactCategoryHobby => '興趣';
+
+  @override
+  String get habitPactHabitLabel => '具體習慣';
+
+  @override
+  String get habitPactHabitHint => '例：每天讀 20 頁書';
+
+  @override
+  String get habitPactStep2 => '習慣四定律設計';
+
+  @override
+  String get habitPactLawVisible => '看得見';
+
+  @override
+  String get habitPactLawVisibleHint => '我會把提示放在...';
+
+  @override
+  String get habitPactLawAttractive => '想去做';
+
+  @override
+  String get habitPactLawAttractiveHint => '我會把它和...連在一起';
+
+  @override
+  String get habitPactLawEasy => '易上手';
+
+  @override
+  String get habitPactLawEasyHint => '我設計的最小版本是...';
+
+  @override
+  String get habitPactLawRewarding => '有獎勵';
+
+  @override
+  String get habitPactLawRewardingHint => '完成後我會獎勵自己...';
+
+  @override
+  String get habitPactStep3 => '行動宣言';
+
+  @override
+  String get habitPactDeclarationEmpty => '填寫上方內容，自動產生宣言...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return '我決定養成「$habit」的習慣';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return '當$cue時';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return '我會$response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return '然後$reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => '理想的我 vs. 現在的我';
+
+  @override
+  String get idealVsRealIdeal => '理想的我';
+
+  @override
+  String get idealVsRealIdealHint => '我希望自己是什麼樣的人？';
+
+  @override
+  String get idealVsRealReal => '現在的我';
+
+  @override
+  String get idealVsRealRealHint => '我現在是什麼樣的人？';
+
+  @override
+  String get idealVsRealSame => '有哪些相同點？';
+
+  @override
+  String get idealVsRealSameHint => '理想和現實之間，已經有哪些重合的地方？';
+
+  @override
+  String get idealVsRealDiff => '有哪些不同？';
+
+  @override
+  String get idealVsRealDiffHint => '差距在哪裡？這些差距讓你有什麼感受？';
+
+  @override
+  String get idealVsRealStep => '靠近理想，我只需要邁出一小步';
+
+  @override
+  String get idealVsRealStepHint => '今天就可以做的一件小事是...';
+
+  @override
+  String get selfPraiseScreenTitle => '我的誇誇群';
+
+  @override
+  String get selfPraiseSubtitle => '寫下你的 5 個優點';
+
+  @override
+  String get selfPraiseHint => '每個人都值得被看見，尤其是自己';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return '優點 $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => '我最溫暖的品質是...';
+
+  @override
+  String get selfPraisePrompt2 => '我擅長的一件事是...';
+
+  @override
+  String get selfPraisePrompt3 => '別人常誇我的是...';
+
+  @override
+  String get selfPraisePrompt4 => '我為自己驕傲的地方是...';
+
+  @override
+  String get selfPraisePrompt5 => '我的獨特之處是...';
+
+  @override
+  String get supportMapScreenTitle => '我身邊的人';
+
+  @override
+  String get supportMapSubtitle => '誰在支持你？';
+
+  @override
+  String get supportMapHint => '記錄身邊重要的人，提醒自己並不孤單';
+
+  @override
+  String get supportMapNameLabel => '姓名';
+
+  @override
+  String get supportMapRelationLabel => '關係';
+
+  @override
+  String get supportMapRelationHint => '例：朋友/家人/同事';
+
+  @override
+  String get supportMapAdd => '新增';
+
+  @override
+  String get worryUnloadScreenTitle => '煩惱減負日';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return '載入失敗: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => '沒有進行中的煩惱';
+
+  @override
+  String get worryUnloadEmptyHint => '太棒了！今天是輕鬆的一天';
+
+  @override
+  String get worryUnloadIntro => '看看你的煩惱，為它們分個類吧';
+
+  @override
+  String get worryUnloadLetGo => '可以放下';
+
+  @override
+  String get worryUnloadTakeAction => '可以行動';
+
+  @override
+  String get worryUnloadAccept => '暫時接受';
+
+  @override
+  String get worryUnloadResultTitle => '減負結果';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label：$count 個';
+  }
+
+  @override
+  String get worryUnloadEncouragement => '每一個分類都是前進的一步。';
+
+  @override
+  String get commonSaved => '已儲存';
+
+  @override
+  String get commonSaveError => '儲存失敗';
+
+  @override
+  String get commonLoadError => '載入失敗';
+
+  @override
+  String get momentEditTitle => '編輯時刻';
+
+  @override
+  String get momentNewHappy => '記錄幸福時刻';
+
+  @override
+  String get momentNewHighlight => '記錄高光時刻';
+
+  @override
+  String get momentDescHappy => '幸福的事';
+
+  @override
+  String get momentDescHighlight => '發生了什麼';
+
+  @override
+  String get momentCompanionHappy => '和誰在一起';
+
+  @override
+  String get momentCompanionHighlight => '我做了什麼';
+
+  @override
+  String get momentFeeling => '感受';
+
+  @override
+  String get momentDate => '日期 (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => '評分';
+
+  @override
+  String get momentDescRequired => '請填寫描述';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return '和$companion一起';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return '我做了：$action';
+  }
+
+  @override
+  String get annualCalendarTitle => '我的年曆';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month 月';
+  }
 }

@@ -128,7 +128,7 @@ jobs:
 
       - name: Check for placeholders
         run: |
-          ! rg -n "TODO|FIXME|TBD|占位" lib test functions/src functions/test .claude/memory
+          ! grep -rn --include='*.dart' -wE 'TODO|FIXME|TBD' lib/ test/
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test

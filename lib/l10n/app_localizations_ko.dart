@@ -3099,4 +3099,846 @@ class SKo extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return '늦은 밤이에요, $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return '좋은 아침이에요, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return '좋은 오후에요, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return '좋은 저녁이에요, $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => '늦은 밤이에요';
+
+  @override
+  String get greetingMorningNoName => '좋은 아침이에요';
+
+  @override
+  String get greetingAfternoonNoName => '좋은 오후에요';
+
+  @override
+  String get greetingEveningNoName => '좋은 저녁이에요';
+
+  @override
+  String get journeyTitle => '여정';
+
+  @override
+  String get journeySegmentWeek => '이번 주';
+
+  @override
+  String get journeySegmentMonth => '이번 달';
+
+  @override
+  String get journeySegmentYear => '올해';
+
+  @override
+  String get journeySegmentExplore => '탐색';
+
+  @override
+  String get journeyMonthlyView => '월간 보기';
+
+  @override
+  String get journeyYearlyView => '연간 보기';
+
+  @override
+  String get journeyExploreActivities => '탐색 활동';
+
+  @override
+  String get journeyEditMonthlyPlan => '월간 계획 편집';
+
+  @override
+  String get journeyEditYearlyPlan => '연간 계획 편집';
+
+  @override
+  String get quickLightTitle => '오늘의 한 줄';
+
+  @override
+  String get quickLightHint => '오늘의 기분을 한 줄로...';
+
+  @override
+  String get quickLightRecord => '기록';
+
+  @override
+  String get quickLightSaveSuccess => '기록했어요';
+
+  @override
+  String get quickLightSaveError => '저장에 실패했어요. 다시 시도해 주세요';
+
+  @override
+  String get habitSnapshotTitle => '오늘의 습관';
+
+  @override
+  String get habitSnapshotEmpty => '아직 습관이 없어요. 여정에서 설정할 수 있어요';
+
+  @override
+  String get habitSnapshotLoadError => '불러오기 실패';
+
+  @override
+  String get worryJarTitle => '걱정 항아리';
+
+  @override
+  String get worryJarLoadError => '불러오기 실패';
+
+  @override
+  String get weeklyReviewEmpty => '이번 주 행복한 순간을 기록해요';
+
+  @override
+  String get weeklyReviewHappyMoments => '행복한 순간';
+
+  @override
+  String get weeklyReviewLoadError => '불러오기 실패';
+
+  @override
+  String get weeklyPlanCardTitle => '이번 주 계획';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count개';
+  }
+
+  @override
+  String get weeklyPlanEmpty => '이번 주 계획을 세워요';
+
+  @override
+  String get weekMoodTitle => '이번 주 기분';
+
+  @override
+  String get weekMoodLoadError => '기분 불러오기 실패';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return '$remaining일 더 기록하면 잠금 해제돼요';
+  }
+
+  @override
+  String get featureLockedSoon => '곧 잠금 해제';
+
+  @override
+  String get weeklyPlanScreenTitle => '이번 주 계획';
+
+  @override
+  String get weeklyPlanSave => '저장';
+
+  @override
+  String get weeklyPlanSaveSuccess => '저장했어요';
+
+  @override
+  String get weeklyPlanSaveError => '저장 실패';
+
+  @override
+  String get weeklyPlanOneLine => '이번 주 나에게 한마디';
+
+  @override
+  String get weeklyPlanOneLineHint => '이번 주는...';
+
+  @override
+  String get weeklyPlanUrgentImportant => '긴급하고 중요한';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => '중요하지만 급하지 않은';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => '급하지만 중요하지 않은';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => '급하지도 중요하지도 않은';
+
+  @override
+  String get weeklyPlanAddHint => '추가...';
+
+  @override
+  String get weeklyPlanMustDo => '반드시';
+
+  @override
+  String get weeklyPlanShouldDo => '해야 할';
+
+  @override
+  String get weeklyPlanNeedToDo => '하면 좋은';
+
+  @override
+  String get weeklyPlanWantToDo => '하고 싶은';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$year년 $month월';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => '불러오기 실패';
+
+  @override
+  String get monthlyGoalsTitle => '이번 달 목표';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return '목표 $index';
+  }
+
+  @override
+  String get monthlySaveError => '저장 실패';
+
+  @override
+  String get monthlyMemoryTitle => '이번 달 추억';
+
+  @override
+  String get monthlyMemoryHint => '이번 달 가장 아름다운 추억은...';
+
+  @override
+  String get monthlyAchievementTitle => '이번 달 성취';
+
+  @override
+  String get monthlyAchievementHint => '이번 달 가장 자랑스러운 성취는...';
+
+  @override
+  String get yearlyMessagesTitle => '올해의 메시지';
+
+  @override
+  String get yearlyMessageBecome => '올해 이런 사람이 되고 싶어요...';
+
+  @override
+  String get yearlyMessageGoals => '이루고 싶은 목표';
+
+  @override
+  String get yearlyMessageBreakthrough => '돌파 성과';
+
+  @override
+  String get yearlyMessageDontDo => '하지 않을 것 (거절도 중요한 일을 위한 자리를 마련하는 것)';
+
+  @override
+  String get yearlyMessageKeyword => '올해 키워드 (예: 집중/용기/인내/따뜻함)';
+
+  @override
+  String get yearlyMessageFutureSelf => '사랑하는 미래의 나에게';
+
+  @override
+  String get yearlyMessageMotto => '나의 좌우명';
+
+  @override
+  String get growthPlanTitle => '연간 성장 계획';
+
+  @override
+  String get growthPlanHint => '나의 계획...';
+
+  @override
+  String get growthPlanSaveError => '저장 실패';
+
+  @override
+  String get growthDimensionHealth => '신체 건강';
+
+  @override
+  String get growthDimensionEmotion => '감정 관리';
+
+  @override
+  String get growthDimensionRelationship => '인간관계';
+
+  @override
+  String get growthDimensionCareer => '커리어 성장';
+
+  @override
+  String get growthDimensionFinance => '재무 관리';
+
+  @override
+  String get growthDimensionLearning => '지속 학습';
+
+  @override
+  String get growthDimensionCreativity => '창의력';
+
+  @override
+  String get growthDimensionSpirituality => '내면 성장';
+
+  @override
+  String get smallWinTitle => '작은 승리 챌린지';
+
+  @override
+  String smallWinEmpty(int days) {
+    return '$days일 챌린지를 설정하고, 매일 조금씩';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return '보상: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => '불러오기 실패';
+
+  @override
+  String get smallWinLawVisible => '보이게';
+
+  @override
+  String get smallWinLawAttractive => '끌리게';
+
+  @override
+  String get smallWinLawEasy => '쉽게';
+
+  @override
+  String get smallWinLawRewarding => '보상있게';
+
+  @override
+  String get moodTrackerTitle => '기분 트래커';
+
+  @override
+  String get moodTrackerLoadError => '불러오기 실패';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count회';
+  }
+
+  @override
+  String get habitTrackerTitle => '이번 달 열정과 꾸준함';
+
+  @override
+  String get habitTrackerComingSoon => '습관 트래킹 기능 개발 중이에요';
+
+  @override
+  String get habitTrackerComingSoonHint => '작은 승리 챌린지에서 습관을 설정해 보세요';
+
+  @override
+  String get listsTitle => '내 리스트';
+
+  @override
+  String get listBookTitle => '독서 리스트';
+
+  @override
+  String get listMovieTitle => '영화 리스트';
+
+  @override
+  String get listCustomTitle => '맞춤 리스트';
+
+  @override
+  String listItemCount(int count) {
+    return '$count개';
+  }
+
+  @override
+  String get listDetailBookTitle => '나의 독서 리스트';
+
+  @override
+  String get listDetailMovieTitle => '나의 영화 리스트';
+
+  @override
+  String get listDetailCustomTitle => '나의 리스트';
+
+  @override
+  String get listDetailSave => '저장';
+
+  @override
+  String get listDetailSaveSuccess => '저장했어요';
+
+  @override
+  String get listDetailSaveError => '저장 실패';
+
+  @override
+  String get listDetailCustomNameLabel => '리스트 이름';
+
+  @override
+  String get listDetailCustomNameHint => '예: 팟캐스트 리스트';
+
+  @override
+  String get listDetailItemTitleHint => '제목';
+
+  @override
+  String get listDetailItemDateHint => '날짜';
+
+  @override
+  String get listDetailItemGenreHint => '장르/태그';
+
+  @override
+  String get listDetailItemKeywordHint => '키워드/느낌';
+
+  @override
+  String get listDetailYearTreasure => '올해의 보물';
+
+  @override
+  String get listDetailYearPick => '올해의 선택';
+
+  @override
+  String get listDetailYearPickHint => '올해 가장 추천하고 싶은 한 편';
+
+  @override
+  String get listDetailInsight => '영감 한 방';
+
+  @override
+  String get listDetailInsightHint => '읽기/감상에서 얻은 가장 큰 영감';
+
+  @override
+  String get exploreMyMoments => '나의 순간';
+
+  @override
+  String get exploreMyMomentsDesc => '행복하고 빛나는 순간을 기록';
+
+  @override
+  String get exploreHabitPact => '습관과의 약속';
+
+  @override
+  String get exploreHabitPactDesc => '아토믹 해빗 4법칙으로 새 습관 디자인';
+
+  @override
+  String get exploreWorryUnload => '걱정 내려놓기';
+
+  @override
+  String get exploreWorryUnloadDesc => '걱정을 분류해요: 내려놓기, 행동하기, 받아들이기';
+
+  @override
+  String get exploreSelfPraise => '나를 칭찬하는 모임';
+
+  @override
+  String get exploreSelfPraiseDesc => '나의 장점 5가지를 적어요';
+
+  @override
+  String get exploreSupportMap => '나를 지지하는 사람들';
+
+  @override
+  String get exploreSupportMapDesc => '나를 지지해주는 사람들을 기록';
+
+  @override
+  String get exploreFutureSelf => '미래의 나';
+
+  @override
+  String get exploreFutureSelfDesc => '3가지 미래의 나를 상상해요';
+
+  @override
+  String get exploreIdealVsReal => '이상적인 나 vs. 지금의 나';
+
+  @override
+  String get exploreIdealVsRealDesc => '이상과 현실의 교차점을 발견';
+
+  @override
+  String get highlightScreenTitle => '나의 순간';
+
+  @override
+  String get highlightTabHappy => '행복한 순간';
+
+  @override
+  String get highlightTabHighlight => '하이라이트';
+
+  @override
+  String get highlightEmptyHappy => '아직 행복한 순간이 없어요';
+
+  @override
+  String get highlightEmptyHighlight => '아직 하이라이트가 없어요';
+
+  @override
+  String highlightLoadError(String error) {
+    return '불러오기 실패: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => '월간 계획';
+
+  @override
+  String get monthlyPlanSave => '저장';
+
+  @override
+  String get monthlyPlanSaveSuccess => '저장했어요';
+
+  @override
+  String get monthlyPlanSaveError => '저장 실패';
+
+  @override
+  String get monthlyPlanGoalsSection => '월간 목표';
+
+  @override
+  String get monthlyPlanChallengeSection => '작은 승리 챌린지';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => '챌린지 습관 이름';
+
+  @override
+  String get monthlyPlanChallengeNameHint => '예: 매일 10분 달리기';
+
+  @override
+  String get monthlyPlanRewardLabel => '완료 후 보상';
+
+  @override
+  String get monthlyPlanRewardHint => '예: 읽고 싶은 책 사기';
+
+  @override
+  String get monthlyPlanSelfCareSection => '나를 위한 활동';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return '활동 $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => '이번 달 추억';
+
+  @override
+  String get monthlyPlanMemoryHint => '이번 달 가장 아름다운 추억은...';
+
+  @override
+  String get monthlyPlanAchievementSection => '이번 달 성취';
+
+  @override
+  String get monthlyPlanAchievementHint => '이번 달 가장 자랑스러운 성취는...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year년 연간 계획';
+  }
+
+  @override
+  String get yearlyPlanSave => '저장';
+
+  @override
+  String get yearlyPlanSaveSuccess => '저장했어요';
+
+  @override
+  String get yearlyPlanSaveError => '저장 실패';
+
+  @override
+  String get yearlyPlanMessagesSection => '올해의 메시지';
+
+  @override
+  String get yearlyPlanGrowthSection => '성장 계획';
+
+  @override
+  String get growthReviewScreenTitle => '성장 돌아보기';
+
+  @override
+  String get growthReviewMyMoments => '나만의 순간';
+
+  @override
+  String get growthReviewEmptyMoments => '아직 하이라이트가 없어요';
+
+  @override
+  String get growthReviewMySummary => '나의 정리';
+
+  @override
+  String get growthReviewSummaryPrompt => '이 여정을 돌아보며, 자신에게 하고 싶은 말은?';
+
+  @override
+  String get growthReviewSmallWins => '작은 승리 시상';
+
+  @override
+  String get growthReviewConsistentRecord => '꾸준한 기록';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return '$count일 기록했어요';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => '주간 리뷰 달인';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '$count번의 주간 리뷰를 완료';
+  }
+
+  @override
+  String get growthReviewWarmClose => '따뜻한 마무리';
+
+  @override
+  String get growthReviewEveryStar => '매일의 기록은 하나의 별';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return '$count개의 별을 모았어요. 계속 빛나세요!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => '미래의 나';
+
+  @override
+  String get futureSelfSubtitle => '3가지 미래의 나를 상상해요';
+
+  @override
+  String get futureSelfHint => '완벽한 답이 아니어도 괜찮아요. 상상을 자유롭게';
+
+  @override
+  String get futureSelfStable => '안정적인 미래';
+
+  @override
+  String get futureSelfStableHint => '모든 게 순조롭다면, 어떤 삶을 살고 있을까?';
+
+  @override
+  String get futureSelfFree => '자유로운 미래';
+
+  @override
+  String get futureSelfFreeHint => '아무 제약이 없다면, 가장 하고 싶은 건?';
+
+  @override
+  String get futureSelfPace => '나만의 속도로 걷는 미래';
+
+  @override
+  String get futureSelfPaceHint => '서두르지 않고, 나의 이상적인 속도는?';
+
+  @override
+  String get futureSelfCoreLabel => '진짜 소중한 것은?';
+
+  @override
+  String get futureSelfCoreHint => '위 3가지에 공통점이 있나요? 그것이 가장 소중한 것...';
+
+  @override
+  String get habitPactScreenTitle => '습관과의 약속';
+
+  @override
+  String get habitPactStep1 => '어떤 습관을 만들고 싶어요?';
+
+  @override
+  String get habitPactCategoryLearning => '학습';
+
+  @override
+  String get habitPactCategoryHealth => '건강';
+
+  @override
+  String get habitPactCategoryRelationship => '관계';
+
+  @override
+  String get habitPactCategoryHobby => '취미';
+
+  @override
+  String get habitPactHabitLabel => '구체적인 습관';
+
+  @override
+  String get habitPactHabitHint => '예: 매일 20페이지 읽기';
+
+  @override
+  String get habitPactStep2 => '습관의 4가지 법칙';
+
+  @override
+  String get habitPactLawVisible => '보이게';
+
+  @override
+  String get habitPactLawVisibleHint => '단서를 놓을 곳은...';
+
+  @override
+  String get habitPactLawAttractive => '끌리게';
+
+  @override
+  String get habitPactLawAttractiveHint => '이것과 연결할 것은...';
+
+  @override
+  String get habitPactLawEasy => '쉽게';
+
+  @override
+  String get habitPactLawEasyHint => '최소 버전은...';
+
+  @override
+  String get habitPactLawRewarding => '보상있게';
+
+  @override
+  String get habitPactLawRewardingHint => '완료 후 나에게 보상...';
+
+  @override
+  String get habitPactStep3 => '행동 선언';
+
+  @override
+  String get habitPactDeclarationEmpty => '위를 채우면 선언이 자동 생성돼요...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return '「$habit」 습관을 만들겠습니다';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return '$cue할 때';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return '$response을 할게요';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return '그리고 $reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => '이상적인 나 vs. 지금의 나';
+
+  @override
+  String get idealVsRealIdeal => '이상적인 나';
+
+  @override
+  String get idealVsRealIdealHint => '어떤 사람이 되고 싶어요?';
+
+  @override
+  String get idealVsRealReal => '지금의 나';
+
+  @override
+  String get idealVsRealRealHint => '지금 나는 어떤 사람인가요?';
+
+  @override
+  String get idealVsRealSame => '공통점은?';
+
+  @override
+  String get idealVsRealSameHint => '이상과 현실에서 이미 겹치는 부분은?';
+
+  @override
+  String get idealVsRealDiff => '다른 점은?';
+
+  @override
+  String get idealVsRealDiffHint => '차이는 어디에? 어떤 기분이 드나요?';
+
+  @override
+  String get idealVsRealStep => '이상에 가까워지려면 작은 한 걸음만';
+
+  @override
+  String get idealVsRealStepHint => '오늘 할 수 있는 작은 일은...';
+
+  @override
+  String get selfPraiseScreenTitle => '나를 칭찬하는 모임';
+
+  @override
+  String get selfPraiseSubtitle => '나의 장점 5가지를 적어요';
+
+  @override
+  String get selfPraiseHint => '누구나 인정받을 자격이 있어요, 특히 자기 자신에게';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return '장점 $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => '가장 따뜻한 나의 성격은...';
+
+  @override
+  String get selfPraisePrompt2 => '잘하는 한 가지는...';
+
+  @override
+  String get selfPraisePrompt3 => '자주 칭찬받는 것은...';
+
+  @override
+  String get selfPraisePrompt4 => '나를 자랑스럽게 만드는 것은...';
+
+  @override
+  String get selfPraisePrompt5 => '나만의 특별함은...';
+
+  @override
+  String get supportMapScreenTitle => '나를 지지하는 사람들';
+
+  @override
+  String get supportMapSubtitle => '누가 나를 지지해주나요?';
+
+  @override
+  String get supportMapHint => '소중한 사람을 기록하고, 혼자가 아님을 기억해요';
+
+  @override
+  String get supportMapNameLabel => '이름';
+
+  @override
+  String get supportMapRelationLabel => '관계';
+
+  @override
+  String get supportMapRelationHint => '예: 친구/가족/동료';
+
+  @override
+  String get supportMapAdd => '추가';
+
+  @override
+  String get worryUnloadScreenTitle => '걱정 내려놓기';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return '불러오기 실패: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => '진행 중인 걱정이 없어요';
+
+  @override
+  String get worryUnloadEmptyHint => '멋져요! 오늘은 가벼운 하루';
+
+  @override
+  String get worryUnloadIntro => '걱정을 살펴보고 분류해 봐요';
+
+  @override
+  String get worryUnloadLetGo => '내려놓을 수 있는';
+
+  @override
+  String get worryUnloadTakeAction => '행동할 수 있는';
+
+  @override
+  String get worryUnloadAccept => '잠시 받아들이는';
+
+  @override
+  String get worryUnloadResultTitle => '내려놓기 결과';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count개';
+  }
+
+  @override
+  String get worryUnloadEncouragement => '분류하는 것만으로도 한 걸음 전진.';
+
+  @override
+  String get commonSaved => '저장했어요';
+
+  @override
+  String get commonSaveError => '저장 실패';
+
+  @override
+  String get commonLoadError => '불러오기 실패';
+
+  @override
+  String get momentEditTitle => '순간 수정';
+
+  @override
+  String get momentNewHappy => '행복한 순간 기록하기';
+
+  @override
+  String get momentNewHighlight => '하이라이트 기록하기';
+
+  @override
+  String get momentDescHappy => '행복한 일';
+
+  @override
+  String get momentDescHighlight => '무슨 일이 있었나요';
+
+  @override
+  String get momentCompanionHappy => '누구와 함께했나요';
+
+  @override
+  String get momentCompanionHighlight => '내가 한 일';
+
+  @override
+  String get momentFeeling => '느낌';
+
+  @override
+  String get momentDate => '날짜 (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => '평가';
+
+  @override
+  String get momentDescRequired => '설명을 입력해 주세요';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return '$companion와 함께';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return '한 일: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => '나의 연간 달력';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month월';
+  }
 }

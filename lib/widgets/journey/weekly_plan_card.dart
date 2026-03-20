@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/weekly_plan.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
 
@@ -41,6 +42,7 @@ class WeeklyPlanCard extends ConsumerWidget {
   Widget _buildContent(BuildContext context, WeeklyPlan plan) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
     final totalItems =
         plan.urgentImportant.length +
         plan.importantNotUrgent.length +
@@ -54,13 +56,10 @@ class WeeklyPlanCard extends ConsumerWidget {
           children: [
             Icon(Icons.checklist, size: 20, color: colorScheme.primary),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              '本周计划', // TODO: l10n
-              style: textTheme.titleSmall,
-            ),
+            Text(l10n.weeklyPlanCardTitle, style: textTheme.titleSmall),
             const Spacer(),
             Text(
-              '$totalItems 项', // TODO: l10n
+              l10n.weeklyPlanItemCount(totalItems),
               style: textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -93,7 +92,7 @@ class WeeklyPlanCard extends ConsumerWidget {
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Text(
-            '制定本周计划', // TODO: l10n
+            context.l10n.weeklyPlanEmpty,
             style: textTheme.titleSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

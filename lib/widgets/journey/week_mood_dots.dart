@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
+import 'package:intl/intl.dart';
 
 /// 本周心情点阵 — 7 个圆点显示每天的心情。
 class WeekMoodDotsRow extends ConsumerWidget {
@@ -26,7 +28,7 @@ class WeekMoodDotsRow extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '本周心情', // TODO: l10n
+              context.l10n.weekMoodTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -41,7 +43,7 @@ class WeekMoodDotsRow extends ConsumerWidget {
               error: (e, _) {
                 debugPrint('[WeekMoodDots] Load error: $e');
                 return Text(
-                  '心情加载失败',
+                  context.l10n.weekMoodLoadError,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.error,
                   ),
@@ -61,7 +63,7 @@ class WeekMoodDotsRow extends ConsumerWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final dayLabels = ['一', '二', '三', '四', '五', '六', '日']; // TODO: l10n
+    final locale = Localizations.localeOf(context).toString();
 
     // 按日期索引 lights
     final lightMap = <String, DailyLight>{};
@@ -76,12 +78,14 @@ class WeekMoodDotsRow extends ConsumerWidget {
         final dateStr = AppDateUtils.formatDay(day);
         final light = lightMap[dateStr];
         final isToday = dateStr == AppDateUtils.todayString();
+        // 使用 locale-aware 的星期缩写首字母
+        final dayLabel = DateFormat.E(locale).format(day).substring(0, 1);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              dayLabels[i],
+              dayLabel,
               style: textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

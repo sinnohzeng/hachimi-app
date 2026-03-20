@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI: Light Up My Inner Universe
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- Neues 3-Tab-Layout: Heute, Reise, Profil
+- Tageslicht: Halte deine Stimmung in einer Zeile fest
+- Reiseplaner: Wochen-, Monats- und Jahresziele
+- 6 monatliche Aktivitäten zur Selbstreflexion
+- Highlight-Momente und Glückstagebuch
+- Stufenweises Freischalten durch tägliche Streaks
+- Vollständige Lokalisierung in 15 Sprachen

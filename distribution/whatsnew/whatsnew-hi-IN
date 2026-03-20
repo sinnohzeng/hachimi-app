@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- नया 3-टैब: आज, यात्रा, प्रोफ़ाइल
+- रोज़ एक पंक्ति में मूड लिखें
+- साप्ताहिक, मासिक, वार्षिक लक्ष्य
+- 6 मासिक गतिविधियाँ
+- खुशी की डायरी
+- स्ट्रीक से अनलॉक
+- 15 भाषाओं में उपलब्ध

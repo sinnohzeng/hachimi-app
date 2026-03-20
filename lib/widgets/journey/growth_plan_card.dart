@@ -6,6 +6,7 @@ import 'package:hachimi_app/core/constants/lumi_constants.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/yearly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -21,6 +22,7 @@ class GrowthPlanCard extends ConsumerStatefulWidget {
 
 class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
   final _controllers = <String, TextEditingController>{};
+  final _focusNodes = <String, FocusNode>{};
   String? _loadedPlanId;
   Timer? _saveTimer;
 
@@ -42,12 +44,23 @@ class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
       final controller = TextEditingController();
       controller.addListener(_scheduleSave);
       _controllers[key] = controller;
+
+      final focusNode = FocusNode();
+      focusNode.addListener(() {
+        if (!focusNode.hasFocus) _save();
+      });
+      _focusNodes[key] = focusNode;
     }
   }
 
   @override
   void dispose() {
+    // 离开页面时立即保存未提交的内容
     _saveTimer?.cancel();
+    _save();
+    for (final node in _focusNodes.values) {
+      node.dispose();
+    }
     for (final c in _controllers.values) {
       c.dispose();
     }
@@ -100,7 +113,7 @@ class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
       await ref.read(planRepositoryProvider).saveYearlyPlan(uid, plan);
     } on Exception catch (e) {
       debugPrint('[GrowthPlanCard] Save error: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     }
   }
 
@@ -130,7 +143,7 @@ class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('年度成长计划', style: textTheme.titleSmall),
+                Text(context.l10n.growthPlanTitle, style: textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -179,11 +192,12 @@ class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
                       Expanded(
                         child: TextField(
                           controller: _controllers[key],
+                          focusNode: _focusNodes[key],
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
                           decoration: InputDecoration(
-                            hintText: '我的计划...',
+                            hintText: context.l10n.growthPlanHint,
                             border: InputBorder.none,
                             isDense: true,
                             contentPadding: EdgeInsets.zero,
@@ -194,7 +208,6 @@ class _GrowthPlanCardState extends ConsumerState<GrowthPlanCard> {
                             ),
                           ),
                           style: textTheme.bodySmall,
-                          onEditingComplete: _save,
                         ),
                       ),
                     ],

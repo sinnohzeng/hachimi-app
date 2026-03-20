@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// 本月热爱与坚持卡片 — 最多 4 个习惯的 31 天打卡网格。
 ///
@@ -26,7 +27,10 @@ class HabitTrackersCard extends StatelessWidget {
                   color: colorScheme.secondary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('本月热爱与坚持', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.habitTrackerTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -37,25 +41,17 @@ class HabitTrackersCard extends StatelessWidget {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.construction_outlined,
+                      Icons.auto_awesome_outlined,
                       size: 32,
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      color: colorScheme.primary.withValues(alpha: 0.6),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '习惯追踪功能正在开发中',
+                      context.l10n.habitTrackerComingSoon,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '在小赢挑战中设定你的习惯',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.7,
-                        ),
-                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -66,5 +62,4 @@ class HabitTrackersCard extends StatelessWidget {
       ),
     );
   }
-
 }

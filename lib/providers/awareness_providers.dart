@@ -56,6 +56,25 @@ final monthlyLightsProvider = FutureProvider.family<List<DailyLight>, String>((
   return awarenessRepo.getLightsForMonth(uid, month);
 });
 
+/// 日期范围内的每日一光列表 — 参数格式：(startDate, endDate)，YYYY-MM-DD。
+/// 用于跨月场景（如本周跨月时 WeekMoodDots 需要两个月的数据）。
+final lightsInRangeProvider =
+    FutureProvider.family<List<DailyLight>, (String, String)>((
+      ref,
+      range,
+    ) async {
+      final (startDate, endDate) = range;
+      final uid = ref.watch(currentUidProvider);
+      if (uid == null) return [];
+
+      final awarenessRepo = ref.watch(awarenessRepositoryProvider);
+
+      // 监听台账变更以自动刷新
+      ref.listen(ledgerChangesProvider, (_, _) {});
+
+      return awarenessRepo.getLightsInRange(uid, startDate, endDate);
+    });
+
 // ─── 周回顾 ───
 
 /// 当前周的周回顾记录 — 从本地 SQLite 读取，台账变更自动刷新。

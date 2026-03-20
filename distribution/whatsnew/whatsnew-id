@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI: Terangi Alam Semesta Batinku
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- Tata letak 3 tab baru: Hari Ini, Perjalanan, Profil
+- Cahaya Harian: catat suasana hatimu dalam satu baris
+- Perencana perjalanan: target mingguan, bulanan, tahunan
+- 6 aktivitas bulanan untuk refleksi diri dan pertumbuhan
+- Momen istimewa dan jurnal kebahagiaan
+- Sistem buka kunci bertahap berdasarkan streak
+- Lokalisasi lengkap dalam 15 bahasa

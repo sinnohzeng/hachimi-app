@@ -1829,5 +1829,505 @@
   "currentStreak": "Current Streak",
   "longestStreak": "Longest Streak",
   "catCompanion": "Cat Companion",
-  "growthReview": "Growth Review"
+  "growthReview": "Growth Review",
+
+  "greetingLateNight": "Late night, {name}",
+  "@greetingLateNight": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingMorning": "Good morning, {name}",
+  "@greetingMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingAfternoon": "Good afternoon, {name}",
+  "@greetingAfternoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEvening": "Good evening, {name}",
+  "@greetingEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingLateNightNoName": "Late night",
+  "greetingMorningNoName": "Good morning",
+  "greetingAfternoonNoName": "Good afternoon",
+  "greetingEveningNoName": "Good evening",
+
+  "journeyTitle": "Journey",
+  "journeySegmentWeek": "Week",
+  "journeySegmentMonth": "Month",
+  "journeySegmentYear": "Year",
+  "journeySegmentExplore": "Explore",
+  "journeyMonthlyView": "Monthly View",
+  "journeyYearlyView": "Yearly View",
+  "journeyExploreActivities": "Explore Activities",
+  "journeyEditMonthlyPlan": "Edit monthly plan",
+  "journeyEditYearlyPlan": "Edit yearly plan",
+
+  "quickLightTitle": "Today's little light",
+  "quickLightHint": "Write how you feel today...",
+  "quickLightRecord": "Record",
+  "quickLightSaveSuccess": "Recorded",
+  "quickLightSaveError": "Save failed, please try again",
+
+  "habitSnapshotTitle": "Today's habits",
+  "habitSnapshotEmpty": "No habits yet. Set them in your journey.",
+  "habitSnapshotLoadError": "Failed to load",
+
+  "worryJarTitle": "Worry jar",
+  "worryJarLoadError": "Failed to load",
+
+  "weeklyReviewEmpty": "Record this week's happy moments",
+  "weeklyReviewHappyMoments": "Happy moments",
+  "weeklyReviewLoadError": "Failed to load",
+
+  "weeklyPlanCardTitle": "Weekly plan",
+  "weeklyPlanItemCount": "{count} items",
+  "@weeklyPlanItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weeklyPlanEmpty": "Make a weekly plan",
+
+  "weekMoodTitle": "Week mood",
+  "weekMoodLoadError": "Failed to load mood",
+
+  "featureLockedDaysRemaining": "Record {remaining} more days to unlock",
+  "@featureLockedDaysRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "featureLockedSoon": "Unlocking soon",
+
+  "weeklyPlanScreenTitle": "Weekly plan",
+  "weeklyPlanSave": "Save",
+  "weeklyPlanSaveSuccess": "Saved",
+  "weeklyPlanSaveError": "Save failed",
+  "weeklyPlanOneLine": "Write a line for yourself this week",
+  "weeklyPlanOneLineHint": "This week I want to...",
+  "weeklyPlanUrgentImportant": "Urgent & Important",
+  "weeklyPlanImportantNotUrgent": "Important, Not Urgent",
+  "weeklyPlanUrgentNotImportant": "Urgent, Not Important",
+  "weeklyPlanNotUrgentNotImportant": "Not Urgent, Not Important",
+  "weeklyPlanAddHint": "Add...",
+  "weeklyPlanMustDo": "Must do",
+  "weeklyPlanShouldDo": "Should do",
+  "weeklyPlanNeedToDo": "Need to do",
+  "weeklyPlanWantToDo": "Want to do",
+
+  "monthlyCalendarYearMonth": "{year}/{month}",
+  "@monthlyCalendarYearMonth": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyCalendarLoadError": "Failed to load",
+
+  "monthlyGoalsTitle": "Monthly goals",
+  "monthlyGoalHint": "Goal {index}",
+  "@monthlyGoalHint": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlySaveError": "Save failed",
+
+  "monthlyMemoryTitle": "Monthly memory",
+  "monthlyMemoryHint": "The most beautiful memory this month is...",
+  "monthlyAchievementTitle": "Monthly achievement",
+  "monthlyAchievementHint": "My proudest achievement this month is...",
+
+  "yearlyMessagesTitle": "Yearly messages",
+  "yearlyMessageBecome": "This year I hope to become...",
+  "yearlyMessageGoals": "Goals to achieve",
+  "yearlyMessageBreakthrough": "Breakthrough completion",
+  "yearlyMessageDontDo": "Don't do (saying no makes room for what matters)",
+  "yearlyMessageKeyword": "Year keyword (e.g. Focus / Brave / Patient / Kind)",
+  "yearlyMessageFutureSelf": "To my dear future self",
+  "yearlyMessageMotto": "My motto",
+
+  "growthPlanTitle": "Growth plan",
+  "growthPlanHint": "My plan...",
+  "growthPlanSaveError": "Save failed",
+  "growthDimensionHealth": "Physical health",
+  "growthDimensionEmotion": "Emotional wellness",
+  "growthDimensionRelationship": "Relationships",
+  "growthDimensionCareer": "Career growth",
+  "growthDimensionFinance": "Financial wellness",
+  "growthDimensionLearning": "Continuous learning",
+  "growthDimensionCreativity": "Creativity",
+  "growthDimensionSpirituality": "Inner growth",
+
+  "smallWinTitle": "Small win challenge",
+  "smallWinEmpty": "Set a {days}-day challenge, a little bit every day",
+  "@smallWinEmpty": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "smallWinReward": "Reward: {reward}",
+  "@smallWinReward": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "smallWinLoadError": "Failed to load",
+  "smallWinLawVisible": "Visible",
+  "smallWinLawAttractive": "Attractive",
+  "smallWinLawEasy": "Easy",
+  "smallWinLawRewarding": "Rewarding",
+
+  "moodTrackerTitle": "Mood tracker",
+  "moodTrackerLoadError": "Failed to load",
+  "moodTrackerCount": "{count} times",
+  "@moodTrackerCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "habitTrackerTitle": "Monthly passion & persistence",
+  "habitTrackerComingSoon": "Habit tracking is under development",
+  "habitTrackerComingSoonHint": "Set your habits in the small win challenge",
+
+  "listsTitle": "My lists",
+  "listBookTitle": "Book list",
+  "listMovieTitle": "Movie list",
+  "listCustomTitle": "Custom list",
+  "listItemCount": "{count} items",
+  "@listItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "listDetailBookTitle": "My book list",
+  "listDetailMovieTitle": "My movie list",
+  "listDetailCustomTitle": "My list",
+  "listDetailSave": "Save",
+  "listDetailSaveSuccess": "Saved",
+  "listDetailSaveError": "Save failed",
+  "listDetailCustomNameLabel": "List name",
+  "listDetailCustomNameHint": "e.g. My podcast list",
+  "listDetailItemTitleHint": "Title",
+  "listDetailItemDateHint": "Date",
+  "listDetailItemGenreHint": "Genre / Tag",
+  "listDetailItemKeywordHint": "Keywords / Thoughts",
+  "listDetailYearTreasure": "Year's treasure",
+  "listDetailYearPick": "Pick of the year",
+  "listDetailYearPickHint": "The one most worth recommending this year",
+  "listDetailInsight": "Aha moment",
+  "listDetailInsightHint": "The biggest inspiration from reading / watching",
+
+  "exploreMyMoments": "My moments",
+  "exploreMyMomentsDesc": "Record happy and highlight moments",
+  "exploreHabitPact": "My habit pact",
+  "exploreHabitPactDesc": "Design a new habit using Atomic Habits' four laws",
+  "exploreWorryUnload": "Worry unload day",
+  "exploreWorryUnloadDesc": "Sort your worries: let go, take action, or accept",
+  "exploreSelfPraise": "My cheer squad",
+  "exploreSelfPraiseDesc": "Write down 5 of your strengths",
+  "exploreSupportMap": "My support circle",
+  "exploreSupportMapDesc": "Record the people who support you",
+  "exploreFutureSelf": "Future me",
+  "exploreFutureSelfDesc": "Imagine 3 versions of your future self",
+  "exploreIdealVsReal": "Ideal me vs. Real me",
+  "exploreIdealVsRealDesc": "Discover where ideal and reality meet",
+
+  "highlightScreenTitle": "My moments",
+  "highlightTabHappy": "Happy moments",
+  "highlightTabHighlight": "Highlight moments",
+  "highlightEmptyHappy": "No happy moments recorded yet",
+  "highlightEmptyHighlight": "No highlight moments recorded yet",
+  "highlightLoadError": "Failed to load: {error}",
+  "@highlightLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "monthlyPlanScreenTitle": "Monthly plan",
+  "monthlyPlanSave": "Save",
+  "monthlyPlanSaveSuccess": "Saved",
+  "monthlyPlanSaveError": "Save failed",
+  "monthlyPlanGoalsSection": "Monthly goals",
+  "monthlyPlanChallengeSection": "Small win challenge",
+  "monthlyPlanChallengeNameLabel": "Challenge habit name",
+  "monthlyPlanChallengeNameHint": "e.g. Run 10 minutes daily",
+  "monthlyPlanRewardLabel": "Reward after completion",
+  "monthlyPlanRewardHint": "e.g. Buy a book I want",
+  "monthlyPlanSelfCareSection": "Self-care activities",
+  "monthlyPlanActivityHint": "Activity {index}",
+  "@monthlyPlanActivityHint": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "monthlyPlanMemorySection": "Monthly memory",
+  "monthlyPlanMemoryHint": "The most beautiful memory this month is...",
+  "monthlyPlanAchievementSection": "Monthly achievement",
+  "monthlyPlanAchievementHint": "My proudest achievement this month is...",
+
+  "yearlyPlanScreenTitle": "{year} Yearly plan",
+  "@yearlyPlanScreenTitle": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "yearlyPlanSave": "Save",
+  "yearlyPlanSaveSuccess": "Saved",
+  "yearlyPlanSaveError": "Save failed",
+  "yearlyPlanMessagesSection": "Yearly messages",
+  "yearlyPlanGrowthSection": "Growth plan",
+
+  "growthReviewScreenTitle": "Growth review",
+  "growthReviewMyMoments": "My moments",
+  "growthReviewEmptyMoments": "No highlight moments recorded yet",
+  "growthReviewMySummary": "My summary",
+  "growthReviewSummaryPrompt": "Looking back on this journey, what would you say to yourself?",
+  "growthReviewSmallWins": "Small win awards",
+  "growthReviewConsistentRecord": "Consistent recording",
+  "growthReviewRecordedDays": "You've recorded {count} days",
+  "@growthReviewRecordedDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "growthReviewWeeklyChamp": "Weekly review champ",
+  "growthReviewCompletedReviews": "Completed {count} weekly reviews",
+  "@growthReviewCompletedReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "growthReviewWarmClose": "A warm closing",
+  "growthReviewEveryStar": "Every record is a star",
+  "growthReviewKeepShining": "You've collected {count} stars. Keep shining!",
+  "@growthReviewKeepShining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "futureSelfScreenTitle": "Future me",
+  "futureSelfSubtitle": "Imagine 3 versions of your future self",
+  "futureSelfHint": "No perfect answers needed, let your imagination flow",
+  "futureSelfStable": "Stable future",
+  "futureSelfStableHint": "If everything goes smoothly, what would your life look like?",
+  "futureSelfFree": "Free future",
+  "futureSelfFreeHint": "If there were no limits, what would you most want to do?",
+  "futureSelfPace": "Your-pace future",
+  "futureSelfPaceHint": "Unhurried, what's your ideal rhythm?",
+  "futureSelfCoreLabel": "What do you truly care about?",
+  "futureSelfCoreHint": "Look at the 3 versions above. What do they have in common? That might be what you care about most...",
+
+  "habitPactScreenTitle": "My habit pact",
+  "habitPactStep1": "What habit do I want to build?",
+  "habitPactCategoryLearning": "Learning",
+  "habitPactCategoryHealth": "Health",
+  "habitPactCategoryRelationship": "Relationship",
+  "habitPactCategoryHobby": "Hobby",
+  "habitPactHabitLabel": "Specific habit",
+  "habitPactHabitHint": "e.g. Read 20 pages every day",
+  "habitPactStep2": "Four laws of habits",
+  "habitPactLawVisible": "Make it obvious",
+  "habitPactLawVisibleHint": "I'll place the cue at...",
+  "habitPactLawAttractive": "Make it attractive",
+  "habitPactLawAttractiveHint": "I'll pair it with...",
+  "habitPactLawEasy": "Make it easy",
+  "habitPactLawEasyHint": "My minimum version is...",
+  "habitPactLawRewarding": "Make it satisfying",
+  "habitPactLawRewardingHint": "After completing, I'll reward myself with...",
+  "habitPactStep3": "Action declaration",
+  "habitPactDeclarationEmpty": "Fill in above to auto-generate your declaration...",
+  "habitPactDeclarationPrefix": "I commit to building the habit of \"{habit}\"",
+  "@habitPactDeclarationPrefix": {
+    "placeholders": {
+      "habit": {
+        "type": "String"
+      }
+    }
+  },
+
+  "habitPactDeclarationWhen": "when {cue}",
+  "@habitPactDeclarationWhen": {
+    "placeholders": {
+      "cue": {
+        "type": "String"
+      }
+    }
+  },
+  "habitPactDeclarationWill": "I will {response}",
+  "@habitPactDeclarationWill": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "habitPactDeclarationThen": "then {reward}",
+  "@habitPactDeclarationThen": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+
+  "idealVsRealScreenTitle": "Ideal me vs. Real me",
+  "idealVsRealIdeal": "Ideal me",
+  "idealVsRealIdealHint": "What kind of person do I want to be?",
+  "idealVsRealReal": "Real me",
+  "idealVsRealRealHint": "What kind of person am I now?",
+  "idealVsRealSame": "What's similar?",
+  "idealVsRealSameHint": "Where do ideal and reality already overlap?",
+  "idealVsRealDiff": "What's different?",
+  "idealVsRealDiffHint": "Where's the gap? How does it make you feel?",
+  "idealVsRealStep": "To get closer to ideal, I just need one small step",
+  "idealVsRealStepHint": "One small thing I can do today is...",
+
+  "selfPraiseScreenTitle": "My cheer squad",
+  "selfPraiseSubtitle": "Write down your 5 strengths",
+  "selfPraiseHint": "Everyone deserves to be seen, especially by yourself",
+  "selfPraiseStrengthLabel": "Strength {index}",
+  "@selfPraiseStrengthLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "selfPraisePrompt1": "My warmest quality is...",
+  "selfPraisePrompt2": "Something I'm good at is...",
+  "selfPraisePrompt3": "People often praise me for...",
+  "selfPraisePrompt4": "I'm proud of myself for...",
+  "selfPraisePrompt5": "What makes me unique is...",
+
+  "supportMapScreenTitle": "My support circle",
+  "supportMapSubtitle": "Who's supporting you?",
+  "supportMapHint": "Note the important people around you, to remind yourself you're not alone",
+  "supportMapNameLabel": "Name",
+  "supportMapRelationLabel": "Relationship",
+  "supportMapRelationHint": "e.g. Friend / Family / Colleague",
+  "supportMapAdd": "Add",
+
+  "worryUnloadScreenTitle": "Worry unload day",
+  "worryUnloadLoadError": "Failed to load: {error}",
+  "@worryUnloadLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "worryUnloadEmptyTitle": "No active worries",
+  "worryUnloadEmptyHint": "Great! Today is a light day",
+  "worryUnloadIntro": "Look at your worries and sort them",
+  "worryUnloadLetGo": "Can let go",
+  "worryUnloadTakeAction": "Can take action",
+  "worryUnloadAccept": "Accept for now",
+  "worryUnloadResultTitle": "Unload results",
+  "worryUnloadSummary": "{label}: {count}",
+  "@worryUnloadSummary": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worryUnloadEncouragement": "Every sorting is a step forward.",
+
+  "commonSave": "Save",
+  "commonSaved": "Saved",
+  "commonSaveError": "Save failed",
+  "commonLoadError": "Failed to load",
+
+  "momentEditTitle": "Edit moment",
+  "momentNewHappy": "Record a happy moment",
+  "momentNewHighlight": "Record a highlight moment",
+  "momentDescHappy": "Something happy",
+  "momentDescHighlight": "What happened",
+  "momentCompanionHappy": "Who were you with",
+  "momentCompanionHighlight": "What I did",
+  "momentFeeling": "Feeling",
+  "momentDate": "Date (YYYY-MM-DD)",
+  "momentRating": "Rating",
+  "momentDescRequired": "Please enter a description",
+  "momentWithCompanion": "With {companion}",
+  "@momentWithCompanion": {
+    "placeholders": {
+      "companion": {
+        "type": "String"
+      }
+    }
+  },
+  "momentDidAction": "I did: {action}",
+  "@momentDidAction": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+
+  "annualCalendarTitle": "My year calendar",
+  "annualCalendarMonthLabel": "{month}",
+  "@annualCalendarMonthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  }
 }

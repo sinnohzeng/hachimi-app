@@ -3138,4 +3138,856 @@ class STr extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return 'Gece oldu, $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'Günaydın, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'İyi öğlenler, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'İyi akşamlar, $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => 'Gece oldu';
+
+  @override
+  String get greetingMorningNoName => 'Günaydın';
+
+  @override
+  String get greetingAfternoonNoName => 'İyi öğlenler';
+
+  @override
+  String get greetingEveningNoName => 'İyi akşamlar';
+
+  @override
+  String get journeyTitle => 'Yolculuk';
+
+  @override
+  String get journeySegmentWeek => 'Hafta';
+
+  @override
+  String get journeySegmentMonth => 'Ay';
+
+  @override
+  String get journeySegmentYear => 'Yıl';
+
+  @override
+  String get journeySegmentExplore => 'Keşfet';
+
+  @override
+  String get journeyMonthlyView => 'Aylık görünüm';
+
+  @override
+  String get journeyYearlyView => 'Yıllık görünüm';
+
+  @override
+  String get journeyExploreActivities => 'Etkinlikler';
+
+  @override
+  String get journeyEditMonthlyPlan => 'Aylık planı düzenle';
+
+  @override
+  String get journeyEditYearlyPlan => 'Yıllık planı düzenle';
+
+  @override
+  String get quickLightTitle => 'Günün düşüncesi';
+
+  @override
+  String get quickLightHint => 'Bugün nasıl hissediyorsun?';
+
+  @override
+  String get quickLightRecord => 'Kaydet';
+
+  @override
+  String get quickLightSaveSuccess => 'Kaydedildi';
+
+  @override
+  String get quickLightSaveError => 'Kaydetme başarısız. Tekrar dene';
+
+  @override
+  String get habitSnapshotTitle => 'Bugünkü alışkanlıklar';
+
+  @override
+  String get habitSnapshotEmpty => 'Henüz alışkanlık yok. Yolculuğunda ayarla';
+
+  @override
+  String get habitSnapshotLoadError => 'Yükleme başarısız';
+
+  @override
+  String get worryJarTitle => 'Endişe kavanozu';
+
+  @override
+  String get worryJarLoadError => 'Yükleme başarısız';
+
+  @override
+  String get weeklyReviewEmpty => 'Bu haftanın mutlu anlarını kaydet';
+
+  @override
+  String get weeklyReviewHappyMoments => 'Mutlu anlar';
+
+  @override
+  String get weeklyReviewLoadError => 'Yükleme başarısız';
+
+  @override
+  String get weeklyPlanCardTitle => 'Haftalık plan';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count öğe';
+  }
+
+  @override
+  String get weeklyPlanEmpty => 'Haftalık plan oluştur';
+
+  @override
+  String get weekMoodTitle => 'Haftalık ruh hali';
+
+  @override
+  String get weekMoodLoadError => 'Ruh hali yüklenemedi';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return '$remaining gün daha kaydet ve aç';
+  }
+
+  @override
+  String get featureLockedSoon => 'Yakında';
+
+  @override
+  String get weeklyPlanScreenTitle => 'Haftalık plan';
+
+  @override
+  String get weeklyPlanSave => 'Kaydet';
+
+  @override
+  String get weeklyPlanSaveSuccess => 'Kaydedildi';
+
+  @override
+  String get weeklyPlanSaveError => 'Kaydetme başarısız';
+
+  @override
+  String get weeklyPlanOneLine => 'Bu hafta kendine bir söz';
+
+  @override
+  String get weeklyPlanOneLineHint => 'Bu hafta istiyorum ki...';
+
+  @override
+  String get weeklyPlanUrgentImportant => 'Acil ve önemli';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => 'Önemli, acil değil';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => 'Acil, önemli değil';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => 'Ne acil ne önemli';
+
+  @override
+  String get weeklyPlanAddHint => 'Ekle...';
+
+  @override
+  String get weeklyPlanMustDo => 'Yapmalı';
+
+  @override
+  String get weeklyPlanShouldDo => 'Yapmalı';
+
+  @override
+  String get weeklyPlanNeedToDo => 'Yapabilir';
+
+  @override
+  String get weeklyPlanWantToDo => 'İstiyorum';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$month/$year';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => 'Yükleme başarısız';
+
+  @override
+  String get monthlyGoalsTitle => 'Aylık hedefler';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return 'Hedef $index';
+  }
+
+  @override
+  String get monthlySaveError => 'Kaydetme başarısız';
+
+  @override
+  String get monthlyMemoryTitle => 'Ayın anısı';
+
+  @override
+  String get monthlyMemoryHint => 'Bu ayın en güzel anısı...';
+
+  @override
+  String get monthlyAchievementTitle => 'Ayın başarısı';
+
+  @override
+  String get monthlyAchievementHint => 'Bu ay en gurur duyduğum şey...';
+
+  @override
+  String get yearlyMessagesTitle => 'Yıllık mesajlar';
+
+  @override
+  String get yearlyMessageBecome => 'Bu yıl olmak istediğim kişi...';
+
+  @override
+  String get yearlyMessageGoals => 'Ulaşılacak hedefler';
+
+  @override
+  String get yearlyMessageBreakthrough => 'Atılım';
+
+  @override
+  String get yearlyMessageDontDo =>
+      'Yapmamak (hayır demek önemli olana yer açar)';
+
+  @override
+  String get yearlyMessageKeyword =>
+      'Yılın kelimesi (ör: Odak/Cesaret/Sabır/Nezaket)';
+
+  @override
+  String get yearlyMessageFutureSelf => 'Gelecekteki bana';
+
+  @override
+  String get yearlyMessageMotto => 'Sloganım';
+
+  @override
+  String get growthPlanTitle => 'Büyüme planı';
+
+  @override
+  String get growthPlanHint => 'Planım...';
+
+  @override
+  String get growthPlanSaveError => 'Kaydetme başarısız';
+
+  @override
+  String get growthDimensionHealth => 'Fiziksel sağlık';
+
+  @override
+  String get growthDimensionEmotion => 'Duygusal denge';
+
+  @override
+  String get growthDimensionRelationship => 'İlişkiler';
+
+  @override
+  String get growthDimensionCareer => 'Kariyer';
+
+  @override
+  String get growthDimensionFinance => 'Finansal sağlık';
+
+  @override
+  String get growthDimensionLearning => 'Sürekli öğrenme';
+
+  @override
+  String get growthDimensionCreativity => 'Yaratıcılık';
+
+  @override
+  String get growthDimensionSpirituality => 'İç büyüme';
+
+  @override
+  String get smallWinTitle => 'Küçük zafer challenge';
+
+  @override
+  String smallWinEmpty(int days) {
+    return '$days günlük challenge başlat, her gün biraz';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'Ödül: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => 'Yükleme başarısız';
+
+  @override
+  String get smallWinLawVisible => 'Görünür';
+
+  @override
+  String get smallWinLawAttractive => 'Çekici';
+
+  @override
+  String get smallWinLawEasy => 'Kolay';
+
+  @override
+  String get smallWinLawRewarding => 'Ödüllendirici';
+
+  @override
+  String get moodTrackerTitle => 'Ruh hali takibi';
+
+  @override
+  String get moodTrackerLoadError => 'Yükleme başarısız';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count kez';
+  }
+
+  @override
+  String get habitTrackerTitle => 'Aylık tutku';
+
+  @override
+  String get habitTrackerComingSoon => 'Alışkanlık takibi geliştiriliyor';
+
+  @override
+  String get habitTrackerComingSoonHint =>
+      'Alışkanlıkları küçük zafer challenge\'da ayarla';
+
+  @override
+  String get listsTitle => 'Listelerim';
+
+  @override
+  String get listBookTitle => 'Kitaplar';
+
+  @override
+  String get listMovieTitle => 'Filmler';
+
+  @override
+  String get listCustomTitle => 'Özel liste';
+
+  @override
+  String listItemCount(int count) {
+    return '$count öğe';
+  }
+
+  @override
+  String get listDetailBookTitle => 'Kitap listem';
+
+  @override
+  String get listDetailMovieTitle => 'Film listem';
+
+  @override
+  String get listDetailCustomTitle => 'Listem';
+
+  @override
+  String get listDetailSave => 'Kaydet';
+
+  @override
+  String get listDetailSaveSuccess => 'Kaydedildi';
+
+  @override
+  String get listDetailSaveError => 'Hata';
+
+  @override
+  String get listDetailCustomNameLabel => 'Liste adı';
+
+  @override
+  String get listDetailCustomNameHint => 'ör: Podcast listem';
+
+  @override
+  String get listDetailItemTitleHint => 'Başlık';
+
+  @override
+  String get listDetailItemDateHint => 'Tarih';
+
+  @override
+  String get listDetailItemGenreHint => 'Tür/Etiket';
+
+  @override
+  String get listDetailItemKeywordHint => 'Anahtar kelimeler/İzlenimler';
+
+  @override
+  String get listDetailYearTreasure => 'Yılın hazinesi';
+
+  @override
+  String get listDetailYearPick => 'Yılın favorisi';
+
+  @override
+  String get listDetailYearPickHint => 'Bu yılın en tavsiye edileni';
+
+  @override
+  String get listDetailInsight => 'İlham';
+
+  @override
+  String get listDetailInsightHint => 'En büyük ilham kaynağın';
+
+  @override
+  String get exploreMyMoments => 'Anlarım';
+
+  @override
+  String get exploreMyMomentsDesc => 'Mutlu ve özel anları kaydet';
+
+  @override
+  String get exploreHabitPact => 'Alışkanlık sözüm';
+
+  @override
+  String get exploreHabitPactDesc => 'Dört yasayla yeni alışkanlık tasarla';
+
+  @override
+  String get exploreWorryUnload => 'Endişe boşaltma günü';
+
+  @override
+  String get exploreWorryUnloadDesc =>
+      'Endişeleri sınıfla: bırak, harekete geç veya kabul et';
+
+  @override
+  String get exploreSelfPraise => 'Övgü grubum';
+
+  @override
+  String get exploreSelfPraiseDesc => '5 güçlü yanını yaz';
+
+  @override
+  String get exploreSupportMap => 'Destek çevrem';
+
+  @override
+  String get exploreSupportMapDesc => 'Seni destekleyenleri kaydet';
+
+  @override
+  String get exploreFutureSelf => 'Gelecekteki ben';
+
+  @override
+  String get exploreFutureSelfDesc => '3 gelecek versiyonunu hayal et';
+
+  @override
+  String get exploreIdealVsReal => 'İdeal ben vs. Gerçek ben';
+
+  @override
+  String get exploreIdealVsRealDesc => 'İdeal ve gerçeğin kesiştiği yeri bul';
+
+  @override
+  String get highlightScreenTitle => 'Anlarım';
+
+  @override
+  String get highlightTabHappy => 'Mutlu anlar';
+
+  @override
+  String get highlightTabHighlight => 'Öne çıkanlar';
+
+  @override
+  String get highlightEmptyHappy => 'Henüz mutlu an yok';
+
+  @override
+  String get highlightEmptyHighlight => 'Henüz öne çıkan yok';
+
+  @override
+  String highlightLoadError(String error) {
+    return 'Hata: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => 'Aylık plan';
+
+  @override
+  String get monthlyPlanSave => 'Kaydet';
+
+  @override
+  String get monthlyPlanSaveSuccess => 'Kaydedildi';
+
+  @override
+  String get monthlyPlanSaveError => 'Hata';
+
+  @override
+  String get monthlyPlanGoalsSection => 'Aylık hedefler';
+
+  @override
+  String get monthlyPlanChallengeSection => 'Küçük zafer challenge';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'Challenge alışkanlığı';
+
+  @override
+  String get monthlyPlanChallengeNameHint => 'ör: Günde 10 dk koşu';
+
+  @override
+  String get monthlyPlanRewardLabel => 'Ödül';
+
+  @override
+  String get monthlyPlanRewardHint => 'ör: Bir kitap al';
+
+  @override
+  String get monthlyPlanSelfCareSection => 'Öz bakım';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return 'Etkinlik $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => 'Ayın anısı';
+
+  @override
+  String get monthlyPlanMemoryHint => 'En güzel anı...';
+
+  @override
+  String get monthlyPlanAchievementSection => 'Ayın başarısı';
+
+  @override
+  String get monthlyPlanAchievementHint => 'En gurur duyduğum...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year yıllık plan';
+  }
+
+  @override
+  String get yearlyPlanSave => 'Kaydet';
+
+  @override
+  String get yearlyPlanSaveSuccess => 'Kaydedildi';
+
+  @override
+  String get yearlyPlanSaveError => 'Hata';
+
+  @override
+  String get yearlyPlanMessagesSection => 'Yıllık mesajlar';
+
+  @override
+  String get yearlyPlanGrowthSection => 'Büyüme planı';
+
+  @override
+  String get growthReviewScreenTitle => 'Büyüme değerlendirmesi';
+
+  @override
+  String get growthReviewMyMoments => 'Özel anlarım';
+
+  @override
+  String get growthReviewEmptyMoments => 'Henüz öne çıkan yok';
+
+  @override
+  String get growthReviewMySummary => 'Özetim';
+
+  @override
+  String get growthReviewSummaryPrompt =>
+      'Bu yolculuğa bakınca kendine ne söylersin?';
+
+  @override
+  String get growthReviewSmallWins => 'Küçük zafer ödülleri';
+
+  @override
+  String get growthReviewConsistentRecord => 'Tutarlı kayıt';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return '$count gün kaydettin';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => 'Haftalık değerlendirme şampiyonu';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '$count haftalık değerlendirme tamamlandı';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'Sıcak bir kapanış';
+
+  @override
+  String get growthReviewEveryStar => 'Her gün bir yıldız';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return '$count yıldız topladın. Parlamaya devam!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => 'Gelecekteki ben';
+
+  @override
+  String get futureSelfSubtitle => '3 gelecek versiyonunu hayal et';
+
+  @override
+  String get futureSelfHint =>
+      'Mükemmel cevap gerekmiyor, hayal gücünü serbest bırak';
+
+  @override
+  String get futureSelfStable => 'Kararlı gelecek';
+
+  @override
+  String get futureSelfStableHint =>
+      'Her şey yolunda giderse hayatın nasıl olur?';
+
+  @override
+  String get futureSelfFree => 'Özgür gelecek';
+
+  @override
+  String get futureSelfFreeHint => 'Hiçbir sınır olmasa ne yapardın?';
+
+  @override
+  String get futureSelfPace => 'Kendi hızında gelecek';
+
+  @override
+  String get futureSelfPaceHint => 'Acele etmeden, ideal ritmin ne?';
+
+  @override
+  String get futureSelfCoreLabel => 'Gerçekten önemsediğin ne?';
+
+  @override
+  String get futureSelfCoreHint =>
+      '3 versiyonun ortak noktası ne? O belki de en önemli şey...';
+
+  @override
+  String get habitPactScreenTitle => 'Alışkanlık sözüm';
+
+  @override
+  String get habitPactStep1 => 'Hangi alışkanlığı istiyorum?';
+
+  @override
+  String get habitPactCategoryLearning => 'Öğrenme';
+
+  @override
+  String get habitPactCategoryHealth => 'Sağlık';
+
+  @override
+  String get habitPactCategoryRelationship => 'İlişkiler';
+
+  @override
+  String get habitPactCategoryHobby => 'Hobi';
+
+  @override
+  String get habitPactHabitLabel => 'Belirli alışkanlık';
+
+  @override
+  String get habitPactHabitHint => 'ör: Günde 20 sayfa oku';
+
+  @override
+  String get habitPactStep2 => 'Alışkanlığın dört yasası';
+
+  @override
+  String get habitPactLawVisible => 'Görünür kıl';
+
+  @override
+  String get habitPactLawVisibleHint => 'İpucunu koyacağım yer...';
+
+  @override
+  String get habitPactLawAttractive => 'Çekici kıl';
+
+  @override
+  String get habitPactLawAttractiveHint => 'Bununla eşleştireceğim...';
+
+  @override
+  String get habitPactLawEasy => 'Kolay kıl';
+
+  @override
+  String get habitPactLawEasyHint => 'Minimum versiyonum...';
+
+  @override
+  String get habitPactLawRewarding => 'Tatmin edici kıl';
+
+  @override
+  String get habitPactLawRewardingHint => 'Sonra kendimi ödüllendireceğim...';
+
+  @override
+  String get habitPactStep3 => 'Eylem bildirisi';
+
+  @override
+  String get habitPactDeclarationEmpty =>
+      'Yukarıyı doldur, bildiri otomatik oluşsun...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return '\"$habit\" alışkanlığını oluşturmaya söz veriyorum';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return '$cue olduğunda';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return '$response yapacağım';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'sonra $reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => 'İdeal ben vs. Gerçek ben';
+
+  @override
+  String get idealVsRealIdeal => 'İdeal ben';
+
+  @override
+  String get idealVsRealIdealHint => 'Nasıl biri olmak istiyorum?';
+
+  @override
+  String get idealVsRealReal => 'Gerçek ben';
+
+  @override
+  String get idealVsRealRealHint => 'Şu an nasıl biriyim?';
+
+  @override
+  String get idealVsRealSame => 'Ortak noktalar?';
+
+  @override
+  String get idealVsRealSameHint => 'İdeal ve gerçek zaten nerede örtüşüyor?';
+
+  @override
+  String get idealVsRealDiff => 'Farklılıklar?';
+
+  @override
+  String get idealVsRealDiffHint => 'Fark nerede? Nasıl hissettiriyor?';
+
+  @override
+  String get idealVsRealStep => 'İdeale doğru küçük bir adım';
+
+  @override
+  String get idealVsRealStepHint => 'Bugün yapabileceğim küçük bir şey...';
+
+  @override
+  String get selfPraiseScreenTitle => 'Övgü grubum';
+
+  @override
+  String get selfPraiseSubtitle => '5 güçlü yanını yaz';
+
+  @override
+  String get selfPraiseHint =>
+      'Herkes görülmeyi hak eder, özellikle kendisi tarafından';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return 'Güçlü yan $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'En sıcak özelliğim...';
+
+  @override
+  String get selfPraisePrompt2 => 'İyi olduğum bir şey...';
+
+  @override
+  String get selfPraisePrompt3 => 'Sıkça övüldüğüm şey...';
+
+  @override
+  String get selfPraisePrompt4 => 'Gurur duyduğum şey...';
+
+  @override
+  String get selfPraisePrompt5 => 'Beni benzersiz kılan...';
+
+  @override
+  String get supportMapScreenTitle => 'Destek çevrem';
+
+  @override
+  String get supportMapSubtitle => 'Seni kim destekliyor?';
+
+  @override
+  String get supportMapHint => 'Yalnız olmadığını hatırla';
+
+  @override
+  String get supportMapNameLabel => 'İsim';
+
+  @override
+  String get supportMapRelationLabel => 'İlişki';
+
+  @override
+  String get supportMapRelationHint => 'ör: Arkadaş/Aile/İş arkadaşı';
+
+  @override
+  String get supportMapAdd => 'Ekle';
+
+  @override
+  String get worryUnloadScreenTitle => 'Endişe boşaltma günü';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return 'Hata: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => 'Aktif endişe yok';
+
+  @override
+  String get worryUnloadEmptyHint => 'Harika! Bugün hafif bir gün';
+
+  @override
+  String get worryUnloadIntro => 'Endişelerine bak ve sınıfla';
+
+  @override
+  String get worryUnloadLetGo => 'Bırakılabilir';
+
+  @override
+  String get worryUnloadTakeAction => 'Harekete geçilebilir';
+
+  @override
+  String get worryUnloadAccept => 'Şimdilik kabul';
+
+  @override
+  String get worryUnloadResultTitle => 'Sonuçlar';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get worryUnloadEncouragement => 'Her sınıflama bir adım ileri.';
+
+  @override
+  String get commonSaved => 'Kaydedildi';
+
+  @override
+  String get commonSaveError => 'Kaydetme başarısız';
+
+  @override
+  String get commonLoadError => 'Yükleme başarısız';
+
+  @override
+  String get momentEditTitle => 'Anı düzenle';
+
+  @override
+  String get momentNewHappy => 'Mutlu bir an kaydet';
+
+  @override
+  String get momentNewHighlight => 'Öne çıkan bir an kaydet';
+
+  @override
+  String get momentDescHappy => 'Mutlu eden bir şey';
+
+  @override
+  String get momentDescHighlight => 'Ne oldu';
+
+  @override
+  String get momentCompanionHappy => 'Kiminle birlikte';
+
+  @override
+  String get momentCompanionHighlight => 'Ne yaptım';
+
+  @override
+  String get momentFeeling => 'Hisler';
+
+  @override
+  String get momentDate => 'Tarih (YYYY-AA-GG)';
+
+  @override
+  String get momentRating => 'Değerlendirme';
+
+  @override
+  String get momentDescRequired => 'Lütfen bir açıklama ekle';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return '$companion ile birlikte';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'Yaptığım: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => 'Yıllık takvimim';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month. ay';
+  }
 }

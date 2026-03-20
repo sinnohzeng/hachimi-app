@@ -1,22 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 未来照见我 — 3 种未来版本 + 反思。
-class FutureSelfScreen extends StatefulWidget {
+class FutureSelfScreen extends ConsumerStatefulWidget {
   const FutureSelfScreen({super.key});
 
   @override
-  State<FutureSelfScreen> createState() => _FutureSelfScreenState();
+  ConsumerState<FutureSelfScreen> createState() => _FutureSelfScreenState();
 }
 
-class _FutureSelfScreenState extends State<FutureSelfScreen> {
-  static const _prefsKey = 'lumi_future_self';
+class _FutureSelfScreenState extends ConsumerState<FutureSelfScreen> {
+  static const _prefsKeySuffix = 'future_self';
+
+  String get _prefsKey {
+    final uid = ref.read(currentUidProvider) ?? 'guest';
+    return 'lumi_${uid}_$_prefsKeySuffix';
+  }
 
   final _stableController = TextEditingController();
   final _freeController = TextEditingController();
@@ -73,12 +81,12 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
       );
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[FutureSelfScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -90,7 +98,7 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('未来照见我')),
+      appBar: AppBar(title: Text(context.l10n.futureSelfScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -100,17 +108,17 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('想象 3 种未来的自己', style: textTheme.titleMedium),
+            Text(context.l10n.futureSelfSubtitle, style: textTheme.titleMedium),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '不需要完美答案，让想象自由流动',
+              context.l10n.futureSelfHint,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -119,24 +127,24 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
 
             _futureField(
               icon: Icons.home_outlined,
-              label: '稳定的未来',
-              hint: '如果一切顺利，稳定发展，你的生活会是什么样？',
+              label: context.l10n.futureSelfStable,
+              hint: context.l10n.futureSelfStableHint,
               controller: _stableController,
               colorScheme: colorScheme,
               textTheme: textTheme,
             ),
             _futureField(
               icon: Icons.flight_outlined,
-              label: '自由的未来',
-              hint: '如果没有任何限制，你最想做什么？',
+              label: context.l10n.futureSelfFree,
+              hint: context.l10n.futureSelfFreeHint,
               controller: _freeController,
               colorScheme: colorScheme,
               textTheme: textTheme,
             ),
             _futureField(
               icon: Icons.self_improvement_outlined,
-              label: '按自己节奏发展的未来',
-              hint: '不急不缓，你理想中的节奏是什么样的？',
+              label: context.l10n.futureSelfPace,
+              hint: context.l10n.futureSelfPaceHint,
               controller: _paceController,
               colorScheme: colorScheme,
               textTheme: textTheme,
@@ -154,7 +162,10 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('你真正在意的是什么？', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.futureSelfCoreLabel,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -162,7 +173,7 @@ class _FutureSelfScreenState extends State<FutureSelfScreen> {
               controller: _coreController,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '看看上面的 3 个版本，它们有什么共同点？那可能就是你内心最在意的...',
+                hintText: context.l10n.futureSelfCoreHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),

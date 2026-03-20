@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/habits_provider.dart';
 
 /// 习惯速览卡 — 显示今日习惯列表，支持快速点击进入专注。
@@ -22,7 +23,7 @@ class HabitSnapshotCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '今日习惯', // TODO: l10n
+              context.l10n.habitSnapshotTitle,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -34,7 +35,7 @@ class HabitSnapshotCard extends ConsumerWidget {
                   return Padding(
                     padding: AppSpacing.paddingVBase,
                     child: Text(
-                      '你还没有习惯，可以在旅程里设定', // TODO: l10n
+                      context.l10n.habitSnapshotEmpty,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -79,7 +80,7 @@ class HabitSnapshotCard extends ConsumerWidget {
                 return Padding(
                   padding: AppSpacing.paddingVBase,
                   child: Text(
-                    '加载失败', // TODO: l10n
+                    context.l10n.habitSnapshotLoadError,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.error,
                     ),

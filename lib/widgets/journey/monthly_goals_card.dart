@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -72,7 +73,7 @@ class _MonthlyGoalsCardState extends ConsumerState<MonthlyGoalsCard> {
       await ref.read(planRepositoryProvider).saveMonthlyPlan(uid, plan);
     } on Exception catch (e) {
       debugPrint('[MonthlyGoalsCard] Save error: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     }
   }
 
@@ -96,7 +97,10 @@ class _MonthlyGoalsCardState extends ConsumerState<MonthlyGoalsCard> {
               children: [
                 Icon(Icons.flag_outlined, size: 20, color: colorScheme.primary),
                 const SizedBox(width: AppSpacing.sm),
-                Text('本月目标', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.monthlyGoalsTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -105,7 +109,7 @@ class _MonthlyGoalsCardState extends ConsumerState<MonthlyGoalsCard> {
               (i) => _GoalRow(
                 controller: _controllers[i],
                 completed: _completed[i],
-                hint: '目标 ${i + 1}',
+                hint: context.l10n.monthlyGoalHint(i + 1),
                 onCompletedChanged: (v) {
                   setState(() => _completed[i] = v);
                   _save();

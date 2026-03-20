@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI : Illumine mon univers intérieur
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- Nouvelle interface à 3 onglets : Aujourd'hui, Parcours, Profil
+- Lumière du jour : notez votre humeur en une ligne
+- Planificateur : objectifs hebdo, mensuels et annuels
+- 6 activités mensuelles d'introspection et de croissance
+- Moments forts et journal du bonheur
+- Déblocage progressif selon vos séries
+- Localisation complète en 15 langues

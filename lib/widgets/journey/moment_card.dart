@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/highlight_entry.dart';
 
 /// 时刻卡片 — 展示幸福/高光时刻的单条记录。
@@ -58,8 +59,10 @@ class MomentCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           isHappy
-                              ? '和${entry.companion}一起'
-                              : '我做了：${entry.companion}',
+                              ? context.l10n.momentWithCompanion(
+                                  entry.companion!,
+                                )
+                              : context.l10n.momentDidAction(entry.companion!),
                           style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

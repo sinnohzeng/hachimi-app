@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/user_list.dart';
 import 'package:hachimi_app/providers/list_highlight_providers.dart';
 
@@ -37,13 +38,13 @@ class ListsOverviewCard extends ConsumerWidget {
               children: [
                 Icon(Icons.list_alt, size: 20, color: colorScheme.primary),
                 const SizedBox(width: AppSpacing.sm),
-                Text('我的清单', style: textTheme.titleSmall),
+                Text(context.l10n.listsTitle, style: textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
             _ListTypeTile(
               icon: Icons.menu_book_outlined,
-              title: '书单',
+              title: context.l10n.listBookTitle,
               count: countByType(ListType.book),
               onTap: () => Navigator.of(context).pushNamed(
                 AppRouter.listDetail,
@@ -55,7 +56,7 @@ class ListsOverviewCard extends ConsumerWidget {
             ),
             _ListTypeTile(
               icon: Icons.movie_outlined,
-              title: '影单',
+              title: context.l10n.listMovieTitle,
               count: countByType(ListType.movie),
               onTap: () => Navigator.of(context).pushNamed(
                 AppRouter.listDetail,
@@ -67,7 +68,7 @@ class ListsOverviewCard extends ConsumerWidget {
             ),
             _ListTypeTile(
               icon: Icons.playlist_add_outlined,
-              title: '自定义清单',
+              title: context.l10n.listCustomTitle,
               count: countByType(ListType.custom),
               onTap: () => Navigator.of(context).pushNamed(
                 AppRouter.listDetail,
@@ -116,7 +117,7 @@ class _ListTypeTile extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(child: Text(title, style: textTheme.bodyMedium)),
             Text(
-              '$count 条',
+              context.l10n.listItemCount(count),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

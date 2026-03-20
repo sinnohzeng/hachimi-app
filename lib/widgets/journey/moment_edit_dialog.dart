@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/highlight_entry.dart';
 import 'package:uuid/uuid.dart';
 
@@ -68,7 +69,7 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
   void _submit() {
     final desc = _descController.text.trim();
     if (desc.isEmpty) {
-      AppFeedback.info(context, '请填写描述');
+      AppFeedback.info(context, context.l10n.momentDescRequired);
       return;
     }
 
@@ -128,8 +129,10 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
 
             Text(
               widget.existing != null
-                  ? '编辑时刻'
-                  : (_isHappy ? '记录幸福时刻' : '记录高光时刻'),
+                  ? context.l10n.momentEditTitle
+                  : (_isHappy
+                        ? context.l10n.momentNewHappy
+                        : context.l10n.momentNewHighlight),
               style: textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.md),
@@ -138,7 +141,9 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
               controller: _descController,
               maxLines: 2,
               decoration: InputDecoration(
-                labelText: _isHappy ? '幸福的事' : '发生了什么',
+                labelText: _isHappy
+                    ? context.l10n.momentDescHappy
+                    : context.l10n.momentDescHighlight,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -147,7 +152,9 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
             TextField(
               controller: _companionController,
               decoration: InputDecoration(
-                labelText: _isHappy ? '和谁在一起' : '我做了什么',
+                labelText: _isHappy
+                    ? context.l10n.momentCompanionHappy
+                    : context.l10n.momentCompanionHighlight,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -156,7 +163,7 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
             TextField(
               controller: _feelingController,
               decoration: InputDecoration(
-                labelText: '感受',
+                labelText: context.l10n.momentFeeling,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -165,7 +172,7 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
             TextField(
               controller: _dateController,
               decoration: InputDecoration(
-                labelText: '日期 (YYYY-MM-DD)',
+                labelText: context.l10n.momentDate,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -174,7 +181,7 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
             // 评分
             Row(
               children: [
-                Text('评分', style: textTheme.bodyMedium),
+                Text(context.l10n.momentRating, style: textTheme.bodyMedium),
                 const SizedBox(width: AppSpacing.md),
                 ...List.generate(5, (i) {
                   final filled = i < _rating;
@@ -198,7 +205,10 @@ class _MomentEditSheetState extends State<_MomentEditSheet> {
 
             SizedBox(
               width: double.infinity,
-              child: FilledButton(onPressed: _submit, child: const Text('保存')),
+              child: FilledButton(
+                onPressed: _submit,
+                child: Text(context.l10n.commonSave),
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
           ],

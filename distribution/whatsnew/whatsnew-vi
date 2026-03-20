@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI: Thắp sáng vũ trụ bên trong tôi
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- Giao diện 3 tab mới: Hôm nay, Hành trình, Hồ sơ
+- Ánh sáng mỗi ngày: ghi lại tâm trạng bằng một dòng
+- Lập kế hoạch: mục tiêu tuần, tháng và năm
+- 6 hoạt động hàng tháng để tự suy ngẫm và phát triển
+- Khoảnh khắc nổi bật và nhật ký hạnh phúc
+- Mở khóa dần theo chuỗi ngày liên tục
+- Hỗ trợ đầy đủ 15 ngôn ngữ

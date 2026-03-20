@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI：心の宇宙を照らそう
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- 新しい3タブ構成：今日・ジャーニー・プロフィール
+- デイリーライト：毎日一言で気分を記録
+- ジャーニープランナー：週・月・年の目標設定
+- 自己振り返りと成長のための月間活動6種
+- ハイライトと幸せジャーナル
+- 継続日数に応じた段階的アンロック
+- 15言語の完全ローカライズ対応

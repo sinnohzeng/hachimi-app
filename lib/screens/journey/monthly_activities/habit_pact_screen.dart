@@ -1,22 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 我与习惯的约定 — 基于原子习惯四定律的习惯设计。
-class HabitPactScreen extends StatefulWidget {
+class HabitPactScreen extends ConsumerStatefulWidget {
   const HabitPactScreen({super.key});
 
   @override
-  State<HabitPactScreen> createState() => _HabitPactScreenState();
+  ConsumerState<HabitPactScreen> createState() => _HabitPactScreenState();
 }
 
-class _HabitPactScreenState extends State<HabitPactScreen> {
-  static const _prefsKey = 'lumi_habit_pact';
+class _HabitPactScreenState extends ConsumerState<HabitPactScreen> {
+  static const _prefsKeySuffix = 'habit_pact';
+
+  String get _prefsKey {
+    final uid = ref.read(currentUidProvider) ?? 'guest';
+    return 'lumi_${uid}_$_prefsKeySuffix';
+  }
 
   String? _selectedCategory;
   final _habitController = TextEditingController();
@@ -26,7 +34,15 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
   final _rewardController = TextEditingController();
   bool _isSaving = false;
 
-  static const _categories = ['学习', '健康', '关系', '兴趣'];
+  List<String> _categories(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.habitPactCategoryLearning,
+      l10n.habitPactCategoryHealth,
+      l10n.habitPactCategoryRelationship,
+      l10n.habitPactCategoryHobby,
+    ];
+  }
 
   @override
   void initState() {
@@ -83,29 +99,30 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
       );
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[HabitPactScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
 
-  String get _declaration {
+  String _declaration(BuildContext context) {
     final habit = _habitController.text.trim();
     final cue = _cueController.text.trim();
     final response = _responseController.text.trim();
     final reward = _rewardController.text.trim();
+    final l10n = context.l10n;
 
     if (habit.isEmpty) return '';
-    final parts = <String>['我决定养成「$habit」的习惯'];
-    if (cue.isNotEmpty) parts.add('当$cue时');
-    if (response.isNotEmpty) parts.add('我会$response');
-    if (reward.isNotEmpty) parts.add('然后$reward');
-    return '${parts.join('，')}。';
+    final parts = <String>[l10n.habitPactDeclarationPrefix(habit)];
+    if (cue.isNotEmpty) parts.add(l10n.habitPactDeclarationWhen(cue));
+    if (response.isNotEmpty) parts.add(l10n.habitPactDeclarationWill(response));
+    if (reward.isNotEmpty) parts.add(l10n.habitPactDeclarationThen(reward));
+    return '${parts.join(', ')}.';
   }
 
   @override
@@ -114,7 +131,7 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('我与习惯的约定')),
+      appBar: AppBar(title: Text(context.l10n.habitPactScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -124,7 +141,7 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -132,11 +149,16 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Step 1: 选择类别
-            _sectionTitle(textTheme, colorScheme, '1', '我想养成什么习惯？'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              '1',
+              context.l10n.habitPactStep1,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
-              children: _categories.map((cat) {
+              children: _categories(context).map((cat) {
                 final selected = _selectedCategory == cat;
                 return ChoiceChip(
                   label: Text(cat),
@@ -151,8 +173,8 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
               controller: _habitController,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                labelText: '具体习惯',
-                hintText: '例：每天读 20 页书',
+                labelText: context.l10n.habitPactHabitLabel,
+                hintText: context.l10n.habitPactHabitHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -160,52 +182,67 @@ class _HabitPactScreenState extends State<HabitPactScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // Step 2: 四定律
-            _sectionTitle(textTheme, colorScheme, '2', '习惯四定律设计'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              '2',
+              context.l10n.habitPactStep2,
+            ),
             const SizedBox(height: AppSpacing.sm),
             _lawField(
-              label: '看得见',
-              hint: '我会把提示放在...',
+              label: context.l10n.habitPactLawVisible,
+              hint: context.l10n.habitPactLawVisibleHint,
               controller: _cueController,
             ),
             _lawField(
-              label: '想去做',
-              hint: '我会把它和...连在一起',
+              label: context.l10n.habitPactLawAttractive,
+              hint: context.l10n.habitPactLawAttractiveHint,
               controller: _cravingController,
             ),
             _lawField(
-              label: '易上手',
-              hint: '我设计的最小版本是...',
+              label: context.l10n.habitPactLawEasy,
+              hint: context.l10n.habitPactLawEasyHint,
               controller: _responseController,
             ),
             _lawField(
-              label: '有奖励',
-              hint: '完成后我会奖励自己...',
+              label: context.l10n.habitPactLawRewarding,
+              hint: context.l10n.habitPactLawRewardingHint,
               controller: _rewardController,
             ),
 
             const SizedBox(height: AppSpacing.lg),
 
             // Step 3: 宣言
-            _sectionTitle(textTheme, colorScheme, '3', '行动宣言'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              '3',
+              context.l10n.habitPactStep3,
+            ),
             const SizedBox(height: AppSpacing.sm),
-            Container(
-              width: double.infinity,
-              padding: AppSpacing.paddingBase,
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                borderRadius: AppShape.borderMedium,
-              ),
-              child: Text(
-                _declaration.isEmpty ? '填写上方内容，自动生成宣言...' : _declaration,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: _declaration.isEmpty
-                      ? colorScheme.onSurfaceVariant
-                      : colorScheme.onSurface,
-                  fontStyle: _declaration.isEmpty
-                      ? FontStyle.italic
-                      : FontStyle.normal,
-                ),
-              ),
+            Builder(
+              builder: (ctx) {
+                final decl = _declaration(ctx);
+                return Container(
+                  width: double.infinity,
+                  padding: AppSpacing.paddingBase,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    borderRadius: AppShape.borderMedium,
+                  ),
+                  child: Text(
+                    decl.isEmpty ? ctx.l10n.habitPactDeclarationEmpty : decl,
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: decl.isEmpty
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onSurface,
+                      fontStyle: decl.isEmpty
+                          ? FontStyle.italic
+                          : FontStyle.normal,
+                    ),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 100), // FAB 间距

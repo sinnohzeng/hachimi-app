@@ -1,22 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 理想的我 vs. 现在的我 — 双栏对比 + 反思。
-class IdealVsRealScreen extends StatefulWidget {
+class IdealVsRealScreen extends ConsumerStatefulWidget {
   const IdealVsRealScreen({super.key});
 
   @override
-  State<IdealVsRealScreen> createState() => _IdealVsRealScreenState();
+  ConsumerState<IdealVsRealScreen> createState() => _IdealVsRealScreenState();
 }
 
-class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
-  static const _prefsKey = 'lumi_ideal_vs_real';
+class _IdealVsRealScreenState extends ConsumerState<IdealVsRealScreen> {
+  static const _prefsKeySuffix = 'ideal_vs_real';
+
+  String get _prefsKey {
+    final uid = ref.read(currentUidProvider) ?? 'guest';
+    return 'lumi_${uid}_$_prefsKeySuffix';
+  }
 
   final _idealController = TextEditingController();
   final _realController = TextEditingController();
@@ -77,12 +85,12 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
       );
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[IdealVsRealScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -94,7 +102,7 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('理想的我 vs. 现在的我')),
+      appBar: AppBar(title: Text(context.l10n.idealVsRealScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -104,7 +112,7 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -119,10 +127,10 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
                   child: _columnCard(
                     colorScheme: colorScheme,
                     textTheme: textTheme,
-                    title: '理想的我',
+                    title: context.l10n.idealVsRealIdeal,
                     icon: Icons.auto_awesome_outlined,
                     controller: _idealController,
-                    hint: '我希望自己是什么样的人？',
+                    hint: context.l10n.idealVsRealIdealHint,
                     color: colorScheme.primaryContainer,
                   ),
                 ),
@@ -131,10 +139,10 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
                   child: _columnCard(
                     colorScheme: colorScheme,
                     textTheme: textTheme,
-                    title: '现在的我',
+                    title: context.l10n.idealVsRealReal,
                     icon: Icons.person_outline,
                     controller: _realController,
-                    hint: '我现在是什么样的人？',
+                    hint: context.l10n.idealVsRealRealHint,
                     color: colorScheme.tertiaryContainer,
                   ),
                 ),
@@ -150,24 +158,24 @@ class _IdealVsRealScreenState extends State<IdealVsRealScreen> {
               textTheme: textTheme,
               colorScheme: colorScheme,
               icon: Icons.compare_arrows,
-              label: '有哪些相同点？',
-              hint: '理想和现实之间，已经有哪些重合的地方？',
+              label: context.l10n.idealVsRealSame,
+              hint: context.l10n.idealVsRealSameHint,
               controller: _sameController,
             ),
             _reflectionField(
               textTheme: textTheme,
               colorScheme: colorScheme,
               icon: Icons.swap_horiz,
-              label: '有哪些不同？',
-              hint: '差距在哪里？这些差距让你有什么感受？',
+              label: context.l10n.idealVsRealDiff,
+              hint: context.l10n.idealVsRealDiffHint,
               controller: _diffController,
             ),
             _reflectionField(
               textTheme: textTheme,
               colorScheme: colorScheme,
               icon: Icons.trending_up,
-              label: '靠近理想，我只需要迈出一小步',
-              hint: '今天就可以做的一件小事是...',
+              label: context.l10n.idealVsRealStep,
+              hint: context.l10n.idealVsRealStepHint,
               controller: _stepController,
             ),
 

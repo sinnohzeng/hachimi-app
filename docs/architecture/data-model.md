@@ -351,8 +351,11 @@ users/{uid}
 | `week_id` | TEXT | NOT NULL |
 | `week_start_date` | TEXT | |
 | `week_end_date` | TEXT | |
-| `one_line_wish` | TEXT | |
-| `eisenhower_matrix` | TEXT (JSON) | |
+| `one_line_for_self` | TEXT | |
+| `urgent_important` | TEXT (JSON) | |
+| `important_not_urgent` | TEXT (JSON) | |
+| `urgent_not_important` | TEXT (JSON) | |
+| `not_urgent_not_important` | TEXT (JSON) | |
 | `new_worries` | TEXT (JSON) | |
 | `created_at` | INTEGER | NOT NULL |
 | `updated_at` | INTEGER | NOT NULL |
@@ -364,7 +367,7 @@ users/{uid}
 |--------|------|------------|
 | `id` | INTEGER | PK |
 | `uid` | TEXT | NOT NULL |
-| `month_key` | TEXT | NOT NULL |
+| `month_id` | TEXT | NOT NULL |
 | `goals` | TEXT (JSON) | |
 | `small_win_challenge` | TEXT (JSON) | |
 | `habit_trackers` | TEXT (JSON) | |
@@ -373,7 +376,7 @@ users/{uid}
 | `achievement` | TEXT | |
 | `created_at` | INTEGER | NOT NULL |
 | `updated_at` | INTEGER | NOT NULL |
-| | | UNIQUE(uid, month_key) |
+| | | UNIQUE(uid, month_id) |
 
 **`local_yearly_plans`**
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
 
 /// 烦恼罐卡片 — 显示进行中的烦恼数量，点击进入烦恼处理器。
@@ -36,7 +37,7 @@ class WorryJarCard extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      '烦恼罐', // TODO: l10n
+                      context.l10n.worryJarTitle,
                       style: textTheme.titleSmall,
                     ),
                   ),
@@ -67,7 +68,7 @@ class WorryJarCard extends ConsumerWidget {
             error: (e, _) {
               debugPrint('[WorryJarCard] Load error: $e');
               return Text(
-                '加载失败', // TODO: l10n
+                context.l10n.worryJarLoadError,
                 style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
               );
             },

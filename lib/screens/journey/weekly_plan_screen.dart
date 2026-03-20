@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/weekly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -76,13 +77,13 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
       await ref.read(planRepositoryProvider).saveWeeklyPlan(uid, plan);
 
       if (mounted) {
-        AppFeedback.success(context, '已保存'); // TODO: l10n
+        AppFeedback.success(context, context.l10n.weeklyPlanSaveSuccess);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[WeeklyPlan] Save failed: $e');
       if (mounted) {
-        AppFeedback.error(context, '保存失败'); // TODO: l10n
+        AppFeedback.error(context, context.l10n.weeklyPlanSaveError);
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -93,9 +94,14 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final plan = ref.read(currentWeekPlanProvider).value;
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) setState(() => _loaded = true);
+      ref.listenManual(currentWeekPlanProvider, (prev, next) {
+        next.whenData((plan) {
+          if (plan != null && !_loaded) {
+            _loadFromPlan(plan);
+            setState(() {});
+          }
+        });
+      }, fireImmediately: true);
     });
   }
 
@@ -105,11 +111,10 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
     ref.watch(currentWeekPlanProvider);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return AppScaffold(
-      appBar: AppBar(
-        title: const Text('本周计划'), // TODO: l10n
-      ),
+      appBar: AppBar(title: Text(l10n.weeklyPlanScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -119,7 +124,7 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'), // TODO: l10n
+        label: Text(l10n.weeklyPlanSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -128,7 +133,7 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
           children: [
             // 一句话
             Text(
-              '写一句话给这周的自己', // TODO: l10n
+              l10n.weeklyPlanOneLine,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -138,15 +143,15 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
               controller: _oneLineController,
               maxLength: 100,
               decoration: InputDecoration(
-                hintText: '这周我想...', // TODO: l10n
+                hintText: l10n.weeklyPlanOneLineHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             // 四象限
             _QuadrantSection(
-              title: '必须做',
-              subtitle: '紧急且重要', // TODO: l10n
+              title: l10n.weeklyPlanMustDo,
+              subtitle: l10n.weeklyPlanUrgentImportant,
               color: colorScheme.error,
               items: _urgentImportant,
               onAdd: (text) => setState(() => _urgentImportant.add(text)),
@@ -154,8 +159,8 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
             ),
             const SizedBox(height: AppSpacing.md),
             _QuadrantSection(
-              title: '要做',
-              subtitle: '重要不紧急', // TODO: l10n
+              title: l10n.weeklyPlanShouldDo,
+              subtitle: l10n.weeklyPlanImportantNotUrgent,
               color: colorScheme.primary,
               items: _importantNotUrgent,
               onAdd: (text) => setState(() => _importantNotUrgent.add(text)),
@@ -163,8 +168,8 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
             ),
             const SizedBox(height: AppSpacing.md),
             _QuadrantSection(
-              title: '该做',
-              subtitle: '紧急不重要', // TODO: l10n
+              title: l10n.weeklyPlanNeedToDo,
+              subtitle: l10n.weeklyPlanUrgentNotImportant,
               color: colorScheme.tertiary,
               items: _urgentNotImportant,
               onAdd: (text) => setState(() => _urgentNotImportant.add(text)),
@@ -172,8 +177,8 @@ class _WeeklyPlanScreenState extends ConsumerState<WeeklyPlanScreen> {
             ),
             const SizedBox(height: AppSpacing.md),
             _QuadrantSection(
-              title: '想做',
-              subtitle: '不紧急不重要', // TODO: l10n
+              title: l10n.weeklyPlanWantToDo,
+              subtitle: l10n.weeklyPlanNotUrgentNotImportant,
               color: colorScheme.secondary,
               items: _wantToDo,
               onAdd: (text) => setState(() => _wantToDo.add(text)),
@@ -304,7 +309,7 @@ class _QuadrantSectionState extends State<_QuadrantSection> {
                   child: TextField(
                     controller: _addController,
                     decoration: InputDecoration(
-                      hintText: '添加...', // TODO: l10n
+                      hintText: context.l10n.weeklyPlanAddHint,
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(

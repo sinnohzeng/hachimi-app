@@ -1,31 +1,43 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 我的夸夸群 — 写下自己的 5 个优点。
-class SelfPraiseScreen extends StatefulWidget {
+class SelfPraiseScreen extends ConsumerStatefulWidget {
   const SelfPraiseScreen({super.key});
 
   @override
-  State<SelfPraiseScreen> createState() => _SelfPraiseScreenState();
+  ConsumerState<SelfPraiseScreen> createState() => _SelfPraiseScreenState();
 }
 
-class _SelfPraiseScreenState extends State<SelfPraiseScreen> {
-  static const _prefsKey = 'lumi_self_praise';
+class _SelfPraiseScreenState extends ConsumerState<SelfPraiseScreen> {
+  static const _prefsKeySuffix = 'self_praise';
+
+  String get _prefsKey {
+    final uid = ref.read(currentUidProvider) ?? 'guest';
+    return 'lumi_${uid}_$_prefsKeySuffix';
+  }
+
   static const _count = 5;
 
-  static const _prompts = [
-    '我最温暖的品质是...',
-    '我擅长的一件事是...',
-    '别人常夸我的是...',
-    '我为自己骄傲的地方是...',
-    '我的独特之处是...',
-  ];
+  List<String> _prompts(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.selfPraisePrompt1,
+      l10n.selfPraisePrompt2,
+      l10n.selfPraisePrompt3,
+      l10n.selfPraisePrompt4,
+      l10n.selfPraisePrompt5,
+    ];
+  }
 
   late final List<TextEditingController> _controllers;
   bool _isSaving = false;
@@ -70,12 +82,12 @@ class _SelfPraiseScreenState extends State<SelfPraiseScreen> {
       await prefs.setString(_prefsKey, jsonEncode(values));
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[SelfPraiseScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -87,7 +99,7 @@ class _SelfPraiseScreenState extends State<SelfPraiseScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('我的夸夸群')),
+      appBar: AppBar(title: Text(context.l10n.selfPraiseScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -97,17 +109,17 @@ class _SelfPraiseScreenState extends State<SelfPraiseScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('写下你的 5 个优点', style: textTheme.titleMedium),
+            Text(context.l10n.selfPraiseSubtitle, style: textTheme.titleMedium),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '每个人都值得被看见，尤其是自己',
+              context.l10n.selfPraiseHint,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -122,8 +134,8 @@ class _SelfPraiseScreenState extends State<SelfPraiseScreen> {
                   controller: _controllers[i],
                   maxLines: 2,
                   decoration: InputDecoration(
-                    labelText: '优点 ${i + 1}',
-                    hintText: _prompts[i],
+                    labelText: context.l10n.selfPraiseStrengthLabel(i + 1),
+                    hintText: _prompts(context)[i],
                     border: OutlineInputBorder(
                       borderRadius: AppShape.borderSmall,
                     ),

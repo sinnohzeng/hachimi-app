@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI: İç Evrenimi Aydınlat
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- Yeni 3 sekmeli düzen: Bugün, Yolculuk, Profil
+- Günlük Işık: Ruh halini tek satırda kaydet
+- Yolculuk planlayıcı: haftalık, aylık ve yıllık hedefler
+- Öz değerlendirme ve gelişim için 6 aylık etkinlik
+- Öne çıkan anlar ve mutluluk günlüğü
+- Seriye dayalı kademeli kilit açma sistemi
+- 15 dilde tam yerelleştirme desteği

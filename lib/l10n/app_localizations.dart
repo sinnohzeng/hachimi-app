@@ -5809,6 +5809,1578 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Growth Review'**
   String get growthReview;
+
+  /// No description provided for @greetingLateNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Late night, {name}'**
+  String greetingLateNight(String name);
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, {name}'**
+  String greetingMorning(String name);
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, {name}'**
+  String greetingAfternoon(String name);
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening, {name}'**
+  String greetingEvening(String name);
+
+  /// No description provided for @greetingLateNightNoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Late night'**
+  String get greetingLateNightNoName;
+
+  /// No description provided for @greetingMorningNoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get greetingMorningNoName;
+
+  /// No description provided for @greetingAfternoonNoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get greetingAfternoonNoName;
+
+  /// No description provided for @greetingEveningNoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get greetingEveningNoName;
+
+  /// No description provided for @journeyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get journeyTitle;
+
+  /// No description provided for @journeySegmentWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get journeySegmentWeek;
+
+  /// No description provided for @journeySegmentMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get journeySegmentMonth;
+
+  /// No description provided for @journeySegmentYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get journeySegmentYear;
+
+  /// No description provided for @journeySegmentExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get journeySegmentExplore;
+
+  /// No description provided for @journeyMonthlyView.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly View'**
+  String get journeyMonthlyView;
+
+  /// No description provided for @journeyYearlyView.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly View'**
+  String get journeyYearlyView;
+
+  /// No description provided for @journeyExploreActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Activities'**
+  String get journeyExploreActivities;
+
+  /// No description provided for @journeyEditMonthlyPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit monthly plan'**
+  String get journeyEditMonthlyPlan;
+
+  /// No description provided for @journeyEditYearlyPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit yearly plan'**
+  String get journeyEditYearlyPlan;
+
+  /// No description provided for @quickLightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s little light'**
+  String get quickLightTitle;
+
+  /// No description provided for @quickLightHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write how you feel today...'**
+  String get quickLightHint;
+
+  /// No description provided for @quickLightRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get quickLightRecord;
+
+  /// No description provided for @quickLightSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded'**
+  String get quickLightSaveSuccess;
+
+  /// No description provided for @quickLightSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed, please try again'**
+  String get quickLightSaveError;
+
+  /// No description provided for @habitSnapshotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s habits'**
+  String get habitSnapshotTitle;
+
+  /// No description provided for @habitSnapshotEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No habits yet. Set them in your journey.'**
+  String get habitSnapshotEmpty;
+
+  /// No description provided for @habitSnapshotLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get habitSnapshotLoadError;
+
+  /// No description provided for @worryJarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worry jar'**
+  String get worryJarTitle;
+
+  /// No description provided for @worryJarLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get worryJarLoadError;
+
+  /// No description provided for @weeklyReviewEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Record this week\'s happy moments'**
+  String get weeklyReviewEmpty;
+
+  /// No description provided for @weeklyReviewHappyMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy moments'**
+  String get weeklyReviewHappyMoments;
+
+  /// No description provided for @weeklyReviewLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get weeklyReviewLoadError;
+
+  /// No description provided for @weeklyPlanCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly plan'**
+  String get weeklyPlanCardTitle;
+
+  /// No description provided for @weeklyPlanItemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String weeklyPlanItemCount(int count);
+
+  /// No description provided for @weeklyPlanEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a weekly plan'**
+  String get weeklyPlanEmpty;
+
+  /// No description provided for @weekMoodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Week mood'**
+  String get weekMoodTitle;
+
+  /// No description provided for @weekMoodLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load mood'**
+  String get weekMoodLoadError;
+
+  /// No description provided for @featureLockedDaysRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Record {remaining} more days to unlock'**
+  String featureLockedDaysRemaining(int remaining);
+
+  /// No description provided for @featureLockedSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocking soon'**
+  String get featureLockedSoon;
+
+  /// No description provided for @weeklyPlanScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly plan'**
+  String get weeklyPlanScreenTitle;
+
+  /// No description provided for @weeklyPlanSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get weeklyPlanSave;
+
+  /// No description provided for @weeklyPlanSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get weeklyPlanSaveSuccess;
+
+  /// No description provided for @weeklyPlanSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get weeklyPlanSaveError;
+
+  /// No description provided for @weeklyPlanOneLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a line for yourself this week'**
+  String get weeklyPlanOneLine;
+
+  /// No description provided for @weeklyPlanOneLineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This week I want to...'**
+  String get weeklyPlanOneLineHint;
+
+  /// No description provided for @weeklyPlanUrgentImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent & Important'**
+  String get weeklyPlanUrgentImportant;
+
+  /// No description provided for @weeklyPlanImportantNotUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Important, Not Urgent'**
+  String get weeklyPlanImportantNotUrgent;
+
+  /// No description provided for @weeklyPlanUrgentNotImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent, Not Important'**
+  String get weeklyPlanUrgentNotImportant;
+
+  /// No description provided for @weeklyPlanNotUrgentNotImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Urgent, Not Important'**
+  String get weeklyPlanNotUrgentNotImportant;
+
+  /// No description provided for @weeklyPlanAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add...'**
+  String get weeklyPlanAddHint;
+
+  /// No description provided for @weeklyPlanMustDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Must do'**
+  String get weeklyPlanMustDo;
+
+  /// No description provided for @weeklyPlanShouldDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Should do'**
+  String get weeklyPlanShouldDo;
+
+  /// No description provided for @weeklyPlanNeedToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Need to do'**
+  String get weeklyPlanNeedToDo;
+
+  /// No description provided for @weeklyPlanWantToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Want to do'**
+  String get weeklyPlanWantToDo;
+
+  /// No description provided for @monthlyCalendarYearMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'{year}/{month}'**
+  String monthlyCalendarYearMonth(int year, int month);
+
+  /// No description provided for @monthlyCalendarLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get monthlyCalendarLoadError;
+
+  /// No description provided for @monthlyGoalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly goals'**
+  String get monthlyGoalsTitle;
+
+  /// No description provided for @monthlyGoalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal {index}'**
+  String monthlyGoalHint(int index);
+
+  /// No description provided for @monthlySaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get monthlySaveError;
+
+  /// No description provided for @monthlyMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly memory'**
+  String get monthlyMemoryTitle;
+
+  /// No description provided for @monthlyMemoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The most beautiful memory this month is...'**
+  String get monthlyMemoryHint;
+
+  /// No description provided for @monthlyAchievementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly achievement'**
+  String get monthlyAchievementTitle;
+
+  /// No description provided for @monthlyAchievementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'My proudest achievement this month is...'**
+  String get monthlyAchievementHint;
+
+  /// No description provided for @yearlyMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly messages'**
+  String get yearlyMessagesTitle;
+
+  /// No description provided for @yearlyMessageBecome.
+  ///
+  /// In en, this message translates to:
+  /// **'This year I hope to become...'**
+  String get yearlyMessageBecome;
+
+  /// No description provided for @yearlyMessageGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals to achieve'**
+  String get yearlyMessageGoals;
+
+  /// No description provided for @yearlyMessageBreakthrough.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakthrough completion'**
+  String get yearlyMessageBreakthrough;
+
+  /// No description provided for @yearlyMessageDontDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t do (saying no makes room for what matters)'**
+  String get yearlyMessageDontDo;
+
+  /// No description provided for @yearlyMessageKeyword.
+  ///
+  /// In en, this message translates to:
+  /// **'Year keyword (e.g. Focus / Brave / Patient / Kind)'**
+  String get yearlyMessageKeyword;
+
+  /// No description provided for @yearlyMessageFutureSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'To my dear future self'**
+  String get yearlyMessageFutureSelf;
+
+  /// No description provided for @yearlyMessageMotto.
+  ///
+  /// In en, this message translates to:
+  /// **'My motto'**
+  String get yearlyMessageMotto;
+
+  /// No description provided for @growthPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth plan'**
+  String get growthPlanTitle;
+
+  /// No description provided for @growthPlanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'My plan...'**
+  String get growthPlanHint;
+
+  /// No description provided for @growthPlanSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get growthPlanSaveError;
+
+  /// No description provided for @growthDimensionHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical health'**
+  String get growthDimensionHealth;
+
+  /// No description provided for @growthDimensionEmotion.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotional wellness'**
+  String get growthDimensionEmotion;
+
+  /// No description provided for @growthDimensionRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationships'**
+  String get growthDimensionRelationship;
+
+  /// No description provided for @growthDimensionCareer.
+  ///
+  /// In en, this message translates to:
+  /// **'Career growth'**
+  String get growthDimensionCareer;
+
+  /// No description provided for @growthDimensionFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial wellness'**
+  String get growthDimensionFinance;
+
+  /// No description provided for @growthDimensionLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous learning'**
+  String get growthDimensionLearning;
+
+  /// No description provided for @growthDimensionCreativity.
+  ///
+  /// In en, this message translates to:
+  /// **'Creativity'**
+  String get growthDimensionCreativity;
+
+  /// No description provided for @growthDimensionSpirituality.
+  ///
+  /// In en, this message translates to:
+  /// **'Inner growth'**
+  String get growthDimensionSpirituality;
+
+  /// No description provided for @smallWinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Small win challenge'**
+  String get smallWinTitle;
+
+  /// No description provided for @smallWinEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a {days}-day challenge, a little bit every day'**
+  String smallWinEmpty(int days);
+
+  /// No description provided for @smallWinReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward: {reward}'**
+  String smallWinReward(String reward);
+
+  /// No description provided for @smallWinLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get smallWinLoadError;
+
+  /// No description provided for @smallWinLawVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible'**
+  String get smallWinLawVisible;
+
+  /// No description provided for @smallWinLawAttractive.
+  ///
+  /// In en, this message translates to:
+  /// **'Attractive'**
+  String get smallWinLawAttractive;
+
+  /// No description provided for @smallWinLawEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get smallWinLawEasy;
+
+  /// No description provided for @smallWinLawRewarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewarding'**
+  String get smallWinLawRewarding;
+
+  /// No description provided for @moodTrackerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood tracker'**
+  String get moodTrackerTitle;
+
+  /// No description provided for @moodTrackerLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get moodTrackerLoadError;
+
+  /// No description provided for @moodTrackerCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} times'**
+  String moodTrackerCount(int count);
+
+  /// No description provided for @habitTrackerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly passion & persistence'**
+  String get habitTrackerTitle;
+
+  /// No description provided for @habitTrackerComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Habit tracking is under development'**
+  String get habitTrackerComingSoon;
+
+  /// No description provided for @habitTrackerComingSoonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your habits in the small win challenge'**
+  String get habitTrackerComingSoonHint;
+
+  /// No description provided for @listsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My lists'**
+  String get listsTitle;
+
+  /// No description provided for @listBookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book list'**
+  String get listBookTitle;
+
+  /// No description provided for @listMovieTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Movie list'**
+  String get listMovieTitle;
+
+  /// No description provided for @listCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom list'**
+  String get listCustomTitle;
+
+  /// No description provided for @listItemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String listItemCount(int count);
+
+  /// No description provided for @listDetailBookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My book list'**
+  String get listDetailBookTitle;
+
+  /// No description provided for @listDetailMovieTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My movie list'**
+  String get listDetailMovieTitle;
+
+  /// No description provided for @listDetailCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My list'**
+  String get listDetailCustomTitle;
+
+  /// No description provided for @listDetailSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get listDetailSave;
+
+  /// No description provided for @listDetailSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get listDetailSaveSuccess;
+
+  /// No description provided for @listDetailSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get listDetailSaveError;
+
+  /// No description provided for @listDetailCustomNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'List name'**
+  String get listDetailCustomNameLabel;
+
+  /// No description provided for @listDetailCustomNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My podcast list'**
+  String get listDetailCustomNameHint;
+
+  /// No description provided for @listDetailItemTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get listDetailItemTitleHint;
+
+  /// No description provided for @listDetailItemDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get listDetailItemDateHint;
+
+  /// No description provided for @listDetailItemGenreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Genre / Tag'**
+  String get listDetailItemGenreHint;
+
+  /// No description provided for @listDetailItemKeywordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keywords / Thoughts'**
+  String get listDetailItemKeywordHint;
+
+  /// No description provided for @listDetailYearTreasure.
+  ///
+  /// In en, this message translates to:
+  /// **'Year\'s treasure'**
+  String get listDetailYearTreasure;
+
+  /// No description provided for @listDetailYearPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick of the year'**
+  String get listDetailYearPick;
+
+  /// No description provided for @listDetailYearPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The one most worth recommending this year'**
+  String get listDetailYearPickHint;
+
+  /// No description provided for @listDetailInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Aha moment'**
+  String get listDetailInsight;
+
+  /// No description provided for @listDetailInsightHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The biggest inspiration from reading / watching'**
+  String get listDetailInsightHint;
+
+  /// No description provided for @exploreMyMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get exploreMyMoments;
+
+  /// No description provided for @exploreMyMomentsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record happy and highlight moments'**
+  String get exploreMyMomentsDesc;
+
+  /// No description provided for @exploreHabitPact.
+  ///
+  /// In en, this message translates to:
+  /// **'My habit pact'**
+  String get exploreHabitPact;
+
+  /// No description provided for @exploreHabitPactDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Design a new habit using Atomic Habits\' four laws'**
+  String get exploreHabitPactDesc;
+
+  /// No description provided for @exploreWorryUnload.
+  ///
+  /// In en, this message translates to:
+  /// **'Worry unload day'**
+  String get exploreWorryUnload;
+
+  /// No description provided for @exploreWorryUnloadDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort your worries: let go, take action, or accept'**
+  String get exploreWorryUnloadDesc;
+
+  /// No description provided for @exploreSelfPraise.
+  ///
+  /// In en, this message translates to:
+  /// **'My cheer squad'**
+  String get exploreSelfPraise;
+
+  /// No description provided for @exploreSelfPraiseDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down 5 of your strengths'**
+  String get exploreSelfPraiseDesc;
+
+  /// No description provided for @exploreSupportMap.
+  ///
+  /// In en, this message translates to:
+  /// **'My support circle'**
+  String get exploreSupportMap;
+
+  /// No description provided for @exploreSupportMapDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record the people who support you'**
+  String get exploreSupportMapDesc;
+
+  /// No description provided for @exploreFutureSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Future me'**
+  String get exploreFutureSelf;
+
+  /// No description provided for @exploreFutureSelfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Imagine 3 versions of your future self'**
+  String get exploreFutureSelfDesc;
+
+  /// No description provided for @exploreIdealVsReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal me vs. Real me'**
+  String get exploreIdealVsReal;
+
+  /// No description provided for @exploreIdealVsRealDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover where ideal and reality meet'**
+  String get exploreIdealVsRealDesc;
+
+  /// No description provided for @highlightScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get highlightScreenTitle;
+
+  /// No description provided for @highlightTabHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy moments'**
+  String get highlightTabHappy;
+
+  /// No description provided for @highlightTabHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight moments'**
+  String get highlightTabHighlight;
+
+  /// No description provided for @highlightEmptyHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'No happy moments recorded yet'**
+  String get highlightEmptyHappy;
+
+  /// No description provided for @highlightEmptyHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'No highlight moments recorded yet'**
+  String get highlightEmptyHighlight;
+
+  /// No description provided for @highlightLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load: {error}'**
+  String highlightLoadError(String error);
+
+  /// No description provided for @monthlyPlanScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly plan'**
+  String get monthlyPlanScreenTitle;
+
+  /// No description provided for @monthlyPlanSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get monthlyPlanSave;
+
+  /// No description provided for @monthlyPlanSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get monthlyPlanSaveSuccess;
+
+  /// No description provided for @monthlyPlanSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get monthlyPlanSaveError;
+
+  /// No description provided for @monthlyPlanGoalsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly goals'**
+  String get monthlyPlanGoalsSection;
+
+  /// No description provided for @monthlyPlanChallengeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Small win challenge'**
+  String get monthlyPlanChallengeSection;
+
+  /// No description provided for @monthlyPlanChallengeNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge habit name'**
+  String get monthlyPlanChallengeNameLabel;
+
+  /// No description provided for @monthlyPlanChallengeNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Run 10 minutes daily'**
+  String get monthlyPlanChallengeNameHint;
+
+  /// No description provided for @monthlyPlanRewardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward after completion'**
+  String get monthlyPlanRewardLabel;
+
+  /// No description provided for @monthlyPlanRewardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Buy a book I want'**
+  String get monthlyPlanRewardHint;
+
+  /// No description provided for @monthlyPlanSelfCareSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-care activities'**
+  String get monthlyPlanSelfCareSection;
+
+  /// No description provided for @monthlyPlanActivityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity {index}'**
+  String monthlyPlanActivityHint(int index);
+
+  /// No description provided for @monthlyPlanMemorySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly memory'**
+  String get monthlyPlanMemorySection;
+
+  /// No description provided for @monthlyPlanMemoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The most beautiful memory this month is...'**
+  String get monthlyPlanMemoryHint;
+
+  /// No description provided for @monthlyPlanAchievementSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly achievement'**
+  String get monthlyPlanAchievementSection;
+
+  /// No description provided for @monthlyPlanAchievementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'My proudest achievement this month is...'**
+  String get monthlyPlanAchievementHint;
+
+  /// No description provided for @yearlyPlanScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{year} Yearly plan'**
+  String yearlyPlanScreenTitle(int year);
+
+  /// No description provided for @yearlyPlanSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get yearlyPlanSave;
+
+  /// No description provided for @yearlyPlanSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get yearlyPlanSaveSuccess;
+
+  /// No description provided for @yearlyPlanSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get yearlyPlanSaveError;
+
+  /// No description provided for @yearlyPlanMessagesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly messages'**
+  String get yearlyPlanMessagesSection;
+
+  /// No description provided for @yearlyPlanGrowthSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth plan'**
+  String get yearlyPlanGrowthSection;
+
+  /// No description provided for @growthReviewScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth review'**
+  String get growthReviewScreenTitle;
+
+  /// No description provided for @growthReviewMyMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'My moments'**
+  String get growthReviewMyMoments;
+
+  /// No description provided for @growthReviewEmptyMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'No highlight moments recorded yet'**
+  String get growthReviewEmptyMoments;
+
+  /// No description provided for @growthReviewMySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'My summary'**
+  String get growthReviewMySummary;
+
+  /// No description provided for @growthReviewSummaryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking back on this journey, what would you say to yourself?'**
+  String get growthReviewSummaryPrompt;
+
+  /// No description provided for @growthReviewSmallWins.
+  ///
+  /// In en, this message translates to:
+  /// **'Small win awards'**
+  String get growthReviewSmallWins;
+
+  /// No description provided for @growthReviewConsistentRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistent recording'**
+  String get growthReviewConsistentRecord;
+
+  /// No description provided for @growthReviewRecordedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve recorded {count} days'**
+  String growthReviewRecordedDays(int count);
+
+  /// No description provided for @growthReviewWeeklyChamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly review champ'**
+  String get growthReviewWeeklyChamp;
+
+  /// No description provided for @growthReviewCompletedReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed {count} weekly reviews'**
+  String growthReviewCompletedReviews(int count);
+
+  /// No description provided for @growthReviewWarmClose.
+  ///
+  /// In en, this message translates to:
+  /// **'A warm closing'**
+  String get growthReviewWarmClose;
+
+  /// No description provided for @growthReviewEveryStar.
+  ///
+  /// In en, this message translates to:
+  /// **'Every record is a star'**
+  String get growthReviewEveryStar;
+
+  /// No description provided for @growthReviewKeepShining.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve collected {count} stars. Keep shining!'**
+  String growthReviewKeepShining(int count);
+
+  /// No description provided for @futureSelfScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Future me'**
+  String get futureSelfScreenTitle;
+
+  /// No description provided for @futureSelfSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Imagine 3 versions of your future self'**
+  String get futureSelfSubtitle;
+
+  /// No description provided for @futureSelfHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No perfect answers needed, let your imagination flow'**
+  String get futureSelfHint;
+
+  /// No description provided for @futureSelfStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stable future'**
+  String get futureSelfStable;
+
+  /// No description provided for @futureSelfStableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If everything goes smoothly, what would your life look like?'**
+  String get futureSelfStableHint;
+
+  /// No description provided for @futureSelfFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free future'**
+  String get futureSelfFree;
+
+  /// No description provided for @futureSelfFreeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If there were no limits, what would you most want to do?'**
+  String get futureSelfFreeHint;
+
+  /// No description provided for @futureSelfPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Your-pace future'**
+  String get futureSelfPace;
+
+  /// No description provided for @futureSelfPaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Unhurried, what\'s your ideal rhythm?'**
+  String get futureSelfPaceHint;
+
+  /// No description provided for @futureSelfCoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you truly care about?'**
+  String get futureSelfCoreLabel;
+
+  /// No description provided for @futureSelfCoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at the 3 versions above. What do they have in common? That might be what you care about most...'**
+  String get futureSelfCoreHint;
+
+  /// No description provided for @habitPactScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My habit pact'**
+  String get habitPactScreenTitle;
+
+  /// No description provided for @habitPactStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'What habit do I want to build?'**
+  String get habitPactStep1;
+
+  /// No description provided for @habitPactCategoryLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get habitPactCategoryLearning;
+
+  /// No description provided for @habitPactCategoryHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get habitPactCategoryHealth;
+
+  /// No description provided for @habitPactCategoryRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get habitPactCategoryRelationship;
+
+  /// No description provided for @habitPactCategoryHobby.
+  ///
+  /// In en, this message translates to:
+  /// **'Hobby'**
+  String get habitPactCategoryHobby;
+
+  /// No description provided for @habitPactHabitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Specific habit'**
+  String get habitPactHabitLabel;
+
+  /// No description provided for @habitPactHabitHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Read 20 pages every day'**
+  String get habitPactHabitHint;
+
+  /// No description provided for @habitPactStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Four laws of habits'**
+  String get habitPactStep2;
+
+  /// No description provided for @habitPactLawVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it obvious'**
+  String get habitPactLawVisible;
+
+  /// No description provided for @habitPactLawVisibleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll place the cue at...'**
+  String get habitPactLawVisibleHint;
+
+  /// No description provided for @habitPactLawAttractive.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it attractive'**
+  String get habitPactLawAttractive;
+
+  /// No description provided for @habitPactLawAttractiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll pair it with...'**
+  String get habitPactLawAttractiveHint;
+
+  /// No description provided for @habitPactLawEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it easy'**
+  String get habitPactLawEasy;
+
+  /// No description provided for @habitPactLawEasyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'My minimum version is...'**
+  String get habitPactLawEasyHint;
+
+  /// No description provided for @habitPactLawRewarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it satisfying'**
+  String get habitPactLawRewarding;
+
+  /// No description provided for @habitPactLawRewardingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'After completing, I\'ll reward myself with...'**
+  String get habitPactLawRewardingHint;
+
+  /// No description provided for @habitPactStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Action declaration'**
+  String get habitPactStep3;
+
+  /// No description provided for @habitPactDeclarationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in above to auto-generate your declaration...'**
+  String get habitPactDeclarationEmpty;
+
+  /// No description provided for @habitPactDeclarationPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'I commit to building the habit of \"{habit}\"'**
+  String habitPactDeclarationPrefix(String habit);
+
+  /// No description provided for @habitPactDeclarationWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'when {cue}'**
+  String habitPactDeclarationWhen(String cue);
+
+  /// No description provided for @habitPactDeclarationWill.
+  ///
+  /// In en, this message translates to:
+  /// **'I will {response}'**
+  String habitPactDeclarationWill(String response);
+
+  /// No description provided for @habitPactDeclarationThen.
+  ///
+  /// In en, this message translates to:
+  /// **'then {reward}'**
+  String habitPactDeclarationThen(String reward);
+
+  /// No description provided for @idealVsRealScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal me vs. Real me'**
+  String get idealVsRealScreenTitle;
+
+  /// No description provided for @idealVsRealIdeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal me'**
+  String get idealVsRealIdeal;
+
+  /// No description provided for @idealVsRealIdealHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What kind of person do I want to be?'**
+  String get idealVsRealIdealHint;
+
+  /// No description provided for @idealVsRealReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Real me'**
+  String get idealVsRealReal;
+
+  /// No description provided for @idealVsRealRealHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What kind of person am I now?'**
+  String get idealVsRealRealHint;
+
+  /// No description provided for @idealVsRealSame.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s similar?'**
+  String get idealVsRealSame;
+
+  /// No description provided for @idealVsRealSameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do ideal and reality already overlap?'**
+  String get idealVsRealSameHint;
+
+  /// No description provided for @idealVsRealDiff.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s different?'**
+  String get idealVsRealDiff;
+
+  /// No description provided for @idealVsRealDiffHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Where\'s the gap? How does it make you feel?'**
+  String get idealVsRealDiffHint;
+
+  /// No description provided for @idealVsRealStep.
+  ///
+  /// In en, this message translates to:
+  /// **'To get closer to ideal, I just need one small step'**
+  String get idealVsRealStep;
+
+  /// No description provided for @idealVsRealStepHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One small thing I can do today is...'**
+  String get idealVsRealStepHint;
+
+  /// No description provided for @selfPraiseScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My cheer squad'**
+  String get selfPraiseScreenTitle;
+
+  /// No description provided for @selfPraiseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down your 5 strengths'**
+  String get selfPraiseSubtitle;
+
+  /// No description provided for @selfPraiseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone deserves to be seen, especially by yourself'**
+  String get selfPraiseHint;
+
+  /// No description provided for @selfPraiseStrengthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength {index}'**
+  String selfPraiseStrengthLabel(int index);
+
+  /// No description provided for @selfPraisePrompt1.
+  ///
+  /// In en, this message translates to:
+  /// **'My warmest quality is...'**
+  String get selfPraisePrompt1;
+
+  /// No description provided for @selfPraisePrompt2.
+  ///
+  /// In en, this message translates to:
+  /// **'Something I\'m good at is...'**
+  String get selfPraisePrompt2;
+
+  /// No description provided for @selfPraisePrompt3.
+  ///
+  /// In en, this message translates to:
+  /// **'People often praise me for...'**
+  String get selfPraisePrompt3;
+
+  /// No description provided for @selfPraisePrompt4.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m proud of myself for...'**
+  String get selfPraisePrompt4;
+
+  /// No description provided for @selfPraisePrompt5.
+  ///
+  /// In en, this message translates to:
+  /// **'What makes me unique is...'**
+  String get selfPraisePrompt5;
+
+  /// No description provided for @supportMapScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My support circle'**
+  String get supportMapScreenTitle;
+
+  /// No description provided for @supportMapSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s supporting you?'**
+  String get supportMapSubtitle;
+
+  /// No description provided for @supportMapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Note the important people around you, to remind yourself you\'re not alone'**
+  String get supportMapHint;
+
+  /// No description provided for @supportMapNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get supportMapNameLabel;
+
+  /// No description provided for @supportMapRelationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get supportMapRelationLabel;
+
+  /// No description provided for @supportMapRelationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Friend / Family / Colleague'**
+  String get supportMapRelationHint;
+
+  /// No description provided for @supportMapAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get supportMapAdd;
+
+  /// No description provided for @worryUnloadScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worry unload day'**
+  String get worryUnloadScreenTitle;
+
+  /// No description provided for @worryUnloadLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load: {error}'**
+  String worryUnloadLoadError(String error);
+
+  /// No description provided for @worryUnloadEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No active worries'**
+  String get worryUnloadEmptyTitle;
+
+  /// No description provided for @worryUnloadEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! Today is a light day'**
+  String get worryUnloadEmptyHint;
+
+  /// No description provided for @worryUnloadIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at your worries and sort them'**
+  String get worryUnloadIntro;
+
+  /// No description provided for @worryUnloadLetGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Can let go'**
+  String get worryUnloadLetGo;
+
+  /// No description provided for @worryUnloadTakeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Can take action'**
+  String get worryUnloadTakeAction;
+
+  /// No description provided for @worryUnloadAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept for now'**
+  String get worryUnloadAccept;
+
+  /// No description provided for @worryUnloadResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unload results'**
+  String get worryUnloadResultTitle;
+
+  /// No description provided for @worryUnloadSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count}'**
+  String worryUnloadSummary(String label, int count);
+
+  /// No description provided for @worryUnloadEncouragement.
+  ///
+  /// In en, this message translates to:
+  /// **'Every sorting is a step forward.'**
+  String get worryUnloadEncouragement;
+
+  /// No description provided for @commonSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get commonSaved;
+
+  /// No description provided for @commonSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed'**
+  String get commonSaveError;
+
+  /// No description provided for @commonLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get commonLoadError;
+
+  /// No description provided for @momentEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit moment'**
+  String get momentEditTitle;
+
+  /// No description provided for @momentNewHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a happy moment'**
+  String get momentNewHappy;
+
+  /// No description provided for @momentNewHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a highlight moment'**
+  String get momentNewHighlight;
+
+  /// No description provided for @momentDescHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Something happy'**
+  String get momentDescHappy;
+
+  /// No description provided for @momentDescHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened'**
+  String get momentDescHighlight;
+
+  /// No description provided for @momentCompanionHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Who were you with'**
+  String get momentCompanionHappy;
+
+  /// No description provided for @momentCompanionHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'What I did'**
+  String get momentCompanionHighlight;
+
+  /// No description provided for @momentFeeling.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling'**
+  String get momentFeeling;
+
+  /// No description provided for @momentDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (YYYY-MM-DD)'**
+  String get momentDate;
+
+  /// No description provided for @momentRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get momentRating;
+
+  /// No description provided for @momentDescRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a description'**
+  String get momentDescRequired;
+
+  /// No description provided for @momentWithCompanion.
+  ///
+  /// In en, this message translates to:
+  /// **'With {companion}'**
+  String momentWithCompanion(String companion);
+
+  /// No description provided for @momentDidAction.
+  ///
+  /// In en, this message translates to:
+  /// **'I did: {action}'**
+  String momentDidAction(String action);
+
+  /// No description provided for @annualCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My year calendar'**
+  String get annualCalendarTitle;
+
+  /// No description provided for @annualCalendarMonthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}'**
+  String annualCalendarMonthLabel(int month);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

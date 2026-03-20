@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/highlight_entry.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
 import 'package:hachimi_app/providers/list_highlight_providers.dart';
@@ -31,24 +32,38 @@ class GrowthReviewScreen extends ConsumerWidget {
     final totalReviews = statsAsync.value?['totalWeeklyReviews'] ?? 0;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('成长回望')),
+      appBar: AppBar(title: Text(context.l10n.growthReviewScreenTitle)),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section 1: 属于我的时刻
-            _sectionTitle(textTheme, colorScheme, Icons.auto_awesome, '属于我的时刻'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.auto_awesome,
+              context.l10n.growthReviewMyMoments,
+            ),
             const SizedBox(height: AppSpacing.sm),
             if (topMoments.isEmpty)
-              _emptyHint(textTheme, colorScheme, '还没有记录高光时刻')
+              _emptyHint(
+                textTheme,
+                colorScheme,
+                context.l10n.growthReviewEmptyMoments,
+              )
             else
               ...topMoments.map((m) => _momentTile(m, textTheme, colorScheme)),
 
             const SizedBox(height: AppSpacing.lg),
 
             // Section 2: 我的总结
-            _sectionTitle(textTheme, colorScheme, Icons.edit_note, '我的总结'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.edit_note,
+              context.l10n.growthReviewMySummary,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
               width: double.infinity,
@@ -58,7 +73,7 @@ class GrowthReviewScreen extends ConsumerWidget {
                 borderRadius: AppShape.borderMedium,
               ),
               child: Text(
-                '回顾这段旅程，你有什么想对自己说的？',
+                context.l10n.growthReviewSummaryPrompt,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -73,21 +88,21 @@ class GrowthReviewScreen extends ConsumerWidget {
               textTheme,
               colorScheme,
               Icons.emoji_events_outlined,
-              '小赢颁奖',
+              context.l10n.growthReviewSmallWins,
             ),
             const SizedBox(height: AppSpacing.sm),
             _achievementCard(
               textTheme,
               colorScheme,
-              '坚持记录',
-              '你已经记录了 $totalDays 天',
+              context.l10n.growthReviewConsistentRecord,
+              context.l10n.growthReviewRecordedDays(totalDays),
               Icons.calendar_today_outlined,
             ),
             _achievementCard(
               textTheme,
               colorScheme,
-              '周回顾达人',
-              '完成了 $totalReviews 次周回顾',
+              context.l10n.growthReviewWeeklyChamp,
+              context.l10n.growthReviewCompletedReviews(totalReviews),
               Icons.rate_review_outlined,
             ),
 
@@ -98,7 +113,7 @@ class GrowthReviewScreen extends ConsumerWidget {
               textTheme,
               colorScheme,
               Icons.favorite_outline,
-              '温暖的收官',
+              context.l10n.growthReviewWarmClose,
             ),
             const SizedBox(height: AppSpacing.sm),
             Container(
@@ -129,14 +144,14 @@ class GrowthReviewScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    '每一天的记录都是一颗星星',
+                    context.l10n.growthReviewEveryStar,
                     style: textTheme.titleSmall?.copyWith(
                       color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    '你已经收集了 $totalDays 颗星星，继续闪耀吧！',
+                    context.l10n.growthReviewKeepShining(totalDays),
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

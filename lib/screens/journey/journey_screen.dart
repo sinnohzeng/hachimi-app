@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/lumi_feature.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
 import 'package:hachimi_app/providers/feature_gate_provider.dart';
@@ -41,36 +42,37 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   Widget build(BuildContext context) {
     final gates = ref.watch(featureGateProvider);
     final showExplore = gates[LumiFeature.monthlyActivities] ?? false;
+    final l10n = context.l10n;
 
     return ContentWidthConstraint(
       child: CustomScrollView(
         slivers: [
-          const SliverAppBar(
+          SliverAppBar(
             floating: true,
             snap: true,
-            title: Text('旅程'), // TODO: l10n
+            title: Text(l10n.journeyTitle),
           ),
           SliverToBoxAdapter(
             child: Padding(
               padding: AppSpacing.paddingHBase,
               child: SegmentedButton<_JourneySegment>(
                 segments: [
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: _JourneySegment.week,
-                    label: Text('本周'), // TODO: l10n
+                    label: Text(l10n.journeySegmentWeek),
                   ),
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: _JourneySegment.month,
-                    label: Text('本月'), // TODO: l10n
+                    label: Text(l10n.journeySegmentMonth),
                   ),
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: _JourneySegment.year,
-                    label: Text('年度'), // TODO: l10n
+                    label: Text(l10n.journeySegmentYear),
                   ),
                   if (showExplore)
-                    const ButtonSegment(
+                    ButtonSegment(
                       value: _JourneySegment.explore,
-                      label: Text('探索'), // TODO: l10n
+                      label: Text(l10n.journeySegmentExplore),
                     ),
                 ],
                 selected: {_segment},
@@ -86,24 +88,25 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   }
 
   Widget _buildSegmentContent(Map<LumiFeature, bool> gates) {
+    final l10n = context.l10n;
     return switch (_segment) {
       _JourneySegment.week => _buildWeekContent(),
       _JourneySegment.month => _buildGatedContent(
         gates,
         LumiFeature.monthlyView,
-        '月度视图',
+        l10n.journeyMonthlyView,
         _buildMonthContent,
       ),
       _JourneySegment.year => _buildGatedContent(
         gates,
         LumiFeature.yearlyPlan,
-        '年度视图',
+        l10n.journeyYearlyView,
         _buildYearContent,
       ),
       _JourneySegment.explore => _buildGatedContent(
         gates,
         LumiFeature.monthlyActivities,
-        '探索活动',
+        l10n.journeyExploreActivities,
         _buildExploreContent,
       ),
     };
@@ -130,6 +133,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   }
 
   Widget _buildMonthContent() {
+    final l10n = context.l10n;
     return SliverPadding(
       padding: AppSpacing.paddingHBase,
       sliver: SliverList(
@@ -151,7 +155,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
             onPressed: () =>
                 Navigator.of(context).pushNamed(AppRouter.monthlyPlan),
             icon: const Icon(Icons.edit_outlined),
-            label: const Text('编辑月计划'),
+            label: Text(l10n.journeyEditMonthlyPlan),
           ),
           const SizedBox(height: AppSpacing.xxl),
         ]),
@@ -160,6 +164,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   }
 
   Widget _buildYearContent() {
+    final l10n = context.l10n;
     return SliverPadding(
       padding: AppSpacing.paddingHBase,
       sliver: SliverList(
@@ -177,7 +182,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
             onPressed: () =>
                 Navigator.of(context).pushNamed(AppRouter.yearlyPlan),
             icon: const Icon(Icons.edit_outlined),
-            label: const Text('编辑年度计划'),
+            label: Text(l10n.journeyEditYearlyPlan),
           ),
           const SizedBox(height: AppSpacing.xxl),
         ]),
@@ -186,6 +191,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   }
 
   Widget _buildExploreContent() {
+    final l10n = context.l10n;
     return SliverPadding(
       padding: AppSpacing.paddingHBase,
       sliver: SliverList(
@@ -193,8 +199,8 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
           // 高光时刻入口
           _ExploreActivityCard(
             icon: Icons.auto_awesome_outlined,
-            title: '我的时刻',
-            description: '记录幸福与高光时刻',
+            title: l10n.exploreMyMoments,
+            description: l10n.exploreMyMomentsDesc,
             onTap: () =>
                 Navigator.of(context).pushNamed(AppRouter.highlightMoments),
           ),
@@ -202,43 +208,43 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
           // 6 个月度活动
           _ExploreActivityCard(
             icon: Icons.handshake_outlined,
-            title: '我与习惯的约定',
-            description: '基于原子习惯四定律设计你的新习惯',
+            title: l10n.exploreHabitPact,
+            description: l10n.exploreHabitPactDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.habitPact),
           ),
           const SizedBox(height: AppSpacing.sm),
           _ExploreActivityCard(
             icon: Icons.cloud_off_outlined,
-            title: '烦恼减负日',
-            description: '为你的烦恼分类：放下、行动或接受',
+            title: l10n.exploreWorryUnload,
+            description: l10n.exploreWorryUnloadDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.worryUnload),
           ),
           const SizedBox(height: AppSpacing.sm),
           _ExploreActivityCard(
             icon: Icons.thumb_up_outlined,
-            title: '我的夸夸群',
-            description: '写下自己的 5 个优点',
+            title: l10n.exploreSelfPraise,
+            description: l10n.exploreSelfPraiseDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.selfPraise),
           ),
           const SizedBox(height: AppSpacing.sm),
           _ExploreActivityCard(
             icon: Icons.people_outline,
-            title: '我身边的人',
-            description: '记录支持你的人',
+            title: l10n.exploreSupportMap,
+            description: l10n.exploreSupportMapDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.supportMap),
           ),
           const SizedBox(height: AppSpacing.sm),
           _ExploreActivityCard(
             icon: Icons.remove_red_eye_outlined,
-            title: '未来照见我',
-            description: '想象 3 种未来的自己',
+            title: l10n.exploreFutureSelf,
+            description: l10n.exploreFutureSelfDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.futureSelf),
           ),
           const SizedBox(height: AppSpacing.sm),
           _ExploreActivityCard(
             icon: Icons.compare_outlined,
-            title: '理想的我 vs. 现在的我',
-            description: '发现理想与现实的交集',
+            title: l10n.exploreIdealVsReal,
+            description: l10n.exploreIdealVsRealDesc,
             onTap: () => Navigator.of(context).pushNamed(AppRouter.idealVsReal),
           ),
           const SizedBox(height: AppSpacing.xxl),

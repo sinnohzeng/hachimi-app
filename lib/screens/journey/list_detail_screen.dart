@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/user_list.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
@@ -95,11 +96,11 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
     setState(() {});
   }
 
-  String get _screenTitle {
+  String _screenTitle(BuildContext context) {
     return switch (widget.listType) {
-      ListType.book => '我的书单',
-      ListType.movie => '我的影单',
-      ListType.custom => '我的清单',
+      ListType.book => context.l10n.listDetailBookTitle,
+      ListType.movie => context.l10n.listDetailMovieTitle,
+      ListType.custom => context.l10n.listDetailCustomTitle,
     };
   }
 
@@ -144,12 +145,12 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
       await ref.read(listHighlightRepositoryProvider).saveList(uid, list);
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[ListDetailScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -166,7 +167,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: Text(_screenTitle)),
+      appBar: AppBar(title: Text(_screenTitle(context))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -176,7 +177,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -187,8 +188,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
               TextField(
                 controller: _customTitleController,
                 decoration: InputDecoration(
-                  labelText: '清单名称',
-                  hintText: '例：我的播客清单',
+                  labelText: context.l10n.listDetailCustomNameLabel,
+                  hintText: context.l10n.listDetailCustomNameHint,
                   border: OutlineInputBorder(
                     borderRadius: AppShape.borderSmall,
                   ),
@@ -206,13 +207,18 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // 年度宝藏
-            _sectionTitle(textTheme, colorScheme, Icons.star_outline, '年度宝藏'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.star_outline,
+              context.l10n.listDetailYearTreasure,
+            ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _yearPickController,
               decoration: InputDecoration(
-                labelText: '年度之选',
-                hintText: '这一年最值得推荐的一部',
+                labelText: context.l10n.listDetailYearPick,
+                hintText: context.l10n.listDetailYearPickHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -221,8 +227,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
               controller: _yearInsightController,
               maxLines: 3,
               decoration: InputDecoration(
-                labelText: '灵感一击',
-                hintText: '阅读/观影带给你的最大启发',
+                labelText: context.l10n.listDetailInsight,
+                hintText: context.l10n.listDetailInsightHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -254,8 +260,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
             const SizedBox(height: AppSpacing.xs),
             TextField(
               controller: _titleControllers[index],
-              decoration: const InputDecoration(
-                hintText: '标题',
+              decoration: InputDecoration(
+                hintText: context.l10n.listDetailItemTitleHint,
                 border: InputBorder.none,
                 isDense: true,
               ),
@@ -266,8 +272,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                 Expanded(
                   child: TextField(
                     controller: _dateControllers[index],
-                    decoration: const InputDecoration(
-                      hintText: '日期',
+                    decoration: InputDecoration(
+                      hintText: context.l10n.listDetailItemDateHint,
                       border: InputBorder.none,
                       isDense: true,
                     ),
@@ -278,8 +284,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                 Expanded(
                   child: TextField(
                     controller: _genreControllers[index],
-                    decoration: const InputDecoration(
-                      hintText: '类型/标签',
+                    decoration: InputDecoration(
+                      hintText: context.l10n.listDetailItemGenreHint,
                       border: InputBorder.none,
                       isDense: true,
                     ),
@@ -295,8 +301,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
             ),
             TextField(
               controller: _keywordControllers[index],
-              decoration: const InputDecoration(
-                hintText: '关键词/感受',
+              decoration: InputDecoration(
+                hintText: context.l10n.listDetailItemKeywordHint,
                 border: InputBorder.none,
                 isDense: true,
               ),

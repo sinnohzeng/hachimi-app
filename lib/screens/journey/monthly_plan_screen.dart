@@ -4,6 +4,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/monthly_plan.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
@@ -111,12 +112,12 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
       await ref.read(planRepositoryProvider).saveMonthlyPlan(uid, plan);
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[MonthlyPlanScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -126,9 +127,14 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final plan = ref.read(currentMonthPlanProvider).value;
-      if (plan != null) _loadFromPlan(plan);
-      if (!_loaded) setState(() => _loaded = true);
+      ref.listenManual(currentMonthPlanProvider, (prev, next) {
+        next.whenData((plan) {
+          if (plan != null && !_loaded) {
+            _loadFromPlan(plan);
+            setState(() {});
+          }
+        });
+      }, fireImmediately: true);
     });
   }
 
@@ -140,7 +146,7 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('月计划')),
+      appBar: AppBar(title: Text(context.l10n.monthlyPlanScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -150,7 +156,7 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
@@ -158,7 +164,12 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 月目标
-            _sectionTitle(textTheme, colorScheme, Icons.flag_outlined, '月目标'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.flag_outlined,
+              context.l10n.monthlyPlanGoalsSection,
+            ),
             const SizedBox(height: AppSpacing.sm),
             ...List.generate(
               _maxGoals,
@@ -180,7 +191,7 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
                       child: TextField(
                         controller: _goalControllers[i],
                         decoration: InputDecoration(
-                          hintText: '目标 ${i + 1}',
+                          hintText: context.l10n.monthlyGoalHint(i + 1),
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -203,14 +214,14 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
               textTheme,
               colorScheme,
               Icons.emoji_events_outlined,
-              '小赢挑战',
+              context.l10n.monthlyPlanChallengeSection,
             ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _challengeNameController,
               decoration: InputDecoration(
-                labelText: '挑战习惯名称',
-                hintText: '例：每天跑步 10 分钟',
+                labelText: context.l10n.monthlyPlanChallengeNameLabel,
+                hintText: context.l10n.monthlyPlanChallengeNameHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -218,8 +229,8 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
             TextField(
               controller: _challengeRewardController,
               decoration: InputDecoration(
-                labelText: '完成后的奖励',
-                hintText: '例：买一本想看的书',
+                labelText: context.l10n.monthlyPlanRewardLabel,
+                hintText: context.l10n.monthlyPlanRewardHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -227,7 +238,12 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // 爱自己活动
-            _sectionTitle(textTheme, colorScheme, Icons.spa_outlined, '爱自己活动'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.spa_outlined,
+              context.l10n.monthlyPlanSelfCareSection,
+            ),
             const SizedBox(height: AppSpacing.sm),
             ...List.generate(
               3,
@@ -236,7 +252,7 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
                 child: TextField(
                   controller: _selfCareControllers[i],
                   decoration: InputDecoration(
-                    hintText: '活动 ${i + 1}',
+                    hintText: context.l10n.monthlyPlanActivityHint(i + 1),
                     border: OutlineInputBorder(
                       borderRadius: AppShape.borderSmall,
                     ),
@@ -252,14 +268,14 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
               textTheme,
               colorScheme,
               Icons.auto_stories_outlined,
-              '本月记忆',
+              context.l10n.monthlyPlanMemorySection,
             ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _memoryController,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '这个月最美好的记忆是...',
+                hintText: context.l10n.monthlyPlanMemoryHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),
@@ -267,13 +283,18 @@ class _MonthlyPlanScreenState extends ConsumerState<MonthlyPlanScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // 本月成就
-            _sectionTitle(textTheme, colorScheme, Icons.star_outline, '本月成就'),
+            _sectionTitle(
+              textTheme,
+              colorScheme,
+              Icons.star_outline,
+              context.l10n.monthlyPlanAchievementSection,
+            ),
             const SizedBox(height: AppSpacing.sm),
             TextField(
               controller: _achievementController,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '这个月我最骄傲的成就是...',
+                hintText: context.l10n.monthlyPlanAchievementHint,
                 border: OutlineInputBorder(borderRadius: AppShape.borderSmall),
               ),
             ),

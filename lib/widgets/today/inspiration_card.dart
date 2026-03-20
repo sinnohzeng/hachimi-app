@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:hachimi_app/core/constants/lumi_constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/providers/inspiration_provider.dart';
 
 /// 灵感卡片 — 每日轮换提示，带星星装饰。
-class InspirationCard extends StatelessWidget {
+class InspirationCard extends ConsumerWidget {
   const InspirationCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    // 根据日期选择提示 — 每天固定一条
-    final dayOfYear = DateTime.now()
-        .difference(DateTime(DateTime.now().year))
-        .inDays;
-    final prompts = LumiConstants.dailyLightPrompts;
-    final prompt = prompts[dayOfYear % prompts.length];
+    final prompt = ref.watch(dailyInspirationProvider);
 
     return Card(
       elevation: 0,

@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.39.0] - 2026-03-20
+
+### Added
+
+- **LUMI 韧性成长手册**：全新 3-Tab 导航（今天/旅程/我的），从猫咪养成转型为韧性成长记录
+- **LUMI Onboarding**：4 页温馨引导（欢迎/你是谁/开始日期/使用指南），替代旧版猫咪引导
+- **今天 Tab**：每日一光（QuickLightCard）快速记录心情 + 习惯快照 + 每日灵感轮换
+- **旅程 Tab**：4 段式导航（周/月/年/探索），覆盖周计划、月目标、年度寄语、成长计划等
+- **6 个月度活动**：习惯约定、烦恼减负、夸夸自己、身边的人、未来照见我、理想 vs 现在
+- **清单系统**：书单/影单/自定义清单 + 年度精选
+- **高光时刻**：幸福时刻 + 高光时刻记录与管理
+- **成长回望**（Day 90 解锁）：里程碑回顾 + 成就 + 温暖结语
+- **渐进解锁**：FeatureGateProvider 基于累计记录天数（Day 0/1/3/7/14/30/90）逐步解锁功能
+- **全量国际化**：1210 个 L10n key × 15 语言，所有 UI 文案零硬编码
+
+### Fixed
+
+- **3-Tab 导航**：修复 JourneyScreen 不可达问题（未加入 HomeScreen IndexedStack）
+- **Provider 数据加载**：`_loaded` boolean guard 改为 `ref.listenManual` + `fireImmediately`，修复 Provider loading 时数据跳过
+- **多行 TextField 保存**：添加 FocusNode 失焦保存，修复 `onEditingComplete` 在多行模式下不触发的数据丢失
+- **月度活动 UID 隔离**：SharedPreferences key 加 UID 前缀，修复多用户数据交叉污染
+- **WeekMoodDots 跨月**：使用日期范围查询替代单月查询，修复月初心情数据缺失
+- **CI placeholder 检查**：`rg` 替换为 `grep`（CI runner 未安装 ripgrep 导致检查从未生效）
+
+### Changed
+
+- **InspirationCard**：改用 `dailyInspirationProvider` 替代 Widget 内重复逻辑
+- **TodayScreen 用户名**：改用 `lumiUserNameProvider`（响应式）替代 `ref.read(sharedPreferences)`
+- **Firestore 安全规则**：补全 5 个新集合（weeklyPlans/monthlyPlans/yearlyPlans/lists/highlightEntries）
+
 ## [2.38.0] - 2026-03-18
 
 ### Added

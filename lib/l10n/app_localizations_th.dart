@@ -3119,4 +3119,850 @@ class STh extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return 'ดึกแล้วนะ $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'อรุณสวัสดิ์ $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'สวัสดีตอนบ่าย $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'สวัสดีตอนเย็น $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => 'ดึกแล้วนะ';
+
+  @override
+  String get greetingMorningNoName => 'อรุณสวัสดิ์';
+
+  @override
+  String get greetingAfternoonNoName => 'สวัสดีตอนบ่าย';
+
+  @override
+  String get greetingEveningNoName => 'สวัสดีตอนเย็น';
+
+  @override
+  String get journeyTitle => 'เส้นทาง';
+
+  @override
+  String get journeySegmentWeek => 'สัปดาห์';
+
+  @override
+  String get journeySegmentMonth => 'เดือน';
+
+  @override
+  String get journeySegmentYear => 'ปี';
+
+  @override
+  String get journeySegmentExplore => 'สำรวจ';
+
+  @override
+  String get journeyMonthlyView => 'มุมมองรายเดือน';
+
+  @override
+  String get journeyYearlyView => 'มุมมองรายปี';
+
+  @override
+  String get journeyExploreActivities => 'กิจกรรม';
+
+  @override
+  String get journeyEditMonthlyPlan => 'แก้ไขแผนเดือน';
+
+  @override
+  String get journeyEditYearlyPlan => 'แก้ไขแผนปี';
+
+  @override
+  String get quickLightTitle => 'แสงเล็กๆ วันนี้';
+
+  @override
+  String get quickLightHint => 'วันนี้รู้สึกยังไง?';
+
+  @override
+  String get quickLightRecord => 'บันทึก';
+
+  @override
+  String get quickLightSaveSuccess => 'บันทึกแล้ว';
+
+  @override
+  String get quickLightSaveError => 'บันทึกไม่สำเร็จ ลองอีกครั้งนะ';
+
+  @override
+  String get habitSnapshotTitle => 'นิสัยวันนี้';
+
+  @override
+  String get habitSnapshotEmpty => 'ยังไม่มีนิสัย ตั้งค่าในเส้นทางได้นะ';
+
+  @override
+  String get habitSnapshotLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get worryJarTitle => 'โหลความกังวล';
+
+  @override
+  String get worryJarLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get weeklyReviewEmpty => 'บันทึกช่วงเวลาแห่งความสุขสัปดาห์นี้';
+
+  @override
+  String get weeklyReviewHappyMoments => 'ช่วงเวลาแห่งความสุข';
+
+  @override
+  String get weeklyReviewLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get weeklyPlanCardTitle => 'แผนสัปดาห์';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count รายการ';
+  }
+
+  @override
+  String get weeklyPlanEmpty => 'สร้างแผนสัปดาห์';
+
+  @override
+  String get weekMoodTitle => 'อารมณ์สัปดาห์นี้';
+
+  @override
+  String get weekMoodLoadError => 'โหลดอารมณ์ไม่สำเร็จ';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return 'บันทึกอีก $remaining วันเพื่อปลดล็อก';
+  }
+
+  @override
+  String get featureLockedSoon => 'เร็วๆ นี้';
+
+  @override
+  String get weeklyPlanScreenTitle => 'แผนสัปดาห์';
+
+  @override
+  String get weeklyPlanSave => 'บันทึก';
+
+  @override
+  String get weeklyPlanSaveSuccess => 'บันทึกแล้ว';
+
+  @override
+  String get weeklyPlanSaveError => 'บันทึกไม่สำเร็จ';
+
+  @override
+  String get weeklyPlanOneLine => 'หนึ่งประโยคให้ตัวเองสัปดาห์นี้';
+
+  @override
+  String get weeklyPlanOneLineHint => 'สัปดาห์นี้อยากจะ...';
+
+  @override
+  String get weeklyPlanUrgentImportant => 'เร่งด่วนและสำคัญ';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => 'สำคัญ ไม่เร่งด่วน';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => 'เร่งด่วน ไม่สำคัญ';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => 'ไม่เร่งด่วน ไม่สำคัญ';
+
+  @override
+  String get weeklyPlanAddHint => 'เพิ่ม...';
+
+  @override
+  String get weeklyPlanMustDo => 'ต้องทำ';
+
+  @override
+  String get weeklyPlanShouldDo => 'ควรทำ';
+
+  @override
+  String get weeklyPlanNeedToDo => 'น่าทำ';
+
+  @override
+  String get weeklyPlanWantToDo => 'อยากทำ';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$month/$year';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get monthlyGoalsTitle => 'เป้าหมายเดือน';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return 'เป้าหมาย $index';
+  }
+
+  @override
+  String get monthlySaveError => 'บันทึกไม่สำเร็จ';
+
+  @override
+  String get monthlyMemoryTitle => 'ความทรงจำเดือนนี้';
+
+  @override
+  String get monthlyMemoryHint => 'ความทรงจำที่สวยงามที่สุดเดือนนี้...';
+
+  @override
+  String get monthlyAchievementTitle => 'ความสำเร็จเดือนนี้';
+
+  @override
+  String get monthlyAchievementHint => 'สิ่งที่ภูมิใจที่สุดเดือนนี้...';
+
+  @override
+  String get yearlyMessagesTitle => 'ข้อความประจำปี';
+
+  @override
+  String get yearlyMessageBecome => 'ปีนี้อยากเป็นคนที่...';
+
+  @override
+  String get yearlyMessageGoals => 'เป้าหมายที่จะทำให้สำเร็จ';
+
+  @override
+  String get yearlyMessageBreakthrough => 'ก้าวกระโดด';
+
+  @override
+  String get yearlyMessageDontDo =>
+      'ไม่ทำ (การปฏิเสธก็คือการเปิดพื้นที่ให้สิ่งสำคัญ)';
+
+  @override
+  String get yearlyMessageKeyword =>
+      'คำสำคัญประจำปี (เช่น โฟกัส/กล้าหาญ/อดทน/อ่อนโยน)';
+
+  @override
+  String get yearlyMessageFutureSelf => 'ถึงตัวเองในอนาคต';
+
+  @override
+  String get yearlyMessageMotto => 'คติประจำใจ';
+
+  @override
+  String get growthPlanTitle => 'แผนเติบโต';
+
+  @override
+  String get growthPlanHint => 'แผนของฉัน...';
+
+  @override
+  String get growthPlanSaveError => 'บันทึกไม่สำเร็จ';
+
+  @override
+  String get growthDimensionHealth => 'สุขภาพกาย';
+
+  @override
+  String get growthDimensionEmotion => 'สุขภาพใจ';
+
+  @override
+  String get growthDimensionRelationship => 'ความสัมพันธ์';
+
+  @override
+  String get growthDimensionCareer => 'อาชีพ';
+
+  @override
+  String get growthDimensionFinance => 'การเงิน';
+
+  @override
+  String get growthDimensionLearning => 'การเรียนรู้';
+
+  @override
+  String get growthDimensionCreativity => 'ความคิดสร้างสรรค์';
+
+  @override
+  String get growthDimensionSpirituality => 'การเติบโตภายใน';
+
+  @override
+  String get smallWinTitle => 'ชาเลนจ์ชัยชนะเล็กๆ';
+
+  @override
+  String smallWinEmpty(int days) {
+    return 'เริ่มชาเลนจ์ $days วัน ทำทีละนิดทุกวัน';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'รางวัล: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get smallWinLawVisible => 'มองเห็น';
+
+  @override
+  String get smallWinLawAttractive => 'น่าสนใจ';
+
+  @override
+  String get smallWinLawEasy => 'ทำง่าย';
+
+  @override
+  String get smallWinLawRewarding => 'มีรางวัล';
+
+  @override
+  String get moodTrackerTitle => 'ติดตามอารมณ์';
+
+  @override
+  String get moodTrackerLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count ครั้ง';
+  }
+
+  @override
+  String get habitTrackerTitle => 'ความรักและความมุ่งมั่น';
+
+  @override
+  String get habitTrackerComingSoon => 'ฟีเจอร์ติดตามนิสัยกำลังพัฒนา';
+
+  @override
+  String get habitTrackerComingSoonHint => 'ตั้งค่านิสัยในชาเลนจ์ชัยชนะเล็กๆ';
+
+  @override
+  String get listsTitle => 'รายการของฉัน';
+
+  @override
+  String get listBookTitle => 'หนังสือ';
+
+  @override
+  String get listMovieTitle => 'หนัง';
+
+  @override
+  String get listCustomTitle => 'รายการกำหนดเอง';
+
+  @override
+  String listItemCount(int count) {
+    return '$count รายการ';
+  }
+
+  @override
+  String get listDetailBookTitle => 'หนังสือของฉัน';
+
+  @override
+  String get listDetailMovieTitle => 'หนังของฉัน';
+
+  @override
+  String get listDetailCustomTitle => 'รายการของฉัน';
+
+  @override
+  String get listDetailSave => 'บันทึก';
+
+  @override
+  String get listDetailSaveSuccess => 'บันทึกแล้ว';
+
+  @override
+  String get listDetailSaveError => 'ผิดพลาด';
+
+  @override
+  String get listDetailCustomNameLabel => 'ชื่อรายการ';
+
+  @override
+  String get listDetailCustomNameHint => 'เช่น Podcast ของฉัน';
+
+  @override
+  String get listDetailItemTitleHint => 'ชื่อ';
+
+  @override
+  String get listDetailItemDateHint => 'วันที่';
+
+  @override
+  String get listDetailItemGenreHint => 'ประเภท/แท็ก';
+
+  @override
+  String get listDetailItemKeywordHint => 'คำสำคัญ/ความรู้สึก';
+
+  @override
+  String get listDetailYearTreasure => 'สมบัติประจำปี';
+
+  @override
+  String get listDetailYearPick => 'ตัวเลือกประจำปี';
+
+  @override
+  String get listDetailYearPickHint => 'สิ่งที่แนะนำมากที่สุดปีนี้';
+
+  @override
+  String get listDetailInsight => 'แรงบันดาลใจ';
+
+  @override
+  String get listDetailInsightHint => 'แรงบันดาลใจที่ยิ่งใหญ่ที่สุด';
+
+  @override
+  String get exploreMyMoments => 'ช่วงเวลาของฉัน';
+
+  @override
+  String get exploreMyMomentsDesc => 'บันทึกช่วงเวลาแห่งความสุข';
+
+  @override
+  String get exploreHabitPact => 'สัญญากับนิสัย';
+
+  @override
+  String get exploreHabitPactDesc => 'ออกแบบนิสัยด้วยกฎสี่ข้อ';
+
+  @override
+  String get exploreWorryUnload => 'วันปลดปล่อยกังวล';
+
+  @override
+  String get exploreWorryUnloadDesc =>
+      'จัดหมวดกังวล: ปล่อยวาง ลงมือทำ หรือยอมรับ';
+
+  @override
+  String get exploreSelfPraise => 'กลุ่มชมตัวเอง';
+
+  @override
+  String get exploreSelfPraiseDesc => 'เขียนจุดแข็ง 5 ข้อ';
+
+  @override
+  String get exploreSupportMap => 'คนรอบข้าง';
+
+  @override
+  String get exploreSupportMapDesc => 'บันทึกคนที่สนับสนุนคุณ';
+
+  @override
+  String get exploreFutureSelf => 'ตัวเองในอนาคต';
+
+  @override
+  String get exploreFutureSelfDesc => 'จินตนาการ 3 เวอร์ชันอนาคต';
+
+  @override
+  String get exploreIdealVsReal => 'ตัวในอุดมคติ vs. ตัวจริง';
+
+  @override
+  String get exploreIdealVsRealDesc => 'ค้นพบจุดที่อุดมคติและความจริงพบกัน';
+
+  @override
+  String get highlightScreenTitle => 'ช่วงเวลาของฉัน';
+
+  @override
+  String get highlightTabHappy => 'ช่วงเวลาแห่งความสุข';
+
+  @override
+  String get highlightTabHighlight => 'ไฮไลท์';
+
+  @override
+  String get highlightEmptyHappy => 'ยังไม่มีช่วงเวลาแห่งความสุข';
+
+  @override
+  String get highlightEmptyHighlight => 'ยังไม่มีไฮไลท์';
+
+  @override
+  String highlightLoadError(String error) {
+    return 'ผิดพลาด: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => 'แผนเดือน';
+
+  @override
+  String get monthlyPlanSave => 'บันทึก';
+
+  @override
+  String get monthlyPlanSaveSuccess => 'บันทึกแล้ว';
+
+  @override
+  String get monthlyPlanSaveError => 'ผิดพลาด';
+
+  @override
+  String get monthlyPlanGoalsSection => 'เป้าหมายเดือน';
+
+  @override
+  String get monthlyPlanChallengeSection => 'ชาเลนจ์ชัยชนะเล็กๆ';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'นิสัยชาเลนจ์';
+
+  @override
+  String get monthlyPlanChallengeNameHint => 'เช่น วิ่ง 10 นาที/วัน';
+
+  @override
+  String get monthlyPlanRewardLabel => 'รางวัล';
+
+  @override
+  String get monthlyPlanRewardHint => 'เช่น ซื้อหนังสือ';
+
+  @override
+  String get monthlyPlanSelfCareSection => 'ดูแลตัวเอง';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return 'กิจกรรม $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => 'ความทรงจำเดือน';
+
+  @override
+  String get monthlyPlanMemoryHint => 'ความทรงจำที่สวยงามที่สุด...';
+
+  @override
+  String get monthlyPlanAchievementSection => 'ความสำเร็จเดือน';
+
+  @override
+  String get monthlyPlanAchievementHint => 'สิ่งที่ภูมิใจที่สุด...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return 'แผนปี $year';
+  }
+
+  @override
+  String get yearlyPlanSave => 'บันทึก';
+
+  @override
+  String get yearlyPlanSaveSuccess => 'บันทึกแล้ว';
+
+  @override
+  String get yearlyPlanSaveError => 'ผิดพลาด';
+
+  @override
+  String get yearlyPlanMessagesSection => 'ข้อความประจำปี';
+
+  @override
+  String get yearlyPlanGrowthSection => 'แผนเติบโต';
+
+  @override
+  String get growthReviewScreenTitle => 'ทบทวนการเติบโต';
+
+  @override
+  String get growthReviewMyMoments => 'ช่วงเวลาพิเศษ';
+
+  @override
+  String get growthReviewEmptyMoments => 'ยังไม่มีไฮไลท์';
+
+  @override
+  String get growthReviewMySummary => 'สรุปของฉัน';
+
+  @override
+  String get growthReviewSummaryPrompt => 'มองย้อนกลับไป อยากบอกอะไรกับตัวเอง?';
+
+  @override
+  String get growthReviewSmallWins => 'มอบรางวัลชัยชนะเล็กๆ';
+
+  @override
+  String get growthReviewConsistentRecord => 'บันทึกสม่ำเสมอ';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return 'คุณบันทึกมาแล้ว $count วัน';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => 'แชมป์ทบทวนสัปดาห์';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return 'ทบทวนสัปดาห์ $count ครั้ง';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'บทสรุปอบอุ่น';
+
+  @override
+  String get growthReviewEveryStar => 'ทุกวันที่บันทึกคือดาวดวงหนึ่ง';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return 'คุณสะสมมาแล้ว $count ดวง ส่องแสงต่อไปนะ!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => 'ตัวเองในอนาคต';
+
+  @override
+  String get futureSelfSubtitle => 'จินตนาการ 3 เวอร์ชันอนาคต';
+
+  @override
+  String get futureSelfHint => 'ไม่ต้องตอบสมบูรณ์แบบ ปล่อยจินตนาการไหลไป';
+
+  @override
+  String get futureSelfStable => 'อนาคตมั่นคง';
+
+  @override
+  String get futureSelfStableHint => 'ถ้าทุกอย่างราบรื่น ชีวิตจะเป็นยังไง?';
+
+  @override
+  String get futureSelfFree => 'อนาคตอิสระ';
+
+  @override
+  String get futureSelfFreeHint => 'ถ้าไม่มีข้อจำกัด อยากทำอะไรมากที่สุด?';
+
+  @override
+  String get futureSelfPace => 'อนาคตตามจังหวะตัวเอง';
+
+  @override
+  String get futureSelfPaceHint => 'ไม่รีบ จังหวะในอุดมคติคืออะไร?';
+
+  @override
+  String get futureSelfCoreLabel => 'สิ่งที่ใส่ใจจริงๆ คืออะไร?';
+
+  @override
+  String get futureSelfCoreHint =>
+      '3 เวอร์ชันมีอะไรเหมือนกัน? นั่นอาจเป็นสิ่งสำคัญที่สุด...';
+
+  @override
+  String get habitPactScreenTitle => 'สัญญากับนิสัย';
+
+  @override
+  String get habitPactStep1 => 'อยากสร้างนิสัยอะไร?';
+
+  @override
+  String get habitPactCategoryLearning => 'การเรียนรู้';
+
+  @override
+  String get habitPactCategoryHealth => 'สุขภาพ';
+
+  @override
+  String get habitPactCategoryRelationship => 'ความสัมพันธ์';
+
+  @override
+  String get habitPactCategoryHobby => 'งานอดิเรก';
+
+  @override
+  String get habitPactHabitLabel => 'นิสัยที่เจาะจง';
+
+  @override
+  String get habitPactHabitHint => 'เช่น อ่าน 20 หน้า/วัน';
+
+  @override
+  String get habitPactStep2 => 'กฎ 4 ข้อของนิสัย';
+
+  @override
+  String get habitPactLawVisible => 'ทำให้เห็น';
+
+  @override
+  String get habitPactLawVisibleHint => 'วางตัวกระตุ้นที่...';
+
+  @override
+  String get habitPactLawAttractive => 'ทำให้น่าสนใจ';
+
+  @override
+  String get habitPactLawAttractiveHint => 'จับคู่กับ...';
+
+  @override
+  String get habitPactLawEasy => 'ทำให้ง่าย';
+
+  @override
+  String get habitPactLawEasyHint => 'เวอร์ชันเล็กสุดคือ...';
+
+  @override
+  String get habitPactLawRewarding => 'ทำให้พอใจ';
+
+  @override
+  String get habitPactLawRewardingHint => 'ให้รางวัลตัวเองด้วย...';
+
+  @override
+  String get habitPactStep3 => 'ประกาศเจตนา';
+
+  @override
+  String get habitPactDeclarationEmpty => 'กรอกข้างบนเพื่อสร้างประกาศ...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return 'ฉันมุ่งมั่นสร้างนิสัย \"$habit\"';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return 'เมื่อ$cue';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return 'ฉันจะ$response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'แล้ว$reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => 'ตัวในอุดมคติ vs. ตัวจริง';
+
+  @override
+  String get idealVsRealIdeal => 'ตัวในอุดมคติ';
+
+  @override
+  String get idealVsRealIdealHint => 'อยากเป็นคนแบบไหน?';
+
+  @override
+  String get idealVsRealReal => 'ตัวจริง';
+
+  @override
+  String get idealVsRealRealHint => 'ตอนนี้เป็นคนแบบไหน?';
+
+  @override
+  String get idealVsRealSame => 'มีอะไรเหมือนกัน?';
+
+  @override
+  String get idealVsRealSameHint => 'อุดมคติและความจริงซ้อนทับกันตรงไหนแล้ว?';
+
+  @override
+  String get idealVsRealDiff => 'มีอะไรต่างกัน?';
+
+  @override
+  String get idealVsRealDiffHint => 'ช่องว่างอยู่ตรงไหน? รู้สึกอย่างไร?';
+
+  @override
+  String get idealVsRealStep => 'ก้าวเล็กๆ สู่อุดมคติ';
+
+  @override
+  String get idealVsRealStepHint => 'สิ่งเล็กๆ ที่ทำได้วันนี้...';
+
+  @override
+  String get selfPraiseScreenTitle => 'กลุ่มชมตัวเอง';
+
+  @override
+  String get selfPraiseSubtitle => 'เขียนจุดแข็ง 5 ข้อ';
+
+  @override
+  String get selfPraiseHint => 'ทุกคนคู่ควรที่จะถูกมองเห็น โดยเฉพาะจากตัวเอง';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return 'จุดแข็ง $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'คุณสมบัติที่อบอุ่นที่สุด...';
+
+  @override
+  String get selfPraisePrompt2 => 'สิ่งที่ทำได้ดี...';
+
+  @override
+  String get selfPraisePrompt3 => 'สิ่งที่คนมักชม...';
+
+  @override
+  String get selfPraisePrompt4 => 'สิ่งที่ภูมิใจ...';
+
+  @override
+  String get selfPraisePrompt5 => 'สิ่งที่ทำให้พิเศษ...';
+
+  @override
+  String get supportMapScreenTitle => 'คนรอบข้าง';
+
+  @override
+  String get supportMapSubtitle => 'ใครสนับสนุนคุณ?';
+
+  @override
+  String get supportMapHint => 'เตือนตัวเองว่าไม่ได้อยู่คนเดียว';
+
+  @override
+  String get supportMapNameLabel => 'ชื่อ';
+
+  @override
+  String get supportMapRelationLabel => 'ความสัมพันธ์';
+
+  @override
+  String get supportMapRelationHint => 'เช่น เพื่อน/ครอบครัว/เพื่อนร่วมงาน';
+
+  @override
+  String get supportMapAdd => 'เพิ่ม';
+
+  @override
+  String get worryUnloadScreenTitle => 'วันปลดปล่อยกังวล';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return 'ผิดพลาด: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => 'ไม่มีกังวลที่กำลังดำเนิน';
+
+  @override
+  String get worryUnloadEmptyHint => 'เยี่ยม! วันนี้เบาสบาย';
+
+  @override
+  String get worryUnloadIntro => 'มองดูกังวลและจัดหมวดหมู่';
+
+  @override
+  String get worryUnloadLetGo => 'ปล่อยวางได้';
+
+  @override
+  String get worryUnloadTakeAction => 'ลงมือทำได้';
+
+  @override
+  String get worryUnloadAccept => 'ยอมรับไว้ก่อน';
+
+  @override
+  String get worryUnloadResultTitle => 'ผลลัพธ์';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get worryUnloadEncouragement => 'ทุกครั้งที่จัดหมวดคือก้าวไปข้างหน้า';
+
+  @override
+  String get commonSaved => 'บันทึกแล้ว';
+
+  @override
+  String get commonSaveError => 'บันทึกไม่สำเร็จ';
+
+  @override
+  String get commonLoadError => 'โหลดไม่สำเร็จ';
+
+  @override
+  String get momentEditTitle => 'แก้ไขช่วงเวลา';
+
+  @override
+  String get momentNewHappy => 'บันทึกช่วงเวลาแห่งความสุข';
+
+  @override
+  String get momentNewHighlight => 'บันทึกช่วงเวลาพิเศษ';
+
+  @override
+  String get momentDescHappy => 'สิ่งที่ทำให้มีความสุข';
+
+  @override
+  String get momentDescHighlight => 'เกิดอะไรขึ้น';
+
+  @override
+  String get momentCompanionHappy => 'อยู่กับใคร';
+
+  @override
+  String get momentCompanionHighlight => 'ฉันทำอะไร';
+
+  @override
+  String get momentFeeling => 'ความรู้สึก';
+
+  @override
+  String get momentDate => 'วันที่ (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => 'ให้คะแนน';
+
+  @override
+  String get momentDescRequired => 'กรุณาเพิ่มคำอธิบาย';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return 'กับ$companion';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'ฉันทำ: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => 'ปฏิทินรายปี';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return 'เดือน $month';
+  }
 }

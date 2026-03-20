@@ -224,7 +224,7 @@ Affected LedgerChange refresh: awareness providers respond to `isGlobalRefresh` 
 
 | Provider | Type | Description |
 |----------|------|-------------|
-| `featureGateProvider` | `FutureProvider<FeatureGate>` | 渐进解锁状态，基于 `totalLightDays` |
+| `featureGateProvider` | `Provider<Map<LumiFeature, bool>>` | 渐进解锁状态，基于 `totalLightDays` |
 
 `FeatureGate` 数据类字段：
 

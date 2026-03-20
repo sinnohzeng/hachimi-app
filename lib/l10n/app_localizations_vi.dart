@@ -3129,4 +3129,857 @@ class SVi extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return 'Khuya rồi, $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'Chào buổi sáng, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'Chào buổi chiều, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'Chào buổi tối, $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => 'Khuya rồi';
+
+  @override
+  String get greetingMorningNoName => 'Chào buổi sáng';
+
+  @override
+  String get greetingAfternoonNoName => 'Chào buổi chiều';
+
+  @override
+  String get greetingEveningNoName => 'Chào buổi tối';
+
+  @override
+  String get journeyTitle => 'Hành trình';
+
+  @override
+  String get journeySegmentWeek => 'Tuần';
+
+  @override
+  String get journeySegmentMonth => 'Tháng';
+
+  @override
+  String get journeySegmentYear => 'Năm';
+
+  @override
+  String get journeySegmentExplore => 'Khám phá';
+
+  @override
+  String get journeyMonthlyView => 'Xem theo tháng';
+
+  @override
+  String get journeyYearlyView => 'Xem theo năm';
+
+  @override
+  String get journeyExploreActivities => 'Hoạt động';
+
+  @override
+  String get journeyEditMonthlyPlan => 'Sửa kế hoạch tháng';
+
+  @override
+  String get journeyEditYearlyPlan => 'Sửa kế hoạch năm';
+
+  @override
+  String get quickLightTitle => 'Ánh sáng nhỏ hôm nay';
+
+  @override
+  String get quickLightHint => 'Hôm nay bạn cảm thấy thế nào?';
+
+  @override
+  String get quickLightRecord => 'Ghi lại';
+
+  @override
+  String get quickLightSaveSuccess => 'Đã ghi';
+
+  @override
+  String get quickLightSaveError => 'Lưu thất bại. Thử lại nhé';
+
+  @override
+  String get habitSnapshotTitle => 'Thói quen hôm nay';
+
+  @override
+  String get habitSnapshotEmpty =>
+      'Chưa có thói quen. Thiết lập trong hành trình nhé';
+
+  @override
+  String get habitSnapshotLoadError => 'Tải thất bại';
+
+  @override
+  String get worryJarTitle => 'Lọ lo lắng';
+
+  @override
+  String get worryJarLoadError => 'Tải thất bại';
+
+  @override
+  String get weeklyReviewEmpty => 'Ghi lại khoảnh khắc hạnh phúc tuần này';
+
+  @override
+  String get weeklyReviewHappyMoments => 'Khoảnh khắc hạnh phúc';
+
+  @override
+  String get weeklyReviewLoadError => 'Tải thất bại';
+
+  @override
+  String get weeklyPlanCardTitle => 'Kế hoạch tuần';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count mục';
+  }
+
+  @override
+  String get weeklyPlanEmpty => 'Lập kế hoạch tuần';
+
+  @override
+  String get weekMoodTitle => 'Tâm trạng tuần';
+
+  @override
+  String get weekMoodLoadError => 'Tải tâm trạng thất bại';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return 'Ghi thêm $remaining ngày để mở khóa';
+  }
+
+  @override
+  String get featureLockedSoon => 'Sắp mở';
+
+  @override
+  String get weeklyPlanScreenTitle => 'Kế hoạch tuần';
+
+  @override
+  String get weeklyPlanSave => 'Lưu';
+
+  @override
+  String get weeklyPlanSaveSuccess => 'Đã lưu';
+
+  @override
+  String get weeklyPlanSaveError => 'Lưu thất bại';
+
+  @override
+  String get weeklyPlanOneLine => 'Một câu cho bản thân tuần này';
+
+  @override
+  String get weeklyPlanOneLineHint => 'Tuần này mình muốn...';
+
+  @override
+  String get weeklyPlanUrgentImportant => 'Gấp và quan trọng';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => 'Quan trọng, không gấp';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => 'Gấp, không quan trọng';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => 'Không gấp, không quan trọng';
+
+  @override
+  String get weeklyPlanAddHint => 'Thêm...';
+
+  @override
+  String get weeklyPlanMustDo => 'Phải làm';
+
+  @override
+  String get weeklyPlanShouldDo => 'Nên làm';
+
+  @override
+  String get weeklyPlanNeedToDo => 'Cần làm';
+
+  @override
+  String get weeklyPlanWantToDo => 'Muốn làm';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$month/$year';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => 'Tải thất bại';
+
+  @override
+  String get monthlyGoalsTitle => 'Mục tiêu tháng';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return 'Mục tiêu $index';
+  }
+
+  @override
+  String get monthlySaveError => 'Lưu thất bại';
+
+  @override
+  String get monthlyMemoryTitle => 'Ký ức tháng';
+
+  @override
+  String get monthlyMemoryHint => 'Ký ức đẹp nhất tháng này...';
+
+  @override
+  String get monthlyAchievementTitle => 'Thành tựu tháng';
+
+  @override
+  String get monthlyAchievementHint => 'Điều tự hào nhất tháng này...';
+
+  @override
+  String get yearlyMessagesTitle => 'Lời nhắn năm';
+
+  @override
+  String get yearlyMessageBecome => 'Năm nay mình muốn trở thành...';
+
+  @override
+  String get yearlyMessageGoals => 'Mục tiêu cần đạt';
+
+  @override
+  String get yearlyMessageBreakthrough => 'Bước đột phá';
+
+  @override
+  String get yearlyMessageDontDo =>
+      'Không làm (nói không cũng là dọn chỗ cho điều quan trọng)';
+
+  @override
+  String get yearlyMessageKeyword =>
+      'Từ khóa năm (vd: Tập trung/Dũng cảm/Kiên nhẫn/Dịu dàng)';
+
+  @override
+  String get yearlyMessageFutureSelf => 'Gửi tương lai của mình';
+
+  @override
+  String get yearlyMessageMotto => 'Châm ngôn';
+
+  @override
+  String get growthPlanTitle => 'Kế hoạch phát triển';
+
+  @override
+  String get growthPlanHint => 'Kế hoạch của mình...';
+
+  @override
+  String get growthPlanSaveError => 'Lưu thất bại';
+
+  @override
+  String get growthDimensionHealth => 'Sức khỏe';
+
+  @override
+  String get growthDimensionEmotion => 'Cảm xúc';
+
+  @override
+  String get growthDimensionRelationship => 'Quan hệ';
+
+  @override
+  String get growthDimensionCareer => 'Sự nghiệp';
+
+  @override
+  String get growthDimensionFinance => 'Tài chính';
+
+  @override
+  String get growthDimensionLearning => 'Học tập';
+
+  @override
+  String get growthDimensionCreativity => 'Sáng tạo';
+
+  @override
+  String get growthDimensionSpirituality => 'Nội tâm';
+
+  @override
+  String get smallWinTitle => 'Thử thách chiến thắng nhỏ';
+
+  @override
+  String smallWinEmpty(int days) {
+    return 'Bắt đầu thử thách $days ngày, mỗi ngày một chút';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'Phần thưởng: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => 'Tải thất bại';
+
+  @override
+  String get smallWinLawVisible => 'Nhìn thấy';
+
+  @override
+  String get smallWinLawAttractive => 'Hấp dẫn';
+
+  @override
+  String get smallWinLawEasy => 'Dễ làm';
+
+  @override
+  String get smallWinLawRewarding => 'Có thưởng';
+
+  @override
+  String get moodTrackerTitle => 'Theo dõi tâm trạng';
+
+  @override
+  String get moodTrackerLoadError => 'Tải thất bại';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count lần';
+  }
+
+  @override
+  String get habitTrackerTitle => 'Đam mê tháng';
+
+  @override
+  String get habitTrackerComingSoon =>
+      'Tính năng theo dõi thói quen đang phát triển';
+
+  @override
+  String get habitTrackerComingSoonHint =>
+      'Thiết lập thói quen trong thử thách chiến thắng nhỏ';
+
+  @override
+  String get listsTitle => 'Danh sách';
+
+  @override
+  String get listBookTitle => 'Sách';
+
+  @override
+  String get listMovieTitle => 'Phim';
+
+  @override
+  String get listCustomTitle => 'Tùy chỉnh';
+
+  @override
+  String listItemCount(int count) {
+    return '$count mục';
+  }
+
+  @override
+  String get listDetailBookTitle => 'Sách của tôi';
+
+  @override
+  String get listDetailMovieTitle => 'Phim của tôi';
+
+  @override
+  String get listDetailCustomTitle => 'Danh sách';
+
+  @override
+  String get listDetailSave => 'Lưu';
+
+  @override
+  String get listDetailSaveSuccess => 'Đã lưu';
+
+  @override
+  String get listDetailSaveError => 'Lỗi';
+
+  @override
+  String get listDetailCustomNameLabel => 'Tên danh sách';
+
+  @override
+  String get listDetailCustomNameHint => 'vd: Podcast';
+
+  @override
+  String get listDetailItemTitleHint => 'Tên';
+
+  @override
+  String get listDetailItemDateHint => 'Ngày';
+
+  @override
+  String get listDetailItemGenreHint => 'Thể loại/Tag';
+
+  @override
+  String get listDetailItemKeywordHint => 'Từ khóa/Cảm nhận';
+
+  @override
+  String get listDetailYearTreasure => 'Kho báu năm';
+
+  @override
+  String get listDetailYearPick => 'Lựa chọn năm';
+
+  @override
+  String get listDetailYearPickHint => 'Đáng giới thiệu nhất năm';
+
+  @override
+  String get listDetailInsight => 'Cảm hứng';
+
+  @override
+  String get listDetailInsightHint => 'Cảm hứng lớn nhất từ sách/phim';
+
+  @override
+  String get exploreMyMoments => 'Khoảnh khắc';
+
+  @override
+  String get exploreMyMomentsDesc => 'Ghi lại khoảnh khắc hạnh phúc';
+
+  @override
+  String get exploreHabitPact => 'Cam kết thói quen';
+
+  @override
+  String get exploreHabitPactDesc => 'Thiết kế thói quen với bốn quy luật';
+
+  @override
+  String get exploreWorryUnload => 'Ngày trút lo';
+
+  @override
+  String get exploreWorryUnloadDesc =>
+      'Phân loại lo lắng: buông, hành động hoặc chấp nhận';
+
+  @override
+  String get exploreSelfPraise => 'Nhóm khen mình';
+
+  @override
+  String get exploreSelfPraiseDesc => 'Viết 5 điểm mạnh';
+
+  @override
+  String get exploreSupportMap => 'Người bên cạnh';
+
+  @override
+  String get exploreSupportMapDesc => 'Ghi lại người hỗ trợ bạn';
+
+  @override
+  String get exploreFutureSelf => 'Tương lai của tôi';
+
+  @override
+  String get exploreFutureSelfDesc => 'Tưởng tượng 3 phiên bản tương lai';
+
+  @override
+  String get exploreIdealVsReal => 'Lý tưởng vs. Hiện tại';
+
+  @override
+  String get exploreIdealVsRealDesc => 'Tìm nơi lý tưởng và thực tế gặp nhau';
+
+  @override
+  String get highlightScreenTitle => 'Khoảnh khắc';
+
+  @override
+  String get highlightTabHappy => 'Hạnh phúc';
+
+  @override
+  String get highlightTabHighlight => 'Nổi bật';
+
+  @override
+  String get highlightEmptyHappy => 'Chưa có khoảnh khắc hạnh phúc';
+
+  @override
+  String get highlightEmptyHighlight => 'Chưa có khoảnh khắc nổi bật';
+
+  @override
+  String highlightLoadError(String error) {
+    return 'Lỗi: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => 'Kế hoạch tháng';
+
+  @override
+  String get monthlyPlanSave => 'Lưu';
+
+  @override
+  String get monthlyPlanSaveSuccess => 'Đã lưu';
+
+  @override
+  String get monthlyPlanSaveError => 'Lỗi';
+
+  @override
+  String get monthlyPlanGoalsSection => 'Mục tiêu tháng';
+
+  @override
+  String get monthlyPlanChallengeSection => 'Thử thách chiến thắng nhỏ';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'Thói quen thử thách';
+
+  @override
+  String get monthlyPlanChallengeNameHint => 'vd: Chạy 10 phút/ngày';
+
+  @override
+  String get monthlyPlanRewardLabel => 'Phần thưởng';
+
+  @override
+  String get monthlyPlanRewardHint => 'vd: Mua một cuốn sách';
+
+  @override
+  String get monthlyPlanSelfCareSection => 'Chăm sóc bản thân';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return 'Hoạt động $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => 'Ký ức tháng';
+
+  @override
+  String get monthlyPlanMemoryHint => 'Ký ức đẹp nhất...';
+
+  @override
+  String get monthlyPlanAchievementSection => 'Thành tựu tháng';
+
+  @override
+  String get monthlyPlanAchievementHint => 'Điều tự hào nhất...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return 'Kế hoạch năm $year';
+  }
+
+  @override
+  String get yearlyPlanSave => 'Lưu';
+
+  @override
+  String get yearlyPlanSaveSuccess => 'Đã lưu';
+
+  @override
+  String get yearlyPlanSaveError => 'Lỗi';
+
+  @override
+  String get yearlyPlanMessagesSection => 'Lời nhắn năm';
+
+  @override
+  String get yearlyPlanGrowthSection => 'Kế hoạch phát triển';
+
+  @override
+  String get growthReviewScreenTitle => 'Nhìn lại hành trình';
+
+  @override
+  String get growthReviewMyMoments => 'Khoảnh khắc đặc biệt';
+
+  @override
+  String get growthReviewEmptyMoments => 'Chưa có khoảnh khắc nổi bật';
+
+  @override
+  String get growthReviewMySummary => 'Tổng kết';
+
+  @override
+  String get growthReviewSummaryPrompt =>
+      'Nhìn lại hành trình, bạn muốn nói gì với mình?';
+
+  @override
+  String get growthReviewSmallWins => 'Trao giải chiến thắng nhỏ';
+
+  @override
+  String get growthReviewConsistentRecord => 'Ghi chép đều đặn';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return 'Bạn đã ghi $count ngày';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => 'Nhà vô địch đánh giá tuần';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return 'Hoàn thành $count đánh giá tuần';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'Kết thúc ấm áp';
+
+  @override
+  String get growthReviewEveryStar => 'Mỗi ngày ghi lại là một ngôi sao';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return 'Bạn đã thu thập $count ngôi sao. Tiếp tục tỏa sáng!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => 'Tương lai của tôi';
+
+  @override
+  String get futureSelfSubtitle => 'Tưởng tượng 3 phiên bản tương lai';
+
+  @override
+  String get futureSelfHint =>
+      'Không cần câu trả lời hoàn hảo, cứ tự do tưởng tượng';
+
+  @override
+  String get futureSelfStable => 'Tương lai ổn định';
+
+  @override
+  String get futureSelfStableHint =>
+      'Nếu mọi thứ suôn sẻ, cuộc sống sẽ như thế nào?';
+
+  @override
+  String get futureSelfFree => 'Tương lai tự do';
+
+  @override
+  String get futureSelfFreeHint => 'Không giới hạn, bạn muốn làm gì nhất?';
+
+  @override
+  String get futureSelfPace => 'Tương lai theo nhịp riêng';
+
+  @override
+  String get futureSelfPaceHint => 'Không vội, nhịp lý tưởng của bạn là gì?';
+
+  @override
+  String get futureSelfCoreLabel => 'Điều bạn thực sự quan tâm?';
+
+  @override
+  String get futureSelfCoreHint =>
+      '3 phiên bản có điểm chung gì? Đó có thể là điều quan trọng nhất...';
+
+  @override
+  String get habitPactScreenTitle => 'Cam kết thói quen';
+
+  @override
+  String get habitPactStep1 => 'Muốn xây dựng thói quen gì?';
+
+  @override
+  String get habitPactCategoryLearning => 'Học tập';
+
+  @override
+  String get habitPactCategoryHealth => 'Sức khỏe';
+
+  @override
+  String get habitPactCategoryRelationship => 'Quan hệ';
+
+  @override
+  String get habitPactCategoryHobby => 'Sở thích';
+
+  @override
+  String get habitPactHabitLabel => 'Thói quen cụ thể';
+
+  @override
+  String get habitPactHabitHint => 'vd: Đọc 20 trang/ngày';
+
+  @override
+  String get habitPactStep2 => 'Bốn quy luật thói quen';
+
+  @override
+  String get habitPactLawVisible => 'Làm rõ ràng';
+
+  @override
+  String get habitPactLawVisibleHint => 'Đặt gợi ý ở...';
+
+  @override
+  String get habitPactLawAttractive => 'Làm hấp dẫn';
+
+  @override
+  String get habitPactLawAttractiveHint => 'Kết hợp với...';
+
+  @override
+  String get habitPactLawEasy => 'Làm dễ dàng';
+
+  @override
+  String get habitPactLawEasyHint => 'Phiên bản tối thiểu...';
+
+  @override
+  String get habitPactLawRewarding => 'Làm hài lòng';
+
+  @override
+  String get habitPactLawRewardingHint => 'Thưởng cho mình bằng...';
+
+  @override
+  String get habitPactStep3 => 'Tuyên bố hành động';
+
+  @override
+  String get habitPactDeclarationEmpty => 'Điền ở trên để tạo tuyên bố...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return 'Tôi cam kết xây dựng thói quen \"$habit\"';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return 'khi $cue';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return 'tôi sẽ $response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'rồi $reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => 'Lý tưởng vs. Hiện tại';
+
+  @override
+  String get idealVsRealIdeal => 'Tôi lý tưởng';
+
+  @override
+  String get idealVsRealIdealHint => 'Tôi muốn trở thành người như thế nào?';
+
+  @override
+  String get idealVsRealReal => 'Tôi hiện tại';
+
+  @override
+  String get idealVsRealRealHint => 'Tôi hiện tại là người như thế nào?';
+
+  @override
+  String get idealVsRealSame => 'Điểm giống?';
+
+  @override
+  String get idealVsRealSameHint => 'Lý tưởng và thực tế đã trùng ở đâu?';
+
+  @override
+  String get idealVsRealDiff => 'Điểm khác?';
+
+  @override
+  String get idealVsRealDiffHint => 'Khoảng cách ở đâu? Bạn cảm thấy sao?';
+
+  @override
+  String get idealVsRealStep => 'Một bước nhỏ tới lý tưởng';
+
+  @override
+  String get idealVsRealStepHint => 'Việc nhỏ có thể làm hôm nay...';
+
+  @override
+  String get selfPraiseScreenTitle => 'Nhóm khen mình';
+
+  @override
+  String get selfPraiseSubtitle => 'Viết 5 điểm mạnh';
+
+  @override
+  String get selfPraiseHint =>
+      'Ai cũng xứng đáng được nhìn nhận, nhất là bởi chính mình';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return 'Điểm mạnh $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'Phẩm chất ấm áp nhất...';
+
+  @override
+  String get selfPraisePrompt2 => 'Một thứ mình giỏi...';
+
+  @override
+  String get selfPraisePrompt3 => 'Thường được khen vì...';
+
+  @override
+  String get selfPraisePrompt4 => 'Tự hào về...';
+
+  @override
+  String get selfPraisePrompt5 => 'Điều khiến mình đặc biệt...';
+
+  @override
+  String get supportMapScreenTitle => 'Người bên cạnh';
+
+  @override
+  String get supportMapSubtitle => 'Ai đang hỗ trợ bạn?';
+
+  @override
+  String get supportMapHint => 'Nhắc nhớ rằng bạn không đơn độc';
+
+  @override
+  String get supportMapNameLabel => 'Tên';
+
+  @override
+  String get supportMapRelationLabel => 'Quan hệ';
+
+  @override
+  String get supportMapRelationHint => 'vd: Bạn/Gia đình/Đồng nghiệp';
+
+  @override
+  String get supportMapAdd => 'Thêm';
+
+  @override
+  String get worryUnloadScreenTitle => 'Ngày trút lo';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return 'Lỗi: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => 'Không có lo lắng';
+
+  @override
+  String get worryUnloadEmptyHint => 'Tuyệt! Hôm nay thật nhẹ nhàng';
+
+  @override
+  String get worryUnloadIntro => 'Nhìn lại lo lắng và phân loại';
+
+  @override
+  String get worryUnloadLetGo => 'Có thể buông';
+
+  @override
+  String get worryUnloadTakeAction => 'Có thể hành động';
+
+  @override
+  String get worryUnloadAccept => 'Tạm chấp nhận';
+
+  @override
+  String get worryUnloadResultTitle => 'Kết quả';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get worryUnloadEncouragement => 'Mỗi lần phân loại là một bước tiến.';
+
+  @override
+  String get commonSaved => 'Đã lưu';
+
+  @override
+  String get commonSaveError => 'Lưu thất bại';
+
+  @override
+  String get commonLoadError => 'Tải thất bại';
+
+  @override
+  String get momentEditTitle => 'Sửa khoảnh khắc';
+
+  @override
+  String get momentNewHappy => 'Ghi lại khoảnh khắc hạnh phúc';
+
+  @override
+  String get momentNewHighlight => 'Ghi lại khoảnh khắc nổi bật';
+
+  @override
+  String get momentDescHappy => 'Điều hạnh phúc';
+
+  @override
+  String get momentDescHighlight => 'Chuyện gì đã xảy ra';
+
+  @override
+  String get momentCompanionHappy => 'Bạn ở cùng ai';
+
+  @override
+  String get momentCompanionHighlight => 'Mình đã làm gì';
+
+  @override
+  String get momentFeeling => 'Cảm xúc';
+
+  @override
+  String get momentDate => 'Ngày (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => 'Đánh giá';
+
+  @override
+  String get momentDescRequired => 'Hãy thêm mô tả nhé';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return 'Cùng $companion';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'Đã làm: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => 'Lịch năm của tôi';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return 'Tháng $month';
+  }
 }

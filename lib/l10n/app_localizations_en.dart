@@ -3130,4 +3130,868 @@ class SEn extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return 'Late night, $name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'Good morning, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'Good afternoon, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'Good evening, $name';
+  }
+
+  @override
+  String get greetingLateNightNoName => 'Late night';
+
+  @override
+  String get greetingMorningNoName => 'Good morning';
+
+  @override
+  String get greetingAfternoonNoName => 'Good afternoon';
+
+  @override
+  String get greetingEveningNoName => 'Good evening';
+
+  @override
+  String get journeyTitle => 'Journey';
+
+  @override
+  String get journeySegmentWeek => 'Week';
+
+  @override
+  String get journeySegmentMonth => 'Month';
+
+  @override
+  String get journeySegmentYear => 'Year';
+
+  @override
+  String get journeySegmentExplore => 'Explore';
+
+  @override
+  String get journeyMonthlyView => 'Monthly View';
+
+  @override
+  String get journeyYearlyView => 'Yearly View';
+
+  @override
+  String get journeyExploreActivities => 'Explore Activities';
+
+  @override
+  String get journeyEditMonthlyPlan => 'Edit monthly plan';
+
+  @override
+  String get journeyEditYearlyPlan => 'Edit yearly plan';
+
+  @override
+  String get quickLightTitle => 'Today\'s little light';
+
+  @override
+  String get quickLightHint => 'Write how you feel today...';
+
+  @override
+  String get quickLightRecord => 'Record';
+
+  @override
+  String get quickLightSaveSuccess => 'Recorded';
+
+  @override
+  String get quickLightSaveError => 'Save failed, please try again';
+
+  @override
+  String get habitSnapshotTitle => 'Today\'s habits';
+
+  @override
+  String get habitSnapshotEmpty => 'No habits yet. Set them in your journey.';
+
+  @override
+  String get habitSnapshotLoadError => 'Failed to load';
+
+  @override
+  String get worryJarTitle => 'Worry jar';
+
+  @override
+  String get worryJarLoadError => 'Failed to load';
+
+  @override
+  String get weeklyReviewEmpty => 'Record this week\'s happy moments';
+
+  @override
+  String get weeklyReviewHappyMoments => 'Happy moments';
+
+  @override
+  String get weeklyReviewLoadError => 'Failed to load';
+
+  @override
+  String get weeklyPlanCardTitle => 'Weekly plan';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get weeklyPlanEmpty => 'Make a weekly plan';
+
+  @override
+  String get weekMoodTitle => 'Week mood';
+
+  @override
+  String get weekMoodLoadError => 'Failed to load mood';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return 'Record $remaining more days to unlock';
+  }
+
+  @override
+  String get featureLockedSoon => 'Unlocking soon';
+
+  @override
+  String get weeklyPlanScreenTitle => 'Weekly plan';
+
+  @override
+  String get weeklyPlanSave => 'Save';
+
+  @override
+  String get weeklyPlanSaveSuccess => 'Saved';
+
+  @override
+  String get weeklyPlanSaveError => 'Save failed';
+
+  @override
+  String get weeklyPlanOneLine => 'Write a line for yourself this week';
+
+  @override
+  String get weeklyPlanOneLineHint => 'This week I want to...';
+
+  @override
+  String get weeklyPlanUrgentImportant => 'Urgent & Important';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => 'Important, Not Urgent';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => 'Urgent, Not Important';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => 'Not Urgent, Not Important';
+
+  @override
+  String get weeklyPlanAddHint => 'Add...';
+
+  @override
+  String get weeklyPlanMustDo => 'Must do';
+
+  @override
+  String get weeklyPlanShouldDo => 'Should do';
+
+  @override
+  String get weeklyPlanNeedToDo => 'Need to do';
+
+  @override
+  String get weeklyPlanWantToDo => 'Want to do';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$year/$month';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => 'Failed to load';
+
+  @override
+  String get monthlyGoalsTitle => 'Monthly goals';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return 'Goal $index';
+  }
+
+  @override
+  String get monthlySaveError => 'Save failed';
+
+  @override
+  String get monthlyMemoryTitle => 'Monthly memory';
+
+  @override
+  String get monthlyMemoryHint => 'The most beautiful memory this month is...';
+
+  @override
+  String get monthlyAchievementTitle => 'Monthly achievement';
+
+  @override
+  String get monthlyAchievementHint =>
+      'My proudest achievement this month is...';
+
+  @override
+  String get yearlyMessagesTitle => 'Yearly messages';
+
+  @override
+  String get yearlyMessageBecome => 'This year I hope to become...';
+
+  @override
+  String get yearlyMessageGoals => 'Goals to achieve';
+
+  @override
+  String get yearlyMessageBreakthrough => 'Breakthrough completion';
+
+  @override
+  String get yearlyMessageDontDo =>
+      'Don\'t do (saying no makes room for what matters)';
+
+  @override
+  String get yearlyMessageKeyword =>
+      'Year keyword (e.g. Focus / Brave / Patient / Kind)';
+
+  @override
+  String get yearlyMessageFutureSelf => 'To my dear future self';
+
+  @override
+  String get yearlyMessageMotto => 'My motto';
+
+  @override
+  String get growthPlanTitle => 'Growth plan';
+
+  @override
+  String get growthPlanHint => 'My plan...';
+
+  @override
+  String get growthPlanSaveError => 'Save failed';
+
+  @override
+  String get growthDimensionHealth => 'Physical health';
+
+  @override
+  String get growthDimensionEmotion => 'Emotional wellness';
+
+  @override
+  String get growthDimensionRelationship => 'Relationships';
+
+  @override
+  String get growthDimensionCareer => 'Career growth';
+
+  @override
+  String get growthDimensionFinance => 'Financial wellness';
+
+  @override
+  String get growthDimensionLearning => 'Continuous learning';
+
+  @override
+  String get growthDimensionCreativity => 'Creativity';
+
+  @override
+  String get growthDimensionSpirituality => 'Inner growth';
+
+  @override
+  String get smallWinTitle => 'Small win challenge';
+
+  @override
+  String smallWinEmpty(int days) {
+    return 'Set a $days-day challenge, a little bit every day';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'Reward: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => 'Failed to load';
+
+  @override
+  String get smallWinLawVisible => 'Visible';
+
+  @override
+  String get smallWinLawAttractive => 'Attractive';
+
+  @override
+  String get smallWinLawEasy => 'Easy';
+
+  @override
+  String get smallWinLawRewarding => 'Rewarding';
+
+  @override
+  String get moodTrackerTitle => 'Mood tracker';
+
+  @override
+  String get moodTrackerLoadError => 'Failed to load';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count times';
+  }
+
+  @override
+  String get habitTrackerTitle => 'Monthly passion & persistence';
+
+  @override
+  String get habitTrackerComingSoon => 'Habit tracking is under development';
+
+  @override
+  String get habitTrackerComingSoonHint =>
+      'Set your habits in the small win challenge';
+
+  @override
+  String get listsTitle => 'My lists';
+
+  @override
+  String get listBookTitle => 'Book list';
+
+  @override
+  String get listMovieTitle => 'Movie list';
+
+  @override
+  String get listCustomTitle => 'Custom list';
+
+  @override
+  String listItemCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get listDetailBookTitle => 'My book list';
+
+  @override
+  String get listDetailMovieTitle => 'My movie list';
+
+  @override
+  String get listDetailCustomTitle => 'My list';
+
+  @override
+  String get listDetailSave => 'Save';
+
+  @override
+  String get listDetailSaveSuccess => 'Saved';
+
+  @override
+  String get listDetailSaveError => 'Save failed';
+
+  @override
+  String get listDetailCustomNameLabel => 'List name';
+
+  @override
+  String get listDetailCustomNameHint => 'e.g. My podcast list';
+
+  @override
+  String get listDetailItemTitleHint => 'Title';
+
+  @override
+  String get listDetailItemDateHint => 'Date';
+
+  @override
+  String get listDetailItemGenreHint => 'Genre / Tag';
+
+  @override
+  String get listDetailItemKeywordHint => 'Keywords / Thoughts';
+
+  @override
+  String get listDetailYearTreasure => 'Year\'s treasure';
+
+  @override
+  String get listDetailYearPick => 'Pick of the year';
+
+  @override
+  String get listDetailYearPickHint =>
+      'The one most worth recommending this year';
+
+  @override
+  String get listDetailInsight => 'Aha moment';
+
+  @override
+  String get listDetailInsightHint =>
+      'The biggest inspiration from reading / watching';
+
+  @override
+  String get exploreMyMoments => 'My moments';
+
+  @override
+  String get exploreMyMomentsDesc => 'Record happy and highlight moments';
+
+  @override
+  String get exploreHabitPact => 'My habit pact';
+
+  @override
+  String get exploreHabitPactDesc =>
+      'Design a new habit using Atomic Habits\' four laws';
+
+  @override
+  String get exploreWorryUnload => 'Worry unload day';
+
+  @override
+  String get exploreWorryUnloadDesc =>
+      'Sort your worries: let go, take action, or accept';
+
+  @override
+  String get exploreSelfPraise => 'My cheer squad';
+
+  @override
+  String get exploreSelfPraiseDesc => 'Write down 5 of your strengths';
+
+  @override
+  String get exploreSupportMap => 'My support circle';
+
+  @override
+  String get exploreSupportMapDesc => 'Record the people who support you';
+
+  @override
+  String get exploreFutureSelf => 'Future me';
+
+  @override
+  String get exploreFutureSelfDesc => 'Imagine 3 versions of your future self';
+
+  @override
+  String get exploreIdealVsReal => 'Ideal me vs. Real me';
+
+  @override
+  String get exploreIdealVsRealDesc => 'Discover where ideal and reality meet';
+
+  @override
+  String get highlightScreenTitle => 'My moments';
+
+  @override
+  String get highlightTabHappy => 'Happy moments';
+
+  @override
+  String get highlightTabHighlight => 'Highlight moments';
+
+  @override
+  String get highlightEmptyHappy => 'No happy moments recorded yet';
+
+  @override
+  String get highlightEmptyHighlight => 'No highlight moments recorded yet';
+
+  @override
+  String highlightLoadError(String error) {
+    return 'Failed to load: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => 'Monthly plan';
+
+  @override
+  String get monthlyPlanSave => 'Save';
+
+  @override
+  String get monthlyPlanSaveSuccess => 'Saved';
+
+  @override
+  String get monthlyPlanSaveError => 'Save failed';
+
+  @override
+  String get monthlyPlanGoalsSection => 'Monthly goals';
+
+  @override
+  String get monthlyPlanChallengeSection => 'Small win challenge';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'Challenge habit name';
+
+  @override
+  String get monthlyPlanChallengeNameHint => 'e.g. Run 10 minutes daily';
+
+  @override
+  String get monthlyPlanRewardLabel => 'Reward after completion';
+
+  @override
+  String get monthlyPlanRewardHint => 'e.g. Buy a book I want';
+
+  @override
+  String get monthlyPlanSelfCareSection => 'Self-care activities';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return 'Activity $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => 'Monthly memory';
+
+  @override
+  String get monthlyPlanMemoryHint =>
+      'The most beautiful memory this month is...';
+
+  @override
+  String get monthlyPlanAchievementSection => 'Monthly achievement';
+
+  @override
+  String get monthlyPlanAchievementHint =>
+      'My proudest achievement this month is...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year Yearly plan';
+  }
+
+  @override
+  String get yearlyPlanSave => 'Save';
+
+  @override
+  String get yearlyPlanSaveSuccess => 'Saved';
+
+  @override
+  String get yearlyPlanSaveError => 'Save failed';
+
+  @override
+  String get yearlyPlanMessagesSection => 'Yearly messages';
+
+  @override
+  String get yearlyPlanGrowthSection => 'Growth plan';
+
+  @override
+  String get growthReviewScreenTitle => 'Growth review';
+
+  @override
+  String get growthReviewMyMoments => 'My moments';
+
+  @override
+  String get growthReviewEmptyMoments => 'No highlight moments recorded yet';
+
+  @override
+  String get growthReviewMySummary => 'My summary';
+
+  @override
+  String get growthReviewSummaryPrompt =>
+      'Looking back on this journey, what would you say to yourself?';
+
+  @override
+  String get growthReviewSmallWins => 'Small win awards';
+
+  @override
+  String get growthReviewConsistentRecord => 'Consistent recording';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return 'You\'ve recorded $count days';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => 'Weekly review champ';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return 'Completed $count weekly reviews';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'A warm closing';
+
+  @override
+  String get growthReviewEveryStar => 'Every record is a star';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return 'You\'ve collected $count stars. Keep shining!';
+  }
+
+  @override
+  String get futureSelfScreenTitle => 'Future me';
+
+  @override
+  String get futureSelfSubtitle => 'Imagine 3 versions of your future self';
+
+  @override
+  String get futureSelfHint =>
+      'No perfect answers needed, let your imagination flow';
+
+  @override
+  String get futureSelfStable => 'Stable future';
+
+  @override
+  String get futureSelfStableHint =>
+      'If everything goes smoothly, what would your life look like?';
+
+  @override
+  String get futureSelfFree => 'Free future';
+
+  @override
+  String get futureSelfFreeHint =>
+      'If there were no limits, what would you most want to do?';
+
+  @override
+  String get futureSelfPace => 'Your-pace future';
+
+  @override
+  String get futureSelfPaceHint => 'Unhurried, what\'s your ideal rhythm?';
+
+  @override
+  String get futureSelfCoreLabel => 'What do you truly care about?';
+
+  @override
+  String get futureSelfCoreHint =>
+      'Look at the 3 versions above. What do they have in common? That might be what you care about most...';
+
+  @override
+  String get habitPactScreenTitle => 'My habit pact';
+
+  @override
+  String get habitPactStep1 => 'What habit do I want to build?';
+
+  @override
+  String get habitPactCategoryLearning => 'Learning';
+
+  @override
+  String get habitPactCategoryHealth => 'Health';
+
+  @override
+  String get habitPactCategoryRelationship => 'Relationship';
+
+  @override
+  String get habitPactCategoryHobby => 'Hobby';
+
+  @override
+  String get habitPactHabitLabel => 'Specific habit';
+
+  @override
+  String get habitPactHabitHint => 'e.g. Read 20 pages every day';
+
+  @override
+  String get habitPactStep2 => 'Four laws of habits';
+
+  @override
+  String get habitPactLawVisible => 'Make it obvious';
+
+  @override
+  String get habitPactLawVisibleHint => 'I\'ll place the cue at...';
+
+  @override
+  String get habitPactLawAttractive => 'Make it attractive';
+
+  @override
+  String get habitPactLawAttractiveHint => 'I\'ll pair it with...';
+
+  @override
+  String get habitPactLawEasy => 'Make it easy';
+
+  @override
+  String get habitPactLawEasyHint => 'My minimum version is...';
+
+  @override
+  String get habitPactLawRewarding => 'Make it satisfying';
+
+  @override
+  String get habitPactLawRewardingHint =>
+      'After completing, I\'ll reward myself with...';
+
+  @override
+  String get habitPactStep3 => 'Action declaration';
+
+  @override
+  String get habitPactDeclarationEmpty =>
+      'Fill in above to auto-generate your declaration...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return 'I commit to building the habit of \"$habit\"';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return 'when $cue';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return 'I will $response';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'then $reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => 'Ideal me vs. Real me';
+
+  @override
+  String get idealVsRealIdeal => 'Ideal me';
+
+  @override
+  String get idealVsRealIdealHint => 'What kind of person do I want to be?';
+
+  @override
+  String get idealVsRealReal => 'Real me';
+
+  @override
+  String get idealVsRealRealHint => 'What kind of person am I now?';
+
+  @override
+  String get idealVsRealSame => 'What\'s similar?';
+
+  @override
+  String get idealVsRealSameHint =>
+      'Where do ideal and reality already overlap?';
+
+  @override
+  String get idealVsRealDiff => 'What\'s different?';
+
+  @override
+  String get idealVsRealDiffHint =>
+      'Where\'s the gap? How does it make you feel?';
+
+  @override
+  String get idealVsRealStep =>
+      'To get closer to ideal, I just need one small step';
+
+  @override
+  String get idealVsRealStepHint => 'One small thing I can do today is...';
+
+  @override
+  String get selfPraiseScreenTitle => 'My cheer squad';
+
+  @override
+  String get selfPraiseSubtitle => 'Write down your 5 strengths';
+
+  @override
+  String get selfPraiseHint =>
+      'Everyone deserves to be seen, especially by yourself';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return 'Strength $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'My warmest quality is...';
+
+  @override
+  String get selfPraisePrompt2 => 'Something I\'m good at is...';
+
+  @override
+  String get selfPraisePrompt3 => 'People often praise me for...';
+
+  @override
+  String get selfPraisePrompt4 => 'I\'m proud of myself for...';
+
+  @override
+  String get selfPraisePrompt5 => 'What makes me unique is...';
+
+  @override
+  String get supportMapScreenTitle => 'My support circle';
+
+  @override
+  String get supportMapSubtitle => 'Who\'s supporting you?';
+
+  @override
+  String get supportMapHint =>
+      'Note the important people around you, to remind yourself you\'re not alone';
+
+  @override
+  String get supportMapNameLabel => 'Name';
+
+  @override
+  String get supportMapRelationLabel => 'Relationship';
+
+  @override
+  String get supportMapRelationHint => 'e.g. Friend / Family / Colleague';
+
+  @override
+  String get supportMapAdd => 'Add';
+
+  @override
+  String get worryUnloadScreenTitle => 'Worry unload day';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return 'Failed to load: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => 'No active worries';
+
+  @override
+  String get worryUnloadEmptyHint => 'Great! Today is a light day';
+
+  @override
+  String get worryUnloadIntro => 'Look at your worries and sort them';
+
+  @override
+  String get worryUnloadLetGo => 'Can let go';
+
+  @override
+  String get worryUnloadTakeAction => 'Can take action';
+
+  @override
+  String get worryUnloadAccept => 'Accept for now';
+
+  @override
+  String get worryUnloadResultTitle => 'Unload results';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get worryUnloadEncouragement => 'Every sorting is a step forward.';
+
+  @override
+  String get commonSaved => 'Saved';
+
+  @override
+  String get commonSaveError => 'Save failed';
+
+  @override
+  String get commonLoadError => 'Failed to load';
+
+  @override
+  String get momentEditTitle => 'Edit moment';
+
+  @override
+  String get momentNewHappy => 'Record a happy moment';
+
+  @override
+  String get momentNewHighlight => 'Record a highlight moment';
+
+  @override
+  String get momentDescHappy => 'Something happy';
+
+  @override
+  String get momentDescHighlight => 'What happened';
+
+  @override
+  String get momentCompanionHappy => 'Who were you with';
+
+  @override
+  String get momentCompanionHighlight => 'What I did';
+
+  @override
+  String get momentFeeling => 'Feeling';
+
+  @override
+  String get momentDate => 'Date (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => 'Rating';
+
+  @override
+  String get momentDescRequired => 'Please enter a description';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return 'With $companion';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'I did: $action';
+  }
+
+  @override
+  String get annualCalendarTitle => 'My year calendar';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month';
+  }
 }

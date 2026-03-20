@@ -3095,4 +3095,846 @@ class SJa extends S {
 
   @override
   String get growthReview => 'Growth Review';
+
+  @override
+  String greetingLateNight(String name) {
+    return '夜ふかしだね、$name';
+  }
+
+  @override
+  String greetingMorning(String name) {
+    return 'おはよう、$name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'こんにちは、$name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'こんばんは、$name';
+  }
+
+  @override
+  String get greetingLateNightNoName => '夜ふかしだね';
+
+  @override
+  String get greetingMorningNoName => 'おはよう';
+
+  @override
+  String get greetingAfternoonNoName => 'こんにちは';
+
+  @override
+  String get greetingEveningNoName => 'こんばんは';
+
+  @override
+  String get journeyTitle => 'ジャーニー';
+
+  @override
+  String get journeySegmentWeek => '今週';
+
+  @override
+  String get journeySegmentMonth => '今月';
+
+  @override
+  String get journeySegmentYear => '年間';
+
+  @override
+  String get journeySegmentExplore => '探索';
+
+  @override
+  String get journeyMonthlyView => '月間ビュー';
+
+  @override
+  String get journeyYearlyView => '年間ビュー';
+
+  @override
+  String get journeyExploreActivities => '探索アクティビティ';
+
+  @override
+  String get journeyEditMonthlyPlan => '月間プランを編集';
+
+  @override
+  String get journeyEditYearlyPlan => '年間プランを編集';
+
+  @override
+  String get quickLightTitle => '今日のひとこと';
+
+  @override
+  String get quickLightHint => '今日の気分をひとこと...';
+
+  @override
+  String get quickLightRecord => '記録';
+
+  @override
+  String get quickLightSaveSuccess => '記録しました';
+
+  @override
+  String get quickLightSaveError => '保存に失敗しました。もう一度お試しください';
+
+  @override
+  String get habitSnapshotTitle => '今日の習慣';
+
+  @override
+  String get habitSnapshotEmpty => 'まだ習慣がありません。ジャーニーで設定できます';
+
+  @override
+  String get habitSnapshotLoadError => '読み込みに失敗しました';
+
+  @override
+  String get worryJarTitle => '心配ごとの瓶';
+
+  @override
+  String get worryJarLoadError => '読み込みに失敗しました';
+
+  @override
+  String get weeklyReviewEmpty => '今週の幸せな瞬間を記録しましょう';
+
+  @override
+  String get weeklyReviewHappyMoments => '幸せな瞬間';
+
+  @override
+  String get weeklyReviewLoadError => '読み込みに失敗しました';
+
+  @override
+  String get weeklyPlanCardTitle => '今週のプラン';
+
+  @override
+  String weeklyPlanItemCount(int count) {
+    return '$count 件';
+  }
+
+  @override
+  String get weeklyPlanEmpty => '今週のプランを立てよう';
+
+  @override
+  String get weekMoodTitle => '今週の気分';
+
+  @override
+  String get weekMoodLoadError => '気分の読み込みに失敗しました';
+
+  @override
+  String featureLockedDaysRemaining(int remaining) {
+    return 'あと $remaining 日記録すると解放されます';
+  }
+
+  @override
+  String get featureLockedSoon => 'もうすぐ解放';
+
+  @override
+  String get weeklyPlanScreenTitle => '今週のプラン';
+
+  @override
+  String get weeklyPlanSave => '保存';
+
+  @override
+  String get weeklyPlanSaveSuccess => '保存しました';
+
+  @override
+  String get weeklyPlanSaveError => '保存に失敗しました';
+
+  @override
+  String get weeklyPlanOneLine => '今週の自分にひとこと';
+
+  @override
+  String get weeklyPlanOneLineHint => '今週は...';
+
+  @override
+  String get weeklyPlanUrgentImportant => '緊急かつ重要';
+
+  @override
+  String get weeklyPlanImportantNotUrgent => '重要だが緊急でない';
+
+  @override
+  String get weeklyPlanUrgentNotImportant => '緊急だが重要でない';
+
+  @override
+  String get weeklyPlanNotUrgentNotImportant => '緊急でも重要でもない';
+
+  @override
+  String get weeklyPlanAddHint => '追加...';
+
+  @override
+  String get weeklyPlanMustDo => '必ずやる';
+
+  @override
+  String get weeklyPlanShouldDo => 'やるべき';
+
+  @override
+  String get weeklyPlanNeedToDo => 'やった方がいい';
+
+  @override
+  String get weeklyPlanWantToDo => 'やりたい';
+
+  @override
+  String monthlyCalendarYearMonth(int year, int month) {
+    return '$year年$month月';
+  }
+
+  @override
+  String get monthlyCalendarLoadError => '読み込みに失敗しました';
+
+  @override
+  String get monthlyGoalsTitle => '今月の目標';
+
+  @override
+  String monthlyGoalHint(int index) {
+    return '目標 $index';
+  }
+
+  @override
+  String get monthlySaveError => '保存に失敗しました';
+
+  @override
+  String get monthlyMemoryTitle => '今月の思い出';
+
+  @override
+  String get monthlyMemoryHint => '今月いちばん素敵な思い出は...';
+
+  @override
+  String get monthlyAchievementTitle => '今月の達成';
+
+  @override
+  String get monthlyAchievementHint => '今月いちばん誇らしい達成は...';
+
+  @override
+  String get yearlyMessagesTitle => '年間メッセージ';
+
+  @override
+  String get yearlyMessageBecome => '今年はこんな自分になりたい...';
+
+  @override
+  String get yearlyMessageGoals => '達成したい目標';
+
+  @override
+  String get yearlyMessageBreakthrough => 'ブレイクスルー';
+
+  @override
+  String get yearlyMessageDontDo => 'やらないこと（ノーと言うのも大切なこと）';
+
+  @override
+  String get yearlyMessageKeyword => '年間キーワード（例：集中/勇気/忍耐/優しさ）';
+
+  @override
+  String get yearlyMessageFutureSelf => '未来の自分へ';
+
+  @override
+  String get yearlyMessageMotto => '座右の銘';
+
+  @override
+  String get growthPlanTitle => '年間成長プラン';
+
+  @override
+  String get growthPlanHint => 'わたしのプラン...';
+
+  @override
+  String get growthPlanSaveError => '保存に失敗しました';
+
+  @override
+  String get growthDimensionHealth => '体の健康';
+
+  @override
+  String get growthDimensionEmotion => '感情マネジメント';
+
+  @override
+  String get growthDimensionRelationship => '人間関係';
+
+  @override
+  String get growthDimensionCareer => 'キャリア';
+
+  @override
+  String get growthDimensionFinance => 'お金の管理';
+
+  @override
+  String get growthDimensionLearning => '学び続ける';
+
+  @override
+  String get growthDimensionCreativity => '創造力';
+
+  @override
+  String get growthDimensionSpirituality => '内面の成長';
+
+  @override
+  String get smallWinTitle => '小さな勝利チャレンジ';
+
+  @override
+  String smallWinEmpty(int days) {
+    return '$days日間のチャレンジを設定しよう。毎日少しずつ';
+  }
+
+  @override
+  String smallWinReward(String reward) {
+    return 'ごほうび: $reward';
+  }
+
+  @override
+  String get smallWinLoadError => '読み込みに失敗しました';
+
+  @override
+  String get smallWinLawVisible => '目に見える';
+
+  @override
+  String get smallWinLawAttractive => 'やりたくなる';
+
+  @override
+  String get smallWinLawEasy => 'かんたん';
+
+  @override
+  String get smallWinLawRewarding => 'ごほうびがある';
+
+  @override
+  String get moodTrackerTitle => '気分トラッカー';
+
+  @override
+  String get moodTrackerLoadError => '読み込みに失敗しました';
+
+  @override
+  String moodTrackerCount(int count) {
+    return '$count 回';
+  }
+
+  @override
+  String get habitTrackerTitle => '今月の情熱と継続';
+
+  @override
+  String get habitTrackerComingSoon => '習慣トラッキング機能を開発中です';
+
+  @override
+  String get habitTrackerComingSoonHint => '小さな勝利チャレンジで習慣を設定してください';
+
+  @override
+  String get listsTitle => 'マイリスト';
+
+  @override
+  String get listBookTitle => '読書リスト';
+
+  @override
+  String get listMovieTitle => '映画リスト';
+
+  @override
+  String get listCustomTitle => 'カスタムリスト';
+
+  @override
+  String listItemCount(int count) {
+    return '$count 件';
+  }
+
+  @override
+  String get listDetailBookTitle => 'わたしの読書リスト';
+
+  @override
+  String get listDetailMovieTitle => 'わたしの映画リスト';
+
+  @override
+  String get listDetailCustomTitle => 'わたしのリスト';
+
+  @override
+  String get listDetailSave => '保存';
+
+  @override
+  String get listDetailSaveSuccess => '保存しました';
+
+  @override
+  String get listDetailSaveError => '保存に失敗しました';
+
+  @override
+  String get listDetailCustomNameLabel => 'リスト名';
+
+  @override
+  String get listDetailCustomNameHint => '例：ポッドキャストリスト';
+
+  @override
+  String get listDetailItemTitleHint => 'タイトル';
+
+  @override
+  String get listDetailItemDateHint => '日付';
+
+  @override
+  String get listDetailItemGenreHint => 'ジャンル/タグ';
+
+  @override
+  String get listDetailItemKeywordHint => 'キーワード/感想';
+
+  @override
+  String get listDetailYearTreasure => '年間のお宝';
+
+  @override
+  String get listDetailYearPick => '年間ベスト';
+
+  @override
+  String get listDetailYearPickHint => '今年いちばんおすすめの一作';
+
+  @override
+  String get listDetailInsight => 'ひらめき';
+
+  @override
+  String get listDetailInsightHint => '読書・映画から得た最大の気づき';
+
+  @override
+  String get exploreMyMoments => 'わたしの瞬間';
+
+  @override
+  String get exploreMyMomentsDesc => '幸せとハイライトの瞬間を記録';
+
+  @override
+  String get exploreHabitPact => '習慣との約束';
+
+  @override
+  String get exploreHabitPactDesc => '原子習慣の4つの法則で新しい習慣をデザイン';
+
+  @override
+  String get exploreWorryUnload => '心配ごとの棚卸し';
+
+  @override
+  String get exploreWorryUnloadDesc => '心配ごとを分類：手放す・行動する・受け入れる';
+
+  @override
+  String get exploreSelfPraise => '自分を褒める会';
+
+  @override
+  String get exploreSelfPraiseDesc => '自分の5つの長所を書き出そう';
+
+  @override
+  String get exploreSupportMap => 'わたしを支える人';
+
+  @override
+  String get exploreSupportMapDesc => '支えてくれる人を記録';
+
+  @override
+  String get exploreFutureSelf => '未来のわたし';
+
+  @override
+  String get exploreFutureSelfDesc => '3つの未来の自分を想像しよう';
+
+  @override
+  String get exploreIdealVsReal => '理想の自分 vs. 今の自分';
+
+  @override
+  String get exploreIdealVsRealDesc => '理想と現実の重なりを見つけよう';
+
+  @override
+  String get highlightScreenTitle => 'わたしの瞬間';
+
+  @override
+  String get highlightTabHappy => '幸せな瞬間';
+
+  @override
+  String get highlightTabHighlight => 'ハイライト';
+
+  @override
+  String get highlightEmptyHappy => '幸せな瞬間はまだありません';
+
+  @override
+  String get highlightEmptyHighlight => 'ハイライトはまだありません';
+
+  @override
+  String highlightLoadError(String error) {
+    return '読み込みに失敗: $error';
+  }
+
+  @override
+  String get monthlyPlanScreenTitle => '月間プラン';
+
+  @override
+  String get monthlyPlanSave => '保存';
+
+  @override
+  String get monthlyPlanSaveSuccess => '保存しました';
+
+  @override
+  String get monthlyPlanSaveError => '保存に失敗しました';
+
+  @override
+  String get monthlyPlanGoalsSection => '月間目標';
+
+  @override
+  String get monthlyPlanChallengeSection => '小さな勝利チャレンジ';
+
+  @override
+  String get monthlyPlanChallengeNameLabel => 'チャレンジ習慣名';
+
+  @override
+  String get monthlyPlanChallengeNameHint => '例：毎日10分ランニング';
+
+  @override
+  String get monthlyPlanRewardLabel => '達成後のごほうび';
+
+  @override
+  String get monthlyPlanRewardHint => '例：読みたい本を買う';
+
+  @override
+  String get monthlyPlanSelfCareSection => '自分を大切にする活動';
+
+  @override
+  String monthlyPlanActivityHint(int index) {
+    return '活動 $index';
+  }
+
+  @override
+  String get monthlyPlanMemorySection => '今月の思い出';
+
+  @override
+  String get monthlyPlanMemoryHint => '今月いちばん素敵な思い出は...';
+
+  @override
+  String get monthlyPlanAchievementSection => '今月の達成';
+
+  @override
+  String get monthlyPlanAchievementHint => '今月いちばん誇らしい達成は...';
+
+  @override
+  String yearlyPlanScreenTitle(int year) {
+    return '$year年 年間プラン';
+  }
+
+  @override
+  String get yearlyPlanSave => '保存';
+
+  @override
+  String get yearlyPlanSaveSuccess => '保存しました';
+
+  @override
+  String get yearlyPlanSaveError => '保存に失敗しました';
+
+  @override
+  String get yearlyPlanMessagesSection => '年間メッセージ';
+
+  @override
+  String get yearlyPlanGrowthSection => '成長プラン';
+
+  @override
+  String get growthReviewScreenTitle => '成長のふりかえり';
+
+  @override
+  String get growthReviewMyMoments => 'わたしの特別な瞬間';
+
+  @override
+  String get growthReviewEmptyMoments => 'ハイライトはまだありません';
+
+  @override
+  String get growthReviewMySummary => 'わたしのまとめ';
+
+  @override
+  String get growthReviewSummaryPrompt => 'この旅を振り返って、自分に何を伝えたい？';
+
+  @override
+  String get growthReviewSmallWins => '小さな勝利の表彰';
+
+  @override
+  String get growthReviewConsistentRecord => '記録を継続';
+
+  @override
+  String growthReviewRecordedDays(int count) {
+    return '$count日間記録しました';
+  }
+
+  @override
+  String get growthReviewWeeklyChamp => '週間レビューの達人';
+
+  @override
+  String growthReviewCompletedReviews(int count) {
+    return '$count回の週間レビューを完了';
+  }
+
+  @override
+  String get growthReviewWarmClose => 'あたたかいフィナーレ';
+
+  @override
+  String get growthReviewEveryStar => '毎日の記録はひとつの星';
+
+  @override
+  String growthReviewKeepShining(int count) {
+    return '$count個の星を集めました。これからも輝き続けよう！';
+  }
+
+  @override
+  String get futureSelfScreenTitle => '未来のわたし';
+
+  @override
+  String get futureSelfSubtitle => '3つの未来の自分を想像しよう';
+
+  @override
+  String get futureSelfHint => '完璧な答えは要りません。想像を自由に';
+
+  @override
+  String get futureSelfStable => '安定した未来';
+
+  @override
+  String get futureSelfStableHint => 'すべて順調なら、どんな生活をしている？';
+
+  @override
+  String get futureSelfFree => '自由な未来';
+
+  @override
+  String get futureSelfFreeHint => '制限がなかったら、何がしたい？';
+
+  @override
+  String get futureSelfPace => '自分のペースで歩む未来';
+
+  @override
+  String get futureSelfPaceHint => '焦らず、あなたの理想のペースは？';
+
+  @override
+  String get futureSelfCoreLabel => '本当に大切にしたいことは？';
+
+  @override
+  String get futureSelfCoreHint => '3つの未来に共通するものは？それがあなたの本当に大切なこと...';
+
+  @override
+  String get habitPactScreenTitle => '習慣との約束';
+
+  @override
+  String get habitPactStep1 => 'どんな習慣を身につけたい？';
+
+  @override
+  String get habitPactCategoryLearning => '学び';
+
+  @override
+  String get habitPactCategoryHealth => '健康';
+
+  @override
+  String get habitPactCategoryRelationship => '人間関係';
+
+  @override
+  String get habitPactCategoryHobby => '趣味';
+
+  @override
+  String get habitPactHabitLabel => '具体的な習慣';
+
+  @override
+  String get habitPactHabitHint => '例：毎日20ページ読む';
+
+  @override
+  String get habitPactStep2 => '習慣の4つの法則';
+
+  @override
+  String get habitPactLawVisible => '目に見える';
+
+  @override
+  String get habitPactLawVisibleHint => 'きっかけを置く場所は...';
+
+  @override
+  String get habitPactLawAttractive => 'やりたくなる';
+
+  @override
+  String get habitPactLawAttractiveHint => 'これと組み合わせる...';
+
+  @override
+  String get habitPactLawEasy => 'かんたん';
+
+  @override
+  String get habitPactLawEasyHint => '最小バージョンは...';
+
+  @override
+  String get habitPactLawRewarding => 'ごほうびがある';
+
+  @override
+  String get habitPactLawRewardingHint => '終わったら自分にごほうび...';
+
+  @override
+  String get habitPactStep3 => 'アクション宣言';
+
+  @override
+  String get habitPactDeclarationEmpty => '上を入力すると宣言が自動生成されます...';
+
+  @override
+  String habitPactDeclarationPrefix(String habit) {
+    return '「$habit」の習慣を身につけます';
+  }
+
+  @override
+  String habitPactDeclarationWhen(String cue) {
+    return '$cueのとき';
+  }
+
+  @override
+  String habitPactDeclarationWill(String response) {
+    return '$responseをする';
+  }
+
+  @override
+  String habitPactDeclarationThen(String reward) {
+    return 'そして$reward';
+  }
+
+  @override
+  String get idealVsRealScreenTitle => '理想の自分 vs. 今の自分';
+
+  @override
+  String get idealVsRealIdeal => '理想の自分';
+
+  @override
+  String get idealVsRealIdealHint => 'どんな人になりたい？';
+
+  @override
+  String get idealVsRealReal => '今の自分';
+
+  @override
+  String get idealVsRealRealHint => '今の自分はどんな人？';
+
+  @override
+  String get idealVsRealSame => '共通点は？';
+
+  @override
+  String get idealVsRealSameHint => '理想と現実で、もう重なっているところは？';
+
+  @override
+  String get idealVsRealDiff => '違いは？';
+
+  @override
+  String get idealVsRealDiffHint => 'ギャップはどこ？どう感じる？';
+
+  @override
+  String get idealVsRealStep => '理想に近づくための小さな一歩';
+
+  @override
+  String get idealVsRealStepHint => '今日できる小さなことは...';
+
+  @override
+  String get selfPraiseScreenTitle => '自分を褒める会';
+
+  @override
+  String get selfPraiseSubtitle => 'あなたの5つの長所を書こう';
+
+  @override
+  String get selfPraiseHint => '誰もが認められる価値がある、特に自分自身に';
+
+  @override
+  String selfPraiseStrengthLabel(int index) {
+    return '長所 $index';
+  }
+
+  @override
+  String get selfPraisePrompt1 => 'いちばん温かい性格は...';
+
+  @override
+  String get selfPraisePrompt2 => '得意なことは...';
+
+  @override
+  String get selfPraisePrompt3 => 'よく褒められることは...';
+
+  @override
+  String get selfPraisePrompt4 => '自分を誇りに思うところは...';
+
+  @override
+  String get selfPraisePrompt5 => 'ユニークなところは...';
+
+  @override
+  String get supportMapScreenTitle => 'わたしを支える人';
+
+  @override
+  String get supportMapSubtitle => '誰があなたを支えてくれてる？';
+
+  @override
+  String get supportMapHint => '大切な人を記録して、ひとりじゃないことを思い出そう';
+
+  @override
+  String get supportMapNameLabel => '名前';
+
+  @override
+  String get supportMapRelationLabel => '関係';
+
+  @override
+  String get supportMapRelationHint => '例：友人/家族/同僚';
+
+  @override
+  String get supportMapAdd => '追加';
+
+  @override
+  String get worryUnloadScreenTitle => '心配ごとの棚卸し';
+
+  @override
+  String worryUnloadLoadError(String error) {
+    return '読み込みに失敗: $error';
+  }
+
+  @override
+  String get worryUnloadEmptyTitle => '心配ごとはありません';
+
+  @override
+  String get worryUnloadEmptyHint => 'すばらしい！今日は気楽な一日';
+
+  @override
+  String get worryUnloadIntro => '心配ごとを見て、分類してみよう';
+
+  @override
+  String get worryUnloadLetGo => '手放せる';
+
+  @override
+  String get worryUnloadTakeAction => '行動できる';
+
+  @override
+  String get worryUnloadAccept => '今は受け入れる';
+
+  @override
+  String get worryUnloadResultTitle => '棚卸し結果';
+
+  @override
+  String worryUnloadSummary(String label, int count) {
+    return '$label: $count 件';
+  }
+
+  @override
+  String get worryUnloadEncouragement => '分類するだけでも一歩前進。';
+
+  @override
+  String get commonSaved => '保存しました';
+
+  @override
+  String get commonSaveError => '保存に失敗しました';
+
+  @override
+  String get commonLoadError => '読み込みに失敗しました';
+
+  @override
+  String get momentEditTitle => '瞬間を編集';
+
+  @override
+  String get momentNewHappy => '幸せな瞬間を記録';
+
+  @override
+  String get momentNewHighlight => 'ハイライトを記録';
+
+  @override
+  String get momentDescHappy => '幸せなこと';
+
+  @override
+  String get momentDescHighlight => '何があった？';
+
+  @override
+  String get momentCompanionHappy => '誰と一緒だった？';
+
+  @override
+  String get momentCompanionHighlight => '何をした？';
+
+  @override
+  String get momentFeeling => '気持ち';
+
+  @override
+  String get momentDate => '日付 (YYYY-MM-DD)';
+
+  @override
+  String get momentRating => '評価';
+
+  @override
+  String get momentDescRequired => '説明を入力してね';
+
+  @override
+  String momentWithCompanion(String companion) {
+    return '$companionと一緒に';
+  }
+
+  @override
+  String momentDidAction(String action) {
+    return 'やったこと：$action';
+  }
+
+  @override
+  String get annualCalendarTitle => '年間カレンダー';
+
+  @override
+  String annualCalendarMonthLabel(int month) {
+    return '$month月';
+  }
 }

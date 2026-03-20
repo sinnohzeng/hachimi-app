@@ -37,6 +37,7 @@ class AccountMergeService {
 
     if (oldUid != newUid) {
       await _ledger.deleteUidData(oldUid);
+      await _deleteMonthlyActivityPrefs(oldUid);
     }
 
     await _prefs.remove(AppPrefsKeys.localGuestUid);
@@ -61,6 +62,7 @@ class AccountMergeService {
     // 1. 关键：本地 UID 迁移（SQLite 事务，原子操作）
     if (oldUid != newUid) {
       await _ledger.migrateUid(oldUid, newUid);
+      await _migrateMonthlyActivityPrefs(oldUid, newUid);
     }
 
     // 2. 确保 Firestore 用户文档存在
@@ -80,6 +82,38 @@ class AccountMergeService {
 
     // 5. Best-effort: 清理旧账号云端孤立数据
     _wipeCloudBestEffort();
+  }
+
+  /// 月度活动 SharedPreferences key 后缀列表。
+  static const _monthlyActivityKeySuffixes = [
+    'support_map',
+    'self_praise',
+    'future_self',
+    'ideal_vs_real',
+    'habit_pact',
+  ];
+
+  /// 删除指定 UID 的月度活动 SharedPreferences 数据。
+  Future<void> _deleteMonthlyActivityPrefs(String uid) async {
+    for (final suffix in _monthlyActivityKeySuffixes) {
+      await _prefs.remove('lumi_${uid}_$suffix');
+    }
+  }
+
+  /// 将月度活动 SharedPreferences key 从 oldUid 迁移到 newUid。
+  Future<void> _migrateMonthlyActivityPrefs(
+    String oldUid,
+    String newUid,
+  ) async {
+    for (final suffix in _monthlyActivityKeySuffixes) {
+      final oldKey = 'lumi_${oldUid}_$suffix';
+      final newKey = 'lumi_${newUid}_$suffix';
+      final value = _prefs.getString(oldKey);
+      if (value != null) {
+        await _prefs.setString(newKey, value);
+        await _prefs.remove(oldKey);
+      }
+    }
   }
 
   /// 云端清理 fire-and-forget — 失败仅记录，不影响用户体验。

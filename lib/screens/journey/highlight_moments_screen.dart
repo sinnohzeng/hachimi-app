@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/highlight_entry.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/providers/list_highlight_providers.dart';
@@ -19,11 +20,11 @@ class HighlightMomentsScreen extends ConsumerWidget {
       length: 2,
       child: AppScaffold(
         appBar: AppBar(
-          title: const Text('我的时刻'),
-          bottom: const TabBar(
+          title: Text(context.l10n.highlightScreenTitle),
+          bottom: TabBar(
             tabs: [
-              Tab(text: '幸福时刻'),
-              Tab(text: '高光时刻'),
+              Tab(text: context.l10n.highlightTabHappy),
+              Tab(text: context.l10n.highlightTabHighlight),
             ],
           ),
         ),
@@ -53,7 +54,9 @@ class _MomentListTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) {
         debugPrint('[HighlightMomentsScreen] Error: $e');
-        return Center(child: Text('加载失败: $e'));
+        return Center(
+          child: Text(context.l10n.highlightLoadError(e.toString())),
+        );
       },
       data: (entries) => _buildContent(context, ref, entries),
     );
@@ -82,7 +85,9 @@ class _MomentListTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      type == HighlightType.happy ? '还没有记录幸福时刻' : '还没有记录高光时刻',
+                      type == HighlightType.happy
+                          ? context.l10n.highlightEmptyHappy
+                          : context.l10n.highlightEmptyHighlight,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -143,10 +148,12 @@ class _MomentListTab extends ConsumerWidget {
 
     try {
       await ref.read(listHighlightRepositoryProvider).saveHighlight(uid, entry);
-      if (context.mounted) AppFeedback.success(context, '已保存');
+      if (context.mounted)
+        AppFeedback.success(context, context.l10n.commonSaved);
     } on Exception catch (e) {
       debugPrint('[HighlightMomentsScreen] Save failed: $e');
-      if (context.mounted) AppFeedback.error(context, '保存失败');
+      if (context.mounted)
+        AppFeedback.error(context, context.l10n.commonSaveError);
     }
   }
 }

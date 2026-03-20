@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
@@ -27,7 +28,10 @@ class MoodTrackerCard extends ConsumerWidget {
               children: [
                 Icon(Icons.mood, size: 20, color: colorScheme.primary),
                 const SizedBox(width: AppSpacing.sm),
-                Text('心情追踪', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.moodTrackerTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -40,7 +44,7 @@ class MoodTrackerCard extends ConsumerWidget {
               error: (e, _) {
                 debugPrint('[MoodTrackerCard] Load error: $e');
                 return Text(
-                  '加载失败',
+                  context.l10n.commonLoadError,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
                   ),
@@ -130,7 +134,7 @@ class MoodTrackerCard extends ConsumerWidget {
                 Text(mood.emoji, style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 2),
                 Text(
-                  '$count 次',
+                  context.l10n.moodTrackerCount(count),
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

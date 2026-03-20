@@ -1,7 +1,9 @@
-v2.38.0
+v2.39.0 — LUMI
 
-- Improved code quality and stability across the app
-- Fixed silent errors that could cause data loss during sync
-- Fixed memory leak in cat sprite rendering
-- Better error messages when things go wrong
-- 125 new automated tests for reliability
+- 3 แท็บใหม่: วันนี้, เดินทาง, โปรไฟล์
+- บันทึกอารมณ์วันละบรรทัด
+- เป้าหมายรายสัปดาห์ เดือน ปี
+- 6 กิจกรรมเพื่อการเติบโต
+- ไฮไลท์และบันทึกความสุข
+- ปลดล็อกตามสตรีค
+- รองรับ 15 ภาษา

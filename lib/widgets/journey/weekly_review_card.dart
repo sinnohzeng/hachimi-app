@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
 
 /// 周回顾摘要卡 — 显示 3 个幸福时刻完成度，点击进入周回顾页。
@@ -14,6 +15,7 @@ class WeeklyReviewCard extends ConsumerWidget {
     final reviewAsync = ref.watch(currentWeekReviewProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     return Card(
       child: InkWell(
@@ -34,7 +36,7 @@ class WeeklyReviewCard extends ConsumerWidget {
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
-                        '记录本周的幸福时刻', // TODO: l10n
+                        l10n.weeklyReviewEmpty,
                         style: textTheme.titleSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -60,7 +62,7 @@ class WeeklyReviewCard extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      '幸福时刻', // TODO: l10n
+                      l10n.weeklyReviewHappyMoments,
                       style: textTheme.titleSmall,
                     ),
                   ),
@@ -80,7 +82,7 @@ class WeeklyReviewCard extends ConsumerWidget {
             error: (e, _) {
               debugPrint('[WeeklyReviewCard] Load error: $e');
               return Text(
-                '加载失败', // TODO: l10n
+                l10n.weeklyReviewLoadError,
                 style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
               );
             },

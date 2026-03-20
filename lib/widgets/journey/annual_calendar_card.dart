@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/models/mood.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
@@ -29,7 +30,10 @@ class AnnualCalendarCard extends ConsumerWidget {
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('我的年历', style: textTheme.titleSmall),
+                Text(
+                  context.l10n.annualCalendarTitle,
+                  style: textTheme.titleSmall,
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -40,7 +44,7 @@ class AnnualCalendarCard extends ConsumerWidget {
 
               return _MonthRow(
                 monthStr: monthStr,
-                monthLabel: '$month 月',
+                monthLabel: context.l10n.annualCalendarMonthLabel(month),
                 year: year,
                 month: month,
               );

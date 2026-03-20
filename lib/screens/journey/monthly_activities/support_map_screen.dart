@@ -1,22 +1,30 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/app_feedback.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/auth_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 我身边的人 — 记录支持你的人。
-class SupportMapScreen extends StatefulWidget {
+class SupportMapScreen extends ConsumerStatefulWidget {
   const SupportMapScreen({super.key});
 
   @override
-  State<SupportMapScreen> createState() => _SupportMapScreenState();
+  ConsumerState<SupportMapScreen> createState() => _SupportMapScreenState();
 }
 
-class _SupportMapScreenState extends State<SupportMapScreen> {
-  static const _prefsKey = 'lumi_support_map';
+class _SupportMapScreenState extends ConsumerState<SupportMapScreen> {
+  static const _prefsKeySuffix = 'support_map';
+
+  String get _prefsKey {
+    final uid = ref.read(currentUidProvider) ?? 'guest';
+    return 'lumi_${uid}_$_prefsKeySuffix';
+  }
 
   final _entries = <_SupportEntry>[];
   bool _isSaving = false;
@@ -92,12 +100,12 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
       await prefs.setString(_prefsKey, jsonEncode(data));
 
       if (mounted) {
-        AppFeedback.success(context, '已保存');
+        AppFeedback.success(context, context.l10n.commonSaved);
         Navigator.of(context).pop();
       }
     } on Exception catch (e) {
       debugPrint('[SupportMapScreen] Save failed: $e');
-      if (mounted) AppFeedback.error(context, '保存失败');
+      if (mounted) AppFeedback.error(context, context.l10n.commonSaveError);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -120,7 +128,7 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('我身边的人')),
+      appBar: AppBar(title: Text(context.l10n.supportMapScreenTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isSaving ? null : _save,
         icon: _isSaving
@@ -130,17 +138,17 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.check),
-        label: const Text('保存'),
+        label: Text(context.l10n.commonSave),
       ),
       body: SingleChildScrollView(
         padding: AppSpacing.paddingScreenBodyFull,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('谁在支持你？', style: textTheme.titleMedium),
+            Text(context.l10n.supportMapSubtitle, style: textTheme.titleMedium),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '记录身边重要的人，提醒自己并不孤单',
+              context.l10n.supportMapHint,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -161,7 +169,7 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
                             TextField(
                               controller: _entries[i].nameController,
                               decoration: InputDecoration(
-                                labelText: '姓名',
+                                labelText: context.l10n.supportMapNameLabel,
                                 border: OutlineInputBorder(
                                   borderRadius: AppShape.borderSmall,
                                 ),
@@ -172,8 +180,8 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
                             TextField(
                               controller: _entries[i].relationshipController,
                               decoration: InputDecoration(
-                                labelText: '关系',
-                                hintText: '例：朋友/家人/同事',
+                                labelText: context.l10n.supportMapRelationLabel,
+                                hintText: context.l10n.supportMapRelationHint,
                                 border: OutlineInputBorder(
                                   borderRadius: AppShape.borderSmall,
                                 ),
@@ -202,7 +210,7 @@ class _SupportMapScreenState extends State<SupportMapScreen> {
               child: TextButton.icon(
                 onPressed: _addEntry,
                 icon: const Icon(Icons.add),
-                label: const Text('添加'),
+                label: Text(context.l10n.supportMapAdd),
               ),
             ),
 

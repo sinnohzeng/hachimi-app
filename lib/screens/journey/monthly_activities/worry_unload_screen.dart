@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/worry.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
@@ -17,7 +18,15 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
   // key: worry id, value: category
   final _categories = <String, String>{};
 
-  static const _categoryOptions = ['可以放下', '可以行动', '暂时接受'];
+  List<String> _categoryOptions(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.worryUnloadLetGo,
+      l10n.worryUnloadTakeAction,
+      l10n.worryUnloadAccept,
+    ];
+  }
+
   static const _categoryIcons = [
     Icons.cloud_off_outlined,
     Icons.directions_run_outlined,
@@ -31,12 +40,14 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('烦恼减负日')),
+      appBar: AppBar(title: Text(context.l10n.worryUnloadScreenTitle)),
       body: worriesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) {
           debugPrint('[WorryUnloadScreen] Error: $e');
-          return Center(child: Text('加载失败: $e'));
+          return Center(
+            child: Text(context.l10n.worryUnloadLoadError(e.toString())),
+          );
         },
         data: (worries) =>
             _buildContent(context, worries, textTheme, colorScheme),
@@ -61,10 +72,13 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
               color: colorScheme.primary,
             ),
             const SizedBox(height: AppSpacing.md),
-            Text('没有进行中的烦恼', style: textTheme.bodyLarge),
+            Text(
+              context.l10n.worryUnloadEmptyTitle,
+              style: textTheme.bodyLarge,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '太棒了！今天是轻松的一天',
+              context.l10n.worryUnloadEmptyHint,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -75,15 +89,16 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
     }
 
     // 统计
-    final letGo = _categories.values.where((v) => v == '可以放下').length;
-    final action = _categories.values.where((v) => v == '可以行动').length;
-    final accept = _categories.values.where((v) => v == '暂时接受').length;
+    final catOptions = _categoryOptions(context);
+    final letGo = _categories.values.where((v) => v == catOptions[0]).length;
+    final action = _categories.values.where((v) => v == catOptions[1]).length;
+    final accept = _categories.values.where((v) => v == catOptions[2]).length;
 
     return ListView(
       padding: AppSpacing.paddingScreenBodyFull,
       children: [
         Text(
-          '看看你的烦恼，为它们分个类吧',
+          context.l10n.worryUnloadIntro,
           style: textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -91,7 +106,7 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
         const SizedBox(height: AppSpacing.md),
 
         ...worries.map(
-          (worry) => _buildWorryTile(worry, textTheme, colorScheme),
+          (worry) => _buildWorryTile(context, worry, textTheme, colorScheme),
         ),
 
         const SizedBox(height: AppSpacing.lg),
@@ -100,14 +115,35 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
         if (_categories.isNotEmpty) ...[
           const Divider(),
           const SizedBox(height: AppSpacing.md),
-          Text('减负结果', style: textTheme.titleSmall),
+          Text(
+            context.l10n.worryUnloadResultTitle,
+            style: textTheme.titleSmall,
+          ),
           const SizedBox(height: AppSpacing.sm),
-          _summaryRow(colorScheme, textTheme, '可以放下', letGo, Colors.green),
-          _summaryRow(colorScheme, textTheme, '可以行动', action, Colors.blue),
-          _summaryRow(colorScheme, textTheme, '暂时接受', accept, Colors.orange),
+          _summaryRow(
+            colorScheme,
+            textTheme,
+            catOptions[0],
+            letGo,
+            Colors.green,
+          ),
+          _summaryRow(
+            colorScheme,
+            textTheme,
+            catOptions[1],
+            action,
+            Colors.blue,
+          ),
+          _summaryRow(
+            colorScheme,
+            textTheme,
+            catOptions[2],
+            accept,
+            Colors.orange,
+          ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            '每一个分类都是前进的一步。',
+            context.l10n.worryUnloadEncouragement,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
@@ -120,11 +156,13 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
   }
 
   Widget _buildWorryTile(
+    BuildContext context,
     Worry worry,
     TextTheme textTheme,
     ColorScheme colorScheme,
   ) {
     final selected = _categories[worry.id];
+    final catOptions = _categoryOptions(context);
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Padding(
@@ -136,17 +174,17 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: List.generate(3, (i) {
-                final isSelected = selected == _categoryOptions[i];
+                final isSelected = selected == catOptions[i];
                 return Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: ChoiceChip(
                     avatar: Icon(_categoryIcons[i], size: 16),
-                    label: Text(_categoryOptions[i]),
+                    label: Text(catOptions[i]),
                     selected: isSelected,
                     onSelected: (v) {
                       setState(() {
                         if (v) {
-                          _categories[worry.id] = _categoryOptions[i];
+                          _categories[worry.id] = catOptions[i];
                         } else {
                           _categories.remove(worry.id);
                         }
@@ -179,7 +217,10 @@ class _WorryUnloadScreenState extends ConsumerState<WorryUnloadScreen> {
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Text('$label: $count 个', style: textTheme.bodyMedium),
+          Text(
+            context.l10n.worryUnloadSummary(label, count),
+            style: textTheme.bodyMedium,
+          ),
         ],
       ),
     );

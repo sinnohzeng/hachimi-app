@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hachimi_app/core/constants/app_prefs_keys.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
-import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
+import 'package:hachimi_app/providers/lumi_user_provider.dart';
 import 'package:hachimi_app/widgets/content_width_constraint.dart';
 import 'package:hachimi_app/widgets/today/quick_light_card.dart';
 import 'package:hachimi_app/widgets/today/habit_snapshot_card.dart';
@@ -15,10 +15,10 @@ class TodayScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prefs = ref.read(sharedPreferencesProvider);
-    final userName = prefs.getString(AppPrefsKeys.lumiUserName) ?? '';
-    final greeting = _buildGreeting(userName);
-    final dateStr = DateFormat('M月d日 EEEE', 'zh_CN').format(DateTime.now());
+    final userName = ref.watch(lumiUserNameProvider);
+    final greeting = _buildGreeting(context, userName);
+    final locale = Localizations.localeOf(context).toString();
+    final dateStr = DateFormat.yMMMEd(locale).format(DateTime.now());
 
     return ContentWidthConstraint(
       child: CustomScrollView(
@@ -64,13 +64,20 @@ class TodayScreen extends ConsumerWidget {
   }
 
   /// 根据时间段和用户名生成问候语。
-  static String _buildGreeting(String name) {
+  static String _buildGreeting(BuildContext context, String name) {
     final hour = DateTime.now().hour;
-    final suffix = name.isNotEmpty ? '，$name' : '';
+    final l10n = context.l10n;
 
-    if (hour < 6) return '夜深了$suffix'; // TODO: l10n
-    if (hour < 12) return '早安$suffix'; // TODO: l10n
-    if (hour < 18) return '下午好$suffix'; // TODO: l10n
-    return '晚上好$suffix'; // TODO: l10n
+    if (name.isNotEmpty) {
+      if (hour < 6) return l10n.greetingLateNight(name);
+      if (hour < 12) return l10n.greetingMorning(name);
+      if (hour < 18) return l10n.greetingAfternoon(name);
+      return l10n.greetingEvening(name);
+    }
+
+    if (hour < 6) return l10n.greetingLateNightNoName;
+    if (hour < 12) return l10n.greetingMorningNoName;
+    if (hour < 18) return l10n.greetingAfternoonNoName;
+    return l10n.greetingEveningNoName;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/journey_providers.dart';
 
 /// 小赢挑战卡片 — 30 天习惯挑战 + 四法则提示。
@@ -30,7 +31,7 @@ class SmallWinChallengeCard extends ConsumerWidget {
                   color: colorScheme.tertiary,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('小赢挑战', style: textTheme.titleSmall),
+                Text(context.l10n.smallWinTitle, style: textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -41,7 +42,7 @@ class SmallWinChallengeCard extends ConsumerWidget {
                   return Padding(
                     padding: AppSpacing.paddingVSm,
                     child: Text(
-                      '设定一个 $daysInMonth 天小挑战，每天坚持一点点',
+                      context.l10n.smallWinEmpty(daysInMonth),
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -67,7 +68,9 @@ class SmallWinChallengeCard extends ConsumerWidget {
                           const SizedBox(width: AppSpacing.xs),
                           Expanded(
                             child: Text(
-                              '奖励: ${plan.challengeReward}',
+                              context.l10n.smallWinReward(
+                                plan.challengeReward!,
+                              ),
                               style: textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
@@ -86,7 +89,7 @@ class SmallWinChallengeCard extends ConsumerWidget {
               error: (e, _) {
                 debugPrint('[SmallWinChallengeCard] Load error: $e');
                 return Text(
-                  '加载失败',
+                  context.l10n.commonLoadError,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
                   ),
@@ -103,14 +106,20 @@ class SmallWinChallengeCard extends ConsumerWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: ['看得见', '想去做', '易上手', '有奖励'].map((label) {
-                  return Text(
-                    label,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onTertiaryContainer,
-                    ),
-                  );
-                }).toList(),
+                children:
+                    [
+                      context.l10n.smallWinLawVisible,
+                      context.l10n.smallWinLawAttractive,
+                      context.l10n.smallWinLawEasy,
+                      context.l10n.smallWinLawRewarding,
+                    ].map((label) {
+                      return Text(
+                        label,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onTertiaryContainer,
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
           ],

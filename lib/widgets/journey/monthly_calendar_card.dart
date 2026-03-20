@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hachimi_app/core/router/app_router.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/core/utils/date_utils.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/models/daily_light.dart';
 import 'package:hachimi_app/providers/awareness_providers.dart';
+import 'package:intl/intl.dart';
 
 /// 月历卡片 — 日历网格，每天显示心情 emoji。
 class MonthlyCalendarCard extends ConsumerWidget {
@@ -33,7 +35,7 @@ class MonthlyCalendarCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  '${now.year} 年 ${now.month} 月',
+                  context.l10n.monthlyCalendarYearMonth(now.year, now.month),
                   style: textTheme.titleSmall,
                 ),
               ],
@@ -52,7 +54,7 @@ class MonthlyCalendarCard extends ConsumerWidget {
               error: (e, _) {
                 debugPrint('[MonthlyCalendarCard] Load error: $e');
                 return Text(
-                  '加载失败',
+                  context.l10n.commonLoadError,
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.error,
                   ),
@@ -66,7 +68,12 @@ class MonthlyCalendarCard extends ConsumerWidget {
   }
 
   Widget _buildWeekdayHeader(BuildContext context) {
-    const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
+    final locale = Localizations.localeOf(context).toString();
+    final symbols = DateFormat('', locale).dateSymbols;
+    // narrowWeekdays: [S, M, T, W, T, F, S] (Sunday-first)
+    // Rotate to Monday-first
+    final narrow = symbols.NARROWWEEKDAYS;
+    final weekdays = [...narrow.sublist(1), narrow[0]];
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 

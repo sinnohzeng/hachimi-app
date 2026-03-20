@@ -5,6 +5,7 @@ import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
 import 'package:hachimi_app/l10n/l10n_ext.dart';
 import 'package:hachimi_app/providers/auth_provider.dart';
+import 'package:hachimi_app/providers/lumi_user_provider.dart';
 import 'package:hachimi_app/widgets/app_scaffold.dart';
 import 'package:intl/intl.dart';
 
@@ -82,6 +83,7 @@ class _LumiOnboardingScreenState extends ConsumerState<LumiOnboardingScreen>
 
     if (name.isNotEmpty) {
       await prefs.setString(AppPrefsKeys.lumiUserName, name);
+      ref.read(lumiUserNameProvider.notifier).update(name);
     }
 
     final birthday =

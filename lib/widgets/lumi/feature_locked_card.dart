@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hachimi_app/core/theme/app_shape.dart';
 import 'package:hachimi_app/core/theme/app_spacing.dart';
+import 'package:hachimi_app/l10n/l10n_ext.dart';
 
 /// 功能锁定占位卡 — 温暖的"即将解锁"提示。
 class FeatureLockedCard extends StatelessWidget {
@@ -25,6 +26,7 @@ class FeatureLockedCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final remaining = requiredDays - currentDays;
+    final l10n = context.l10n;
 
     return Card(
       elevation: 0,
@@ -55,8 +57,8 @@ class FeatureLockedCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               remaining > 0
-                  ? '再记录 $remaining 天后解锁' // TODO: l10n
-                  : '即将解锁', // TODO: l10n
+                  ? l10n.featureLockedDaysRemaining(remaining)
+                  : l10n.featureLockedSoon,
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
