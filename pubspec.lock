@@ -61,10 +61,10 @@ packages:
     dependency: "direct main"
     description:
       name: atmospheric_particles
-      sha256: "9c3debf4d6bc733bb1e3eb61296bcf3d8316907829abcce0c7c531cd3d5849c1"
+      sha256: "259e1861ecb0fb9fe1f0fd970bec45384af472f23f5813f08e7b27026dab6e7b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.4.0"
   boolean_selector:
     dependency: transitive
     description:
